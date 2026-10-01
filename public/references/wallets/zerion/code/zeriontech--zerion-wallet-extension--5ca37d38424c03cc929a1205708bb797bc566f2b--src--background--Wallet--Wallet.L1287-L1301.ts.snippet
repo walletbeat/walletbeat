@@ -1,0 +1,46 @@
+{
+	"highlightFirstLine": 1287,
+	"highlightLastLine": 1301,
+	"segments": [
+		{
+			"lines": [
+				"export class Wallet {"
+			],
+			"startLine": 213
+		},
+		{
+			"lines": [
+				"  }: WalletMethodParams<{ transaction: IncomingTransactionWithChainId }>) {"
+			],
+			"startLine": 1279
+		},
+		{
+			"lines": [
+				"    const typedData = createTypedData(prepared);",
+				"    return typedData;",
+				"  }",
+				"",
+				"  private async getNodeUrlByChainId(chainId: ChainId) {",
+				"    const networksStore = getNetworksStore(Model.getPreferences(this.record));",
+				"    const networks = await networksStore.loadNetworksByChainId(chainId);",
+				"    return networks.getRpcUrlInternal(networks.getChainById(chainId));",
+				"  }",
+				"",
+				"  private async getZkSyncProvider(chainId: ChainId) {",
+				"    const nodeUrl = await this.getNodeUrlByChainId(chainId);",
+				"    return new ZksProvider(nodeUrl); // return new ethers.providers.JsonRpcProvider(nodeUrl);",
+				"  }",
+				"",
+				"  private async getProvider(chainId: ChainId) {",
+				"    const nodeUrl = await this.getNodeUrlByChainId(chainId);",
+				"    return new ethers.JsonRpcProvider(nodeUrl);",
+				"  }",
+				"",
+				"  private getKeypairByAddress(address: string): Keypair {",
+				"    this.ensureRecord(this.record);",
+				"    invariant(isSolanaAddress(address), 'Keypairs are for solana addresseses');"
+			],
+			"startLine": 1283
+		}
+	]
+}

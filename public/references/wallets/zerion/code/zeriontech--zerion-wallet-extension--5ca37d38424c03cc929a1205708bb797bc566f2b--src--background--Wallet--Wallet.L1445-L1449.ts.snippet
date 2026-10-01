@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 1445,
+	"highlightLastLine": 1449,
+	"segments": [
+		{
+			"lines": [
+				"export class Wallet {"
+			],
+			"startLine": 213
+		},
+		{
+			"lines": [
+				"  }): Promise<SerializableTransactionResponse> {"
+			],
+			"startLine": 1380
+		},
+		{
+			"lines": [
+				"    if (paymasterEligible) {"
+			],
+			"startLine": 1421
+		},
+		{
+			"lines": [
+				"      } catch (error) {",
+				"        throw getEthersError(error);",
+				"      }",
+				"    } else {",
+				"      try {",
+				"        const signer = await this.getSigner(chainId);",
+				"        const transactionResponse = await signer.sendTransaction({",
+				"          ...transaction,",
+				"          type: transaction.type ?? undefined, // to exclude null",
+				"        });",
+				"        const safeTx = removeSignature(transactionResponse);",
+				"",
+				"        const safeTxPlain = toPlainTransactionResponse(safeTx);",
+				"        emitter.emit("
+			],
+			"startLine": 1440
+		}
+	]
+}

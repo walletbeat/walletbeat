@@ -891,15 +891,80 @@ export const zerion: SoftwareWallet = {
 				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
-				l1: {
-					ref: refTodo,
-					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+				[Variant.BROWSER]: {
+					l1: {
+						ref: [
+							{
+								file: 'public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-custom-rpc.png',
+								label: 'Zerion browser extension Ethereum network page with a custom RPC set',
+								lastRetrieved: '2026-09-28',
+							},
+							{
+								explanation: 'Zerion supports custom RPCs and sends transactions directly to them.',
+								url: [
+									{
+										label: 'Browser extension uses a custom RPC',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/networks/Networks.ts#L375-L381',
+									},
+									{
+										label: 'Browser extension connecting to a custom RPC to send transactions',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1287-L1301',
+									},
+									{
+										label: 'Browser extension sending a signed transaction through a custom RPC',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1445-L1449',
+									},
+								],
+							},
+						],
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: featureSupported,
+					},
+					l2: {
+						ref: [
+							{
+								file: 'public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-network-list.png',
+								label: 'Zerion browser extension Networks page listing Arbitrum and Base',
+								lastRetrieved: '2026-09-28',
+							},
+							{
+								explanation:
+									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								url: [
+									{
+										label:
+											"Browser extension sends the signed transaction through the network's RPC",
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1445-L1449',
+									},
+								],
+							},
+						],
+						arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					},
 				},
-				l2: {
-					ref: refTodo,
-					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+				[Variant.MOBILE]: {
+					l1: {
+						ref: {
+							explanation: "Zerion's mobile app supports custom RPCs.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-custom-rpc.png',
+							label: 'Zerion iOS Ethereum network page with an RPC URL field',
+							lastRetrieved: '2026-10-01',
+						},
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: featureSupported,
+					},
+					l2: {
+						ref: {
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png',
+							label: 'Zerion iOS Networks page listing Base, Optimism and Arbitrum',
+							lastRetrieved: '2026-10-01',
+						},
+						arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					},
 				},
 			},
 		},
