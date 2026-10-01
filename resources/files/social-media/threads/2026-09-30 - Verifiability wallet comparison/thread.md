@@ -1,27 +1,27 @@
 Ethereum prides itself on being verifiable.
 
-At @walletbeat, verifiability is a basic requirement for an Ethereum wallet.
+For wallets, that starts with one question: can you see the source code?
 
-Yet some wallets fail even this basic requirement.
+At @walletbeat, public source code is a Stage 0 requirement.
 
-A comparison of top Ethereum wallets to see where they stand 🧵
+So, how do the top Ethereum wallets stack up? 🧵
 
 BONUS: Are they fully open source?
 
 ---
 
-Why does verifiability matter?
+Why does source availability matter?
 
-Your wallets hold your private keys.
+Your wallet holds your private keys.
 
-If you can't inspect the code running your wallet, you're ultimately trusting the wallet provider to tell you what it does.
+If you can't inspect the code running your wallet, you can't verify what it does. You're trusting the wallet provider's word.
 
-Verifiable wallets should be the default.
+Source-available wallets should be the default.
 
 ---
 Taking it a step further, wallets should raise the bar and do FOSS. What does that mean?
 
-Verifiable means a wallet's source code is available to inspect.
+Source available means anyone can inspect a wallet's code.
 
 FOSS goes further: users can freely use, modify, and distribute the code.
 
@@ -184,13 +184,24 @@ Mobile app: ❌ Proprietary (only the wallet core is open source, under Apache 2
 
 ---
 
-15/18 wallets are verifiable.
+15/18 wallets are source available.
 
 Of those, only 8/15 are fully Free & Open Source.
 
-Verifiability should be a basic requirement for any Ethereum wallet.
+Source availability should be a basic requirement for any Ethereum wallet.
 
 And FOSS should be the standard.
+
+---
+
+Source code is only the first step toward a verifiable wallet.
+
+You also need:
+- Reproducible builds, so you know the app you installed matches the code
+- Visibility into external data the wallet acts on at runtime (blocklists, swap routing, fees, clear signing registries)
+- For hardware wallets, open hardware and secure elements
+
+This thread only covers the first step.
 
 ---
 
