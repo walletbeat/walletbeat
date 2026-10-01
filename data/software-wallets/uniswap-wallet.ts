@@ -578,7 +578,7 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'The send confirmation shows the amount sent (in USD and ETH), the recipient address and label, the sending wallet and the network cost. The nonce and an explicit chain/network row are not shown.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-transaction-details-send.png',
 						label: 'Uniswap Wallet send confirmation',
 					},
 					{
@@ -596,41 +596,41 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
 						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
 					},
 					{
 						explanation: 'Uniswap Wallet simulates an ERC-721 transfer and shows the NFT received.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
 						label: 'Uniswap Wallet simulation of an ERC-721 transfer',
 					},
 					{
 						explanation:
 							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
 						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
 					},
 					{
 						explanation: 'Uniswap Wallet simulates a USDC approval and shows the approved amount.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
 						label: 'Uniswap Wallet simulation of a USDC approval',
 					},
 					{
 						explanation:
 							'Uniswap Wallet simulates an Aave supply and shows the amount of USDC sent.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
 						label: 'Uniswap Wallet simulation of an Aave supply',
 					},
 					{
 						explanation:
 							'Uniswap Wallet detects a transaction that will fail and shows a "cannot estimate" error, disabling confirmation.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
 						label: 'Uniswap Wallet simulation of a failing transaction',
 					},
 					{
 						explanation:
 							'For a transaction with a nondeterministic outcome, Uniswap Wallet shows a single static simulated outcome, without warning that the outcome may differ.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
 						label: 'Uniswap Wallet simulation of a nondeterministic transaction',
 					},
 				],
@@ -638,7 +638,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
 						label: 'Uniswap Wallet signature request for an ERC-4361 message',
 					},
 				}),
