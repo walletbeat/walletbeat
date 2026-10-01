@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 476,
+	"highlightLastLine": 493,
+	"segments": [
+		{
+			"lines": [
+				"/**"
+			],
+			"startLine": 469
+		},
+		{
+			"lines": [
+				" * @param scanResult - The Blockaid scan transaction response",
+				" * @param address - The contract address to look up",
+				" * @returns The contract name if found, or undefined",
+				" */",
+				"export function extractContractName(",
+				"  scanResult: BlockaidScanTransactionResponse | null | undefined,",
+				"  address: string | undefined,",
+				"): string | undefined {",
+				"  if (!address || scanResult?.simulation?.status !== 'Success') {",
+				"    return undefined",
+				"  }",
+				"",
+				"  const addressDetails = scanResult.simulation.address_details",
+				"",
+				"  // Normalize the address to lowercase for case-insensitive lookup",
+				"  const normalizedAddress = normalizeAddress(address, AddressStringFormat.Lowercase)",
+				"  const matchingKey = Object.keys(addressDetails).find(",
+				"    (key) => normalizeAddress(key, AddressStringFormat.Lowercase) === normalizedAddress,",
+				"  )",
+				"",
+				"  return matchingKey ? addressDetails[matchingKey]?.contract_name : undefined",
+				"}"
+			],
+			"startLine": 472
+		}
+	]
+}
