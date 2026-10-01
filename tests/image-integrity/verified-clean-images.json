@@ -451,10 +451,6 @@
 		"hash": "dc9658c4794ca5dee71019bde7108be4d8c9a5bbb705817f568a9dda4a2c890b",
 		"passedTests": ["blockiness", "file-format"]
 	},
-	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_7.png": {
-		"hash": "135395666bcc767127575ec1cccf2d3de50a050d553a53a955ef3b92b6d4e553",
-		"passedTests": ["blockiness", "file-format"]
-	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png": {
 		"hash": "52406e2e1152eec025b8dbea1e7ec390ce09f839d8ddb3bb6a8999f69028ce1d",
 		"passedTests": ["blockiness", "file-format"]
