@@ -946,7 +946,7 @@ export const zerion: SoftwareWallet = {
 				[Variant.MOBILE]: {
 					l1: {
 						ref: {
-							explanation: 'Users can set their own Ethereum RPC in the mobile app.',
+							explanation: "Zerion's mobile app supports custom RPCs.",
 							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-custom-rpc.png',
 							label: 'Zerion iOS Ethereum network page with an RPC URL field',
 							lastRetrieved: '2026-10-01',
