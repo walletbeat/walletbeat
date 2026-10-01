@@ -14,7 +14,7 @@ Why does source availability matter?
 
 Your wallet holds your private keys.
 
-If you can't inspect the code running your wallet, you can't verify what it does. You're trusting the wallet provider's word.
+If you can't inspect the code running your wallet, you can't check what it does. You're trusting the wallet provider's word.
 
 Source-available wallets should be the default.
 
@@ -194,14 +194,23 @@ And FOSS should be the standard.
 
 ---
 
-Source code is only the first step toward a verifiable wallet.
+Why source availability matters:
 
-You also need:
-- Reproducible builds, so you know the app you installed matches the code
-- Visibility into external data the wallet acts on at runtime (blocklists, swap routing, fees, clear signing registries)
-- For hardware wallets, open hardware and secure elements
+Your wallet holds your keys. If the code is closed, you're trusting the provider's word on what it does.
 
-This thread only covers the first step.
+Public source code lets anyone inspect how the wallet works, so security researchers and users can spot bugs or shady behavior.
+
+But it only lets you read the code. Without a FOSS license, you can't fork, fix, or ship your own version.
+
+![Why it matters](./why-it-matters.png)
+
+---
+
+Why FOSS should be the standard:
+
+Anyone can audit, modify, and redistribute the code. Users avoid lock-in, researchers can freely find and report bugs, and other teams can build on it.
+
+That turns a wallet into a public good, which is what Ethereum is about.
 
 ---
 
