@@ -1591,6 +1591,10 @@
 		"hash": "ff8bfcb9d173257a592782a9469a2c2022424f7ba22761d7da8551b066aa3001",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/why-it-matters.png": {
+		"hash": "80fd70f3ab296e23999a59765977555ec2e90ad9a26138fa4b5c81341ca45e18",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/zerion-license.png": {
 		"hash": "522fcf43bb6bec667c85b498cfc4798028900dfca227dcbe8895bae11e2d5185",
 		"passedTests": ["blockiness", "file-format"]
