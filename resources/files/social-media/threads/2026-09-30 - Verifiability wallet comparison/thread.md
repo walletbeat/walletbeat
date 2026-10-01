@@ -214,5 +214,21 @@ That turns a wallet into a public good, which is what Ethereum is about.
 
 ---
 
+If your wallet's source code isn't available, you can't see what it does with your keys, your transactions, or your data.
+
+Is it really an Ethereum wallet?
+
+Ethereum is built on openness, transparency, and not having to trust anyone. Those values should land on wallets too, where users actually touch Ethereum.
+
+---
+
+Using a wallet that isn't FOSS yet?
+
+Let them know. Tag them and ask them to open source their code.
+
+Wallets listen to their users.
+
+---
+
 Check out how your wallets stack up 👇
 https://beta.walletbeat.eth.limo/
