@@ -28,10 +28,13 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	BasicBenchmarkTransactions,
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
@@ -39,10 +42,15 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -566,8 +574,74 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
-				erc4361: null,
+				ref: [
+					{
+						explanation:
+							'The send confirmation shows the amount sent (in USD and ETH), the recipient address and label, the sending wallet and the network cost. The nonce and an explicit chain/network row are not shown.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png',
+						label: 'Uniswap Wallet send confirmation',
+					},
+					{
+						explanation:
+							'For a contract call that sends no value, Uniswap Wallet shows the function name and raw data, but not the contract being called.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-no-value.png',
+						label: 'Uniswap Wallet transaction request for a mint without value',
+					},
+					{
+						explanation:
+							'For a contract call that sends ETH, Uniswap Wallet shows the contract being called under the expanded details.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-with-value.png',
+						label: 'Uniswap Wallet transaction request for a mint that sends ETH',
+					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates an ERC-721 transfer and shows the NFT received.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-721 transfer',
+					},
+					{
+						explanation:
+							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
+						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates a USDC approval and shows the approved amount.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
+						label: 'Uniswap Wallet simulation of a USDC approval',
+					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an Aave supply and shows the amount of USDC sent.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
+						label: 'Uniswap Wallet simulation of an Aave supply',
+					},
+					{
+						explanation:
+							'Uniswap Wallet detects a transaction that will fail and shows a "cannot estimate" error, disabling confirmation.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
+						label: 'Uniswap Wallet simulation of a failing transaction',
+					},
+					{
+						explanation:
+							'For a transaction with a nondeterministic outcome, Uniswap Wallet shows a single static simulated outcome, without warning that the outcome may differ.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
+						label: 'Uniswap Wallet simulation of a nondeterministic transaction',
+					},
+				],
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
+						label: 'Uniswap Wallet signature request for an ERC-4361 message',
+					},
+				}),
 				erc7730: supported({
 					ref: [
 						{
@@ -646,8 +720,53 @@ export const uniswapWallet: SoftwareWallet = {
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				transactionDetailsDisplay: null,
-				transactionSimulations: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.NOT_IN_UI,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_OPTIONALLY,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED, // Only receiving explained, transfer out nothing.
+					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -690,13 +809,44 @@ export const uniswapWallet: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				artifactSigning: notSupported,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The committed `bun.lock` pins exact versions for the `@uniswap/extension` workspace (`apps/extension`) and its transitive JavaScript dependencies.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock',
+						},
+						{
+							explanation:
+								'iOS: the committed `Podfile.lock` pins every CocoaPods dependency version and records the Podfile checksum used to resolve them.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock',
+						},
+						{
+							explanation:
+								'Android (and iOS JS layer): the committed `bun.lock` pins exact versions for the `apps/mobile` workspace, locking the React Native JavaScript dependencies bundled into the Android app. Native Gradle dependencies have no lockfile.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#L305-L502',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported<MustRef<{}>>({
+					ref: [
+						{
+							explanation:
+								'Uniswap publishes GitHub releases with per-version notes for each platform, tagged `extension/<version>` and `mobile/<version>` alongside `web/<version>`.',
+							url: 'https://github.com/Uniswap/interface/releases',
+						},
+						{
+							explanation:
+								'On each push to main, the workflow reads the `VERSION` and `RELEASE` files, tags the commit, and creates a GitHub release whose body is the `RELEASE` notes.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/.github/workflows/tag_and_release.yml#L27-L54',
+						},
+					],
+				}),
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
@@ -720,6 +870,15 @@ export const uniswapWallet: SoftwareWallet = {
 						(for Uniswap handles, a separate feature from ENS resolution). The
 						resolved address is picked with the raw address first, the ENS
 						result second, and the Unitag result last.
+					`),
+				},
+			},
+			security: {
+				transactionLegibility: {
+					note: mdParagraph(`
+						Uniswap Wallet only shows the contract being called when the
+						transaction sends value. Contract calls that send no value show
+						the function name and raw data, but not the contract address.
 					`),
 				},
 			},
