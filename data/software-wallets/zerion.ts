@@ -945,12 +945,23 @@ export const zerion: SoftwareWallet = {
 				},
 				[Variant.MOBILE]: {
 					l1: {
-						ref: refTodo,
+						ref: {
+							explanation: 'Users can set their own Ethereum RPC in the mobile app.',
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-custom-rpc.png',
+							label: 'Zerion iOS Ethereum network page with an RPC URL field',
+							lastRetrieved: '2026-10-01',
+						},
 						selfBroadcastViaDirectGossip: notSupported,
 						selfBroadcastViaSelfHostedNode: featureSupported,
 					},
 					l2: {
-						ref: refTodo,
+						ref: {
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png',
+							label: 'Zerion iOS Networks page listing Base, Optimism and Arbitrum',
+							lastRetrieved: '2026-10-01',
+						},
 						arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 						opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					},
