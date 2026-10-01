@@ -473,19 +473,7 @@ export function evaluateWalletOnLadder<_AttributeGroupId extends string>(
 			return { ladder, stage: 'UNRATED', highestClearedStage: clearedStage }
 		}
 
-		// This cannot vacuously pass, because `stageEvaluations` is guaranteed to be non-empty.
-		if (
-			stageEvaluations.every(
-				evaluation =>
-					evaluation.rating === StageCriterionRating.PASS ||
-					evaluation.rating === StageCriterionRating.EXEMPT,
-			)
-		) {
-			clearedStage = stage
-			continue
-		}
-
-		break
+		clearedStage = stage
 	}
 
 	if (clearedStage === null) {
