@@ -10,6 +10,7 @@ import {
 	type LooseReference,
 	toFullyQualified,
 } from '@/schema/reference'
+import { CodebaseEntryType, crawlCodebase, GitIgnoredFiles } from '@/utils/codebase'
 
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
@@ -19,6 +20,16 @@ const repoRoot = resolve(currentDir, '..')
 await warmupHarperLinter()
 
 const WALLET_REFERENCES_DIR = 'public/references/wallets'
+
+/**
+ * Wallet questionnaire responses stored under `public/references/wallets/`.
+ * These are kept even when no wallet ref cites them, so add new questionnaire
+ * files here when you add them.
+ */
+const QUESTIONNAIRE_FILES: string[] = [
+	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
+]
 
 describe('RepoFileReference', () => {
 	describe('toFullyQualified with file references', () => {
@@ -210,5 +221,49 @@ describe('wallet references directories', () => {
 				}
 			}
 		}
+	})
+
+	// Checks the files on disk. Fails on a file that no wallet ref points to, e.g. a
+	// screenshot left behind after its ref was removed or changed to another file.
+	// Code snippets are skipped; `code-snippets-integrity.test.ts` keeps those in sync.
+	// Questionnaire files in `QUESTIONNAIRE_FILES` are also allowed without a ref.
+	it('every file under public/references/wallets/ is referenced by wallet data', async () => {
+		const urlPrefix = `/${WALLET_REFERENCES_DIR.slice('public/'.length)}/`
+		const referencedFiles = new Set<string>(QUESTIONNAIRE_FILES)
+
+		for (const collected of collectAllRefs(allWallets)) {
+			for (const fq of collected.fullyQualifiedRefs) {
+				for (const { url } of fq.urls) {
+					if (url.startsWith(urlPrefix)) {
+						referencedFiles.add(`public${url}`)
+					}
+				}
+			}
+		}
+
+		const unreferencedFiles: string[] = []
+
+		await crawlCodebase({
+			ignore: [
+				'.git',
+				await GitIgnoredFiles(),
+				/\.snippet$/i,
+				path =>
+					!(
+						path.startsWith(`${WALLET_REFERENCES_DIR}/`) ||
+						`${WALLET_REFERENCES_DIR}/`.startsWith(`${path}/`)
+					),
+			],
+			baseTraversalFn: entry => {
+				if (entry.type === CodebaseEntryType.FILE && !referencedFiles.has(entry.path)) {
+					unreferencedFiles.push(entry.path)
+				}
+			},
+		})
+
+		expect(
+			unreferencedFiles.sort(),
+			'These files are not referenced by any wallet data; delete them or add a ref to them.',
+		).toEqual([])
 	})
 })
