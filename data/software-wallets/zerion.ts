@@ -903,15 +903,15 @@ export const zerion: SoftwareWallet = {
 								explanation: 'Zerion supports custom RPCs and sends transactions directly to them.',
 								url: [
 									{
-										label: 'Browser extension uses your custom RPC instead of its default one',
+										label: 'Browser extension uses a custom RPC',
 										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/networks/Networks.ts#L375-L381',
 									},
 									{
-										label: 'Browser extension connects to your custom RPC to send transactions',
+										label: 'Browser extension connecting to a custom RPC to send transactions',
 										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1287-L1301',
 									},
 									{
-										label: 'Browser extension sends the signed transaction through your custom RPC',
+										label: 'Browser extension sending a signed transaction through a custom RPC',
 										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1445-L1449',
 									},
 								],
