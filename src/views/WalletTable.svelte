@@ -878,6 +878,8 @@
 
 					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
 						<small>N/A</small>
+					{:else if stage === 'UNRATED'}
+						<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
 					{:else}
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
