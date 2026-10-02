@@ -19,6 +19,7 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	(await import('./2026-08-19-rabby-silent-signature-extraction')).default,
 	(await import('./2026-09-10-newsletter-provider-breach-phishing')).default,
 	(await import('./2026-09-24-payy-bridge-exploit')).default,
+	(await import('./2026-09-30-metamask-infrastructure-security-incident')).default,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**

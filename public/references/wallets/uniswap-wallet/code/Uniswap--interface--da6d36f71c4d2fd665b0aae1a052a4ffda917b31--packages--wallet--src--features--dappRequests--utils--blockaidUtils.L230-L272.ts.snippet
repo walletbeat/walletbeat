@@ -1,0 +1,69 @@
+{
+	"highlightFirstLine": 230,
+	"highlightLastLine": 272,
+	"segments": [
+		{
+			"lines": [
+				"function maxRiskLevel(levels: TransactionRiskLevel[]): TransactionRiskLevel {",
+				"  return levels.reduce("
+			],
+			"startLine": 223
+		},
+		{
+			"lines": [
+				"    TransactionRiskLevel.None,",
+				"  )",
+				"}",
+				"",
+				"// `result_type` is Blockaid's authoritative verdict, matched case-insensitively. Benign/Spam/unknown -> None.",
+				"function getRiskLevelFromResultType(resultType?: string): TransactionRiskLevel {",
+				"  switch (resultType?.toLowerCase()) {",
+				"    case 'malicious':",
+				"      return TransactionRiskLevel.Critical",
+				"    case 'warning':",
+				"      return TransactionRiskLevel.Warning",
+				"    default:",
+				"      return TransactionRiskLevel.None",
+				"  }",
+				"}",
+				"",
+				"// Defense-in-depth: a Malicious feature (e.g. HIGH_RISK_SPENDER) -> Critical, a Warning feature -> Warning.",
+				"// `type` is a validated enum (unlike result_type), so exact match is intentional — a casing drift fails Zod upstream.",
+				"function getRiskLevelFromFeatures(features?: { type: string }[]): TransactionRiskLevel {",
+				"  if (!features?.length) {",
+				"    return TransactionRiskLevel.None",
+				"  }",
+				"  if (features.some((feature) => feature.type === 'Malicious')) {",
+				"    return TransactionRiskLevel.Critical",
+				"  }",
+				"  if (features.some((feature) => feature.type === 'Warning')) {",
+				"    return TransactionRiskLevel.Warning",
+				"  }",
+				"  return TransactionRiskLevel.None",
+				"}",
+				"",
+				"/**",
+				" * Risk level from a Blockaid validation result: the highest severity across `result_type`",
+				" * (authoritative verdict), `features[].type` (defense-in-depth), and a `classification` substring match.",
+				" */",
+				"export function getRiskLevelFromValidation(",
+				"  validation?: BlockaidScanTransactionResponse['validation'],",
+				"): TransactionRiskLevel {",
+				"  if (!validation) {",
+				"    return TransactionRiskLevel.None",
+				"  }",
+				"  return maxRiskLevel([",
+				"    getRiskLevelFromResultType(validation.result_type),",
+				"    getRiskLevelFromFeatures(validation.features),",
+				"    getRiskLevelFromClassification(validation.classification),",
+				"  ])",
+				"}",
+				"",
+				"/**",
+				" * Type alias for asset diffs array from successful simulation",
+				" */"
+			],
+			"startLine": 226
+		}
+	]
+}

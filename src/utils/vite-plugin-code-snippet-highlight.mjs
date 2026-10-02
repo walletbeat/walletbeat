@@ -1,6 +1,8 @@
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 
+import * as shiki from 'shiki'
+
 /**
  * Vite plugin turning `.snippet` file imports (stored code snippets, see
  * src/tools/code-snippet-collector/) into modules whose default export is an
@@ -60,9 +62,10 @@ let highlighterPromise
 /** @returns {Promise<import('shiki').Highlighter>} */
 function getHighlighter() {
 	if (highlighterPromise === undefined) {
-		highlighterPromise = import('shiki').then(shiki =>
-			shiki.createHighlighter({ langs: [], themes: Object.values(themes) }),
-		)
+		highlighterPromise = shiki.createHighlighter({
+			langs: [],
+			themes: Object.values(themes),
+		})
 	}
 
 	return highlighterPromise

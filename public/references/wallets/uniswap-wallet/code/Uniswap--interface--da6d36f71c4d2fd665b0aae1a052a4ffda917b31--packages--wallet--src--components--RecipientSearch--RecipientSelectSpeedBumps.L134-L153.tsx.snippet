@@ -1,0 +1,51 @@
+{
+	"highlightFirstLine": 134,
+	"highlightLastLine": 153,
+	"segments": [
+		{
+			"lines": [
+				"}: RecipientSelectSpeedBumpsProps): JSX.Element | null {"
+			],
+			"startLine": 37
+		},
+		{
+			"lines": [
+				"  const renderSmartContractWarning = useCallback<PaginatedModalRenderer>("
+			],
+			"startLine": 118
+		},
+		{
+			"lines": [
+				"    ),",
+				"    [t],",
+				"  )",
+				"",
+				"  const isActiveViewOnly = viewOnlyAccounts.some((a) => a.address === activeAddress)",
+				"",
+				"  const isNewRecipient = !previousTransactions || previousTransactions.length === 0",
+				"  const isSignerRecipient = useMemo(",
+				"    () => currentSignerAccounts.some((a) => a.address === recipientAddress),",
+				"    [currentSignerAccounts, recipientAddress],",
+				"  )",
+				"  const isViewOnlyRecipient = useMemo(",
+				"    () => viewOnlyAccounts.some((a) => a.address === recipientAddress),",
+				"    [viewOnlyAccounts, recipientAddress],",
+				"  )",
+				"",
+				"  const shouldWarnViewOnly = isViewOnlyRecipient",
+				"  const shouldWarnERC20 = isERC20ContractAddress",
+				"  const shouldWarnSmartContract = isNewRecipient && !isSignerRecipient && isSmartContractAddress && !shouldWarnERC20",
+				"  const shouldWarnNewAddress = isNewRecipient && !isSignerRecipient && !shouldWarnSmartContract && !shouldWarnERC20",
+				"  const shouldWarnSelfSend = areAddressesEqual({",
+				"    addressInput1: { address: activeAddress, platform },",
+				"    addressInput2: { address: recipientAddress, platform },",
+				"  })",
+				"",
+				"  const modalRenderers = useMemo<ConditionalModalRenderer[]>(",
+				"    () => [",
+				"      { renderModal: renderViewOnlyWarning, condition: shouldWarnViewOnly },"
+			],
+			"startLine": 130
+		}
+	]
+}
