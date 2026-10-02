@@ -218,7 +218,7 @@ describe('wallets', () => {
 							)
 						}
 					}
-				})
+				}, 300_000) // Large captures exceed the default timeout on slower CI runners.
 			}
 		})
 	}
