@@ -49,7 +49,7 @@ Wallets should also implement the foundations of a proper Ethereum wallet.
 	This provides a level of assurance about the software security practices of the wallet developer.
 
 - Hardware Wallet Interoperability
-	Hardware wallets keep private keys isolated on dedicated, purpose-built devices, and direct support for multiple manufacturers ensures users are not locked into a single hardware vendor and can freely choose the device that best fits their security needs.
+	Hardware wallets keep private keys isolated on dedicated, purpose-built devices. Direct support for multiple manufacturers ensures users are not locked into a single hardware vendor. Also, users can freely choose the device that best fits their security needs.
 
 - Scam Alerting 🚨
 	Wallets should alert users about known scams before transactions are made, helping prevent irreversible losses. Transaction legibility (Stage 0.5) is a prerequisite for meaningful scam alerting.
@@ -127,7 +127,7 @@ The wallet collects no more information about its users by default than a web br
 
 - Full Wallet Address Privacy 🔍
 	Wallet addresses must not be correlatable with any user information, including IP address.
-	At Stage 2, wallets must go beyond avoiding sensitive personal data linkage. Even an IP address is enough to de-anonymize a user across sessions and devices. All network requests carrying the wallet address must be proxied or otherwise decoupled from the user's network identity.
+	At Stage 2, wallets must go beyond avoiding sensitive personal data linkage. Even an IP address is enough to deanonymize a user across sessions and devices. All network requests carrying the wallet address must be proxied or otherwise decoupled from the user's network identity.
 
 - App Isolation 🍪
 	The wallet must offer app-specific accounts by default when connecting to apps.
