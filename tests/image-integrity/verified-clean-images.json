@@ -1527,6 +1527,14 @@
 		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/payy_security_news.png": {
+		"hash": "48d52f3030ff36b0324c453e6ce5449af774896277f6defeb3f1e78a103e061b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/september_cover.png": {
+		"hash": "3a40fba76842fa7634354267b3825ad1082bab663fc16668b2b07ffa506c7e82",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
