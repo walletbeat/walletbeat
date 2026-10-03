@@ -502,8 +502,9 @@ To test:
 - `canDeployNew`: Go through the wallet's UI and check whether it offers
   a flow to deploy a new Safe contract.
 - `keyRotationTransactionGeneration`: In an existing Safe, attempt to
-  replace an owner key. Check whether the wallet generates the `swapOwner`
-  transaction itself, uses a standalone app, or relies on an external API.
+  replace an owner key. Check whether the `swapOwner` transaction can be
+  generated using an open-source standalone app, only a proprietary
+  standalone app, only an external API, or not at all.
 - `supportedOwners`: Try connecting the wallet to Safes with 1,
   2, and many owners and note the limits.
 
