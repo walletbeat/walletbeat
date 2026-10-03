@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 47,
+	"highlightLastLine": 54,
+	"segments": [
+		{
+			"lines": [
+				"/** TODO:",
+				" * parameterize apiClient: ZerionApiClient as a dependency",
+				" * so that this method can be used in background scripts, too",
+				" */",
+				"export async function resolveDomain(domain: string): Promise<string | null> {",
+				"  try {",
+				"    const response = await ZerionAPI.getWalletsMeta({ identifiers: [domain] });",
+				"    return response?.data?.[0]?.address || null;",
+				"  } catch {",
+				"    return null;",
+				"  }",
+				"}"
+			],
+			"startLine": 43
+		}
+	]
+}
