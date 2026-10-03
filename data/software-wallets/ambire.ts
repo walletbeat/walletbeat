@@ -312,7 +312,19 @@ export const ambire: SoftwareWallet = {
 			}),
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation: 'Ambire supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/AmbireTech/extension/blob/3f6c7af91fde4c056da96ff9ede5c39f53ed7083/src/common/hooks/useAddressInput/useAddressInput.tsx#L149',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/services/nameResolvers/resolvers/EnsCompatibleResolver.ts#L84-L104',
+					},
+				],
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
