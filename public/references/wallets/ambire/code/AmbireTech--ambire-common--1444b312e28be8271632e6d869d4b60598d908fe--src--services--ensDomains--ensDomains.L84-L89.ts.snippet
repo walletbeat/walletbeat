@@ -1,0 +1,25 @@
+{
+	"highlightFirstLine": 84,
+	"highlightLastLine": 89,
+	"segments": [
+		{
+			"lines": [
+				"}> {",
+				"  const normalizedDomainName = normalize(domain)",
+				"  if (!normalizedDomainName) return { address: '', avatar: null, expiry: null }",
+				"",
+				"  const client = getViemClientForProvider(provider)",
+				"  const universalResolverAddress = options?.universalResolverAddress ?? ENS_UNIVERSAL_RESOLVER",
+				"  const skipExpiry = options?.expiry === null",
+				"",
+				"  const [address, avatar, expiry] = await Promise.all([",
+				"    getEnsAddress(client, { name: normalizedDomainName, universalResolverAddress }),",
+				"    viemGetEnsAvatar(client, { name: normalizedDomainName, universalResolverAddress }),",
+				"    skipExpiry",
+				"      ? Promise.resolve(null)",
+				"      : getEnsExpiry(provider, {"
+			],
+			"startLine": 80
+		}
+	]
+}
