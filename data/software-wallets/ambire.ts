@@ -306,8 +306,6 @@ export const ambire: SoftwareWallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
-				supportsAddingOrRemovingSigners: false,
-				supportsKeyRotationWithoutModules: false,
 				tokenTransferTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 			}),
 		},

@@ -501,20 +501,13 @@ To test:
 
 - `canDeployNew`: Go through the wallet's UI and check whether it offers
   a flow to deploy a new Safe contract.
-- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
-  or remove an owner using only the wallet's native UI (no extra modules).
-  Check whether the wallet generates the `addOwnerWithThreshold` /
-  `removeOwner` transaction directly.
-- `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  replace an owner key using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `swapOwner` transaction
-  directly.
-- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+- `keyRotationTransactionGeneration`: In an existing Safe, attempt to
+  replace an owner key. Check whether the wallet generates the `swapOwner`
+  transaction itself, uses a standalone app, or relies on an external API.
+- `supportedOwners`: Try connecting the wallet to Safes with 1,
   2, and many owners and note the limits.
 
 - `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
-- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
-- `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
 - `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
 
   - SINGLE_SIGNER: only single-owner Safes are supported.
