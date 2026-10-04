@@ -887,6 +887,22 @@
 		"hash": "850a58668e1f87efd2d97979ce4acd6e4267b02a8fb2b608d0e8e6d5dfdb8001",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7828-unresolved.png": {
+		"hash": "7095e9f7fe7427dae07fa6d4a78ef3930714e795e7ab0337fbb4b4a9cf481650",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7831-unresolved.png": {
+		"hash": "165ea0f3a43ff944b7803889d67461f6e2740d0a5fa89091726b8b1ac0a8eda2",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7828-unresolved.png": {
+		"hash": "add6b7710e19bc591b50c104d2203ae3a2080934fb6c163fdbc01c4249bb358e",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7831-unresolved.png": {
+		"hash": "4534aa1b1a24f581686b4b3a98389ec30634283e4da87b008e734ecbe45526a2",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
 		"passedTests": ["blockiness", "file-format"]
