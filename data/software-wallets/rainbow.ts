@@ -188,7 +188,27 @@ export const rainbow: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation: 'Rainbow supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/hooks/send/useSendState.ts#L48-L50',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/hooks/useEnsAddress.ts#L21',
+					},
+					{
+						label: 'Mobile app looking up a recipient name',
+						url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/features/transfer/screens/SendSheet.tsx#L389',
+					},
+					{
+						label: 'Mobile app uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L468-L469',
+					},
+				],
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
