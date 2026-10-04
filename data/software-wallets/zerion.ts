@@ -164,16 +164,54 @@ export const zerion: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+			[Variant.BROWSER]: {
+				ref: {
+					explanation:
+						'The browser extension supports sending funds to ENS names using offchain data.',
+					url: [
+						{
+							label: 'Browser extension looking up a recipient name',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/ui/components/ReceiverAddressDialog/ReceiverAddressDialog.tsx#L132',
+						},
+						{
+							label: "Browser extension looking up names through Zerion's servers",
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/name-service/index.ts#L47-L54',
+						},
+					],
+				},
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'OFFCHAIN',
-				offchainDataVerifiability: 'NOT_VERIFIABLE',
-				offchainProviderConnection: 'DIRECT_CONNECTION',
-			}),
+			[Variant.MOBILE]: {
+				ref: [
+					{
+						explanation: 'The mobile app supports sending funds to ENS names using offchain data.',
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-recipient.png',
+						label: 'Mobile app finding vitalik.eth as a recipient',
+					},
+					{
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-lookup-capture.png',
+						label:
+							"Network capture of the mobile app looking up an ENS name through Zerion's servers",
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
+			},
 		},
 		chainAbstraction: {
 			bridging: {
