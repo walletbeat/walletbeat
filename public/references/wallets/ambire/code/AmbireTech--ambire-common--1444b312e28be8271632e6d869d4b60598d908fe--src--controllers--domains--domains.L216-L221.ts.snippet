@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 216,
+	"highlightLastLine": 221,
+	"segments": [
+		{
+			"lines": [
+				"export class DomainsController extends EventEmitter implements IDomainsController {"
+			],
+			"startLine": 71
+		},
+		{
+			"lines": [
+				"  get #activeResolvers(): NameResolver[] {"
+			],
+			"startLine": 206
+		},
+		{
+			"lines": [
+				"    return this.#resolvers.filter(",
+				"      (resolver) =>"
+			],
+			"startLine": 208
+		},
+		{
+			"lines": [
+				"        featureFlags.isFeatureEnabled(resolver.featureFlag)",
+				"    )",
+				"  }",
+				"",
+				"  #context(): ResolveContext {",
+				"    return {",
+				"      getProvider: (chainId: string) =>",
+				"        this.#isNetworkEnabled(BigInt(chainId)) ? this.#providers[chainId] : undefined,",
+				"      networkMode: this.#defaultNetworksMode",
+				"    }",
+				"  }",
+				"",
+				"  #resolverById(id: NameServiceId): NameResolver | undefined {",
+				"    return this.#resolvers.find((resolver) => resolver.id === id)"
+			],
+			"startLine": 212
+		}
+	]
+}
