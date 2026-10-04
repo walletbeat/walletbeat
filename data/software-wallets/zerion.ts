@@ -167,7 +167,7 @@ export const zerion: SoftwareWallet = {
 			[Variant.BROWSER]: {
 				ref: {
 					explanation:
-						'The browser extension supports sending funds to ENS names using offchain data.',
+						"The browser extension supports sending funds to ENS names using Zerion's servers.",
 					url: [
 						{
 							label: 'Browser extension looking up a recipient name',
@@ -192,7 +192,8 @@ export const zerion: SoftwareWallet = {
 			[Variant.MOBILE]: {
 				ref: [
 					{
-						explanation: 'The mobile app supports sending funds to ENS names using offchain data.',
+						explanation:
+							"The mobile app supports sending funds to ENS names using Zerion's servers.",
 						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-recipient.png',
 						label: 'Mobile app finding vitalik.eth as a recipient',
 					},
