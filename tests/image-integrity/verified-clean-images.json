@@ -699,6 +699,22 @@
 		"hash": "52a455bdcfcc345de2bca1971a863462829c34754a7f93948b16e701c034c10d",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7828-rejected.png": {
+		"hash": "4b6988ec6aa06c2ae99d25ee1a65b71f499223d4f8d33678386a990194e47ac0",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7831-rejected.png": {
+		"hash": "5ed4ed9841de7252137b8e7905498ec4e86defc98a085c6e8d3e5f5f4338e41e",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7828-rejected.png": {
+		"hash": "157c6d98a34bc71f0259cfe759875b442740595163fb95961d958ae8ae94ec9a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7831-rejected.png": {
+		"hash": "61695ca37ed8fb7cce3fc694c5f7dae161beaf33a7066feb61304a9614bfa9ac",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
 		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
 		"passedTests": ["blockiness", "file-format"]
