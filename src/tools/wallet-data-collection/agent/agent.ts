@@ -2,7 +2,6 @@
  * Pi-based harness for the wallet-data-collection agent.
  */
 import path from 'node:path'
-import { createInterface } from 'node:readline'
 
 import {
 	createAgentSession,
@@ -10,10 +9,14 @@ import {
 	createLocalBashOperations,
 	DefaultResourceLoader,
 	defineTool,
+	type ExtensionUIContext,
 	getAgentDir,
 	SessionManager,
 	SettingsManager,
+	Theme,
 } from '@earendil-works/pi-coding-agent'
+import askUserExtension from 'pi-ask-user/index.ts'
+import prompts from 'prompts'
 
 import { getRepositoryRoot } from '../../../utils/codebase'
 import { createCommandCheckBashOperations } from './command-check-hooks'
@@ -62,7 +65,7 @@ const resourceLoader = new DefaultResourceLoader({
 	noThemes: true,
 	noContextFiles: true,
 	additionalSkillPaths: [],
-	// Fill the wallet-context placeholders in APPEND_SYSTEM.md from the env vars.
+	extensionFactories: [askUserExtension],
 	appendSystemPromptOverride: baseAppend => baseAppend.map(substituteWalletPlaceholders),
 })
 
@@ -75,12 +78,74 @@ const bashTool = defineTool(createBashToolDefinition(agentDir, { operations: bas
 const { session } = await createAgentSession({
 	cwd: agentDir,
 	agentDir: agentDirGlobal,
-	tools: ['bash'],
+	tools: ['bash', 'ask_user'],
 	customTools: [bashTool],
 	resourceLoader,
 	settingsManager,
 	sessionManager: SessionManager.inMemory(agentDir),
 })
+
+// The `ask_user` extension renders its rich UI through the runner's `ctx.ui`, which is
+// unavailable in this plain (non-TUI) harness. It degrades to the `select()`/`input()`
+// dialog fallback when `ctx.ui.custom()` is unavailable, so we provide a `prompts`-based
+// context that answers interactively through `prompts`. This makes `ask_user` usable in
+// the harness without a pi-tui overlay.
+session.extensionRunner.setUIContext(createPromptsUIContext(), 'print')
+
+let stdinClosed = false
+const stdinCloseWaiters: Array<() => void> = []
+
+function notifyStdinClosed(): void {
+	if (stdinClosed) {
+		return
+	}
+
+	stdinClosed = true
+
+	for (const resolve of stdinCloseWaiters.splice(0)) {
+		resolve()
+	}
+}
+
+process.stdin.on('end', notifyStdinClosed)
+process.stdin.on('close', notifyStdinClosed)
+
+function waitForStdinClose(): {
+	promise: Promise<null>
+	release: () => void
+} {
+	if (stdinClosed) {
+		return { promise: Promise.resolve(null), release: () => {} }
+	}
+
+	let resolveFn: () => void = () => {}
+	const promise = new Promise<null>(resolve => {
+		resolveFn = () => resolve(null)
+	})
+
+	stdinCloseWaiters.push(resolveFn)
+
+	return {
+		promise,
+		release: () => {
+			const index = stdinCloseWaiters.indexOf(resolveFn)
+
+			if (index >= 0) {
+				stdinCloseWaiters.splice(index, 1)
+			}
+		},
+	}
+}
+
+async function promptOrClose<T>(run: () => Promise<T>): Promise<T | null> {
+	const { promise, release } = waitForStdinClose()
+
+	try {
+		return await Promise.race([run(), promise])
+	} finally {
+		release()
+	}
+}
 
 // Narrow the (any-typed) tool args to a shape with an optional `command`, without an
 // unsafe type assertion.
@@ -113,48 +178,189 @@ session.subscribe(event => {
 	}
 })
 
-const readlineInterface = createInterface({ input: process.stdin })
+// A minimal theme for the prompts-based UI context. The `ask_user` fallback path never
+// reads `theme`, but `ExtensionUIContext` requires one, so we provide a stub whose color
+// helpers all resolve to the terminal reset sequence.
+function createStubTheme(): Theme {
+	const fgColors = [
+		'accent',
+		'border',
+		'borderAccent',
+		'borderMuted',
+		'success',
+		'error',
+		'warning',
+		'muted',
+		'dim',
+		'text',
+		'thinkingText',
+		'userMessageText',
+		'customMessageText',
+		'customMessageLabel',
+		'toolTitle',
+		'toolOutput',
+		'mdHeading',
+		'mdLink',
+		'mdLinkUrl',
+		'mdCode',
+		'mdCodeBlock',
+		'mdCodeBlockBorder',
+		'mdQuote',
+		'mdQuoteBorder',
+		'mdHr',
+		'mdListBullet',
+		'toolDiffAdded',
+		'toolDiffRemoved',
+		'toolDiffContext',
+		'syntaxComment',
+		'syntaxKeyword',
+		'syntaxFunction',
+		'syntaxVariable',
+		'syntaxString',
+		'syntaxNumber',
+		'syntaxType',
+		'syntaxOperator',
+		'syntaxPunctuation',
+		'thinkingOff',
+		'thinkingMinimal',
+		'thinkingLow',
+		'thinkingMedium',
+		'thinkingHigh',
+		'thinkingXhigh',
+		'bashMode',
+	] as const
+	const bgColors = [
+		'selectedBg',
+		'userMessageBg',
+		'customMessageBg',
+		'toolPendingBg',
+		'toolSuccessBg',
+		'toolErrorBg',
+	] as const
+	const fg = Object.fromEntries(fgColors.map(color => [color, '']))
+	const bg = Object.fromEntries(bgColors.map(color => [color, 0]))
 
-const pendingLines: string[] = []
-const lineWaiters: Array<(line: string | null) => void> = []
-let stdinClosed = false
+	return new Theme(fg, bg, 'dark')
+}
 
-readlineInterface.on('line', line => {
-	const waiter = lineWaiters.shift()
+/**
+ * Build an `ExtensionUIContext` whose `select`/`input` dialogs use the `prompts` package,
+ * so the `ask_user` extension's interactive fallback works in this plain harness. The
+ * `custom` method returns `undefined`, which makes the extension fall back to the
+ * `select()`/`input()` dialogs instead of the unavailable pi-tui overlay.
+ */
+function createPromptsUIContext(): ExtensionUIContext {
+	const noOp = () => {}
+	const noOpInput = (): Promise<undefined> => Promise.resolve(undefined)
 
-	if (waiter) {
-		waiter(line)
-	} else {
-		pendingLines.push(line)
+	const runPrompt = async <T>(run: () => Promise<T>): Promise<T | undefined> => {
+		try {
+			return await run()
+		} catch {
+			// `prompts` rejects on cancellation (Ctrl+C); treat it as "no answer".
+			return undefined
+		}
 	}
-})
 
-readlineInterface.on('close', () => {
-	stdinClosed = true
+	return {
+		async select(title, options, opts) {
+			if (opts?.signal?.aborted) {
+				return undefined
+			}
 
-	for (const waiter of lineWaiters.splice(0)) {
-		waiter(null)
+			return runPrompt(async () => {
+				const response = await promptOrClose(() =>
+					prompts({
+						type: 'select',
+						name: 'answer',
+						message: title,
+						choices: options.map(option => ({ title: option, value: option })),
+					}),
+				)
+
+				return typeof response?.answer === 'string' ? response.answer : undefined
+			})
+		},
+		async input(title, placeholder, opts) {
+			if (opts?.signal?.aborted) {
+				return undefined
+			}
+
+			return runPrompt(async () => {
+				const response = await promptOrClose(() =>
+					prompts({
+						type: 'text',
+						name: 'answer',
+						message: title,
+						initial: placeholder,
+					}),
+				)
+
+				return typeof response?.answer === 'string' ? response.answer : undefined
+			})
+		},
+		confirm: () => Promise.resolve(false),
+		notify: noOp,
+		onTerminalInput: () => noOp,
+		setStatus: noOp,
+		setWorkingMessage: noOp,
+		setWorkingVisible: noOp,
+		setWorkingIndicator: noOp,
+		setHiddenThinkingLabel: noOp,
+		setWidget: noOp,
+		setFooter: noOp,
+		setHeader: noOp,
+		setTitle: noOp,
+		// Returning `undefined` makes the ask_user extension fall back to `select`/`input`.
+		// The pi-ask-user extension requires `custom<T>` to return `Promise<T>`, and a no-op
+		// returning `undefined` can only be typed as an arbitrary `T` via an assertion; the
+		// rich pi-tui overlay this method would render is unavailable in this plain harness.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+		custom: <T>() => Promise.resolve(undefined as T),
+		pasteToEditor: noOp,
+		setEditorText: noOp,
+		getEditorText: () => '',
+		editor: noOpInput,
+		addAutocompleteProvider: noOp,
+		setEditorComponent: noOp,
+		getEditorComponent: () => undefined,
+		get theme() {
+			return createStubTheme()
+		},
+		getAllThemes: () => [],
+		getTheme: () => undefined,
+		setTheme: () => ({ success: false, error: 'UI not available' }),
+		getToolsExpanded: () => false,
+		setToolsExpanded: noOp,
 	}
-})
-
-function nextLine(): Promise<string | null> {
-	if (pendingLines.length > 0) {
-		return Promise.resolve(pendingLines.shift()!)
-	}
-
-	if (stdinClosed) {
-		return Promise.resolve(null)
-	}
-
-	return new Promise(resolve => {
-		lineWaiters.push(resolve)
-	})
 }
 
 async function runPrompt(prompt: string): Promise<void> {
 	process.stdout.write('\n')
 	await session.prompt(prompt)
 	process.stdout.write('\n')
+}
+
+/**
+ * Read one line of user input interactively via `prompts`. Returns `null` when the user
+ * cancels (Ctrl+C) or stdin closes, which the caller treats as quitting. `prompts` is the
+ * single consumer of stdin in this harness, so it never conflicts with the `ask_user`
+ * dialogs (which also use `prompts`) during a model turn.
+ */
+async function readUserInput(): Promise<string | null> {
+	try {
+		const response = await promptOrClose(() =>
+			prompts({
+				type: 'text',
+				name: 'input',
+				message: '> ',
+			}),
+		)
+
+		return typeof response?.input === 'string' ? response.input : null
+	} catch {
+		return null
+	}
 }
 
 try {
@@ -165,10 +371,8 @@ try {
 	}
 
 	// Interactive loop: read a prompt, run it, repeat until the user quits.
-	process.stdout.write('> ')
-
 	while (true) {
-		const line = await nextLine()
+		const line = await readUserInput()
 
 		if (line === null) {
 			break
@@ -177,20 +381,16 @@ try {
 		const trimmed = line.trim()
 
 		if (trimmed === 'quit' || trimmed === 'exit' || trimmed === '/quit' || trimmed === '/exit') {
-			readlineInterface.close()
 			break
 		}
 
 		if (!trimmed) {
 			process.stdout.write('(Use `/quit` to quit.)\n')
-			process.stdout.write('> ')
 			continue
 		}
 
 		await runPrompt(trimmed)
-		process.stdout.write('> ')
 	}
 } finally {
-	readlineInterface.close()
 	session.dispose()
 }

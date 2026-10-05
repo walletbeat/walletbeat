@@ -8,6 +8,9 @@
 		"node": ">=22.0.0"
 	},
 	"dependencies": {
-		"@earendil-works/pi-coding-agent": "0.85.1"
+		"@earendil-works/pi-coding-agent": "0.85.1",
+		"@sinclair/typebox": "^0.34.0",
+		"pi-ask-user": "^0.16.0",
+		"prompts": "^2.4.2"
 	}
 }
