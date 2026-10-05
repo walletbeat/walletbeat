@@ -22,6 +22,7 @@ import prompts from 'prompts'
 
 import { getRepositoryRoot } from '../../../utils/codebase'
 import { COMMAND_CHECK_HOOK_MARKER, createCommandCheckBashOperations } from './command-check-hooks'
+import { detectModelConfigurationIssue } from './model-config'
 import {
 	createLocalReadOperations,
 	createReadCheckOperations,
@@ -119,6 +120,15 @@ const { session } = await createAgentSession({
 	settingsManager,
 	sessionManager: SessionManager.inMemory(agentDir),
 })
+
+// Detect whether a model is configured and authenticated before running any prompt.
+const modelIssue = detectModelConfigurationIssue(session, agentDirGlobal, agentDir)
+
+if (modelIssue !== null) {
+	process.stderr.write(modelIssue)
+	session.dispose()
+	process.exit(1)
+}
 
 // The `ask_user` extension renders its rich UI through the runner's `ctx.ui`, which is
 // unavailable in this plain (non-TUI) harness. It degrades to the `select()`/`input()`

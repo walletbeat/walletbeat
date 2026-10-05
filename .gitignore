@@ -71,3 +71,7 @@ deploy/dev/dev-server.url
 
 # wallet-data-collection agent backup tree
 src/tools/wallet-data-collection/agent/backup-tree.bak
+
+# wallet-data-collection agent repo-local model/auth config (secrets)
+src/tools/wallet-data-collection/agent/models.json
+src/tools/wallet-data-collection/agent/auth.json
