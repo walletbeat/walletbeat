@@ -187,8 +187,6 @@ export const rabby: SoftwareWallet = {
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
-				supportsAddingOrRemovingSigners: true,
-				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
@@ -202,8 +200,32 @@ export const rabby: SoftwareWallet = {
 				},
 			],
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rabby doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7828-rejected.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7828-rejected.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rabby doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7831-rejected.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7831-rejected.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
 			},
 			nonChainSpecificEnsResolution: notSupported,
 		},

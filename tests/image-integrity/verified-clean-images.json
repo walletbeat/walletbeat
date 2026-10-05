@@ -363,6 +363,14 @@
 		"hash": "127f3c43a41c825f72698832bd8f066903822a0d246cf7201b28e12c335af66b",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7828-rejected.png": {
+		"hash": "1364bd2135c895c944630bf2c45df8d25755aed44cd8711232c328a420ed443d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7831-rejected.png": {
+		"hash": "0fc6b63059964eb670cf5bce131133edc3531e1264464e8e76130de0d9771412",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
 		"passedTests": ["blockiness", "file-format"]
@@ -517,6 +525,22 @@
 	},
 	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-network-list.png": {
 		"hash": "7666e57b3f80b8f26b0e2a26edbf70a462025a7e5dab8e8963dfe00ffc2fc7c2",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7828-unresolved.png": {
+		"hash": "79098f1332d5bcc6736d059d53f3c80ddf818530adf7120e89a6251a96fc5b13",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7831-unresolved.png": {
+		"hash": "ba9712de3eb97d6ac573d595624e9190024f166bdd3eb5cb1a7220d41d4f5d70",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7828-unresolved.png": {
+		"hash": "2a305f7fc7878b724daca9dc5b186c5c2c9313496fd657666b6cf68a03ed6903",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7831-unresolved.png": {
+		"hash": "e73bf46b7bbc9d2964e33a619dc57ddbfabe3cfc1fa43a30c61648dacb821105",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
@@ -697,6 +721,22 @@
 	},
 	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png": {
 		"hash": "52a455bdcfcc345de2bca1971a863462829c34754a7f93948b16e701c034c10d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7828-rejected.png": {
+		"hash": "4b6988ec6aa06c2ae99d25ee1a65b71f499223d4f8d33678386a990194e47ac0",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7831-rejected.png": {
+		"hash": "5ed4ed9841de7252137b8e7905498ec4e86defc98a085c6e8d3e5f5f4338e41e",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7828-rejected.png": {
+		"hash": "157c6d98a34bc71f0259cfe759875b442740595163fb95961d958ae8ae94ec9a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7831-rejected.png": {
+		"hash": "61695ca37ed8fb7cce3fc694c5f7dae161beaf33a7066feb61304a9614bfa9ac",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
@@ -885,6 +925,22 @@
 	},
 	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png": {
 		"hash": "850a58668e1f87efd2d97979ce4acd6e4267b02a8fb2b608d0e8e6d5dfdb8001",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7828-unresolved.png": {
+		"hash": "7095e9f7fe7427dae07fa6d4a78ef3930714e795e7ab0337fbb4b4a9cf481650",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7831-unresolved.png": {
+		"hash": "165ea0f3a43ff944b7803889d67461f6e2740d0a5fa89091726b8b1ac0a8eda2",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7828-unresolved.png": {
+		"hash": "add6b7710e19bc591b50c104d2203ae3a2080934fb6c163fdbc01c4249bb358e",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7831-unresolved.png": {
+		"hash": "4534aa1b1a24f581686b4b3a98389ec30634283e4da87b008e734ecbe45526a2",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
@@ -1145,6 +1201,30 @@
 	},
 	"public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png": {
 		"hash": "285f6059ac163b8f74ca7646e334ba8f23f366e5103be8be0b8439a12949b9a5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-lookup-capture.png": {
+		"hash": "8b5e21c66e40e5b62a3c68982aa3145fb15d9e81dfe43dec95ea723cdf98170d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-recipient.png": {
+		"hash": "5e92da8c73a004d24d9f9ebbcb70d661cdb82f129d445bdeaebec167c54bac14",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7828-unresolved.png": {
+		"hash": "8acf0f5e6b9003bf5d6c411f618ddb92bcd491dc8cad1c7b6b05f964443e87d7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7831-unresolved.png": {
+		"hash": "3e9fcdb46bddec220bf0def3a13dc58ceb2d63cf1fe04358192a0a026d727a6b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7828-unresolved.png": {
+		"hash": "a04bb1d12854bf0765a7e646bfcb7e1be6ff2b6d8690d2b755ff30ead3e37233",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7831-unresolved.png": {
+		"hash": "bfef3a1a48a1b122cc53489639df2c275fcca6ec56c245d149f63b8b5bb89ba9",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/robot.png": {

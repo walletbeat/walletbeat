@@ -501,20 +501,14 @@ To test:
 
 - `canDeployNew`: Go through the wallet's UI and check whether it offers
   a flow to deploy a new Safe contract.
-- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
-  or remove an owner using only the wallet's native UI (no extra modules).
-  Check whether the wallet generates the `addOwnerWithThreshold` /
-  `removeOwner` transaction directly.
-- `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  replace an owner key using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `swapOwner` transaction
-  directly.
-- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+- `keyRotationTransactionGeneration`: In an existing Safe, attempt to
+  replace an owner key. Check whether the `swapOwner` transaction can be
+  generated using an open-source standalone app, only a proprietary
+  standalone app, only an external API, or not at all.
+- `supportedOwners`: Try connecting the wallet to Safes with 1,
   2, and many owners and note the limits.
 
 - `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
-- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
-- `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
 - `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
 
   - SINGLE_SIGNER: only single-owner Safes are supported.
@@ -2546,16 +2540,45 @@ type SendTransactionWarning = WithRef<
 
 ---
 
+### Enum: `UnlimitedApprovalWarningBenchmarkSpenders`
+
+Benchmark spenders for unlimited ERC-20 token approvals.
+
+Each entry is a concrete, pinned on-chain address. Instead of describing a category of spender, we grant unlimited approval to this specific address and evaluate whether the wallet warns.
+
+- `PUBLIC_EOA` = `'PUBLIC_EOA'`: A publicly attributable Ethereum EOA belonging to an individual, rather than a protocol, application, or contract
+- `UNISWAP_V3_ROUTER` = `'UNISWAP_V3_ROUTER'`: Uniswap V3 SwapRouter, 0xE592427A0AEce92De3Edee1F18E0157C05861564: A verified, widely-used, reputable contract.
+- `PINK_PHISHING_ADDRESS` = `'PINK_PHISHING_ADDRESS'`: 0x9fA7bB759641FCd37fe4aE41f725e0f653f2C726, labeled "PinkDrainer: Wallet 2" on Etherscan. Pink Drainer was a scam-as-a-service operation that stole over $85M from more than 21,000 victims across 2023–2024 before its operators shut it down in May 2024. Stays valid as a benchmark as long as this address remains publicly flagged.
+- `CONTRACT_NOT_INTERACTED_BEFORE` = `'CONTRACT_NOT_INTERACTED_BEFORE'`: A contract the test wallet has never interacted with before. Any real contract works, as long as the tester's wallet has no prior history with it. Walletbeat's own testing contracts is a convenient default, since it's guaranteed untouched until deliberately used for this benchmark.
+- `RECENTLY_DEPLOYED_CONTRACT` = `'RECENTLY_DEPLOYED_CONTRACT'`: A contract that was only recently deployed onchain. Any real contract works, as long as it was deployed shortly before testing. Walletbeat's own testing contracts is a convenient default, since it can be redeployed on demand.
+
+---
+
+### Type: `UnlimitedApprovalWarningBenchmarks`
+
+Per-benchmark data on whether the wallet warns for that specific unlimited-approval spender.
+
+`null` means the benchmark has not been tested yet for the wallet.
+
+```typescript
+type UnlimitedApprovalWarningBenchmarks = Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	Support | null
+>
+```
+
+---
+
 ### Type: `UnlimitedApprovalWarning`
 
 ```typescript
 type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Which unlimited-approval benchmark spenders the wallet is known to
+		 * warn on.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address

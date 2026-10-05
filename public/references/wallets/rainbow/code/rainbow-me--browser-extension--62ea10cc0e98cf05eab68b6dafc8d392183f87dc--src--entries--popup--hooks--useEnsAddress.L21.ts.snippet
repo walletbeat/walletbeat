@@ -1,0 +1,26 @@
+{
+	"highlightFirstLine": 21,
+	"highlightLastLine": 21,
+	"segments": [
+		{
+			"lines": [
+				"} = {}) {"
+			],
+			"startLine": 15
+		},
+		{
+			"lines": [
+				"  return useQuery({",
+				"    queryKey: ['ensAddress', name, chainId],",
+				"    queryFn: async () => {",
+				"      if (!name) return null;",
+				"      return getEnsAddress(getViemClient({ chainId }), { name });",
+				"    },",
+				"    enabled: enabled && !!name,",
+				"    refetchOnWindowFocus: false,",
+				"    staleTime: 20 * 1000,"
+			],
+			"startLine": 17
+		}
+	]
+}
