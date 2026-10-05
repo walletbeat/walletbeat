@@ -87,7 +87,9 @@ fetch_endpoint() {
 
 ping_gateway() {
 	local url="$1" actual_sha
-	if ! fetch_endpoint "$url" 15; then
+	# Filebase gives up on provider discovery after about 55 seconds; wait
+	# longer so freshly pinned content can be found and its error is logged.
+	if ! fetch_endpoint "$url" 60; then
 		log "Failed to fetch content from '$url'."
 		return 1
 	fi
