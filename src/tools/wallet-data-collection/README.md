@@ -230,6 +230,22 @@ All requests must be reviewed manually at least once. This is your chance to:
 
 After a request is manually reviewed, it will never be prompted for in future executions of the `review-requests` subcommand.
 
+#### `agent` subcommand
+
+```
+pnpm wallet-data-collection <global flags> agent [<prompt>]
+```
+
+Run a Pi-based harness that drives the wallet-data-collection workflow autonomously.
+
+The `prompt` that follows `agent` is the initial instruction given to the agent, for example:
+
+```
+pnpm wallet-data-collection agent 'Classify network traffic for metamask browser extension'
+```
+
+After the initial instruction runs, the harness keeps reading further prompts from the terminal until you quit with `/quit`.
+
 ## Workflow
 
 - Human:

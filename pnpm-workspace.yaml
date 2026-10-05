@@ -2,10 +2,14 @@ minimumReleaseAge: 20160
 minimumReleaseAgeIgnoreMissingTime: false
 minimumReleaseAgeStrict: true
 trustPolicy: no-downgrade
+packages:
+  - 'src/tools/wallet-data-collection/agent'
 allowBuilds:
+  '@google/genai': false
   bufferutil: false
   esbuild: false
   keccak: false
+  protobufjs: false
   sharp: false
   ttf2woff2: false
   utf-8-validate: false

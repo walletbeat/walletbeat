@@ -9,7 +9,8 @@ src/generated/
 .cache/
 
 # Dependencies
-node_modules/
+node_modules
+**/node_modules
 
 # ESLint cache
 .eslintcache
@@ -67,3 +68,6 @@ deploy/dev/dev-server.url
 
 # Ruff cache
 .ruff_cache
+
+# wallet-data-collection agent backup tree
+src/tools/wallet-data-collection/agent/backup-tree.bak
