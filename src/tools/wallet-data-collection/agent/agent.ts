@@ -21,7 +21,7 @@ import askUserExtension from 'pi-ask-user/index.ts'
 import prompts from 'prompts'
 
 import { getRepositoryRoot } from '../../../utils/codebase'
-import { createCommandCheckBashOperations } from './command-check-hooks'
+import { COMMAND_CHECK_HOOK_MARKER, createCommandCheckBashOperations } from './command-check-hooks'
 import {
 	createLocalReadOperations,
 	createReadCheckOperations,
@@ -45,6 +45,8 @@ const outputStyles = {
 	toolName: chalk.magentaBright.bold,
 	/** Streamed tool (bash) output. */
 	toolOutput: chalk.cyan,
+	/** Command-check hook error message (appended to tool output). */
+	hookError: chalk.redBright.bold,
 } as const
 
 /**
@@ -294,10 +296,25 @@ class SessionOutput {
 	private writeToolOutput(toolCallId: string, text: string): void {
 		const written = this.toolOutputWritten.get(toolCallId) ?? 0
 
-		if (text.length > written) {
-			process.stdout.write(outputStyles.toolOutput(text.slice(written)))
-			this.toolOutputWritten.set(toolCallId, text.length)
+		if (text.length <= written) {
+			return
 		}
+
+		const newText = text.slice(written)
+
+		// Command-check hook messages are appended to the end of tool output. Detect the
+		// marker so the message (and the offending-file list that follows) renders in a
+		// distinct error style instead of the generic tool-output color.
+		const markerIndex = newText.indexOf(COMMAND_CHECK_HOOK_MARKER)
+
+		if (markerIndex === -1) {
+			process.stdout.write(outputStyles.toolOutput(newText))
+		} else {
+			process.stdout.write(outputStyles.toolOutput(newText.slice(0, markerIndex)))
+			process.stdout.write(outputStyles.hookError(newText.slice(markerIndex)))
+		}
+
+		this.toolOutputWritten.set(toolCallId, text.length)
 	}
 
 	/** Handle a streaming tool output snapshot (cumulative). */

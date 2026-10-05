@@ -36,6 +36,29 @@ import {
 /** A repo-relative path, e.g. `/src` or `/package.json`. */
 type RepoRelativePath = `/${string}`
 
+/**
+ * Prefix marking a command-check hook message in tool output. The display layer detects
+ * this marker to render hook messages in a distinct (error) style.
+ */
+export const COMMAND_CHECK_HOOK_MARKER = '[command-check-hooks]'
+
+/**
+ * Build the error message appended to a reverted command's output, naming every file
+ * that triggered the revert.
+ */
+export function buildCommandCheckErrorMessage(files: ReadonlySet<RepoRelativePath>): string {
+	const list = [...files]
+		.sort((a, b) => a.localeCompare(b))
+		.map(file => `  - ${file}`)
+		.join('\n')
+
+	return [
+		`${COMMAND_CHECK_HOOK_MARKER} A modified file was outside the allowed edit set or failed validation;`,
+		'reverted all changes to the scoped repo paths from backup-tree.bak. Offending file(s):',
+		list,
+	].join('\n')
+}
+
 /** Compute the sha256 hex digest of a buffer or string. */
 function sha256(data: Buffer | string): string {
 	return createHash('sha256').update(data).digest('hex')
@@ -455,39 +478,46 @@ export class WalletDataCollectionBash {
 		}
 
 		const allowed = this.agent.allowedEditFiles
-		let invalid = false
+
+		// Collect the files that triggered the revert, so the hook message can name them.
+		const offendingFiles = new Set<RepoRelativePath>()
 
 		// With an edit allowlist configured, any change to a file outside it is a violation.
-		if (this.agent.hasAllowedRestriction && changedFiles.some(key => !allowed.has(key))) {
-			invalid = true
+		if (this.agent.hasAllowedRestriction) {
+			for (const key of changedFiles) {
+				if (!allowed.has(key)) {
+					offendingFiles.add(key)
+				}
+			}
 		}
 
 		// A deleted capture file cannot be validated, so it always requires a revert.
-		if (!invalid && changedFiles.some(key => isCaptureFile(key) && !(key in currentHashes))) {
-			invalid = true
+		if (offendingFiles.size === 0) {
+			for (const key of changedFiles) {
+				if (isCaptureFile(key) && !(key in currentHashes)) {
+					offendingFiles.add(key)
+				}
+			}
 		}
 
 		// Validate any modified capture file that is still present.
-		if (!invalid) {
+		if (offendingFiles.size === 0) {
 			for (const key of changedFiles) {
 				if (!isCaptureFile(key) || !(key in currentHashes)) {
 					continue
 				}
 
 				if (!(await this.agent.isCaptureFileLoadable(key))) {
-					invalid = true
-					break
+					offendingFiles.add(key)
 				}
 			}
 		}
 
-		if (invalid) {
+		if (offendingFiles.size > 0) {
 			this.agent.revertRepo(Object.keys(currentHashes).map(key => assertStringHasPrefix(key, '/')))
 
 			return {
-				output:
-					output +
-					'\n[command-check-hooks] A modified file was outside the allowed edit set or failed validation; reverted all changes to the scoped repo paths from backup-tree.bak.',
+				output: output + `\n${buildCommandCheckErrorMessage(offendingFiles)}`,
 			}
 		}
 	}
