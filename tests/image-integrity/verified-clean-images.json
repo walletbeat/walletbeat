@@ -1527,6 +1527,10 @@
 		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/ERC-7730_tracker.png": {
+		"hash": "f02d1284ce1dfaa96ae696c9520b04061c0ba526fb1fb66df67626a432edb8f0",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/payy_security_news.png": {
 		"hash": "48d52f3030ff36b0324c453e6ce5449af774896277f6defeb3f1e78a103e061b",
 		"passedTests": ["blockiness", "file-format"]
