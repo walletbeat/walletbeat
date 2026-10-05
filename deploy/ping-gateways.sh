@@ -102,37 +102,37 @@ ping_gateway() {
 	log "Content verified on '$url'."
 }
 
-# Converts an HTTPS multiaddr such as /dns/example.com/tcp/443/https or
+# Converts an HTTPS provider address such as /dns/example.com/tcp/443/https or
 # /dns4/example.com/tcp/443/tls/sni/example.com/http into a base URL.
-multiaddr_to_url() {
-	local multiaddr="$1"
-	if [[ "$multiaddr" =~ ^/(dns|dns4|dns6|ip4)/([A-Za-z0-9.-]+)/tcp/([0-9]{1,5})/(https|tls/http|tls/sni/[A-Za-z0-9.-]+/http)$ ]]; then
+provider_address_to_url() {
+	local address="$1"
+	if [[ "$address" =~ ^/(dns|dns4|dns6|ip4)/([A-Za-z0-9.-]+)/tcp/([0-9]{1,5})/(https|tls/http|tls/sni/[A-Za-z0-9.-]+/http)$ ]]; then
 		echo "https://${BASH_REMATCH[2]}:${BASH_REMATCH[3]}"
 		return 0
 	fi
 	return 1
 }
 
-# Asks the IPNI indexer which providers advertise the CID over the trustless
+# Asks cid.contact which providers advertise the CID over the trustless
 # HTTP gateway protocol, then fetches the root block directly from them. This
 # avoids depending on any public gateway; the block is verified against the
 # CID's own digest, so an untrusted provider cannot fake availability.
 ipfs_provider_check() {
-	local url="$1" routing_status routing_retry_after multiaddr provider_url actual_digest
+	local url="$1" routing_status routing_retry_after provider_address provider_url actual_digest
 	local -a provider_urls=()
 	if ! fetch_endpoint "$url" 30; then
-		log "Failed to look up providers for CID '$DIRECTORY_CID' on the IPNI indexer."
+		log "Failed to look up providers for CID '$DIRECTORY_CID' on cid.contact."
 		return 1
 	fi
 	routing_status="$HTTP_STATUS"
 	routing_retry_after="$RETRY_AFTER_DELAY"
-	while IFS= read -r multiaddr; do
-		if provider_url="$(multiaddr_to_url "$multiaddr")"; then
+	while IFS= read -r provider_address; do
+		if provider_url="$(provider_address_to_url "$provider_address")"; then
 			provider_urls+=("$provider_url")
 		fi
 	done < <(jq -r '.Providers[]? | select(.Protocols | index("transport-ipfs-gateway-http")) | .Addrs[]?' "$TEMP_DIRECTORY/body" | head -n "$MAX_PROVIDERS")
 	if [[ "${#provider_urls[@]}" -eq 0 ]]; then
-		log "No HTTP providers found for CID '$DIRECTORY_CID' on the IPNI indexer."
+		log "No HTTP providers found for CID '$DIRECTORY_CID' on cid.contact."
 		return 1
 	fi
 	for provider_url in "${provider_urls[@]}"; do
@@ -170,16 +170,16 @@ if [[ ! "$DIRECTORY_CID" =~ ^[a-z2-7]+$ ]]; then
 	log "CID '$DIRECTORY_CID' is not base32-lowercase alphanumeric; refusing to build check URLs."
 	exit 1
 fi
-# The CID is the multibase prefix 'b' plus unpadded base32 of
-# <version><codec><multihash>. Only CIDv1 with a single-byte codec and a
-# sha2-256 multihash is supported, which is what omnipin produces.
+# The CID is the multibase prefix 'b' plus base32 (without padding) of
+# <version><codec><hash>. Only CIDv1 with a single-byte codec and a
+# sha2-256 hash is supported, which is what omnipin produces.
 CID_BASE32="$(tr 'a-z' 'A-Z' <<<"${DIRECTORY_CID#b}")"
 while [[ "$((${#CID_BASE32} % 8))" -ne 0 ]]; do
 	CID_BASE32+='='
 done
 CID_HEX="$(basenc --base32 --decode <<<"$CID_BASE32" | od -An -tx1 -v | tr -d ' \n')"
 if [[ ! "$CID_HEX" =~ ^01[0-7][0-9a-f]1220([0-9a-f]{64})$ ]]; then
-	log "CID '$DIRECTORY_CID' is not a CIDv1 with a sha2-256 multihash; cannot verify provider blocks."
+	log "CID '$DIRECTORY_CID' is not a CIDv1 with a sha2-256 hash; cannot verify provider blocks."
 	exit 1
 fi
 EXPECTED_ROOT_DIGEST="${BASH_REMATCH[1]}"
@@ -192,7 +192,7 @@ trap 'rm -rf "$TEMP_DIRECTORY"' EXIT
 ENDPOINTS=(ipfs-providers "${GATEWAY_FUNCTIONS[@]}")
 ENDPOINT_URLS=("https://cid.contact/routing/v1/providers/${DIRECTORY_CID}")
 ATTEMPTS=()
-BACKOFFS=()
+BACKOFF_SECONDS=()
 NEXT_ATTEMPTS=()
 LAST_HTTP_STATUS=()
 for GATEWAY_FUNC in "${GATEWAY_FUNCTIONS[@]}"; do
@@ -201,7 +201,7 @@ done
 DEADLINE="$((SECONDS + 600))"
 for INDEX in "${!ENDPOINTS[@]}"; do
 	ATTEMPTS+=(0)
-	BACKOFFS+=(10)
+	BACKOFF_SECONDS+=(10)
 	NEXT_ATTEMPTS+=("$SECONDS")
 	LAST_HTTP_STATUS+=(not-attempted)
 done
@@ -228,19 +228,19 @@ while [[ "$SECONDS" -lt "$DEADLINE" ]]; do
 		fi
 		LAST_HTTP_STATUS[$INDEX]="$HTTP_STATUS"
 		# Add up to 20% jitter; at the cap, jitter downward to stay within 60s.
-		JITTER="$((RANDOM % (BACKOFFS[$INDEX] / 5 + 1)))"
-		if [[ "${BACKOFFS[$INDEX]}" -eq 60 ]]; then
+		JITTER="$((RANDOM % (BACKOFF_SECONDS[$INDEX] / 5 + 1)))"
+		if [[ "${BACKOFF_SECONDS[$INDEX]}" -eq 60 ]]; then
 			RETRY_DELAY="$((60 - JITTER))"
 		else
-			RETRY_DELAY="$((BACKOFFS[$INDEX] + JITTER))"
+			RETRY_DELAY="$((BACKOFF_SECONDS[$INDEX] + JITTER))"
 		fi
 		if [[ "$RETRY_AFTER_DELAY" -gt "$RETRY_DELAY" ]]; then
 			RETRY_DELAY="$RETRY_AFTER_DELAY"
 		fi
 		NEXT_ATTEMPTS[$INDEX]="$((SECONDS + RETRY_DELAY))"
-		BACKOFFS[$INDEX]="$((BACKOFFS[$INDEX] * 2))"
-		if [[ "${BACKOFFS[$INDEX]}" -gt 60 ]]; then
-			BACKOFFS[$INDEX]=60
+		BACKOFF_SECONDS[$INDEX]="$((BACKOFF_SECONDS[$INDEX] * 2))"
+		if [[ "${BACKOFF_SECONDS[$INDEX]}" -gt 60 ]]; then
+			BACKOFF_SECONDS[$INDEX]=60
 		fi
 		if [[ "${NEXT_ATTEMPTS[$INDEX]}" -ge "$DEADLINE" ]]; then
 			log "${ENDPOINTS[$INDEX]}: HTTP $HTTP_STATUS, curl exit $CURL_EXIT_CODE; retry delay ${RETRY_DELAY}s exceeds the remaining budget. No further attempts."
