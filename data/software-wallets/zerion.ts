@@ -180,8 +180,20 @@ export const zerion: SoftwareWallet = {
 					],
 				},
 				chainSpecificAddressing: {
-					erc7828: notSupported,
-					erc7831: notSupported,
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+					}),
 				},
 				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 					medium: 'OFFCHAIN',
@@ -204,8 +216,20 @@ export const zerion: SoftwareWallet = {
 					},
 				],
 				chainSpecificAddressing: {
-					erc7828: notSupported,
-					erc7831: notSupported,
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					}),
 				},
 				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 					medium: 'OFFCHAIN',
