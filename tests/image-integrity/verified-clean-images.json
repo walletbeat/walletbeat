@@ -363,6 +363,14 @@
 		"hash": "127f3c43a41c825f72698832bd8f066903822a0d246cf7201b28e12c335af66b",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7828-rejected.png": {
+		"hash": "1364bd2135c895c944630bf2c45df8d25755aed44cd8711232c328a420ed443d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7831-rejected.png": {
+		"hash": "0fc6b63059964eb670cf5bce131133edc3531e1264464e8e76130de0d9771412",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
 		"passedTests": ["blockiness", "file-format"]

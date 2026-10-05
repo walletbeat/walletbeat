@@ -324,8 +324,20 @@ export const ambire: SoftwareWallet = {
 				],
 			},
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: {
+						explanation: "Ambire doesn't support ERC-7828 names.",
+						file: 'public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7828-rejected.png',
+						label: 'Browser extension fails to resolve an ERC-7828 name',
+					},
+				}),
+				erc7831: notSupportedWithRef({
+					ref: {
+						explanation: "Ambire doesn't support ERC-7831 names.",
+						file: 'public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7831-rejected.png',
+						label: 'Browser extension fails to resolve an ERC-7831 name',
+					},
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
