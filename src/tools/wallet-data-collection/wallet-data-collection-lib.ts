@@ -796,13 +796,13 @@ function repoDir(): string {
 function capturePath(options: GlobalOptions): string {
 	const { type, id, variant } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.${variant.toLocaleLowerCase()}.capture.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.${variant.toLocaleLowerCase()}.capture.json`
 }
 
 function annotationsPath(options: GlobalOptions): string {
 	const { type, id } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.annotations.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.annotations.json`
 }
 
 function globalAnnotationsPath(): string {
@@ -2777,8 +2777,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 				'data',
 				typeDir,
 				'collection',
-				walletId.toLowerCase(),
-				`${walletId.toLowerCase()}.${variant.toLowerCase()}.capture.json`,
+				walletId,
+				`${walletId}.${variant.toLowerCase()}.capture.json`,
 			)
 
 			const exists = fs.existsSync(captureFilePath)
@@ -2791,8 +2791,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 					'data',
 					typeDir,
 					'collection',
-					walletId.toLowerCase(),
-					`${walletId.toLowerCase()}.annotations.json`,
+					walletId,
+					`${walletId}.annotations.json`,
 				)
 				const globalAnnotations = globalAnnotationsPath()
 
