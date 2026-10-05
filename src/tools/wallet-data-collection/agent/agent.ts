@@ -78,7 +78,7 @@ function substituteWalletPlaceholders(content: string): string {
 const settingsManager = SettingsManager.create(agentDir, agentDirGlobal)
 
 const resourceLoader = new DefaultResourceLoader({
-	cwd: repoRoot,
+	cwd: agentDir,
 	agentDir: agentDirGlobal,
 	settingsManager,
 	noExtensions: true,
