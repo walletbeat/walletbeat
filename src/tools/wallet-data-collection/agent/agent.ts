@@ -82,7 +82,7 @@ function substituteWalletPlaceholders(content: string): string {
 const settingsManager = SettingsManager.create(agentDir, agentDirGlobal)
 
 const resourceLoader = new DefaultResourceLoader({
-	cwd: agentDir,
+	cwd: repoRoot,
 	agentDir: agentDirGlobal,
 	settingsManager,
 	noExtensions: true,
@@ -99,7 +99,7 @@ await resourceLoader.reload()
 
 // Wrap the `bash` tool with the command-check hooks.
 const bashOperations = createCommandCheckBashOperations(createLocalBashOperations())
-const bashTool = defineTool(createBashToolDefinition(agentDir, { operations: bashOperations }))
+const bashTool = defineTool(createBashToolDefinition(repoRoot, { operations: bashOperations }))
 
 // Wrap the `read` tool with path-validation hooks: refuse out-of-repo reads and reads
 // inside backup-tree.bak (except pi-*.log files and directories), and render the
@@ -109,10 +109,10 @@ const readOperations = createReadCheckOperations(
 	repoRoot,
 	backupTreeDir,
 )
-const readTool = defineTool(createReadToolDefinition(agentDir, { operations: readOperations }))
+const readTool = defineTool(createReadToolDefinition(repoRoot, { operations: readOperations }))
 
 const { session } = await createAgentSession({
-	cwd: agentDir,
+	cwd: repoRoot,
 	agentDir: agentDirGlobal,
 	tools: ['bash', 'read', 'ask_user'],
 	customTools: [bashTool, readTool],
@@ -361,7 +361,7 @@ session.subscribe(event => {
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
 			const readPath = isReadToolArgs(event.args)
-				? resolveReadDisplayPath(event.args.path, repoRoot, agentDir)
+				? resolveReadDisplayPath(event.args.path, repoRoot, repoRoot)
 				: undefined
 
 			sessionOutput.handleToolStart(event.toolName, event.toolCallId, command ?? readPath)
