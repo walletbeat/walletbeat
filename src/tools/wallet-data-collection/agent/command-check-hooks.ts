@@ -140,7 +140,11 @@ export class WalletDataCollectionAgent {
 	 */
 	lastSnapshot: RepoSnapshot | null = null
 
-	/** The set of repo-relative paths the harness is allowed to edit. */
+	/**
+	 * The set of repo-relative paths the harness is allowed to edit.
+	 * Entries ending with `/` are directory prefixes: any file under
+	 * them is allowed. Non-prefix entries are exact file paths.
+	 */
 	readonly allowedEditFiles: Set<RepoRelativePath>
 
 	/** Whether an edit allowlist is active (the env var is set, even if empty). */
@@ -163,6 +167,24 @@ export class WalletDataCollectionAgent {
 	}
 
 	/**
+	 * True if `rel` is an explicitly allowed file or lives under an allowed directory
+	 * prefix.
+	 */
+	isAllowedEdit(rel: RepoRelativePath): boolean {
+		for (const allowed of this.allowedEditFiles) {
+			if (allowed.endsWith('/')) {
+				if (rel.startsWith(allowed)) {
+					return true
+				}
+			} else if (rel === allowed) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	/**
 	 * One-time harness initialization: crawl the scoped paths, checksum them, and mirror
 	 * them into `backup-tree.bak/`. The initial sync compares against the backup's own
 	 * hashes (read once here) so files already present from a prior session are not
@@ -175,6 +197,10 @@ export class WalletDataCollectionAgent {
 		// initial snapshot, otherwise the harness would be told it may edit a file that
 		// does not exist.
 		for (const rel of this.allowedEditFiles) {
+			if (rel.endsWith('/')) {
+				continue
+			}
+
 			if (snapshot[rel] === undefined) {
 				throw new Error(
 					`[command-check-hooks] Allowed edit file ${rel} is missing from the initial snapshot`,
@@ -477,15 +503,13 @@ export class WalletDataCollectionBash {
 			}
 		}
 
-		const allowed = this.agent.allowedEditFiles
-
 		// Collect the files that triggered the revert, so the hook message can name them.
 		const offendingFiles = new Set<RepoRelativePath>()
 
 		// With an edit allowlist configured, any change to a file outside it is a violation.
 		if (this.agent.hasAllowedRestriction) {
 			for (const key of changedFiles) {
-				if (!allowed.has(key)) {
+				if (!this.agent.isAllowedEdit(key)) {
 					offendingFiles.add(key)
 				}
 			}

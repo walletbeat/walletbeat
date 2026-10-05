@@ -24,8 +24,8 @@ export function createLocalReadOperations(): ReadOperations {
 
 /** True if `child` is `parent` or lives under `parent`. */
 function isPathWithin(child: string, parent: string): boolean {
-	const normalizedChild = normalizePath(child)
-	const normalizedParent = normalizePath(parent)
+	const normalizedChild = normalizePath(child).replace(/\/+$/, '')
+	const normalizedParent = normalizePath(parent).replace(/\/+$/, '')
 
 	return normalizedChild === normalizedParent || normalizedChild.startsWith(`${normalizedParent}/`)
 }

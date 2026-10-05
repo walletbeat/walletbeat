@@ -16,7 +16,11 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { type Variant, variantEnum } from '@/schema/variants'
 import { variantToWalletType, WalletType, walletTypes } from '@/schema/wallet-types'
-import { assertStringHasPrefix, trimWhitespacePrefix } from '@/types/utils/text'
+import {
+	assertStringHasPrefix,
+	assertStringHasPrefixAndSuffix,
+	trimWhitespacePrefix,
+} from '@/types/utils/text'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import { recordedFlow } from './wallet-capture-file'
@@ -423,8 +427,8 @@ cli
 				}
 			}
 
-			// Repo-global data files the agent may edit regardless of the wallet.
-			pushIfExists('/data/entities/domains/entity-domains.json')
+			// Repo-global data the agent may edit regardless of the wallet.
+			files.push(assertStringHasPrefixAndSuffix('/data/entities/', { prefix: '/', suffix: '/' }))
 			pushIfExists('/data/collection/global.annotations.json')
 
 			for (const v of variants) {
