@@ -3,23 +3,16 @@
 set -euo pipefail
 set +x
 
-gateway_dweb() {
-	echo "https://${1}.ipfs.dweb.link/"
-}
-
-gateway_w3s() {
-	echo "https://${1}.ipfs.w3s.link/"
-}
-
-gateway_nftstorage() {
-	echo "https://${1}.ipfs.nftstorage.link/"
+gateway_filebase() {
+	echo "https://ipfs.filebase.io/ipfs/${1}/"
 }
 
 GATEWAY_FUNCTIONS=(
-	dweb
-	w3s
-	nftstorage
+	filebase
 )
+
+# At most this many provider addresses are tried per routing lookup.
+MAX_PROVIDERS=5
 
 log() {
 	echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] $*" >&2
@@ -109,17 +102,55 @@ ping_gateway() {
 	log "Content verified on '$url'."
 }
 
-ipfs_check_cid() {
-	local url="$1"
-	if ! fetch_endpoint "$url" 40; then
-		log "Failed to fetch CID availability from the IPFS check service."
+# Converts an HTTPS multiaddr such as /dns/example.com/tcp/443/https or
+# /dns4/example.com/tcp/443/tls/sni/example.com/http into a base URL.
+multiaddr_to_url() {
+	local multiaddr="$1"
+	if [[ "$multiaddr" =~ ^/(dns|dns4|dns6|ip4)/([A-Za-z0-9.-]+)/tcp/([0-9]{1,5})/(https|tls/http|tls/sni/[A-Za-z0-9.-]+/http)$ ]]; then
+		echo "https://${BASH_REMATCH[2]}:${BASH_REMATCH[3]}"
+		return 0
+	fi
+	return 1
+}
+
+# Asks the IPNI indexer which providers advertise the CID over the trustless
+# HTTP gateway protocol, then fetches the root block directly from them. This
+# avoids depending on any public gateway; the block is verified against the
+# CID's own digest, so an untrusted provider cannot fake availability.
+ipfs_provider_check() {
+	local url="$1" routing_status routing_retry_after multiaddr provider_url actual_digest
+	local -a provider_urls=()
+	if ! fetch_endpoint "$url" 30; then
+		log "Failed to look up providers for CID '$DIRECTORY_CID' on the IPNI indexer."
 		return 1
 	fi
-	if ! jq -e '([.[] | select(.DataAvailableOverBitswap.Found == true)] | length) >= 1 and ([.[] | select(.DataAvailableOverHTTP.Found == true)] | length) >= 1' "$TEMP_DIRECTORY/body" >/dev/null; then
-		log "CID '$DIRECTORY_CID' not reported as available by the IPFS check service."
+	routing_status="$HTTP_STATUS"
+	routing_retry_after="$RETRY_AFTER_DELAY"
+	while IFS= read -r multiaddr; do
+		if provider_url="$(multiaddr_to_url "$multiaddr")"; then
+			provider_urls+=("$provider_url")
+		fi
+	done < <(jq -r '.Providers[]? | select(.Protocols | index("transport-ipfs-gateway-http")) | .Addrs[]?' "$TEMP_DIRECTORY/body" | head -n "$MAX_PROVIDERS")
+	if [[ "${#provider_urls[@]}" -eq 0 ]]; then
+		log "No HTTP providers found for CID '$DIRECTORY_CID' on the IPNI indexer."
 		return 1
 	fi
-	log "CID '$DIRECTORY_CID' reported as available by the IPFS check service."
+	for provider_url in "${provider_urls[@]}"; do
+		if ! fetch_endpoint "${provider_url}/ipfs/${DIRECTORY_CID}?format=raw" 30; then
+			log "Failed to fetch root block from provider '$provider_url'."
+			continue
+		fi
+		actual_digest="$(sha256sum "$TEMP_DIRECTORY/body" | awk '{print $1}')"
+		if [[ "$actual_digest" == "$EXPECTED_ROOT_DIGEST" ]]; then
+			log "Root block of CID '$DIRECTORY_CID' verified on provider '$provider_url'."
+			return 0
+		fi
+		log "Root block digest mismatch on provider '$provider_url' (expected '$EXPECTED_ROOT_DIGEST', got '$actual_digest')."
+	done
+	# Back off according to the indexer, not the last provider tried.
+	HTTP_STATUS="$routing_status"
+	RETRY_AFTER_DELAY="$routing_retry_after"
+	return 1
 }
 
 print_summary() {
@@ -139,14 +170,27 @@ if [[ ! "$DIRECTORY_CID" =~ ^[a-z2-7]+$ ]]; then
 	log "CID '$DIRECTORY_CID' is not base32-lowercase alphanumeric; refusing to build check URLs."
 	exit 1
 fi
+# The CID is the multibase prefix 'b' plus unpadded base32 of
+# <version><codec><multihash>. Only CIDv1 with a single-byte codec and a
+# sha2-256 multihash is supported, which is what omnipin produces.
+CID_BASE32="$(tr 'a-z' 'A-Z' <<<"${DIRECTORY_CID#b}")"
+while [[ "$((${#CID_BASE32} % 8))" -ne 0 ]]; do
+	CID_BASE32+='='
+done
+CID_HEX="$(basenc --base32 --decode <<<"$CID_BASE32" | od -An -tx1 -v | tr -d ' \n')"
+if [[ ! "$CID_HEX" =~ ^01[0-7][0-9a-f]1220([0-9a-f]{64})$ ]]; then
+	log "CID '$DIRECTORY_CID' is not a CIDv1 with a sha2-256 multihash; cannot verify provider blocks."
+	exit 1
+fi
+EXPECTED_ROOT_DIGEST="${BASH_REMATCH[1]}"
 EXPECTED_SHA="$(sed -E 's#<a href="https://[^"]*cdn-cgi/content\?id=[^"]*"[^>]*></a>##g' "$DEPLOY_DIRECTORY/index.html" | sha256sum | awk '{print $1}')"
 TEMP_DIRECTORY="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIRECTORY"' EXIT
 
 # Each endpoint has its own attempt count, backoff, and cooldown. Track the
 # waiting budget using the shell's elapsed seconds.
-ENDPOINTS=("${GATEWAY_FUNCTIONS[@]}" ipfs-check)
-ENDPOINT_URLS=()
+ENDPOINTS=(ipfs-providers "${GATEWAY_FUNCTIONS[@]}")
+ENDPOINT_URLS=("https://cid.contact/routing/v1/providers/${DIRECTORY_CID}")
 ATTEMPTS=()
 BACKOFFS=()
 NEXT_ATTEMPTS=()
@@ -154,7 +198,6 @@ LAST_HTTP_STATUS=()
 for GATEWAY_FUNC in "${GATEWAY_FUNCTIONS[@]}"; do
 	ENDPOINT_URLS+=("$(gateway_"$GATEWAY_FUNC" "$DIRECTORY_CID")")
 done
-ENDPOINT_URLS+=("https://ipfs-check-backend.ipfs.io/check?cid=${DIRECTORY_CID}&multiaddr=&ipniIndexer=https%3A%2F%2Fcid.contact&timeoutSeconds=30&httpRetrieval=on")
 DEADLINE="$((SECONDS + 600))"
 for INDEX in "${!ENDPOINTS[@]}"; do
 	ATTEMPTS+=(0)
@@ -174,8 +217,8 @@ while [[ "$SECONDS" -lt "$DEADLINE" ]]; do
 		ATTEMPTS[$INDEX]="$((ATTEMPTS[$INDEX] + 1))"
 		log "Checking '${ENDPOINTS[$INDEX]}' for CID '$DIRECTORY_CID' (attempt ${ATTEMPTS[$INDEX]}) at '${ENDPOINT_URLS[$INDEX]}'..."
 		CHECK_FUNCTION=ping_gateway
-		if [[ "${ENDPOINTS[$INDEX]}" == ipfs-check ]]; then
-			CHECK_FUNCTION=ipfs_check_cid
+		if [[ "${ENDPOINTS[$INDEX]}" == ipfs-providers ]]; then
+			CHECK_FUNCTION=ipfs_provider_check
 		fi
 		if "$CHECK_FUNCTION" "${ENDPOINT_URLS[$INDEX]}"; then
 			LAST_HTTP_STATUS[$INDEX]="$HTTP_STATUS"
