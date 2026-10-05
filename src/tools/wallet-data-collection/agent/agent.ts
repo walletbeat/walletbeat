@@ -92,7 +92,7 @@ const bashTool = defineTool(createBashToolDefinition(agentDir, { operations: bas
 const { session } = await createAgentSession({
 	cwd: agentDir,
 	agentDir: agentDirGlobal,
-	tools: ['bash', 'ask_user'],
+	tools: ['bash', 'read', 'ask_user'],
 	customTools: [bashTool],
 	resourceLoader,
 	settingsManager,
@@ -169,45 +169,150 @@ function isToolArgs(value: unknown): value is { command?: string } {
 
 // Track the kind of the most recently streamed assistant block so we can insert a
 // blank line when the model switches between thinking and non-thinking output.
-let lastStreamKind: 'thinking' | 'text' | null = null
+// Both this and the per-call output tracking are held on the session output state so
+// the harness has a single mutable object rather than loose module-level variables.
+class SessionOutput {
+	private lastStreamKind: 'thinking' | 'text' | null = null
+
+	/** How many characters of a tool's output have already been written, per tool call id. */
+	private readonly toolOutputWritten = new Map<string, number>()
+
+	/**
+	 * Narrow a content part to a `{ type: "text", text: string }` shape, or return null.
+	 * Used to safely extract text from a tool result's content array.
+	 */
+	private static asTextPart(value: unknown): { text: string } | null {
+		if (typeof value !== 'object' || value === null) {
+			return null
+		}
+
+		if (!('type' in value) || !('text' in value)) {
+			return null
+		}
+
+		const { type, text } = value
+
+		if (type !== 'text' || typeof text !== 'string') {
+			return null
+		}
+
+		return { text }
+	}
+
+	/**
+	 * Extract the concatenated text of a tool result/partial result's content array.
+	 * Returns an empty string for anything that is not a `{ content: [...] }` shape with
+	 * text parts, so non-bash tools and unexpected shapes degrade to no output.
+	 */
+	private static extractToolText(result: unknown): string {
+		if (typeof result !== 'object' || result === null) {
+			return ''
+		}
+
+		const content = (result as { content?: unknown }).content
+
+		if (!Array.isArray(content)) {
+			return ''
+		}
+
+		let text = ''
+
+		for (const part of content) {
+			const textPart = SessionOutput.asTextPart(part)
+
+			if (textPart !== null) {
+				text += textPart.text
+			}
+		}
+
+		return text
+	}
+
+	/** Handle a streaming assistant message update (thinking or output text). */
+	handleMessageUpdate(event: { type: string; delta: string }): void {
+		if (event.type === 'text_delta') {
+			if (this.lastStreamKind === 'thinking') {
+				process.stdout.write('\n')
+			}
+
+			this.lastStreamKind = 'text'
+			process.stdout.write(outputStyles.output(event.delta))
+		} else if (event.type === 'thinking_delta') {
+			if (this.lastStreamKind === 'text') {
+				process.stdout.write('\n')
+			}
+
+			this.lastStreamKind = 'thinking'
+			process.stdout.write(outputStyles.thinking(event.delta))
+		}
+	}
+
+	/** Handle a tool starting to execute: reset per-call tracking and print the header. */
+	handleToolStart(toolName: string, toolCallId: string, command: string | undefined): void {
+		this.lastStreamKind = null
+		this.toolOutputWritten.delete(toolCallId)
+		process.stdout.write(
+			`\n${outputStyles.toolInput(`[${outputStyles.toolName(toolName)}]${command ? ` $ ${command}` : ''}`)}\n`,
+		)
+	}
+
+	/**
+	 * Write the portion of `text` not already printed for `toolCallId`. The bash tool
+	 * streams cumulative snapshots via `tool_execution_update`, so each update contains
+	 * the full output so far; we only write the tail that is new.
+	 */
+	private writeToolOutput(toolCallId: string, text: string): void {
+		const written = this.toolOutputWritten.get(toolCallId) ?? 0
+
+		if (text.length > written) {
+			process.stdout.write(outputStyles.toolOutput(text.slice(written)))
+			this.toolOutputWritten.set(toolCallId, text.length)
+		}
+	}
+
+	/** Handle a streaming tool output snapshot (cumulative). */
+	handleToolUpdate(toolCallId: string, partialResult: unknown): void {
+		this.writeToolOutput(toolCallId, SessionOutput.extractToolText(partialResult))
+	}
+
+	/** Handle a tool finishing: flush the final output and emit a trailing newline. */
+	handleToolEnd(toolCallId: string, result: unknown): void {
+		this.writeToolOutput(toolCallId, SessionOutput.extractToolText(result))
+		process.stdout.write('\n')
+	}
+}
+
+// One session-scoped output state for the whole harness run.
+const sessionOutput = new SessionOutput()
+
+// Tools whose output is intentionally not echoed to stdout. The `read` tool's file
+// contents are visible in the transcript context but would clutter the terminal, so we
+// print its call header but suppress its output.
+const quietTools = new Set(['read'])
 
 session.subscribe(event => {
 	switch (event.type) {
 		case 'message_update': {
-			const kind = event.assistantMessageEvent.type
-
-			if (kind === 'text_delta') {
-				if (lastStreamKind === 'thinking') {
-					process.stdout.write('\n')
-				}
-
-				lastStreamKind = 'text'
-				process.stdout.write(outputStyles.output(event.assistantMessageEvent.delta))
-			} else if (kind === 'thinking_delta') {
-				if (lastStreamKind === 'text') {
-					process.stdout.write('\n')
-				}
-
-				lastStreamKind = 'thinking'
-				process.stdout.write(outputStyles.thinking(event.assistantMessageEvent.delta))
-			}
-
+			sessionOutput.handleMessageUpdate(event.assistantMessageEvent)
 			break
 		}
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
 
-			lastStreamKind = null
-			process.stdout.write(
-				`\n${outputStyles.toolInput(`[${outputStyles.toolName(event.toolName)}]${command ? ` $ ${command}` : ''}`)}\n`,
-			)
+			sessionOutput.handleToolStart(event.toolName, event.toolCallId, command)
 			break
 		}
-		case 'bash_execution_update':
-			process.stdout.write(outputStyles.toolOutput(event.delta))
+		case 'tool_execution_update':
+			if (!quietTools.has(event.toolName)) {
+				sessionOutput.handleToolUpdate(event.toolCallId, event.partialResult)
+			}
+
 			break
 		case 'tool_execution_end':
-			process.stdout.write('\n')
+			if (!quietTools.has(event.toolName)) {
+				sessionOutput.handleToolEnd(event.toolCallId, event.result)
+			}
+
 			break
 		default:
 			break
