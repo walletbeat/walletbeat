@@ -7,6 +7,7 @@ import {
 	createAgentSession,
 	createBashToolDefinition,
 	createLocalBashOperations,
+	createReadToolDefinition,
 	DefaultResourceLoader,
 	defineTool,
 	type ExtensionUIContext,
@@ -21,9 +22,17 @@ import prompts from 'prompts'
 
 import { getRepositoryRoot } from '../../../utils/codebase'
 import { createCommandCheckBashOperations } from './command-check-hooks'
+import {
+	createLocalReadOperations,
+	createReadCheckOperations,
+	resolveReadDisplayPath,
+} from './read-hooks'
 
 const agentDir = path.join(getRepositoryRoot(), 'src/tools/wallet-data-collection/agent')
 const agentDirGlobal = getAgentDir()
+
+const repoRoot = getRepositoryRoot()
+const backupTreeDir = path.join(agentDir, 'backup-tree.bak')
 
 const outputStyles = {
 	/** Model reasoning/thinking text (assistant `thinking_delta`). */
@@ -89,11 +98,21 @@ await resourceLoader.reload()
 const bashOperations = createCommandCheckBashOperations(createLocalBashOperations())
 const bashTool = defineTool(createBashToolDefinition(agentDir, { operations: bashOperations }))
 
+// Wrap the `read` tool with path-validation hooks: refuse out-of-repo reads and reads
+// inside backup-tree.bak (except pi-*.log files and directories), and render the
+// repo-root-relative path in the call header.
+const readOperations = createReadCheckOperations(
+	createLocalReadOperations(),
+	repoRoot,
+	backupTreeDir,
+)
+const readTool = defineTool(createReadToolDefinition(agentDir, { operations: readOperations }))
+
 const { session } = await createAgentSession({
 	cwd: agentDir,
 	agentDir: agentDirGlobal,
 	tools: ['bash', 'read', 'ask_user'],
-	customTools: [bashTool],
+	customTools: [bashTool, readTool],
 	resourceLoader,
 	settingsManager,
 	sessionManager: SessionManager.inMemory(agentDir),
@@ -165,6 +184,16 @@ async function promptOrClose<T>(run: () => Promise<T>): Promise<T | null> {
 // unsafe type assertion.
 function isToolArgs(value: unknown): value is { command?: string } {
 	return typeof value === 'object' && value !== null && 'command' in value
+}
+
+// Narrow the (any-typed) tool args to a shape with a `path`, for the read tool.
+function isReadToolArgs(value: unknown): value is { path: string } {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		'path' in value &&
+		typeof (value as { path?: unknown }).path === 'string'
+	)
 }
 
 // Track the kind of the most recently streamed assistant block so we can insert a
@@ -249,11 +278,11 @@ class SessionOutput {
 	}
 
 	/** Handle a tool starting to execute: reset per-call tracking and print the header. */
-	handleToolStart(toolName: string, toolCallId: string, command: string | undefined): void {
+	handleToolStart(toolName: string, toolCallId: string, detail: string | undefined): void {
 		this.lastStreamKind = null
 		this.toolOutputWritten.delete(toolCallId)
 		process.stdout.write(
-			`\n${outputStyles.toolInput(`[${outputStyles.toolName(toolName)}]${command ? ` $ ${command}` : ''}`)}\n`,
+			`\n${outputStyles.toolInput(`[${outputStyles.toolName(toolName)}]${detail ? ` $ ${detail}` : ''}`)}\n`,
 		)
 	}
 
@@ -304,8 +333,11 @@ session.subscribe(event => {
 		}
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
+			const readPath = isReadToolArgs(event.args)
+				? resolveReadDisplayPath(event.args.path, repoRoot, agentDir)
+				: undefined
 
-			sessionOutput.handleToolStart(event.toolName, event.toolCallId, command)
+			sessionOutput.handleToolStart(event.toolName, event.toolCallId, command ?? readPath)
 			break
 		}
 		case 'tool_execution_update':
