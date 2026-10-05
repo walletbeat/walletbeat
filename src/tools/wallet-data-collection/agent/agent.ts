@@ -229,21 +229,22 @@ class SessionOutput {
 	}
 
 	/** Handle a streaming assistant message update (thinking or output text). */
-	handleMessageUpdate(event: { type: string; delta: string }): void {
-		if (event.type === 'text_delta') {
+	/** Handle a streaming assistant message delta (thinking or output text). */
+	handleMessageDelta(kind: 'text_delta' | 'thinking_delta', delta: string): void {
+		if (kind === 'text_delta') {
 			if (this.lastStreamKind === 'thinking') {
 				process.stdout.write('\n')
 			}
 
 			this.lastStreamKind = 'text'
-			process.stdout.write(outputStyles.output(event.delta))
-		} else if (event.type === 'thinking_delta') {
+			process.stdout.write(outputStyles.output(delta))
+		} else {
 			if (this.lastStreamKind === 'text') {
 				process.stdout.write('\n')
 			}
 
 			this.lastStreamKind = 'thinking'
-			process.stdout.write(outputStyles.thinking(event.delta))
+			process.stdout.write(outputStyles.thinking(delta))
 		}
 	}
 
@@ -293,7 +294,12 @@ const quietTools = new Set(['read'])
 session.subscribe(event => {
 	switch (event.type) {
 		case 'message_update': {
-			sessionOutput.handleMessageUpdate(event.assistantMessageEvent)
+			const { type } = event.assistantMessageEvent
+
+			if (type === 'text_delta' || type === 'thinking_delta') {
+				sessionOutput.handleMessageDelta(type, event.assistantMessageEvent.delta)
+			}
+
 			break
 		}
 		case 'tool_execution_start': {
@@ -323,65 +329,63 @@ session.subscribe(event => {
 // reads `theme`, but `ExtensionUIContext` requires one, so we provide a stub whose color
 // helpers all resolve to the terminal reset sequence.
 function createStubTheme(): Theme {
-	const fgColors = [
-		'accent',
-		'border',
-		'borderAccent',
-		'borderMuted',
-		'success',
-		'error',
-		'warning',
-		'muted',
-		'dim',
-		'text',
-		'thinkingText',
-		'userMessageText',
-		'customMessageText',
-		'customMessageLabel',
-		'toolTitle',
-		'toolOutput',
-		'mdHeading',
-		'mdLink',
-		'mdLinkUrl',
-		'mdCode',
-		'mdCodeBlock',
-		'mdCodeBlockBorder',
-		'mdQuote',
-		'mdQuoteBorder',
-		'mdHr',
-		'mdListBullet',
-		'toolDiffAdded',
-		'toolDiffRemoved',
-		'toolDiffContext',
-		'syntaxComment',
-		'syntaxKeyword',
-		'syntaxFunction',
-		'syntaxVariable',
-		'syntaxString',
-		'syntaxNumber',
-		'syntaxType',
-		'syntaxOperator',
-		'syntaxPunctuation',
-		'thinkingOff',
-		'thinkingMinimal',
-		'thinkingLow',
-		'thinkingMedium',
-		'thinkingHigh',
-		'thinkingXhigh',
-		'bashMode',
-	] as const
-	const bgColors = [
-		'selectedBg',
-		'userMessageBg',
-		'customMessageBg',
-		'toolPendingBg',
-		'toolSuccessBg',
-		'toolErrorBg',
-	] as const
-	const fg = Object.fromEntries(fgColors.map(color => [color, '']))
-	const bg = Object.fromEntries(bgColors.map(color => [color, 0]))
+	const fg = {
+		accent: '',
+		border: '',
+		borderAccent: '',
+		borderMuted: '',
+		success: '',
+		error: '',
+		warning: '',
+		muted: '',
+		dim: '',
+		text: '',
+		thinkingText: '',
+		userMessageText: '',
+		customMessageText: '',
+		customMessageLabel: '',
+		toolTitle: '',
+		toolOutput: '',
+		mdHeading: '',
+		mdLink: '',
+		mdLinkUrl: '',
+		mdCode: '',
+		mdCodeBlock: '',
+		mdCodeBlockBorder: '',
+		mdQuote: '',
+		mdQuoteBorder: '',
+		mdHr: '',
+		mdListBullet: '',
+		toolDiffAdded: '',
+		toolDiffRemoved: '',
+		toolDiffContext: '',
+		syntaxComment: '',
+		syntaxKeyword: '',
+		syntaxFunction: '',
+		syntaxVariable: '',
+		syntaxString: '',
+		syntaxNumber: '',
+		syntaxType: '',
+		syntaxOperator: '',
+		syntaxPunctuation: '',
+		thinkingOff: '',
+		thinkingMinimal: '',
+		thinkingLow: '',
+		thinkingMedium: '',
+		thinkingHigh: '',
+		thinkingXhigh: '',
+		bashMode: '',
+	}
+	const bg = {
+		selectedBg: 0,
+		userMessageBg: 0,
+		customMessageBg: 0,
+		toolPendingBg: 0,
+		toolSuccessBg: 0,
+		toolErrorBg: 0,
+	}
 
-	return new Theme(fg, bg, 'dark')
+	return new Theme(fg, bg, 'truecolor')
 }
 
 /**
