@@ -23,11 +23,7 @@ import prompts from 'prompts'
 import { getRepositoryRoot } from '../../../utils/codebase'
 import { COMMAND_CHECK_HOOK_MARKER, createCommandCheckBashOperations } from './command-check-hooks'
 import { detectModelConfigurationIssue } from './model-config'
-import {
-	createLocalReadOperations,
-	createReadCheckOperations,
-	resolveReadDisplayPath,
-} from './read-hooks'
+import { createLocalReadOperations, createReadCheckOperations } from './read-hooks'
 
 const agentDir = path.join(getRepositoryRoot(), 'src/tools/wallet-data-collection/agent')
 const agentDirGlobal = getAgentDir()
@@ -360,9 +356,7 @@ session.subscribe(event => {
 		}
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
-			const readPath = isReadToolArgs(event.args)
-				? resolveReadDisplayPath(event.args.path, repoRoot, repoRoot)
-				: undefined
+			const readPath = isReadToolArgs(event.args) ? event.args.path : undefined
 
 			sessionOutput.handleToolStart(event.toolName, event.toolCallId, command ?? readPath)
 			break

@@ -102,28 +102,3 @@ export function createReadCheckOperations(
 		},
 	}
 }
-
-/**
- * Resolve a read-tool `path` argument to a repo-root-relative display string, or the
- * resolved absolute path when the target is outside the repo. Used to render the tool's
- * call header.
- */
-export function resolveReadDisplayPath(rawPath: string, repoRoot: string, cwd: string): string {
-	const absolute = path.resolve(cwd, rawPath)
-	const relative = path.relative(repoRoot, absolute)
-
-	// A `..` prefix (or an empty/`.` result for the repo root itself) means the target is
-	// outside the repo, so fall back to the absolute path.
-	if (
-		relative === '' ||
-		relative === '.' ||
-		relative === '..' ||
-		relative.startsWith(`..${path.sep}`)
-	) {
-		return absolute
-	}
-
-	// The read tool resolves relative to `cwd` (agentDir), but we want the display to be
-	// repo-root-relative, so prefix the normalized relative path with `/`.
-	return `/${normalizePath(relative)}`
-}
