@@ -185,8 +185,32 @@ export const metamask: SoftwareWallet = {
 				},
 			],
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
