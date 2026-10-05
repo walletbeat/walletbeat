@@ -337,8 +337,38 @@ function createPromptsUIContext(): ExtensionUIContext {
 
 async function runPrompt(prompt: string): Promise<void> {
 	process.stdout.write('\n')
-	await session.prompt(prompt)
+	await withAgentInterrupt(() => session.prompt(prompt))
 	process.stdout.write('\n')
+}
+
+/**
+ * Watch stdin during a model turn for `Esc` or Ctrl+C.
+ */
+async function withAgentInterrupt<T>(run: () => Promise<T>): Promise<T> {
+	const stdin = process.stdin
+
+	if (typeof stdin.setRawMode !== 'function' || !stdin.isTTY) {
+		return run()
+	}
+
+	const onData = (chunk: Buffer) => {
+		// Ctrl+C (0x03) or `Esc` (0x1b). Requiring a single byte avoids matching the
+		// first byte of multi-byte escape sequences such as arrow keys.
+		if (chunk.length === 1 && (chunk[0] === 0x03 || chunk[0] === 0x1b)) {
+			void session.abort()
+		}
+	}
+
+	stdin.on('data', onData)
+	stdin.setRawMode(true)
+	stdin.resume()
+
+	try {
+		return await run()
+	} finally {
+		stdin.setRawMode(false)
+		stdin.off('data', onData)
+	}
 }
 
 /**
@@ -349,6 +379,7 @@ async function runPrompt(prompt: string): Promise<void> {
  */
 async function readUserInput(): Promise<string | null> {
 	try {
+		process.stdout.write('Type `/quit` to quit.\n')
 		const response = await promptOrClose(() =>
 			prompts({
 				type: 'text',
@@ -385,7 +416,6 @@ try {
 		}
 
 		if (!trimmed) {
-			process.stdout.write('(Use `/quit` to quit.)\n')
 			continue
 		}
 
