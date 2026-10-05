@@ -15,6 +15,7 @@ import {
 	SettingsManager,
 	Theme,
 } from '@earendil-works/pi-coding-agent'
+import chalk from 'chalk'
 import askUserExtension from 'pi-ask-user/index.ts'
 import prompts from 'prompts'
 
@@ -23,6 +24,19 @@ import { createCommandCheckBashOperations } from './command-check-hooks'
 
 const agentDir = path.join(getRepositoryRoot(), 'src/tools/wallet-data-collection/agent')
 const agentDirGlobal = getAgentDir()
+
+const outputStyles = {
+	/** Model reasoning/thinking text (assistant `thinking_delta`). */
+	thinking: chalk.gray,
+	/** Non-thinking assistant output text (assistant `text_delta`). */
+	output: chalk.white,
+	/** Tool call input header (`[toolName] $ command`). */
+	toolInput: chalk.blue,
+	/** Tool name within the call header (`[bash]`). */
+	toolName: chalk.magentaBright.bold,
+	/** Streamed tool (bash) output. */
+	toolOutput: chalk.cyan,
+} as const
 
 /**
  * Substitute `{{name}}` / `{{name|fallback}}` placeholders in the system prompt with the
@@ -153,22 +167,44 @@ function isToolArgs(value: unknown): value is { command?: string } {
 	return typeof value === 'object' && value !== null && 'command' in value
 }
 
+// Track the kind of the most recently streamed assistant block so we can insert a
+// blank line when the model switches between thinking and non-thinking output.
+let lastStreamKind: 'thinking' | 'text' | null = null
+
 session.subscribe(event => {
 	switch (event.type) {
-		case 'message_update':
-			if (event.assistantMessageEvent.type === 'text_delta') {
-				process.stdout.write(event.assistantMessageEvent.delta)
+		case 'message_update': {
+			const kind = event.assistantMessageEvent.type
+
+			if (kind === 'text_delta') {
+				if (lastStreamKind === 'thinking') {
+					process.stdout.write('\n')
+				}
+
+				lastStreamKind = 'text'
+				process.stdout.write(outputStyles.output(event.assistantMessageEvent.delta))
+			} else if (kind === 'thinking_delta') {
+				if (lastStreamKind === 'text') {
+					process.stdout.write('\n')
+				}
+
+				lastStreamKind = 'thinking'
+				process.stdout.write(outputStyles.thinking(event.assistantMessageEvent.delta))
 			}
 
 			break
+		}
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
 
-			process.stdout.write(`\n\n[${event.toolName}]${command ? ` $ ${command}` : ''}\n`)
+			lastStreamKind = null
+			process.stdout.write(
+				`\n${outputStyles.toolInput(`[${outputStyles.toolName(event.toolName)}]${command ? ` $ ${command}` : ''}`)}\n`,
+			)
 			break
 		}
 		case 'bash_execution_update':
-			process.stdout.write(event.delta)
+			process.stdout.write(outputStyles.toolOutput(event.delta))
 			break
 		case 'tool_execution_end':
 			process.stdout.write('\n')
@@ -384,7 +420,7 @@ async function readUserInput(): Promise<string | null> {
 			prompts({
 				type: 'text',
 				name: 'input',
-				message: '> ',
+				message: '',
 			}),
 		)
 
