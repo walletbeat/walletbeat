@@ -967,28 +967,8 @@
 		"hash": "348f2cbc4221ca5f3ed2bb51de4342a4a04cb7f9b93a0fb236392fb1e4f7d6d8",
 		"passedTests": ["blockiness"]
 	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/cover.png": {
-		"hash": "0df7a89bafe8dbc3ca005c612f6d0c83fa013d3146340a6163ede256390cbb65",
-		"passedTests": ["blockiness"]
-	},
 	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/our_socials.png": {
 		"hash": "1a6b8f75976fe478368cc3785105fcad5d2b8301020309c1e6eb93da1b442d10",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.5.png": {
-		"hash": "1c6f86c5f28c8cbc5601aa514b71b5941d3de155638d05f86d241ec74e772dd6",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.png": {
-		"hash": "15a627dbeca6dd2b300755690e3ea3fe1f7c87de9f59cb21cb860df532375d3e",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_1.png": {
-		"hash": "3748d42a46186feec2fecbc05e2c77662bea10184fa9a3ff94c1ee5c56ffa0e5",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_2.png": {
-		"hash": "1534d4b88274dca19e537a0fbb5f4687bdef94f6696fd6165e324a8313a65853",
 		"passedTests": ["blockiness"]
 	},
 	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/wallet_stages.png": {
