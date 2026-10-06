@@ -1,17 +1,14 @@
 ![Wallet Stage Definitions](./cover.png)
+ 
+# Stage Evaluation Framework for Ethereum Wallets  
+
+We’re introducing Wallet Stage Definitions to map a wallet’s progression toward self-sovereignty. The stage system is a CROPS-aligned maturity framework for wallets to grow, not a simple checklist to go through.
+
+Walletbeat took inspiration from L2BEAT’s Rollup Maturity Framework. Stages describe the milestones Ethereum wallets should work towards. Each stage builds on the previous, forming a roadmap for wallet teams to follow.
 
 Walletbeat is a rating system for Ethereum wallets. We use a framework to evaluate wallets across five dimensions: Security, Privacy, Transparency, Ecosystem Alignment, and Self-sovereignty. The same values that CROPS stands for.
 
-There are many dimensions to consider when evaluating wallets. As a wallet development team, this gives you many targets to address: where do you start, how do you make progress, and how do you make sense of it all? This is where the Stage System comes in.
- 
-### Stage Evaluation Framework for Ethereum Wallets  
-
-We’re introducing Wallet Stage Definitions to map a wallet’s progression toward self-sovereignty. It’s a cross-cutting rating system across all five attribute groups. The stage system is a CROPS-aligned maturity framework for wallets to grow, not a simple checklist to go through.
-
-Walletbeat took inspiration from L2BEAT’s Rollup Maturity Framework. We introduce the same Stage Evaluation Framework, but for Ethereum wallets.
-Stages describe the milestones Ethereum wallets should work towards. Each stage builds on the previous, forming a roadmap for wallet teams to follow.
-
-We want to answer the question: What does a CROPS wallet look like?
+There are many dimensions to consider when evaluating wallets. As a wallet development team, this gives you many targets to address. But: where do you start, how do you make progress, and how do you make sense of it all? This is where the Stage System comes in. We want to answer the question: What does a CROPS wallet look like?
 
 ## Stage 0: Verifiable
 ### Users should at least be able to see how the wallet they're using operates:
@@ -62,10 +59,10 @@ Wallets should also implement the foundations of a proper Ethereum wallet.
 	Without private token transfers, the user’s Ethereum activity will be publicly stored forever for the world to see. This would be the equivalent of a financial panopticon.
 
 - Wallet Address Privacy 🔍
-	Your wallet address is unique and permanent, which makes it easy to track your activity. At minimum, wallets must not link your wallet address to personally identifying data such as your name, email, phone number, or account credentials. Linkage to IP address or pseudonyms is tolerated at this stage.
+	Wallet addresses are unique and permanent, which makes it easy to track their activity. At minimum, wallets must not link wallet addresses to personally identifying data such as name, email, phone number, or account credentials. Linkage to IP address or pseudonyms is tolerated at this stage.
 
 - Multi-Address Privacy 👛
-	You probably have more than one wallet address configured in your wallet, which you use for different purposes and perhaps as different identities. These wallet addresses all belong to you, but you would rather keep that fact private. It is therefore important to use a wallet that does not reveal it.
+	Users probably have more than one wallet address configured in their wallet, which they use for different purposes and perhaps as different identities. These wallet addresses all belong to the same user. It is therefore important to use a wallet that does not reveal that fact.
 
 ### The wallet does not lock the user in and lets the user remain in full control of their account: 
 
@@ -96,7 +93,7 @@ The wallet is aligned with basic Ethereum ecosystem best practices for usability
 	The wallet must comply with web browser integration standards. This ensures compatibility across wallets and helps keep the Ethereum wallet ecosystem competitive through interoperability. 
 
 ## Stage 2: Trust Minimized
-The wallet has minimized trust assumptions on its own infrastructure while maximizing user privacy and sovereignty.
+The wallet has minimized trust assumptions on its own infrastructure while maximizing user privacy and sovereignty. Like L2BEAT, it is a high bar and we expect it will take time for any wallet to reach this stage. But the tech already exists to fulfill every single one of these criteria today.
 
 ### The wallet provides a strong level of security:
 
@@ -178,24 +175,12 @@ The wallet must not lock the user in and lets the user remain in full control of
 	The wallet must support atomic batched transactions.
 	Batched transactions through the WalletCall API enable better UX for common DeFi workflows, such as token approvals followed by a DeFi operation. Atomic batched transactions make such batched transactions safer and easier to understand for the user, as well as enabling advanced DeFi use-cases.
 
-## Open questions
-### - How do we get wallet teams to care? 
-This is a problem for any so-called "Dashboard Organization" that L2BEAT has had to face. We don't just need a dashboard to exist. We need wallets to care about what the dashboard says. And that means credibility, community engagement, having outreach. So we welcome your support here.
+### Conclusion
 
-### - How do we know how/when to change the bar? 
-If it’s too high or too low, we need a feedback mechanism in case the bar is not being helpful.
+Walletbeat introduced a stage system, now what?
 
-### - How will governance avoid capture?
-It also needs to avoid capture by wallet development teams, who have an incentive to change where the bar is. So, again, a difficult balance to strike.
-
-### - Sustainable funding for wallet research/updates
-Wallets will update, methodology will change, the data that needs to be collected about each wallet will change. So there needs to be a sustainable development model, which L2BEAT has cracked but Walletbeat is not there yet.
+Ethereum values should land in wallets. We're trying to solve the last mile delivery problem through the stage system. The stage system is a roadmap for Ethereum wallets to adopt Ethereum values.
 
 If you want to know more about our stages, please visit https://beta.walletbeat.eth.limo/stages/
 
 ![Wallet Stages](./wallet_stages.png)
-
-Join us! 🌸
-There’s the site, our GitHub repository, the Farcaster channel for social conversation, and the X account for updates.
-
-![Our Socials](./our_socials.png)
