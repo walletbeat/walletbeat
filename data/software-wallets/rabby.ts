@@ -257,23 +257,60 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: refTodo,
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-				withNoConnectivityExceptL1RPCEndpoint: {
-					accountCreation: featureSupported,
-					accountImport: featureSupported,
-					erc20BalanceLookup: notSupported,
-					erc20TokenSend: notSupported,
-					etherBalanceLookup: notSupported,
+		chainConfigurability: {
+			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
+				ref: [
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
+						label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
+						lastRetrieved: '2026-09-27',
+					},
+					{
+						explanation:
+							"The extension lets you set a custom RPC, but still loads your balances and the tokens you send from Rabby's servers.",
+						url: [
+							{
+								label: "Browser extension loads token balances from Rabby's API",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/utils/portfolio/tokenUtils.ts#L36-L68',
+							},
+							{
+								label: "Browser extension Send page loads the token to send from Rabby's API",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/SendToken/index.tsx#L2172-L2178',
+							},
+							{
+								label: "Browser extension's API address is Rabby's server",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/constant/index.ts#L528',
+							},
+						],
+					},
+					{
+						label: 'Browser extension lets you add a custom network',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/Dashboard/components/Settings/index.tsx#L1073-L1090',
+					},
+				],
+				customChainRpcEndpoint: featureSupported,
+				l1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+					withNoConnectivityExceptL1RPCEndpoint: {
+						accountCreation: featureSupported,
+						accountImport: featureSupported,
+						erc20BalanceLookup: notSupported,
+						erc20TokenSend: notSupported,
+						etherBalanceLookup: notSupported,
+					},
+				}),
+				nonL1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				}),
+			}),
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: {
+					explanation: 'The mobile app has no custom RPC setting.',
+					label: "Mobile app's Modify RPC URL setting is commented out",
+					url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
 				},
 			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			}),
-		}),
+		},
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
