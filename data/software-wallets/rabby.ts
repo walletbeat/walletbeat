@@ -304,9 +304,17 @@ export const rabby: SoftwareWallet = {
 			}),
 			[Variant.MOBILE]: notSupportedWithRef({
 				ref: {
-					explanation: 'The mobile app has no custom RPC setting.',
-					label: "Mobile app's Modify RPC URL setting is commented out",
-					url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
+					explanation: "The mobile app can add custom networks but can't change Ethereum's RPC.",
+					url: [
+						{
+							label: "Mobile app's Modify RPC URL setting is commented out",
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
+						},
+						{
+							label: 'Mobile app always reports that no custom RPC is set',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
+						},
+					],
 				},
 			}),
 		},
