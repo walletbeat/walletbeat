@@ -1156,14 +1156,15 @@ export const rabby: SoftwareWallet = {
 				[Variant.MOBILE]: {
 					l1: {
 						ref: {
-							explanation: "Rabby's mobile app sends transactions through Rabby's servers.",
+							explanation:
+								"Rabby's mobile app can't send Ethereum mainnet transactions through your own node.",
 							url: [
 								{
 									label: 'Mobile app ignores any saved custom RPC',
 									url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
 								},
 								{
-									label: "Mobile app sends every transaction to Rabby's servers",
+									label: "Mobile app sends Ethereum mainnet transactions to Rabby's servers",
 									url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
 								},
 							],
@@ -1185,7 +1186,8 @@ export const rabby: SoftwareWallet = {
 							{
 								explanation:
 									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
-								label: "Mobile app sends every transaction to Rabby's servers",
+								label:
+									"Mobile app sends transactions on Rabby's built-in networks to Rabby's servers",
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
 							},
 						],
