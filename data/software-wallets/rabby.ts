@@ -261,14 +261,13 @@ export const rabby: SoftwareWallet = {
 			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
 				ref: [
 					{
-						file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
-						label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
-						lastRetrieved: '2026-09-27',
-					},
-					{
 						explanation:
 							"The extension lets you set a custom RPC, but still loads your balances and the tokens you send from Rabby's servers.",
 						url: [
+							{
+								label: 'Browser extension has a Modify RPC URL setting',
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/Dashboard/components/Settings/index.tsx#L1091-L1112',
+							},
 							{
 								label: "Browser extension loads token balances from Rabby's API",
 								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/utils/portfolio/tokenUtils.ts#L36-L68',
