@@ -1133,7 +1133,8 @@ export const rabby: SoftwareWallet = {
 						ref: [
 							{
 								file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png',
-								label: 'Rabby browser extension Send chain picker listing Arbitrum and Base',
+								label:
+									'Rabby browser extension chain picker on the Send screen, listing Arbitrum and Base',
 								lastRetrieved: '2026-09-27',
 							},
 							{
