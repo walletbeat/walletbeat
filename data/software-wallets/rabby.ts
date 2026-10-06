@@ -314,7 +314,7 @@ export const rabby: SoftwareWallet = {
 							"Rabby's mobile app doesn't let you set a custom RPC for Ethereum mainnet.",
 						url: [
 							{
-								label: "Mobile app's Modify RPC URL setting is commented out",
+								label: 'Mobile app removed the Modify RPC URL option from its settings menu',
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
 							},
 							{
@@ -322,7 +322,7 @@ export const rabby: SoftwareWallet = {
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customTestnetService.ts#L122-L143',
 							},
 							{
-								label: 'Mobile app always reports that no custom RPC is set',
+								label: 'Mobile app ignores any saved custom RPC',
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
 							},
 						],
