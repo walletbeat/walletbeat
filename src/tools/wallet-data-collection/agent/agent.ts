@@ -44,6 +44,8 @@ const outputStyles = {
 	toolOutput: chalk.cyan,
 	/** Command-check hook error message (appended to tool output). */
 	hookError: chalk.redBright.bold,
+	/** Additional info surfaced by an assistant message (e.g. `errorMessage` / diagnostics). */
+	messageError: chalk.redBright.bold,
 } as const
 
 /**
@@ -265,6 +267,60 @@ class SessionOutput {
 		return text
 	}
 
+	/**
+	 * Extract additional info an assistant message may carry at `message_end`, such as
+	 * an `errorMessage` or diagnostic errors, or `null` when no error.
+	 */
+	private static extractAssistantError(message: unknown): string | null {
+		if (typeof message !== 'object' || message === null) {
+			return null
+		}
+
+		const role = (message as { role?: unknown }).role
+
+		if (role !== 'assistant') {
+			return null
+		}
+
+		const parts: string[] = []
+		const errorMessage = (message as { errorMessage?: unknown }).errorMessage
+
+		if (typeof errorMessage === 'string' && errorMessage.trim() !== '') {
+			parts.push(errorMessage)
+		}
+
+		const diagnostics = (message as { diagnostics?: unknown[] }).diagnostics
+
+		if (Array.isArray(diagnostics)) {
+			for (const diagnostic of diagnostics) {
+				const message = SessionOutput.diagnosticErrorMessage(diagnostic)
+
+				if (message !== null) {
+					parts.push(message)
+				}
+			}
+		}
+
+		return parts.length > 0 ? parts.join('\n') : null
+	}
+
+	/** Extract the error message from an assistant diagnostic, or null when absent. */
+	private static diagnosticErrorMessage(diagnostic: unknown): string | null {
+		if (typeof diagnostic !== 'object' || diagnostic === null || !('error' in diagnostic)) {
+			return null
+		}
+
+		const error = diagnostic.error
+
+		if (typeof error !== 'object' || error === null || !('message' in error)) {
+			return null
+		}
+
+		const message = error.message
+
+		return typeof message === 'string' && message.trim() !== '' ? message : null
+	}
+
 	/** Handle a streaming assistant message update (thinking or output text). */
 	/** Handle a streaming assistant message delta (thinking or output text). */
 	handleMessageDelta(kind: 'text_delta' | 'thinking_delta', delta: string): void {
@@ -283,6 +339,26 @@ class SessionOutput {
 			this.lastStreamKind = 'thinking'
 			process.stdout.write(outputStyles.thinking(delta))
 		}
+	}
+
+	/** Handle the end of a message. */
+	handleMessageEnd(message: unknown): void {
+		const error = SessionOutput.extractAssistantError(message)
+
+		if (error !== null) {
+			process.stdout.write(`\n${outputStyles.messageError(error)}\n`)
+		}
+	}
+
+	/** Handle the start of a model turn. */
+	handleTurnStart(): void {
+		this.lastStreamKind = null
+		process.stdout.write('\n')
+	}
+
+	/** Handle the end of a model turn. */
+	handleTurnEnd(): void {
+		process.stdout.write('\n')
 	}
 
 	/** Handle a tool starting to execute: reset per-call tracking and print the header. */
@@ -328,10 +404,9 @@ class SessionOutput {
 		this.writeToolOutput(toolCallId, SessionOutput.extractToolText(partialResult))
 	}
 
-	/** Handle a tool finishing: flush the final output and emit a trailing newline. */
+	/** Handle a tool finishing: flush the final output. The trailing newline is emitted by `turn_end`. */
 	handleToolEnd(toolCallId: string, result: unknown): void {
 		this.writeToolOutput(toolCallId, SessionOutput.extractToolText(result))
-		process.stdout.write('\n')
 	}
 }
 
@@ -345,6 +420,15 @@ const quietTools = new Set(['read'])
 
 session.subscribe(event => {
 	switch (event.type) {
+		case 'turn_start':
+			sessionOutput.handleTurnStart()
+			break
+		case 'turn_end':
+			sessionOutput.handleTurnEnd()
+			break
+		case 'message_end':
+			sessionOutput.handleMessageEnd(event.message)
+			break
 		case 'message_update': {
 			const { type } = event.assistantMessageEvent
 
@@ -373,8 +457,32 @@ session.subscribe(event => {
 			}
 
 			break
-		default:
+		// Session lifecycle, message, and tool events that this harness intentionally
+		// does not surface to stdout. Each is listed explicitly so that adding a new
+		// event type to the `AgentSessionEvent` union forces an explicit case here
+		// instead of silently falling through the `default` branch below.
+		case 'agent_start':
+		case 'agent_end':
+		case 'agent_settled':
+		case 'message_start':
+		case 'queue_update':
+		case 'compaction_start':
+		case 'compaction_end':
+		case 'entry_appended':
+		case 'session_info_changed':
+		case 'thinking_level_changed':
+		case 'auto_retry_start':
+		case 'auto_retry_end':
+		case 'summarization_retry_scheduled':
+		case 'summarization_retry_attempt_start':
+		case 'summarization_retry_finished':
+		case 'bash_execution_update':
 			break
+		default: {
+			const exhaustive: never = event
+
+			throw new Error(`Unsupported session event type: ${(exhaustive as { type: string }).type}`)
+		}
 	}
 })
 
