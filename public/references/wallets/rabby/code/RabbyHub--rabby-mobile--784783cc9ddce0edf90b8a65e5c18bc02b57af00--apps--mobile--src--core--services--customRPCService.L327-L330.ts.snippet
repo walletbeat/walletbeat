@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 327,
+	"highlightLastLine": 330,
+	"segments": [
+		{
+			"lines": [
+				"> {"
+			],
+			"startLine": 96
+		},
+		{
+			"lines": [
+				"  getDefaultRPC = (chainServerId: string) => {",
+				"    return cloneDeep(this.store.defaultRPC?.[chainServerId]);",
+				"  };",
+				"",
+				"  hasCustomRPC = (chain: CHAINS_ENUM) => {",
+				"    return false;",
+				"    // return this.store.customRPC[chain] && this.store.customRPC[chain].enable;",
+				"  };",
+				"",
+				"  getRPCByChain = (chain: CHAINS_ENUM) => {",
+				"    return cloneDeep(this.store.customRPC[chain]);",
+				"  };"
+			],
+			"startLine": 323
+		}
+	]
+}
