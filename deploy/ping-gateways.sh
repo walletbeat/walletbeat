@@ -11,8 +11,7 @@ GATEWAY_FUNCTIONS=(
 	filebase
 )
 
-# At most this many provider addresses are tried per routing lookup.
-MAX_PROVIDERS=5
+MAX_PROVIDER_ADDRESSES=5
 
 log() {
 	echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] $*" >&2
@@ -115,31 +114,30 @@ provider_address_to_url() {
 	return 1
 }
 
-# Asks cid.contact which providers advertise the CID over the trustless
-# HTTP gateway protocol, then fetches the root block directly from them. This
-# avoids depending on any public gateway; the block is verified against the
-# CID's own digest, so an untrusted provider cannot fake availability.
+# Bypasses public gateways. The root block is checked against the CID's digest,
+# so an untrusted provider cannot fake availability.
 ipfs_provider_check() {
-	local url="$1" routing_status routing_retry_after provider_address provider_url actual_digest
+	local url="$1" routing_status routing_curl_exit_code routing_retry_after provider_address provider_url actual_digest
 	local -a provider_urls=()
 	if ! fetch_endpoint "$url" 30; then
 		log "Failed to look up providers for CID '$DIRECTORY_CID' on cid.contact."
 		return 1
 	fi
 	routing_status="$HTTP_STATUS"
+	routing_curl_exit_code="$CURL_EXIT_CODE"
 	routing_retry_after="$RETRY_AFTER_DELAY"
 	while IFS= read -r provider_address; do
 		if provider_url="$(provider_address_to_url "$provider_address")"; then
 			provider_urls+=("$provider_url")
 		fi
-	done < <(jq -r '.Providers[]? | select(.Protocols | index("transport-ipfs-gateway-http")) | .Addrs[]?' "$TEMP_DIRECTORY/body" | head -n "$MAX_PROVIDERS")
+	done < <(jq -r '.Providers[]? | select(.Protocols | index("transport-ipfs-gateway-http")) | .Addrs[]?' "$TEMP_DIRECTORY/body" | head -n "$MAX_PROVIDER_ADDRESSES")
 	if [[ "${#provider_urls[@]}" -eq 0 ]]; then
 		log "No HTTP providers found for CID '$DIRECTORY_CID' on cid.contact."
 		return 1
 	fi
 	for provider_url in "${provider_urls[@]}"; do
 		if ! fetch_endpoint "${provider_url}/ipfs/${DIRECTORY_CID}?format=raw" 30; then
-			log "Failed to fetch root block from provider '$provider_url'."
+			log "Failed to fetch root block from provider '$provider_url' (HTTP $HTTP_STATUS, curl exit $CURL_EXIT_CODE)."
 			continue
 		fi
 		actual_digest="$(sha256sum "$TEMP_DIRECTORY/body" | awk '{print $1}')"
@@ -149,8 +147,9 @@ ipfs_provider_check() {
 		fi
 		log "Root block digest mismatch on provider '$provider_url' (expected '$EXPECTED_ROOT_DIGEST', got '$actual_digest')."
 	done
-	# Back off according to the indexer, not the last provider tried.
+	# Report and back off according to the indexer, not the last provider tried.
 	HTTP_STATUS="$routing_status"
+	CURL_EXIT_CODE="$routing_curl_exit_code"
 	RETRY_AFTER_DELAY="$routing_retry_after"
 	return 1
 }
@@ -189,8 +188,6 @@ EXPECTED_SHA="$(sed -E 's#<a href="https://[^"]*cdn-cgi/content\?id=[^"]*"[^>]*>
 TEMP_DIRECTORY="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIRECTORY"' EXIT
 
-# Each endpoint has its own attempt count, backoff, and cooldown. Track the
-# waiting budget using the shell's elapsed seconds.
 ENDPOINTS=(ipfs-providers "${GATEWAY_FUNCTIONS[@]}")
 ENDPOINT_URLS=("https://cid.contact/routing/v1/providers/${DIRECTORY_CID}")
 ATTEMPTS=()
@@ -250,15 +247,15 @@ while [[ "$SECONDS" -lt "$DEADLINE" ]]; do
 			log "${ENDPOINTS[$INDEX]}: HTTP $HTTP_STATUS, curl exit $CURL_EXIT_CODE; next retry in ${RETRY_DELAY}s."
 		fi
 	done
-	if [[ "$SECONDS" -ge "$DEADLINE" ]]; then
-		break
-	fi
 	NEXT_WAKE="$DEADLINE"
 	for INDEX in "${!ENDPOINTS[@]}"; do
 		if [[ "${NEXT_ATTEMPTS[$INDEX]}" -lt "$NEXT_WAKE" ]]; then
 			NEXT_WAKE="${NEXT_ATTEMPTS[$INDEX]}"
 		fi
 	done
+	if [[ "$NEXT_WAKE" -ge "$DEADLINE" ]]; then
+		break
+	fi
 	WAIT_SECONDS="$((NEXT_WAKE - SECONDS))"
 	if [[ "$WAIT_SECONDS" -gt 0 ]]; then
 		sleep "$WAIT_SECONDS"
