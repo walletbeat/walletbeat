@@ -303,19 +303,30 @@ export const rabby: SoftwareWallet = {
 				}),
 			}),
 			[Variant.MOBILE]: notSupportedWithRef({
-				ref: {
-					explanation: "The mobile app can add custom networks but can't change Ethereum's RPC.",
-					url: [
-						{
-							label: "Mobile app's Modify RPC URL setting is commented out",
-							url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
-						},
-						{
-							label: 'Mobile app always reports that no custom RPC is set',
-							url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
-						},
-					],
-				},
+				ref: [
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-10-06-rabby-mobile-ethereum-custom-network-rejected.png',
+						label: 'Rabby iOS app rejects a custom network with chain ID 1',
+						lastRetrieved: '2026-10-06',
+					},
+					{
+						explanation: "The mobile app can add custom networks but can't change Ethereum's RPC.",
+						url: [
+							{
+								label: "Mobile app's Modify RPC URL setting is commented out",
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
+							},
+							{
+								label: 'Mobile app rejects custom networks that reuse a built-in chain ID',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customTestnetService.ts#L122-L143',
+							},
+							{
+								label: 'Mobile app always reports that no custom RPC is set',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
+							},
+						],
+					},
+				],
 			}),
 		},
 		ecosystem: {
