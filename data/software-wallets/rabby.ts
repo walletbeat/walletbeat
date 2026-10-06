@@ -1118,7 +1118,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
-								label: 'Browser extension sends through a custom RPC when one is set',
+								label: 'Browser extension sends transactions through a custom RPC when one is set',
 								url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
 							},
 						],
@@ -1141,7 +1141,8 @@ export const rabby: SoftwareWallet = {
 									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
 								url: [
 									{
-										label: 'Browser extension sends through a custom RPC when one is set',
+										label:
+											'Browser extension sends transactions through a custom RPC when one is set',
 										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
 									},
 									{
