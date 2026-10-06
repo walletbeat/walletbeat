@@ -1148,7 +1148,7 @@ export const rabby: SoftwareWallet = {
 									},
 									{
 										label:
-											"Browser extension sends transactions to Rabby's servers when no custom RPC is set",
+											"Browser extension sends transactions to Rabby's servers when using default RPC settings",
 										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
 									},
 								],
