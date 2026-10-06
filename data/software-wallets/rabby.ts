@@ -1145,7 +1145,8 @@ export const rabby: SoftwareWallet = {
 										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
 									},
 									{
-										label: "Browser extension otherwise submits through Rabby's servers",
+										label:
+											"Browser extension sends transactions to Rabby's servers when no custom RPC is set",
 										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
 									},
 								],
