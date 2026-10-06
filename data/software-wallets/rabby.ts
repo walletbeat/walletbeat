@@ -310,7 +310,8 @@ export const rabby: SoftwareWallet = {
 						lastRetrieved: '2026-10-06',
 					},
 					{
-						explanation: "The mobile app can add custom networks but can't change Ethereum's RPC.",
+						explanation:
+							"Rabby's mobile app doesn't let you set a custom RPC for Ethereum mainnet.",
 						url: [
 							{
 								label: "Mobile app's Modify RPC URL setting is commented out",
