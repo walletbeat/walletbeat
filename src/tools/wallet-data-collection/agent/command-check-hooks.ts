@@ -22,6 +22,7 @@ import {
 	normalizePath,
 	type PathPredicate,
 } from '../../../utils/codebase'
+import { ARBITRARY_COMMAND_ENV } from '../read-only'
 import { WalletCaptureAnnotations } from '../wallet-capture-annotations'
 import { WalletCaptureFile } from '../wallet-capture-file'
 import {
@@ -42,13 +43,6 @@ type RepoRelativePath = `/${string}`
  * this marker to render hook messages in a distinct (error) style.
  */
 export const COMMAND_CHECK_HOOK_MARKER = '[command-check-hooks]'
-
-/**
- * Environment variable the bash tool sets for arbitrary (non-single-invocation) commands.
- * When set, the `pnpm wallet-data-collection:agent` tool runs in read-only mode. Referencing
- * this variable is a gaming attempt that terminates the session.
- */
-export const ARBITRARY_COMMAND_ENV = 'WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND'
 
 /**
  * Build the error message appended to a reverted arbitrary command's output. It tells the
