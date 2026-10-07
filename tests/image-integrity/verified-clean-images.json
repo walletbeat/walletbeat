@@ -16,11 +16,11 @@
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"governance/treasury/treasury-expenses-breakdown.svg": {
-		"hash": "adca3a7975e12fd03d3df214ce7174b60ef2fc7996a184f46765ddbf832a81ad",
+		"hash": "c0f349719f67d2179b8771221e62b86e92acef1fb599f729e908da41e94520ea",
 		"passedTests": ["file-format"]
 	},
 	"governance/treasury/treasury-expenses-over-time.svg": {
-		"hash": "94fec3478d854446df585fb88d3b434deaa8f5c0ca2cd867be5fa972b5a408a0",
+		"hash": "620073e9cc12c7d23f74449b5ed9d928e2961365ad24023db15f566614662ac6",
 		"passedTests": ["file-format"]
 	},
 	"public/banner--small.png": {
