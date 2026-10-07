@@ -116,8 +116,8 @@ jobs:
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
-      - name: Check site data availability on IPFS gateways
-        run: ./deploy/ping-gateways.sh
+      - name: Check site data availability on IPFS
+        run: ./deploy/check-ipfs-availability.sh
         env:
           DEPLOY_DIRECTORY: dist
   update-ens:
@@ -148,8 +148,8 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: Check site data availability on IPFS gateways
-        run: ./deploy/ping-gateways.sh
+      - name: Check site data availability on IPFS
+        run: ./deploy/check-ipfs-availability.sh
         env:
           DEPLOY_DIRECTORY: dist
       - name: Update beta.walletbeat.eth ENS records
