@@ -784,10 +784,10 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 
 Which methods of address resolution a wallet supports.
 
-- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
+- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `wallet.ensdao.eth` in the send address field. If it resolves, it is supported.
 - `chainSpecificAddressing` (object): Chain-specific address lookups.
-  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves.
-  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves.
+  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `wallet.ensdao.eth@ethereum` in the send address field and check if it resolves.
+  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `wallet.ensdao.eth:ethereum` in the send address field and check if it resolves.
 
 ---
 

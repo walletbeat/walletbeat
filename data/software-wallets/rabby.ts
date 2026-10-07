@@ -5,6 +5,7 @@ import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -192,18 +193,58 @@ export const rabby: SoftwareWallet = {
 			}),
 		},
 		addressResolution: {
-			ref: [
-				{
-					explanation:
-						'Rabby supports resolving plain ENS addresses when importing watch addresses, but not when sending funds.',
-					url: 'https://github.com/RabbyHub/Rabby/blob/5f2b84491b6af881ab4ef41f7627d5e068d10652/src/ui/views/ImportWatchAddress.tsx#L170',
-				},
-			],
-			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+			ref: {
+				explanation: 'Rabby supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/SelectToAddress/components/EnterAddress.tsx#L157',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/utils/ens.ts#L14-L31',
+					},
+					{
+						label: 'Mobile app looking up a recipient name',
+						url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/components/AccountSelectModalTx/modalScreens/EnterAddress.tsx#L82',
+					},
+					{
+						label: 'Mobile app uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/utils/ens.ts#L9-L35',
+					},
+				],
 			},
-			nonChainSpecificEnsResolution: notSupported,
+			chainSpecificAddressing: {
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rabby doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7828-rejected.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7828-rejected.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rabby doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-browser-erc7831-rejected.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7831-rejected.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
+			},
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
 		},
 		chainAbstraction: {
 			bridging: {
@@ -233,23 +274,79 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: refTodo,
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-				withNoConnectivityExceptL1RPCEndpoint: {
-					accountCreation: featureSupported,
-					accountImport: featureSupported,
-					erc20BalanceLookup: notSupported,
-					erc20TokenSend: notSupported,
-					etherBalanceLookup: notSupported,
-				},
+		chainConfigurability: {
+			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
+				ref: [
+					{
+						explanation:
+							"The extension lets you set a custom RPC, but still loads your balances and the tokens you send from Rabby's servers.",
+						url: [
+							{
+								label: 'Browser extension has a Modify RPC URL setting',
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/Dashboard/components/Settings/index.tsx#L1091-L1112',
+							},
+							{
+								label: "Browser extension loads token balances from Rabby's API",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/utils/portfolio/tokenUtils.ts#L36-L68',
+							},
+							{
+								label: "Browser extension Send page loads the token to send from Rabby's API",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/SendToken/index.tsx#L2172-L2178',
+							},
+							{
+								label: "Browser extension's API address is Rabby's server",
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/constant/index.ts#L528',
+							},
+						],
+					},
+					{
+						label: 'Browser extension lets you add a custom network',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/Dashboard/components/Settings/index.tsx#L1073-L1090',
+					},
+				],
+				customChainRpcEndpoint: featureSupported,
+				l1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+					withNoConnectivityExceptL1RPCEndpoint: {
+						accountCreation: featureSupported,
+						accountImport: featureSupported,
+						erc20BalanceLookup: notSupported,
+						erc20TokenSend: notSupported,
+						etherBalanceLookup: notSupported,
+					},
+				}),
+				nonL1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				}),
 			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: [
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-10-06-rabby-mobile-ethereum-custom-network-rejected.png',
+						label: 'Rabby iOS app rejects a custom network with chain ID 1',
+						lastRetrieved: '2026-10-06',
+					},
+					{
+						explanation:
+							"Rabby's mobile app doesn't let you set a custom RPC for Ethereum mainnet.",
+						url: [
+							{
+								label: "Mobile app's Modify RPC URL setting is commented out",
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/screens/Settings/Settings.tsx#L834-L847',
+							},
+							{
+								label: 'Mobile app rejects custom networks that reuse a built-in chain ID',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customTestnetService.ts#L122-L143',
+							},
+							{
+								label: 'Mobile app ignores any saved custom RPC',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
+							},
+						],
+					},
+				],
 			}),
-		}),
+		},
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
@@ -1084,69 +1181,93 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 			transactionSubmission: {
-				l1: {
-					ref: [
-						{
-							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
-							label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
-							lastRetrieved: '2026-09-27',
-						},
-						{
-							explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
-							url: [
-								{
-									label: 'Browser extension sends through a custom RPC when one is set',
-									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
-								},
-								{
-									label: 'Mobile app sends through a custom RPC when one is set',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
-								},
-							],
-						},
-					],
-					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+				[Variant.BROWSER]: {
+					l1: {
+						ref: [
+							{
+								file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
+								label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
+								lastRetrieved: '2026-09-27',
+							},
+							{
+								explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
+								label: 'Browser extension sends transactions through a custom RPC when one is set',
+								url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+							},
+						],
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: featureSupported,
+					},
+					l2: {
+						[TransactionSubmissionL2Type.arbitrum]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						[TransactionSubmissionL2Type.opStack]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						ref: [
+							{
+								file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png',
+								label:
+									'Rabby browser extension chain picker on the Send screen, listing Arbitrum and Base',
+								lastRetrieved: '2026-09-27',
+							},
+							{
+								explanation:
+									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								url: [
+									{
+										label:
+											'Browser extension sends transactions through a custom RPC when one is set',
+										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+									},
+									{
+										label:
+											"Browser extension sends transactions to Rabby's servers when using default RPC settings",
+										url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
+									},
+								],
+							},
+						],
+					},
 				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]:
-						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					[TransactionSubmissionL2Type.opStack]:
-						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: [
-						{
-							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png',
-							label: 'Rabby browser extension Send chain picker listing Arbitrum and Base',
-							lastRetrieved: '2026-09-27',
-						},
-						{
-							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png',
-							label: 'Rabby mobile app chain picker listing Arbitrum and Base',
-							lastRetrieved: '2026-09-27',
-						},
-						{
+				[Variant.MOBILE]: {
+					l1: {
+						ref: {
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Rabby's mobile app can't send Ethereum mainnet transactions through your own node.",
 							url: [
 								{
-									label: 'Browser extension sends through a custom RPC when one is set',
-									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+									label: 'Mobile app ignores any saved custom RPC',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/services/customRPCService.ts#L327-L330',
 								},
 								{
-									label: "Browser extension otherwise submits through Rabby's servers",
-									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
-								},
-								{
-									label: 'Mobile app sends through a custom RPC when one is set',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
-								},
-								{
-									label: "Mobile app otherwise submits through Rabby's servers",
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1474-L1476',
+									label: "Mobile app sends Ethereum mainnet transactions to Rabby's servers",
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
 								},
 							],
 						},
-					],
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: notSupported,
+					},
+					l2: {
+						[TransactionSubmissionL2Type.arbitrum]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						[TransactionSubmissionL2Type.opStack]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						ref: [
+							{
+								file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png',
+								label: 'Rabby mobile app chain picker listing Arbitrum and Base',
+								lastRetrieved: '2026-09-27',
+							},
+							{
+								explanation:
+									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								label:
+									"Mobile app sends transactions on Rabby's built-in networks to Rabby's servers",
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
+							},
+						],
+					},
 				},
 			},
 		},
