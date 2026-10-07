@@ -1,6 +1,6 @@
 import { AbiFunction, Address, Bytes, Ens, Hex } from 'ox'
 
-import { prefixError } from '@/types/errors'
+import { getErrorMessage, prefixError } from '@/types/errors'
 
 /**
  * The canonical ENS registry contract on Ethereum mainnet.
@@ -157,9 +157,7 @@ async function ethCall(
 	const { error, result } = payload as { error?: unknown; result?: unknown }
 
 	if (error !== undefined) {
-		const message = typeof error === 'string' ? error : 'RPC returned an unknown error.'
-
-		throw new Error(message)
+		throw new Error(`RPC returned an error: ${getErrorMessage(error)}`)
 	}
 
 	if (!Hex.validate(result)) {
