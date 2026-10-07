@@ -1,4 +1,4 @@
-import { createHash, randomInt } from 'node:crypto'
+import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as sleep } from 'node:timers/promises'
@@ -29,9 +29,6 @@ const PROVIDER_TIMEOUT_MS = 30_000
 // so freshly pinned content can be found and its error is logged.
 const GATEWAY_TIMEOUT_MS = 60_000
 
-const CDN_CGI_LINK_PATTERN =
-	/<a href="https:\/\/[^"\n]*cdn-cgi\/content\?id=[^"\n]*"[^>\n]*><\/a>/gu
-
 /** Outcome of a single HTTP request. */
 interface FetchResult {
 	/** HTTP status of the final response, or `null` if no response was received. */
@@ -54,10 +51,6 @@ interface Endpoint {
 	name: string
 	url: string
 	check: () => Promise<CheckResult>
-	attempts: number
-	backoffSeconds: number
-	nextAttemptAt: number
-	lastStatus: string
 }
 
 function log(message: string): void {
@@ -68,18 +61,6 @@ function log(message: string): void {
 
 function sha256Hex(data: Uint8Array): string {
 	return createHash('sha256').update(data).digest('hex')
-}
-
-/**
- * Remove links that Cloudflare-fronted gateways inject into served HTML.
- * Works on latin1 so every byte round-trips and the hash covers exactly the
- * bytes that were served.
- */
-function stripCdnCgiLinks(html: Uint8Array): Uint8Array {
-	return Buffer.from(
-		Buffer.from(html).toString('latin1').replace(CDN_CGI_LINK_PATTERN, ''),
-		'latin1',
-	)
 }
 
 /**
@@ -332,7 +313,7 @@ async function checkGateway(
 		return { ...result, verified: false }
 	}
 
-	const actualSha = sha256Hex(stripCdnCgiLinks(body))
+	const actualSha = sha256Hex(body)
 
 	if (actualSha !== expectedSha) {
 		log(`Content hash mismatch for '${url}' (expected '${expectedSha}', got '${actualSha}').`)
@@ -345,23 +326,44 @@ async function checkGateway(
 	return { ...result, verified: true }
 }
 
-function printSummary(endpoints: Endpoint[]): void {
-	for (const endpoint of endpoints) {
-		log(
-			`${endpoint.name}: ${endpoint.attempts} attempts; last HTTP status: ${endpoint.lastStatus}.`,
-		)
+/**
+ * Retry `endpoint` with exponential backoff until it verifies the CID. Rejects
+ * once the next retry would land past the deadline.
+ */
+async function poll(endpoint: Endpoint, cid: string, deadline: number): Promise<void> {
+	let backoffSeconds = MIN_BACKOFF_SECONDS
+
+	for (let attempt = 1; ; attempt++) {
+		log(`Checking '${endpoint.name}' for CID '${cid}' (attempt ${attempt}) at '${endpoint.url}'...`)
+
+		const result = await endpoint.check()
+
+		if (result.verified) {
+			return
+		}
+
+		const retryDelay = Math.max(backoffSeconds, result.retryAfterSeconds)
+
+		backoffSeconds = Math.min(backoffSeconds * 2, MAX_BACKOFF_SECONDS)
+
+		if (performance.now() + retryDelay * 1000 >= deadline) {
+			throw new Error(
+				`${endpoint.name}: ${describeResult(result)}; retry delay ${retryDelay}s exceeds the remaining budget. Gave up after ${attempt} attempt(s).`,
+			)
+		}
+
+		log(`${endpoint.name}: ${describeResult(result)}; next retry in ${retryDelay}s.`)
+		await sleep(retryDelay * 1000)
 	}
 }
 
 /**
- * Poll every endpoint with its own exponential backoff until one verifies the
- * CID or the time budget runs out.
+ * Poll every endpoint concurrently until one verifies the CID or all of them
+ * run out of time budget.
  */
 async function checkAvailability(cid: string, deployDirectory: string): Promise<boolean> {
 	const rootDigest = parseRootDigest(cid)
-	const expectedSha = sha256Hex(
-		stripCdnCgiLinks(await readFile(join(deployDirectory, 'index.html'))),
-	)
+	const expectedSha = sha256Hex(await readFile(join(deployDirectory, 'index.html')))
 	const deadline = performance.now() + TIME_BUDGET_MS
 	const providerLookupUrl = `https://cid.contact/routing/v1/providers/${cid}`
 	const endpoints: Endpoint[] = [
@@ -375,73 +377,26 @@ async function checkAvailability(cid: string, deployDirectory: string): Promise<
 
 			return { name: gateway.name, url, check: () => checkGateway(url, expectedSha, deadline) }
 		}),
-	].map(endpoint => ({
-		...endpoint,
-		attempts: 0,
-		backoffSeconds: MIN_BACKOFF_SECONDS,
-		nextAttemptAt: performance.now(),
-		lastStatus: 'not-attempted',
-	}))
+	]
 
-	while (performance.now() < deadline) {
-		for (const endpoint of endpoints) {
-			if (performance.now() >= deadline) {
-				break
-			}
+	try {
+		await Promise.any(
+			endpoints.map(endpoint =>
+				poll(endpoint, cid, deadline).catch((error: unknown) => {
+					log(getErrorMessage(error))
+					throw error
+				}),
+			),
+		)
+	} catch {
+		log('No endpoint verified CID availability within the ten-minute budget. Failure.')
 
-			if (performance.now() < endpoint.nextAttemptAt) {
-				continue
-			}
-
-			endpoint.attempts++
-			log(
-				`Checking '${endpoint.name}' for CID '${cid}' (attempt ${endpoint.attempts}) at '${endpoint.url}'...`,
-			)
-
-			const result = await endpoint.check()
-
-			endpoint.lastStatus = result.status?.toString() ?? 'none'
-
-			if (result.verified) {
-				printSummary(endpoints)
-				log('CID availability verified. Success.')
-
-				return true
-			}
-
-			// Add up to 20% jitter; at the cap, jitter downward to stay within it.
-			const jitter = randomInt(endpoint.backoffSeconds / 5 + 1)
-			const backoffDelay =
-				endpoint.backoffSeconds === MAX_BACKOFF_SECONDS
-					? MAX_BACKOFF_SECONDS - jitter
-					: endpoint.backoffSeconds + jitter
-			const retryDelay = Math.max(backoffDelay, result.retryAfterSeconds)
-
-			endpoint.nextAttemptAt = performance.now() + retryDelay * 1000
-			endpoint.backoffSeconds = Math.min(endpoint.backoffSeconds * 2, MAX_BACKOFF_SECONDS)
-
-			if (endpoint.nextAttemptAt >= deadline) {
-				log(
-					`${endpoint.name}: ${describeResult(result)}; retry delay ${retryDelay}s exceeds the remaining budget. No further attempts.`,
-				)
-			} else {
-				log(`${endpoint.name}: ${describeResult(result)}; next retry in ${retryDelay}s.`)
-			}
-		}
-
-		const nextWake = Math.min(deadline, ...endpoints.map(endpoint => endpoint.nextAttemptAt))
-
-		if (nextWake >= deadline) {
-			break
-		}
-
-		await sleep(Math.max(0, nextWake - performance.now()))
+		return false
 	}
 
-	printSummary(endpoints)
-	log('No endpoint verified CID availability within the ten-minute budget. Failure.')
+	log('CID availability verified. Success.')
 
-	return false
+	return true
 }
 
 const cli = cac('ipfs-availability-check')
@@ -453,9 +408,8 @@ cli
 	)
 	.action(async (cid: string, deployDirectory: string) => {
 		try {
-			if (!(await checkAvailability(cid, deployDirectory))) {
-				process.exitCode = 1
-			}
+			// Exit explicitly so endpoints still polling don't keep the process alive.
+			process.exit((await checkAvailability(cid, deployDirectory)) ? 0 : 1)
 		} catch (error) {
 			process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 			process.exit(1)
