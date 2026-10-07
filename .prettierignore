@@ -4,5 +4,6 @@
 .pnpm-store/
 data/*-wallets/collection/*
 data/coinspect/current-reports/
+data/coinspect/config/
 pnpm-lock.yaml
 resources/files/

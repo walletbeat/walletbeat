@@ -16,6 +16,17 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
       - name: Refresh Coinspect snapshot
         run: ./deploy/coinspect/coinspect-update.sh
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.9
+      - name: Install Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Require every Coinspect check to be mapped or skipped
+        run: pnpm exec tsx deploy/coinspect/check-classification.ts
       - name: Commit snapshot
         run: |
           ./deploy/setup-git.sh
