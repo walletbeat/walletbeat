@@ -61,6 +61,17 @@ import {
 // CLI Definition
 // ============================================================================
 
+// The bash tool injects WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND into the
+// environment of any command that is not a single `pnpm wallet-data-collection:agent`
+// invocation. When set, refuse to run: this tool may only be invoked as a standalone
+// command, never as part of an arbitrary command chain.
+if (process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND !== undefined) {
+	process.stderr.write(
+		'[wallet-data-collection] The wallet data collection tool may only be run as a standalone `pnpm wallet-data-collection:agent` command, not as part of an arbitrary command chain.\n',
+	)
+	process.exit(1)
+}
+
 const cli = cac(`pnpm wallet-data-collection${actorEnvSuffixFromEnv()}`)
 
 function getCommand(

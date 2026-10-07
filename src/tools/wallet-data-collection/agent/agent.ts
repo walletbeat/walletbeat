@@ -21,7 +21,12 @@ import askUserExtension from 'pi-ask-user/index.ts'
 import prompts from 'prompts'
 
 import { getRepositoryRoot } from '../../../utils/codebase'
-import { COMMAND_CHECK_HOOK_MARKER, createCommandCheckBashOperations } from './command-check-hooks'
+import {
+	COMMAND_CHECK_HOOK_MARKER,
+	createCommandCheckBashOperations,
+	getFatalError,
+	WalletDataCollectionFatalError,
+} from './command-check-hooks'
 import { detectModelConfigurationIssue } from './model-config'
 import { createLocalReadOperations, createReadCheckOperations } from './read-hooks'
 
@@ -645,6 +650,11 @@ async function runPrompt(prompt: string): Promise<void> {
 	process.stdout.write('\n')
 	await withAgentInterrupt(() => session.prompt(prompt))
 	process.stdout.write('\n')
+	const fatal = getFatalError()
+
+	if (fatal !== null) {
+		throw fatal
+	}
 }
 
 /**
@@ -726,6 +736,13 @@ try {
 		}
 
 		await runPrompt(trimmed)
+	}
+} catch (error) {
+	if (error instanceof WalletDataCollectionFatalError) {
+		process.stderr.write(`\n${outputStyles.messageError(error.message)}\n`)
+		process.exitCode = 1
+	} else {
+		throw error
 	}
 } finally {
 	session.dispose()

@@ -43,6 +43,76 @@ type RepoRelativePath = `/${string}`
 export const COMMAND_CHECK_HOOK_MARKER = '[command-check-hooks]'
 
 /**
+ * Environment variable the bash tool sets for arbitrary (non-single-invocation) commands.
+ * The `pnpm wallet-data-collection:agent` tool refuses to run when this is set.
+ */
+export const ARBITRARY_COMMAND_ENV = 'WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND'
+
+/** The one command the agent may run through bash without being marked arbitrary. */
+const AGENT_INVOCATION_COMMAND = 'pnpm wallet-data-collection:agent'
+
+/** Shell metacharacters in a command. */
+const AGENT_INVOCATION_METACHARACTERS = /[;&|`$()<>\r\n\\]/
+
+/**
+ * True when `command` is exactly one `pnpm wallet-data-collection:agent` invocation with
+ * arguments that contain no shell metacharacter capable of running another command or
+ * subshell. Anything else is treated as an arbitrary command.
+ */
+function isPlainAgentInvocation(command: string): boolean {
+	const trimmed = command.trim()
+
+	if (trimmed === AGENT_INVOCATION_COMMAND) {
+		return true
+	}
+
+	const prefix = `${AGENT_INVOCATION_COMMAND} `
+
+	if (!trimmed.startsWith(prefix)) {
+		return false
+	}
+
+	return !AGENT_INVOCATION_METACHARACTERS.test(trimmed.slice(prefix.length))
+}
+
+/**
+ * Fatal error thrown (and cached) when the agent attempts to game the bash restriction.
+ * The harness checks {@link getFatalError} after each turn and terminates the session.
+ */
+export class WalletDataCollectionFatalError extends Error {
+	constructor(message: string) {
+		super(message)
+		this.name = 'WalletDataCollectionFatalError'
+	}
+}
+
+/** The most recent fatal error, or null. Once set, every subsequent command fails. */
+let fatalError: WalletDataCollectionFatalError | null = null
+
+/** Return the pending fatal error, if any. The harness terminates the session when set. */
+export function getFatalError(): WalletDataCollectionFatalError | null {
+	return fatalError
+}
+
+/**
+ * Build the error message appended to a reverted arbitrary command's output. It tells the
+ * model that repository files may only be edited through a plain `pnpm wallet-data-collection:agent`
+ * command, and names every file that triggered the revert.
+ */
+export function buildArbitraryCommandEditMessage(files: ReadonlyArray<RepoRelativePath>): string {
+	const list = [...files]
+		.sort((a, b) => a.localeCompare(b))
+		.map(file => `  - ${file}`)
+		.join('\n')
+
+	return [
+		`${COMMAND_CHECK_HOOK_MARKER} An arbitrary command may not modify repository files;`,
+		'reverted all changes. Edit files only through a plain `pnpm wallet-data-collection:agent` command. Offending file(s):',
+		list,
+	].join('\n')
+}
+
+/**
  * Build the error message appended to a reverted command's output, naming every file
  * that triggered the revert.
  */
@@ -437,6 +507,11 @@ export class WalletDataCollectionBash {
 	originalCommand: string
 
 	/**
+	 * True when the command is not a single `pnpm wallet-data-collection:agent` invocation.
+	 */
+	isArbitraryCommand: boolean
+
+	/**
 	 * sha256 of every scoped file as of the pre-hook, keyed by repo-relative path.
 	 * Used by the post-hook to detect what the command changed.
 	 */
@@ -445,30 +520,59 @@ export class WalletDataCollectionBash {
 	constructor(agent: WalletDataCollectionAgent) {
 		this.agent = agent
 		this.originalCommand = ''
+		this.isArbitraryCommand = false
 		this.preHashes = {}
 	}
 
 	/**
 	 * Pre-run hook: re-crawl the scoped paths, update `backup-tree.bak/` to match (copying
-	 * only files whose hash changed against the agent's baseline) and inject
-	 * `WALLETBEAT_ENV=AGENT`.
+	 * only files whose hash changed against the agent's baseline), inject `WALLETBEAT_ENV=AGENT`,
+	 * and enforce the single-invocation restriction:
+	 *
+	 * - A command referencing the arbitrary-command sentinel is a gaming attempt that
+	 *   terminates the session.
+	 * - A command that is not a single `pnpm wallet-data-collection:agent` invocation gets
+	 *   `WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND=true` injected, so any nested
+	 *   `pnpm wallet-data-collection:agent` refuses to run.
 	 */
 	async runPreHook(
 		command: string,
 		options?: BashOperationsOptions,
 	): Promise<BashPreHookResult<WalletDataCollectionBash>> {
+		// Once a fatal error is set, every subsequent command fails so the agent can make no
+		// further progress before the harness terminates.
+		if (fatalError !== null) {
+			throw fatalError
+		}
+
+		// The agent must never reference the sentinel; doing so is a gaming attempt.
+		if (command.includes(ARBITRARY_COMMAND_ENV)) {
+			fatalError = new WalletDataCollectionFatalError(
+				`Refusing to run: the command references ${ARBITRARY_COMMAND_ENV}, which the agent is not allowed to inspect or set. The agent attempted to game the command restriction. Terminating the session.`,
+			)
+
+			throw fatalError
+		}
+
 		const preSnapshot = await this.agent.snapshotRepo()
 
 		this.agent.syncBackup(preSnapshot, this.agent.lastSnapshot ?? {})
 		this.agent.lastSnapshot = preSnapshot
 		this.originalCommand = command
 		this.preHashes = preSnapshot
+		this.isArbitraryCommand = !isPlainAgentInvocation(command)
+
+		const env: NodeJS.ProcessEnv = { ...options?.env, WALLETBEAT_ENV: 'AGENT' }
+
+		if (this.isArbitraryCommand) {
+			env[ARBITRARY_COMMAND_ENV] = 'true'
+		}
 
 		return {
 			command,
 			options: {
 				...options,
-				env: { ...options?.env, WALLETBEAT_ENV: 'AGENT' },
+				env,
 			},
 			data: this,
 		}
@@ -477,7 +581,9 @@ export class WalletDataCollectionBash {
 	/**
 	 * Post-run hook: detect capture files the command added, modified, or deleted, validate
 	 * each still-present modified capture file via {@link WalletCaptureFile}, and revert the
-	 * scoped paths from `backup-tree.bak` if any is invalid.
+	 * scoped paths from `backup-tree.bak` if any is invalid. An arbitrary command may not edit
+	 * any snapshot file, so every change is reverted with a directive to edit via a plain
+	 * `pnpm wallet-data-collection:agent` command instead.
 	 */
 	async runPostHook({
 		output,
@@ -501,6 +607,21 @@ export class WalletDataCollectionBash {
 			if (!(key in currentHashes)) {
 				changedFiles.push(assertStringHasPrefix(key, '/'))
 			}
+		}
+
+		// An arbitrary command may not edit any file in the snapshot: revert every change.
+		if (this.isArbitraryCommand) {
+			if (changedFiles.length > 0) {
+				this.agent.revertRepo(
+					Object.keys(currentHashes).map(key => assertStringHasPrefix(key, '/')),
+				)
+
+				return {
+					output: `${output}\n${buildArbitraryCommandEditMessage(changedFiles)}`,
+				}
+			}
+
+			return
 		}
 
 		// Collect the files that triggered the revert, so the hook message can name them.
