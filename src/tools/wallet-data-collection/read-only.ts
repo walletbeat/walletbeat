@@ -24,7 +24,7 @@ export function isReadOnlyMode(): boolean {
  */
 function readOnlyWriteError(filePath: string): Error {
 	return new Error(
-		`[wallet-data-collection] Refusing to save changes: read-only mode is active.\nThe command would have modified: ${filePath}.\nThe \`pnpm wallet-data-collection:agent\` command must be run on its own invocation with no shell variables.\nDo not attempt to work around this limitation; attempts to do so will be flagged immediately.\nInstead, simply run the \`pnpm wallet-data-collection:agent [args...]\` command you intended to run, one per tool call, no variables.`,
+		`[wallet-data-collection] Command too complex; no changes were saved.\nThis command would have modified: ${filePath}.\nThe \`pnpm wallet-data-collection:agent\` command must be run on its own invocation with no shell variables.\nDo not attempt to work around this limitation; attempts to do so will be flagged immediately.\nInstead, simply run the \`pnpm wallet-data-collection:agent [args...]\` command you intended to run, one per tool call, no variables.`,
 	)
 }
 
