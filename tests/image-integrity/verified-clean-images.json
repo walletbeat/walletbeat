@@ -1607,6 +1607,38 @@
 		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/account_portability.png": {
+		"hash": "ae00f839b67530af2713e70e449fe9289285dfbed88b2fc86144c17686ab559b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/account_unruggability.png": {
+		"hash": "4018b6f42303996db2f93b1c18148abd2dc0cb864c3e17b72f644e50da8dcd09",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/chain_verification.png": {
+		"hash": "32b6753338056d505f0feb30e14d48d9feb6859849c30342c3589dbe836e4ee7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/l1_provider_independence.png": {
+		"hash": "98a69dcfc0ad2ffb12bb9333d1e83c4d36e8bc5cbd8638c68225de91ff7a5098",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/permissions_management.png": {
+		"hash": "ae82e5ca5cc7f619b1e16545c27c89c0fd67e6144bb13a2d209333d003a344a3",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/self_sovereignty.png": {
+		"hash": "92fa48ec47e92be4027cd6ad03522077565e878c8a11d2e05bc7931a5b655bc4",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/setting_the_bar.png": {
+		"hash": "05264cb53b41c3a85ccdb290a916a7c9e9db593e868d88c82b8c4742e955f8b1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/transaction_inclusion.png": {
+		"hash": "10a1ab6c4b9a5c2bf2173aa659928dc500f8d133d0698de906d34fd98dbcf286",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
