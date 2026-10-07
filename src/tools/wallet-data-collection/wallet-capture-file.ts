@@ -56,6 +56,7 @@ import {
 	stableJSONStringify,
 } from '@/utils/json'
 
+import { removeFile, writeFileAtomically } from './read-only'
 import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
@@ -3315,11 +3316,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${this.path}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = this.path + '.tmp'
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, this.path)
+			await writeFileAtomically(this.path, content)
 			changed.push(this.path)
 		}
 
@@ -3352,7 +3349,7 @@ export class WalletCaptureFile {
 					throw new Error(`File not in sync: ${jsonPath}`)
 				}
 
-				await fs.promises.rm(jsonPath)
+				await removeFile(jsonPath)
 
 				return [jsonPath]
 			}
@@ -3378,11 +3375,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${jsonPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${jsonPath}.tmp`
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, jsonPath)
+			await writeFileAtomically(jsonPath, content)
 			changed.push(jsonPath)
 		}
 
@@ -3472,11 +3465,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${aggregationLibPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${aggregationLibPath}.tmp`
-
-			await fs.promises.mkdir(dir, { recursive: true })
-			await fs.promises.writeFile(tmpPath, wantTypescript, 'utf8')
-			await fs.promises.rename(tmpPath, aggregationLibPath)
+			await writeFileAtomically(aggregationLibPath, wantTypescript)
 			changed.push(aggregationLibPath)
 		}
 

@@ -50,6 +50,7 @@ import {
 import { Enum } from '@/utils/enum'
 
 import { type ChalkLike, getChalk as _getChalk } from './chalk-like'
+import { writeFileAtomically } from './read-only'
 import {
 	chunkBinaryAwareString,
 	classifyStringHeuristically,
@@ -1200,11 +1201,7 @@ async function writeDomainMappingFile(mapping: DomainToEntityIdMapping): Promise
 	assertValidDomainToEntityIdMapping(sortedDomains)
 
 	// Save file with formatting, atomically (write to a temp file, then rename).
-	const tmpPath = domainFile + '.tmp'
-
-	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
-	await fs.promises.writeFile(tmpPath, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
-	await fs.promises.rename(tmpPath, domainFile)
+	await writeFileAtomically(domainFile, JSON.stringify(sortedDomains, null, '\t') + '\n')
 
 	// Keep the module-level mapping in sync with the file it was loaded from.
 	updateDomainMapping(sortedDomains)
