@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 122,
+	"highlightLastLine": 143,
+	"segments": [
+		{
+			"lines": [
+				"> {"
+			],
+			"startLine": 78
+		},
+		{
+			"lines": [
+				"  update = async (chain: TestnetChainBase) => {",
+				"    return this._update(chain);",
+				"  };",
+				"",
+				"  _update = async (chain: TestnetChainBase, isAdd?: boolean) => {",
+				"    const local = findChain({",
+				"      id: +chain.id,",
+				"    });",
+				"    if (isAdd && local) {",
+				"      if (local.isTestnet) {",
+				"        return {",
+				"          error: {",
+				"            key: 'id',",
+				"            message: \"You've already added this chain\",",
+				"            status: 'alreadyAdded',",
+				"          },",
+				"        };",
+				"      } else {",
+				"        return {",
+				"          error: {",
+				"            key: 'id',",
+				"            message: 'Chain already integrated by Rabby Wallet',",
+				"            status: 'alreadySupported',",
+				"          },",
+				"        };",
+				"      }",
+				"    }",
+				"    try {",
+				"      const { data } = await axios.post(",
+				"        chain.rpcUrl,"
+			],
+			"startLine": 118
+		}
+	]
+}

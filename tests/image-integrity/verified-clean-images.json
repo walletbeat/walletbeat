@@ -739,6 +739,10 @@
 		"hash": "61695ca37ed8fb7cce3fc694c5f7dae161beaf33a7066feb61304a9614bfa9ac",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rabby/screenshots/2026-10-06-rabby-mobile-ethereum-custom-network-rejected.png": {
+		"hash": "c65a0b7d9bffe060d8133b0004b864c142c968e57b4d584e0fab87c902f5477b",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
 		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
 		"passedTests": ["blockiness", "file-format"]
