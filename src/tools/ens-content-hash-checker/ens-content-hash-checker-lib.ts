@@ -86,8 +86,8 @@ export function base32Encode(bytes: Uint8Array): string {
 /**
  * The `multicodec` prefix for an IPFS content-hash, as defined by EIP-1577.
  * A content-hash is `<codec><value>`; for IPFS the codec is `0xe3`, which is
- * unsigned-varint encoded as the two bytes `0xe3 0x01`, and the value is the
- * raw (base32-decoded) CIDv1 bytes.
+ * an unsigned variable-length integer encoded as the two bytes `0xe3 0x01`.
+ * The value is the raw (base32-decoded) CIDv1 bytes.
  */
 const IPFS_CONTENT_HASH_PREFIX = Uint8Array.of(0xe3, 0x01)
 
