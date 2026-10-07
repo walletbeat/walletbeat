@@ -2121,8 +2121,7 @@
 				transition-property: opacity, ---slice-scale;
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)),
-			:global(.navigation-items summary:has(~ menu a:target-current) > a) {
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)) {
 				---slice-scale: 1.045;
 				opacity: 1;
 				outline: none;
