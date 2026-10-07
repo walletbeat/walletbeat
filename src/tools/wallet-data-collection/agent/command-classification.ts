@@ -196,13 +196,34 @@ function stdoutStderrRedirectionLength(segment: string, gtIndex: number): number
 
 /**
  * True when `segment` contains no forbidden shell metacharacter, other than a
- * stdout/stderr dup redirection (`2>&1`, `>&2`, `1>&2`, ...). File redirection, input
- * redirection, command substitution, subshells, backgrounding, escapes, and newlines are
- * all rejected.
+ * stdout/stderr dup redirection (`2>&1`, `>&2`, `1>&2`, ...). Inside single or double
+ * quotes, shell separators (`;`, `|`, `&`, `<`, `>`) are literal and harmless, so they are
+ * allowed; but command substitution (`$`, backtick) and escapes (`\`) are still forbidden
+ * inside double quotes. File redirection, input redirection, subshells, backgrounding,
+ * escapes, and newlines are all rejected.
  */
 function isSafeSegment(segment: string): boolean {
+	let quote: '"' | "'" | null = null
+
 	for (let i = 0; i < segment.length; i++) {
 		const ch = segment[i]
+
+		if (quote !== null) {
+			if (ch === quote) {
+				quote = null
+			} else if (quote === '"' && (ch === '$' || ch === '`' || ch === '\\')) {
+				// Inside double quotes, command substitution and escapes are still special.
+				return false
+			}
+
+			continue
+		}
+
+		if (ch === '"' || ch === "'") {
+			quote = ch
+
+			continue
+		}
 
 		if (ch === '>') {
 			const length = stdoutStderrRedirectionLength(segment, i)
@@ -221,7 +242,7 @@ function isSafeSegment(segment: string): boolean {
 		}
 	}
 
-	return true
+	return quote === null
 }
 
 /**

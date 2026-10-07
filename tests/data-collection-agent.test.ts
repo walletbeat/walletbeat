@@ -132,7 +132,11 @@ describe('isPlainAgentInvocation', () => {
 				false,
 			)
 			expect(isPlainAgentInvocation('echo `date` && pnpm wallet-data-collection:agent')).toBe(false)
-			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='$(x)'")).toBe(false)
+			// Command substitution inside single quotes is literal and safe.
+			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='$(x)'")).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent | grep "$(date)"')).toBe(
+				false,
+			)
 		})
 
 		it('rejects file and input redirection', () => {
@@ -185,6 +189,17 @@ describe('isPlainAgentInvocation', () => {
 				),
 			).toBe(true)
 			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2>&1; pwd')).toBe(true)
+		})
+
+		it('accepts grep patterns with | inside quotes', () => {
+			expect(
+				isPlainAgentInvocation(
+					'pnpm wallet-data-collection:agent 2>&1 | grep -iE "successfully|Error|already" | head',
+				),
+			).toBe(true)
+			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent | grep -E 'foo|bar'")).toBe(
+				true,
+			)
 		})
 
 		it('rejects backgrounding', () => {

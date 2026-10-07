@@ -430,6 +430,7 @@ cli
 			// Repo-global data the agent may edit regardless of the wallet.
 			files.push(assertStringHasPrefixAndSuffix('/data/entities/', { prefix: '/', suffix: '/' }))
 			pushIfExists('/data/collection/global.annotations.json')
+			pushIfExists('/data/entities.ts')
 
 			for (const v of variants) {
 				for (const t of types) {
