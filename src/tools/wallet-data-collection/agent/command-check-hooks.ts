@@ -32,6 +32,7 @@ import {
 	type BashPreHookResult,
 	createHookBashOperations,
 } from './bash-hooks'
+import { isPlainAgentInvocation } from './command-classification'
 
 /** A repo-relative path, e.g. `/src` or `/package.json`. */
 type RepoRelativePath = `/${string}`
@@ -44,55 +45,10 @@ export const COMMAND_CHECK_HOOK_MARKER = '[command-check-hooks]'
 
 /**
  * Environment variable the bash tool sets for arbitrary (non-single-invocation) commands.
- * The `pnpm wallet-data-collection:agent` tool refuses to run when this is set.
+ * When set, the `pnpm wallet-data-collection:agent` tool runs in read-only mode. Referencing
+ * this variable is a gaming attempt that terminates the session.
  */
 export const ARBITRARY_COMMAND_ENV = 'WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND'
-
-/** The one command the agent may run through bash without being marked arbitrary. */
-const AGENT_INVOCATION_COMMAND = 'pnpm wallet-data-collection:agent'
-
-/** Shell metacharacters in a command. */
-const AGENT_INVOCATION_METACHARACTERS = /[;&|`$()<>\r\n\\]/
-
-/**
- * True when `command` is exactly one `pnpm wallet-data-collection:agent` invocation with
- * arguments that contain no shell metacharacter capable of running another command or
- * subshell. Anything else is treated as an arbitrary command.
- */
-function isPlainAgentInvocation(command: string): boolean {
-	const trimmed = command.trim()
-
-	if (trimmed === AGENT_INVOCATION_COMMAND) {
-		return true
-	}
-
-	const prefix = `${AGENT_INVOCATION_COMMAND} `
-
-	if (!trimmed.startsWith(prefix)) {
-		return false
-	}
-
-	return !AGENT_INVOCATION_METACHARACTERS.test(trimmed.slice(prefix.length))
-}
-
-/**
- * Fatal error thrown (and cached) when the agent attempts to game the bash restriction.
- * The harness checks {@link getFatalError} after each turn and terminates the session.
- */
-export class WalletDataCollectionFatalError extends Error {
-	constructor(message: string) {
-		super(message)
-		this.name = 'WalletDataCollectionFatalError'
-	}
-}
-
-/** The most recent fatal error, or null. Once set, every subsequent command fails. */
-let fatalError: WalletDataCollectionFatalError | null = null
-
-/** Return the pending fatal error, if any. The harness terminates the session when set. */
-export function getFatalError(): WalletDataCollectionFatalError | null {
-	return fatalError
-}
 
 /**
  * Build the error message appended to a reverted arbitrary command's output. It tells the
@@ -539,19 +495,12 @@ export class WalletDataCollectionBash {
 		command: string,
 		options?: BashOperationsOptions,
 	): Promise<BashPreHookResult<WalletDataCollectionBash>> {
-		// Once a fatal error is set, every subsequent command fails so the agent can make no
-		// further progress before the harness terminates.
-		if (fatalError !== null) {
-			throw fatalError
-		}
-
-		// The agent must never reference the sentinel; doing so is a gaming attempt.
+		// The agent must never reference the sentinel.
 		if (command.includes(ARBITRARY_COMMAND_ENV)) {
-			fatalError = new WalletDataCollectionFatalError(
-				`Refusing to run: the command references ${ARBITRARY_COMMAND_ENV}, which the agent is not allowed to inspect or set. The agent attempted to game the command restriction. Terminating the session.`,
+			process.stderr.write(
+				`Refusing to run: the command references ${ARBITRARY_COMMAND_ENV}, which the agent is not allowed to inspect or set. The agent attempted to game the command restriction. Terminating the session.\n`,
 			)
-
-			throw fatalError
+			process.exit(1)
 		}
 
 		const preSnapshot = await this.agent.snapshotRepo()
