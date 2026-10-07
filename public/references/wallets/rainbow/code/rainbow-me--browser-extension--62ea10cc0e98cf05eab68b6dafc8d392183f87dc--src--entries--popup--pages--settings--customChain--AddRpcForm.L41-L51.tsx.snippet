@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 41,
+	"highlightLastLine": 51,
+	"segments": [
+		{
+			"lines": [
+				"export function AddRpcForm() {"
+			],
+			"startLine": 24
+		},
+		{
+			"lines": [
+				"  const form = useForm({"
+			],
+			"startLine": 33
+		},
+		{
+			"lines": [
+				"    } as AddRpcFormValues,",
+				"    validators: {",
+				"      onChange: addRpcSchema,",
+				"    },",
+				"    onSubmit: async ({ value }) => {",
+				"      const chainObj = buildChainObject({",
+				"        chainId: chain.id,",
+				"        name: chain.name,",
+				"        symbol: chain.nativeCurrency.symbol,",
+				"        rpcUrl: value.rpcUrl,",
+				"        explorerUrl: chain.blockExplorers?.default?.url,",
+				"        testnet: chain.testnet,",
+				"      });",
+				"",
+				"      addCustomChain(chain.id, chainObj, value.rpcUrl, value.active);",
+				"      triggerToast({",
+				"        title: i18n.t('settings.networks.custom_rpc.network_added'),",
+				"        description: i18n.t(",
+				"          'settings.networks.custom_rpc.network_added_correctly',"
+			],
+			"startLine": 37
+		}
+	]
+}

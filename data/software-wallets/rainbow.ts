@@ -48,10 +48,6 @@ import {
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import {
-	type ChainConfigurability,
-	RpcEndpointConfiguration,
-} from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -418,23 +414,42 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: refTodo,
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-				withNoConnectivityExceptL1RPCEndpoint: {
-					accountCreation: featureSupported,
-					accountImport: featureSupported,
-					erc20BalanceLookup: featureSupported,
-					erc20TokenSend: featureSupported,
-					etherBalanceLookup: featureSupported,
+		chainConfigurability: {
+			[Variant.BROWSER]: notSupportedWithRef({
+				ref: {
+					explanation:
+						"The extension lets you set a custom RPC, but sends its traffic through Rainbow's servers unless the node runs on the same computer at port 8545.",
+					url: [
+						{
+							label: 'Browser extension lets you add a custom RPC to a network',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/pages/settings/customChain/AddRpcForm.tsx#L41-L51',
+						},
+						{
+							label:
+								"Browser extension routes custom RPCs through Rainbow's servers except for a few local addresses",
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
+						},
+						{
+							label:
+								'Browser extension can only reach the computer it runs on and a fixed list of servers run by Rainbow and other companies',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
+						},
+						{
+							label:
+								'Browser extension tells the browser to block any server not on its allowed list, including a node on your home network',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
+						},
+					],
 				},
 			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: {
+					explanation: 'The mobile app has no custom RPC setting.',
+					label: "Mobile app only uses Rainbow's default RPC outside developer mode",
+					url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L137-L156',
+				},
 			}),
-		}),
+		},
 		ecosystem: {
 			// Delegation is never offered at EOA creation or import; it is applied lazily,
 			// bundled into the first operation (e.g. a swap) that benefits from it.
