@@ -135,7 +135,7 @@ describe('isPlainAgentInvocation', () => {
 			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='$(x)'")).toBe(false)
 		})
 
-		it('rejects redirection', () => {
+		it('rejects file and input redirection', () => {
 			expect(isPlainAgentInvocation('echo hi > out && pnpm wallet-data-collection:agent')).toBe(
 				false,
 			)
@@ -143,6 +143,48 @@ describe('isPlainAgentInvocation', () => {
 			expect(isPlainAgentInvocation('grep x < file && pnpm wallet-data-collection:agent')).toBe(
 				false,
 			)
+			expect(isPlainAgentInvocation('echo hi >> out && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+			expect(isPlainAgentInvocation('echo hi 2> out && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+		})
+
+		it('rejects multi-digit and out-of-range descriptors', () => {
+			expect(isPlainAgentInvocation('echo hi 12>&1 && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+			expect(isPlainAgentInvocation('echo hi 2>&12 && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+			expect(isPlainAgentInvocation('echo hi 3>&1 && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+			expect(isPlainAgentInvocation('echo hi 2>&3 && pnpm wallet-data-collection:agent')).toBe(
+				false,
+			)
+		})
+
+		it('accepts stdout/stderr dup redirection', () => {
+			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='metamask' 2>&1")).toBe(
+				true,
+			)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 1>&2')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent >&2')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent >&1')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2>& 1')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2 >&1')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2 >& 1')).toBe(true)
+		})
+
+		it('accepts a chain using stdout/stderr dup redirection', () => {
+			expect(
+				isPlainAgentInvocation(
+					"cd /tmp && pnpm wallet-data-collection:agent --id='metamask' 2>&1 | head -40",
+				),
+			).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2>&1; pwd')).toBe(true)
 		})
 
 		it('rejects backgrounding', () => {
