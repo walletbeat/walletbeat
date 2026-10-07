@@ -1,6 +1,20 @@
 {
+	"cloudflare.com": "cloudflare",
+	"pimlico.io": {
+		"intermediaries": ["cloudflare"],
+		"operator": "pimlico"
+	},
 	"apple.com": "apple",
+	"ambire.com": "ambire",
+	"coingecko.com": {
+		"intermediaries": ["cloudflare"],
+		"operator": "coingecko"
+	},
 	"debank.com": "debank",
+	"socket.tech": {
+		"operator": "socket",
+		"intermediaries": ["cloudflare"]
+	},
 	"google-analytics.com": "alphabet",
 	"google.com": "alphabet",
 	"googleapis.com": "alphabet",
@@ -9,8 +23,17 @@
 	"gstatic.com": "alphabet",
 	"gvt1.com": "alphabet",
 	"hyperliquid.xyz": "hyperFoundation",
+	"li.quest": {
+		"intermediaries": ["cloudflare"],
+		"operator": "lifi"
+	},
 	"rabby.io": "debank",
+	"monad.xyz": "monad",
 	"sentry.io": "sentry",
+	"uniswap.org": {
+		"intermediaries": ["cloudflare"],
+		"operator": "uniswapLabs"
+	},
 	"walletbeat.eth": "walletbeat",
 	"walletbeat.eth.limo": "walletbeat",
 	"walletbeat.eth.link": "walletbeat",
