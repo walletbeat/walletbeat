@@ -5,6 +5,7 @@ import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -192,13 +193,27 @@ export const rabby: SoftwareWallet = {
 			}),
 		},
 		addressResolution: {
-			ref: [
-				{
-					explanation:
-						'Rabby supports resolving plain ENS addresses when importing watch addresses, but not when sending funds.',
-					url: 'https://github.com/RabbyHub/Rabby/blob/5f2b84491b6af881ab4ef41f7627d5e068d10652/src/ui/views/ImportWatchAddress.tsx#L170',
-				},
-			],
+			ref: {
+				explanation: 'Rabby supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/views/SelectToAddress/components/EnterAddress.tsx#L157',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/src/ui/utils/ens.ts#L14-L31',
+					},
+					{
+						label: 'Mobile app looking up a recipient name',
+						url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/components/AccountSelectModalTx/modalScreens/EnterAddress.tsx#L82',
+					},
+					{
+						label: 'Mobile app uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/utils/ens.ts#L9-L35',
+					},
+				],
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupportedWithRef({
 					ref: [
@@ -227,7 +242,9 @@ export const rabby: SoftwareWallet = {
 					],
 				}),
 			},
-			nonChainSpecificEnsResolution: notSupported,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
 		},
 		chainAbstraction: {
 			bridging: {
