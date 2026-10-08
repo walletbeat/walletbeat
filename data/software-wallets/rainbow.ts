@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { alphabet } from '@/data/entities/alphabet'
@@ -81,9 +82,9 @@ export const rainbow: SoftwareWallet = {
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
 		coinspectId: 'rainbow',
-		contributors: [polymutex, mattmatt, ren2140],
+		contributors: [polymutex, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-09-03',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -1649,7 +1650,26 @@ export const rainbow: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'Production Chrome and Edge releases are built with `yarn build:webpack`, which runs the webpack build tooling under LavaMoat; the LavaMoat browserify step that would sandbox the shipped bundle at runtime is not used, and the shipped v1.6.13 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/.github/workflows/publish-prod-chrome.yml',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app uses @lavamoat/allow-scripts to gate install scripts, but has no runtime dependency isolation.',
+								url: 'https://github.com/rainbow-me/rainbow/blob/1753c733bf204c0046b9f16b6e43b594e78f2c81/package.json',
+							},
+						],
+					}),
+				},
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
