@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { cantina } from '@/data/entities/cantina'
 import { certora } from '@/data/entities/certora'
@@ -45,9 +46,9 @@ export const baseApp: SoftwareWallet = {
 		displayName: 'Base App',
 		tableName: 'Base App',
 		coinspectId: 'coinbase-wallet',
-		contributors: [ren2140],
+		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-03-19',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],
 			extensions: [],
@@ -494,14 +495,18 @@ export const baseApp: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				// App-store signing only; no developer-published signatures or release artifacts.
+				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				// Only generic store release notes; no public changelog for the app.
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Closed source: "Build cannot be done because the source code is not publicly available."
+				// Source: https://walletscrutiny.com/mobile/org.toshi/
+				reproducibleBuilds: notSupported,
 			},
 		},
 		// Base App accounts run Coinbase Smart Wallet logic, which exposes
