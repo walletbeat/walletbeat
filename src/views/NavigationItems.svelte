@@ -467,18 +467,8 @@
 					:target-current
 				),
 				&:is(summary):is(
-					:has(
-						a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					),
-					:not(details:open > &):has(
-						~ menu a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					)
+					:has(a[aria-current='page']),
+					:not(details:open > &):has(~ menu a[aria-current='page'])
 				) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
 

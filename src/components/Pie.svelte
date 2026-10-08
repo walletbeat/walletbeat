@@ -160,12 +160,6 @@
 		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
 	}
 
-	const sliceBackdropFilter = (slice: ComputedSlice) => (
-		slice.gradient || slice.color === 'var(--rating-unrated)'
-			? 'var(--rating-unrated-backdropFilter)'
-			: 'none'
-	)
-
 	// State
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
@@ -228,7 +222,6 @@
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
-		style:--slice-backdropFilter={sliceBackdropFilter(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 
@@ -424,11 +417,6 @@
 					--slice-outerStartY: calc(var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
 
 					background: var(--slice-fill);
-					backdrop-filter: var(--slice-backdropFilter, none);
-
-					@media (prefers-reduced-transparency: reduce) {
-						backdrop-filter: none;
-					}
 
 					clip-path: shape(
 						from
