@@ -154,5 +154,41 @@
 			"purposes": "NOT_WALLET_INITIATED"
 		}
 	],
-	"benignStrings": ["AWSALB", "engagement_time_msec", "rbisource", "x-api-ver"]
+	"benignStrings": [
+		"0xeeeeeeee14d718c2b47d9923deab1335e144eeee",
+		"?address",
+		"?key",
+		"?query",
+		"AWSALB",
+		"FIS_v2",
+		"ZodErrors",
+		"addys.p.rainbow.me",
+		"attrs",
+		"auto.http.browser.inp",
+		"auto.pageload.react.reactrouter_v6",
+		"connection.rtt",
+		"crosschain",
+		"degenMode",
+		"engagement_time_msec",
+		"entrypoint",
+		"fid",
+		"firebaseremoteconfig.googleapis.com",
+		"first-contentful-paint",
+		"https://rainbowjiumask.dataplane.rudderstack.com/v1/batch",
+		"includeTestnets",
+		"inp",
+		"jsonrpc",
+		"query dApp($shortName: String! $url: String! $status: Boolean!) { dApp(shortName: $shortName url: $url) { name status @include(if: $status) colors { primary fallback shadow } iconURL url description shortName } }",
+		"query priceChart($chainId: Int! $address: String! $day: Boolean! $hour: Boolean! $week: Boolean! $month: Boolean! $year: Boolean!) { token(chainID: $chainId address: $address) { priceCharts { day @include(if: $day) { points } hour @include(if: $hour) { points } week @include(if: $week) { points } month @include(if: $month) { points } year @include(if: $year) { points } } } }",
+		"query reverseResolveENSProfile($chainId: Int! $address: String! $fields: [String!]) { reverseResolveENSProfile(chainID: $chainId address: $address fields: $fields) { name resolverAddress reverseResolverAddress fields { key value } } }",
+		"rainbowjiumask.dataplane.rudderstack.com",
+		"rbisource",
+		"reverseResolveENSProfile",
+		"ttfb",
+		"ttfb.requestTime",
+		"w:0.6.19",
+		"x-api-ver",
+		"x-goog-api-key",
+		"{ Q0: token( address: \""
+	]
 }

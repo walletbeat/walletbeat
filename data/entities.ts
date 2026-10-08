@@ -2,11 +2,16 @@ import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
+import { aws } from '@/data/entities/aws'
 import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
+import { cloudinary } from '@/data/entities/cloudinary'
 import { deBank } from '@/data/entities/debank'
+import { fastly } from '@/data/entities/fastly'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
 import { monad } from '@/data/entities/monad'
+import { rainbow } from '@/data/entities/rainbow'
+import { rudderstack } from '@/data/entities/rudderstack'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
@@ -21,11 +26,16 @@ export const allEntities = {
 	alphabet,
 	ambire: ambireEntity,
 	apple,
+	aws,
 	citrea,
 	cloudflare,
+	cloudinary,
 	debank: deBank,
+	fastly,
 	hyperFoundation,
 	monad,
+	rainbow,
+	rudderstack,
 	sentry,
 	sonicLabs,
 	walletbeat,
