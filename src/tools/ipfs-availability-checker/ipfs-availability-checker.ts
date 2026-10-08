@@ -19,6 +19,15 @@ const GATEWAYS: Array<{ name: string; url: (cid: string) => string }> = [
 	{ name: 'filebase', url: cid => `https://ipfs.filebase.io/ipfs/${cid}/` },
 ]
 
+/** Delegated routing services that list the providers announcing a CID. */
+const ROUTERS: Array<{ name: string; url: (cid: string) => string }> = [
+	{ name: 'cid.contact', url: cid => `https://cid.contact/routing/v1/providers/${cid}` },
+	{
+		name: 'delegated-ipfs.dev',
+		url: cid => `https://delegated-ipfs.dev/routing/v1/providers/${cid}`,
+	},
+]
+
 const TIME_BUDGET_MS = 600_000
 const MIN_BACKOFF_SECONDS = 10
 const MAX_BACKOFF_SECONDS = 60
@@ -209,18 +218,19 @@ function httpProviderAddresses(payload: unknown): string[] {
 }
 
 /**
- * Bypass public gateways by fetching the root block from providers listed on
- * the indexer. The block is checked against the CID's digest, so an untrusted
+ * Bypass public gateways by fetching the root block from providers listed by
+ * a delegated router. The block is checked against the CID's digest, so an untrusted
  * provider cannot fake availability.
  */
 async function checkProviders(
+	routerName: string,
 	lookupUrl: string,
 	cid: string,
 	rootDigest: string,
 	deadline: number,
 ): Promise<CheckResult> {
 	const lookup = await fetchEndpoint(lookupUrl, PROVIDER_TIMEOUT_MS, deadline)
-	// Report and back off according to the indexer, not the last provider tried.
+	// Report and back off according to the router, not the last provider tried.
 	const failure: CheckResult = {
 		status: lookup.status,
 		error: lookup.error,
@@ -229,7 +239,7 @@ async function checkProviders(
 	}
 
 	if (lookup.body === null) {
-		log(`Failed to look up providers for CID '${cid}' on cid.contact.`)
+		log(`Failed to look up providers for CID '${cid}' on ${routerName}.`)
 
 		return failure
 	}
@@ -239,7 +249,7 @@ async function checkProviders(
 	try {
 		payload = JSON.parse(Buffer.from(lookup.body).toString('utf8'))
 	} catch (error) {
-		log(`Invalid provider lookup response from cid.contact: ${getErrorMessage(error)}`)
+		log(`Invalid provider lookup response from ${routerName}: ${getErrorMessage(error)}`)
 
 		return failure
 	}
@@ -249,7 +259,7 @@ async function checkProviders(
 		.filter(url => url !== null)
 
 	if (providerUrls.length === 0) {
-		log(`No HTTP providers found for CID '${cid}' on cid.contact.`)
+		log(`No HTTP providers found for CID '${cid}' on ${routerName}.`)
 
 		return failure
 	}
@@ -347,13 +357,16 @@ async function checkAvailability(cid: string, deployDirectory: string): Promise<
 	const rootDigest = parseRootDigest(cid)
 	const expectedSha = sha256Hex(await readFile(join(deployDirectory, 'index.html')))
 	const deadline = performance.now() + TIME_BUDGET_MS
-	const providerLookupUrl = `https://cid.contact/routing/v1/providers/${cid}`
 	const endpoints: Endpoint[] = [
-		{
-			name: 'ipfs-providers',
-			url: providerLookupUrl,
-			check: () => checkProviders(providerLookupUrl, cid, rootDigest, deadline),
-		},
+		...ROUTERS.map(router => {
+			const url = router.url(cid)
+
+			return {
+				name: `ipfs-providers (${router.name})`,
+				url,
+				check: () => checkProviders(router.name, url, cid, rootDigest, deadline),
+			}
+		}),
 		...GATEWAYS.map(gateway => {
 			const url = gateway.url(cid)
 
