@@ -78,7 +78,8 @@ export const stageCriterionRatings = {
 		icon: '❔',
 		label: 'Criterion unrated',
 		color: 'var(--rating-unrated)',
-		textColor: 'var(--rating-unrated)',
+		// `--rating-unrated` is a translucent fill; it washes out as text.
+		textColor: 'var(--text-secondary)',
 	},
 } as const satisfies Record<
 	StageCriterionRating,
