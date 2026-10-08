@@ -3,12 +3,13 @@ import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { iamkio } from '../contributors/iamkio'
+import { minimalsm } from '../contributors/minimalsm'
 import { kernal7702Contract } from '../wallet-contracts/kernal-7702'
 
 export const pillarx: SoftwareWallet = {
@@ -17,9 +18,9 @@ export const pillarx: SoftwareWallet = {
 		displayName: 'PillarX',
 		tableName: 'PillarX',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [iamkio],
+		contributors: [iamkio, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-12-16',
+		lastUpdated: '2026-10-08',
 		urls: {
 			websites: ['https://pillarx.app'],
 		},
@@ -83,7 +84,12 @@ export const pillarx: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Pillar raised 113,674 ETH (about $21M) in a July 2017 token sale.',
+					url: 'https://www.financemagnates.com/cryptocurrency/news/pillar-ico-raises-21-million-little-help-bitcoin-whales/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -117,7 +123,9 @@ export const pillarx: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			// No active bug bounty covers PillarX: the former Immunefi page for Pillar returns 404, no HackerOne team exists, there is no SECURITY.md or security.txt, and GitHub private vulnerability reporting is disabled.
+			// Source: https://github.com/pillarwallet/x
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -152,14 +160,47 @@ export const pillarx: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
-				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Web: served from Cloudflare Pages with no signed artifacts. Mobile: signed for the app stores only.
+				artifactSigning: notSupported,
+				dependencyLocking: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The web CI workflows install with `npm i` rather than `npm ci`, and the mobile CircleCI build runs `yarn install` without `--frozen-lockfile`, so committed lockfiles are not enforced.',
+							url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows/unit-tests.yml',
+						},
+					],
+				}),
+				// No LavaMoat or install-script allowlisting; `.npmrc` sets `ignore-scripts=false`.
+				// Source: https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc
+				dependencySandboxing: notSupported,
+				// No Dependabot, Snyk or Socket configuration in either repository.
+				// Source: https://github.com/pillarwallet/x/tree/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows
+				dependencyVulnerabilityScanning: notSupported,
+				// The web repo has no releases or changelog; mobile GitHub releases stop at v3.29.9 (June 2024) and App Store notes are generic.
+				// Source: https://github.com/pillarwallet/pillarwallet/releases
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
+				repositoryChangeControls: {
+					[Variant.BROWSER]: {
+						ref: [
+							{
+								explanation:
+									'Rulesets on main block deletion and force-pushes and require a pull request with one approving review; no required status checks or tag protection.',
+								url: 'https://api.github.com/repos/pillarwallet/x/rules/branches/main',
+							},
+						],
+						branchDeletionBlocked: true,
+						forcePushBlocked: true,
+						requiredChecks: false,
+						requiredReview: true,
+						tagsImmutable: false,
+					},
+					// Mobile repo branches are protected, but details are not visible to non-admins.
+					[Variant.MOBILE]: null,
+				},
+				// No reproducible build process is documented, and WalletScrutiny has no entry.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
