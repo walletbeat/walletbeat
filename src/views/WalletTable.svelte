@@ -1328,13 +1328,18 @@
 										summaryType={WalletAttributeGroupSummaryType.None}
 										{isInTooltip}
 									/>
-								{:else}
+								{:else if isInTooltip}
 									<WalletOverallSummary
 										{wallet}
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
 										{isInTooltip}
 									/>
+								{:else}
+									<!-- The row already shows the name and stage; explain the flower instead. -->
+									<p class="flower-hint">
+										Hover or select a petal to see how {wallet.metadata.displayName} rates on it.
+									</p>
 								{/if}
 							{/snippet}
 						</TooltipOrAccordion>
@@ -2026,6 +2031,16 @@
 
 	.eip-tooltip-content {
 		width: 34rem;
+	}
+
+	.flower-hint {
+		max-inline-size: 14rem;
+		margin-inline: auto;
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+		line-height: 1.45;
+		text-align: center;
+		text-wrap: balance;
 	}
 
 	.pie-center-dot {
