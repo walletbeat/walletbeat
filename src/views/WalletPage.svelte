@@ -550,72 +550,84 @@
 
 			<section
 				class="wallet-overview"
-				data-column="gap-6"
+				data-column="gap-3"
 			>
-				<nav data-row="gap-2 start wrap">
-					{#if wallet.metadata.urls?.websites?.[0] !== undefined}
-						<a
-							href={getUrl(wallet.metadata.urls.websites[0])}
-							data-badge="medium"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<span data-icon="wbicons-simple browser_integration"></span>
-							Website
-						</a>
-					{/if}
-
-					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
-						<a
-							href={getUrl(wallet.metadata.urls.repositories[0])}
-							data-badge="medium"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<span data-icon="wbicons-simple code_repository"></span>
-							Source Code
-						</a>
-					{/if}
-				</nav>
-
 				<div
-					class="wallet-platforms"
-					data-card="padding-5"
+					class="wallet-meta"
+					data-row="start gap-4 wrap"
 				>
-					<p>
-						<span class="platforms-label">Platforms: </span>
-						{#each Object.keys(wallet.variants) as variant, i}
-							{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant)}</strong>
-						{/each}.
-					</p>
+					<ul
+						class="wallet-platforms"
+						data-list="unstyled"
+						data-row="start gap-2 wrap"
+						aria-label="Platforms"
+					>
+						{#each Object.keys(wallet.variants) as variant}
+							<li class="wallet-platform">
+								<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
+								{variants[variant].label}
+							</li>
+						{/each}
+					</ul>
 
-					{#if !hasSingleVariant(wallet.variants)}
-						<p>
-							The ratings below may vary depending on the version.
-							{#if selectedVariant}
+					<nav
+						class="wallet-links"
+						data-row="start gap-2 wrap"
+						data-row-item="wrap-end"
+						aria-label="Wallet links"
+					>
+						{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+							<a
+								class="wallet-link"
+								href={getUrl(wallet.metadata.urls.websites[0])}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<span data-icon="wbicons-simple browser_integration" aria-hidden="true"></span>
+								Website
+							</a>
+						{/if}
+
+						{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
+							<a
+								class="wallet-link"
+								href={getUrl(wallet.metadata.urls.repositories[0])}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<span data-icon="wbicons-simple code_repository" aria-hidden="true"></span>
+								Source code
+							</a>
+						{/if}
+					</nav>
+				</div>
+
+				{#if !hasSingleVariant(wallet.variants)}
+					<p class="wallet-overview-note">
+						The ratings below may vary depending on the version.
+						{#if selectedVariant}
+							You are currently viewing the ratings for the
+							<strong>{variantToName(selectedVariant, false)}</strong> version.
+						{:else}
+							Select a version to see version-specific ratings.
+						{/if}
+					</p>
+				{/if}
+
+				{#if 'hardware' in wallet.variants}
+					{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
+					{#if brandModels.length > 1}
+						<p class="wallet-overview-note">
+							The ratings below may vary depending on the model.
+							{#if selectedModel}
 								You are currently viewing the ratings for the
-								<strong>{variantToName(selectedVariant, false)}</strong> version.
+								<strong>{brandModels.find(m => m.id.split('.')[1] === selectedModel)?.modelName}</strong> model.
 							{:else}
-								Select a version to see version-specific ratings.
+								Select a model to see model-specific ratings.
 							{/if}
 						</p>
 					{/if}
-
-					{#if 'hardware' in wallet.variants}
-						{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-						{#if brandModels.length > 1}
-							<p>
-								The ratings below may vary depending on the model.
-								{#if selectedModel}
-									You are currently viewing the ratings for the
-									<strong>{brandModels.find(m => m.id.split('.')[1] === selectedModel)?.modelName}</strong> model.
-								{:else}
-									Select a model to see model-specific ratings.
-								{/if}
-							</p>
-						{/if}
-					{/if}
-				</div>
+				{/if}
 			</section>
 		</header>
 
@@ -2900,8 +2912,63 @@
 		font-size: 0.9rem;
 	}
 
-	.platforms-label {
-		color: var(--accent);
+	/* Platforms read as facts (quiet chips); links read as actions (outlined pills). */
+	.wallet-platform {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		padding: 0.35em 0.7em;
+		border-radius: 999em;
+		background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
+		color: var(--text-primary);
+		font-weight: 500;
+		line-height: 1.2;
+	}
+
+	.wallet-platform-icon {
+		display: inline-flex;
+		opacity: 0.7;
+
+		:global(svg) {
+			inline-size: 1.1em;
+			block-size: 1.1em;
+			fill: currentColor;
+		}
+	}
+
+	.wallet-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		padding: 0.35em 0.8em;
+		border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+		border-radius: 999em;
+		color: var(--text-primary);
+		font-weight: 600;
+		line-height: 1.2;
+
+		transition-property: border-color, background-color;
+
+		&:hover {
+			border-color: var(--text-primary);
+			text-decoration: none;
+		}
+
+		[data-icon] {
+			--icon-size: 1.1em;
+		}
+	}
+
+	.wallet-overview-note {
+		color: var(--text-secondary);
+		text-wrap: pretty;
+	}
+
+	/* Once the links wrap below the platforms, keep them on the start edge with everything else. */
+	@media (max-width: 600px) {
+		.wallet-links {
+			margin-inline-start: 0;
+		}
 	}
 
 	#news {
