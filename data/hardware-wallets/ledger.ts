@@ -1,12 +1,16 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import { synacktiv } from '@/data/entities/synacktiv'
 import type { HardwareWallet } from '@/data/hardware-wallets'
+import { AccountType } from '@/schema/features/account-support'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -14,12 +18,21 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -28,7 +41,7 @@ export const ledgerWalletMetadata: WalletMetadata = {
 	displayName: 'Ledger Wallet',
 	tableName: 'Ledger',
 	coinspectId: { type: 'NO_COINSPECT_ID' },
-	contributors: [nconsigny, patrickalphac, mattmatt],
+	contributors: [nconsigny, patrickalphac, mattmatt, minimalsm],
 	hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 	hardwareWalletModels: [
 		{
@@ -63,7 +76,7 @@ export const ledgerWalletMetadata: WalletMetadata = {
 		},
 	],
 	iconExtension: 'svg',
-	lastUpdated: '2025-03-12',
+	lastUpdated: '2026-10-08',
 	urls: {
 		docs: ['https://developers.ledger.com/'],
 		repositories: ['https://github.com/LedgerHQ/'],
@@ -81,7 +94,45 @@ export const ledgerWalletMetadata: WalletMetadata = {
 export const ledgerWallet: HardwareWallet = {
 	metadata: ledgerWalletMetadata,
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			// The Ethereum app (v1.17.0+, 2025-05-05) can sign EIP-7702 authorizations, but only with the
+			// "Smart account upgrade" setting turned on (off by default) and only for allowlisted delegation
+			// contracts. Ledger Wallet (Ledger Live) has no 7702 flow.
+			eip7702: notSupportedWithRef({
+				ref: [
+					{
+						explanation:
+							'Ethereum app v1.17.0 added EIP-7702 authorization signing behind a "Smart account upgrade" setting that is off by default and limited to an allowlist of delegation contracts.',
+						url: 'https://github.com/LedgerHQ/app-ethereum/blob/develop/CHANGELOG.md',
+					},
+				],
+			}),
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							"Ethereum accounts are derived from a 24-word BIP-39 seed with BIP-32, using m/44'/60'/<account>'/0/0 by default (Ledger Live path) plus the legacy path.",
+						url: 'https://github.com/LedgerHQ/ledger-live/blob/develop/libs/ledger-wallet-framework/src/derivation.ts',
+					},
+					{
+						explanation:
+							'"Once the device is initialized, there is absolutely no way to retrieve the seed." The Ethereum app returns public keys and signatures only.',
+						url: 'https://donjon.ledger.com/threat-model/os-seed-confidentiality/',
+					},
+				],
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: false,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ledger.com/article/360018444599-zd',
 			requiresManufacturerConsent: {
@@ -101,12 +152,24 @@ export const ledgerWallet: HardwareWallet = {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 			},
 		}),
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation:
+							'The Ledger OS that runs on the secure element is closed source; Ledger lists "Protect the confidentiality of the firmware" as a security objective. Device apps such as the Ethereum app are Apache-2.0.',
+						url: 'https://donjon.ledger.com/threat-model/',
+					},
+				],
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
+		},
 		monetization: {
 			ref: [
 				{
 					explanation:
-						'Ledger raises $380 million to make digital assets more secure and accessible to everyone',
+						'Ledger raised a $380 million Series C led by 10T Holdings in 2021, after earlier venture rounds.',
 					url: 'https://www.businesswire.com/news/home/20210609005985/en/Ledger-completes-a-%24380-million-Series-C-fundraising-valuing-the-company-at-more-than-%241.5-billion-to-strengthen-its-position-as-the-leading-secure-gateway-to-digital-assets',
 				},
 			],
@@ -114,10 +177,10 @@ export const ledgerWallet: HardwareWallet = {
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
+				publicOffering: false,
 				selfFunded: null,
 				transparentConvenienceFees: null,
 				ventureCapital: true,
@@ -132,13 +195,32 @@ export const ledgerWallet: HardwareWallet = {
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				// Ledger Wallet has no private transfer feature. RAILGUN's ledger-client SDK is a pre-1.0
+				// app installed outside Ledger's app catalog for Flex and Nano S+ only, not a Ledger-supported feature.
+				// Source: https://github.com/Railgun-Community/ledger-client
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			// Left null: Ledger Recover (opt-in, paid) splits encrypted seed entropy into three fragments held
+			// by Ledger and two partner companies, restorable 2-of-3 after ID verification. The schema has no
+			// guardian type for third-party custodians, so this needs a maintainer decision.
+			// Source: https://shop.ledger.com/pages/ledger-recover
 			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Ledger Donjon runs a self-hosted bug bounty with safe harbor for researchers who follow its responsible disclosure rules and a 90-day disclosure policy; reward amounts are not published.',
+						url: 'https://donjon.ledger.com/bounty/',
+					},
+				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
 				dateStarted: '2020-03-07' as const,
@@ -160,12 +242,79 @@ export const ledgerWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			firmware: null,
-			keysHandling: null,
+			firmware: {
+				// Updates are signed by Ledger's HSM and installed over a secure channel; the third-party OS review
+				// found "Critical features require user consent ... Upgrading the firmware."
+				// Source: https://donjon.ledger.com/threat-model/os-confidentiality-and-integrity/
+				// Source: https://github.com/LedgerHQ/Ledger-OS-third-party-reports
+				// The OS is closed, so it cannot be rebuilt: "Build cannot be done because the source code is not publicly available."
+				// Source: https://walletscrutiny.com/hardware/ledgerNanoX/
+				// Custom OS images are not possible. A custom certificate authority can install unlisted apps on Nano S+, Stax and Flex, but the device then fails the Genuine Check.
+				// Source: https://developers.ledger.com/docs/device-app/deliver
+				type: FirmwareType.PARTIAL,
+				customFirmware: FirmwareType.FAIL,
+				details:
+					'Signed updates that need user consent on the device; closed-source OS that cannot be rebuilt; no custom OS.',
+				firmwareOpenSource: FirmwareType.FAIL,
+				reproducibleBuilds: FirmwareType.FAIL,
+				silentUpdateProtection: FirmwareType.PASS,
+				url: 'https://donjon.ledger.com/threat-model/os-confidentiality-and-integrity/',
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'"The seed can be either generated by the Secure Element itself thanks to its True Random Number Generator" or restored by the user on the device.',
+						url: 'https://donjon.ledger.com/threat-model/os-seed-confidentiality/',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation:
+								'Synacktiv source review of the Ledger OS (Nano S+ 1.5.0, Nano X 2.6.0, Flex 1.5.0, Stax 1.9.0) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/January%202026',
+						},
+					],
+					auditDate: '2026-01-19',
+					auditor: synacktiv,
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+				{
+					ref: [
+						{
+							explanation:
+								'Synacktiv source review of the Ledger OS (Nano S+ 1.4.0, Nano X 2.5.0, Flex 1.4.0, Stax 1.8.0) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/July%202025',
+						},
+					],
+					auditDate: '2025-07-17',
+					auditor: synacktiv,
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+				{
+					ref: [
+						{
+							explanation:
+								'Synacktiv source review of the Ledger OS (Nano S+ 1.3.1, Nano X 2.4.1, Flex 1.2.1, Stax 1.6.1) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/December%202024',
+						},
+					],
+					auditDate: '2024-12-20',
+					auditor: synacktiv,
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+			],
 			secureElement: supported({
 				ref: [
 					{
@@ -178,7 +327,30 @@ export const ledgerWallet: HardwareWallet = {
 			}),
 			securityBestPractices: null,
 			supplyChainDIY: null,
-			supplyChainFactory: null,
+			supplyChainFactory: {
+				// Attestation keys are provisioned at the factory through a Ledger HSM; no physical factory controls are documented.
+				// Source: https://donjon.ledger.com/threat-model/device-genuineness/
+				// French government security certificates (Nano X 2023, Stax 2025) cover the product, not manufacturing, and assume "The HSM is properly operated by LEDGER".
+				// Source: https://messervices.cyber.gouv.fr/visas/ANSSI-CSPN-2025-03-cible.pdf
+				// Ledger avoids packaging seals ("Classic anti-tampering seals ... trivial to clone"); most Flex devices ship with an anti-tamper seal and Nano Gen5 has a tamper-evident casing, while Stax, Nano X and Nano S+ have none.
+				// Source: https://support.ledger.com/article/4404389367057-zd
+				// No schematics or BOM are published: "Ledger is not obligated to distribute ... proprietary hardware schematics".
+				// Source: https://support.ledger.com/article/14716777063837-zd
+				// Secure elements: ST33K1M5 (CC EAL6+) on Stax, Flex and Nano S+, ST33J2M0 (EAL5+) on Nano X; the secure element checks the MCU flash at boot.
+				// Source: https://sec-certs.org/cc/1e7fe9a44df65612/
+				// Genuine Check: the secure element proves a factory-provisioned key to Ledger's HSM through Ledger Wallet.
+				// Source: https://support.ledger.com/article/4404389367057-zd
+				type: SupplyChainFactoryType.FAIL,
+				details:
+					'Factory key provisioning documented, but no factory audit; tamper-evident seals on some models only; no published schematics; certified secure element; cryptographic genuine check.',
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				factoryOpsecDocs: SupplyChainFactoryType.PARTIAL,
+				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.FAIL,
+				tamperEvidence: SupplyChainFactoryType.PARTIAL,
+				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://donjon.ledger.com/threat-model/device-genuineness/',
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				dataExtraction: {
@@ -203,7 +375,24 @@ export const ledgerWallet: HardwareWallet = {
 			interoperability: null,
 		},
 		transparency: {
-			maintenance: null,
+			maintenance: {
+				// No drop, water-resistance or MTBF ratings are published; Ledger gives an expected device lifespan of 3-5 years.
+				// Source: https://support.ledger.com/article/The-Expected-Lifespan-of-Ledger-Devices
+				// Devices are "not designed to be manually repaired"; the Nano X battery "cannot be replaced". Stax and Flex also have batteries.
+				// Source: https://support.ledger.com/article/360015216913-zd
+				// One-year limited warranty, which excludes batteries; Ledger Replace is a paid replacement plan.
+				// Source: https://shop.ledger.com/pages/one-year-limited-warranty
+				// Source: https://support.ledger.com/article/14679623461021-zd
+				type: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.FAIL,
+				details:
+					'No durability ratings; expected lifespan stated but no MTBF data; no repairs; non-replaceable batteries excluded from the one-year warranty; paid replacement plan.',
+				mtbfDocumentation: MaintenanceType.PARTIAL,
+				physicalDurability: MaintenanceType.FAIL,
+				repairability: MaintenanceType.FAIL,
+				url: 'https://shop.ledger.com/pages/one-year-limited-warranty',
+				warrantyExtensions: MaintenanceType.PARTIAL,
+			},
 			operationFees: null,
 			releaseTransparency: {
 				artifactSigning: null,
@@ -215,7 +404,26 @@ export const ledgerWallet: HardwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
-			reputation: null,
+			reputation: {
+				// Founded 2014; hardware and OS designed in-house around ST secure elements. Current models: Stax, Flex, Nano Gen5, Nano X, Nano S+.
+				// Source: https://www.ledger.com/
+				// End-of-life policy published; Nano S updates ended after it stopped selling in June 2022.
+				// Source: https://shop.ledger.com/pages/ledger-os-and-device-apps-policy
+				// Public security bulletins (LSB 001-025) with credit to finders; the 2020 customer data breach and the 2023 Connect Kit compromise both got incident reports.
+				// Source: https://donjon.ledger.com/lsb/
+				// Source: https://www.ledger.com/blog/security-incident-report
+				// Bug bounty with safe harbor and a 90-day disclosure policy, but no published reward amounts.
+				// Source: https://donjon.ledger.com/bounty/
+				type: ReputationType.PASS,
+				availability: ReputationType.PASS,
+				bugBounty: ReputationType.PARTIAL,
+				details:
+					'Original in-house design on the market since 2014 with a published support policy; public security bulletin list and incident reports; bug bounty with safe harbor but no published reward amounts.',
+				disclosureHistory: ReputationType.PASS,
+				originalProduct: ReputationType.PASS,
+				url: 'https://donjon.ledger.com/lsb/',
+				warrantySupportRisk: ReputationType.PASS,
+			},
 		},
 	},
 	variants: {
