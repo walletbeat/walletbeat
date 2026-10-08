@@ -93,12 +93,17 @@
 			)
 	})
 
-	function openHashDetails() {
-		const id = decodeURIComponent(globalThis.location.hash.slice(1))
+	function openDetailsFor(id: string) {
 		const target = id ? globalThis.document.getElementById(id) : null
 
 		if(target instanceof HTMLDetailsElement)
 			target.open = true
+
+		// Attribute sections wrap their card, which starts collapsed when unrated.
+		const ownDetails = target?.querySelector(':scope > details')
+
+		if(ownDetails instanceof HTMLDetailsElement)
+			ownDetails.open = true
 
 		const containingDetails = target?.closest('details')
 
@@ -106,12 +111,31 @@
 			containingDetails.open = true
 	}
 
+	function openHashDetails() {
+		openDetailsFor(decodeURIComponent(globalThis.location.hash.slice(1)))
+	}
+
+	/*
+	 * The table of contents uses CSS scroll markers, which scroll to and update
+	 * the URL fragment without firing `hashchange`, so in-page link clicks are
+	 * handled directly too.
+	 */
+	function openLinkedDetails(event: MouseEvent) {
+		const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
+		const href = link?.getAttribute('href')
+
+		if(href)
+			openDetailsFor(decodeURIComponent(href.slice(1)))
+	}
+
 	$effect(() => {
 		openHashDetails()
 		globalThis.addEventListener('hashchange', openHashDetails)
+		globalThis.document.addEventListener('click', openLinkedDetails)
 
 		return () => {
 			globalThis.removeEventListener('hashchange', openHashDetails)
+			globalThis.document.removeEventListener('click', openLinkedDetails)
 		}
 	})
 
@@ -897,8 +921,9 @@
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
+		<!-- Unrated cards only carry the generic "help us rate this" note, so they start as a header. -->
 		<details
-			open
+			open={evalAttr.evaluation.outcome.rating !== Rating.UNRATED}
 			data-card="radius-8 padding-6"
 			data-column="gap-0"
 			data-sticky-breadcrumb="scope"
@@ -2726,6 +2751,15 @@
 				.attribute-icon::before {
 					animation: none;
 				}
+
+				/*
+				 * A collapsed card's header stays in flow, so it must not keep the
+				 * breadcrumb layer, or its icon and badges scroll over the sticky header.
+				 */
+				.attribute-summary-companions,
+				.attribute-icon {
+					z-index: auto;
+				}
 			}
 		}
 
@@ -3175,6 +3209,19 @@
 				--badge-textColor: var(---rating-ink);
 
 				letter-spacing: 0.06em;
+			}
+
+			/* Collapsed unrated cards: a compact, quieter header row. */
+			.attribute[data-rating='unrated'] > &:not([open]) {
+				--card-padding: 1em;
+
+				box-shadow: none;
+				background-image: none;
+				border-style: dashed;
+
+				.attribute-icon {
+					font-size: 2rem;
+				}
 			}
 
 			.subsection-caption {
