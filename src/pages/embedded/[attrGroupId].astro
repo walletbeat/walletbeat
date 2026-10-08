@@ -46,7 +46,11 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
+		<EmbeddedWalletTable
+			client:visible
+			title='Embedded Wallets'
+			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/embedded/summary/' }}
+		/>
 	</main>
 </Layout>
 

@@ -262,7 +262,10 @@
 
 			this.pageSize = pageSize || Infinity
 
-			const defaultSortedColumn = this.columns.find(column => column.sort?.isDefault)
+			// The default sort may sit on a nested column (e.g. a group under "Rating").
+			const flattenColumns = (cols: Column<_RowValue, _CellValue, _ColumnId>[]): Column<_RowValue, _CellValue, _ColumnId>[] =>
+				cols.flatMap(column => [column, ...flattenColumns(column.subcolumns ?? [])])
+			const defaultSortedColumn = flattenColumns(this.columns).find(column => column.sort?.isDefault)
 
 			this.#defaultColumnSort = this.sortState = defaultSortedColumn && {
 				columnId: defaultSortedColumn.id,
