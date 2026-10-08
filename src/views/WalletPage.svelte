@@ -1286,7 +1286,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	<section
 		class="attribute"
-		data-card="radius-8 padding-6 border-accent"
+		data-card="radius-8 padding-6"
 		data-sticky-breadcrumb="scope clearance size"
 		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
@@ -1429,6 +1429,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						data-list-item="gap-3"
 						data-scroll-item="snap-prose"
 						data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
+						data-rating-marker={evalAttr.evaluation.outcome.rating.toLowerCase()}
 					>
 						{#if isTypographicContent(evalAttr.evaluation.details)}
 							<Typography
@@ -1525,11 +1526,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					</div>
 				{/if}
 
-				<div class="attribute-accordions" data-column="gap-3">
+				<div class="attribute-accordions" data-column="gap-0">
 					<details
 						id={`${slugifyCamelCase(attribute.id)}-why`}
-						open
-						data-card="padding-5 secondary radius-4"
+						data-card="padding-6"
 						data-column="gap-0"
 						data-sticky-container
 					>
@@ -1555,8 +1555,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 					<details
 						id={`${slugifyCamelCase(attribute.id)}-methodology`}
-						open
-						data-card="secondary padding-5 radius-4"
+						data-card="padding-6"
 						data-column="gap-0"
 						data-sticky-container
 					>
@@ -1591,7 +1590,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 												.filter(({ exampleRatings }) => !!exampleRatings)
 												.map( ({ rating, label, exampleRatings }) => ({ rating, label, exampleRatings: normalizeExampleRatings(exampleRatings) }) )
 												.filter((item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<OutcomeMetadata>> } => item.exampleRatings.length > 0) as { rating, label, exampleRatings }}
-												<li data-list-item="gap-3" data-list-item-marker={ratingIcons[rating]}>
+												<li
+													data-list-item="gap-3"
+													data-list-item-marker={ratingIcons[rating]}
+													data-rating-marker={rating.toLowerCase()}
+												>
 													<p>A wallet would get a <strong>{label}</strong> rating if...</p>
 
 													<ul>
@@ -1618,7 +1621,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						<details
 							id={`${slugifyCamelCase(attribute.id)}-improvement`}
 							open
-							data-card="secondary padding-5 radius-4"
+							data-card="padding-6"
 							data-column="gap-0"
 							data-sticky-container
 						>
@@ -2579,7 +2582,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		--column-supportLineHeight: calc(1rem * var(---wallet-line-height));
 
 		a:is(:hover, :focus-visible, :interest-source) {
-			color: var(--accent);
+			color: var(--accent-textColor, var(--accent));
 			text-decoration: none;
 		}
 
@@ -2611,7 +2614,20 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 
 	.attribute {
+		/* Ink for glyphs and labels drawn on rating fills, which stay light in both color schemes. */
+		---rating-ink: #130A2B;
+		---attribute-divider-color: color-mix(in srgb, var(--border-color) 65%, transparent);
+
 		position: relative;
+		border: 1px solid color-mix(in oklch, var(--accent) 50%, var(---attribute-divider-color));
+		background-image: linear-gradient(
+			to bottom,
+			color-mix(in oklch, var(--accent) 14%, transparent),
+			transparent 9rem
+		);
+		box-shadow:
+			0 1px 2px rgb(19 10 43 / 0.04),
+			0 12px 32px -16px rgb(19 10 43 / 0.12);
 
 		> details > summary {
 			min-inline-size: 0;
@@ -2626,7 +2642,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 			min-inline-size: 0;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 			contain: style;
 
 			> summary {
@@ -2634,15 +2649,24 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				max-inline-size: 100%;
 			}
 
+			.attribute-summary-companions > data:is([value='PASS'], [value='PARTIAL'], [value='FAIL']) {
+				--badge-backgroundColor: var(--accent);
+				--badge-borderColor: transparent;
+				--badge-textColor: var(---rating-ink);
+
+				letter-spacing: 0.06em;
+			}
+
 			.attribute-rating-details {
 				&:is(ul) {
-					--list-markerGap: 1em;
+					--list-markerGap: 0.875em;
+					--list-marker-inlineSize: 1.5em;
 				}
 
-				background-color: color-mix(in srgb, var(--accent) 5%, var(--background-secondary));
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+				background-color: color-mix(in srgb, var(--accent) 16%, var(--background-primary));
+				border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
 
-				color: var(--text-secondary);
+				color: var(--text-primary);
 				font-weight: 500;
 
 				&[data-rating="exempt"] {
@@ -2663,20 +2687,96 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 	}
 
+	/*
+	 * Rating glyph in a filled circle. The emoji in `data-list-item-marker`
+	 * stays as the unstyled fallback; this selector outranks the
+	 * `[data-list-item-marker]` rule that renders it.
+	 */
+	.attribute li[data-rating-marker][data-list-item-marker] {
+		&::before {
+			content: '';
+			block-size: var(--list-marker-inlineSize);
+			margin-block-start: calc((1lh - var(--list-marker-inlineSize)) / 2);
+			border-radius: 50%;
+			background:
+				var(---rating-glyph) center / 62% no-repeat,
+				var(---rating-marker-color);
+		}
+
+		&[data-rating-marker='pass'] {
+			---rating-marker-color: var(--rating-pass);
+			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.75 8.5l2.75 2.75 5.75-6.5'/%3E%3C/svg%3E");
+		}
+
+		&[data-rating-marker='partial'] {
+			---rating-marker-color: var(--rating-partial);
+			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M8 3.75v5M8 12.25v.01'/%3E%3C/svg%3E");
+		}
+
+		&[data-rating-marker='fail'] {
+			---rating-marker-color: var(--rating-fail);
+			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 4.75l6.5 6.5M11.25 4.75l-6.5 6.5'/%3E%3C/svg%3E");
+		}
+
+		&[data-rating-marker='unrated'] {
+			---rating-marker-color: light-dark(oklch(0.86 0.01 280), oklch(0.78 0.01 280));
+			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.75 6a2.25 2.25 0 1 1 3.4 1.95c-.7.4-1.15.85-1.15 1.55M8 12.25v.01'/%3E%3C/svg%3E");
+		}
+
+		&[data-rating-marker='exempt'] {
+			---rating-marker-color: var(--rating-neutral);
+			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 8h6.5'/%3E%3C/svg%3E");
+		}
+	}
+
 	.attribute-rating-methodology {
 		h5 {
 			font-size: 1rem;
 			font-weight: 600;
 		}
+
+		> aside {
+			--card-backgroundColor: color-mix(in oklch, var(--text-primary) 3%, transparent);
+
+			border: 1px solid var(---attribute-divider-color);
+
+			> ul {
+				--list-marker-inlineSize: 1.25em;
+				--list-markerGap: 0.75em;
+
+				:global(ul) {
+					--list-marker-inlineSize: 0.75em;
+					--list-gap: 0.25lh;
+
+					margin-block-start: 0.5lh;
+					color: var(--text-secondary);
+				}
+			}
+		}
 	}
 
+	/* Full-bleed disclosure rows split by hairlines, flush with the card's bottom edge. */
 	.attribute-accordions {
+		margin-inline: calc(-1 * var(--card-padding));
+		margin-block-end: calc(-1 * var(--card-padding));
+
 		details {
+			--card-backgroundColor: transparent;
+
 			overflow: visible;
+			border-block-start: 1px solid var(---attribute-divider-color);
+			border-radius: 0;
 
 			summary {
 				h4 {
 					max-width: 60ch;
+					font-size: 1rem;
+					font-weight: 600;
+					transition-property: color;
+				}
+
+				&:hover h4 {
+					color: var(--accent-textColor, var(--accent));
 				}
 			}
 
