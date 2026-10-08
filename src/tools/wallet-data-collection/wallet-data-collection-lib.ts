@@ -470,6 +470,36 @@ export const globalOptions = new Options<GlobalOptions>({
 	},
 })
 
+/**
+ * Options for the `agent` subcommand. Unlike other subcommands, `id`/`variant`/`type`
+ * are optional: they scope the harness to a wallet but are not required to run it.
+ * `actor` is accepted for consistency with the other global options but is not used by
+ * the harness (which always runs as an agent).
+ */
+export interface AgentOptions {
+	id: WalletName | null
+	variant: Variant | null
+	type: WalletType | null
+	actor: DataCollectionActor | null
+}
+
+export const agentOptions = new Options<AgentOptions>({
+	id: optionalOption((x: string | null): WalletName => {
+		if (x === null || x === '') {
+			throw new Error('must specify wallet ID')
+		}
+
+		if (!isValidWalletName(x)) {
+			throw new Error(`not a valid wallet ID: ${x}`)
+		}
+
+		return x
+	}),
+	variant: optionalOption(enumOption(variantEnum)),
+	type: optionalOption(enumOption(walletTypes)),
+	actor: optionalOption(enumOption(dataCollectionActor)),
+})
+
 export function getSaveOptions(opts: GlobalOptions): SaveOptions {
 	return {
 		verifyExisting: false,
@@ -766,13 +796,13 @@ function repoDir(): string {
 function capturePath(options: GlobalOptions): string {
 	const { type, id, variant } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.${variant.toLocaleLowerCase()}.capture.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.${variant.toLocaleLowerCase()}.capture.json`
 }
 
 function annotationsPath(options: GlobalOptions): string {
 	const { type, id } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.annotations.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.annotations.json`
 }
 
 function globalAnnotationsPath(): string {
@@ -2747,8 +2777,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 				'data',
 				typeDir,
 				'collection',
-				walletId.toLowerCase(),
-				`${walletId.toLowerCase()}.${variant.toLowerCase()}.capture.json`,
+				walletId,
+				`${walletId}.${variant.toLowerCase()}.capture.json`,
 			)
 
 			const exists = fs.existsSync(captureFilePath)
@@ -2761,8 +2791,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 					'data',
 					typeDir,
 					'collection',
-					walletId.toLowerCase(),
-					`${walletId.toLowerCase()}.annotations.json`,
+					walletId,
+					`${walletId}.annotations.json`,
 				)
 				const globalAnnotations = globalAnnotationsPath()
 

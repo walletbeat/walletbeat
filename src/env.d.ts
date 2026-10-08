@@ -20,5 +20,26 @@ declare namespace NodeJS {
 		 * Set to "CI" in CI, can take other values in other contexts.
 		 */
 		WALLETBEAT_ENV?: string
+
+		/**
+		 * Wallet ID passed via the `--id` flag to the `agent` subcommand.
+		 */
+		WALLETBEAT_WALLET_DATA_COLLECTION_ID?: string
+
+		/**
+		 * Wallet variant passed via the `--variant` flag to the `agent` subcommand.
+		 */
+		WALLETBEAT_WALLET_DATA_COLLECTION_VARIANT?: string
+
+		/**
+		 * Wallet type passed via the `--type` flag to the `agent` subcommand.
+		 */
+		WALLETBEAT_WALLET_DATA_COLLECTION_TYPE?: string
+
+		/**
+		 * Comma-separated set of repo-root-relative capture file paths the `agent`
+		 * harness is allowed to edit, derived from the `--id`/`--variant`/`--type` flags.
+		 */
+		WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES?: string
 	}
 }
