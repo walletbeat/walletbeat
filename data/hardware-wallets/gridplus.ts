@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import type { HardwareWallet } from '@/data/hardware-wallets'
@@ -12,6 +13,7 @@ import {
 	type HardwarePrivacyImplementation,
 	HardwarePrivacyType,
 } from '@/schema/features/privacy/hardware-privacy'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -25,6 +27,7 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	ComplexBenchmarkTransactions,
 	DataExtraction,
@@ -33,7 +36,9 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
+import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const gridplusWallet: HardwareWallet = {
@@ -42,7 +47,7 @@ export const gridplusWallet: HardwareWallet = {
 		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [nconsigny, patrickalphac, mattmatt],
+		contributors: [nconsigny, patrickalphac, mattmatt, minimalsm],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -53,7 +58,7 @@ export const gridplusWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://docs.gridplus.io/'],
 			repositories: ['https://github.com/GridPlus'],
@@ -68,7 +73,17 @@ export const gridplusWallet: HardwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			// The device shows "Authorize Contract" with the contract address, chain ID and nonce; the SDK exposes signAuthorization.
+			// Source: https://github.com/GridPlus/gridplus-sdk/blob/dev/packages/docs/docs/signing.md
+			eip7702: supported({
+				ref: [
+					{
+						explanation: 'Lattice1 firmware v0.18.8 (June 18, 2025) added "EIP-7702 support".',
+						url: 'https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md',
+					},
+				],
+				contract: 'UNKNOWN',
+			}),
 			eoa: supported({
 				ref: [
 					{
@@ -114,6 +129,11 @@ export const gridplusWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
+					explanation:
+						'GridPlus was "spun out of ConsenSys in October 2017 after a $29 million ICO."',
+					url: 'https://decrypt.co/4324/electric-dreams',
+				},
+				{
 					explanation: 'Grid+ is the first internally incubated venture to spin out of Consensys.',
 					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
 				},
@@ -130,7 +150,7 @@ export const gridplusWallet: HardwareWallet = {
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
+				publicOffering: true,
 				selfFunded: null,
 				transparentConvenienceFees: null,
 				ventureCapital: true,
@@ -158,7 +178,15 @@ export const gridplusWallet: HardwareWallet = {
 				// Source: gridplus team responses fileverse document
 			}),
 			privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				// Lattice Manager sends only Bitcoin and points Ethereum users to MetaMask, Frame or Rabby; no private transfer support is documented.
+				// Source: https://docs.gridplus.io/apps-and-integrations/lattice-manager
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
@@ -176,7 +204,13 @@ export const gridplusWallet: HardwareWallet = {
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							"GridPlus bug bounty and responsible disclosure policy: hardware and firmware attacks on the Lattice1 and SafeCards in scope; rewards at GridPlus's sole discretion with no published amounts.",
+						url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
+					},
+				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
 				dateStarted: '2021-09-23' as const,
@@ -220,7 +254,9 @@ export const gridplusWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			publicSecurityAudits: null,
+			// No public third-party audit of the Lattice1 firmware, bootloader, SafeCard applet or Lattice Manager found (GridPlus docs, blog, GitHub, WalletScrutiny, web search).
+			// Source: https://docs.gridplus.io/lattice1/security-features
+			publicSecurityAudits: [],
 			secureElement: supported({
 				ref: [
 					{
@@ -233,7 +269,28 @@ export const gridplusWallet: HardwareWallet = {
 			}),
 			securityBestPractices: null,
 			supplyChainDIY: null,
-			supplyChainFactory: null,
+			supplyChainFactory: {
+				// GridPlus says all manufacturing is done under its direct supervision in a facility also used by defense contractors. No provisioning procedure is published, and no factory audit was found.
+				// Source: https://gridplus.io/pages/contact
+				// No tamper-evident seal is described; the terms only refer to returns with packaging "opened, broken, or otherwise tampered with".
+				// Source: https://docs.gridplus.io/resources/shipping-and-delivery
+				// No schematics, PCB files or BOM are published; GitHub has only the SDK, tools, release notes and the SafeCard applet.
+				// Source: https://github.com/GridPlus
+				// An armed tamper mesh (PCB layers, 3D enclosure, conductive elastomer) wipes and bricks the device if tripped; no debug access to the secure compute environment.
+				// Source: https://docs.gridplus.io/lattice1/security-features
+				// Each device has an ID key signed by GridPlus; Verify Lattice signs a user challenge checked on a GridPlus page.
+				// Source: https://docs.gridplus.io/lattice1/lattice1-guides/how-to-verify-that-your-lattice1-is-authentic
+				type: SupplyChainFactoryType.FAIL,
+				details:
+					'Supervised manufacturing claimed without documentation or audit; no tamper-evident seal described; no published hardware design; armed tamper mesh that wipes the device; cryptographic device verification.',
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				factoryOpsecDocs: SupplyChainFactoryType.PARTIAL,
+				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.FAIL,
+				tamperEvidence: SupplyChainFactoryType.FAIL,
+				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://docs.gridplus.io/lattice1/security-features',
+			},
 			transactionLegibility: {
 				ref: [
 					{
@@ -270,7 +327,23 @@ export const gridplusWallet: HardwareWallet = {
 			interoperability: null,
 		},
 		transparency: {
-			maintenance: null,
+			maintenance: {
+				// No drop or water ratings; dropping the device can trip an armed mesh and wipe it. The mesh battery lasts "around 5 years" unplugged; if depleted while armed the device erases its data. No replacement path is documented.
+				// Source: https://docs.gridplus.io/lattice1/security-features
+				// SafeCards are rated for "around 2000 inserts".
+				// Source: https://docs.gridplus.io/safecards/introduction-to-safecards
+				// The terms reference a separate Limited Warranty that could not be found; returns within 14 days, defective units replaced.
+				// Source: https://gridplus.io/policies/refund-policy
+				type: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.FAIL,
+				details:
+					'No durability ratings; battery and card lifetime figures but no MTBF; defective units replaced; non-replaceable mesh battery whose depletion wipes the device; warranty terms not published.',
+				mtbfDocumentation: MaintenanceType.PARTIAL,
+				physicalDurability: MaintenanceType.FAIL,
+				repairability: MaintenanceType.PARTIAL,
+				url: 'https://docs.gridplus.io/lattice1/security-features',
+				warrantyExtensions: MaintenanceType.FAIL,
+			},
 			operationFees: null,
 			releaseTransparency: {
 				artifactSigning: null,
@@ -282,7 +355,23 @@ export const gridplusWallet: HardwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
-			reputation: null,
+			reputation: {
+				// Founded 2017 as a ConsenSys spin-out; Lattice1 firmware releases since September 2020, latest v0.18.9 (October 2025). Own architecture; the SafeCard applet is a fork of Status Keycard.
+				// Source: https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md
+				// No security advisories or disclosed vulnerabilities; changelog entries such as "Firmware security updates" give no details.
+				// Source: https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md
+				// Bug bounty with safe harbor but no published reward amounts.
+				// Source: https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy
+				type: ReputationType.PARTIAL,
+				availability: ReputationType.PASS,
+				bugBounty: ReputationType.PARTIAL,
+				details:
+					'Original design on the market since 2020 and still sold; security fixes shipped without advisories; bug bounty without published reward amounts.',
+				disclosureHistory: ReputationType.FAIL,
+				originalProduct: ReputationType.PASS,
+				url: 'https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md',
+				warrantySupportRisk: ReputationType.PASS,
+			},
 		},
 	},
 	variants: {
