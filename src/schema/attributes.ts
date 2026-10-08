@@ -194,7 +194,8 @@ export function ratingToTextColor(rating: Rating): string {
 		case Rating.FAIL:
 			return 'var(--rating-fail-text)'
 		case Rating.UNRATED:
-			return 'var(--rating-unrated)'
+			// `--rating-unrated` is a translucent fill; it washes out as text.
+			return 'var(--text-secondary)'
 		case Rating.EXEMPT:
 			return 'var(--rating-neutral-text)'
 	}
