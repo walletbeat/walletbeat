@@ -407,7 +407,7 @@ export const ledgerWallet: HardwareWallet = {
 			reputation: {
 				// Founded 2014; hardware and OS designed in-house around ST secure elements. Current models: Stax, Flex, Nano Gen5, Nano X, Nano S+.
 				// Source: https://www.ledger.com/
-				// End-of-life policy published; Nano S updates ended after it stopped selling in June 2022.
+				// End-of-life policy published; Nano S reached end of sale in June 2022 under that policy.
 				// Source: https://shop.ledger.com/pages/ledger-os-and-device-apps-policy
 				// Public security bulletins (LSB 001-025) with credit to finders; the 2020 customer data breach and the 2023 Connect Kit compromise both got incident reports.
 				// Source: https://donjon.ledger.com/lsb/
