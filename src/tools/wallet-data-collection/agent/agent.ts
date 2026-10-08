@@ -354,6 +354,20 @@ session.subscribe(event => {
 
 			break
 		}
+		case 'message_end': {
+			// Provider failures (auth, rate limits, unknown model, ...) do not throw; they end
+			// the assistant message with an error stop reason. Surface them so a failed turn
+			// is not silently empty.
+			const { message } = event
+
+			if (message.role === 'assistant' && message.stopReason === 'error') {
+				process.stdout.write(
+					`\n${outputStyles.hookError(`[model error] ${message.errorMessage ?? 'unknown error'}`)}\n`,
+				)
+			}
+
+			break
+		}
 		case 'tool_execution_start': {
 			const command = isToolArgs(event.args) ? event.args.command : undefined
 			const readPath = isReadToolArgs(event.args) ? event.args.path : undefined
