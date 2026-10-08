@@ -1869,14 +1869,18 @@
 				--slice-arcSize: small;
 			}
 
-			/* Firefox lacks typed length division/multiplication outside shape(). */
-			@supports not (top: calc(sibling-index() * 1px)) {
+			/*
+			 * Firefox lacks typed division (the label radius divides an angle by an
+			 * angle). Test that directly: Firefox now supports sibling-index(), so
+			 * gating on it left the label offset invalid and the icons hidden.
+			 */
+			@supports not (top: calc(1px * (1deg / 1rad))) {
 				:global(.navigation-items summary > a) {
 					---slice-label-offset: 52.313px;
 				}
 
 				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-					---slice-label-offset: 10.99px;
+					---slice-label-offset: 24.45px;
 				}
 			}
 
