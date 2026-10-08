@@ -1,32 +1,37 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { slowMist } from '@/data/entities/slowmist'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 const elytroAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/132867d031f25261562128e15a73da3c6bed671f/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
+		ref: 'https://github.com/Elytro-eth/elytro-wallet-core/blob/68ae7ff6a21143325bcf3f73217b6e95b4ae9deb/audits/SlowMist%20Audit%20Report%20v1.1.0.pdf',
 		auditDate: '2025-07-07',
 		auditor: slowMist,
 		codeSnapshot: {
 			commit:
-				'https://github.com/Elytro-eth/Elytro-wallet-contract/commit/3d64ccd3d0cd8228298cedb25af81eb042172c59',
-			date: '2025-06-26',
-			tag: 'v1.1.1',
+				'https://github.com/Elytro-eth/elytro-wallet-core/commit/26d30a431b42c5f8241db58c6390443896a37077',
+			date: '2025-05-24',
 		},
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: 'ALL_VARIANTS',
 	},
 	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+		ref: 'https://github.com/Elytro-eth/elytro-wallet-core/blob/68ae7ff6a21143325bcf3f73217b6e95b4ae9deb/audits/SlowMist%20Audit%20Report%20v1.0.0.pdf',
 		auditDate: '2024-05-16',
 		auditor: slowMist,
 		codeSnapshot: {
@@ -46,9 +51,9 @@ export const elytro: SoftwareWallet = {
 		displayName: 'Elytro',
 		tableName: 'Elytro',
 		coinspectId: 'elytro',
-		contributors: [nconsigny],
+		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		urls: {
 			repositories: ['https://github.com/Elytro-eth'],
 			socials: {
@@ -99,20 +104,44 @@ export const elytro: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: null,
+		// The extension monorepo is GPL-3.0, but it depends on @elytro/sdk and other packages fetched from npm whose source repository (Elytro-eth/elytro-wallet-lib) is no longer public.
+		// Source: https://registry.npmjs.org/@elytro/sdk
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'The Elytro extension monorepo is licensed under GPL-3.0.',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/main/LICENSE',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Soul Wallet (renamed Elytro) raised a $3M seed round in 2023 from investors including Struck Crypto, Game7DAO, NGC Ventures, Alchemy and Signum Capital.',
+					url: 'https://techcrunch.com/2023/03/16/soul-wallet-crypto-wallet/',
+				},
+				{
+					explanation:
+						'The extension has no built-in swap or bridge; it links out to third-party apps, and Elytro says users pay only network fees.',
+					url: 'https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/constants/dapps.ts',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				hiddenConvenienceFees: false,
 				publicOffering: null,
 				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				transparentConvenienceFees: false,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -135,13 +164,25 @@ export const elytro: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			// The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro's terms say "No bug‑bounty commitment ... no bounty or reward is due unless we expressly agree in writing."
+			// Source: https://github.com/Elytro-eth/soul-wallet-contract/blob/develop/bug-bounty.md
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'The extension generates the owner key locally with viem generatePrivateKey (browser CSPRNG) and stores it encrypted with AES-GCM under a PBKDF2-derived passcode key.',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/background/services/keyring.ts',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -182,14 +223,30 @@ export const elytro: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				// Only the Chrome Web Store's own signing; no release assets or published signatures.
+				artifactSigning: notSupported,
+				// pnpm-lock.yaml is committed, but the repository has no CI workflows, so nothing enforces it.
+				dependencyLocking: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The repository has no CI workflows; lockfiles are committed but builds are not run with a frozen lockfile in CI.',
+							url: 'https://github.com/Elytro-eth/Elytro',
+						},
+					],
+				}),
+				// SES lockdown() hardens JavaScript built-ins, but there are no LavaMoat policies or per-package compartments.
+				// Source: https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/utils/security.ts
+				dependencySandboxing: notSupported,
+				// No Dependabot, Snyk or Socket configuration.
+				dependencyVulnerabilityScanning: notSupported,
+				// No GitHub releases, tags or changelog for the extension.
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Builds need private API keys and bump the version automatically; no reproducible build process is documented.
+				// Source: https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/CONFIGURATION.md
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
