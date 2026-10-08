@@ -94,7 +94,10 @@
 
 
 	// Functions
-	const sliceFill = (slice: ComputedSlice) => {
+	type GradientStops = { color: string; position: number }[]
+
+	/** A gradient slice's color stops (radius in px), or a single flat color. */
+	const sliceGradientStops = (slice: ComputedSlice): GradientStops | string => {
 		const children = slice.children
 		const gradient = slice.gradient
 
@@ -157,7 +160,35 @@
 				[],
 			)
 
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
+		return colorWeights.map(({ color }, index) => ({
+			color: color === gradient.transparentStopColor ? 'transparent' : color,
+			position: stopPositions[index],
+		}))
+	}
+
+	const sliceFill = (slice: ComputedSlice) => {
+		const stops = sliceGradientStops(slice)
+
+		if (typeof stops === 'string') return stops
+
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${stops.map(({ color, position }) => `${color} ${position}px`).join(', ')}), var(--rating-unrated)`
+	}
+
+	/**
+	 * The fill color under the slice's label, so the label's ink can contrast
+	 * with what is actually drawn there rather than with the slice's nominal
+	 * color (gradient slices can be mostly unrated grey around the label).
+	 */
+	const sliceLabelBackground = (slice: ComputedSlice) => {
+		const stops = sliceGradientStops(slice)
+
+		if (typeof stops === 'string') return stops
+
+		const nearest = stops.reduce((best, stop) => (
+			Math.abs(stop.position - slice.computed.labelR) < Math.abs(best.position - slice.computed.labelR) ? stop : best
+		))
+
+		return nearest.color === 'transparent' ? 'var(--rating-unrated)' : nearest.color
 	}
 
 	// State
@@ -222,6 +253,7 @@
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
+		style:--slice-labelBackground={sliceLabelBackground(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 
@@ -542,7 +574,7 @@
 						 */
 						color: light-dark(
 							rgb(19 10 43 / 0.62),
-							oklch(from var(--slice-color, #000) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
+							oklch(from var(--slice-labelBackground, var(--slice-color, #000)) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
 						);
 						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
