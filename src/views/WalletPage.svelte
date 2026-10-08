@@ -2348,9 +2348,10 @@
 		}
 
 		@media (max-width: 864px) {
+			/* On its own row, line the stage badge up with the platforms and links below. */
 			.wallet-summary-badges {
 				flex-basis: 100%;
-				justify-content: end;
+				justify-content: start;
 			}
 		}
 	}
