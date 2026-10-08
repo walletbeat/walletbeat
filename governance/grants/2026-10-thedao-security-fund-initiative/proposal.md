@@ -60,7 +60,7 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed by Wa
 
 Neither is affiliated with a wallet Walletbeat rates; affiliations are disclosed in the repository.
 
-Other funding: the Ethereum Foundation pays $50,000 through January 2027 for Walletbeat's software wallet work, including the top five software wallet ratings. In May 2026 Walletbeat received 5,585 USD and 9.2302 ETH from Giveth, TheDAO and public donations in the Giveth Ethereum Security QF round: https://github.com/walletbeat/walletbeat/blob/beta/src/pages/about/about.md
+Other funding: the Ethereum Foundation pays $50,000 through January 2027 for Walletbeat's software wallet work, including the top five software wallet ratings. In May 2026 Walletbeat received funds from Giveth, TheDAO and public donations in the Giveth Ethereum Security QF round: https://github.com/walletbeat/walletbeat/blob/beta/src/pages/about/about.md
 
 ## Why a grant: what already exists
 
@@ -78,7 +78,7 @@ Walletbeat can use this methodology and test harness immediately. The grant pays
 - A private gap list for every rated wallet team, explaining how to fix each check that failed.
 - Retests of shipped fixes, with results in the public impact log.
 
-The work includes direct follow-up with wallet teams on their gap lists and releases.
+The real work is the follow-up: getting wallet teams to act on their gap lists and ship the fixes.
 
 ## Out of scope
 
@@ -98,11 +98,11 @@ The work includes direct follow-up with wallet teams on their gap lists and rele
 
 ### Clear signing ratings published - $25,000
 
-- [ ] Public clear signing ratings for at least 11 hardware and 16 software wallets, with a reference for every tested field, verified by the technical reviewer in the repository
+- [ ] At least 11 hardware and 16 software wallets rated on the clear signing checks of Walletbeat's transaction legibility rating, with a reference for every tested field, verified by the technical reviewer in the repository
 
 ### Software wallets ship clear signing fixes - $15,000 (adoption)
 
-- [ ] At least 4 software wallet teams ship a release that changes at least one failed clear signing check to a pass; at least 2 are MetaMask, Rabby, Phantom, Base App, Rainbow, Uniswap Wallet, Zerion or OKX
+- [ ] At least 4 software wallet teams ship a release that changes at least one failed clear signing check to a pass, 2 of them from this list: MetaMask, Rabby, Phantom, Base App, Rainbow, Uniswap Wallet, Zerion, OKX
 - [ ] The technical reviewer verifies each fix from Walletbeat's published retest in the repository and the team's public credit or direct confirmation
 
 ### Hardware wallets ship on-device clear signing fixes - $20,000 (adoption)
