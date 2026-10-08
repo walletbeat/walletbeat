@@ -101,17 +101,13 @@
 
 		if (!root) return
 
-		const itemsById = new Map<string, NavigationItem>()
-		const collect = (items: NavigationItem[]) => {
-			for (const item of items) {
-				itemsById.set(item.id, item)
-				if (item.children) collect(item.children)
-			}
-		}
-		for (const group of groups ?? [{ items }]) collect(group.items)
+		const flatten = (items: NavigationItem[]): NavigationItem[] => (
+			items.flatMap(item => [item, ...flatten(item.children ?? [])])
+		)
+		const allItems = (groups ?? [{ items }]).flatMap(group => flatten(group.items))
 
 		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
-			const item = itemsById.get(details.dataset.navigationItem ?? '')
+			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)
 
 			if (item && details.open !== (defaultOpen || hasCurrentPage(item)))
 				isOpen.set(item, details.open)
