@@ -1990,6 +1990,16 @@
 		zoom: 0.48;
 	}
 
+	/*
+	 * At row and card size the attribute-level icons are a few pixels wide; the
+	 * colors carry the meaning. Attribute slice IDs are built in this file
+	 * (`…__attr_…` in rows, `…_a_…` in mobile cards).
+	 */
+	:global(.pie-container.wallet-overall-rating-pie .pie .slice[data-slice-id*='__attr_'] > .slice-shape > .label),
+	.mobile-card-pie :global(.pie-container .pie .slice[data-slice-id*='_a_'] > .slice-shape > .label) {
+		display: none;
+	}
+
 	/* One toolbar: groups flow from the start edge, each a wrapping row of chips. */
 	.filters {
 		> [data-scroll-item][data-row] {
