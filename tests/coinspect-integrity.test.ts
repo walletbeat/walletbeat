@@ -6,6 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { allWallets } from '@/data/wallets'
 import { getRepositoryRoot } from '@/utils/codebase'
 
+import { coinspectClassificationReport } from '../deploy/coinspect/check-classification'
+
 /**
  * Coinspect `walletMakerUID`s that Walletbeat does not track.
  * When Coinspect adds a wallet, either set `coinspectId` on the matching
@@ -202,5 +204,17 @@ describe('coinspect upstream pin', () => {
 		const localSha = fs.readFileSync(pinPath, { encoding: 'utf-8' }).trim()
 
 		expect(localSha, `${UPSTREAM_COMMIT_FILE} must be a full 40-character SHA-1`).toMatch(FULL_SHA1)
+	})
+})
+
+describe('coinspect check classification', () => {
+	it('classifies every vendored check id and leaves no stale rows', () => {
+		const report = coinspectClassificationReport()
+
+		expect(report.unclassified).toEqual([])
+		expect(report.stale).toEqual([])
+		expect(report.mappedWithoutDefinition).toEqual([])
+		expect(report.unhandledScores).toEqual([])
+		expect(report.emptySkipReasons).toEqual([])
 	})
 })

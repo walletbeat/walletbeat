@@ -29,8 +29,9 @@ export const commonExclusions: PathPredicate[] = [
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',
 
-	// Vendored Coinspect reports not ours to rewrite.
+	// Vendored Coinspect files not ours to rewrite.
 	/^data\/coinspect\/current-reports\//,
+	/^data\/coinspect\/config\//,
 ]
 
 /** Escape special regex characters in a string. */
