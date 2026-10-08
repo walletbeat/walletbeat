@@ -252,63 +252,35 @@ const frequentlyAskedQuestions = [
 
 // Components
 import Typography from '@/components/Typography.svelte'
-import Layout from '@/layouts/Layout.astro'
-import Navigation from '@/views/Navigation.astro'
-
-import { defaultNavigationItems } from '@/constants/navigation'
+import PageLayout from '@/layouts/PageLayout.astro'
 ---
 
-<Layout
+<PageLayout
 	metadata={{
 		title: 'Walletbeat FAQ',
 		keywordsAfter: ['faq'],
 	}}
+	title='Frequently Asked Questions'
+	description='Everything you need to know about Walletbeat and how we evaluate wallets.'
 >
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
+		{
+			frequentlyAskedQuestions.map(entry => (
+				<details id={entry.anchor} data-card='padding-5 radius-4'>
+					<summary>
+						<h4>{entry.question}</h4>
+					</summary>
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
-		<header id='top' data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-2'>
-				<h1>Frequently Asked Questions</h1>
-				<p>Everything you need to know about Walletbeat and how we evaluate wallets.</p>
-			</hgroup>
-		</header>
-
-		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
-			{
-				frequentlyAskedQuestions.map(entry => (
-					<details id={entry.anchor} data-card='padding-5 radius-4'>
-						<summary>
-							<h4>{entry.question}</h4>
-						</summary>
-
-						<div data-column='gap-5'>
-							<Typography client:visible content={entry.answer} />
-						</div>
-					</details>
-				))
-			}
-		</div>
-	</main>
-</Layout>
+					<div data-prose>
+						<Typography client:visible content={entry.answer} />
+					</div>
+				</details>
+			))
+		}
+	</div>
+</PageLayout>
 
 <style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-paddingStart: 4.5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-	}
-
-	hgroup p {
-		color: var(--text-secondary);
-		font-size: 1rem;
-	}
-
 	details[data-card] {
 		border: var(--separator-width) solid var(--border-color);
 
@@ -348,14 +320,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			&::after {
 				transform: rotate(180deg);
 			}
-		}
-
-		> div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
 		}
 	}
 </style>

@@ -18,96 +18,38 @@ type Props = {
 const { metadata, entries, parentUrl } = Astro.props
 
 // Layouts
-import Layout from '@/layouts/Layout.astro'
-import Navigation from '@/views/Navigation.astro'
-import { defaultNavigationItems } from '@/constants/navigation'
+import PageLayout from '@/layouts/PageLayout.astro'
 ---
 
-<Layout metadata={metadata}>
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+<PageLayout metadata={metadata} description={metadata.description} parentUrl={parentUrl}>
+	{
+		entries.length > 0 ? (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<div class='index-grid'>
+					{entries.map(entry => (
+						<a class='index-card' href={entry.path}>
+							<div class='index-card-content'>
+								<h2>{entry.title}</h2>
 
-	<main data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start' data-column='gap-4'>
-			{
-				parentUrl && (
-					<nav aria-label='Breadcrumb'>
-						<a href={parentUrl}>← Back</a>
-					</nav>
-				)
-			}
+								{entry.description && <p>{entry.description}</p>}
+							</div>
 
-			<hgroup data-column='gap-3'>
-				<h1>{metadata.title}</h1>
-
-				{metadata.description && <p>{metadata.description}</p>}
-			</hgroup>
-		</header>
-
-		{
-			entries.length > 0 ? (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<div class='index-grid'>
-						{entries.map(entry => (
-							<a class='index-card' href={entry.path}>
-								<div class='index-card-content'>
-									<h2>{entry.title}</h2>
-
-									{entry.description && <p>{entry.description}</p>}
-								</div>
-
-								<span class='index-card-arrow' aria-hidden='true'>
-									→
-								</span>
-							</a>
-						))}
-					</div>
+							<span class='index-card-arrow' aria-hidden='true'>
+								→
+							</span>
+						</a>
+					))}
 				</div>
-			) : (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<p>No pages in this directory.</p>
-				</div>
-			)
-		}
-	</main>
-</Layout>
+			</div>
+		) : (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<p>No pages in this directory.</p>
+			</div>
+		)
+	}
+</PageLayout>
 
 <style>
-	main {
-		/* Same column and header as MarkdownPage, so moving between index and article keeps the left edge. */
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 52rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup {
-			h1 {
-				font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
-				line-height: 1.15;
-			}
-
-			p {
-				max-inline-size: 60ch;
-				font-size: 1.125rem;
-				line-height: 1.5;
-				color: var(--text-secondary);
-				text-wrap: pretty;
-			}
-		}
-
-		nav a {
-			font-size: 0.875rem;
-			color: var(--text-secondary);
-			text-decoration: none;
-
-			&:hover {
-				color: var(--text-primary);
-			}
-		}
-	}
-
 	.index-grid {
 		display: grid;
 		gap: 0.75rem;
