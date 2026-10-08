@@ -48,6 +48,12 @@
 	--rating-unrated-backdropFilter: blur(6px);
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+	/* Rating glyphs, drawn in --rating-* filled circles by `[data-list-item-rating]`. Ink matches the light fills in both schemes. */
+	--icon-rating-pass: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.75 8.5l2.75 2.75 5.75-6.5'/%3E%3C/svg%3E");
+	--icon-rating-partial: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M8 3.75v5M8 12.25v.01'/%3E%3C/svg%3E");
+	--icon-rating-fail: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 4.75l6.5 6.5M11.25 4.75l-6.5 6.5'/%3E%3C/svg%3E");
+	--icon-rating-unrated: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.75 6a2.25 2.25 0 1 1 3.4 1.95c-.7.4-1.15.85-1.15 1.55M8 12.25v.01'/%3E%3C/svg%3E");
+	--icon-rating-exempt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 8h6.5'/%3E%3C/svg%3E");
 	--fontFamily-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 
 	--safeArea-insetTop: env(safe-area-inset-top, 0px);

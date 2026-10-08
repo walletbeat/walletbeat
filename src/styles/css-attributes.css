@@ -1041,10 +1041,12 @@ ol {
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
 	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-rating]` is an optional attribute on a row that also has `[data-list-item-marker]`: it draws the rating as a glyph in a filled circle, and the marker string stays as the fallback.
 	 *
 	 * ### Tokens
 	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
 	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+	 * - rating glyph: `pass`, `partial`, `fail`, `unrated`, `exempt` via `[data-list-item-rating]`
 	 *
 	 * ### CSS Variables
 	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -1064,6 +1066,13 @@ ol {
 	 *   <ul>
 	 *     <li data-list-item-marker="*">First step</li>
 	 *     <li data-list-item-marker="1.">Second step</li>
+	 *   </ul>
+	 *   ```
+	 * - Rating glyph with an emoji fallback (`[data-list-item-rating]`):
+	 *   ```html
+	 *   <ul>
+	 *     <li data-list-item-marker="✅" data-list-item-rating="pass">Criterion met</li>
+	 *     <li data-list-item-marker="❌" data-list-item-rating="fail">Criterion not met</li>
 	 *   </ul>
 	 *   ```
 	 *
@@ -1124,6 +1133,40 @@ ol {
 			content: attr(data-list-item-marker);
 		}
 		/* } */
+
+		&[data-list-item-marker][data-list-item-rating] {
+			&::before {
+				content: '';
+				block-size: var(--list-marker-inlineSize);
+				margin-block-start: calc((1lh - var(--list-marker-inlineSize)) / 2);
+				border-radius: 50%;
+				background:
+					var(--listItem-ratingGlyph) center / 62% no-repeat,
+					var(--listItem-ratingColor);
+			}
+
+			&[data-list-item-rating~='pass'] {
+				--listItem-ratingColor: var(--rating-pass);
+				--listItem-ratingGlyph: var(--icon-rating-pass);
+			}
+			&[data-list-item-rating~='partial'] {
+				--listItem-ratingColor: var(--rating-partial);
+				--listItem-ratingGlyph: var(--icon-rating-partial);
+			}
+			&[data-list-item-rating~='fail'] {
+				--listItem-ratingColor: var(--rating-fail);
+				--listItem-ratingGlyph: var(--icon-rating-fail);
+			}
+			&[data-list-item-rating~='unrated'] {
+				/* Opaque, unlike the translucent --rating-unrated fill, so the glyph stays legible. */
+				--listItem-ratingColor: light-dark(oklch(0.86 0.01 280), oklch(0.78 0.01 280));
+				--listItem-ratingGlyph: var(--icon-rating-unrated);
+			}
+			&[data-list-item-rating~='exempt'] {
+				--listItem-ratingColor: var(--rating-neutral);
+				--listItem-ratingGlyph: var(--icon-rating-exempt);
+			}
+		}
 
 		padding-inline-start: var(--list-markerGap);
 

@@ -1074,7 +1074,7 @@
 				<li
 					data-list-item="gap-3"
 					data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
-					data-rating-marker={evalAttr.evaluation.outcome.rating.toLowerCase()}
+					data-list-item-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 				>
 					{#if isTypographicContent(evalAttr.evaluation.details)}
 						<Typography
@@ -1283,7 +1283,7 @@
 											<li
 												data-list-item="gap-3"
 												data-list-item-marker={ratingIcons[rating]}
-												data-rating-marker={rating.toLowerCase()}
+												data-list-item-rating={rating.toLowerCase()}
 											>
 												<p>A wallet would get a <strong>{label}</strong> rating if...</p>
 
@@ -3214,48 +3214,6 @@
 			.impact {
 				color: var(--text-secondary);
 			}
-		}
-	}
-
-	/*
-	 * Rating glyph in a filled circle. The emoji in `data-list-item-marker`
-	 * stays as the unstyled fallback; this selector mirrors and outranks the
-	 * `[data-list]` rule that renders it (Svelte's scoping adds no specificity).
-	 */
-	.attribute ul:not([data-list~='unstyled']) > li[data-rating-marker][data-list-item-marker] {
-		&::before {
-			content: '';
-			block-size: var(--list-marker-inlineSize);
-			margin-block-start: calc((1lh - var(--list-marker-inlineSize)) / 2);
-			border-radius: 50%;
-			background:
-				var(---rating-glyph) center / 62% no-repeat,
-				var(---rating-marker-color);
-		}
-
-		&[data-rating-marker='pass'] {
-			---rating-marker-color: var(--rating-pass);
-			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.75 8.5l2.75 2.75 5.75-6.5'/%3E%3C/svg%3E");
-		}
-
-		&[data-rating-marker='partial'] {
-			---rating-marker-color: var(--rating-partial);
-			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M8 3.75v5M8 12.25v.01'/%3E%3C/svg%3E");
-		}
-
-		&[data-rating-marker='fail'] {
-			---rating-marker-color: var(--rating-fail);
-			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 4.75l6.5 6.5M11.25 4.75l-6.5 6.5'/%3E%3C/svg%3E");
-		}
-
-		&[data-rating-marker='unrated'] {
-			---rating-marker-color: light-dark(oklch(0.86 0.01 280), oklch(0.78 0.01 280));
-			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.75 6a2.25 2.25 0 1 1 3.4 1.95c-.7.4-1.15.85-1.15 1.55M8 12.25v.01'/%3E%3C/svg%3E");
-		}
-
-		&[data-rating-marker='exempt'] {
-			---rating-marker-color: var(--rating-neutral);
-			---rating-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23130A2B' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M4.75 8h6.5'/%3E%3C/svg%3E");
 		}
 	}
 
