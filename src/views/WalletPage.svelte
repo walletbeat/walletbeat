@@ -629,26 +629,29 @@
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
-			<section id="stages" data-sticky-breadcrumb="scope">
-				<header
-					data-sticky="block backdrop-none"
-					data-sticky-breadcrumb="position"
-					data-row
-					data-scroll-item="inline-detached"
-				>
-					<a
-						data-link="camouflaged"
-						data-sticky-breadcrumb="item"
-						href="#stages"
+			<!-- Wallets without a stage ladder (e.g. hardware wallets) have nothing to show here. -->
+			{#if ladderEvaluation !== null}
+				<section id="stages" data-sticky-breadcrumb="scope">
+					<header
+						data-sticky="block backdrop-none"
+						data-sticky-breadcrumb="position"
+						data-row
+						data-scroll-item="inline-detached"
 					>
-						<h2 id="stages">Stage Progress</h2>
-					</a>
-				</header>
+						<a
+							data-link="camouflaged"
+							data-sticky-breadcrumb="item"
+							href="#stages"
+						>
+							<h2 id="stages">Stage Progress</h2>
+						</a>
+					</header>
 
-				<div data-scroll-item="inline-detached padding-match-end" data-column>
-					<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
-				</div>
-			</section>
+					<div data-scroll-item="inline-detached padding-match-end" data-column>
+						<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
+					</div>
+				</section>
+			{/if}
 		{/if}
 
 		{#each evalTree ? Object.values(attributeTree) : [] as attrGroup}
