@@ -535,7 +535,15 @@
 						white-space: nowrap;
 						text-align: center;
 						line-height: 1;
-						color: #fff;
+						/*
+						 * Dark ink on the light rating fills (white was ~1.4:1 on yellow and green).
+						 * In dark mode, translucent fills (unrated) composite to a dark tone, so
+						 * their effective lightness (l × alpha) picks light ink instead.
+						 */
+						color: light-dark(
+							rgb(19 10 43 / 0.62),
+							oklch(from var(--slice-color, #000) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
+						);
 						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
@@ -544,7 +552,7 @@
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
-					filter: opacity(0.75) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+					filter: opacity(0.8);
 				}
 			}
 
