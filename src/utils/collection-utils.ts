@@ -301,9 +301,11 @@ function parentUrl(urlPrefix: `/${string}`, s: string | undefined): string | und
 		return undefined
 	}
 
-	return `${urlPrefix}/${s
+	const parentSegments = s
 		.split('/')
 		.slice(0, -1)
 		.filter(p => p !== '')
-		.join('/')}/`
+
+	// A first-level directory's parent is the collection root (`/docs/`, not `/docs//`).
+	return [urlPrefix, ...parentSegments].join('/') + '/'
 }
