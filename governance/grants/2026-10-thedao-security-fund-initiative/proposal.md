@@ -55,8 +55,8 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed by Wa
 
 ## The team
 
-- **polymutex**, Walletbeat lead maintainer, owns the rating methodology: https://x.com/polymutex
-- **0xMattmatt**, wallet transaction security research. His public wallet comparisons on a malicious transaction, address poisoning and unlimited approvals led Ambire, WalletChan and Safe to ship fixes in July and August 2026: https://x.com/0xmattmatt
+- **polymutex**, Walletbeat lead and core contributor: https://x.com/polymutex
+- **0xMattmatt**, Walletbeat core contributor: https://x.com/0xmattmatt
 
 Neither is affiliated with a wallet Walletbeat rates; affiliations are disclosed in the repository.
 
