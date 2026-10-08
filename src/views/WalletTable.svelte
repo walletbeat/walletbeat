@@ -2202,5 +2202,6 @@
 	.mobile-card-pie {
 		display: flex;
 		justify-content: center;
+		content-visibility: auto;
 	}
 </style>
