@@ -1,27 +1,38 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import type { HardwareWallet } from '@/data/hardware-wallets'
+import { AccountType } from '@/schema/features/account-support'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
-	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
+import type { WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const trezorWallet: HardwareWallet = {
@@ -30,7 +41,7 @@ export const trezorWallet: HardwareWallet = {
 		displayName: 'Trezor Wallet',
 		tableName: 'Trezor',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [nconsigny, patrickalphac, mattmatt],
+		contributors: [nconsigny, patrickalphac, mattmatt, minimalsm],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -59,7 +70,7 @@ export const trezorWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://trezor.io/learn'],
 			repositories: ['https://github.com/trezor/trezor-suite'],
@@ -75,7 +86,47 @@ export const trezorWallet: HardwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupportedWithRef({
+				ref: [
+					{
+						explanation:
+							'EIP-7702 authorization signing was added in core firmware 2.12.4 as an experimental feature. Experimental messages are rejected unless the user enables experimental features on the device, and delegates must be on a built-in allowlist. It is not available by default and not on Model One.',
+						url: 'https://github.com/trezor/trezor-firmware/blob/main/core/CHANGELOG.md',
+					},
+				],
+			}),
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							"Ethereum accounts use BIP-44 derivation (m/44'/60'/0'/0/x) from a BIP-39 or SLIP-39 seed.",
+						url: 'https://github.com/trezor/trezor-firmware/blob/main/core/src/apps/ethereum/keychain.py',
+					},
+					{
+						explanation:
+							'All Trezor models support 12- or 24-word BIP-39 backups; Model T and Safe models also support SLIP-39 Single-share and Multi-share backups.',
+						url: 'https://trezor.io/learn/security-privacy/personal-security-standards/understanding-trezor-wallet-backups-12-20-or-24-words',
+					},
+					{
+						explanation:
+							'The device protocol has no message that exports a private key; the seed is only displayed on the device during backup.',
+						url: 'https://github.com/trezor/trezor-firmware/blob/main/common/protob/messages-management.proto',
+					},
+				],
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: false,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
 			requiresManufacturerConsent: null,
@@ -88,20 +139,43 @@ export const trezorWallet: HardwareWallet = {
 				[SoftwareWalletType.OTHER]: true,
 			},
 		}),
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation:
+							'The trezor-firmware repository is licensed per directory: `core` (the Model T and Safe firmware) is GPLv3, `legacy` (Model One) is LGPLv3, `crypto` is mostly MIT, and all other files are GPLv3.',
+						url: 'https://github.com/trezor/trezor-firmware/blob/main/LICENSE.md',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'The Trezor CEO (2023): Trezor is "a notable crypto startup without outside investors" and "we don\'t want any venture money to tell us what\'s right for the user."',
+					url: 'https://www.theblock.co/post/208854/trezor-ceo-matej-zak-plans',
+				},
+				{
+					explanation:
+						'Czech business register (ARES) for Trezor Company s.r.o. (ID 02440032): owned by SatoshiLabs Group a.s. (82.5%) and four company managers; no investment funds among the holders.',
+					url: 'https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty-vr/02440032',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
+				publicOffering: false,
+				selfFunded: true,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: false,
 			},
 		},
 		multiAddress: null,
@@ -113,26 +187,37 @@ export const trezorWallet: HardwareWallet = {
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://trezor.io/privacy-policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: null,
+				// No guardian, social or custodial recovery service is offered; backups (BIP-39 or
+				// SLIP-39 Multi-share) are held by the user.
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rewards up to $100,000 for core firmware ("In exceptionally critical cases, there is no upper reward limit"), $50,000 for Model One firmware and $20,000 for Trezor Suite. Coordinated disclosure, with up to three months to release a fix.',
+						url: 'https://trezor.io/other/partner-portal/for-developers/bug-bounty-program',
+					},
+				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
 				dateStarted: '2018-08-25' as const,
 				disclosure: notSupported,
-				legalProtections: supported({
-					type: LegalProtectionType.SAFE_HARBOR,
-					ref: [
-						{
-							explanation: 'Use exploits solely to verify the existence of vulnerabilities.',
-							url: 'https://trezor.io/other/partner-portal/for-developers/bug-bounty-program',
-						},
-					],
-				}),
+				// The program page sets rules for researchers ("Use exploits solely to verify the
+				// existence of vulnerabilities") but contains no safe-harbor or legal-assurance language.
+				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,
 				rewards: supported({
 					currency: 'USD',
@@ -142,12 +227,42 @@ export const trezorWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			firmware: null,
-			keysHandling: null,
+			firmware: {
+				// Firmware updates need an on-device confirmation; the bootloader checks Ed25519 signatures on every boot and enforces downgrade protection.
+				// Source: https://github.com/trezor/trezor-firmware/blob/main/docs/core/misc/boot.md
+				// Reproducible builds are documented: build in Docker/Nix, zero out the signature data of the official image and compare hashes.
+				// Source: https://github.com/trezor/trezor-firmware/blob/main/docs/common/reproducible-build.md
+				// WalletScrutiny currently lists Trezor Safe 5 with a "source available" verdict rather than "reproducible".
+				// Source: https://walletscrutiny.com/hardware/trezorSafe5/
+				// Users can install custom firmware. On Safe models this requires irreversibly unlocking the bootloader, which wipes the device and disables the attestation key; unofficial firmware shows a warning at boot.
+				// Source: https://trezor.io/learn/a/unlocking-the-bootloader-on-trezor-safe-3
+				type: FirmwareType.PASS,
+				customFirmware: FirmwareType.PASS,
+				details:
+					'On-device confirmation for updates with signature checks and downgrade protection; open-source (GPLv3) firmware; documented reproducible builds not yet independently confirmed by WalletScrutiny; custom firmware supported with a wipe and permanent warning.',
+				firmwareOpenSource: FirmwareType.PASS,
+				reproducibleBuilds: FirmwareType.PARTIAL,
+				silentUpdateProtection: FirmwareType.PASS,
+				url: 'https://github.com/trezor/trezor-firmware/blob/main/docs/core/misc/boot.md',
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'The seed is generated on the device from its own entropy combined with entropy supplied by the host; Trezor Suite can verify the result with a commit-reveal "entropy check".',
+						url: 'https://trezor.io/learn/security-privacy/how-trezor-keeps-you-safe/entropy-check-how-trezor-suite-verifies-wallet-generation',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
-			publicSecurityAudits: null,
+			// No public third-party audit report of Trezor firmware or devices was found. Trezor's bug
+			// bounty page says its code has "undergone audits by independent security researchers for
+			// many years" but names no auditor and links no report.
+			publicSecurityAudits: [],
 			secureElement: supported({
 				ref: [
 					{
@@ -160,7 +275,28 @@ export const trezorWallet: HardwareWallet = {
 			}),
 			securityBestPractices: null,
 			supplyChainDIY: null,
-			supplyChainFactory: null,
+			supplyChainFactory: {
+				// Trezor Model T and Safe devices ship with a tamper-evident holographic seal over the USB-C connector; Model One boxes carry two holographic seals.
+				// Source: https://trezor.io/support/a/is-my-device-safe-to-use
+				// Hardware designs are published under AGPL-3.0 and CERN-OHL-S. Model One and Model T include full schematic and PCB sources with a BOM; Trezor Safe 5 has schematic PDFs only, with no PCB sources or BOM.
+				// Source: https://github.com/trezor/trezor-hardware
+				// Safe 3 and Safe 5 use an EAL6+ secure element that only releases the PIN-gated secret on the correct PIN; private keys stay on the main chip.
+				// Source: https://trezor.io/learn/security-privacy/how-trezor-keeps-you-safe/secure-elements-in-trezor-safe-devices
+				// Ledger Donjon bypassed the Trezor Safe 3 authenticity checks (reported 2024-11-12); Trezor states Safe 5 is not affected.
+				// Source: https://trezor.io/vulnerability/donjon-s-trezor-safe-3-evaluation
+				// Devices ship without firmware, the bootloader only accepts signed firmware, and Trezor Suite verifies Safe devices with a secure-element-signed certificate issued before the device leaves the production line.
+				// Source: https://trezor.io/learn/a/trezor-safe-device-authentication-check
+				type: SupplyChainFactoryType.PARTIAL,
+				details:
+					'Tamper-evident seals and an authenticity check backed by the secure element; partial open hardware (no BOM or PCB sources for Safe 5); no published factory security documentation or factory audit.',
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.PARTIAL,
+				tamperEvidence: SupplyChainFactoryType.PASS,
+				tamperResistance: SupplyChainFactoryType.PARTIAL,
+				url: 'https://trezor.io/support/a/is-my-device-safe-to-use',
+			},
 			transactionLegibility: {
 				ref: [
 					{
@@ -194,7 +330,25 @@ export const trezorWallet: HardwareWallet = {
 			interoperability: null,
 		},
 		transparency: {
-			maintenance: null,
+			maintenance: {
+				// Trezor Safe 5 lists a Gorilla Glass 3 screen and operating temperature range but no drop or water rating; only Trezor Safe 7 is IP54-rated.
+				// Source: https://trezor.io/trezor-safe-5
+				// Warranty is two years for individual customers and one year for business customers; extended warranties are only offered where shown in the Trezor Shop.
+				// Source: https://trezor.io/support/logistics/warranty-returns/trezor-warranty-coverage-period-and-terms
+				// Defective devices may be repaired or replaced under warranty, but users are told not to open or repair the device themselves and no spare parts are offered.
+				// Source: https://trezor.io/documents/product_terms_of_use.pdf
+				// Trezor Safe 3, Safe 5, Model T and Model One have no battery (USB-powered); only Trezor Safe 7 has a LiFePO4 battery.
+				// Source: https://trezor.io/compare
+				type: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.PASS,
+				details:
+					'No battery on Safe 5; two-year consumer warranty; repair or replacement only through warranty; no drop/water rating or MTBF data for Safe 5.',
+				mtbfDocumentation: MaintenanceType.FAIL,
+				physicalDurability: MaintenanceType.PARTIAL,
+				repairability: MaintenanceType.PARTIAL,
+				url: 'https://trezor.io/trezor-safe-5',
+				warrantyExtensions: MaintenanceType.PARTIAL,
+			},
 			operationFees: null,
 			releaseTransparency: {
 				artifactSigning: null,
@@ -206,7 +360,25 @@ export const trezorWallet: HardwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
-			reputation: null,
+			reputation: {
+				// Trezor launched the Model One in 2014. Model One and Model T, withdrawn from sale in January 2026, keep critical security updates until at least 2036.
+				// Source: https://trezor.io/other/product-updates/how-long-will-trezor-model-one-and-model-t-be-supported
+				// Hardware and firmware are designed in-house and published; Safe 3 and Safe 5 use a third-party secure element, and Safe 7 adds one from sister company Tropic Square.
+				// Source: https://trezor.io/learn/security-privacy/how-trezor-keeps-you-safe/secure-elements-in-trezor-safe-devices
+				// Trezor maintains a public list of resolved vulnerabilities (58 entries from 2014 to 2026) naming reporters and affected models.
+				// Source: https://trezor.io/security
+				// Bug bounty rewards up to $100,000 for core firmware, uncapped for exceptionally critical issues.
+				// Source: https://trezor.io/other/partner-portal/for-developers/bug-bounty-program
+				type: ReputationType.PASS,
+				availability: ReputationType.PASS,
+				bugBounty: ReputationType.PASS,
+				details:
+					'Original in-house design on the market since 2014, long support commitments for discontinued models, a public vulnerability list and a bug bounty of up to $100,000 or more.',
+				disclosureHistory: ReputationType.PASS,
+				originalProduct: ReputationType.PASS,
+				url: 'https://trezor.io/other/product-updates/how-long-will-trezor-model-one-and-model-t-be-supported',
+				warrantySupportRisk: ReputationType.PASS,
+			},
 		},
 	},
 	variants: {
