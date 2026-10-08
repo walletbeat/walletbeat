@@ -17,6 +17,7 @@ import { isRecord } from '@/types/utils/record'
 /** Public gateways that serve the site's `index.html` for a CID. */
 const GATEWAYS: Array<{ name: string; url: (cid: string) => string }> = [
 	{ name: 'filebase', url: cid => `https://ipfs.filebase.io/ipfs/${cid}/` },
+	{ name: 'orbitor', url: cid => `https://ipfs.orbitor.dev/ipfs/${cid}/` },
 ]
 
 /** Delegated routing services that list the providers announcing a CID. */
@@ -131,13 +132,14 @@ function describeResult({ status, error }: Omit<FetchResult, 'body'>): string {
 
 /**
  * Fetch `url`, bounded by both `timeoutMs` and the overall deadline. Error
- * responses and partial transfers never yield a body, so they cannot reach a
+ * responses and interrupted transfers never yield a body, so they cannot reach a
  * content hash.
  */
 async function fetchEndpoint(
 	url: string,
 	timeoutMs: number,
 	deadline: number,
+	headers: Record<string, string> = {},
 ): Promise<FetchResult> {
 	const remainingMs = deadline - performance.now()
 
@@ -149,6 +151,7 @@ async function fetchEndpoint(
 
 	try {
 		response = await fetch(url, {
+			headers,
 			signal: AbortSignal.timeout(Math.ceil(Math.min(timeoutMs, remainingMs))),
 		})
 	} catch (error) {
@@ -297,7 +300,11 @@ async function checkGateway(
 	expectedSha: string,
 	deadline: number,
 ): Promise<CheckResult> {
-	const { body, ...result } = await fetchEndpoint(url, GATEWAY_TIMEOUT_MS, deadline)
+	// Request all bytes as a range to avoid Cloudflare's HTML script injection.
+	// The complete response must still match the local build's hash.
+	const { body, ...result } = await fetchEndpoint(url, GATEWAY_TIMEOUT_MS, deadline, {
+		Range: 'bytes=0-',
+	})
 
 	if (body === null) {
 		log(`Failed to fetch content from '${url}'.`)
