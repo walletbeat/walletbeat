@@ -703,19 +703,12 @@ Issued At: ${new Date().toISOString()}`;
 
 <section
 	class="wallet-test"
-	data-scroll-item="inline-detached padding-match-start"
+	data-scroll-item="inline-detached padding-match-end"
 	data-column="gap-6"
+	aria-label="Wallet test playground"
 >
-	<header data-row="gap-3 wrap">
-		<div data-column="gap-2">
-			<h2>Wallet interaction playground</h2>
-			<p class="subtitle">
-				Quickly test how your wallet behaves when connecting, sending transactions, and signing messages.
-				This runs on your current network and never stores results.
-			</p>
-		</div>
-
-		<div class="header-actions" data-column="gap-2 end">
+	<header class="wallet-test-toolbar" data-row="gap-3 wrap">
+		<div class="header-actions" data-row="gap-2 end">
 			{#if account?.isConnected && account.address}
 				<div class="account-pill" data-badge="medium">
 					<span class="status-dot" aria-hidden="true"></span>
@@ -741,14 +734,15 @@ Issued At: ${new Date().toISOString()}`;
 				</button>
 			{/if}
 		</div>
-	</header>
 
 	<!-- Tab Selector -->
-	<div class="tab-selector" data-row="gap-2">
+	<div class="tab-selector" data-row="gap-2" role="tablist">
 		{#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts', 'erc-8213'] as tab (tab)}
 			<button
 				type="button"
 				class="tab-button"
+				role="tab"
+				aria-selected={uiState.activeTab === tab}
 				class:active={uiState.activeTab === tab}
 				onclick={() => {
 					if (tab === 'transactions') {
@@ -785,6 +779,7 @@ Issued At: ${new Date().toISOString()}`;
 			</button>
 		{/each}
 	</div>
+	</header>
 
 	<!-- Content Area -->
 	<div class="content-wrapper" data-row="gap-6">
@@ -1064,40 +1059,39 @@ Issued At: ${new Date().toISOString()}`;
 
 
 <style>
-	.wallet-test {
-		max-width: 80rem;
-		margin-inline: auto;
+	/* Tabs on the start edge, connection status on the end edge, one shared rule below. */
+	.wallet-test-toolbar {
+		align-items: end;
+		flex-wrap: wrap-reverse;
+		border-block-end: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
 	}
 
 	.header-actions {
+		order: 2;
 		margin-inline-start: auto;
-		align-items: flex-end;
-	}
-
-	.subtitle {
-		font-size: 0.9rem;
-		color: var(--text-secondary);
-		max-width: 38rem;
+		padding-block-end: 0.5rem;
 	}
 
 	.tab-selector {
+		order: 1;
 		justify-content: flex-start;
-		gap: 0.75rem;
-		border-bottom: 1px solid var(--background-secondary);
-		padding-bottom: 0.5rem;
+		gap: 0.25rem;
+		min-inline-size: 0;
 	}
 
 	.tab-button {
-		padding: 0.75rem 1.5rem;
+		padding: 0.75rem 1rem;
 		border: none;
+		border-radius: 0;
 		background: transparent;
 		color: var(--text-secondary);
 		font-size: 0.9rem;
-		font-weight: 500;
+		font-weight: 600;
+		line-height: 1.2;
 		cursor: pointer;
-		border-bottom: 2px solid transparent;
-		margin-bottom: -0.5rem;
-		transition: all 0.2s;
+		border-block-end: 2px solid transparent;
+		margin-block-end: -1px;
+		transition: color 0.2s, border-color 0.2s;
 	}
 
 	.tab-button:hover {
@@ -1105,8 +1099,30 @@ Issued At: ${new Date().toISOString()}`;
 	}
 
 	.tab-button.active {
-		color: var(--accent);
-		border-bottom-color: var(--accent);
+		color: var(--text-primary);
+		border-block-end-color: var(--text-primary);
+	}
+
+	/*
+	 * Primary action inside the test panes. Tabs that style their own buttons
+	 * win (this stays at class specificity); the Transactions and Signatures
+	 * panes relied on it being styled and rendered a plain field-like button.
+	 */
+	.main-content :global(:where(button[data-pressable]:not([data-pressable~='secondary']))) {
+		align-self: flex-start;
+		padding: 0.7em 1.3em;
+		border: none;
+		border-radius: 999em;
+		background-color: var(--text-primary);
+		color: var(--background-primary);
+		font-size: 0.9rem;
+		font-weight: 600;
+
+		&:disabled {
+			background-color: var(--border-color);
+			color: var(--text-secondary);
+			cursor: not-allowed;
+		}
 	}
 
 	.content-wrapper {
@@ -1115,8 +1131,10 @@ Issued At: ${new Date().toISOString()}`;
 	}
 
 	.sidebar {
-		width: 18rem;
+		width: 17rem;
 		flex-shrink: 0;
+		position: sticky;
+		top: 1rem;
 	}
 
 	.sidebar-content {
