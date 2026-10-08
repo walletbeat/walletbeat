@@ -2341,7 +2341,8 @@
 		---linked-icon-filter: none;
 		---slice-scale: 1.045;
 
-		color: var(--accent);
+		/* Attribute cards provide a legible text variant of their rating fill. */
+		color: var(--accent-textColor, var(--accent));
 		opacity: 1;
 		text-decoration: none;
 	}
