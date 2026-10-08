@@ -81,11 +81,44 @@
 	let searchValue = $state('')
 	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
+	// Stable between server and client, so the client can find its server-rendered markup.
+	const instanceId = $props.id()
+
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
 		currentHref === item.href
 		|| (item.children?.some(hasCurrentPage) ?? false)
 	)
+
+	/*
+	 * Groups are native <details>, so a click before hydration toggles them.
+	 * Hydrating the `open` bindings below would then write back the
+	 * server-rendered state, undoing that click (the nav is visible for a few
+	 * hundred ms before it hydrates). Adopt any such toggles first.
+	 */
+	const adoptPreHydrationToggles = () => {
+		const root = globalThis.document?.querySelector(`[data-navigation-instance="${instanceId}"]`)
+
+		if (!root) return
+
+		const itemsById = new Map<string, NavigationItem>()
+		const collect = (items: NavigationItem[]) => {
+			for (const item of items) {
+				itemsById.set(item.id, item)
+				if (item.children) collect(item.children)
+			}
+		}
+		for (const group of groups ?? [{ items }]) collect(group.items)
+
+		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
+			const item = itemsById.get(details.dataset.navigationItem ?? '')
+
+			if (item && details.open !== (defaultOpen || hasCurrentPage(item)))
+				isOpen.set(item, details.open)
+		}
+	}
+
+	adoptPreHydrationToggles()
 
 	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
 		const ranges: [number, number][] = []
@@ -145,6 +178,7 @@
 	data-column-item="flexible"
 	aria-label={ariaLabel}
 	data-sticky-container
+	data-navigation-instance={instanceId}
 >
 	{#if showSearch}
 		<search
@@ -240,6 +274,7 @@
 		{@render linkable(item, depth)}
 	{:else}
 		<details
+			data-navigation-item={item.id}
 			bind:open={
 				() => (
 					effectiveSearchValue
