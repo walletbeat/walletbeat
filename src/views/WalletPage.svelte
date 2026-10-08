@@ -950,99 +950,119 @@
 							class="attribute-summary-companions-position"
 							data-row-item="wrap-end"
 						>
+							<!--
+								The badges below become `position: fixed` while they travel into the
+								sticky breadcrumb, which would collapse this anchor to zero size. This
+								invisible copy keeps the anchor sized so the breadcrumb title can reserve
+								room for the badges instead of running underneath them.
+							-->
+							<div
+								class="attribute-summary-companions-sizer"
+								data-row="gap-2 wrap"
+								aria-hidden="true"
+								inert
+							>
+								{@render attributeSummaryCompanions()}
+							</div>
+
 							<div
 								class="attribute-summary-companions"
 								data-row="gap-2 wrap"
 							>
-								{#if showStage}
-								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
-
-								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
-
-								{@const stageNumbers = (
-									ladderType &&
-										attributeStages
-											.find(stage => stage.ladderType === ladderType)
-											?.stageNumbers
-									||
-										[]
-								)}
-
-								{#if stageNumbers.length > 0}
-									{@const stageNumber = stageNumbers[0]}
-									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
-									{@const stageLabels = ladderEvaluation ? (
-										stageNumbers
-											.map(n => ladderEvaluation.ladder.stages[n])
-											.filter(s => s !== undefined)
-											.map(s => s.label.replace(/^Stage /, ''))
-									) : []}
-
-									{#if stage}
-										<a
-											href={`#${stage.id}`}
-											data-link="camouflaged"
-											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
-										>
-											<div
-												data-badge="small"
-												style:--accent="var(--accent-color)"
-											>
-												<small>Stage {stageLabels.join(', ')}</small>
-											</div>
-										</a>
-									{/if}
-								{/if}
-								{/if}
-
-								{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
-								<div
-									class="variant-indicator"
-									data-badge="small"
-									data-row="gap-2"
-									style:--accent="var(--color-accent-pink-light)"
-									title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
-								>
-									{#if relevantVariants.length === 1}
-										<small>Only</small>
-									{/if}
-
-									{#each relevantVariants as variant}
-										<span class="variant-badge" data-row="gap-1">
-											{@html variants[variant].icon}
-										</span>
-									{/each}
-								</div>
-								{/if}
-
-								{#if true}
-								{@const verifiability = evalAttr.evaluation.outcome.verifiability}
-								{#if verifiability === Verifiability.UNVERIFIABLE}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable</data>
-								{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable but audited</data>
-								{/if}
-								{/if}
-
-								<data
-									data-badge="medium"
-									value={evalAttr.evaluation.outcome.rating}
-								>{evalAttr.evaluation.outcome.rating}</data>
+								{@render attributeSummaryCompanions()}
 							</div>
 						</div>
 					</div>
 				</header>
 			</summary>
+
+			{#snippet attributeSummaryCompanions()}
+				{#if showStage}
+				{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
+
+				{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
+
+				{@const stageNumbers = (
+					ladderType &&
+						attributeStages
+							.find(stage => stage.ladderType === ladderType)
+							?.stageNumbers
+					||
+						[]
+				)}
+
+				{#if stageNumbers.length > 0}
+					{@const stageNumber = stageNumbers[0]}
+					{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+					{@const stageLabels = ladderEvaluation ? (
+						stageNumbers
+							.map(n => ladderEvaluation.ladder.stages[n])
+							.filter(s => s !== undefined)
+							.map(s => s.label.replace(/^Stage /, ''))
+					) : []}
+
+					{#if stage}
+						<a
+							href={`#${stage.id}`}
+							data-link="camouflaged"
+							title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
+						>
+							<div
+								data-badge="small"
+								style:--accent="var(--accent-color)"
+							>
+								<small>Stage {stageLabels.join(', ')}</small>
+							</div>
+						</a>
+					{/if}
+				{/if}
+				{/if}
+
+				{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
+				<div
+					class="variant-indicator"
+					data-badge="small"
+					data-row="gap-2"
+					style:--accent="var(--color-accent-pink-light)"
+					title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
+				>
+					{#if relevantVariants.length === 1}
+						<small>Only</small>
+					{/if}
+
+					{#each relevantVariants as variant}
+						<span class="variant-badge" data-row="gap-1">
+							{@html variants[variant].icon}
+						</span>
+					{/each}
+				</div>
+				{/if}
+
+				{#if true}
+				{@const verifiability = evalAttr.evaluation.outcome.verifiability}
+				{#if verifiability === Verifiability.UNVERIFIABLE}
+					<data
+						data-row-item="wrap-end"
+						data-badge="medium"
+						value={verifiability}
+						style:--accent="var(--accent-color)"
+					>Unverifiable</data>
+				{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+					<data
+						data-row-item="wrap-end"
+						data-badge="medium"
+						value={verifiability}
+						style:--accent="var(--accent-color)"
+					>Unverifiable but audited</data>
+				{/if}
+				{/if}
+
+				<data
+					data-badge="medium"
+					value={evalAttr.evaluation.outcome.rating}
+				>{evalAttr.evaluation.outcome.rating}</data>
+			{/snippet}
+
 			<div class="attribute-content" data-column="gap-6">
 
 			<ul
@@ -1342,7 +1362,7 @@
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-name-flow-gap: 0.5em;
 		---wallet-line-height: 1.6;
-		---wallet-breadcrumb-attribute-font-size: 1.17rem;
+		---wallet-breadcrumb-attribute-font-size: 1.05rem;
 		---wallet-breadcrumb-group-font-size: calc(
 			(
 				var(---wallet-breadcrumb-root-font-size)
@@ -1413,7 +1433,7 @@
 				* 1rem
 			);
 			---wallet-breadcrumb-companion-inline-end-clearance: var(---wallet-mobile-pie-size);
-			---wallet-name-sticky-icon-size: 2.4rem;
+			---wallet-name-sticky-icon-size: 2rem;
 			---wallet-breadcrumb-gap: 1.25rem;
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
@@ -1427,7 +1447,7 @@
 			;
 		}
 		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-breadcrumb-gap: 1rem;
+			---wallet-breadcrumb-gap: 1.25rem;
 			---wallet-breadcrumb-heading-icon-size: 1.25rem;
 			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 		}
@@ -1535,7 +1555,7 @@
 		);
 		---wallet-page-block-offset: 0px;
 		---wallet-sticky-content-inset: 1rem;
-		---wallet-breadcrumb-root-font-size: 1.8rem;
+		---wallet-breadcrumb-root-font-size: 1.5rem;
 		---wallet-breadcrumb-block-size: calc(
 			var(---wallet-breadcrumb-root-font-size)
 			* 1.6
@@ -1560,10 +1580,11 @@
 
 		@media (min-width: 865px) and (max-width: 1280px) {
 			---wallet-page-navigation-inline-size-rem: 16;
-			---wallet-breadcrumb-root-font-size: 1.5rem;
+			---wallet-breadcrumb-root-font-size: 1.3rem;
 		}
 
 		@media (max-width: 864px) {
+			---wallet-breadcrumb-root-font-size: 1.25rem;
 			--scrollContainer-scrollPaddingBlockStart: calc(
 				var(---wallet-page-block-offset)
 				+ var(---wallet-sticky-content-inset)
@@ -2379,6 +2400,7 @@
 
 		@keyframes SectionHeadingArrowAnimation {
 			from {
+				content: '› ';
 				opacity: 0;
 			}
 			to {
@@ -2568,6 +2590,26 @@
 			}
 		}
 
+		@media (max-width: 864px) {
+			.attribute-group-heading-position[data-sticky-breadcrumb~='position'] {
+				--stickyBreadcrumb-item-insetInlineEnd: calc(
+					anchor(--wallet-breadcrumb-surface end)
+						+ var(---wallet-content-inline-start)
+						+ var(---wallet-breadcrumb-companion-inline-end-clearance)
+				);
+
+				> [data-sticky-breadcrumb~='item'] {
+					min-inline-size: 0;
+
+					h2 {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+			}
+		}
+
 		.attribute-group-stack > header {
 			.section-caption,
 			.section-controls {
@@ -2612,6 +2654,12 @@
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
 				min-inline-size: 0;
+				/*
+				 * The item is lifted out of flow even before its transition starts, so
+				 * keep it to its column's width; otherwise long titles run under the
+				 * badges beside them instead of truncating.
+				 */
+				max-inline-size: anchor-size(--sticky-breadcrumb-position inline);
 
 				h3 {
 					overflow: hidden;
@@ -2633,6 +2681,11 @@
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
 						var(---wallet-breadcrumb-animation-range-end);
+
+					/* On its own row there is no preceding crumb to separate from. */
+					@media (max-width: 864px) {
+						animation: none;
+					}
 				}
 			}
 		}
@@ -2837,6 +2890,8 @@
 				);
 				---wallet-breadcrumb-companion-block-start: calc(
 					anchor(--wallet-breadcrumb-surface top)
+					+ var(---wallet-breadcrumb-surface-fade)
+					+ var(---wallet-sticky-content-inset)
 					+ var(---wallet-breadcrumb-block-size)
 					+ var(---wallet-breadcrumb-mobile-row-gap)
 					+ var(---wallet-breadcrumb-block-size) / 2
@@ -3049,6 +3104,19 @@
 						}
 					}
 				}
+			}
+
+			.attribute-summary-companions-position {
+				display: grid;
+				align-items: center;
+
+				> * {
+					grid-area: 1 / 1;
+				}
+			}
+
+			.attribute-summary-companions-sizer {
+				visibility: hidden;
 			}
 
 			.subsection-caption {
