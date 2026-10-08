@@ -114,24 +114,6 @@ function parseRetryAfter(value: string | null): number {
 	return Math.min(Math.max(0, Math.ceil((retryAt - Date.now()) / 1000)), MAX_RETRY_AFTER_SECONDS)
 }
 
-/** Include the network error code, which `fetch` hides in `cause`. */
-function describeFetchError(error: unknown): string {
-	const description =
-		error instanceof Error ? `${error.name}: ${error.message}` : getErrorMessage(error)
-	const cause = error instanceof Error ? error.cause : undefined
-
-	if (
-		typeof cause === 'object' &&
-		cause !== null &&
-		'code' in cause &&
-		typeof cause.code === 'string'
-	) {
-		return `${description} (${cause.code})`
-	}
-
-	return description
-}
-
 function describeResult({ status, error }: Omit<FetchResult, 'body'>): string {
 	const httpStatus = `HTTP ${status ?? 'none'}`
 
@@ -161,7 +143,7 @@ async function fetchEndpoint(
 			signal: AbortSignal.timeout(Math.ceil(Math.min(timeoutMs, remainingMs))),
 		})
 	} catch (error) {
-		return { status: null, body: null, error: describeFetchError(error), retryAfterSeconds: 0 }
+		return { status: null, body: null, error: getErrorMessage(error), retryAfterSeconds: 0 }
 	}
 
 	const { status } = response
@@ -181,7 +163,7 @@ async function fetchEndpoint(
 			retryAfterSeconds,
 		}
 	} catch (error) {
-		return { status, body: null, error: describeFetchError(error), retryAfterSeconds }
+		return { status, body: null, error: getErrorMessage(error), retryAfterSeconds }
 	}
 }
 
