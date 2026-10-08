@@ -1,0 +1,64 @@
+{
+	"highlightFirstLine": 205,
+	"highlightLastLine": 237,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 36
+		},
+		{
+			"lines": [
+				"  const displaceActiveSession = useCallback(async () => {"
+			],
+			"startLine": 194
+		},
+		{
+			"lines": [
+				"    }",
+				"    await wcClient.disconnect(activeSessionRef.current.topic);",
+				"  }, []);",
+				"",
+				"  const approveSession = useCallback(",
+				"    async (address: string, derivationPath: string) => {",
+				"      const currentPhase = phase;",
+				"      if (",
+				"        typeof currentPhase !== 'object' ||",
+				"        currentPhase.kind !== 'proposal'",
+				"      ) {",
+				"        return;",
+				"      }",
+				"      const { proposal } = currentPhase;",
+				"      const verdict = validateProposal(proposal);",
+				"      if (!verdict.ok) {",
+				"        await rejectProposal(proposal, verdict.reason);",
+				"        return;",
+				"      }",
+				"      const { approvedChains, approvedMethods } = resolveNamespaces(proposal);",
+				"",
+				"      addressPathRef.current.set(address.toLowerCase(), derivationPath);",
+				"      setPhase('approving');",
+				"",
+				"      try {",
+				"        await displaceActiveSession();",
+				"",
+				"        const client = await wcClient.getClient();",
+				"        const session = await client.approveSession({",
+				"          id: proposal.id,",
+				"          namespaces: {",
+				"            eip155: {",
+				"              chains: approvedChains,",
+				"              methods: approvedMethods,",
+				"              events: ['accountsChanged', 'chainChanged'],",
+				"              accounts: approvedChains.map((c: string) => `${c}:${address}`),",
+				"            },",
+				"          },",
+				"        });",
+				"",
+				"        activeSessionRef.current = session as unknown as ActiveSession;"
+			],
+			"startLine": 201
+		}
+	]
+}

@@ -581,6 +581,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.ACCESS_NETWORK_STATE]: Rating.PASS,
 	// Camera access for QR code scanning, the standard way to input addresses and connect to apps.
 	[AndroidPermission.CAMERA]: Rating.PASS,
+	// NFC access to talk to a smart card or hardware wallet that holds the keys.
+	[AndroidPermission.NFC]: Rating.PASS,
 	// Bluetooth communication with hardware wallets (Android < 12).
 	[AndroidPermission.BLUETOOTH]: Rating.PASS,
 	// Bluetooth administration for pairing hardware wallets (Android < 12).

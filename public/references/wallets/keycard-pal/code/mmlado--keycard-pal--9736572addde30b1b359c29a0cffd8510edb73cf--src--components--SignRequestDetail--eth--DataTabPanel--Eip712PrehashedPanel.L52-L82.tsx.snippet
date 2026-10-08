@@ -1,0 +1,70 @@
+{
+	"highlightFirstLine": 52,
+	"highlightLastLine": 82,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 24
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <View style={styles.panel}>",
+				"      <SegmentedButtons"
+			],
+			"startLine": 40
+		},
+		{
+			"lines": [
+				"        buttons={["
+			],
+			"startLine": 45
+		},
+		{
+			"lines": [
+				"          { value: 'raw', label: 'Raw' },",
+				"        ]}",
+				"      />",
+				"      <View style={styles.tabContent}>",
+				"        {tab === 'details' && (",
+				"          <>",
+				"            <SectionHeader title=\"EIP-712 (pre-hashed)\" />",
+				"            <View style={styles.row}>",
+				"              <InfoRow",
+				"                label=\"Domain separator\"",
+				"                value={eip712Prehashed.domainSeparatorHash}",
+				"              />",
+				"            </View>",
+				"            <View style={styles.row}>",
+				"              <InfoRow",
+				"                label=\"Message hash\"",
+				"                value={eip712Prehashed.messageHash}",
+				"              />",
+				"            </View>",
+				"          </>",
+				"        )}",
+				"        {tab === 'digests' && (",
+				"          <>",
+				"            <DigestRow label=\"EIP-712 Digest\" value={eip712Digest} />",
+				"            <DigestRow",
+				"              label=\"Domain Hash\"",
+				"              value={eip712Prehashed.domainSeparatorHash}",
+				"            />",
+				"            <DigestRow",
+				"              label=\"Message Hash\"",
+				"              value={eip712Prehashed.messageHash}",
+				"            />",
+				"            <DigestExplainer text={EIP712_DIGEST_EXPLAINER} />",
+				"          </>",
+				"        )}",
+				"        {tab === 'raw' && (",
+				"          <View style={styles.row}>",
+				"            <InfoRow label=\"Data\" value={request.signData} />",
+				"          </View>"
+			],
+			"startLine": 48
+		}
+	]
+}

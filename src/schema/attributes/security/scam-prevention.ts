@@ -194,7 +194,7 @@ function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport 
 		return {
 			supported: false,
 			privacyPreserving: true,
-			ref: refNotNecessary,
+			ref: hasRefs(support) ? support.ref : refNotNecessary,
 			...baseProps,
 		}
 	}

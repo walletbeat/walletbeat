@@ -1,0 +1,73 @@
+{
+	"highlightFirstLine": 55,
+	"highlightLastLine": 95,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 27
+		},
+		{
+			"lines": [
+				"  useEffect(() => {"
+			],
+			"startLine": 46
+		},
+		{
+			"lines": [
+				"    if (!showSimulationTab && tab === 'simulation') {",
+				"      setTab(hasDecodedCall ? 'decoded' : 'digests');",
+				"    }",
+				"  }, [hasDecodedCall, showSimulationTab, tab]);",
+				"",
+				"  const buttons = [",
+				"    ...(hasDecodedCall ? [{ value: 'decoded', label: 'Decoded' }] : []),",
+				"    { value: 'digests', label: 'Digests' },",
+				"    { value: 'raw', label: 'Raw' },",
+				"    ...(showSimulationTab",
+				"      ? [{ value: 'simulation', label: 'Simulation' }]",
+				"      : []),",
+				"  ];",
+				"",
+				"  return (",
+				"    <View style={styles.panel}>",
+				"      <SegmentedButtons",
+				"        value={tab}",
+				"        onValueChange={v => setTab(v as Tab)}",
+				"        buttons={buttons}",
+				"      />",
+				"      <View style={styles.tabContent}>",
+				"        {tab === 'decoded' && tx.decodedCall && (",
+				"          <DecodedCallSection",
+				"            call={tx.decodedCall}",
+				"            tokenContract={tx.to}",
+				"            chainId={chainId}",
+				"          />",
+				"        )}",
+				"        {tab === 'digests' && calldataDigest && (",
+				"          <>",
+				"            <DigestRow label=\"Calldata Digest\" value={calldataDigest} />",
+				"            <DigestExplainer text={CALLDATA_DIGEST_EXPLAINER} />",
+				"          </>",
+				"        )}",
+				"        {tab === 'raw' && (",
+				"          <View style={styles.row}>",
+				"            <InfoRow label=\"Data\" value={request.signData} />",
+				"          </View>",
+				"        )}",
+				"        {tab === 'simulation' && showSimulationTab && (",
+				"          <SimulationPanel",
+				"            state={simulationState}",
+				"            onSimulate={handleSimulate}",
+				"          />",
+				"        )}",
+				"      </View>",
+				"    </View>",
+				"  );",
+				"}"
+			],
+			"startLine": 50
+		}
+	]
+}
