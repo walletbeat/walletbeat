@@ -1,6 +1,7 @@
 import { allWallets, type WalletName } from '@/data/wallets'
 import type { Eip, EipNumber } from '@/schema/eips'
 import type { Variant } from '@/schema/variants'
+import type { WalletType } from '@/schema/wallet-types'
 
 /**
  * Returns the relative URL for a wallet page, optionally including a variant
@@ -61,4 +62,25 @@ export function getEipTrackerUrl(eip: EipNumber | Eip): string {
 	}
 
 	return `/wallet/eip/${eipNumber}/`
+}
+
+/**
+ * Returns the GitHub URL of a wallet's data file, where contributors fill in
+ * missing feature data. Empty when the wallet has no known type.
+ */
+export function getWalletDataFileUrl(wallet: {
+	metadata: { id: string }
+	types: Partial<Record<WalletType, true>>
+}): string {
+	const directory = wallet.types.SOFTWARE
+		? 'software-wallets'
+		: wallet.types.HARDWARE
+			? 'hardware-wallets'
+			: wallet.types.EMBEDDED
+				? 'embedded-wallets'
+				: null
+
+	return directory === null
+		? ''
+		: `https://github.com/walletbeat/walletbeat/tree/beta/data/${directory}/${wallet.metadata.id}.ts`
 }
