@@ -1,11 +1,14 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { mmlado } from '@/data/contributors/mmlado'
 import { phift } from '@/data/contributors/phift'
 import type { HardwareWallet } from '@/data/hardware-wallets'
+import { AccountType } from '@/schema/features/account-support'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BasicUnlockMechanism,
@@ -19,6 +22,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -26,8 +30,15 @@ import {
 	DataLocation,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -37,7 +48,7 @@ export const keycardShell: HardwareWallet = {
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [phift, mmlado],
+		contributors: [phift, mmlado, minimalsm],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -48,7 +59,7 @@ export const keycardShell: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-02',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://keycard.tech/en/developers/overview', 'https://keycard.tech/start/shell'],
 			repositories: [
@@ -63,7 +74,47 @@ export const keycardShell: HardwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupportedWithRef({
+				ref: [
+					{
+						explanation:
+							'Firmware v1.4.0 signs only legacy, EIP-2930 and EIP-1559 Ethereum transactions; other types return ERR_UNSUPPORTED, and there is no raw-hash signing for authorization tuples.',
+						url: 'https://github.com/keycard-tech/keycard-shell/blob/v1.4.0/app/core/core_eth.c',
+					},
+				],
+			}),
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							"BIP-39 (12 or 24 words) or SLIP-39 backups; the Ethereum default path is m/44'/60'/0'/0/N.",
+						url: 'https://docs.keycard.tech/en/help/other-derivation-path-support',
+					},
+					{
+						explanation:
+							'"Transaction-signing keys never leave the card. Only the public key can be exported for an arbitrary path. Private key export is restricted to paths under the EIP-1581 subtree".',
+						url: 'https://docs.keycard.tech/en/developers/apdu/exportkey',
+					},
+					{
+						explanation:
+							'The recovery phrase cannot be shown again; "Verify" only checks a phrase the user enters against the card.',
+						url: 'https://docs.keycard.tech/en/help/verify-your-keycards-seed-and-addresses',
+					},
+				],
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: false,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		// Ecosystem: Keycard Shell works with Ethereum + Bitcoin wallets via air-gapped QR codes
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: [
@@ -139,12 +190,27 @@ export const keycardShell: HardwareWallet = {
 				wirelessPrivacy: HardwarePrivacyType.PASS,
 			},
 			privacyPolicy: 'https://keycard.tech/legal/privacy-policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the firmware; transfers are made by third-party wallets using the Shell as a QR signer.
+				// Source: https://docs.keycard.tech/en/help/faq
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
-			bugBountyProgram: null,
+			accountRecovery: {
+				drills: null,
+				// Recovery is only from the user's own BIP-39 or SLIP-39 phrases: "Use your recovery phrase to restore your wallet on a new device."
+				// Source: https://docs.keycard.tech/en/help/faq
+				guardianRecovery: notSupported,
+			},
+			// No Keycard bug bounty found. The parent organization's bug bounty programs (Status, Logos) are paused and do not list Keycard in scope; no security.txt on keycard.tech.
+			// Source: https://hackenproof.com/company/ift/programs
+			bugBountyProgram: notSupported,
 			duressResistance: {
 				basicUnlock: {
 					ref: [
@@ -176,7 +242,9 @@ export const keycardShell: HardwareWallet = {
 			// Firmware: open source MIT, reproducible builds, manual updates with hash verification
 			firmware: {
 				type: FirmwareType.PASS,
-				customFirmware: null,
+				// "Production Keycard Shell devices only accept signed firmware updates." Custom firmware needs a self-built device or dev unit with a bootloader key you control.
+				// Source: https://docs.keycard.tech/en/developers/diy-keycard-shell
+				customFirmware: FirmwareType.FAIL,
 				details:
 					'Firmware is MIT-licensed and open source; builds are fully reproducible (bootloader uses public key to verify firmware signature); users verify firmware by matching hashes via provided script; air-gapped update flow available with SHA256 checksum verification',
 				// Firmware source is open (MIT license)
@@ -208,7 +276,9 @@ export const keycardShell: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			publicSecurityAudits: null, // Security: EAL6+ certified JavaCard secure element (on the Keycard smartcard)
+			// No public third-party audit of the Shell firmware, bootloader or Keycard applet found. The card chip (EAL6+) and MCU (PSA Level 3) certifications are chip-level, not audits of Keycard code.
+			// Source: https://docs.keycard.tech/en/developers/hardware-specification
+			publicSecurityAudits: [],
 			secureElement: supported({
 				ref: {
 					explanation:
@@ -227,7 +297,28 @@ export const keycardShell: HardwareWallet = {
 				diyNoNda: SupplyChainDIYType.PASS,
 				url: 'https://github.com/keycard-tech/keycard-shell/tree/c2cf30bc46ab665a3b4a06fe0513e51ffb87d49c/hardware',
 			},
-			supplyChainFactory: null,
+			supplyChainFactory: {
+				// No manufacturing or provisioning documentation beyond a factory test firmware and a tool for importing factory lists of device public keys.
+				// Source: https://github.com/keycard-tech/keycard-shell
+				// No packaging seals: Keycard says seals "can create a false sense of security and can be cloned" and relies on cryptographic verification.
+				// Source: https://docs.keycard.tech/en/blog/keycard-shell-verification-what-verify-actually-proves-and-why-it-matters
+				// Schematics, PCB files, fabrication files and BOM for the serial run are published in the repository.
+				// Source: https://github.com/keycard-tech/keycard-shell/tree/master/hardware/shell/serial_run
+				// Keys live on the Keycard (NXP smart card chip, CC EAL6+); the Shell's MCU has a write-protected bootloader. No mesh or epoxy is documented.
+				// Source: https://docs.keycard.tech/en/developers/hardware-specification
+				// "During verification, the Shell signs a one-time QR challenge and includes its device certificate"; cards carry a factory-signed certificate.
+				// Source: https://docs.keycard.tech/en/help/verify-keycard-shell-authenticity
+				type: SupplyChainFactoryType.PARTIAL,
+				details:
+					'No factory security documentation or audit; no tamper-evident packaging by design; full hardware design files published; keys on an EAL6+ smart card; cryptographic device and card verification.',
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.PASS,
+				tamperEvidence: SupplyChainFactoryType.FAIL,
+				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://docs.keycard.tech/en/help/verify-keycard-shell-authenticity',
+			},
 			// Transaction legibility: QR-based signing via ERC-4527
 			transactionLegibility: {
 				ref: [
@@ -299,7 +390,23 @@ export const keycardShell: HardwareWallet = {
 			},
 		},
 		transparency: {
-			maintenance: null,
+			maintenance: {
+				// The enclosure is described as "dust resistant"; no drop or water rating and no MTBF data.
+				// Source: https://docs.keycard.tech/en/developers/hardware-specification
+				// "Removable BL-4C, about $3, sold worldwide. No tools."
+				// Source: https://keycard.tech/products/keycard-shell
+				// Two-year guarantee against defects in materials and workmanship (EU terms); no extension offered.
+				// Source: https://keycard.tech/pages/european-guarantee-terms
+				type: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.PASS,
+				details:
+					'User-replaceable commodity battery; two-year guarantee without extension; no durability ratings, MTBF data or repair service.',
+				mtbfDocumentation: MaintenanceType.FAIL,
+				physicalDurability: MaintenanceType.FAIL,
+				repairability: MaintenanceType.PARTIAL,
+				url: 'https://keycard.tech/pages/european-guarantee-terms',
+				warrantyExtensions: MaintenanceType.PARTIAL,
+			},
 			operationFees: null,
 			releaseTransparency: {
 				artifactSigning: null,
@@ -311,7 +418,25 @@ export const keycardShell: HardwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
-			reputation: null,
+			reputation: {
+				// In-house design built on an STM32 MCU and NXP smart card; the Keycard card applet dates from 2018, the Shell shipped firmware v1.0.0 in October 2025 and v1.4.0 in September 2026.
+				// Source: https://github.com/keycard-tech/keycard-shell/releases
+				// Backed by Status (founded 2017), part of the Institute of Free Technology.
+				// Source: https://free.technology
+				// No security advisories, disclosed vulnerabilities or published security contact.
+				// Source: https://github.com/keycard-tech/keycard-shell/security
+				// No bug bounty covering Keycard.
+				// Source: https://hackenproof.com/company/ift/programs
+				type: ReputationType.PARTIAL,
+				availability: ReputationType.PASS,
+				bugBounty: ReputationType.FAIL,
+				details:
+					'Original open design with regular firmware releases, backed by an organization operating since 2017; no vulnerability disclosure channel or advisories; no bug bounty.',
+				disclosureHistory: ReputationType.FAIL,
+				originalProduct: ReputationType.PASS,
+				url: 'https://github.com/keycard-tech/keycard-shell',
+				warrantySupportRisk: ReputationType.PASS,
+			},
 		},
 	},
 	variants: {
