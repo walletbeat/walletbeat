@@ -3,6 +3,9 @@ export enum SortDirection {
 	Descending = 'desc',
 }
 
+/** A value rows are ordered by. `null` and `undefined` mean the row has none. */
+export type SortKey = string | number | bigint | boolean | null | undefined
+
 export type SortOptions<_RowValue, _CellValue> = {
 	direction: SortDirection
 	value: (row: _RowValue) => _CellValue
@@ -11,13 +14,13 @@ export type SortOptions<_RowValue, _CellValue> = {
 	 * Maps a cell value to the value that gets ordered.
 	 * Returning `null` or `undefined` places the row last in either direction.
 	 */
-	rank?: (value: _CellValue) => unknown
+	rank?: (value: _CellValue) => SortKey
 
 	/** Ascending comparison of two present values. */
 	compare?: (a: _CellValue, b: _CellValue, rowA: _RowValue, rowB: _RowValue) => number
 }
 
-const isMissing = (value: unknown): value is null | undefined =>
+const isMissing = <T>(value: T | null | undefined): value is null | undefined =>
 	value === null || value === undefined
 
 /** Ascending comparison used when a column has no `compare` of its own. */

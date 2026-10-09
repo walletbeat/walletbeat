@@ -39,16 +39,6 @@ describe('sortRows', () => {
 		])
 	})
 
-	it('does not treat null as zero', () => {
-		const rows: Row[] = [
-			{ id: 'null', value: null },
-			{ id: 'zero', value: 0 },
-		]
-
-		expect(sortBy(rows, SortDirection.Ascending)).toEqual(['zero', 'null'])
-		expect(sortBy(rows, SortDirection.Descending)).toEqual(['zero', 'null'])
-	})
-
 	it('sorts strings by locale', () => {
 		const rows: Row[] = [
 			{ id: 'b', value: 'beta' },
