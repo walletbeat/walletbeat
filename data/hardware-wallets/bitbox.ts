@@ -149,8 +149,8 @@ export const bitboxWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'SIX Fintech Ventures, the venture arm of the Swiss stock exchange operator, made an undisclosed investment in Shift Crypto (now BitBox Swiss) in 2018.',
-					label: 'Fintech News Switzerland',
+						'The venture arm of SIX, the Swiss stock exchange operator, made an undisclosed investment in Shift Crypto (now BitBox Swiss) in 2018.',
+					label: 'News report on the SIX investment',
 					url: 'https://fintechnews.ch/fintech/six-fintech-venture-finds-first-investments-vestr-and-shift-cryptosecurity/',
 				},
 			],
@@ -282,7 +282,7 @@ export const bitboxWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The seed is generated on the device from the secure chip and microcontroller random number generators plus factory entropy, with host and password entropy mixed in.',
+							'The seed is generated on the device from the secure chip and main chip random number generators plus factory entropy, with host and password entropy mixed in.',
 						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/rust/bitbox02-rust/src/keystore.rs',
 					},
 				],
