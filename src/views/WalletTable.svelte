@@ -1742,13 +1742,16 @@
 	section {
 		---filters-blockSize: 4rem;
 		--filter-cluster-size: 1.3rem;
-		container: wallet-table / inline-size;
 
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 60.5rem;
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 		}
+	}
+
+	:global(#content:has(.wallet-table)) {
+		container: wallet-table / inline-size;
 	}
 
 	/* Wide: filter groups are anchored to the header cell they filter.
@@ -2014,6 +2017,10 @@
 					summary {
 						box-sizing: content-box;
 						margin: calc(-1 * var(--table-cell-padding));
+
+						@container wallet-table (width < 42rem) {
+							margin: 0;
+						}
 
 						transition-property: opacity, scale, min-block-size;
 
