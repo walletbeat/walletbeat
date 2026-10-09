@@ -466,7 +466,7 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 						)
 					}
 
-					return components.join('\n')
+					return components.join('\n\n')
 				})(),
 			)
 	}
