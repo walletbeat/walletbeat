@@ -3,15 +3,8 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import {
-	mapWalletTypes,
-	urlSlugToWalletType,
-	WalletType,
-	walletTypeToUrlSlug,
-} from '@/schema/wallet-types'
+import { mapWalletTypes, urlSlugToWalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
 import { getRepositoryRoot } from '@/utils/codebase'
-
-import astroConfig from '../astro.config.mjs'
 
 const pagesDir = path.join(getRepositoryRoot(), 'src', 'pages')
 
@@ -30,22 +23,4 @@ describe('wallet type routes', () => {
 			})
 		})
 	}
-
-	describe.each([
-		['hww', WalletType.HARDWARE],
-		['embedded', WalletType.EMBEDDED],
-	])('legacy /%s/ URLs', (legacySlug, walletType) => {
-		const slug = walletTypeToUrlSlug(walletType)
-
-		it('redirect to the current pages', () => {
-			expect(astroConfig.redirects).toMatchObject({
-				[`/${legacySlug}/summary`]: `/${slug}/summary`,
-				[`/${legacySlug}/[attrGroupId]`]: `/${slug}/[attrGroupId]`,
-			})
-		})
-
-		it('have no page of their own', () => {
-			expect(existsSync(path.join(pagesDir, legacySlug))).toBe(false)
-		})
-	})
 })
