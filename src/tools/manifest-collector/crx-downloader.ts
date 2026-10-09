@@ -11,11 +11,18 @@ const CRX_HEADER_PREFIX_SIZE = 12 // 4 magic + 4 version + 4 headerSize
  * manifest.json from the embedded ZIP archive.
  */
 export async function fetchBrowserExtensionManifest(extensionId: string): Promise<unknown> {
-	const crxBuffer = await downloadCrx(extensionId)
-	const zipBuffer = extractZipFromCrx(crxBuffer)
+	const zipBuffer = await fetchBrowserExtensionZip(extensionId)
 	const manifestBytes = readFileFromZip(zipBuffer, 'manifest.json')
 
 	return JSON.parse(manifestBytes.toString('utf8')) as unknown
+}
+
+/**
+ * Downloads a Chrome extension from the Chrome Web Store and returns the ZIP
+ * archive embedded in its CRX3 file (the unpacked extension's files).
+ */
+export async function fetchBrowserExtensionZip(extensionId: string): Promise<Buffer> {
+	return extractZipFromCrx(await downloadCrx(extensionId))
 }
 
 function extractZipFromCrx(crxBuffer: Buffer): Buffer {

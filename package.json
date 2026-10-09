@@ -40,6 +40,7 @@
 		"generate:css-attributes:vscode": "tsx src/styles/generate/css-attributes-vscode.ts",
 		"generate:wbicons": "tsx src/tools/icon-font-generator/icon-font-generator.ts --font-name wbicons --font-type-name WBIcon --variants complex,simple --svg-icons-dir resources/files/wbicons --font-output-dir src/assets/fonts --css-output-dir src/styles",
 		"l1-lying-rpc-proxy": "tsx src/tools/l1-lying-rpc-proxy/index.ts",
+		"benchmark:extensions": "tsx src/tools/extension-speedometer/extension-speedometer.ts",
 		"dev": "cross-env WALLETBEAT_DEV=true pnpm run astro dev",
 		"dev:background": "deploy/dev/background-dev.sh",
 		"dev:background:stop": "deploy/dev/background-dev.sh --stop",
