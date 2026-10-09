@@ -80,7 +80,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			dataCollection: null,
 			hardwarePrivacy: null,
-			privacyPolicy: '',
+			privacyPolicy: null,
 			transactionPrivacy: {
 				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash support in either Firefly generation's firmware; the demo app sends plain public transactions.
 				// Source: https://github.com/firefly
