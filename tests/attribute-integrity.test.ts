@@ -1,7 +1,18 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
+import { withBasePath } from '@/base-url'
 import { attributeTree } from '@/schema/attribute-tree'
-import { type Evaluation, type OutcomeMetadata, Rating, ratingToText } from '@/schema/attributes'
+import {
+	type Evaluation,
+	type OutcomeMetadata,
+	Rating,
+	ratingToText,
+	type WalletNameStrings,
+} from '@/schema/attributes'
+import { ContentType, type TypographicContent } from '@/types/content'
 
 import { warmupHarperLinter } from './utils/grammar'
 
@@ -22,9 +33,29 @@ function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
 	)
 }
 
+/** Site-relative docs page paths linked from a piece of markdown or text content. */
+function linkedDocsPages(content: TypographicContent<WalletNameStrings>): string[] {
+	const text = content.contentType === ContentType.MARKDOWN ? content.markdown : content.text
+	const docsPrefix = withBasePath('/docs/')
+
+	return Array.from(text.matchAll(/\]\(([^)\s]+)\)/g), match => match[1]).filter(url =>
+		url.startsWith(docsPrefix),
+	)
+}
+
 await warmupHarperLinter()
 
 describe('attribute', () => {
+	it('methodology links to the wallet testing guides', () => {
+		const linkedPages = Object.values(attributeTree).flatMap(group =>
+			group.attributes.flatMap(({ attribute }) => linkedDocsPages(attribute.methodology)),
+		)
+
+		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/data-collection/'))
+		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/chain-verification/'))
+		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/l1-provider-independence/'))
+	})
+
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
 			for (const { attribute } of attributeGroup.attributes) {
@@ -36,6 +67,18 @@ describe('attribute', () => {
 						expect(
 							attributeGroup.attributes.filter(row => row.attribute.id === attribute.id).length,
 						).toBe(1)
+					})
+					it('links only to existing docs pages in its methodology', () => {
+						for (const url of linkedDocsPages(attribute.methodology)) {
+							const slug = url.slice(withBasePath('/docs/').length).replace(/[#?].*$/, '')
+							const docsDir = path.join('resources/docs', slug)
+
+							expect(
+								fs.existsSync(docsDir) &&
+									fs.readdirSync(docsDir).some(file => file.endsWith('.md')),
+								`${url} does not match a page under resources/docs`,
+							).toBe(true)
+						}
 					})
 					const ratingScale = attribute.ratingScale
 
