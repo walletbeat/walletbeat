@@ -950,8 +950,8 @@
 						& td.sticky {
 							backdrop-filter: none;
 							transition:
-								all var(--active-transitionInDuration),
-								backdrop-filter none;
+								all var(--pressable-transitionInDuration),
+								backdrop-filter 0s;
 							opacity: 0;
 							scale: 0.9;
 						}
