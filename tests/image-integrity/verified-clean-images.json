@@ -55,6 +55,10 @@
 		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/cloakedTechnologies.png": {
+		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/images/entities/coinbase.svg": {
 		"hash": "d451b6ab3368559fc2d6c03e89668bf745e91fc8417150c44ab7b11076c088e9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -182,6 +186,10 @@
 	"public/images/wallets/bitget.svg": {
 		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/cloaked.png": {
+		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/images/wallets/cypherock.svg": {
 		"hash": "01d46eacc61d583a8249e55df6c3a8eeda2fe0cbd62ea05bece39a5b98edecb9",
