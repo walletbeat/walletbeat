@@ -72,7 +72,7 @@
 
 
 	// State
-	import { SvelteURLSearchParams } from 'svelte/reactivity'
+	import { MediaQuery, SvelteURLSearchParams } from 'svelte/reactivity'
 	import { getUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
@@ -290,6 +290,21 @@
 		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
 	)
 
+	// Below this width, the flower is one button that toggles the table of contents.
+	const isFlowerTocToggle = new MediaQuery('max-width: 864px', false)
+
+	let isTocOpen = $state(false)
+	let pageNavigation = $state<HTMLElement>()
+	let toc = $state<HTMLElement>()
+	let flowerTocToggle = $state<HTMLButtonElement>()
+
+	const closeToc = ({ restoreFocus }: { restoreFocus: boolean }) => {
+		isTocOpen = false
+
+		if (restoreFocus)
+			flowerTocToggle?.focus({ preventScroll: true })
+	}
+
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
@@ -372,6 +387,21 @@
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
+
+<svelte:document
+	onpointerdown={event => {
+		if (isTocOpen && event.target instanceof Node && !pageNavigation?.contains(event.target))
+			closeToc({ restoreFocus: false })
+	}}
+	onclick={event => {
+		if (isTocOpen && event.target instanceof Element && toc?.contains(event.target.closest('a[href]')))
+			closeToc({ restoreFocus: false })
+	}}
+	onkeydown={event => {
+		if (isTocOpen && event.key === 'Escape')
+			closeToc({ restoreFocus: true })
+	}}
+/>
 
 <svelte:head>
 	{@html (
@@ -678,10 +708,12 @@
 	</article>
 
 	<aside
+		bind:this={pageNavigation}
 		class="page-navigation"
 		data-scroll-container="block"
 		data-sticky-container
 		data-column="gap-0"
+		data-toc-open={isTocOpen ? '' : undefined}
 	>
 		<nav
 			class="pie-navigation"
@@ -689,7 +721,22 @@
 			aria-label="Attribute pie navigation"
 			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
-			<div class="pie-navigation-geometry">
+			<button
+				bind:this={flowerTocToggle}
+				type="button"
+				class="pie-navigation-toc-toggle"
+				aria-label="Table of contents"
+				aria-controls="wallet-page-toc"
+				aria-expanded={isTocOpen}
+				onclick={() => {
+					isTocOpen = !isTocOpen
+				}}
+			></button>
+
+			<div
+				class="pie-navigation-geometry"
+				inert={isFlowerTocToggle.current}
+			>
 				<ScrollAngleSteps steps={pieRotationSteps}>
 					<NavigationItems
 						items={pieNavigationItems}
@@ -711,6 +758,8 @@
 		</nav>
 
 		<nav
+			bind:this={toc}
+			id="wallet-page-toc"
 			data-column
 			data-column-item="flexible"
 			data-sticky-container
@@ -1499,23 +1548,33 @@
 				box-shadow: none;
 
 				> nav:not(.pie-navigation) {
-					z-index: 6;
+					z-index: var(---wallet-breadcrumb-layer-attribute);
 					position: fixed;
-					inset-inline: 0 auto;
-					inset-block: calc(var(---wallet-page-block-offset) + 4rem) 0;
+					inset-inline: auto 0;
+					/* Below the sticky breadcrumbs and the flower that toggles it. */
+					inset-block: calc(
+						var(---wallet-page-block-offset)
+						+ max(
+							0.125rem + var(---wallet-mobile-pie-size),
+							var(---wallet-sticky-content-inset)
+							+ 2 * var(---wallet-breadcrumb-block-size)
+							+ var(---wallet-breadcrumb-mobile-row-gap)
+						)
+						+ 0.25rem
+					) 0;
 					inline-size: var(---wallet-page-navigation-inline-size);
-					translate: -100% 0;
+					max-inline-size: 85vi;
+					translate: 100% 0;
 					/*
 					 * Hidden while off-canvas, so its links leave the tab order and the
 					 * accessibility tree. Visibility flips to hidden only once the slide-out
-					 * has finished. Focusing the flower still opens the drawer, and Tab then
-					 * continues into it.
+					 * has finished.
 					 */
 					visibility: hidden;
 					transition:
 						translate 0.3s var(--ease-out-expo),
 						visibility 0.3s;
-					background-color: var(--background-secondary);
+					background-color: var(---wallet-breadcrumb-surface-background);
 					overflow-y: auto;
 					min-block-size: 0;
 					box-shadow: 0 0 var(--separator-width) var(--border-color);
@@ -1525,7 +1584,7 @@
 					content: none;
 				}
 
-				&:focus-within > nav:not(.pie-navigation) {
+				&[data-toc-open] > nav:not(.pie-navigation) {
 					translate: 0 0;
 					visibility: visible;
 				}
@@ -1682,6 +1741,10 @@
 	}
 
 	.pie-navigation {
+		display: none;
+	}
+
+	.pie-navigation-toc-toggle {
 		display: none;
 	}
 
@@ -2237,6 +2300,27 @@
 				/* At badge size the attribute icons are a few pixels wide; the colors carry the meaning. */
 				:global(.navigation-items menu[data-navigation-depth='1'] .pie-navigation-icon) {
 					display: none;
+				}
+
+				.pie-navigation-toc-toggle {
+					display: block;
+					position: absolute;
+					inset: 0;
+					z-index: 1;
+					padding: 0;
+					border: none;
+					border-radius: 50%;
+					background: none;
+					pointer-events: auto;
+					cursor: pointer;
+					-webkit-tap-highlight-color: transparent;
+					transition-property: box-shadow;
+					/* Sticky, so always in view: keep focusing it from scrolling the page clear of the scroll padding. */
+					scroll-margin-block-start: -100vb;
+
+					&[aria-expanded='true'] {
+						box-shadow: 0 0 0 0.125rem var(--border-color);
+					}
 				}
 			}
 		}
