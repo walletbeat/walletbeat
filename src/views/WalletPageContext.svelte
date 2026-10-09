@@ -1,16 +1,22 @@
 <script lang="ts">
-	import { allRatedWalletsBySlug, attributeTreeForWallet } from '@/data/wallets'
+	import type { HardwareModelSummary } from '@/data/hardware-wallets'
+	import { attributeTreeForWallet, rateWalletOfType, type WalletOfType } from '@/data/wallet-rating'
 	import { allWalletLadders } from '@/schema/ladders'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 	import WalletPage from './WalletPage.svelte'
 
+	// The page passes this wallet's unrated data and the hardware model list
+	// as props, and the wallet is rated here. Importing them from `@/data`
+	// instead would ship every wallet's data to every wallet page.
 	const {
-		walletId,
+		walletOfType,
+		hardwareModels,
 		showStage = true,
 		showScores = false,
 		codeSnippets = {},
 	}: {
-		walletId: string,
+		walletOfType: WalletOfType,
+		hardwareModels: HardwareModelSummary[],
 		showStage?: boolean,
 		showScores?: boolean,
 		// Only the stored code snippets this wallet's page references, resolved
@@ -20,15 +26,7 @@
 
 	setCodeSnippetContext(() => codeSnippets)
 
-	const wallet = $derived.by(() => {
-		const value = allRatedWalletsBySlug[walletId]
-
-		if(!value) {
-			throw new Error(`Unknown wallet ID: ${walletId}`)
-		}
-
-		return value
-	})
+	const wallet = $derived(rateWalletOfType(walletOfType))
 
 	const attributeTree = $derived(attributeTreeForWallet(wallet))
 </script>
@@ -37,6 +35,7 @@
 	ladders={allWalletLadders}
 	{attributeTree}
 	{wallet}
+	allHardwareModels={hardwareModels}
 	{showStage}
 	{showScores}
 />

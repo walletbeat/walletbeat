@@ -39,7 +39,7 @@
 		variantToRunsOn,
 	} from '@/constants/variants'
 	import type { NavigationItem } from '@/constants/navigation'
-	import { allHardwareModels } from '@/data/hardware-wallets'
+	import type { HardwareModelSummary } from '@/data/hardware-wallets'
 	import {
 		type AttributeGroup,
 		calculateAttributeGroupScore,
@@ -60,12 +60,15 @@
 		ladders,
 		attributeTree,
 		wallet,
+		allHardwareModels,
 		showStage = true,
 		showScores = false,
 	}: {
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
 		wallet: RatedWallet<_AttributeGroupId>
+		// Passed in rather than imported, so the page doesn't load every hardware wallet's data.
+		allHardwareModels: HardwareModelSummary[]
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
