@@ -493,26 +493,6 @@
 						</h1>
 					</a>
 
-					{#if Object.keys(wallet.variants).length > 1}
-						<Select
-							bind:value={selectedVariant}
-							options={[
-								{
-									value: undefined,
-									label: 'All versions',
-								},
-								...(
-									Object.keys(wallet.variants)
-										.map(v => ({
-											value: v,
-											label: variants[v].label,
-											icon: variants[v].icon,
-										}))
-								),
-							]}
-						/>
-					{/if}
-
 					{#if 'hardware' in wallet.variants}
 						{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
 						{#if brandModels.length > 1}
@@ -559,19 +539,54 @@
 					class="wallet-meta"
 					data-row="start gap-4 wrap"
 				>
-					<ul
-						class="wallet-platforms"
-						data-list="unstyled"
-						data-row="start gap-2 wrap"
-						aria-label="Platforms"
-					>
-						{#each Object.keys(wallet.variants) as variant}
-							<li class="wallet-platform">
-								<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
-								{variants[variant].label}
-							</li>
-						{/each}
-					</ul>
+					{#if hasSingleVariant(wallet.variants)}
+						<ul
+							class="wallet-platforms"
+							data-list="unstyled"
+							data-row="start gap-2 wrap"
+							aria-label="Platforms"
+						>
+							{#each Object.keys(wallet.variants) as variant}
+								<li class="wallet-platform">
+									<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
+									{variants[variant].label}
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<!-- The platform chips double as the version selector. -->
+						<div
+							class="wallet-platforms"
+							role="group"
+							data-row="start gap-2 wrap"
+							aria-label="Version"
+						>
+							<button
+								type="button"
+								class="wallet-platform"
+								aria-pressed={selectedVariant === undefined}
+								onclick={() => {
+									selectedVariant = undefined
+								}}
+							>
+								All versions
+							</button>
+
+							{#each Object.keys(wallet.variants) as Variant[] as variant}
+								<button
+									type="button"
+									class="wallet-platform"
+									aria-pressed={variant === selectedVariant}
+									onclick={() => {
+										selectedVariant = variant === selectedVariant ? undefined : variant
+									}}
+								>
+									<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
+									{variants[variant].label}
+								</button>
+							{/each}
+						</div>
+					{/if}
 
 					<nav
 						class="wallet-links"
@@ -2927,6 +2942,26 @@
 		color: var(--text-primary);
 		font-weight: 500;
 		line-height: 1.2;
+	}
+
+	button.wallet-platform {
+		border: 1px solid transparent;
+		font-size: inherit;
+
+		transition-property: border-color, background-color, color, opacity, scale;
+
+		&:hover {
+			border-color: color-mix(in srgb, var(--text-primary) 40%, transparent);
+		}
+
+		&[aria-pressed='true'] {
+			background-color: var(--text-primary);
+			color: var(--background-primary);
+
+			.wallet-platform-icon {
+				opacity: 1;
+			}
+		}
 	}
 
 	.wallet-platform-icon {
