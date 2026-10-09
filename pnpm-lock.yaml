@@ -84,6 +84,9 @@ importers:
       '@kindspells/astro-shield':
         specifier: ^1.7.1
         version: 1.7.1(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@22.20.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      '@types/mdast':
+        specifier: 4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^22.20.4
         version: 22.20.4
