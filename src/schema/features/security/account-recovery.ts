@@ -128,18 +128,21 @@ export function guardianId(guardian: Guardian): string {
 	}
 }
 
+/**
+ * @returns A noun phrase naming the guardian, worded for use mid-sentence.
+ */
 export function guardianMarkdown(guardian: Guardian): string {
 	switch (guardian.type) {
 		case GuardianType.SELF_CUSTODY:
-			return "The user's self-custodied key material"
+			return "the user's self-custodied key material"
 		case GuardianType.WALLET_PASSWORD:
-			return "The user's wallet password"
+			return "the user's wallet password"
 		case GuardianType.USER_EXTERNAL_ACCOUNT:
-			return `The user's ${guardian.description}`
+			return `the user's ${guardian.description}`
 		case GuardianType.WALLET_PROVIDER:
 			return guardian.description
 		case GuardianType.PASSKEY:
-			return "The user's passkey device"
+			return "the user's passkey device"
 		case GuardianType.ZKID:
 			return guardian.description
 	}
@@ -454,45 +457,44 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 						)
 					}
 
-					const optGuardians = guardianPolicy.optionalGuardians.map(guardianMarkdown)
+					if (isNonEmptyArray(guardianPolicy.optionalGuardians)) {
+						const optGuardians = nonEmptyMap(guardianPolicy.optionalGuardians, guardianMarkdown)
 
-					components.push(
-						trimWhitespacePrefix(`
-						The recovery process requires setting up recovery with at least ${guardianPolicy.optionalGuardiansMinimumConfigurable.toString()} of the following:${markdownListFormat(
-							optGuardians,
-							{
+						components.push(
+							trimWhitespacePrefix(`
+							${markdownListFormat(optGuardians, {
 								ifEmpty: { behavior: 'THROW_ERROR' },
-								singleItemTemplate: 'ITEM.',
+								singleItemTemplate: 'The recovery process requires setting up recovery with ITEM.',
 								uppercaseFirstCharacterOfListItems: true,
-								multiItemPrefix: `
-						`,
+								multiItemPrefix: `The recovery process requires setting up recovery with at least ${guardianPolicy.optionalGuardiansMinimumConfigurable.toString()} of the following:
+							`,
 								multiItemTemplate: `
-						- ITEM`,
+							- ITEM`,
 								multiItemSuffix: `
 
-						`,
-							},
-						)}
-					`),
-					)
+							`,
+							})}
+						`),
+						)
 
-					if (
-						guardianPolicy.optionalGuardiansMinimumConfigurable !==
-						guardianPolicy.optionalGuardiansMinimumNeededForRecovery
-					) {
+						if (
+							guardianPolicy.optionalGuardiansMinimumConfigurable !==
+							guardianPolicy.optionalGuardiansMinimumNeededForRecovery
+						) {
+							components.push(
+								`At least ${guardianPolicy.optionalGuardiansMinimumNeededForRecovery.toString()} of the above are required for recovery.`,
+							)
+						}
+
 						components.push(
-							`At least ${guardianPolicy.optionalGuardiansMinimumNeededForRecovery.toString()} of the above are required for recovery.`,
+							trimWhitespacePrefix(`
+								For evaluation purposes, Walletbeat assumes the user will use
+								the policy requiring the _least amount of effort_ that the
+								wallet allows, i.e.
+								${guardianPolicy.optionalGuardiansMinimumConfigurable === 1 ? 'a single recovery guardian' : `${guardianPolicy.optionalGuardiansMinimumConfigurable.toString()} recovery guardians`}.
+							`),
 						)
 					}
-
-					components.push(
-						trimWhitespacePrefix(`
-							For evaluation purposes, Walletbeat assumes the user will use
-							the policy requiring the _least amount of effort_ that the
-							wallet allows, i.e.
-							${guardianPolicy.optionalGuardiansMinimumConfigurable === 1 ? 'a single recovery guardian' : `${guardianPolicy.optionalGuardiansMinimumConfigurable.toString()} recovery guardians`}.
-						`),
-					)
 
 					if (guardianPolicy.secretReconstitution === 'CLIENT_SIDE') {
 						components.push('The key is reconstituted **client-side**.')
@@ -502,7 +504,7 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 						)
 					}
 
-					return components.join('\n')
+					return components.join('\n\n')
 				})(),
 			)
 	}
