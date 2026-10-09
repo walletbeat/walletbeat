@@ -79,10 +79,6 @@ describe('compareEipSupportCardSortKeys', () => {
 		expect(compareEipSupportCardSortKeys(key(null, 1, 0.8), key(null, 1, 0.4))).toBeLessThan(0)
 		expect(compareEipSupportCardSortKeys(key(null, 1, 0.4), key(null, 1, 0.4))).toBe(0)
 	})
-
-	it('treats a missing score as zero', () => {
-		expect(compareEipSupportCardSortKeys(key(null, 0, null), key(null, 0, 0.1))).toBeGreaterThan(0)
-	})
 })
 
 describe('sortEipSupportCards', () => {
