@@ -39,7 +39,7 @@ import {
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
 import { ReputationType } from '@/schema/features/transparency/reputation'
@@ -280,10 +280,13 @@ export const gridplusWallet: HardwareWallet = {
 						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
-				// The firmware reference lists PIN, SafeCard PIN and sleep-timer settings and no duress PIN,
-				// decoy wallet or wipe credential.
-				// Source: https://docs.gridplus.io/lattice1/lattice1-firmware-reference
-				duressMode: notSupported,
+				duressMode: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The firmware reference lists settings for the device PIN, the backup card PIN and the sleep timer, and no duress PIN, decoy wallet or wipe credential.',
+						url: 'https://docs.gridplus.io/lattice1/lattice1-firmware-reference',
+					},
+				}),
 			},
 			firmware: {
 				// Source: gridplus team responses fileverse document
