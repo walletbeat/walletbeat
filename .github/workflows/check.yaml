@@ -93,7 +93,21 @@ jobs:
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: choco install $(cat deploy/windows-packages.txt) -y
+        # `choco install` exits 0 with "installed 0/0 packages" when the
+        # community feed errors out before resolving anything, so retry and
+        # check that every package really got installed.
+        run: |
+          $packages = @(Get-Content deploy/windows-packages.txt | Where-Object { $_.Trim() })
+          foreach ($attempt in 1..3) {
+            choco install $packages -y --no-progress
+            $missing = @($packages | Where-Object { -not (choco list --exact --limit-output $_) })
+            if ($missing.Count -eq 0) {
+              exit 0
+            }
+            Write-Host "Attempt ${attempt}: not installed: $($missing -join ', ')"
+            Start-Sleep -Seconds 30
+          }
+          throw "Chocolatey failed to install: $($missing -join ', ')"
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
