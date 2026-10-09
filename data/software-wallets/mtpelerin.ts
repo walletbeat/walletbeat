@@ -14,7 +14,12 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -139,9 +144,13 @@ export const mtpelerin: SoftwareWallet = {
 		security: {
 			accountRecovery: {
 				drills: null,
-				// Recovery is only from the user's secret phrase: "we have no way to help you recover it if you lose your secret phrase."
-				// Source: https://www.mtpelerin.com/faq
-				guardianRecovery: notSupported,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Recovery is only from the user\'s secret phrase: "we have no way to help you recover it if you lose your secret phrase."',
+						url: 'https://www.mtpelerin.com/faq',
+					},
+				}),
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
@@ -157,7 +166,6 @@ export const mtpelerin: SoftwareWallet = {
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.IMMUNEFI,
-				// Immunefi lists a maximum bounty of $5,000 (flat $5,000 Critical and $1,000 High for websites and applications).
 				rewards: supported({
 					currency: 'USD',
 					maximum: 5000,
@@ -211,18 +219,20 @@ export const mtpelerin: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// App-store signing only; no published signatures or release artifacts.
 				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				// Only generic App Store release notes (e.g. version 1.73 only says it fixes bugs); no public changelog.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Closed source: "Build cannot be done because the source code is not publicly available."
-				// Source: https://walletscrutiny.com/android/com.mtpelerin.bridge/
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The app is closed source. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/android/com.mtpelerin.bridge/',
+					},
+				}),
 			},
 		},
 		walletCall: null,
