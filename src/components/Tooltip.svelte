@@ -1,12 +1,5 @@
 <script module lang="ts">
 	declare global {
-		interface HTMLButtonElement {
-			popoverTargetElement?: HTMLElement & {
-				showPopover(): void
-				hidePopover(): void
-			}
-		}
-
 		interface HTMLElement {
 			showPopover(): void
 			hidePopover(): void
@@ -82,65 +75,101 @@
 		globalThis.CSS?.supports('anchor-name: --test')
 	)
 
-	const useButtonTrigger = async (node: HTMLElement & { popoverTargetElement: HTMLElement }) => {
+	let triggerElement: HTMLElement | undefined
+
+	const useButtonTrigger = (node: HTMLElement) => {
+		triggerElement = node
+
 		$effect(() => {
 			if(hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
 			else
 				node.style.removeProperty('position')
 		})
+	}
 
+	// Attachments must return their cleanup synchronously (an async attachment
+	// returns a Promise, which Svelte silently ignores), and floating-ui's
+	// `autoUpdate` polls and re-measures on every scroll, so it only runs while
+	// the popover is open.
+	const useFloatingUiPositioning = (popover: HTMLElement) => {
 		if (layoutMode === TooltipLayoutMode.AnchorPositioning && supportsAnchorPositioning)
 			return
 
-		const {
-			computePosition,
-			offset: offsetMiddleware,
-			flip,
-			shift,
-			autoUpdate,
-		} = await import('@floating-ui/dom')
-
 		// Disable native anchor positioning
-		node.popoverTargetElement.style.position = 'absolute'
-		node.popoverTargetElement.style.setProperty('position-area', 'none')
-		node.popoverTargetElement.style.setProperty('position-anchor', anchorName)
+		popover.style.position = 'absolute'
+		popover.style.setProperty('position-area', 'none')
+		popover.style.setProperty('position-anchor', anchorName)
 
-		const updatePosition = () => {
-			void computePosition(
-				node,
-				node.popoverTargetElement,
-				{
-					placement: ({
-						'block-start': 'top',
-						'block-end': 'bottom',
-						'inline-start': 'left',
-						'inline-end': 'right',
-					} as const)[placement],
-					middleware: [
-						offsetMiddleware(offset),
-						flip(),
-						shift({
-							padding: offset * 2,
-							crossAxis: true,
-							mainAxis: true,
-						}),
-					],
-				}
-			)
-				.then(({ x, y }) => {
-					node.popoverTargetElement.style.left = `${x}px`
-					node.popoverTargetElement.style.top = `${y}px`
-				})
+		let stopAutoUpdate: (() => void) | undefined
+		let isDetached = false
+
+		const stopPositioning = () => {
+			stopAutoUpdate?.()
+			stopAutoUpdate = undefined
 		}
 
-		updatePosition()
+		const startPositioning = async () => {
+			const {
+				computePosition,
+				offset: offsetMiddleware,
+				flip,
+				shift,
+				autoUpdate,
+			} = await import('@floating-ui/dom')
 
-		return autoUpdate(
-			node,
-			node.popoverTargetElement,
-			updatePosition
-		)
+			const reference = triggerElement
+
+			if (isDetached || stopAutoUpdate || !reference || !popover.matches(':popover-open'))
+				return
+
+			stopAutoUpdate = autoUpdate(
+				reference,
+				popover,
+				() => {
+					void computePosition(
+						reference,
+						popover,
+						{
+							placement: ({
+								'block-start': 'top',
+								'block-end': 'bottom',
+								'inline-start': 'left',
+								'inline-end': 'right',
+							} as const)[placement],
+							middleware: [
+								offsetMiddleware(offset),
+								flip(),
+								shift({
+									padding: offset * 2,
+									crossAxis: true,
+									mainAxis: true,
+								}),
+							],
+						}
+					)
+						.then(({ x, y }) => {
+							popover.style.left = `${x}px`
+							popover.style.top = `${y}px`
+						})
+				}
+			)
+		}
+
+		const onToggle = (event: ToggleEvent) => {
+			if (event.newState === 'open')
+				void startPositioning()
+			else
+				stopPositioning()
+		}
+
+		popover.addEventListener('toggle', onToggle)
+
+		return () => {
+			isDetached = true
+			popover.removeEventListener('toggle', onToggle)
+			stopPositioning()
+		}
 	}
 </script>
 
@@ -170,6 +199,7 @@
 					}
 				}
 			}}
+			{@attach useFloatingUiPositioning}
 
 			style:position-area={placement}
 			style:position-anchor={anchorName}

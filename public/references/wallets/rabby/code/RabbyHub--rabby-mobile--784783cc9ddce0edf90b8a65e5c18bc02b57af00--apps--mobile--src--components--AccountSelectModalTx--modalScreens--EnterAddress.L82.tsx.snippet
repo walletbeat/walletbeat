@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 82,
+	"highlightLastLine": 82,
+	"segments": [
+		{
+			"lines": [
+				"}) => {"
+			],
+			"startLine": 60
+		},
+		{
+			"lines": [
+				"  const debouncedResolveEns = React.useMemo(",
+				"    () =>",
+				"      debounce(",
+				"        async (",
+				"          value: string,",
+				"          callback: (result: { addr: string; name: string } | null) => void,",
+				"        ) => {",
+				"          const result = await resolveEnsAddressByName(value);",
+				"          callback(result);",
+				"        },",
+				"        500,",
+				"        { leading: false, trailing: true },"
+			],
+			"startLine": 75
+		}
+	]
+}

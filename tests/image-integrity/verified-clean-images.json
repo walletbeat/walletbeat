@@ -16,11 +16,11 @@
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"governance/treasury/treasury-expenses-breakdown.svg": {
-		"hash": "adca3a7975e12fd03d3df214ce7174b60ef2fc7996a184f46765ddbf832a81ad",
+		"hash": "c0f349719f67d2179b8771221e62b86e92acef1fb599f729e908da41e94520ea",
 		"passedTests": ["file-format"]
 	},
 	"governance/treasury/treasury-expenses-over-time.svg": {
-		"hash": "94fec3478d854446df585fb88d3b434deaa8f5c0ca2cd867be5fa972b5a408a0",
+		"hash": "620073e9cc12c7d23f74449b5ed9d928e2961365ad24023db15f566614662ac6",
 		"passedTests": ["file-format"]
 	},
 	"public/banner--small.png": {
@@ -737,6 +737,10 @@
 	},
 	"public/references/wallets/rabby/screenshots/2026-10-04-rabby-mobile-erc7831-rejected.png": {
 		"hash": "61695ca37ed8fb7cce3fc694c5f7dae161beaf33a7066feb61304a9614bfa9ac",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-10-06-rabby-mobile-ethereum-custom-network-rejected.png": {
+		"hash": "c65a0b7d9bffe060d8133b0004b864c142c968e57b4d584e0fab87c902f5477b",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
@@ -1607,6 +1611,7 @@
 		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
 		"passedTests": ["blockiness", "file-format"]
 	},
+<<<<<<< HEAD
 	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/account_portability.png": {
 		"hash": "ae00f839b67530af2713e70e449fe9289285dfbed88b2fc86144c17686ab559b",
 		"passedTests": ["blockiness", "file-format"]
@@ -1637,6 +1642,18 @@
 	},
 	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/transaction_inclusion.png": {
 		"hash": "10a1ab6c4b9a5c2bf2173aa659928dc500f8d133d0698de906d34fd98dbcf286",
+=======
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/erc-7730_tracker.png": {
+		"hash": "f02d1284ce1dfaa96ae696c9520b04061c0ba526fb1fb66df67626a432edb8f0",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/payy_security_news.png": {
+		"hash": "48d52f3030ff36b0324c453e6ce5449af774896277f6defeb3f1e78a103e061b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/september_cover.png": {
+		"hash": "3a40fba76842fa7634354267b3825ad1082bab663fc16668b2b07ffa506c7e82",
+>>>>>>> 20b6bc28047d030c071ebfdf8ecadfa6d59ace14
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
