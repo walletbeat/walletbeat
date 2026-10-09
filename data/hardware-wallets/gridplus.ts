@@ -74,12 +74,12 @@ export const gridplusWallet: HardwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			// The device shows "Authorize Contract" with the contract address, chain ID and nonce; the SDK exposes signAuthorization.
-			// Source: https://github.com/GridPlus/gridplus-sdk/blob/dev/packages/docs/docs/signing.md
+			// Source: https://github.com/GridPlus/gridplus-sdk/blob/ba9cecdd7bea47c98e33dee70e954e6a3a14be59/packages/docs/docs/signing.md
 			eip7702: supported({
 				ref: [
 					{
 						explanation: 'Lattice1 firmware v0.18.8 (June 18, 2025) added "EIP-7702 support".',
-						url: 'https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md',
+						url: 'https://github.com/GridPlus/lattice-software-releases/blob/72233a9767066e4dd4707ec0c924198617eb5ea6/history/HSM.md',
 					},
 				],
 				contract: 'UNKNOWN',
@@ -130,7 +130,7 @@ export const gridplusWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'GridPlus was "spun out of ConsenSys in October 2017 after a $29 million ICO."',
+						'GridPlus was spun out of Consensys in October 2017 after a $29 million initial coin offering.',
 					url: 'https://decrypt.co/4324/electric-dreams',
 				},
 				{
@@ -254,7 +254,7 @@ export const gridplusWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			// No public third-party audit of the Lattice1 firmware, bootloader, SafeCard applet or Lattice Manager found (GridPlus docs, blog, GitHub, WalletScrutiny, web search).
+			// No public independent audit of the Lattice1 firmware, bootloader, SafeCard applet or Lattice Manager found (GridPlus docs, blog, GitHub, WalletScrutiny, web search).
 			// Source: https://docs.gridplus.io/lattice1/security-features
 			publicSecurityAudits: [],
 			secureElement: supported({
@@ -357,9 +357,9 @@ export const gridplusWallet: HardwareWallet = {
 			},
 			reputation: {
 				// Founded 2017 as a ConsenSys spin-out; Lattice1 firmware releases since September 2020, latest v0.18.9 (October 2025). Own architecture; the SafeCard applet is a fork of Status Keycard.
-				// Source: https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md
+				// Source: https://github.com/GridPlus/lattice-software-releases/blob/72233a9767066e4dd4707ec0c924198617eb5ea6/history/HSM.md
 				// No security advisories or disclosed vulnerabilities; changelog entries such as "Firmware security updates" give no details.
-				// Source: https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md
+				// Source: https://github.com/GridPlus/lattice-software-releases/blob/72233a9767066e4dd4707ec0c924198617eb5ea6/history/HSM.md
 				// Bug bounty with safe harbor but no published reward amounts.
 				// Source: https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy
 				type: ReputationType.PARTIAL,
@@ -369,7 +369,7 @@ export const gridplusWallet: HardwareWallet = {
 					'Original design on the market since 2020 and still sold; security fixes shipped without advisories; bug bounty without published reward amounts.',
 				disclosureHistory: ReputationType.FAIL,
 				originalProduct: ReputationType.PASS,
-				url: 'https://github.com/GridPlus/lattice-software-releases/blob/main/history/HSM.md',
+				url: 'https://github.com/GridPlus/lattice-software-releases/blob/72233a9767066e4dd4707ec0c924198617eb5ea6/history/HSM.md',
 				warrantySupportRisk: ReputationType.PASS,
 			},
 		},
