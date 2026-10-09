@@ -950,12 +950,7 @@
 							class="attribute-summary-companions-position"
 							data-row-item="wrap-end"
 						>
-							<!--
-								The badges below become `position: fixed` while they travel into the
-								sticky breadcrumb, which would collapse this anchor to zero size. This
-								invisible copy keeps the anchor sized so the breadcrumb title can reserve
-								room for the badges instead of running underneath them.
-							-->
+							<!-- Invisible copy of the badges below, which keeps this anchor sized while they are `position: fixed`. -->
 							<div
 								class="attribute-summary-companions-sizer"
 								data-row="gap-2 wrap"
@@ -2657,11 +2652,7 @@
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
 				min-inline-size: 0;
-				/*
-				 * The item is lifted out of flow even before its transition starts, so
-				 * keep it to its column's width; otherwise long titles run under the
-				 * badges beside them instead of truncating.
-				 */
+				/* The item is out of flow from the start of its transition; keep it to its column's width. */
 				max-inline-size: anchor-size(--sticky-breadcrumb-position inline);
 
 				h3 {
