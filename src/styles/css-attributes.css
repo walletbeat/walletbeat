@@ -124,6 +124,15 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 	}
 }
 
+/* iOS zooms the page when a text field under 16px gets focus. */
+@supports (-webkit-touch-callout: none) {
+	input:not([type='checkbox'], [type='radio'], [type='range']),
+	select,
+	textarea {
+		font-size: max(16px, 1em);
+	}
+}
+
 option,
 label:has(> input:is([type='checkbox'], [type='radio'])) {
 	padding: 0.6em 0.8em;
