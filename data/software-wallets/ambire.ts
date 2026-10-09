@@ -1181,8 +1181,6 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				// LavaMoat is enabled only for production builds where WEB_ENGINE is webkit (Chromium and Safari); Firefox builds and the in-page and content-script entries run without it.
-				// Source: https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js
 				dependencySandboxing: supported({
 					ref: [
 						{
@@ -1193,6 +1191,11 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation: 'Committed LavaMoat policy for the webpack build.',
 							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/lavamoat/webpack/policy.json',
+						},
+						{
+							explanation:
+								'LavaMoat is enabled only for production builds where `WEB_ENGINE` is `webkit` (Chromium and Safari); Firefox builds and the in-page and content-script entries run without it.',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js',
 						},
 					],
 				}),
