@@ -60,6 +60,7 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
+	import { getWalletLinkGroups } from '@/utils/wallet-links'
 	import { allCriteriaInStage, getAttributeStagesForWallet, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
@@ -742,12 +743,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	})
 
 	const overallScore = $derived(calculateOverallScore(attributeTree, wallet.overall, () => true))
+
+	const walletLinkGroups = $derived(getWalletLinkGroups(wallet))
 	const allPageReferences = $derived(mergeRefs(...evaluatedAttributeGroups.flatMap(({ attributes }) =>
 		attributes.flatMap(({ evalAttr }) => toFullyQualified(evalAttr.evaluation.references)),
 	)))
 
 	// Components
-	import { ListTree, ListCollapse } from 'lucide-static'
+	import { ChevronDown, Link, ListTree, ListCollapse } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -963,32 +966,53 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		<div data-row-item="flexible" data-row="start gap-1 wrap">
 			<WalletTags {wallet} {selectedVariant} />
 		</div>
-		<nav data-row="gap-2 start wrap" data-row-item="wrap-end">
-			{#if wallet.metadata.urls?.websites?.[0] !== undefined}
-				<a
-					href={getUrl(wallet.metadata.urls.websites[0])}
-					data-badge="medium"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<span data-icon="wbicons-simple browser_integration"></span>
-					Website
-				</a>
+		{#if walletLinkGroups.length > 0}
+			<button
+				type="button"
+				data-badge="medium"
+				data-row-item="wrap-end"
+				popovertarget="wallet-links-menu"
+				style:anchor-name="--wallet-links-menu"
+			>
+				<span aria-hidden="true">{@html Link}</span>
+				Links
+				<span aria-hidden="true">{@html ChevronDown}</span>
+			</button>
 
-			{/if}
+			<nav
+				id="wallet-links-menu"
+				popover="auto"
+				data-card="padding-2 radius-6"
+				data-column="gap-2"
+				aria-label="Wallet links"
+			>
+				{#each walletLinkGroups as group (group.id)}
+					<section data-column="gap-0">
+						<p id="wallet-links-{group.id}">{group.label}</p>
 
-			{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
-				<a
-					href={getUrl(wallet.metadata.urls.repositories[0])}
-					data-badge="medium"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<span data-icon="wbicons-simple code_repository"></span>
-					Source Code
-				</a>
-			{/if}
-		</nav>
+						<ul data-list="unstyled" data-column="gap-0" aria-labelledby="wallet-links-{group.id}">
+							{#each group.links as link (link.url)}
+								<li>
+									<a
+										href={link.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										data-link="camouflaged"
+										data-row="gap-4"
+										onclick={event => {
+											event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover()
+										}}
+									>
+										<span>{link.label}</span>
+										<span>{link.hint}</span>
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</section>
+				{/each}
+			</nav>
+		{/if}
 	</section>
 	</div>
 
@@ -2562,6 +2586,66 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	.wallet-overview {
 		font-size: 0.9rem;
+
+		[popovertarget='wallet-links-menu'] > :last-child {
+			transition-property: rotate;
+		}
+
+		[popovertarget='wallet-links-menu']:has(+ :popover-open) > :last-child {
+			rotate: 180deg;
+		}
+	}
+
+	#wallet-links-menu {
+		position-anchor: --wallet-links-menu;
+		position-area: block-end span-inline-start;
+		position-try-fallbacks: flip-inline, flip-block;
+		inset: auto;
+		margin-block: 0.5em;
+
+		min-inline-size: 16em;
+		max-inline-size: calc(100vw - 2em);
+		max-block-size: min(80vh, 40em);
+		overflow: auto;
+
+		border: 1px solid var(--border-color);
+		box-shadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+
+		/* `[data-card]` sets `display`, which would otherwise override the closed popover's `display: none`. */
+		&:not(:popover-open) {
+			display: none;
+		}
+
+		@supports not (anchor-name: --wallet-links-menu) {
+			inset: 0;
+			margin: auto;
+		}
+
+		section > p {
+			padding: 0.5em 0.75em 0.25em;
+			color: var(--text-secondary);
+			font-size: 0.75em;
+			font-weight: 600;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+		}
+
+		a {
+			padding: 0.5em 0.75em;
+			border-radius: 0.5em;
+
+			transition-property: background-color, color;
+
+			&:is(:hover, :focus-visible) {
+				background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
+			}
+
+			> :last-child {
+				color: var(--text-secondary);
+				font-size: smaller;
+				font-weight: 400;
+			}
+		}
 	}
 
 	:global([data-sticky-breadcrumb~="scope"]) > header:has(h2) {
