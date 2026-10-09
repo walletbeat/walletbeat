@@ -120,12 +120,12 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<h5>
+		<h4>
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</h5>
+		</h4>
 
 		<ul class="references-list" data-list="gap-2">
 			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
@@ -327,7 +327,7 @@
 		line-height: 1.7;
 	}
 
-	h5 {
+	h4 {
 		font-size: 1em;
 	}
 
