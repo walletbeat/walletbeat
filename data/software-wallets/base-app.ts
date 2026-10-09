@@ -27,6 +27,10 @@ import type {
 	ScamUrlWarning,
 } from '@/schema/features/security/scam-alerts'
 import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BuiltInSwapDefaultApprovalBehavior,
 	SpendingApprovalsControl,
 } from '@/schema/features/self-sovereignty/permissions-management'
@@ -39,6 +43,9 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+
+import baseAppRawExtManifest from './manifests/baseApp/hnfanknocfeofbddgcijnmhnfnkdnaad.manifest.json'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
@@ -51,7 +58,9 @@ export const baseApp: SoftwareWallet = {
 		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],
-			extensions: [],
+			extensions: [
+				'https://chromewebstore.google.com/detail/coinbase-wallet-extension/hnfanknocfeofbddgcijnmhnfnkdnaad',
+			],
 			repositories: [
 				'https://github.com/coinbase/smart-wallet',
 				'https://github.com/base/account-sdk',
@@ -111,56 +120,71 @@ export const baseApp: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
-			// Confirmed in-app (Base App v29.94.123): neither ERC-7828
-			// (donations.walletbeat.eth@optimism.eth) nor ERC-7831
-			// (donations.walletbeat.eth:optimism:1) resolves in the Send recipient
-			// field. No public documentation indicates support for either standard.
-			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+			[Variant.BROWSER]: null,
+			[Variant.MOBILE]: {
+				ref: refTodo,
+				// Confirmed in-app (Base App v29.94.123): neither ERC-7828
+				// (donations.walletbeat.eth@optimism.eth) nor ERC-7831
+				// (donations.walletbeat.eth:optimism:1) resolves in the Send recipient
+				// field. No public documentation indicates support for either standard.
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'CHAIN_CLIENT',
+				}),
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'CHAIN_CLIENT',
-			}),
 		},
 		chainAbstraction: {
-			bridging: {
-				builtInBridging: supported({
-					ref: refTodo,
-					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
-					},
-					risksExplained: 'NOT_IN_UI',
-				}),
-				suggestedBridging: notSupported,
-			},
-			crossChainBalances: {
-				ref: refTodo, // Source: Base team responses via Fileverse questionnaire (Q7, Q8, Q9)
-				ether: supported({
-					ref: refTodo,
-					crossChainSumView: featureSupported,
-					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
-				globalAccountValue: featureSupported,
-				perChainAccountValue: featureSupported,
-				usdc: supported({
-					ref: refTodo,
-					crossChainSumView: featureSupported,
-					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+			[Variant.BROWSER]: null,
+			[Variant.MOBILE]: {
+				bridging: {
+					builtInBridging: supported({
+						ref: refTodo,
+						feesLargerThan1bps: {
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: null,
+						},
+						risksExplained: 'NOT_IN_UI',
+					}),
+					suggestedBridging: notSupported,
+				},
+				crossChainBalances: {
+					ref: refTodo, // Source: Base team responses via Fileverse questionnaire (Q7, Q8, Q9)
+					ether: supported({
+						ref: refTodo,
+						crossChainSumView: featureSupported,
+						perChainBalanceViewAcrossMultipleChains: featureSupported,
+					}),
+					globalAccountValue: featureSupported,
+					perChainAccountValue: featureSupported,
+					usdc: supported({
+						ref: refTodo,
+						crossChainSumView: featureSupported,
+						perChainBalanceViewAcrossMultipleChains: featureSupported,
+					}),
+				},
 			},
 		},
-		chainConfigurability: notSupported,
+		chainConfigurability: {
+			[Variant.BROWSER]: null,
+			[Variant.MOBILE]: notSupported,
+		},
 		ecosystem: {
 			delegation: null,
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'The injected provider script of the Chrome Web Store package (`requestProvider.js`, version 3.149.0, `.crx` file SHA-256 `40e8e5ce04bc3266c7a7bda57a80213b441a8af8afabcd0232cf81036ddd0ce6`) exposes an EIP-1193 `request` method and `on`/`removeListener` event subscriptions (EIP-2700). It dispatches `eip6963:announceProvider` with the name "Coinbase Wallet" and the rdns `com.coinbase.wallet`, and announces again on each `eip6963:requestProvider` event (EIP-6963).',
+					label: 'Coinbase Wallet extension on the Chrome Web Store',
+					lastRetrieved: '2026-10-09',
+					url: 'https://chromewebstore.google.com/detail/coinbase-wallet-extension/hnfanknocfeofbddgcijnmhnfnkdnaad',
+				},
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
@@ -199,22 +223,25 @@ export const baseApp: SoftwareWallet = {
 		// "Add Wallet" sheet offers both "Create Wallet" (a new multi-chain wallet)
 		// and "Import Wallet" (sign into an existing passkey). Verified in-app
 		// (Base App v29.99.7, 2026-06-19).
-		multiAddress: supported({
-			ref: [
-				{
-					explanation:
-						'The Base App wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
-					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
-					label: 'Base App "Add Wallet" sheet: Create Wallet / Import Wallet options',
-				},
-				{
-					explanation:
-						'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
-					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
-					label: 'Base App wallet picker showing multiple coexisting wallets',
-				},
-			],
-		}),
+		multiAddress: {
+			[Variant.BROWSER]: null,
+			[Variant.MOBILE]: supported({
+				ref: [
+					{
+						explanation:
+							'The Base App wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
+						label: 'Base App "Add Wallet" sheet: Create Wallet / Import Wallet options',
+					},
+					{
+						explanation:
+							'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
+						label: 'Base App wallet picker showing multiple coexisting wallets',
+					},
+				],
+			}),
+		},
 		privacy: {
 			// Per direct in-app check (Settings > Privacy & Security, Base App v29.94.123):
 			// there is NO toggle to disable crash reporting, diagnostics, or usage
@@ -222,53 +249,65 @@ export const baseApp: SoftwareWallet = {
 			// (defaulted ON), which reduces ad-related data sharing but does not stop
 			// the underlying analytics collection.
 			analytics: {
-				crashReports: supported<WalletAnalytics>({
-					ref: [
-						{
-							explanation:
-								'Apple App Store privacy label declares "Diagnostics: Crash Data" and performance metrics are collected.',
-							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
-						},
-						{
-							explanation:
-								'No opt-out exists in the Base App Privacy & Security settings as of v29.94.123.',
-							url: 'https://wallet.coinbase.com/privacy-policy',
-						},
-					],
-					entity: coinbase,
-					policy: CollectionPolicy.ALWAYS,
-				}),
-				usage: supported<WalletAnalytics>({
-					ref: [
-						{
-							explanation:
-								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity. It states that it is used for external advertising, developer advertising/marketing, and analytics. The in-app "Personalized Advertising" toggle (defaulted on) reduces sharing, but does not stop the underlying analytics collection.',
-							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
-						},
-						{
-							explanation:
-								'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with external analytics providers and advertising partners.',
-							url: 'https://wallet.coinbase.com/privacy-policy',
-						},
-					],
-					entity: coinbase,
-					policy: CollectionPolicy.ALWAYS,
-				}),
+				crashReports: {
+					[Variant.BROWSER]: null,
+					[Variant.MOBILE]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation:
+									'Apple App Store privacy label declares "Diagnostics: Crash Data" and performance metrics are collected.',
+								url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+							},
+							{
+								explanation:
+									'No opt-out exists in the Base App Privacy & Security settings as of v29.94.123.',
+								url: 'https://wallet.coinbase.com/privacy-policy',
+							},
+						],
+						entity: coinbase,
+						policy: CollectionPolicy.ALWAYS,
+					}),
+				},
+				usage: {
+					[Variant.BROWSER]: null,
+					[Variant.MOBILE]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation:
+									'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity. It states that it is used for external advertising, developer advertising/marketing, and analytics. The in-app "Personalized Advertising" toggle (defaulted on) reduces sharing, but does not stop the underlying analytics collection.',
+								url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+							},
+							{
+								explanation:
+									'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with external analytics providers and advertising partners.',
+								url: 'https://wallet.coinbase.com/privacy-policy',
+							},
+						],
+						entity: coinbase,
+						policy: CollectionPolicy.ALWAYS,
+					}),
+				},
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: 'https://wallet.coinbase.com/dapp-privacy-policy',
+			privacyPolicy: {
+				[Variant.BROWSER]: 'https://wallet.coinbase.com/privacy-policy',
+				[Variant.MOBILE]: 'https://wallet.coinbase.com/dapp-privacy-policy',
+			},
 			// Base App ships no built-in privacy features as of v29.94.123. Default
 			// transfers are public ERC-20 / ETH sends on Base. Coinbase has signaled
 			// future work on private transactions (Iron Fish acquisition, March 2025),
 			// but no stealth address, Railgun, Privacy Pools, or Tornado Cash Nova
 			// integration is in the app today. Confirmed by direct app testing.
 			transactionPrivacy: {
-				defaultFungibleTokenTransferMode: 'PUBLIC',
-				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
-				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
-				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
-				[PrivateTransferTechnology.RAILGUN]: notSupported,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					defaultFungibleTokenTransferMode: 'PUBLIC',
+					[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+					[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+					[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+					[PrivateTransferTechnology.RAILGUN]: notSupported,
+				},
 			},
 		},
 		profile: WalletProfile.GENERIC,
@@ -299,16 +338,22 @@ export const baseApp: SoftwareWallet = {
 			// Per the schema: "Set to 'NO_LOCK_MECHANISM' if the wallet has no lock
 			// screen at all."
 			duressResistance: {
-				basicUnlock: 'NO_LOCK_MECHANISM',
-				duressMode: notSupported,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: 'NO_LOCK_MECHANISM',
+					duressMode: notSupported,
+				},
 			},
 			// Base App exposes no UI for adding, pairing, or managing hardware wallet keys
 			// and there are no settings for Ledger, Trezor, or other hardware devices.
 			// There is also nothing in the Base App documentation that indicates support
 			// for hardware wallets.
 			hardwareWalletSupport: {
-				ref: refNotNecessary,
-				wallets: {},
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					ref: refNotNecessary,
+					wallets: {},
+				},
 			},
 			// New passkey accounts (rawErc4337 default): WebAuthn passkey generated in
 			// the device secure enclave (iOS) / Android Keystore. Legacy 12-word-phrase
@@ -393,35 +438,49 @@ export const baseApp: SoftwareWallet = {
 				},
 			],
 			scamAlerts: {
-				contractTransactionWarning: supported<ContractTransactionWarning>({
-					ref: refTodo,
-					contractRegistry: true,
-					leaksContractAddress: true,
-					leaksUserAddress: true,
-					leaksUserIp: true,
-					previousContractInteractionWarning: false,
-					recentContractWarning: true,
-				}),
-				scamUrlWarning: supported<ScamUrlWarning>({
-					ref: [
-						{
-							explanation:
-								'Base App v30.1.0 issues a `useBlocklistQueryQuery` query to `graphql-base.coinbase.com` on every in-app-browser navigation. The request carries the full visited URL, including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. Coinbase additionally documents that Base App warns users before they proceed to a flagged site.',
-							lastRetrieved: '2026-06-29',
-							url: 'https://help.coinbase.com/en/wallet/security/avoiding-crypto-scams',
-						},
-					],
-					leaksUserAddress: false,
-					leaksUserIp: true,
-					leaksVisitedUrl: 'FULL_URL',
-				}),
-				sendTransactionWarning: notSupported,
-				unlimitedApprovalWarning: null,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					contractTransactionWarning: supported<ContractTransactionWarning>({
+						ref: refTodo,
+						contractRegistry: true,
+						leaksContractAddress: true,
+						leaksUserAddress: true,
+						leaksUserIp: true,
+						previousContractInteractionWarning: false,
+						recentContractWarning: true,
+					}),
+					scamUrlWarning: supported<ScamUrlWarning>({
+						ref: [
+							{
+								explanation:
+									'Base App v30.1.0 issues a `useBlocklistQueryQuery` query to `graphql-base.coinbase.com` on every in-app-browser navigation. The request carries the full visited URL, including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. Coinbase additionally documents that Base App warns users before they proceed to a flagged site.',
+								lastRetrieved: '2026-06-29',
+								url: 'https://help.coinbase.com/en/wallet/security/avoiding-crypto-scams',
+							},
+						],
+						leaksUserAddress: false,
+						leaksUserIp: true,
+						leaksVisitedUrl: 'FULL_URL',
+					}),
+					sendTransactionWarning: notSupported,
+					unlimitedApprovalWarning: null,
+				},
 			},
 			// The mobile app is closed source: "Build cannot be done because the source code is not publicly available."
 			// Source: https://walletscrutiny.com/mobile/org.toshi/
 			securityBestPractices: {
-				browser: 'NOT_A_BROWSER_EXTENSION',
+				browser: {
+					ref: {
+						explanation:
+							'Extension hardening is parsed from the manifest of the Chrome Web Store package (version 3.149.0, `.crx` file SHA-256 `40e8e5ce04bc3266c7a7bda57a80213b441a8af8afabcd0232cf81036ddd0ce6`). Key storage and the randomness source cannot be verified because the extension source code is not public.',
+						label: 'Coinbase Wallet extension on the Chrome Web Store',
+						lastRetrieved: '2026-10-09',
+						url: 'https://chromewebstore.google.com/detail/coinbase-wallet-extension/hnfanknocfeofbddgcijnmhnfnkdnaad',
+					},
+					browserExtensionHardening: parseBrowserExtensionManifest(baseAppRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
+					secureRng: SecureRngSource.NOT_VERIFIABLE,
+				},
 				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: 'SOURCE_NOT_AVAILABLE',
 			},
@@ -436,31 +495,34 @@ export const baseApp: SoftwareWallet = {
 			// allowances. NFT (ERC-721 / ERC-1155) approvals are NOT surfaced in this
 			// view.
 			permissionsManagement: {
-				ref: [
-					{
-						explanation:
-							'Base App Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
-						file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png',
-						label: 'Base App Trade screen for a $1.52 USDC to ETH swap',
-						lastRetrieved: '2026-09-09',
-					},
-					{
-						explanation:
-							'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
-						file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
-						label:
-							'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
-						lastRetrieved: '2026-09-09',
-					},
-				],
-				approvalsManagement: supported({
-					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-				}),
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Base App Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
+							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png',
+							label: 'Base App Trade screen for a $1.52 USDC to ETH swap',
+							lastRetrieved: '2026-09-09',
+						},
+						{
+							explanation:
+								'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
+							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
+							label:
+								'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
+							lastRetrieved: '2026-09-09',
+						},
+					],
+					approvalsManagement: supported({
+						erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					}),
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+				},
 			},
-			// Base App is mobile-only and closed-source. It does not ship its own
+			// Base App mobile is closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
 			// are broadcast via Coinbase's RPC infrastructure. Users cannot configure
 			// a custom RPC endpoint (chainConfigurability: notSupported above), so
@@ -468,24 +530,27 @@ export const baseApp: SoftwareWallet = {
 			// For L2s: Base + Optimism (OP Stack) and Arbitrum are supported. No in-app force-inclusion UI for any L2, users
 			// would need to interact with L1 bridge contracts directly.
 			transactionSubmission: {
-				l1: {
-					ref: {
-						explanation:
-							"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
-						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					l1: {
+						ref: {
+							explanation:
+								"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
+							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+						},
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: notSupported,
 					},
-					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: notSupported,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]:
-						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					[TransactionSubmissionL2Type.opStack]:
-						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: {
-						explanation:
-							'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
-						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+					l2: {
+						[TransactionSubmissionL2Type.arbitrum]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						[TransactionSubmissionL2Type.opStack]:
+							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						ref: {
+							explanation:
+								'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
+							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+						},
 					},
 				},
 			},
@@ -514,33 +579,37 @@ export const baseApp: SoftwareWallet = {
 		// wallet is deployed to, including Ethereum L1. Confirmed live on
 		// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
 		// UserOperation routed through the account's executeBatch (see refs).
-		walletCall: supported({
-			ref: [
-				{
-					explanation:
-						'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
-					url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
-				},
-				{
-					explanation:
-						'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
-					url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
-				},
-				{
-					explanation:
-						'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
-					url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
-				},
-				{
-					explanation:
-						"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
-					url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
-				},
-			],
-			atomicMultiTransactions: featureSupported,
-		}),
+		walletCall: {
+			[Variant.BROWSER]: null,
+			[Variant.MOBILE]: supported({
+				ref: [
+					{
+						explanation:
+							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
+					},
+					{
+						explanation:
+							'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
+						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+					},
+					{
+						explanation:
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
+						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+					},
+					{
+						explanation:
+							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
+						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
+		},
 	},
 	variants: {
+		[Variant.BROWSER]: true,
 		[Variant.MOBILE]: true,
 	},
 }
