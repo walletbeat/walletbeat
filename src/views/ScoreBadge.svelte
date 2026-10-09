@@ -26,7 +26,7 @@
 		style:--accent={scoreToColor(score.score)}
 	>
 		<strong>
-			{`${Math.round(score.score * 100)}%`}
+			{`${Math.round(Math.max(0, score.score) * 100)}%`}
 		</strong
 		>{#if score.hasUnratedComponent}*{/if}
 	</data>
