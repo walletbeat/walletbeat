@@ -131,6 +131,7 @@ export const pillarx: SoftwareWallet = {
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

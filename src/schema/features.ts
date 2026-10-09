@@ -29,6 +29,7 @@ import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SecurityBestPracticesData } from './features/security/security-best-practices'
+import type { SecurityLibraries } from './features/security/security-libraries'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
@@ -218,6 +219,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Support for alerting the user about potential scams. */
 		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
 
+		/** External libraries the wallet uses directly for key and signature cryptography. */
+		securityLibraries: VariantFeature<SecurityLibraries>
+
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
@@ -394,6 +398,7 @@ export interface ResolvedFeatures {
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>
 		securityBestPractices: ResolvedFeature<SecurityBestPracticesData>
+		securityLibraries: ResolvedFeature<SecurityLibraries>
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
@@ -554,6 +559,10 @@ export function resolveFeatures(
 				features => features.security.supplyChainDIY,
 			),
 			securityBestPractices: features.security.securityBestPractices,
+			securityLibraries: softwareFeat(
+				'security.securityLibraries',
+				features => features.security.securityLibraries,
+			),
 			supplyChainFactory: hardwareFeat(
 				'security.supplyChainFactory',
 				features => features.security.supplyChainFactory,

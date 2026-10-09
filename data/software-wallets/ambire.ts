@@ -925,6 +925,7 @@ export const ambire: SoftwareWallet = {
 				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: 'NOT_A_MOBILE_APP',
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: [
 					{

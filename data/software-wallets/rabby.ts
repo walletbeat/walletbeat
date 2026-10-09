@@ -959,6 +959,7 @@ export const rabby: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: [
 					{

@@ -337,6 +337,7 @@ export const imtoken: SoftwareWallet = {
 				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
