@@ -2,9 +2,9 @@ import type { SecurityAuditor } from '@/schema/entity'
 
 export const certik: SecurityAuditor = {
 	id: 'certik',
-	name: 'Certik',
+	name: 'CertiK',
 	// @TODO
-	legalName: { name: 'Certik', soundsDifferent: false },
+	legalName: { name: 'CertiK', soundsDifferent: false },
 	type: {
 		chainDataProvider: false,
 		corporate: true,

@@ -26,6 +26,11 @@ const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
  */
 const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
 
+/**
+ * Compound nouns that Harper's phrasal-verb rule mistakes for verbs (e.g. "setup" for "set up").
+ */
+const COMPOUND_NOUNS = new Set(['backup', 'setup'])
+
 let vocabulary: string[] | null = null
 
 function getVocabulary(): string[] {
@@ -179,14 +184,20 @@ function isInsideUrl(text: string, start: number): boolean {
 	return false
 }
 
+function deprecatedTermMessage(matchedText: string, replacement: string | null): string {
+	return `The term "${matchedText}" is deprecated across the site. Use "${replacement}" instead.`
+}
+
 function getRegexpLinter({
 	name,
 	regExp,
 	replace,
+	message = deprecatedTermMessage,
 }: {
 	name: string
 	regExp: RegExp
 	replace: ((substring: string) => string) | null
+	message?: (matchedText: string, replacement: string | null) => string
 }): () => Promise<AbstractLinter> {
 	return (): Promise<AbstractLinter> => {
 		let linter = specificWordingLinters.get(name)
@@ -235,7 +246,7 @@ function getRegexpLinter({
 								return { start, end }
 							},
 							message(): string {
-								return `The term "${matchedText}" is deprecated across the site. Use "${replacement}" instead.`
+								return message(matchedText, replacement)
 							},
 						}
 
@@ -273,6 +284,22 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 		name: 'offchain', // Use offchain not off-chain
 		regExp: /\boff-chain\b/gi,
 		replace: () => 'offchain',
+	}),
+	getRegexpLinter({
+		// A capitalized determiner between two lowercase words, e.g. "depends on The user's password".
+		name: 'Capitalized determiner',
+		regExp:
+			/(?<=\b[a-z][\w'’-]*[ \t]+)(?:The|A|An|This|That|These|Those|Its|Their|Your|Our)\b(?=[ \t]+[a-z])/g,
+		replace: (substring: string) => substring.toLowerCase(),
+		message: matchedText => `"${matchedText}" is capitalized in the middle of a sentence.`,
+	}),
+	getRegexpLinter({
+		// A word, a colon and a capitalized word with no space after the colon, e.g.
+		// "the following:The user's device". Host names ("git@github.com:User") do not match.
+		name: 'Space after colon',
+		regExp: /(?<=(?:^|\s)[a-z]+):(?=[A-Z][a-z])/gm,
+		replace: () => ': ',
+		message: () => 'Add a space after the colon.',
 	}),
 ]
 
@@ -407,9 +434,11 @@ export async function grammarLintMessages(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
 	)
 
-	// Suppress Word Choice false positives for "setup" used as a noun.
+	// Suppress Word Choice false positives for compound nouns used as nouns.
 	lints = lints.filter(
-		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'setup',
+		lint =>
+			lint.lint_kind_pretty() !== 'Word Choice' ||
+			!COMPOUND_NOUNS.has(lint.get_problem_text().toLowerCase()),
 	)
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
