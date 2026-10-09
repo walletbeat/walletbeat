@@ -218,13 +218,13 @@ export const phantom: SoftwareWallet = {
 			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: false, // No donation mechanism in Phantom's terms, privacy policy or help center; revenue comes from fees
+				donations: false,
 				ecosystemGrants: null,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
 				publicOffering: false,
-				selfFunded: false, // Venture-backed from its first round (Series A, 2021)
+				selfFunded: false,
 				transparentConvenienceFees: true,
 				ventureCapital: true,
 			},
