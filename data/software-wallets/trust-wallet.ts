@@ -20,7 +20,7 @@ import {
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
@@ -112,10 +112,11 @@ export const trustWallet: SoftwareWallet = {
 				],
 				license: FOSSLicense.APACHE_2_0,
 			},
-			// No source repository exists for the mobile app or the browser extension.
-			// Source: https://walletscrutiny.com/android/com.wallet.crypto.trustapp/
 			walletAppLicense: {
-				ref: refNotNecessary,
+				ref: {
+					explanation: 'No source repository exists for the mobile app or the browser extension.',
+					url: 'https://walletscrutiny.com/android/com.wallet.crypto.trustapp/',
+				},
 				license: SourceNotAvailableLicense.PROPRIETARY,
 			},
 		},
