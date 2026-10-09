@@ -1,8 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
-	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
+
+	// Stored code snippets for this page, provided by the island's root component.
+	const codeSnippetForUrl = getCodeSnippetLookup()
 
 
 	// Props
@@ -18,7 +21,14 @@
 	// Internal state
 	let lightbox = $state<{ open: (url: string) => void }>()
 
+	// Long lists show their first few references until expanded. A list is only
+	// cut when that hides at least two references, so "show all" is never for one.
+	const collapsedCount = 2
+	let showAll = $state(false)
+
 	// (Derived)
+	const isCollapsible = $derived(references.length > collapsedCount + 1)
+	const isCollapsed = $derived(isCollapsible && !showAll)
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -61,15 +71,14 @@
 
 	// Actions
 
-	// Scope-header/context lines can push the highlighted (referenced) lines
-	// below the fold of the fixed-height snippet box, so scroll them into view
-	// as soon as the box mounts. Sets `pre.scrollTop` directly (rather than
-	// `scrollIntoView`) so only the snippet box scrolls, not the page.
-	const scrollToHighlight = (pre: HTMLElement) => {
+	// Centers the highlighted (referenced) lines in the fixed-height snippet box
+	// the first time the box comes near the viewport. Only the box scrolls, not
+	// the page.
+	const highlightScrollTop = (pre: HTMLElement): number | undefined => {
 		const highlighted = pre.querySelectorAll<HTMLElement>('.row.highlighted')
 
 		if (highlighted.length === 0) {
-			return
+			return undefined
 		}
 
 		const first = highlighted[0]
@@ -79,7 +88,45 @@
 		const lastBottom = last.getBoundingClientRect().bottom - preTop + pre.scrollTop
 		const center = (firstTop + lastBottom) / 2
 
-		pre.scrollTop = Math.max(0, center - pre.clientHeight / 2)
+		return Math.max(0, center - pre.clientHeight / 2)
+	}
+
+	let highlightObserver: IntersectionObserver | undefined
+
+	const scrollToHighlight = (pre: HTMLElement) => {
+		if (pre.querySelector('.row.highlighted') === null) {
+			return
+		}
+
+		highlightObserver ??= new IntersectionObserver(
+			entries => {
+				// Measure every box that came into range before scrolling any.
+				const scrolls = entries
+					.filter(entry => entry.isIntersecting)
+					.map(entry => entry.target)
+					.filter(box => box instanceof HTMLElement)
+					.map(box => {
+						highlightObserver?.unobserve(box)
+
+						return { box, scrollTop: highlightScrollTop(box) }
+					})
+
+				for (const { box, scrollTop } of scrolls) {
+					if (scrollTop !== undefined) {
+						box.scrollTo({ top: scrollTop, behavior: 'instant' })
+					}
+				}
+			},
+			{ rootMargin: '50% 0px' },
+		)
+
+		highlightObserver.observe(pre)
+
+		return {
+			destroy: () => {
+				highlightObserver?.unobserve(pre)
+			},
+		}
 	}
 
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
@@ -258,7 +305,10 @@
 					{/if}
 				{/snippet}
 
-				<li data-list-item="gap-2">
+				<li
+					data-list-item="gap-2"
+					hidden={isCollapsed && index >= collapsedCount}
+				>
 					{#if imageUrls.length > 1 && refImages.length > 0}
 						<div data-row="start gap-4 align-start">
 							<div data-row-item="flexible" data-column="gap-2">
@@ -279,7 +329,10 @@
 										<img
 											src={image.url}
 											alt={image.label}
+											width="128"
+											height="96"
 											loading="lazy"
+											decoding="async"
 										/>
 									</a>
 								{/each}
@@ -291,6 +344,17 @@
 				</li>
 			{/each}
 		</ul>
+
+		{#if isCollapsible}
+			<button
+				class="references-toggle"
+				type="button"
+				aria-expanded={showAll}
+				onclick={() => { showAll = !showAll }}
+			>
+				{showAll ? 'Show fewer sources' : `Show all ${totalUrls} sources`}
+			</button>
+		{/if}
 
 		<ImageLightbox
 			bind:this={lightbox}
@@ -367,7 +431,8 @@
 			inline-size: 100%;
 			max-inline-size: 100%;
 			min-inline-size: 0;
-			max-block-size: 32em;
+			/* About 12 lines; the box scrolls itself to the highlighted lines when first shown. */
+			max-block-size: 20em;
 			overflow: auto;
 
 			padding: 0.75em 1em;
@@ -448,6 +513,18 @@
 		.line-content {
 			flex: 1;
 		}
+	}
+
+	.references-list > li[hidden] {
+		display: none;
+	}
+
+	.references-toggle {
+		align-self: start;
+		margin-block-start: 0.75em;
+		padding-inline: 1em;
+		border-radius: 999em;
+		font-weight: 600;
 	}
 
 	.thumbnail {

@@ -128,19 +128,22 @@
 		left: -50vw;
 		z-index: var(--blob-z-index);
 
-		@media (prefers-reduced-motion: reduce) {
-			& * {
-				animation: none;
-			}
-		}
-
 		@media (max-width: 600px) and (pointer: coarse) {
 			display: none;
 		}
 	}
 
+	/*
+	 * Each blob layer animates between its `from` and `to` values. With
+	 * reduced motion, the animations stay paused on their first frame, so the
+	 * background keeps its look but nothing moves or has to be re-composited.
+	 */
 	.background-blob .opacity {
 		animation: blob-opacity var(--opacity-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-opacity {
 		from {
@@ -153,6 +156,10 @@
 
 	.background-blob .translation-x {
 		animation: blob-translation-x var(--translation-x-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-translation-x {
 		from {
@@ -165,6 +172,10 @@
 
 	.background-blob .translation-y {
 		animation: blob-translation-y var(--translation-y-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-translation-y {
 		from {
@@ -177,6 +188,10 @@
 
 	.background-blob .rotation {
 		animation: blob-rotation var(--rotation-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-rotation {
 		from {
@@ -189,6 +204,10 @@
 
 	.background-blob .scale-x {
 		animation: blob-scale-x var(--scale-x-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-scale-x {
 		from {
@@ -201,6 +220,10 @@
 
 	.background-blob .scale-y {
 		animation: blob-scale-y var(--scale-y-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-scale-y {
 		from {
@@ -213,6 +236,10 @@
 
 	.background-blob .hue {
 		animation: blob-hue var(--hue-duration) var(--transition-blob) 0s alternate infinite;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-play-state: paused;
+		}
 	}
 	@keyframes blob-hue {
 		from {
