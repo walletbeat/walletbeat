@@ -32,8 +32,11 @@ const secondaryNavigationItems = [
 		if (!(event.target instanceof Element) || event.target.closest('#theme-toggle') === null) {
 			return
 		}
-		document.documentElement.style.colorScheme =
-			document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
+		// The scheme in effect: the stored choice, or else the system's.
+		const currentColorScheme =
+			document.documentElement.style.colorScheme ||
+			(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+		document.documentElement.style.colorScheme = currentColorScheme === 'dark' ? 'light' : 'dark'
 		localStorage.setItem('theme', document.documentElement.style.colorScheme)
 		document
 			.querySelector('meta[name="color-scheme"]')
