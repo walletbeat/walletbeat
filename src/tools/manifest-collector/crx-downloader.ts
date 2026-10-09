@@ -37,18 +37,27 @@ function extractZipFromCrx(crxBuffer: Buffer): Buffer {
 	return crxBuffer.subarray(zipOffset)
 }
 
-function downloadCrx(extensionId: string): Promise<Buffer> {
+async function downloadCrx(extensionId: string): Promise<Buffer> {
 	// Chrome Web Store CRX download endpoint.
 	// The `x` parameter is a URL-encoded query string for the extension update check.
+	// `prodversion` is the requesting Chrome version; the store serves nothing to
+	// versions below an extension's `minimum_chrome_version`, so ask as a version
+	// newer than any release.
 	const innerQuery = encodeURIComponent(`id=${extensionId}&installsource=ondemand&uc`)
 	const url =
 		'https://clients2.google.com/service/update2/crx' +
 		'?response=redirect' +
-		'&prodversion=120.0' +
+		'&prodversion=9999.0' +
 		'&acceptformat=crx3' +
 		`&x=${innerQuery}`
 
-	return fetchBuffer(url)
+	const crx = await fetchBuffer(url)
+
+	if (crx.length === 0) {
+		throw new Error(`Chrome Web Store served no CRX for extension ${extensionId}: ${url}`)
+	}
+
+	return crx
 }
 
 async function fetchBuffer(url: string): Promise<Buffer> {
