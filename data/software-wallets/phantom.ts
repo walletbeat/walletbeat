@@ -84,7 +84,7 @@ export const phantom: SoftwareWallet = {
 		coinspectId: 'phantom',
 		contributors: [nconsigny, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.phantom.com/'],
 			extensions: [
@@ -207,24 +207,37 @@ export const phantom: SoftwareWallet = {
 				},
 				{
 					explanation:
+						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021; it skipped a seed round.",
+					url: 'https://www.theblock.co/post/111249/defi-wallet-solana-phantom-9-million-series-a-a16z',
+				},
+				{
+					explanation:
 						'Phantom charges a 0.85% fee on most swaps; users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
 					url: 'https://help.phantom.com/hc/en-us/articles/5985106844435-Swap-tokens-in-Phantom',
 				},
 			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
+				donations: false, // No donation mechanism in Phantom's terms, privacy policy or help center; revenue comes from fees
 				ecosystemGrants: null,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
 				publicOffering: false,
-				selfFunded: null,
+				selfFunded: false, // Venture-backed from its first round (Series A, 2021)
 				transparentConvenienceFees: true,
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Users can add more wallets and accounts, including new accounts derived from the existing Secret Recovery Phrase, in both the browser extension and the mobile app.',
+					url: 'https://help.phantom.com/articles/add-wallets-and-accounts-to-your-phantom-wallet-28355310978067',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
