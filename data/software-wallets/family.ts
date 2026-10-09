@@ -74,7 +74,7 @@ export const family: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The terms grant only "a limited non-exclusive, non-transferable license, with no right to sublicense"; the audited wallet repositories named in the 2024 audit are private.',
+							'The terms grant only a limited, nonexclusive, non-transferable license "with no right to sublicense"; the audited wallet repositories named in the 2024 audit are private.',
 						url: 'https://family.co/terms',
 					},
 				],
