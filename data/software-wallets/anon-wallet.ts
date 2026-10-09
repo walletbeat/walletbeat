@@ -6,6 +6,7 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import {
+	AndroidPermission,
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
@@ -176,7 +177,35 @@ export const anonWallet: SoftwareWallet = {
 					secureRng: SecureRngSource.NOT_VERIFIABLE,
 				},
 				desktop: 'NOT_A_DESKTOP_APP',
-				mobile: 'SOURCE_NOT_AVAILABLE',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'Permissions come from the manifest of the published Android app, version 1.3.6 (build 10306). The download hash matches the one listed on the releases page, and the package is signed by Ahloop. The app source code is not published, so key storage and RNG cannot be verified.',
+							url: 'https://anon.inc/releases',
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
+					mobileAppHardening: {
+						// The APK also declares FOREGROUND_SERVICE, FOREGROUND_SERVICE_DATA_SYNC, WAKE_LOCK,
+						// RECEIVE_BOOT_COMPLETED and the AndroidX DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION,
+						// which AndroidPermission cannot represent yet (#1602).
+						android: {
+							usesPermissions: [
+								AndroidPermission.ACCESS_NETWORK_STATE,
+								AndroidPermission.CAMERA,
+								AndroidPermission.DETECT_SCREEN_CAPTURE,
+								AndroidPermission.INTERNET,
+								AndroidPermission.POST_NOTIFICATIONS,
+								AndroidPermission.USE_BIOMETRIC,
+								AndroidPermission.USE_FINGERPRINT,
+								AndroidPermission.VIBRATE,
+							],
+						},
+						ios: 'NOT_AN_IOS_APP',
+					},
+					secureRng: SecureRngSource.NOT_VERIFIABLE,
+				},
 			},
 			transactionLegibility: null,
 		},
