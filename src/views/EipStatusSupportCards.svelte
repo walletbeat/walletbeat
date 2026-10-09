@@ -15,8 +15,8 @@
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
 	// backgrounds; solid text needs its own, legible color.
 	const headingColor: Record<EipSupportStatus, string> = {
-		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
-		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail)',
+		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass-text)',
+		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail-text)',
 		[EipSupportStatus.UNKNOWN]: 'var(--text-secondary)',
 		[EipSupportStatus.NOT_APPLICABLE]: 'var(--text-secondary)',
 	}
@@ -258,7 +258,8 @@
 	.status-tag {
 		--badge-backgroundColor: color-mix(in srgb, var(--accent) 14%, transparent);
 		--badge-borderColor: color-mix(in srgb, var(--accent) 20%, transparent);
-		--badge-textColor: var(--accent);
+		/* Small text on the tinted card needs a darker shade than the heading. */
+		--badge-textColor: light-dark(oklch(from var(--accent) min(l, 0.48) c h), var(--accent));
 
 		flex-shrink: 0;
 		font-size: 0.65em;
