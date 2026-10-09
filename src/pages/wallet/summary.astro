@@ -6,16 +6,59 @@ import { defaultNavigationItems } from '@/constants/navigation'
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+
+// Content
+const intro =
+	'Software wallets are apps for your phone, computer or browser that hold your keys or smart account and let you send, receive and sign transactions on Ethereum. Walletbeat rates every wallet against the same public criteria; expand a row to see its ratings, or open a wallet for the full evaluation.'
 ---
 
 <Layout
 	metadata={{
 		title: 'Ethereum Wallets - Walletbeat',
+		description: intro,
 	}}
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
+		<header data-scroll-item='inline-detached'>
+			<h1>Ethereum wallets summary</h1>
+			<p>{intro}</p>
+		</header>
+
 		<SoftwareWalletTable client:visible title='Software Wallets' />
 	</main>
 </Layout>
+
+<style>
+	/* Same column as the wallet table title below. */
+	main[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 60.5rem;
+		--scrollItem-inlineDetached-paddingStart: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+		--scrollItem-inlineDetached-paddingEnd: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+	}
+
+	main > header {
+		padding-block-start: 2rem;
+
+		h1 {
+			margin: 0 0 0.75rem;
+			font-size: 2rem;
+		}
+
+		p {
+			margin: 0;
+			max-inline-size: 48rem;
+			color: var(--text-secondary);
+			line-height: 1.6;
+		}
+	}
+</style>

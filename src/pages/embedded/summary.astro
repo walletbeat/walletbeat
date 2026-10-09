@@ -6,16 +6,59 @@ import { defaultNavigationItems } from '@/constants/navigation'
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
+
+// Content
+const intro =
+	'Embedded wallets are built into another app or website. You create one by signing in to that app, often with an email address or social account, instead of installing a separate wallet. Walletbeat rates every wallet against the same public criteria; expand a row to see its ratings, or open a wallet for the full evaluation.'
 ---
 
 <Layout
 	metadata={{
-		title: 'Walletbeat',
+		title: 'Ethereum Embedded Wallets - Walletbeat',
+		description: intro,
 	}}
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
+		<header data-scroll-item='inline-detached'>
+			<h1>Embedded wallets summary</h1>
+			<p>{intro}</p>
+		</header>
+
 		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
 	</main>
 </Layout>
+
+<style>
+	/* Same column as the wallet table title below. */
+	main[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 60.5rem;
+		--scrollItem-inlineDetached-paddingStart: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+		--scrollItem-inlineDetached-paddingEnd: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+	}
+
+	main > header {
+		padding-block-start: 2rem;
+
+		h1 {
+			margin: 0 0 0.75rem;
+			font-size: 2rem;
+		}
+
+		p {
+			margin: 0;
+			max-inline-size: 48rem;
+			color: var(--text-secondary);
+			line-height: 1.6;
+		}
+	}
+</style>
