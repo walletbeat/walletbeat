@@ -80,7 +80,7 @@ export const keystoneWallet: HardwareWallet = {
 					{
 						explanation:
 							'Keystone 3 Pro firmware 3.1.0 only parses legacy and EIP-1559 (type 2) Ethereum transactions; any other type is rejected as unsupported, and there is no authorization signing function.',
-						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/3.1.0/rust/rust_c/src/ethereum/mod.rs',
+						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/a249eb910608392b0bac5efb083135783299073c/rust/rust_c/src/ethereum/mod.rs',
 					},
 				],
 			}),
@@ -89,12 +89,13 @@ export const keystoneWallet: HardwareWallet = {
 					{
 						explanation:
 							"Ethereum accounts use the BIP-44 path m/44'/60'/0'/0/n by default, with Ledger Live and Ledger legacy paths available.",
-						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/3.1.0/src/ui/gui_widgets/multi/web3/gui_multi_path_coin_receive_widgets.c',
+						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/a249eb910608392b0bac5efb083135783299073c/src/ui/gui_widgets/multi/web3/gui_multi_path_coin_receive_widgets.c',
 					},
 					{
 						explanation:
-							'Setup screen: "Back up your seed phrase. It cannot be viewed or exported later." Only extended public keys are shared with companion wallets.',
-						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/3.1.0/src/ui/lv_i18n/data.csv',
+							'The setup screen says: "Back up your seed phrase. It cannot be viewed or exported later." Only extended public keys are shared with companion wallets.',
+						label: 'Keystone 3 firmware UI strings',
+						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/a249eb910608392b0bac5efb083135783299073c/src/ui/lv_i18n/data.csv',
 					},
 				],
 				canExportPrivateKey: false,
@@ -124,8 +125,8 @@ export const keystoneWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Keystone 3 Pro firmware is MIT-licensed ("License: MIT Licensor: YANSSIE HK LIMITED"). The MCU vendor library is included only as a pre-compiled binary.',
-						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/master/LICENSE',
+							"Keystone 3 Pro firmware is MIT-licensed. The main chip vendor's library is included only as a precompiled binary.",
+						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/0c0ae4675c436b1dbbb322cd707d80f06f311182/LICENSE',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -215,7 +216,7 @@ export const keystoneWallet: HardwareWallet = {
 			firmware: {
 				type: FirmwareType.PASS,
 				// The bootloader only installs images signed with the vendor key; anything else is deleted with a "Firmware signature mismatch" error.
-				// Source: https://github.com/KeystoneHQ/keystone3-bootloader/blob/master/app/firmware_update.c
+				// Source: https://github.com/KeystoneHQ/keystone3-bootloader/blob/e4582d30386be966375e7e693b7c6c511bbfc49b/app/firmware_update.c
 				customFirmware: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.PASS,
 				reproducibleBuilds: FirmwareType.PASS,
@@ -225,8 +226,8 @@ export const keystoneWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The seed is generated on the device from the MCU random number generator and two secure element generators, mixed with a hash of the device password.',
-						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/3.1.0/src/managers/keystore.c',
+							'The seed is generated on the device from the main chip random number generator and two secure element generators, mixed with a hash of the device password.',
+						url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/a249eb910608392b0bac5efb083135783299073c/src/managers/keystore.c',
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -277,13 +278,13 @@ export const keystoneWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: {
 				// No published documentation or audit of manufacturing or key provisioning; the Keylabs audit only recommends tracking units through manufacturing.
-				// Source: https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf
+				// Source: https://github.com/keylabsio/audits/blob/fd4e9f6e8f5f325e03a9f8cad22a6584e90440c7/2023-11-keystone3.pdf
 				// The listed box contents (device, manual, seed sheets, cable) mention no seal, and the setup guides rely on online device verification instead.
 				// Source: https://keyst.one/shop/products/keystone-3pro
 				// Schematics and BOM for hardware v3.1 and v3.2 are published; PCB layout files are not.
-				// Source: https://github.com/KeystoneHQ/keystone3-firmware/tree/master/hardware
+				// Source: https://github.com/KeystoneHQ/keystone3-firmware/tree/0c0ae4675c436b1dbbb322cd707d80f06f311182/hardware
 				// A mesh board covers the sensitive parts; removing it erases the secrets and bricks the device, even with the main battery drained. Three secure elements (Microchip and Maxim parts).
-				// Source: https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf
+				// Source: https://github.com/keylabsio/audits/blob/fd4e9f6e8f5f325e03a9f8cad22a6584e90440c7/2023-11-keystone3.pdf
 				// Device verification: "Device verification is based on a cryptographic signature mechanism." The step is skippable during setup.
 				// Source: https://keyst.one/authentication
 				type: SupplyChainFactoryType.FAIL,
@@ -364,7 +365,7 @@ export const keystoneWallet: HardwareWallet = {
 				reproducibleBuilds: null,
 			},
 			reputation: {
-				// In-house board design using third-party MCU and secure element chips. The project began in 2018 under its earlier brand and relaunched as Keystone in 2021, run by the original team.
+				// In-house board design using MCU and secure element chips from external vendors. The project began in 2018 under its earlier brand and relaunched as Keystone in 2021, run by the original team.
 				// Source: https://keyst.one/about-us
 				// Keystone 3 Pro firmware is actively released (3.1.0 in September 2026); the previous-generation Keystone Pro/Essential app last released in May 2024 with no end-of-life notice.
 				// Source: https://github.com/KeystoneHQ/keystone3-firmware/releases
