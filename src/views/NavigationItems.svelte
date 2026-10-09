@@ -17,6 +17,7 @@
 	import LayersIcon from 'lucide-static/icons/layers.svg?raw'
 	import LogInIcon from 'lucide-static/icons/log-in.svg?raw'
 	import PlugIcon from 'lucide-static/icons/plug.svg?raw'
+	import QrCodeIcon from 'lucide-static/icons/qr-code.svg?raw'
 	import RadarIcon from 'lucide-static/icons/radar.svg?raw'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
 	import SignatureIcon from 'lucide-static/icons/signature.svg?raw'
@@ -39,6 +40,7 @@
 		ICON_LAYERS: LayersIcon,
 		ICON_LOG_IN: LogInIcon,
 		ICON_PLUG: PlugIcon,
+		ICON_QR_CODE: QrCodeIcon,
 		ICON_RADAR: RadarIcon,
 		ICON_SIGNATURE: SignatureIcon,
 		ICON_STAIRS: StairsIcon,

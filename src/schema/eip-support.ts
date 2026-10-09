@@ -163,6 +163,8 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.erc4361.ref)
 	},
+	// No wallet feature records ERC-4527 (QR code signing) support yet.
+	'4527': () => 'UNKNOWN',
 	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
 	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it
 	// implements `validateUserOp`). EIP-7702 alone does not imply ERC-4337:

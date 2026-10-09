@@ -15,6 +15,7 @@ export type LucideNavigationIcon =
 	| 'ICON_LAYERS'
 	| 'ICON_LOG_IN'
 	| 'ICON_PLUG'
+	| 'ICON_QR_CODE'
 	| 'ICON_RADAR'
 	| 'ICON_SIGNATURE'
 	| 'ICON_STAIRS'

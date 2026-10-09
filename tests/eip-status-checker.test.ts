@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { eip712 } from '@/data/eips/eip-712'
 import { erc4337 } from '@/data/eips/erc-4337'
+import { erc4527 } from '@/data/eips/erc-4527'
 import { EipPrefix, EipStatus } from '@/schema/eips'
 import {
 	checkEip,
@@ -73,7 +74,7 @@ describe('EIP status checker drift detection', () => {
 	})
 
 	it('reports an upstream status that Walletbeat does not model as drift', async () => {
-		vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('Stagnant'))
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('Withdrawn'))
 
 		const result = expectDrift(await checkEip(eip712))
 
@@ -81,6 +82,27 @@ describe('EIP status checker drift detection', () => {
 			field: EipMismatchField.STATUS,
 			ours: EipStatus.FINAL,
 			upstream: null,
+			upstreamRaw: 'Withdrawn',
+		})
+	})
+
+	it('maps an upstream Stagnant status to EipStatus.STAGNANT', async () => {
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('Stagnant', 'ERC'))
+
+		const result = await checkEip(erc4527)
+
+		expect(result.kind).toBe(EipStatusCheckKind.MATCH)
+	})
+
+	it('reports a Final EIP that became Stagnant upstream as drift', async () => {
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('Stagnant'))
+
+		const result = expectDrift(await checkEip(eip712))
+
+		expect(result.mismatches).toContainEqual({
+			field: EipMismatchField.STATUS,
+			ours: EipStatus.FINAL,
+			upstream: EipStatus.STAGNANT,
 			upstreamRaw: 'Stagnant',
 		})
 	})

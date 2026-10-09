@@ -7,6 +7,7 @@ import { eip6963 } from './eips/eip-6963'
 import { eip7702 } from './eips/eip-7702'
 import { erc4337 } from './eips/erc-4337'
 import { erc4361 } from './eips/erc-4361'
+import { erc4527 } from './eips/erc-4527'
 import { erc5564 } from './eips/erc-5564'
 import { erc7730 } from './eips/erc-7730'
 import { erc7828 } from './eips/erc-7828'
@@ -21,6 +22,7 @@ export const eips: Record<EipNumber, Eip> = {
 	'2700': eip2700,
 	'4337': erc4337,
 	'4361': erc4361,
+	'4527': erc4527,
 	'5564': erc5564,
 	'5792': eip5792,
 	'6963': eip6963,

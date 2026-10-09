@@ -12,6 +12,7 @@ export type EipNumber =
 	| '2700'
 	| '4337'
 	| '4361'
+	| '4527'
 	| '5564'
 	| '5792'
 	| '6963'
@@ -30,6 +31,7 @@ export enum EipStatus {
 	FINAL = 'FINAL',
 	LIVING = 'LIVING',
 	LAST_CALL = 'LAST_CALL',
+	STAGNANT = 'STAGNANT',
 }
 
 /**
@@ -120,4 +122,5 @@ export const eipStatusLabel: Record<EipStatus, string> = {
 	[EipStatus.REVIEW]: 'Review',
 	[EipStatus.LIVING]: 'Living',
 	[EipStatus.LAST_CALL]: 'Last Call',
+	[EipStatus.STAGNANT]: 'Stagnant',
 }

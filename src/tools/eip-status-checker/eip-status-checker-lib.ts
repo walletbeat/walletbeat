@@ -200,12 +200,13 @@ const UPSTREAM_STATUS_MAP = new Map<string, EipStatus>([
 	['last call', EipStatus.LAST_CALL],
 	['final', EipStatus.FINAL],
 	['living', EipStatus.LIVING],
+	['stagnant', EipStatus.STAGNANT],
 ])
 
 /**
  * Maps an upstream frontmatter status string to a Walletbeat `EipStatus`.
- * Returns null for statuses Walletbeat does not model (e.g. Stagnant,
- * Withdrawn, Moved).
+ * Returns null for statuses Walletbeat does not model (e.g. Withdrawn,
+ * Moved).
  */
 export function mapUpstreamStatus(raw: string): EipStatus | null {
 	return UPSTREAM_STATUS_MAP.get(raw.trim().toLowerCase()) ?? null
@@ -284,7 +285,7 @@ export async function checkEip(
 
 		const mismatches: EipMismatch[] = []
 
-		// A status we cannot map (Stagnant, Withdrawn, …) is still a verified
+		// A status we cannot map (Withdrawn, …) is still a verified
 		// upstream value that disagrees with ours: report it as drift.
 		const upstreamStatus = mapUpstreamStatus(rawStatus)
 

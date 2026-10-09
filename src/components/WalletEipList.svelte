@@ -246,6 +246,11 @@
 			background: color-mix(in srgb, #facc15 15%, transparent);
 			color: #facc15;
 		}
+
+		&[data-status='STAGNANT'] {
+			background: color-mix(in srgb, #fb923c 15%, transparent);
+			color: #fb923c;
+		}
 	}
 
 	/* Expanded detail */
