@@ -34,7 +34,7 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -250,9 +250,13 @@ export const imtoken: SoftwareWallet = {
 		security: {
 			accountRecovery: {
 				drills: null,
-				// Recovery is only by importing the user's own mnemonic, private key or keystore: "If you lost your mnemonic phrase and you haven't backed it up, it can't be retrieved." No cloud, social or vendor-assisted recovery is documented for the mobile app.
-				// Source: https://support.token.im/hc/en-us/articles/360003123113
-				guardianRecovery: notSupported,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Recovery is only by importing the user's own mnemonic, private key or keystore: \"If you lost your mnemonic phrase and you haven't backed it up, it can't be retrieved.\" No cloud, social or vendor-assisted recovery is documented for the mobile app.",
+						url: 'https://support.token.im/hc/en-us/articles/360003123113',
+					},
+				}),
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
@@ -396,13 +400,16 @@ export const imtoken: SoftwareWallet = {
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				// Only store release notes and occasional help-center articles; no complete public changelog for the app.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Only the TokenCore library is open source; the app is not: "Build cannot be done because the source code is not publicly available."
-				// Source: https://walletscrutiny.com/mobile/im.token.app/
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Only the TokenCore library is open source; the app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/mobile/im.token.app/',
+					},
+				}),
 			},
 		},
 		walletCall: null,
