@@ -227,6 +227,10 @@
 		"hash": "99873319aa6259b1f2f47261cd1b04b6047d535186dd3edaae4492a48086ffa4",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/wallets/keycard-pal.svg": {
+		"hash": "f6469cb8e19e6171f7143deef4947b5d442b970e9b7f24a6289c725b24c2430a",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/wallets/keycard-shell.svg": {
 		"hash": "358098d86167fb48947aa4edd8a994f2a2048d0f82df74096b074eadf16130a1",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]

@@ -309,6 +309,9 @@ export enum AndroidPermission {
 	/** Camera access, typically for QR code scanning. */
 	CAMERA = 'android.permission.CAMERA',
 
+	/** NFC access, e.g. to talk to a smart card or hardware wallet. */
+	NFC = 'android.permission.NFC',
+
 	/** Microphone access. */
 	RECORD_AUDIO = 'android.permission.RECORD_AUDIO',
 
@@ -366,6 +369,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.ACCESS_NETWORK_STATE]: true,
 	[AndroidPermission.SYSTEM_ALERT_WINDOW]: true,
 	[AndroidPermission.CAMERA]: true,
+	[AndroidPermission.NFC]: true,
 	[AndroidPermission.RECORD_AUDIO]: true,
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
 	[AndroidPermission.VIBRATE]: true,

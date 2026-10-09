@@ -1,0 +1,40 @@
+{
+	"highlightFirstLine": 43,
+	"highlightLastLine": 44,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  build:"
+			],
+			"startLine": 9
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"      - name: Set up Node.js"
+			],
+			"startLine": 37
+		},
+		{
+			"lines": [
+				"        with:",
+				"          node-version: '22'",
+				"          cache: 'npm'",
+				"",
+				"      - name: Install Node dependencies",
+				"        run: npm ci",
+				"",
+				"      - name: Install SDK components",
+				"        run: echo \"y\" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \"platforms;android-37.0\" \"build-tools;37.0.0\" \"ndk;27.1.12297006\"",
+				""
+			],
+			"startLine": 39
+		}
+	]
+}

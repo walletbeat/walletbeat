@@ -2318,6 +2318,7 @@ Connection method between software and hardware wallet. To identify: connect the
 - `webUSB` = `'WEBUSB'`: USB through the browser's WebUSB API (browser extensions or web apps). Use USB instead for native desktop applications.
 - `webHID` = `'WEBHID'`: HID through the browser's WebHID API. Similar to webUSB but uses the HID protocol instead. (e.g. Trezor uses WebHID in some browser integrations.)
 - `bluetooth` = `'BLUETOOTH'`: Wireless connection via Bluetooth.
+- `NFC` = `'NFC'`: Near-field communication: the hardware wallet is a smart card or tag held against the phone (e.g. Keycard).
 - `WALLET_CONNECT` = `'WALLET_CONNECT'`: Indirect connection via the WalletConnect protocol — the hardware wallet connects through its companion app rather than directly to the software wallet.
 
 ---
@@ -2854,6 +2855,7 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
 - `SYSTEM_ALERT_WINDOW` = `'android.permission.SYSTEM_ALERT_WINDOW'`: Draw overlays on top of other apps — significant phishing risk.
 - `CAMERA` = `'android.permission.CAMERA'`: Camera access, typically for QR code scanning.
+- `NFC` = `'android.permission.NFC'`: NFC access, e.g. to talk to a smart card or hardware wallet.
 - `RECORD_AUDIO` = `'android.permission.RECORD_AUDIO'`: Microphone access.
 - `MODIFY_AUDIO_SETTINGS` = `'android.permission.MODIFY_AUDIO_SETTINGS'`: Modify global audio settings.
 - `VIBRATE` = `'android.permission.VIBRATE'`: Control device vibration.

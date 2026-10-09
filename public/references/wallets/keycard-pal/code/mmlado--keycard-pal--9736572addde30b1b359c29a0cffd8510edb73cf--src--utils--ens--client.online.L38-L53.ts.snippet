@@ -1,0 +1,45 @@
+{
+	"highlightFirstLine": 38,
+	"highlightLastLine": 53,
+	"segments": [
+		{
+			"lines": [
+				"export async function resolveEnsName(",
+				"  address: string,",
+				"  rpcUrl: string,",
+				"): Promise<ResolveEnsNameResult> {"
+			],
+			"startLine": 8
+		},
+		{
+			"lines": [
+				"  } catch {",
+				"    return { name: null, reason: 'rpc-error' };",
+				"  }",
+				"}",
+				"",
+				"export async function validateRpcUrl(",
+				"  url: string,",
+				"): Promise<'ok' | 'non-mainnet' | 'timeout' | 'unreachable'> {",
+				"  try {",
+				"    const client = createPublicClient({",
+				"      chain: mainnet,",
+				"      transport: http(url, { timeout: 5000 }),",
+				"    });",
+				"",
+				"    const chainId = await client.getChainId();",
+				"",
+				"    if (chainId === 1) {",
+				"      return 'ok';",
+				"    }",
+				"",
+				"    return 'non-mainnet';",
+				"  } catch (error: any) {",
+				"    if (",
+				"      error?.name === 'TimeoutError' ||",
+				"      error?.code === 'TIMEOUT' ||"
+			],
+			"startLine": 33
+		}
+	]
+}

@@ -14,6 +14,7 @@ import { family } from './software-wallets/family'
 import { frame } from './software-wallets/frame'
 import { gemwallet } from './software-wallets/gemwallet'
 import { imtoken } from './software-wallets/imtoken'
+import { keycardPal } from './software-wallets/keycard-pal'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
@@ -73,6 +74,7 @@ export const softwareWallets = {
 	frame,
 	gemwallet,
 	imtoken,
+	keycardPal,
 	metamask,
 	mtpelerin,
 	nufi,

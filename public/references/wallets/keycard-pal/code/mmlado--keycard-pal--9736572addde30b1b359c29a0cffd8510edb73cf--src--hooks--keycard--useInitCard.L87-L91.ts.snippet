@@ -1,0 +1,54 @@
+{
+	"highlightFirstLine": 87,
+	"highlightLastLine": 91,
+	"segments": [
+		{
+			"lines": [
+				"export function useInitCard(): UseInitCardOperation {"
+			],
+			"startLine": 42
+		},
+		{
+			"lines": [
+				"  const {",
+				"    start: startNFC,",
+				"    cancel: nfcCancel,",
+				"    reset: nfcReset,",
+				"    phase: nfcPhase,",
+				"    ...rest",
+				"  } = useNFCOperation(",
+				"    useCallback(",
+				"      async (",
+				"        cmdSet: Commandset,",
+				"        setStatus: (status: string) => void,",
+				"        card: SelectedCard,",
+				"      ) => {"
+			],
+			"startLine": 56
+		},
+		{
+			"lines": [
+				"        if (appInfo && secureChannelVersion(appInfo) === 'v2') {"
+			],
+			"startLine": 77
+		},
+		{
+			"lines": [
+				"          }",
+				"          // No pairing on 4.0; the SDK opens the channel in init() (ADR-0008).",
+				"          setStatus('Initializing...');",
+				"          setInitSent(true);",
+				"          const resp = await cmdSet.init(",
+				"            pinRef.current,",
+				"            puk,",
+				"            undefined,",
+				"            duressPin,",
+				"          );",
+				"          // An answer, refusal included, ends the unknown window.",
+				"          setInitSent(false);",
+				"          resp.checkOK('Initializing the Keycard failed');"
+			],
+			"startLine": 83
+		}
+	]
+}
