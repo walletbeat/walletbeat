@@ -160,12 +160,12 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<h5>
+		<h4>
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</h5>
+		</h4>
 
 		<ul class="references-list" data-list="gap-2">
 			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
@@ -245,7 +245,14 @@
 									<span>{@html CodeIcon}</span>
 								</a>
 							</figcaption>
-							<pre use:scrollToHighlight><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
+							<!-- The snippet box scrolls, so it is focusable. -->
+							<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+							<pre
+								use:scrollToHighlight
+								tabindex="0"
+								role="group"
+								aria-label={`Code: ${url.label}`}
+							><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
 						</figure>
 					{/each}
 
@@ -370,7 +377,7 @@
 		line-height: 1.7;
 	}
 
-	h5 {
+	h4 {
 		font-size: 1em;
 	}
 
@@ -460,6 +467,16 @@
 			}
 
 			&:hover::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+			}
+
+			&:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+				scrollbar-width: thin;
+			}
+
+			&:focus-visible::-webkit-scrollbar-thumb {
 				background-color: var(--border-color);
 			}
 		}

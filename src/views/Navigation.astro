@@ -28,6 +28,18 @@ const secondaryNavigationItems = [
 ---
 
 <script is:inline>
+	// Expose the effective color scheme as the theme toggle's pressed state
+	function syncThemeTogglePressed() {
+		const colorScheme =
+			document.documentElement.style.colorScheme ||
+			(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+		document
+			.getElementById('theme-toggle')
+			?.setAttribute('aria-pressed', String(colorScheme === 'dark'))
+	}
+	document.addEventListener('astro:page-load', syncThemeTogglePressed)
+	matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncThemeTogglePressed)
+
 	document.addEventListener('click', event => {
 		if (!(event.target instanceof Element) || event.target.closest('#theme-toggle') === null) {
 			return
@@ -41,11 +53,13 @@ const secondaryNavigationItems = [
 		document
 			.querySelector('meta[name="color-scheme"]')
 			?.setAttribute('content', document.documentElement.style.colorScheme)
+		syncThemeTogglePressed()
 	})
 </script>
 
 <nav
 	id='nav'
+	aria-label='Site'
 	popover='auto'
 	data-column='gap-0'
 	data-sticky='backdrop-self backdrop-always'
@@ -53,7 +67,7 @@ const secondaryNavigationItems = [
 	data-sticky-container
 >
 	<header data-sticky='backdrop-self backdrop-always' data-row>
-		<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
+		<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav' aria-label='Menu'>
 			<span set:html={LuMenu} />
 		</button>
 
@@ -67,7 +81,7 @@ const secondaryNavigationItems = [
 			/>
 		</a>
 
-		<button type='button' id='theme-toggle' data-icon='circle' data-stack>
+		<button type='button' id='theme-toggle' data-icon='circle' data-stack aria-label='Dark mode'>
 			<span set:html={LuSun} />
 			<span set:html={LuMoon} />
 		</button>
