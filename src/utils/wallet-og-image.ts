@@ -25,6 +25,7 @@ import { ratingToColor } from '@/schema/attributes'
 import { getVariants, type Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import type { WBIconID } from '@/styles/wbicons'
+import { recompressPng } from '@/tools/image-integrity/png-optimizer-lib'
 import { setItems } from '@/types/utils/non-empty'
 import { getAstroBuildTimeRepositoryRoot } from '@/utils/codebase.astro'
 import { scoreToColor, stageToColor } from '@/utils/colors'
@@ -262,8 +263,9 @@ export async function renderWalletOgImage<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
 	wallet: RatedWallet<_AttributeGroupId>,
 ): Promise<Buffer> {
-	return await sharp(Buffer.from(walletOgImageSvg(attributeTree, wallet)))
-		.removeAlpha()
-		.png({ compressionLevel: 9, adaptiveFiltering: true, palette: false })
-		.toBuffer()
+	return await recompressPng(
+		await sharp(Buffer.from(walletOgImageSvg(attributeTree, wallet)))
+			.png()
+			.toBuffer(),
+	)
 }

@@ -87,20 +87,24 @@ export const overallRatingPieMaxRadius = Math.max(
 )
 
 /**
- * SVG path data for a computed slice, drawn pointing up (toward negative y)
- * around the pie origin at (0, 0), before its `rotate(midAngle)` and
- * `translate(0, -offset)` transforms. Matches the `clip-path` shape that
- * `Pie.svelte` draws in CSS, for renderers that only understand SVG.
+ * Path data for a computed slice, drawn pointing up (toward negative y)
+ * around the pie origin, before its `rotate(midAngle)` and
+ * `translate(0, -offset)` transforms. Usable both as SVG path data and in
+ * CSS `clip-path: path()`.
  */
-export const slicePathData = ({
-	totalAngle,
-	outerR,
-	innerR,
-	outerCornerRadius,
-	innerCornerRadius,
-	gap,
-}: ComputedSlice['computed']): string => {
-	const point = (x: number, y: number) => `${x.toFixed(3)} ${y.toFixed(3)}`
+export const slicePathData = (
+	{
+		totalAngle,
+		outerR,
+		innerR,
+		outerCornerRadius,
+		innerCornerRadius,
+		gap,
+	}: ComputedSlice['computed'],
+	origin: { x: number; y: number } = { x: 0, y: 0 },
+): string => {
+	const point = (x: number, y: number) =>
+		`${(origin.x + x).toFixed(3)} ${(origin.y + y).toFixed(3)}`
 	const polar = (angle: number, r: number) => point(Math.sin(angle) * r, -Math.cos(angle) * r)
 
 	if (Math.abs(totalAngle) >= 359.99) {
