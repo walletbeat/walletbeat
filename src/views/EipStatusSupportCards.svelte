@@ -3,6 +3,7 @@
 	import { type EipStatusSupportCard, EipSupportStatus } from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
+	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 
 	const statusColor: Record<EipSupportStatus, string> = {
 		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
@@ -14,8 +15,8 @@
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
 	// backgrounds; solid text needs its own, legible color.
 	const headingColor: Record<EipSupportStatus, string> = {
-		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
-		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail)',
+		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass-text)',
+		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail-text)',
 		[EipSupportStatus.UNKNOWN]: 'var(--text-secondary)',
 		[EipSupportStatus.NOT_APPLICABLE]: 'var(--text-secondary)',
 	}
@@ -48,10 +49,15 @@
 	let {
 		title,
 		cards,
+		codeSnippets = {},
 	}: {
 		title?: string
 		cards: EipStatusSupportCard[]
+		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
+		codeSnippets?: CodeSnippetIndex
 	} = $props()
+
+	setCodeSnippetContext(() => codeSnippets)
 
 
 	// Functions
@@ -112,7 +118,7 @@
 						{#each statusCards as card (card.id)}
 							{@const hasReferences = card.references.length > 0}
 
-							{#snippet WalletCardHeader()}
+							{#snippet WalletCardHeader(isSummary: boolean)}
 								<span class="wallet-icon" data-icon="shadow">
 									<img
 										src={`/images/wallets/${card.id}.${card.iconExtension}`}
@@ -123,11 +129,16 @@
 								</span>
 
 								<div class="wallet-heading" data-row-item="flexible" data-row="start gap-2">
-									<h5>
-										<a data-link="camouflaged" href={card.url}>
+									<h4>
+										<!-- Links can't nest in the summary toggle; the expanded card links to the wallet page. -->
+										{#if isSummary}
 											{card.displayName}
-										</a>
-									</h5>
+										{:else}
+											<a data-link="camouflaged" href={card.url}>
+												{card.displayName}
+											</a>
+										{/if}
+									</h4>
 
 									<span
 										class="status-tag"
@@ -148,7 +159,7 @@
 
 									<details data-card="radius-4 padding-4 border-accent" data-column="gap-0">
 										<summary data-row="center gap-3">
-											{@render WalletCardHeader()}
+											{@render WalletCardHeader(true)}
 										</summary>
 
 										<div class="wallet-card-content" data-column="gap-3">
@@ -170,7 +181,7 @@
 								{:else}
 									<div class="wallet-card-static" data-card="radius-4 padding-4 border-accent">
 										<div data-row="center gap-3">
-											{@render WalletCardHeader()}
+											{@render WalletCardHeader(false)}
 											<span class="chevron-spacer" aria-hidden="true"></span>
 										</div>
 									</div>
@@ -239,7 +250,7 @@
 	.wallet-heading {
 		min-inline-size: 0;
 
-		h5 {
+		h4 {
 			flex-shrink: 1;
 			font-size: 0.9rem;
 			font-weight: 600;
@@ -252,7 +263,8 @@
 	.status-tag {
 		--badge-backgroundColor: color-mix(in srgb, var(--accent) 14%, transparent);
 		--badge-borderColor: color-mix(in srgb, var(--accent) 20%, transparent);
-		--badge-textColor: var(--accent);
+		/* Small text on the tinted card needs a darker shade than the heading. */
+		--badge-textColor: light-dark(oklch(from var(--accent) min(l, 0.48) c h), var(--accent));
 
 		flex-shrink: 0;
 		font-size: 0.65em;

@@ -2783,6 +2783,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
 - `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `FAVICON` = `'favicon'`: Load website favicons from the browser's favicon cache via `_favicon/` URLs.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).

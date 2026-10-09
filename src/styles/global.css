@@ -130,6 +130,9 @@
 
 	font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
 	font-size: min(3.2vw, 16px);
+	/* Disable iOS Safari text autosizing, which inflates some code snippets but not others */
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 
 	color-scheme: light dark;
 	color: var(--text-primary);
@@ -138,7 +141,8 @@
 
 	transition-property: background-color, color;
 
-	touch-action: none;
+	/* Block panning the root (content scrolls in `[data-scroll-container]`), but keep pinch zoom */
+	touch-action: pinch-zoom;
 }
 
 label:has(> input) {
