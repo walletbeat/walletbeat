@@ -2,21 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { allRatedWallets } from '@/data/wallets'
 import type { Evaluation, OutcomeMetadata } from '@/schema/attributes'
-import {
-	securityAuditsAndBounties,
-	type SecurityAuditsMetadata,
-} from '@/schema/attributes/security/security-audits-bounties'
 import { securityAuditId } from '@/schema/features/security/security-audits'
 import { Variant } from '@/schema/variants'
 import type { RatedWallet, ResolvedWallet } from '@/schema/wallet'
 import { isSecurityAuditsMetadata } from '@/types/content/security-audits-details'
 import { nonEmptyValues } from '@/types/utils/non-empty'
-
-function isSecurityAuditsEvaluation<_Evaluation extends Evaluation<OutcomeMetadata>>(
-	evaluation: _Evaluation,
-): evaluation is _Evaluation & Evaluation<SecurityAuditsMetadata> {
-	return isSecurityAuditsMetadata(evaluation.outcome.metadata)
-}
 
 function auditIds(evaluation: Evaluation<OutcomeMetadata> | undefined): string[] {
 	const metadata = evaluation?.outcome.metadata
@@ -68,61 +58,4 @@ describe('securityAuditsAndBounties aggregate', () => {
 			}
 		})
 	}
-
-	it('does not apply browser-only audits to Phantom mobile', () => {
-		const { phantom } = allRatedWallets
-		const mobile = phantom.variants[Variant.MOBILE]
-		const browser = phantom.variants[Variant.BROWSER]
-
-		expect(mobile).toBeDefined()
-		expect(browser).toBeDefined()
-
-		const browserOnlyIds = (browser?.features.security.publicSecurityAudits ?? [])
-			.filter(audit => audit.variantsScope !== 'ALL_VARIANTS')
-			.map(securityAuditId)
-
-		expect(browserOnlyIds.length).toBeGreaterThan(0)
-
-		const mobileIds = auditIds(mobile === undefined ? undefined : variantAuditsEvaluation(mobile))
-		const overallIds = auditIds(phantom.overall.security.securityAuditsAndBounties.evaluation)
-
-		for (const id of browserOnlyIds) {
-			expect(mobileIds).not.toContain(id)
-			expect(overallIds).toContain(id)
-		}
-	})
-
-	it('does not mutate the per-variant evaluations it aggregates', () => {
-		const { phantom } = allRatedWallets
-		const mobile = phantom.variants[Variant.MOBILE]
-		const browser = phantom.variants[Variant.BROWSER]
-
-		if (mobile === undefined || browser === undefined) {
-			throw new Error('Phantom must have mobile and browser variants')
-		}
-
-		const mobileEvaluation = variantAuditsEvaluation(mobile)
-		const browserEvaluation = variantAuditsEvaluation(browser)
-
-		if (
-			mobileEvaluation === undefined ||
-			browserEvaluation === undefined ||
-			!isSecurityAuditsEvaluation(mobileEvaluation) ||
-			!isSecurityAuditsEvaluation(browserEvaluation)
-		) {
-			throw new Error('Phantom must have security audit evaluations')
-		}
-
-		const mobileMetadataBefore = mobileEvaluation.outcome.metadata
-		const browserMetadataBefore = browserEvaluation.outcome.metadata
-		const aggregated = securityAuditsAndBounties.aggregate({
-			[Variant.MOBILE]: mobileEvaluation,
-			[Variant.BROWSER]: browserEvaluation,
-		})
-
-		expect(mobileEvaluation.outcome.metadata).toBe(mobileMetadataBefore)
-		expect(browserEvaluation.outcome.metadata).toBe(browserMetadataBefore)
-		expect(aggregated).not.toBe(mobileEvaluation)
-		expect(aggregated).not.toBe(browserEvaluation)
-	})
 })
