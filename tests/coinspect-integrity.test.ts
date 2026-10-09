@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { coinspectUpstreamCommit } from '@/data/coinspect/upstream-commit'
 import { allWallets } from '@/data/wallets'
+import { coinspectCheckResult, type CoinspectReport } from '@/schema/data-sources'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 /**
@@ -203,5 +204,56 @@ describe('coinspect upstream pin', () => {
 			coinspectUpstreamCommit,
 			`${UPSTREAM_COMMIT_FILE} must export a full 40-character SHA-1`,
 		).toMatch(FULL_SHA1)
+	})
+})
+
+/**
+ * Check UIDs that vendored reports use but that `data/coinspect/checks.json`,
+ * taken from the same upstream commit, does not define (upstream renamed or
+ * versioned the check after these reports were made). Remove entries once a
+ * refresh brings reports and definitions back in line.
+ */
+const knownUndefinedChecks: ReadonlySet<string> = new Set(['WSR-PHYS-002.v1', 'WSR-THRE-002.v1'])
+
+const coinspectReports = Object.entries(
+	import.meta.glob<CoinspectReport>('/data/coinspect/current-reports/*/*.json', {
+		eager: true,
+		import: 'default',
+	}),
+)
+
+describe('coinspect check definitions', () => {
+	it('loads the vendored reports', () => {
+		expect(coinspectReports.length).toBeGreaterThan(0)
+	})
+
+	// Every check result in every report resolves to a check definition and to
+	// the criterion its score stands for, so `coinspectCheckRef` can cite it.
+	it('defines every check that reports use, with a criterion for each score', () => {
+		const failures = new Set<string>()
+		const undefinedChecksSeen = new Set<string>()
+
+		for (const [reportPath, report] of coinspectReports) {
+			for (const { checkResults } of report.scores.categories) {
+				for (const { checkUID } of checkResults) {
+					if (knownUndefinedChecks.has(checkUID)) {
+						undefinedChecksSeen.add(checkUID)
+						continue
+					}
+
+					try {
+						coinspectCheckResult(report, checkUID)
+					} catch (error) {
+						failures.add(`${reportPath}: ${error instanceof Error ? error.message : String(error)}`)
+					}
+				}
+			}
+		}
+
+		expect([...failures].sort()).toEqual([])
+		expect(
+			[...knownUndefinedChecks].filter(checkUID => !undefinedChecksSeen.has(checkUID)).sort(),
+			'remove these IDs from knownUndefinedChecks; no vendored report uses them',
+		).toEqual([])
 	})
 })
