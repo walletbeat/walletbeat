@@ -217,24 +217,6 @@ export const ledgerWallet: HardwareWallet = {
 				usage: null,
 			},
 			dataCollection: null,
-			// Ledger Stax connects over USB-C, Bluetooth LE and NFC. Bluetooth pairing uses an ECDH key exchange
-			// with numeric comparison and AES-based encryption; only public data such as addresses crosses the
-			// link. NFC is disabled by default and is used for Ledger Recovery Key and Security Key.
-			// Source: https://shop.ledger.com/products/ledger-stax
-			// Source: https://support.ledger.com/article/360019138694-zd
-			// Source: https://support.ledger.com/article/18934878523037-zd
-			// Source: https://www.ledger.com/ledger-nano-x-Bluetooth-security-model-of-a-wireless-hardware-wallet
-			// The device has no network access of its own. Ledger Wallet runs a genuine check against Ledger's
-			// HSM on every My Ledger connection, installs apps and firmware through Ledger's servers, and sends
-			// account addresses to Ledger's explorers; the privacy policy keeps those addresses for market
-			// analyses. Ledger documents no own-node option for Ethereum.
-			// Source: https://support.ledger.com/article/4404389367057-zd
-			// Source: https://developers.ledger.com/docs/device-interaction/references/device-management-kit/secure-channel
-			// Source: https://shop.ledger.com/pages/privacy-policy-what-ledger-wallet
-			// Ledger Wallet's source is public under the MIT license, and the repository lists every external
-			// service it contacts.
-			// Source: https://github.com/LedgerHQ/ledger-live/blob/23e5f1e6a56971ae50e9d702a9c43319a0819b86/LICENSE.txt
-			// Source: https://github.com/LedgerHQ/ledger-live/blob/23e5f1e6a56971ae50e9d702a9c43319a0819b86/docs/services.md
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PARTIAL,
 				details:
@@ -464,15 +446,6 @@ export const ledgerWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			// Ledger lists MetaMask and Rabby among the wallets that support Ethereum on Ledger devices; Rainbow
-			// and Ambire also document Ledger support.
-			// Source: https://support.ledger.com/article/360026472413-zd
-			// Source: https://rainbow.me/en/support/extension/connect-your-hardware-wallet
-			// Source: https://help.ambire.com/en/articles/13714236-using-ambire-extension-with-hardware-wallets
-			// Installing the Ethereum app, updating the firmware and the genuine check all go through Ledger
-			// Wallet and a secure channel with a Ledger backend service.
-			// Source: https://developers.ledger.com/docs/device-interaction/references/device-management-kit/secure-channel
-			// Source: https://support.ledger.com/article/4404382258961-zd
 			interoperability: {
 				type: InteroperabilityType.PARTIAL,
 				details:
