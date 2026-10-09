@@ -1,4 +1,9 @@
-import { guardianId, type GuardianPolicy, GuardianPolicyType } from '../security/account-recovery'
+import {
+	guardianId,
+	type GuardianPolicy,
+	GuardianPolicyType,
+	validateGuardianPolicy,
+} from '../security/account-recovery'
 import {
 	evaluateGuardianShareLostScenario,
 	possibleGuardiansLosingShares,
@@ -93,6 +98,8 @@ const scenarioExpanders: GuardianScenarioExpander[] = [
 export function evaluateAllGuardianScenarios(
 	guardianPolicy: GuardianPolicy,
 ): GuardianScenarioOutcome<GuardianScenarioType>[] {
+	validateGuardianPolicy(guardianPolicy)
+
 	const scenarios: GuardianScenario<GuardianScenarioType>[] = scenarioExpanders.flatMap(expander =>
 		expander(guardianPolicy),
 	)
