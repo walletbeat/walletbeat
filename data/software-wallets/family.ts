@@ -6,7 +6,7 @@ import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -172,12 +172,6 @@ export const family: SoftwareWallet = {
 				},
 			],
 			scamAlerts: null,
-			// The app's source is not public: the app repositories named in the Zellic audit are not
-			// publicly accessible, and github.com/family hosts only ConnectKit and a forked crypto library.
-			// The app is iOS-only, and the App Store build can only be downloaded with an Apple ID, so
-			// neither an Android manifest nor the Info.plist is publicly available.
-			// Source: https://family.co/media/family-wallet-audit-report-2024.pdf
-			// Source: https://github.com/family
 			securityBestPractices: {
 				browser: 'NOT_A_BROWSER_EXTENSION',
 				desktop: 'NOT_A_DESKTOP_APP',
@@ -204,18 +198,26 @@ export const family: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// App Store signing only; no developer-published signatures or attestations.
 				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				// family.co/changelog lists ConnectKit releases only; app release notes appear only in the App Store.
-				// Source: https://family.co/changelog
-				hasPublicChangelog: notSupported,
+				hasPublicChangelog: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The changelog on family.co lists releases of the Family wallet-connection library only; app release notes appear only in the App Store listing.',
+						url: 'https://family.co/changelog',
+					},
+				}),
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// The app's source is not public, so its builds cannot be reproduced independently.
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The app repositories named in the Zellic audit are not public, and the Family GitHub organization hosts only a wallet-connection library and a forked library.',
+						url: 'https://github.com/family',
+					},
+				}),
 			},
 		},
 		walletCall: null,
