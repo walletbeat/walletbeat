@@ -95,11 +95,12 @@ export const frame: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			// Frame has no built-in swap, bridge or onramp; swaps go through third-party dapps with Frame as an injected wallet, so Frame takes no convenience fees.
+			// Frame has no built-in swap, bridge or onramp; swaps go through external apps with Frame as an injected wallet, so Frame takes no convenience fees.
 			ref: [
 				{
 					explanation:
-						'Frame interacts with dapps as an injected wallet; the swap guide uses a third-party DEX and mentions no Frame fee.',
+						'Frame interacts with apps as an injected wallet; the swap guide uses an external decentralized exchange and mentions no Frame fee.',
+					label: 'Frame documentation',
 					url: 'https://docs.frame.sh/',
 				},
 			],
@@ -255,7 +256,7 @@ export const frame: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'package-lock.json is committed and CI installs with `npm ci` (the setup:ci script).',
+									'package-lock.json is committed and CI installs with `npm ci` (the `setup:ci` script).',
 								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json',
 							},
 						],
