@@ -486,9 +486,12 @@
 						href="#top"
 					>
 						<h1 data-row="gap-2">
+							<!-- Decorative: the name is right next to it in the same heading. -->
 							<img
 								class="wallet-icon"
-								alt={wallet.metadata.displayName}
+								alt=""
+								width="48"
+								height="48"
 								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 							/>
 							<span>{wallet.metadata.displayName}</span>
