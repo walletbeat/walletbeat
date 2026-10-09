@@ -118,7 +118,7 @@
 						{#each statusCards as card (card.id)}
 							{@const hasReferences = card.references.length > 0}
 
-							{#snippet WalletCardHeader()}
+							{#snippet WalletCardHeader(isSummary: boolean)}
 								<span class="wallet-icon" data-icon="shadow">
 									<img
 										src={`/images/wallets/${card.id}.${card.iconExtension}`}
@@ -130,9 +130,14 @@
 
 								<div class="wallet-heading" data-row-item="flexible" data-row="start gap-2">
 									<h4>
-										<a data-link="camouflaged" href={card.url}>
+										<!-- Links can't nest in the summary toggle; the expanded card links to the wallet page. -->
+										{#if isSummary}
 											{card.displayName}
-										</a>
+										{:else}
+											<a data-link="camouflaged" href={card.url}>
+												{card.displayName}
+											</a>
+										{/if}
 									</h4>
 
 									<span
@@ -154,7 +159,7 @@
 
 									<details data-card="radius-4 padding-4 border-accent" data-column="gap-0">
 										<summary data-row="center gap-3">
-											{@render WalletCardHeader()}
+											{@render WalletCardHeader(true)}
 										</summary>
 
 										<div class="wallet-card-content" data-column="gap-3">
@@ -176,7 +181,7 @@
 								{:else}
 									<div class="wallet-card-static" data-card="radius-4 padding-4 border-accent">
 										<div data-row="center gap-3">
-											{@render WalletCardHeader()}
+											{@render WalletCardHeader(false)}
 											<span class="chevron-spacer" aria-hidden="true"></span>
 										</div>
 									</div>
