@@ -59,10 +59,8 @@ const variantSentinelFields: VariantSentinelField[] = [
  * Known incoherent `${walletId}:${fieldName}` pairs, skipped by the coherence
  * check below.
  *
- * `family:integration.browser`: Family is mobile-only but still carries a
- * browser integration record. The fix sits next to lines changed by an open
- * data PR for this wallet (#1373), so it is deferred until that PR merges to
- * avoid a merge conflict.
+ * `family:integration.browser`: Family is mobile-only but carries a browser
+ * integration record.
  *
  * Entries are checked to still be incoherent, so this list cannot go stale.
  */
