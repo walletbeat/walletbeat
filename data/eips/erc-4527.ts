@@ -8,6 +8,7 @@ export const erc4527: Eip = {
 	// The protocol is implemented on both ends: by offline signers (hardware
 	// wallets) and by the watch-only wallets that talk to them.
 	appliesTo: nonEmptySet(Variant.HARDWARE, Variant.MOBILE, Variant.BROWSER, Variant.DESKTOP),
+	finalizedDate: null,
 	icon: 'ICON_QR_CODE',
 	noteMarkdown: `
 		ERC-4527 is marked as Stagnant in the ERC repository, but it is used in
