@@ -48,7 +48,7 @@ export const baseApp: SoftwareWallet = {
 		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],
 			extensions: [],
@@ -418,14 +418,13 @@ export const baseApp: SoftwareWallet = {
 				sendTransactionWarning: notSupported,
 				unlimitedApprovalWarning: null,
 			},
-			// Base App is closed-source; no public URL hosts the AndroidManifest.xml
-			// or Info.plist, so the `pnpm collect:manifests` tool cannot fetch them.
-			// Filling this out requires manually extracting the manifests from the
-			// published APK/IPA. What we know without extraction: for new passkey
-			// accounts (the smart-wallet path), keyStorageMechanism would be
-			// PASSKEY_MANAGED — the WebAuthn passkey lives in the iOS Secure
-			// Enclave or Android Keystore and no private key is stored by the app.
-			securityBestPractices: null,
+			// The mobile app is closed source: "Build cannot be done because the source code is not publicly available."
+			// Source: https://walletscrutiny.com/mobile/org.toshi/
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
