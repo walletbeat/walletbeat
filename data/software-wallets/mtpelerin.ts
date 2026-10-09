@@ -20,8 +20,8 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const mtpelerin: SoftwareWallet = {
@@ -86,13 +86,7 @@ export const mtpelerin: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: [
 				{

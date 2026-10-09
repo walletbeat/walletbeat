@@ -3,9 +3,10 @@
 import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
 import { eips } from '@/data/eips'
-import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedSoftwareWallets } from '@/data/software-wallets'
+import { embeddedWalletAttributeTree, ratedEmbeddedWallets } from '@/data/embedded-wallets'
+import { hardwareWalletAttributeTree, ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
+import type { AttributeTree } from '@/schema/attribute-groups'
 import {
 	EipSupportStatus,
 	ratedWalletEipSupportByStatus,
@@ -13,6 +14,9 @@ import {
 } from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
 import type { RatedWallet } from '@/schema/wallet'
+import { type CodeSnippetIndex } from '@/utils/code-snippet-index'
+import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
+import { sortEipSupportCards } from '@/utils/eip-support-sort'
 import { getWalletUrl } from '@/utils/urls'
 
 // Components
@@ -34,9 +38,15 @@ type Props = { eip: Eip }
 
 const { eip } = Astro.props
 
-/** Precompute the per-status EIP support cards at build time. */
-function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSupportCard[] {
-	return wallets.flatMap(wallet => {
+/**
+ * Precompute the per-status EIP support cards at build time, ordered by
+ * earliest evidence of support and then by the homepage order.
+ */
+function eipStatusSupportCards<_AttributeGroupId extends string>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	wallets: Array<RatedWallet<_AttributeGroupId>>,
+): EipStatusSupportCard[] {
+	const entries = wallets.flatMap(wallet => {
 		const byStatus = ratedWalletEipSupportByStatus(wallet, eip.number)
 
 		return Object.values(EipSupportStatus).flatMap(status => {
@@ -46,22 +56,43 @@ function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSu
 				? []
 				: [
 						{
-							id: wallet.metadata.id,
-							displayName: wallet.metadata.displayName,
-							iconExtension: wallet.metadata.iconExtension,
-							url: getWalletUrl(wallet),
-							status,
-							variants: entry.variants,
-							references: entry.references,
+							wallet,
+							card: {
+								id: wallet.metadata.id,
+								displayName: wallet.metadata.displayName,
+								iconExtension: wallet.metadata.iconExtension,
+								url: getWalletUrl(wallet),
+								status,
+								variants: entry.variants,
+								references: entry.references,
+							},
 						},
 					]
 		})
 	})
+
+	return sortEipSupportCards(attributeTree, entries)
 }
 
-const softwareCards = eipStatusSupportCards(Object.values(ratedSoftwareWallets))
-const hardwareCards = eipStatusSupportCards(Object.values(ratedHardwareWallets))
-const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
+/** The stored code snippets referenced by `cards`. */
+function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
+	return Object.fromEntries(
+		cards.flatMap(card => Object.entries(codeSnippetsForReferences(card.id, card.references))),
+	)
+}
+
+const softwareCards = eipStatusSupportCards(
+	softwareWalletAttributeTree,
+	Object.values(ratedSoftwareWallets),
+)
+const hardwareCards = eipStatusSupportCards(
+	hardwareWalletAttributeTree,
+	Object.values(ratedHardwareWallets),
+)
+const embeddedCards = eipStatusSupportCards(
+	embeddedWalletAttributeTree,
+	Object.values(ratedEmbeddedWallets),
+)
 ---
 
 <Layout
@@ -74,7 +105,7 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start'>
-			<EipDetails eip={eip} />
+			<EipDetails eip={eip} headingLevel={1} />
 		</header>
 
 		{
@@ -82,6 +113,7 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 				<EipStatusSupportCards
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
+					codeSnippets={cardCodeSnippets(softwareCards)}
 					client:visible
 				/>
 			)
@@ -92,6 +124,7 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 				<EipStatusSupportCards
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
+					codeSnippets={cardCodeSnippets(hardwareCards)}
 					client:visible
 				/>
 			)
@@ -102,6 +135,7 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 				<EipStatusSupportCards
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
+					codeSnippets={cardCodeSnippets(embeddedCards)}
 					client:visible
 				/>
 			)
@@ -120,6 +154,20 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 		</footer>
 	</main>
 </Layout>
+
+<script>
+	import { eipFinalForLabel } from '@/schema/eips'
+	import { assertCalendarDate, daysSince } from '@/types/date'
+
+	// Recompute "Final for N days" in the browser, so it is current between builds.
+	for (const element of document.querySelectorAll<HTMLElement>('[data-final-since]')) {
+		const finalizedDate = element.dataset.finalSince
+
+		if (finalizedDate !== undefined) {
+			element.textContent = eipFinalForLabel(daysSince(assertCalendarDate(finalizedDate)))
+		}
+	}
+</script>
 
 <style>
 	main {

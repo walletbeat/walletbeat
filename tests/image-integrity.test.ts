@@ -20,6 +20,13 @@ import {
 } from '@/tools/image-integrity/image-integrity-lib'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
 import {
+	hasSamePixels,
+	isWorthRecompressing,
+	parsePngChunks,
+	readPngHeader,
+	recompressPng,
+} from '@/tools/image-integrity/png-optimizer-lib'
+import {
 	CodebaseEntryType,
 	crawlCodebase,
 	getRepositoryRoot,
@@ -249,6 +256,35 @@ const SVG_OPTIMIZED_TEST: ImageTest = {
 			return {
 				pass: false,
 				detail: `${originalSize} -> ${optimizedSize} bytes (${originalSize - optimizedSize} can be saved)`,
+			}
+		}
+
+		return { pass: true }
+	},
+}
+
+/**
+ * Detect PNGs that a lossless re-encode can make noticeably smaller (see
+ * `isWorthRecompressing` for the thresholds).
+ *
+ * The re-encode (see `recompressPng`) keeps every pixel value, the bit depth,
+ * and the chunks that affect rendering such as ICC profiles; it only changes
+ * how the pixel data is compressed. Fix failing files in place with
+ * `pnpm tsx src/tools/image-integrity/png-optimizer.ts <file.png>...`.
+ */
+const PNG_OPTIMIZED_TEST: ImageTest = {
+	name: 'png-optimized',
+	requiresInkscape: false,
+	appliesTo: entry =>
+		extensionOf(entry.filePath) === '.png' && detectImageFormat(entry.raw) === 'png',
+	run: async entry => {
+		const originalSize = entry.raw.length
+		const optimizedSize = (await recompressPng(entry.raw)).length
+
+		if (isWorthRecompressing(originalSize, optimizedSize)) {
+			return {
+				pass: false,
+				detail: `${originalSize} -> ${optimizedSize} bytes (${originalSize - optimizedSize} can be saved losslessly)`,
 			}
 		}
 
@@ -578,6 +614,7 @@ const FILE_FORMAT_TEST: ImageTest = {
 const IMAGE_TESTS: ImageTest[] = [
 	BLOCKINESS_TEST,
 	FILE_FORMAT_TEST,
+	PNG_OPTIMIZED_TEST,
 	SVG_OPTIMIZED_TEST,
 	SVG_VECTOR_TEST,
 	WBICON_SQUARE_TEST,
@@ -798,6 +835,85 @@ describe('image integrity', () => {
 		})
 	})
 
+	describe('PNG recompression', () => {
+		it('shrinks a poorly compressed PNG without changing its pixels', async () => {
+			const raw = makePhotoLikeRaw(256, 256, 3, 7)
+			const original = await sharp(raw, { raw: { width: 256, height: 256, channels: 3 } })
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(recompressed.length).toBeLessThan(original.length)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps 16-bit samples', async () => {
+			const raw = Buffer.alloc(64 * 64 * 3 * 2)
+
+			for (let i = 0; i < raw.length; i += 2) {
+				raw.writeUInt16LE((i * 257) % 65536, i)
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 3 } })
+				.toColourspace('rgb16')
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(original)).bitDepth).toBe(16)
+			expect(readPngHeader(parsePngChunks(recompressed)).bitDepth).toBe(16)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps the ICC profile', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 3, 11)
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 3 } })
+				.withIccProfile('p3')
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+			const iccChunk = (png: Buffer): Buffer | undefined =>
+				parsePngChunks(png).find(chunk => chunk.type === 'iCCP')?.bytes
+
+			expect(iccChunk(original)).toBeDefined()
+			expect(iccChunk(recompressed)).toEqual(iccChunk(original))
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('drops a fully opaque alpha channel', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 4, 13)
+
+			for (let i = 3; i < raw.length; i += 4) {
+				raw[i] = 255
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 4 } })
+				.png()
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(original)).colorType).toBe(6)
+			expect(readPngHeader(parsePngChunks(recompressed)).colorType).toBe(2)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps a partially transparent alpha channel', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 4, 17)
+
+			for (let i = 3; i < raw.length; i += 4) {
+				raw[i] = (i >> 2) % 256
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 4 } })
+				.png()
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(recompressed)).colorType).toBe(6)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+	})
+
 	describe('repository images', async () => {
 		const isCi = env.WALLETBEAT_ENV === 'CI'
 
@@ -967,7 +1083,8 @@ describe('image integrity', () => {
 							return `  ${f.filePath}\n    test: ${f.test}${score}${detail}`
 						})
 						.join('\n\n') +
-					'\n\nFix these images (re-encode at higher quality or optimize the SVG).\n'
+					'\n\nFix these images (re-encode at higher quality, optimize the SVG, or run\n' +
+					'`pnpm tsx src/tools/image-integrity/png-optimizer.ts <file.png>` for PNGs).\n'
 
 				console.error(message)
 				expect(
