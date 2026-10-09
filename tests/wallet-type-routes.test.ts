@@ -31,7 +31,6 @@ describe('wallet type routes', () => {
 		})
 	}
 
-	// Old URLs must keep working after #146 renamed them.
 	describe.each([
 		['hww', WalletType.HARDWARE],
 		['embedded', WalletType.EMBEDDED],

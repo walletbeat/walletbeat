@@ -23,8 +23,8 @@ export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
 	site: process.env.SITE_URL ?? 'https://wallet.page', // Set your production site URL here
 	output: 'static',
-	// Wallet type pages moved from `/hww/` and `/embedded/`. Static output turns
-	// these into meta-refresh pages, so old links and indexed URLs keep working.
+	// Legacy `/hww/` and `/embedded/` wallet type URLs; static output turns these
+	// into meta-refresh pages.
 	redirects: {
 		'/hww/summary': '/hardware-wallets/summary',
 		'/hww/[attrGroupId]': '/hardware-wallets/[attrGroupId]',
