@@ -83,7 +83,7 @@ export const imkeyWallet: HardwareWallet = {
 					},
 					{
 						explanation:
-							'BIP-44 derivation paths are supported, including custom account, change and index values.',
+							'BIP-44 derivation paths are supported, including custom account, change, and index values.',
 						url: 'https://support.imkey.im/hc/en-001/articles/36697124453657',
 					},
 				],
@@ -198,7 +198,7 @@ export const imkeyWallet: HardwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Reward tiers: Critical $5,000-10,000, High $1,000-5,000, Medium $500-1,000, Low $10-500.',
+								'Reward tiers: Critical $5,000–10,000, High $1,000–5,000, Medium $500–1,000, Low $10–500.',
 							url: 'https://support.imkey.im/hc/en-001/articles/52956224536345',
 						},
 					],
@@ -340,7 +340,7 @@ export const imkeyWallet: HardwareWallet = {
 				reproducibleBuilds: null,
 			},
 			reputation: {
-				// Co-developed with a third-party security firm, which "provides architecture design, hardware customization, and secure code reviews"; third-party secure element.
+				// Co-developed with an independent security firm, which "provides architecture design, hardware customization, and secure code reviews"; secure element from an external vendor.
 				// Source: https://support.imkey.im/hc/en-001/articles/52780277095577
 				// Company founded 2018; imKey Pro released 2020; the latest firmware (COS v1.9.05) is from August 2024.
 				// Source: https://support.imkey.im/hc/en-001/articles/52925909789337
@@ -352,7 +352,7 @@ export const imkeyWallet: HardwareWallet = {
 				availability: ReputationType.PARTIAL,
 				bugBounty: ReputationType.PARTIAL,
 				details:
-					'Co-developed with a third-party security firm; no firmware release since August 2024; no vulnerability disclosures or advisories; bug bounty with published rewards but no safe harbor.',
+					'Co-developed with an independent security firm; no firmware release since August 2024; no vulnerability disclosures or advisories; bug bounty with published rewards but no safe harbor.',
 				disclosureHistory: ReputationType.PARTIAL,
 				originalProduct: ReputationType.PARTIAL,
 				url: 'https://support.imkey.im/hc/en-001/articles/52780277095577',
