@@ -45,7 +45,7 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container data-scroll-item='inline-attached'>
 		<SoftwareWalletTable client:load title='Software Wallets' />
 	</main>
 </Layout>
