@@ -26,10 +26,9 @@ export interface ResolvedCodeSnippet {
  * The filename fully encodes org, repo, commit, path, and line range, so the
  * same URL always maps to identical content no matter which wallet stored it.
  *
- * Pages build the subset they render with `codeSnippetsReferencedBy`
- * (code-snippet-store.ts, build time only) and hand it to their island, which
- * provides it to `ReferenceLinks` via `setCodeSnippetContext`. This keeps
- * every other wallet's snippets out of the client bundle.
+ * Pages build the subset they render with code-snippet-store.ts (build time
+ * only) and hand it to their island, which provides it to `ReferenceLinks`
+ * via `setCodeSnippetContext`.
  */
 export type CodeSnippetIndex = Record<string, SnippetRow[]>
 

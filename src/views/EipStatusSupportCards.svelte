@@ -53,8 +53,7 @@
 	}: {
 		title?: string
 		cards: EipStatusSupportCard[]
-		// Only the stored code snippets these cards reference, resolved at
-		// build time (see `codeSnippetsReferencedBy`).
+		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
 	} = $props()
 

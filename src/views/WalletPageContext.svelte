@@ -16,8 +16,7 @@
 		hardwareModels: HardwareModelSummary[],
 		showStage?: boolean,
 		showScores?: boolean,
-		// Only the stored code snippets this wallet's page references, resolved
-		// at build time (see `codeSnippetsReferencedBy`).
+		// The stored code snippets this wallet's data references (see `codeSnippetsForWallet`).
 		codeSnippets?: CodeSnippetIndex,
 	} = $props()
 
