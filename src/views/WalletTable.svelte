@@ -430,6 +430,19 @@
 		expandedRowIds.has(walletId)
 	)
 
+	// Clicking a petal selects its attribute in every row and opens the clicked row's details.
+	// Clicking it again in the open row deselects it and closes the row.
+	const toggleRowPetal = (walletId: string, attributeId: string) => {
+		if (selectedAttribute === attributeId && isRowExpanded(walletId)) {
+			selectedAttribute = undefined
+			expandedRowIds.delete(walletId)
+			return
+		}
+
+		selectedAttribute = attributeId
+		expandedRowIds.add(walletId)
+	}
+
 
 	// Components
 	import FactoryIcon from '@material-icons/svg/svg/factory/baseline.svg?raw'
@@ -489,6 +502,17 @@
 	}
 </script>
 
+
+{#snippet PetalDetailsLink(wallet: RatedWallet<_AttributeGroupId>, entityId: string, entityName: string)}
+	<a
+		href={getWalletUrl(wallet, {
+			variant: selectedVariant,
+			attributeAnchor: slugifyCamelCase(entityId),
+		})}
+	>
+		See {wallet.metadata.displayName}'s {entityName} details →
+	</a>
+{/snippet}
 
 <section
 	data-sticky-container
@@ -1310,7 +1334,11 @@
 								onSliceClick={sliceId => {
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
-									selectedAttribute = attributeId && selectedAttribute === attributeId ? undefined : attributeId
+									if (attributeId) {
+										toggleRowPetal(wallet.metadata.id, attributeId)
+									} else {
+										selectedAttribute = undefined
+									}
 								}}
 								onSliceMouseEnter={sliceId => {
 									const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
@@ -1398,6 +1426,10 @@
 										summaryType={WalletAttributeSummaryType.Rating}
 										{isInTooltip}
 									/>
+
+									{#if !isInTooltip}
+										{@render PetalDetailsLink(wallet, displayedAttribute.attribute.id, displayedAttribute.attribute.displayName)}
+									{/if}
 								{:else if displayedGroup}
 									<WalletAttributeGroupSummary
 										{wallet}
@@ -1405,6 +1437,10 @@
 										summaryType={WalletAttributeGroupSummaryType.None}
 										{isInTooltip}
 									/>
+
+									{#if !isInTooltip}
+										{@render PetalDetailsLink(wallet, displayedGroup.id, displayedGroup.displayName)}
+									{/if}
 								{:else if isInTooltip}
 									<WalletOverallSummary
 										{wallet}
@@ -1532,7 +1568,7 @@
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
 									if (attributeId) {
-										selectedAttribute = selectedAttribute === attributeId ? undefined : attributeId
+										toggleRowPetal(wallet.metadata.id, attributeId)
 									}
 								}}
 								onSliceMouseEnter={sliceId => {
@@ -1611,6 +1647,10 @@
 										summaryType={WalletAttributeSummaryType.Rating}
 										{isInTooltip}
 									/>
+
+									{#if !isInTooltip}
+										{@render PetalDetailsLink(wallet, displayedAttribute.attribute.id, displayedAttribute.attribute.displayName)}
+									{/if}
 								{:else}
 									<WalletAttributeGroupSummary
 										{wallet}
@@ -1871,14 +1911,11 @@
 							{/if}
 
 							<div class="mobile-petal-drawer-actions" data-row="gap-4">
-								<a
-									href={getWalletUrl(wallet, {
-										variant: selectedVariant,
-										attributeAnchor: slugifyCamelCase(petal.attributeId ?? petal.attributeGroupId),
-									})}
-								>
-									See {wallet.metadata.displayName}'s {petalAttribute?.attribute.displayName ?? petalGroup.displayName} details →
-								</a>
+								{@render PetalDetailsLink(
+									wallet,
+									petal.attributeId ?? petal.attributeGroupId,
+									petalAttribute?.attribute.displayName ?? petalGroup.displayName,
+								)}
 
 								<button
 									type="button"

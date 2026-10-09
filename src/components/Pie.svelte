@@ -202,6 +202,11 @@
 		onblur={() => { onSliceBlur?.(slice.id) }}
 		onclick={(event: MouseEvent) => {
 			event.stopPropagation()
+
+			// Behave like a button inside a `<summary>`: a click selects the slice without toggling the `<details>`.
+			if (!slice.href)
+				event.preventDefault()
+
 			onSliceClick?.(slice.id)
 		}}
 		onkeydown={(event: KeyboardEvent) => {
