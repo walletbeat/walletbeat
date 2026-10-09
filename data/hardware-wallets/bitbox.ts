@@ -276,22 +276,6 @@ export const bitboxWallet: HardwareWallet = {
 					collected: [],
 				},
 			},
-			// The BitBox02 connects over USB-C only. The BitBox02 Nova adds Bluetooth Low Energy with LE Secure
-			// Connections and authenticated pairing; Bluetooth can be disabled from a USB host. On both, the app
-			// and device encrypt and authenticate traffic with the Noise protocol and a pairing code confirmed on
-			// both screens.
-			// Source: https://bitbox.swiss/bitbox02/threat-model/
-			// Source: https://blog.bitbox.swiss/en/whisper-how-the-secure-bluetooth-integration-of-the-bitbox02-nova-works/
-			// Source: https://support.bitbox.swiss/en_US/nova/enable-or-disable-bluetooth-bitbox02-nova-desktop
-			// The device has no network access of its own. Unless a custom backend is configured, the BitBoxApp
-			// uses Shift Crypto servers, checks for updates and fetches exchange rates from them, and retrieves
-			// Ethereum data through an Etherscan proxy hosted by Shift Crypto. A custom node is only available for
-			// Bitcoin; a Tor proxy covers all backend traffic on desktop.
-			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing
-			// Source: https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/042faba65b813deacba7df9591e06444f1ea7636/backend/coins/eth/etherscan/etherscan.go
-			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-tor-setup
-			// The BitBoxApp source is public under the Apache License 2.0.
-			// Source: https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/042faba65b813deacba7df9591e06444f1ea7636/LICENSE
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PARTIAL,
 				details:
@@ -462,17 +446,6 @@ export const bitboxWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			// BitBox lists Rabby, MEW and NuFi as compatible wallets for Ethereum. MetaMask does not support the
-			// BitBox02.
-			// Source: https://support.bitbox.swiss/en_US/bitbox02-supported-third-party-wallets-compatibility
-			// Rabby and MEW pair with the device directly, but BitBox guides ask users to set up the wallet and
-			// update firmware in the BitBoxApp.
-			// Source: https://support.bitbox.swiss/en_US/why-pairing-bitbox02-with-bitboxapp-is-essential
-			// Source: https://support.bitbox.swiss/en_US/myetherwallet-bitbox02-connect
-			// Source: https://support.bitbox.swiss/en_US/update-bitbox02-firmware
-			// Unless a custom backend is configured, the BitBoxApp connects to backend infrastructure operated by
-			// Shift Crypto.
-			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing
 			interoperability: {
 				type: InteroperabilityType.PARTIAL,
 				details:
