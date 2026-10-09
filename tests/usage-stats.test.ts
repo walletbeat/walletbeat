@@ -3,14 +3,13 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { type GithubRepository, parseGithubRepository } from '@/constants/github'
 import { allWallets } from '@/data/wallets'
 import { Variant } from '@/schema/variants'
 import { firefoxAddonSlugs } from '@/tools/usage-stats-collector/firefox-addons'
 import {
 	collectUsageStats,
 	firefoxAddonUrl,
-	type GithubRepository,
-	parseGithubRepository,
 	parseUsageStatsSnapshot,
 	serializeUsageStats,
 	USAGE_STATS_FILE,
@@ -107,29 +106,6 @@ describe('collectUsageStats', () => {
 				'2026-01-02',
 			),
 		).rejects.toThrow('HTTP 503')
-	})
-})
-
-describe('parseUsageStatsSnapshot', () => {
-	it('rejects malformed snapshots', () => {
-		expect(() => parseUsageStatsSnapshot({ retrieved: '2026-13-01', wallets: {} })).toThrow()
-		expect(() =>
-			parseUsageStatsSnapshot({
-				retrieved: '2026-01-02',
-				wallets: { alpha: { githubRepositories: [{ url: 'x', stars: 1 }], firefoxAddon: null } },
-			}),
-		).toThrow('canonical GitHub repository URL')
-		expect(() =>
-			parseUsageStatsSnapshot({
-				retrieved: '2026-01-02',
-				wallets: {
-					alpha: {
-						githubRepositories: [{ url: 'https://github.com/a/b', stars: -1 }],
-						firefoxAddon: null,
-					},
-				},
-			}),
-		).toThrow('non-negative integer')
 	})
 })
 

@@ -1,3 +1,10 @@
+import Ajv2020 from 'ajv/dist/2020'
+
+import {
+	type GithubRepository,
+	githubRepositoryUrl,
+	parseGithubRepository,
+} from '@/constants/github'
 import { assertCalendarDate, type CalendarDate } from '@/types/date'
 
 /** Path of the committed snapshot, relative to the repository root. */
@@ -59,35 +66,6 @@ export interface WalletUsageSources {
 export interface UsageStatsFetchers {
 	githubStars: (repository: GithubRepository) => Promise<number>
 	firefoxAverageDailyUsers: (slug: string) => Promise<number>
-}
-
-/** A GitHub repository identified by its owner and name. */
-export interface GithubRepository {
-	owner: string
-	repo: string
-}
-
-const GITHUB_REPOSITORY_URL =
-	/^https:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+?)(?:\.git)?\/?$/
-
-/**
- * Parse a `https://github.com/<owner>/<repo>` URL. Returns null for anything
- * else, including organization-only URLs such as `https://github.com/<owner>`,
- * which have no star count.
- */
-export function parseGithubRepository(url: string): GithubRepository | null {
-	const match = GITHUB_REPOSITORY_URL.exec(url)
-
-	if (match === null) {
-		return null
-	}
-
-	return { owner: match[1], repo: match[2] }
-}
-
-/** Canonical URL of a GitHub repository. */
-export function githubRepositoryUrl({ owner, repo }: GithubRepository): string {
-	return `https://github.com/${owner}/${repo}`
 }
 
 const FIREFOX_ADDON_SLUG = /^[A-Za-z0-9_-]+$/
@@ -224,107 +202,70 @@ export function utcToday(): CalendarDate {
 	return assertCalendarDate(new Date().toISOString().slice(0, 'YYYY-MM-DD'.length))
 }
 
-/** Throw unless `value` is a non-negative integer. */
-function assertCount(value: unknown, where: string): number {
-	if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
-		throw new Error(`${where} must be a non-negative integer`)
-	}
+/** `UsageStatsSnapshot` as stored in JSON, before its date is checked. */
+type UsageStatsSnapshotJson = Omit<UsageStatsSnapshot, 'retrieved'> & { retrieved: string }
 
-	return value
+const usageStatsSnapshotSchema = {
+	type: 'object',
+	properties: {
+		retrieved: { type: 'string' },
+		wallets: {
+			type: 'object',
+			required: [],
+			additionalProperties: {
+				type: 'object',
+				properties: {
+					githubRepositories: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								url: { type: 'string' },
+								stars: { type: 'integer', minimum: 0 },
+							},
+							required: ['url', 'stars'],
+							additionalProperties: false,
+						},
+					},
+					firefoxAddon: {
+						type: ['object', 'null'],
+						properties: {
+							url: { type: 'string' },
+							averageDailyUsers: { type: 'integer', minimum: 0 },
+						},
+						required: ['url', 'averageDailyUsers'],
+						additionalProperties: false,
+					},
+				},
+				required: ['githubRepositories', 'firefoxAddon'],
+				additionalProperties: false,
+			},
+		},
+	},
+	required: ['retrieved', 'wallets'],
+	additionalProperties: false,
 }
 
-/** Throw unless `value` is a plain object. */
-function assertObject(value: unknown, where: string): object {
-	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-		throw new Error(`${where} must be an object`)
-	}
+const ajv = new Ajv2020({ allErrors: true })
+const isUsageStatsSnapshotJson = ajv.compile<UsageStatsSnapshotJson>(usageStatsSnapshotSchema)
 
-	return value
-}
-
-/** Throw unless `value` is a string. */
-function assertString(value: unknown, where: string): string {
-	if (typeof value !== 'string') {
-		throw new Error(`${where} must be a string`)
-	}
-
-	return value
-}
-
-/** Throw unless `value` has exactly the given keys. */
-function assertKeys(value: object, keys: string[], where: string): void {
-	const actual = Object.keys(value).toSorted()
-	const expected = keys.toSorted()
-
-	if (actual.join(',') !== expected.join(',')) {
-		throw new Error(`${where} must have exactly the keys ${expected.join(', ')}`)
-	}
-}
-
-/**
- * Validate parsed snapshot JSON, returning it typed. Throws with the path of
- * the first invalid field.
- */
+/** Validate parsed snapshot JSON, returning it typed. Throws listing the invalid fields. */
 export function parseUsageStatsSnapshot(json: unknown): UsageStatsSnapshot {
-	const root = assertObject(json, 'snapshot')
+	if (!isUsageStatsSnapshotJson(json)) {
+		throw new Error(
+			`Invalid usage statistics snapshot: ${ajv.errorsText(isUsageStatsSnapshotJson.errors)}`,
+		)
+	}
 
-	assertKeys(root, ['retrieved', 'wallets'], 'snapshot')
-
-	const retrieved = assertCalendarDate(assertString(Reflect.get(root, 'retrieved'), 'retrieved'))
-	const walletsJson = assertObject(Reflect.get(root, 'wallets'), 'wallets')
-	const wallets: Record<string, WalletUsageStats> = {}
-
-	for (const [id, statsJson] of Object.entries(walletsJson)) {
-		const where = `wallets.${id}`
-		const stats = assertObject(statsJson, where)
-
-		assertKeys(stats, ['githubRepositories', 'firefoxAddon'], where)
-
-		const repositoriesJson: unknown = Reflect.get(stats, 'githubRepositories')
-
-		if (!Array.isArray(repositoriesJson)) {
-			throw new Error(`${where}.githubRepositories must be an array`)
-		}
-
-		const githubRepositories = repositoriesJson.map((repositoryJson: unknown, index) => {
-			const repositoryWhere = `${where}.githubRepositories[${index}]`
-			const repository = assertObject(repositoryJson, repositoryWhere)
-
-			assertKeys(repository, ['url', 'stars'], repositoryWhere)
-
-			const url = assertString(Reflect.get(repository, 'url'), `${repositoryWhere}.url`)
+	for (const [id, { githubRepositories }] of Object.entries(json.wallets)) {
+		for (const { url } of githubRepositories) {
 			const parsed = parseGithubRepository(url)
 
 			if (parsed === null || githubRepositoryUrl(parsed) !== url) {
-				throw new Error(`${repositoryWhere}.url must be a canonical GitHub repository URL`)
-			}
-
-			return {
-				url,
-				stars: assertCount(Reflect.get(repository, 'stars'), `${repositoryWhere}.stars`),
-			}
-		})
-
-		const addonJson: unknown = Reflect.get(stats, 'firefoxAddon')
-		let firefoxAddon: FirefoxAddonStats | null = null
-
-		if (addonJson !== null) {
-			const addonWhere = `${where}.firefoxAddon`
-			const addon = assertObject(addonJson, addonWhere)
-
-			assertKeys(addon, ['url', 'averageDailyUsers'], addonWhere)
-
-			firefoxAddon = {
-				url: assertString(Reflect.get(addon, 'url'), `${addonWhere}.url`),
-				averageDailyUsers: assertCount(
-					Reflect.get(addon, 'averageDailyUsers'),
-					`${addonWhere}.averageDailyUsers`,
-				),
+				throw new Error(`wallets.${id}: ${url} is not a canonical GitHub repository URL`)
 			}
 		}
-
-		wallets[id] = { githubRepositories, firefoxAddon }
 	}
 
-	return { retrieved, wallets }
+	return { ...json, retrieved: assertCalendarDate(json.retrieved) }
 }

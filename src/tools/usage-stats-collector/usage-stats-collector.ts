@@ -1,6 +1,8 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
+import { cac } from 'cac'
+
 import { allWallets } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
 import { getErrorMessage } from '@/types/errors'
@@ -16,30 +18,29 @@ import {
 	type WalletUsageSources,
 } from './usage-stats-collector-lib'
 
-function usage(): never {
-	process.stderr.write(`
-Usage: pnpm collect:usage-stats [--dry-run]
+const cli = cac('collect:usage-stats')
 
-Fetches wallet usage statistics and writes a dated snapshot to
-${USAGE_STATS_FILE}:
+cli.usage(
+	`[--dry-run]
+
+Fetches wallet usage statistics and writes a dated snapshot to ${USAGE_STATS_FILE}:
   - GitHub stars, for each github.com/<owner>/<repo> URL in a wallet's
     \`urls.repositories\` metadata (GitHub REST API);
   - Firefox add-on users, for wallets listed in
     src/tools/usage-stats-collector/firefox-addons.ts (addons.mozilla.org API).
 
-Set GITHUB_TOKEN to raise the GitHub API rate limit.
+Set GITHUB_TOKEN to raise the GitHub API rate limit.`,
+)
+cli.option('--dry-run', 'Print the snapshot instead of writing it')
+cli.help()
 
-Options:
-  --dry-run   Print the snapshot instead of writing it.
-`)
-	process.exit(1)
+const { options } = cli.parse()
+
+if (options.help === true) {
+	process.exit(0)
 }
 
-const args = process.argv.slice(2)
-
-if (args.includes('--help') || args.some(arg => arg !== '--dry-run')) {
-	usage()
-}
+const dryRun = options.dryRun === true
 
 const wallets: WalletUsageSources[] = Object.values(allWallets).map(wallet => ({
 	id: wallet.metadata.id,
@@ -65,7 +66,7 @@ try {
 
 	const serialized = serializeUsageStats(snapshot)
 
-	if (args.includes('--dry-run')) {
+	if (dryRun) {
 		process.stdout.write(serialized)
 	} else {
 		fs.writeFileSync(path.join(getRepositoryRoot(), USAGE_STATS_FILE), serialized)
