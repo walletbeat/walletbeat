@@ -5,9 +5,6 @@
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 	import WalletPage from './WalletPage.svelte'
 
-	// The page passes this wallet's unrated data and the hardware model list
-	// as props, and the wallet is rated here. Importing them from `@/data`
-	// instead would ship every wallet's data to every wallet page.
 	const {
 		walletOfType,
 		hardwareModels,

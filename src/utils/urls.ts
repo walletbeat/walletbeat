@@ -6,8 +6,7 @@ import type { Variant } from '@/schema/variants'
  * query parameter and/or an anchor.
  *
  * @param wallet - Any object that carries `metadata.id` (e.g. `RatedWallet`,
- *   `BaseWallet`). This module deliberately does not import the wallet list,
- *   so that wallet pages can use it without loading every wallet's data.
+ *   `BaseWallet`).
  * @param options.variant - When set, appends `?variant=<variant>` to the URL.
  * @param options.attributeAnchor - When set, appends `#<anchor>` to the URL.
  *   Pass a pre-formatted slug (e.g. the result of `slugifyCamelCase(id)`).

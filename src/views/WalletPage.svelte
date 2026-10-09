@@ -67,7 +67,6 @@
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
 		wallet: RatedWallet<_AttributeGroupId>
-		// Passed in rather than imported, so the page doesn't load every hardware wallet's data.
 		allHardwareModels: HardwareModelSummary[]
 		showStage?: boolean,
 		showScores?: boolean,
