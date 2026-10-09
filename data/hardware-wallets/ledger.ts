@@ -10,6 +10,7 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -18,6 +19,11 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -29,6 +35,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -76,7 +83,7 @@ export const ledgerWalletMetadata: WalletMetadata = {
 		},
 	],
 	iconExtension: 'svg',
-	lastUpdated: '2026-10-08',
+	lastUpdated: '2026-10-09',
 	urls: {
 		docs: ['https://developers.ledger.com/'],
 		repositories: ['https://github.com/LedgerHQ/'],
@@ -186,14 +193,57 @@ export const ledgerWallet: HardwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Ledger Wallet lets users add multiple accounts for each asset, and independent wallets such as MetaMask can import several Ledger accounts.',
+					urls: [
+						{
+							label: 'Add accounts in Ledger Wallet',
+							url: 'https://support.ledger.com/article/360011454079-zd',
+						},
+						{
+							label: 'Connect Ledger to MetaMask',
+							url: 'https://support.ledger.com/article/4404366864657-zd',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
 				usage: null,
 			},
 			dataCollection: null,
-			hardwarePrivacy: null,
+			// Ledger Stax connects over USB-C, Bluetooth LE and NFC. Bluetooth pairing uses an ECDH key exchange
+			// with numeric comparison and AES-based encryption; only public data such as addresses crosses the
+			// link. NFC is disabled by default and is used for Ledger Recovery Key and Security Key.
+			// Source: https://shop.ledger.com/products/ledger-stax
+			// Source: https://support.ledger.com/article/360019138694-zd
+			// Source: https://support.ledger.com/article/18934878523037-zd
+			// Source: https://www.ledger.com/ledger-nano-x-Bluetooth-security-model-of-a-wireless-hardware-wallet
+			// The device has no network access of its own. Ledger Wallet runs a genuine check against Ledger's
+			// HSM on every My Ledger connection, installs apps and firmware through Ledger's servers, and sends
+			// account addresses to Ledger's explorers; the privacy policy keeps those addresses for market
+			// analyses. Ledger documents no own-node option for Ethereum.
+			// Source: https://support.ledger.com/article/4404389367057-zd
+			// Source: https://developers.ledger.com/docs/device-interaction/references/device-management-kit/secure-channel
+			// Source: https://shop.ledger.com/pages/privacy-policy-what-ledger-wallet
+			// Ledger Wallet's source is public under the MIT license, and the repository lists every external
+			// service it contacts.
+			// Source: https://github.com/LedgerHQ/ledger-live/blob/23e5f1e6a56971ae50e9d702a9c43319a0819b86/LICENSE.txt
+			// Source: https://github.com/LedgerHQ/ledger-live/blob/23e5f1e6a56971ae50e9d702a9c43319a0819b86/docs/services.md
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PARTIAL,
+				details:
+					'Bluetooth pairing is encrypted and authenticated with numeric comparison. Ledger Wallet, whose source and service list are public, checks the device against Ledger servers, installs apps through them and sends addresses to Ledger explorers, with no documented alternative for Ethereum.',
+				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				phoningHome: HardwarePrivacyType.FAIL,
+				url: 'https://shop.ledger.com/pages/privacy-policy-what-ledger-wallet',
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://ledger.com/privacy-policy',
 			transactionPrivacy: {
 				// Ledger Wallet has no private transfer feature. RAILGUN's ledger-client SDK is a pre-1.0
@@ -241,7 +291,49 @@ export const ledgerWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								'Setting up the device includes choosing a PIN of 4 to 8 digits, including when the device is set up without Ledger Wallet. Three wrong PIN entries wipe the device.',
+							urls: [
+								{
+									label: 'Set up a touchscreen Ledger',
+									url: 'https://support.ledger.com/article/8166861096349-zd',
+								},
+								{
+									label: 'Set up Ledger Nano S Plus',
+									url: 'https://support.ledger.com/article/4416927988625-zd',
+								},
+							],
+						},
+					],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
+					},
+				},
+				duressMode: supported({
+					ref: [
+						{
+							explanation:
+								'A passphrase can be attached to a second PIN that unlocks the passphrase-protected accounts. Ledger describes this as plausible deniability: under duress, the user can give up the main PIN and keep the second PIN hidden.',
+							url: 'https://support.ledger.com/article/115005214529-zd',
+						},
+					],
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.SELF_DESTRUCT]: false,
+						[DuressAction.ONCHAIN_LOCKDOWN]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
+				}),
+			},
 			firmware: {
 				// Updates are signed by Ledger's HSM and installed over a secure channel; the independent OS review
 				// found "Critical features require user consent ... Upgrading the firmware."
@@ -372,7 +464,23 @@ export const ledgerWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			// Ledger lists MetaMask and Rabby among the wallets that support Ethereum on Ledger devices; Rainbow
+			// and Ambire also document Ledger support.
+			// Source: https://support.ledger.com/article/360026472413-zd
+			// Source: https://rainbow.me/en/support/extension/connect-your-hardware-wallet
+			// Source: https://help.ambire.com/en/articles/13714236-using-ambire-extension-with-hardware-wallets
+			// Installing the Ethereum app, updating the firmware and the genuine check all go through Ledger
+			// Wallet and a secure channel with a Ledger backend service.
+			// Source: https://developers.ledger.com/docs/device-interaction/references/device-management-kit/secure-channel
+			// Source: https://support.ledger.com/article/4404382258961-zd
+			interoperability: {
+				type: InteroperabilityType.PARTIAL,
+				details:
+					'Works with many independent wallets, but installing the Ethereum app and updating the firmware require Ledger Wallet and Ledger servers.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.FAIL,
+				url: 'https://support.ledger.com/article/360026472413-zd',
+			},
 		},
 		transparency: {
 			maintenance: {
