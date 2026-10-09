@@ -91,10 +91,8 @@
 	)
 
 	/*
-	 * Groups are native <details>, so a click before hydration toggles them.
-	 * Hydrating the `open` bindings below would then write back the
-	 * server-rendered state, undoing that click (the nav is visible for a few
-	 * hundred ms before it hydrates). Adopt any such toggles first.
+	 * Copies the open state of groups (native <details>) toggled before
+	 * hydration, so the `open` bindings below keep it.
 	 */
 	const adoptPreHydrationToggles = () => {
 		const root = globalThis.document?.querySelector(`[data-navigation-instance="${instanceId}"]`)
