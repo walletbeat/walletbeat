@@ -353,9 +353,13 @@ export const safe: SoftwareWallet = {
 						publication: 'SIGSTORE_REKOR',
 						signer: 'BUILD_INFRA_IDENTITY',
 					}),
-					// Safe{Mobile} is built on the Expo EAS cloud service and signed for the app stores; no signatures or attestations are published.
-					// Source: https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/apps/mobile/eas.json
-					[Variant.MOBILE]: notSupported,
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Safe{Mobile} is built on the Expo EAS cloud service and signed for the app stores; no signatures or attestations are published.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/apps/mobile/eas.json',
+						},
+					}),
 				},
 				dependencyLocking: supported({
 					ref: [
@@ -366,9 +370,13 @@ export const safe: SoftwareWallet = {
 						},
 					],
 				}),
-				// No runtime dependency isolation such as LavaMoat. `.yarnrc.yml` sets `enableScripts: false`, which blocks install scripts but does not sandbox dependencies at runtime.
-				// Source: https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.yarnrc.yml
-				dependencySandboxing: notSupported,
+				dependencySandboxing: notSupportedWithRef({
+					ref: {
+						explanation:
+							'No runtime dependency isolation such as LavaMoat. `.yarnrc.yml` sets `enableScripts: false`, which blocks install scripts but does not sandbox dependencies at runtime.',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.yarnrc.yml',
+					},
+				}),
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
@@ -416,9 +424,13 @@ export const safe: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				// No reproducible build process is documented, and WalletScrutiny has no entry for Safe{Wallet}.
-				// Source: https://github.com/safe-global/safe-wallet-monorepo
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'No reproducible build process is documented, and WalletScrutiny has no entry for Safe{Wallet}.',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo',
+					},
+				}),
 			},
 		},
 		walletCall: supported({
