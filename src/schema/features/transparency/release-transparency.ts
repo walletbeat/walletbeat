@@ -49,6 +49,25 @@ export type ArtifactSigningDetails = WithRef<ArtifactSigningPayload>
 export type ArtifactSigning = Support<ArtifactSigningDetails>
 
 /**
+ * Whether routine dependency updates only pick up dependency releases that
+ * are at least a minimum age, so that a compromised release has time to be
+ * detected and pulled before the wallet adopts it. One-off updates for
+ * security fixes may bypass the minimum age.
+ *
+ * To test: look in the wallet's source repository for a minimum release age
+ * setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a
+ * Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in
+ * `.github/dependabot.yml`. Set to `notSupported` if routine updates have no
+ * minimum age.
+ */
+export type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
+
+/**
  * Whether the wallet's release builds enforce a lockfile (or equivalent)
  * for locked dependency resolution.
  */
