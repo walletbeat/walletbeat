@@ -44,6 +44,7 @@ export const safe: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.safe,
 			eip7702: notSupported,

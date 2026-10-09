@@ -27,6 +27,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: null,
 		licensing: null,
 		monetization: {

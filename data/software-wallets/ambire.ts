@@ -233,6 +233,7 @@ export const ambire: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.eip7702,
 			eip7702: supported({

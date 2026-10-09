@@ -113,6 +113,7 @@ export const rabby: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupportedWithRef({
