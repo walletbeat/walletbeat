@@ -173,7 +173,7 @@ export const nufi: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
-			// No public third-party audit of NuFi's wallet code found (nu.fi, support.nu.fi, changelog, GitHub, web search).
+			// No public independent audit of NuFi's wallet code found (nu.fi, support.nu.fi, changelog, GitHub, web search).
 			// Source: https://nu.fi/features/security
 			publicSecurityAudits: [],
 			scamAlerts: null,
@@ -222,7 +222,10 @@ export const nufi: SoftwareWallet = {
 				dependencyVulnerabilityScanning: null,
 				// The public changelog exists but lags the shipped version (latest entry 31.0.0 from December 2025; the extension ships 35.2.0).
 				hasPublicChangelog: supported({
-					ref: 'https://support.nu.fi/support/solutions/articles/80001016927-changelog',
+					ref: {
+						label: 'NuFi changelog',
+						url: 'https://support.nu.fi/support/solutions/articles/80001016927-changelog',
+					},
 				}),
 				// Closed source: builds cannot be inspected or reproduced.
 				hermeticBuilds: notSupported,
