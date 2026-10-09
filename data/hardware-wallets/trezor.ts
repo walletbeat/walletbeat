@@ -92,8 +92,8 @@ export const trezorWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'EIP-7702 authorization signing was added in core firmware 2.12.4 as an experimental feature. Experimental messages are rejected unless the user enables experimental features on the device, and delegates must be on a built-in allowlist. It is not available by default and not on Model One.',
-						url: 'https://github.com/trezor/trezor-firmware/blob/main/core/CHANGELOG.md',
+							'EIP-7702 authorization signing was added in core firmware 2.12.4 as an experimental feature. Experimental messages are rejected unless the user enables experimental features on the device, and delegates must be on a built-in allow list. It is not available by default and not on Model One.',
+						url: 'https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/core/CHANGELOG.md',
 					},
 				],
 			}),
@@ -102,7 +102,8 @@ export const trezorWallet: HardwareWallet = {
 					{
 						explanation:
 							"Ethereum accounts use BIP-44 derivation (m/44'/60'/0'/0/x) from a BIP-39 or SLIP-39 seed.",
-						url: 'https://github.com/trezor/trezor-firmware/blob/main/core/src/apps/ethereum/keychain.py',
+						label: 'Trezor firmware Ethereum keychain',
+						url: 'https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/core/src/apps/ethereum/keychain.py',
 					},
 					{
 						explanation:
@@ -112,7 +113,8 @@ export const trezorWallet: HardwareWallet = {
 					{
 						explanation:
 							'The device protocol has no message that exports a private key; the seed is only displayed on the device during backup.',
-						url: 'https://github.com/trezor/trezor-firmware/blob/main/common/protob/messages-management.proto',
+						label: 'Trezor firmware management messages',
+						url: 'https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/common/protob/messages-management.proto',
 					},
 				],
 				canExportPrivateKey: false,
@@ -146,7 +148,7 @@ export const trezorWallet: HardwareWallet = {
 					{
 						explanation:
 							'The trezor-firmware repository is licensed per directory: `core` (the Model T and Safe firmware) is GPLv3, `legacy` (Model One) is LGPLv3, `crypto` is mostly MIT, and all other files are GPLv3.',
-						url: 'https://github.com/trezor/trezor-firmware/blob/main/LICENSE.md',
+						url: 'https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/LICENSE.md',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -161,7 +163,8 @@ export const trezorWallet: HardwareWallet = {
 				},
 				{
 					explanation:
-						'Czech business register (ARES) for Trezor Company s.r.o. (ID 02440032): owned by SatoshiLabs Group a.s. (82.5%) and four company managers; no investment funds among the holders.',
+						'Czech business register entry for Trezor Company (ID 02440032): owned by SatoshiLabs Group (82.5%) and four company managers; no investment funds among the holders.',
+					label: 'Czech business register',
 					url: 'https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty-vr/02440032',
 				},
 			],
@@ -229,9 +232,9 @@ export const trezorWallet: HardwareWallet = {
 			duressResistance: null,
 			firmware: {
 				// Firmware updates need an on-device confirmation; the bootloader checks Ed25519 signatures on every boot and enforces downgrade protection.
-				// Source: https://github.com/trezor/trezor-firmware/blob/main/docs/core/misc/boot.md
+				// Source: https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/docs/core/misc/boot.md
 				// Reproducible builds are documented: build in Docker/Nix, zero out the signature data of the official image and compare hashes.
-				// Source: https://github.com/trezor/trezor-firmware/blob/main/docs/common/reproducible-build.md
+				// Source: https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/docs/common/reproducible-build.md
 				// WalletScrutiny currently lists Trezor Safe 5 with a "source available" verdict rather than "reproducible".
 				// Source: https://walletscrutiny.com/hardware/trezorSafe5/
 				// Users can install custom firmware. On Safe models this requires irreversibly unlocking the bootloader, which wipes the device and disables the attestation key; unofficial firmware shows a warning at boot.
@@ -243,7 +246,7 @@ export const trezorWallet: HardwareWallet = {
 				firmwareOpenSource: FirmwareType.PASS,
 				reproducibleBuilds: FirmwareType.PARTIAL,
 				silentUpdateProtection: FirmwareType.PASS,
-				url: 'https://github.com/trezor/trezor-firmware/blob/main/docs/core/misc/boot.md',
+				url: 'https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/docs/core/misc/boot.md',
 			},
 			keysHandling: {
 				ref: [
@@ -259,7 +262,7 @@ export const trezorWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			// No public third-party audit report of Trezor firmware or devices was found. Trezor's bug
+			// No public independent audit report of Trezor firmware or devices was found. Trezor's bug
 			// bounty page says its code has "undergone audits by independent security researchers for
 			// many years" but names no auditor and links no report.
 			publicSecurityAudits: [],
@@ -363,7 +366,7 @@ export const trezorWallet: HardwareWallet = {
 			reputation: {
 				// Trezor launched the Model One in 2014. Model One and Model T, withdrawn from sale in January 2026, keep critical security updates until at least 2036.
 				// Source: https://trezor.io/other/product-updates/how-long-will-trezor-model-one-and-model-t-be-supported
-				// Hardware and firmware are designed in-house and published; Safe 3 and Safe 5 use a third-party secure element, and Safe 7 adds one from sister company Tropic Square.
+				// Hardware and firmware are designed in-house and published; Safe 3 and Safe 5 use a secure element from an external vendor, and Safe 7 adds one from sister company Tropic Square.
 				// Source: https://trezor.io/learn/security-privacy/how-trezor-keeps-you-safe/secure-elements-in-trezor-safe-devices
 				// Trezor maintains a public list of resolved vulnerabilities (58 entries from 2014 to 2026) naming reporters and affected models.
 				// Source: https://trezor.io/security
