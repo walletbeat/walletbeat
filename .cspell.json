@@ -785,6 +785,7 @@
 		{ "name": "Git short commit hashes", "pattern": "/\\b[0-9a-f]{8}\\b/g" },
 		{ "name": "GitHub line anchors", "pattern": "/\\bL\\d+(?:-\\d+)?\\b/g" },
 		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
+		{ "name": "Ledger Nano models", "pattern": "/\\bNano [SX]\\+?/g" },
 		{ "name": "Million-dollar and billion-dollar amounts", "pattern": "/\\$[.0-9a]+[BM]/g" },
 		{
 			"name": "Rabby Walle audit PDF filename",
@@ -819,6 +820,7 @@
 		"Git short commit hashes",
 		"GitHub line anchors",
 		"Hexadecimal addresses",
+		"Ledger Nano models",
 		"Million-dollar and billion-dollar amounts",
 		"Mixed-case filenames",
 		"N/A",

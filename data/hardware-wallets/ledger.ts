@@ -103,8 +103,8 @@ export const ledgerWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Ethereum app v1.17.0 added EIP-7702 authorization signing behind a "Smart account upgrade" setting that is off by default and limited to an allowlist of delegation contracts.',
-						url: 'https://github.com/LedgerHQ/app-ethereum/blob/develop/CHANGELOG.md',
+							'Ethereum app v1.17.0 added EIP-7702 authorization signing behind a "Smart account upgrade" setting that is off by default and limited to an allow list of delegation contracts.',
+						url: 'https://github.com/LedgerHQ/app-ethereum/blob/e5b6dbff3aca3e3c97a1079c8dccbd1dafdb32c7/CHANGELOG.md',
 					},
 				],
 			}),
@@ -113,7 +113,7 @@ export const ledgerWallet: HardwareWallet = {
 					{
 						explanation:
 							"Ethereum accounts are derived from a 24-word BIP-39 seed with BIP-32, using m/44'/60'/<account>'/0/0 by default (Ledger Live path) plus the legacy path.",
-						url: 'https://github.com/LedgerHQ/ledger-live/blob/develop/libs/ledger-wallet-framework/src/derivation.ts',
+						url: 'https://github.com/LedgerHQ/ledger-live/blob/829a01505e7a9a9da207bc0b72641bf60d4bfc69/libs/ledger-wallet-framework/src/derivation.ts',
 					},
 					{
 						explanation:
@@ -210,7 +210,7 @@ export const ledgerWallet: HardwareWallet = {
 		security: {
 			// Left null: Ledger Recover (opt-in, paid) splits encrypted seed entropy into three fragments held
 			// by Ledger and two partner companies, restorable 2-of-3 after ID verification. The schema has no
-			// guardian type for third-party custodians, so this needs a maintainer decision.
+			// guardian type for external custodians, so this needs a maintainer decision.
 			// Source: https://shop.ledger.com/pages/ledger-recover
 			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
@@ -243,7 +243,7 @@ export const ledgerWallet: HardwareWallet = {
 			}),
 			duressResistance: null,
 			firmware: {
-				// Updates are signed by Ledger's HSM and installed over a secure channel; the third-party OS review
+				// Updates are signed by Ledger's HSM and installed over a secure channel; the independent OS review
 				// found "Critical features require user consent ... Upgrading the firmware."
 				// Source: https://donjon.ledger.com/threat-model/os-confidentiality-and-integrity/
 				// Source: https://github.com/LedgerHQ/Ledger-OS-third-party-reports
@@ -280,7 +280,7 @@ export const ledgerWallet: HardwareWallet = {
 						{
 							explanation:
 								'Synacktiv source review of the Ledger OS (Nano S+ 1.5.0, Nano X 2.6.0, Flex 1.5.0, Stax 1.9.0) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
-							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/January%202026',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/ba5ce08be35b92ecdd81cf3bf75798f88d7665c8/January%202026',
 						},
 					],
 					auditDate: '2026-01-19',
@@ -293,7 +293,7 @@ export const ledgerWallet: HardwareWallet = {
 						{
 							explanation:
 								'Synacktiv source review of the Ledger OS (Nano S+ 1.4.0, Nano X 2.5.0, Flex 1.4.0, Stax 1.8.0) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
-							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/July%202025',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/ba5ce08be35b92ecdd81cf3bf75798f88d7665c8/July%202025',
 						},
 					],
 					auditDate: '2025-07-17',
@@ -306,7 +306,7 @@ export const ledgerWallet: HardwareWallet = {
 						{
 							explanation:
 								'Synacktiv source review of the Ledger OS (Nano S+ 1.3.1, Nano X 2.4.1, Flex 1.2.1, Stax 1.6.1) for hidden features and undocumented access: "No dangerous features were found during the assessment."',
-							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/main/December%202024',
+							url: 'https://github.com/LedgerHQ/Ledger-OS-third-party-reports/tree/ba5ce08be35b92ecdd81cf3bf75798f88d7665c8/December%202024',
 						},
 					],
 					auditDate: '2024-12-20',
