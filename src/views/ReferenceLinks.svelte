@@ -316,7 +316,7 @@
 		opacity: 0.75;
 	}
 
-	/* A lone reference reads as a paragraph; a bullet would imply a list. */
+	/* A lone reference renders as a paragraph, without a bullet. */
 	.references .references-list:has(> :only-child) {
 		padding-inline-start: 0;
 
