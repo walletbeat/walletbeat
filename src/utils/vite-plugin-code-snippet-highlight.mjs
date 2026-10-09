@@ -149,6 +149,12 @@ export function codeSnippetHighlight() {
 				const tokenLines = highlighter.codeToTokensWithThemes(segment.lines.join('\n'), {
 					lang: /** @type {import('shiki').BundledLanguage | 'text'} */ (language),
 					themes,
+					// Shiki stops tokenizing a line after 500ms by default and leaves the
+					// rest unstyled. Each theme is tokenized separately, so a line that hits
+					// the limit in one pass but not the other mixes colors from both, and
+					// whether it does depends on build load and on which snippet compiles
+					// the grammar first. Snippets are short, so tokenize them fully.
+					tokenizeTimeLimit: 0,
 				})
 
 				tokenLines.forEach((lineTokens, lineIndex) => {
