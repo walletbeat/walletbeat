@@ -1,6 +1,7 @@
 <script module lang="ts">
 	// Types
 	import type { Snippet } from 'svelte'
+	import type { SortKey } from './table-sort'
 
 	type Value = object | string | number | bigint | boolean | undefined | null
 
@@ -20,7 +21,7 @@
 			isDefault?: boolean
 			defaultDirection: SortDirection
 			/** Maps the cell value to what is ordered; `null`/`undefined` sort last. */
-			rank?: (value: _CellValue) => unknown
+			rank?: (value: _CellValue) => SortKey
 			/** Ascending comparison; missing values never reach it. */
 			compare?: (a: _CellValue, b: _CellValue, rowA: _RowValue, rowB: _RowValue) => number
 		}
