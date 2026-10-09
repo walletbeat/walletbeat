@@ -12,7 +12,8 @@
 
 
 	// Functions
-	import { eipEthereumDotOrgUrl } from '@/schema/eips'
+	import { eipEthereumDotOrgUrl, eipFinalForLabel } from '@/schema/eips'
+	import { daysSince } from '@/types/date'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 
 
@@ -36,6 +37,21 @@
 			>
 				{eip.status}
 			</div>
+
+			{#if eip.finalizedDate !== null}
+				<!-- `data-final-since` lets pages refresh the day count client-side, so it does not go stale between builds. -->
+				<span class="final-since">
+					<strong data-final-since={eip.finalizedDate}>{eipFinalForLabel(daysSince(eip.finalizedDate))}</strong>,
+					since <time datetime={eip.finalizedDate}>{
+						new Date(eip.finalizedDate).toLocaleDateString('en-US', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC',
+						})
+					}</time>
+				</span>
+			{/if}
 		</div>
 
 		<h2>
@@ -99,6 +115,19 @@
 		> header {
 			h3 {
 				color: var(--text-secondary);
+			}
+
+			.tags {
+				flex-wrap: wrap;
+				align-items: center;
+			}
+
+			.final-since {
+				color: var(--text-secondary);
+
+				strong {
+					color: var(--text-primary);
+				}
 			}
 		}
 

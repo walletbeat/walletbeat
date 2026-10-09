@@ -6,6 +6,8 @@ export const eip5792: Eip = {
 	formalTitle: 'Wallet Call API',
 	// The wallet call API is a software wallet feature.
 	appliesTo: allVariantsForWalletType(WalletType.SOFTWARE),
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/644778e485f0c637ed88cd607c0eda048e50d4f6
+	finalizedDate: '2025-05-11',
 	icon: 'ICON_LAYERS',
 	number: '5792',
 	prefix: EipPrefix.EIP,
