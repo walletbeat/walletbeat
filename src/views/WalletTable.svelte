@@ -263,7 +263,7 @@
 	// Functions
 	import { variantToName } from '@/constants/variants'
 	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
-	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
+	import { evaluatedAttributesEntries, ratingSortRank, ratingToColor } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
 	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
@@ -764,6 +764,8 @@
 											},
 											sort: {
 												defaultDirection: SortDirection.Descending,
+												// PASS > PARTIAL > FAIL; UNRATED and EXEMPT sort last.
+												rank: rating => ratingSortRank(rating as Rating | undefined),
 											},
 										}))
 								),
