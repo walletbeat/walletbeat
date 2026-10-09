@@ -16,6 +16,6 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
+		<EmbeddedWalletTable client:visible title='Embedded Wallets' titleLevel={1} />
 	</main>
 </Layout>
