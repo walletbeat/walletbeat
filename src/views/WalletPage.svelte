@@ -1407,10 +1407,7 @@
 			;
 		}
 		@media (max-width: 864px) {
-			/*
-			 * Pixels, not rem: `---pie-scale` assumes 16px per rem, but phones shrink
-			 * the root font below that, which clipped the flower to a smaller box.
-			 */
+			/* Pixels, not rem: `---pie-scale` assumes 16px per rem. */
 			---wallet-mobile-pie-size-rem: 4.5;
 			---wallet-mobile-pie-size: calc(
 				var(---wallet-mobile-pie-size-rem)
@@ -1869,11 +1866,7 @@
 				--slice-arcSize: small;
 			}
 
-			/*
-			 * Firefox lacks typed division (the label radius divides an angle by an
-			 * angle). Test that directly: Firefox now supports sibling-index(), so
-			 * gating on it left the label offset invalid and the icons hidden.
-			 */
+			/* Fallback offsets for browsers without typed division (the label radius divides an angle by an angle). */
 			@supports not (top: calc(1px * (1deg / 1rad))) {
 				:global(.navigation-items summary > a) {
 					---slice-label-offset: 52.313px;
@@ -2153,9 +2146,9 @@
 			:global(.navigation-items a > .pie-navigation-icon) {
 				--icon-size: calc(var(---slice-label-size) * 1px);
 				/*
-				 * Dark ink on the light rating fills (white was ~1.4:1 on yellow and green).
-				 * In dark mode, translucent fills (unrated) composite to a dark tone, so their
-				 * effective lightness (l × alpha) picks light ink instead.
+				 * Dark ink on the light rating fills. In dark mode, translucent fills
+				 * (unrated) composite to a dark tone, so their effective lightness
+				 * (l × alpha) picks light ink instead.
 				 */
 				color: light-dark(
 					rgb(19 10 43 / 0.62),

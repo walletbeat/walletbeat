@@ -568,9 +568,9 @@
 						text-align: center;
 						line-height: 1;
 						/*
-						 * Dark ink on the light rating fills (white was ~1.4:1 on yellow and green).
-						 * In dark mode, translucent fills (unrated) composite to a dark tone, so
-						 * their effective lightness (l × alpha) picks light ink instead.
+						 * Dark ink on the light rating fills. In dark mode, translucent fills
+						 * (unrated) composite to a dark tone, so their effective lightness
+						 * (l × alpha) picks light ink instead.
 						 */
 						color: light-dark(
 							rgb(19 10 43 / 0.62),
