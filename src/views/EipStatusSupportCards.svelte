@@ -4,6 +4,7 @@
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
+	import { type ImageSizeIndex, setImageSizeContext } from '@/utils/image-size-index'
 
 	const statusColor: Record<EipSupportStatus, string> = {
 		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
@@ -50,14 +51,18 @@
 		title,
 		cards,
 		codeSnippets = {},
+		imageSizes = {},
 	}: {
 		title?: string
 		cards: EipStatusSupportCard[]
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
+		// The dimensions of the images these cards reference (see `imageSizesForReferences`).
+		imageSizes?: ImageSizeIndex
 	} = $props()
 
 	setCodeSnippetContext(() => codeSnippets)
+	setImageSizeContext(() => imageSizes)
 
 
 	// Functions

@@ -2,10 +2,14 @@
 	// Types/constants
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { getImageSizeLookup } from '@/utils/image-size-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
 
 	// Stored code snippets for this page, provided by the island's root component.
 	const codeSnippetForUrl = getCodeSnippetLookup()
+
+	// Dimensions of repo-hosted images, provided by the island's root component.
+	const imageSizeForUrl = getImageSizeLookup()
 
 
 	// Props
@@ -206,6 +210,8 @@
 					{/each}
 
 					{#if inlineImage !== undefined}
+						{@const inlineImageSize = imageSizeForUrl(inlineImage.url)}
+
 						<figure class="inline-image" data-column="start gap-1">
 							<a
 								href={inlineImage.url}
@@ -218,6 +224,10 @@
 								<img
 									src={inlineImage.url}
 									alt={inlineImage.label}
+									width={inlineImageSize?.width}
+									height={inlineImageSize?.height}
+									style:--image-width={inlineImageSize && `${inlineImageSize.width}px`}
+									style:--image-aspectRatio={inlineImageSize && inlineImageSize.width / inlineImageSize.height}
 									loading="lazy"
 								/>
 							</a>
@@ -349,12 +359,20 @@
 		margin: 0;
 
 		img {
+			--image-maxBlockSize: 20em;
+
 			display: block;
 			max-inline-size: 100%;
-			max-block-size: 20em;
+			max-block-size: var(--image-maxBlockSize);
 
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
+
+			/* Reserve the box the loaded image scales down to, before it loads. */
+			&[width][height] {
+				inline-size: min(var(--image-width), var(--image-maxBlockSize) * var(--image-aspectRatio));
+				block-size: auto;
+			}
 		}
 	}
 
