@@ -35,9 +35,9 @@ import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
  * Server-render the details of an evaluation the same way `WalletPage.svelte`
  * does, and return the resulting HTML.
  */
-function renderDetailsHtml(
+function renderDetailsHtml<_OutcomeMetadata extends OutcomeMetadata>(
 	wallet: RatedWallet<string>,
-	evalAttr: EvaluatedAttribute<OutcomeMetadata>,
+	evalAttr: EvaluatedAttribute<_OutcomeMetadata>,
 ): string {
 	const { details, outcome } = evalAttr.evaluation
 
@@ -171,15 +171,13 @@ describe('wallet page evaluation details', () => {
 						evalTree,
 						(_, evalGroup) => {
 							mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-								// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
-								const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
-								const { details } = genericEvalAttr.evaluation
-								const label = `${genericEvalAttr.attribute.displayName} (${
+								const { details } = evalAttr.evaluation
+								const label = `${evalAttr.attribute.displayName} (${
 									isTypographicContent(details) ? 'text' : details.component.component
 								})`
 
 								expect(
-									visibleText(renderDetailsHtml(ratedWallet, genericEvalAttr)),
+									visibleText(renderDetailsHtml(ratedWallet, evalAttr)),
 									`${label} details rendered empty`,
 								).not.toBe('')
 							})
