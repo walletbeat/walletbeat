@@ -127,6 +127,9 @@ export enum BrowserExtensionPermission {
 	/** Capture the desktop, a window, or a tab as a media stream. */
 	DESKTOP_CAPTURE = 'desktopCapture',
 
+	/** Load website favicons from the browser's favicon cache via `_favicon/` URLs. */
+	FAVICON = 'favicon',
+
 	/** Access the device's geographic location. */
 	GEOLOCATION = 'geolocation',
 
