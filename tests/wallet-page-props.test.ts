@@ -7,8 +7,7 @@ import { allRatedWalletsBySlug, walletOfTypeBySlug } from '@/data/wallets'
 /**
  * Revive props serialized by Astro's `serializeProps`, the same way the
  * `<astro-island>` element does in the browser. Only plain values, objects,
- * arrays and `undefined` are supported; anything else fails the test so that
- * a new kind of value in wallet data gets noticed.
+ * arrays and `undefined` are supported; anything else fails the test.
  */
 function reviveTuple(tuple: unknown): unknown {
 	if (!Array.isArray(tuple)) {
