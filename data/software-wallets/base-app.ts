@@ -38,7 +38,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
@@ -466,8 +471,6 @@ export const baseApp: SoftwareWallet = {
 					unlimitedApprovalWarning: null,
 				},
 			},
-			// The mobile app is closed source: "Build cannot be done because the source code is not publicly available."
-			// Source: https://walletscrutiny.com/mobile/org.toshi/
 			securityBestPractices: {
 				browser: {
 					ref: {
@@ -559,18 +562,20 @@ export const baseApp: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// App-store signing only; no developer-published signatures or release artifacts.
 				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				// Only generic store release notes; no public changelog for the app.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Closed source: "Build cannot be done because the source code is not publicly available."
-				// Source: https://walletscrutiny.com/mobile/org.toshi/
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/mobile/org.toshi/',
+					},
+				}),
 			},
 		},
 		// Base App accounts run Coinbase Smart Wallet logic, which exposes
