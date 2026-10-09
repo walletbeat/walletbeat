@@ -98,6 +98,32 @@ function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): strin
 	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
 }
 
+/** Matches a magic URL produced by `markdownMagicUrl`, capturing the plain URL and EIP number. */
+const markdownMagicUrlPattern =
+	/(https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+))#wb-format=(?:long|short)/
+
+/**
+ * Parse a magic URL produced by `markdownMagicUrl`.
+ * Returns null if `url` is not such a URL.
+ */
+export function parseEipMagicUrl(url: string): { eipNumber: number; url: string } | null {
+	const match = new RegExp(`^${markdownMagicUrlPattern.source}$`).exec(url)
+
+	if (match === null) {
+		return null
+	}
+
+	return { eipNumber: Number(match[2]), url: match[1] }
+}
+
+/**
+ * Replace all magic URLs in `text` with the plain eips.ethereum.org URL.
+ * Used wherever Markdown is output as-is rather than rendered with EIP tooltips.
+ */
+export function stripEipMagicUrls(text: string): string {
+	return text.replace(new RegExp(markdownMagicUrlPattern.source, 'g'), '$1')
+}
+
 /** Return a markdown link for an EIP using only its short label (e.g. "EIP-712"). */
 export function eipMarkdownShortLink(eip: Eip): string {
 	return `[${eipShortLabel(eip)}](${markdownMagicUrl(eip, 'short')})`

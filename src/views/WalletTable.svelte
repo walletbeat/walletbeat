@@ -1958,10 +1958,6 @@
 		margin-inline: -1em;
 	}
 
-	.eip-tooltip-content {
-		width: 34rem;
-	}
-
 	.pie-center-dot {
 		display: inline-block;
 		width: 16px;
