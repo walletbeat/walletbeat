@@ -133,8 +133,7 @@ async function fetchJson(
 
 /**
  * Fetchers backed by the GitHub REST API and the addons.mozilla.org API.
- * A GitHub token is optional but raises the API rate limit from 60 to 5,000
- * requests per hour.
+ * A GitHub token is optional and raises the API rate limit.
  */
 export function apiFetchers(options: {
 	githubToken: string | null
@@ -172,8 +171,7 @@ export function apiFetchers(options: {
 /**
  * Collect usage statistics for each wallet. Repository URLs that are not
  * `github.com/<owner>/<repo>` URLs are skipped and returned in `skipped`.
- * A failing fetch rejects the whole collection, so a snapshot is never written
- * with silently missing data.
+ * A failing fetch rejects the whole collection.
  */
 export async function collectUsageStats(
 	wallets: WalletUsageSources[],
