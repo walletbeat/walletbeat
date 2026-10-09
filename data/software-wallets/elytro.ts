@@ -47,6 +47,17 @@ export const elytro: SoftwareWallet = {
 		tableName: 'Elytro',
 		coinspectId: 'elytro',
 		contributors: [nconsigny],
+		discontinued: {
+			ref: [
+				{
+					explanation:
+						'All Elytro repositories, including the Elytro extension monorepo, were archived on 2026-07-29, and the elytro.com deployment has been disabled.',
+					label: 'Archived Elytro extension repository',
+					url: 'https://github.com/Elytro-eth/Elytro',
+				},
+			],
+			date: '2026-07-29',
+		},
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
 		urls: {
