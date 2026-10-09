@@ -170,6 +170,31 @@ export interface WalletUrls {
 	/** Other relevant URL(s), if any. */
 	others?: LabeledUrl[]
 }
+
+/**
+ * The forms a wallet's `BROWSER` variant ships in.
+ */
+export enum BrowserDistribution {
+	EXTENSION = 'EXTENSION',
+	WEB_APP = 'WEB_APP',
+	EXTENSION_AND_WEB_APP = 'EXTENSION_AND_WEB_APP',
+}
+
+/**
+ * Infer how a wallet's `BROWSER` variant ships from its URLs.
+ * A wallet counts as a web app only if it lists web app URLs; without them,
+ * the `BROWSER` variant is a browser extension.
+ */
+export function browserDistribution(urls: WalletUrls | undefined): BrowserDistribution {
+	const hasWebApp = (urls?.webapps ?? []).length > 0
+	const hasExtension = (urls?.extensions ?? []).length > 0
+
+	if (!hasWebApp) {
+		return BrowserDistribution.EXTENSION
+	}
+
+	return hasExtension ? BrowserDistribution.EXTENSION_AND_WEB_APP : BrowserDistribution.WEB_APP
+}
 export interface SocialUrls extends Record<string, Url | undefined> {
 	/** X (formerly Twitter) URL, if available. */
 	x?: DomainUrl<'x.com'>

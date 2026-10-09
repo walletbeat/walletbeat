@@ -34,9 +34,9 @@
 
 	// Functions
 	import {
-		variants,
 		variantToName,
 		variantToRunsOn,
+		walletVariantDisplay,
 	} from '@/constants/variants'
 	import type { NavigationItem } from '@/constants/navigation'
 	import { allHardwareModels } from '@/data/hardware-wallets'
@@ -441,7 +441,7 @@
 				applicationCategory: 'Cryptocurrency Wallet',
 				operatingSystem: (
 					Object.keys(wallet.variants)
-						.map(variant => variantToRunsOn(variant))
+						.map(variant => variantToRunsOn(variant, wallet.metadata.urls))
 						.join(', ')
 				),
 			},
@@ -547,9 +547,10 @@
 							aria-label="Platforms"
 						>
 							{#each Object.keys(wallet.variants) as variant}
+								{@const display = walletVariantDisplay(variant, wallet.metadata.urls)}
 								<li class="wallet-platform">
-									<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
-									{variants[variant].label}
+									<span class="wallet-platform-icon" aria-hidden="true">{@html display.icon}</span>
+									{display.label}
 								</li>
 							{/each}
 						</ul>
@@ -573,6 +574,7 @@
 							</button>
 
 							{#each Object.keys(wallet.variants) as Variant[] as variant}
+								{@const display = walletVariantDisplay(variant, wallet.metadata.urls)}
 								<button
 									type="button"
 									class="wallet-platform"
@@ -581,8 +583,8 @@
 										selectedVariant = variant === selectedVariant ? undefined : variant
 									}}
 								>
-									<span class="wallet-platform-icon" aria-hidden="true">{@html variants[variant].icon}</span>
-									{variants[variant].label}
+									<span class="wallet-platform-icon" aria-hidden="true">{@html display.icon}</span>
+									{display.label}
 								</button>
 							{/each}
 						</div>
@@ -1039,7 +1041,7 @@
 
 									{#each relevantVariants as variant}
 										<span class="variant-badge" data-row="gap-1">
-											{@html variants[variant].icon}
+											{@html walletVariantDisplay(variant, wallet.metadata.urls).icon}
 										</span>
 									{/each}
 								</div>
