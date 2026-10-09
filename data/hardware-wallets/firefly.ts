@@ -43,7 +43,7 @@ export const fireflyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Firefly V1 firmware and hardware: "MIT and BSD license. Each file includes license information at the top."',
+							'First-generation Firefly firmware and hardware: "MIT and BSD license. Each file includes license information at the top."',
 						url: 'https://github.com/firefly/wallet',
 					},
 				],
@@ -55,6 +55,7 @@ export const fireflyWallet: HardwareWallet = {
 				{
 					explanation:
 						'Firefly received a 50k USDC ENS DAO Public Goods large grant in the Q3 2024 round.',
+					label: 'ENS DAO forum post',
 					url: 'https://discuss.ens.domains/t/active-q3-2024-large-grants/19311',
 				},
 			],
@@ -98,7 +99,7 @@ export const fireflyWallet: HardwareWallet = {
 			firmware: {
 				// Firefly V1 is flashed over USB with the Arduino toolchain; the current Pixie devkit also has no signature check ("# CONFIG_SECURE_BOOT is not set"), so any connected computer can install firmware without on-device approval.
 				// Source: https://github.com/firefly/wallet
-				// Source: https://github.com/firefly/pixie-firmware/blob/main/sdkconfig
+				// Source: https://github.com/firefly/pixie-firmware/blob/c5b6722cc4b79ca46d4c34115d21b869c872f4be/sdkconfig
 				// Users are encouraged to build and flash their own firmware ("customize the source code and add your own interesting features").
 				// Source: https://firefly.city/
 				// No reproducible build process is documented.
@@ -116,7 +117,7 @@ export const fireflyWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			// No public third-party audit of either Firefly generation found (GitHub org, firefly.city, firefly.app, project pages, web search).
+			// No public independent audit of either Firefly generation found (GitHub org, firefly.city, firefly.app, project pages, web search).
 			// Source: https://github.com/firefly
 			publicSecurityAudits: [],
 			secureElement: null,
