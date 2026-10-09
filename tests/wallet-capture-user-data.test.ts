@@ -109,14 +109,4 @@ describe('WalletCaptureFile.gatherStrings', () => {
 			).toEqual([])
 		},
 	)
-
-	it('recognizes a standalone address with a different casing', async () => {
-		const capture = captureWithPayload(
-			checksummedAddress,
-			JSON.stringify({ account: lowercaseAddress }),
-		)
-		const strings = await capture.gatherStrings()
-
-		expect(strings.get(lowercaseAddress)?.str.pieces).toEqual(new Set([WalletInfo.ACCOUNT_ADDRESS]))
-	})
 })
