@@ -32,7 +32,7 @@ import { getWalletStageAndLadder } from '@/utils/stage'
 import {
 	allCriteriaInStage,
 	computeCountsAndStatus,
-	getCriterionAttributeId,
+	getCriterionAttributeAnchor,
 } from '@/utils/stage-attributes'
 import { getWalletUrl } from '@/utils/urls'
 
@@ -147,7 +147,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 
 					for (const criterion of groupCriteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
-						const attributeId = getCriterionAttributeId(criterion)
+						const attributeAnchor = getCriterionAttributeAnchor(criterion, evaluation.rating)
 						const descText = normalizeMarkdownBlankLines(
 							renderContentToText(criterion.description, evalStrings, { trim: true }),
 						)
@@ -157,10 +157,8 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 								: descText
 						const displayName = criterion.displayName
 						const attrLink =
-							attributeId !== null
-								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, {
-										attributeAnchor: slugifyCamelCase(attributeId),
-									})})`
+							attributeAnchor !== null
+								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor })})`
 								: displayName
 						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- StageCriterionEvaluation.rating is a discriminated union; tsc requires narrowing to index stageCriterionRatings.
 						const ratingInfo = stageCriterionRatings[evaluation.rating as StageCriterionRating]
