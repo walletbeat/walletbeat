@@ -158,12 +158,7 @@ export const baseApp: SoftwareWallet = {
 			delegation: null,
 		},
 		integration: {
-			browser: {
-				ref: refTodo,
-				'1193': featureSupported,
-				'2700': featureSupported,
-				'6963': featureSupported,
-			},
+			browser: 'NOT_A_BROWSER_WALLET',
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
