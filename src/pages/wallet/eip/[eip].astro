@@ -133,6 +133,20 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 	</main>
 </Layout>
 
+<script>
+	import { eipFinalForLabel } from '@/schema/eips'
+	import { assertCalendarDate, daysSince } from '@/types/date'
+
+	// Recompute "Final for N days" in the browser, so it is current between builds.
+	for (const element of document.querySelectorAll<HTMLElement>('[data-final-since]')) {
+		const finalizedDate = element.dataset.finalSince
+
+		if (finalizedDate !== undefined) {
+			element.textContent = eipFinalForLabel(daysSince(assertCalendarDate(finalizedDate)))
+		}
+	}
+</script>
+
 <style>
 	main {
 		&[data-sticky-container] {
