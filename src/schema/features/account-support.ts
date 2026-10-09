@@ -71,26 +71,71 @@ const allAccountTypes: NonEmptyArray<AccountType> = [
 	AccountType.safe,
 ]
 
-/** The ability (or lack thereof) to generate a transaction of a specific type. */
-export enum TransactionGenerationCapability {
-	/** The process to generate such a transaction relies on an external API. */
+/**
+ * The tooling required to carry out an account management operation, such as
+ * generating a transaction of a specific type or recovering the account
+ * (or the lack of any such tooling).
+ */
+export enum AccountManagementTooling {
+	/** The process relies on an external API. */
 	RELYING_ON_EXTERNAL_API = 'RELYING_ON_EXTERNAL_API',
 
-	/** The process to generate such a transaction requires the use of a standalone proprietary application. */
+	/** The process requires the use of a standalone proprietary application. */
 	USING_PROPRIETARY_STANDALONE_APP = 'USING_PROPRIETARY_STANDALONE_APP',
 
-	/** The process to generate such a transaction requires the use of an open-source standalone application. */
+	/** The process requires the use of an open-source standalone application. */
 	USING_OPEN_SOURCE_STANDALONE_APP = 'USING_OPEN_SOURCE_STANDALONE_APP',
 
-	/** It is not possible to generate such a transaction. */
+	/**
+	 * The process requires the use of a proprietary web app that is only
+	 * available as hosted by its maintainer.
+	 */
+	USING_PROPRIETARY_HOSTED_WEB_APP = 'USING_PROPRIETARY_HOSTED_WEB_APP',
+
+	/**
+	 * The process requires the use of a web app that the user can host and
+	 * run themselves, without relying on its maintainer's infrastructure.
+	 */
+	USING_SELF_HOSTABLE_WEB_APP = 'USING_SELF_HOSTABLE_WEB_APP',
+
+	/** It is not possible to carry out the operation. */
 	IMPOSSIBLE = 'IMPOSSIBLE',
 }
 
-/** The ability to generate a transaction of a specific type. */
-export type PossibleTransactionGenerationCapability = Exclude<
-	TransactionGenerationCapability,
-	TransactionGenerationCapability.IMPOSSIBLE
+/** Tooling with which an account management operation can be carried out. */
+export type PossibleAccountManagementTooling = Exclude<
+	AccountManagementTooling,
+	AccountManagementTooling.IMPOSSIBLE
 >
+
+/**
+ * What carrying out an account management operation depends on, beyond
+ * the user's own devices, when using the given tooling.
+ *
+ * - `MAINTAINER_INFRASTRUCTURE`: Services operated by the tooling's
+ *   maintainer must be available and cooperative.
+ * - `PROPRIETARY_SOFTWARE`: The user can run the tooling themselves, but
+ *   cannot inspect or modify it.
+ * - `NONE`: The user can run the tooling themselves without restriction.
+ */
+export type AccountManagementToolingDependency =
+	'MAINTAINER_INFRASTRUCTURE' | 'PROPRIETARY_SOFTWARE' | 'NONE'
+
+/** Classify what the given account management tooling depends on. */
+export function accountManagementToolingDependency(
+	tooling: PossibleAccountManagementTooling,
+): AccountManagementToolingDependency {
+	switch (tooling) {
+		case AccountManagementTooling.RELYING_ON_EXTERNAL_API:
+		case AccountManagementTooling.USING_PROPRIETARY_HOSTED_WEB_APP:
+			return 'MAINTAINER_INFRASTRUCTURE'
+		case AccountManagementTooling.USING_PROPRIETARY_STANDALONE_APP:
+			return 'PROPRIETARY_SOFTWARE'
+		case AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP:
+		case AccountManagementTooling.USING_SELF_HOSTABLE_WEB_APP:
+			return 'NONE'
+	}
+}
 
 /**
  * Account support features.
@@ -232,7 +277,7 @@ interface AccountTypeMultifactor {
 	 * while blocking network access to the provider's endpoints to see if it
 	 * is still possible.
 	 */
-	tokenTransferTransactionGeneration: PossibleTransactionGenerationCapability
+	tokenTransferTransactionGeneration: PossibleAccountManagementTooling
 }
 
 /**
@@ -267,7 +312,7 @@ export type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 	 * This implies that the code to create such a transaction is open-source
 	 * and does not rely on any network request to a proprietary API or service.
 	 */
-	keyRotationTransactionGeneration: TransactionGenerationCapability
+	keyRotationTransactionGeneration: AccountManagementTooling
 }
 
 /** A wallet backed by a smart contract. */

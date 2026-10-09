@@ -12,6 +12,7 @@ import {
 	Rating,
 } from '@/schema/attributes'
 import {
+	AccountManagementTooling,
 	type AccountSupport,
 	AccountType,
 	type AccountTypeEoa,
@@ -22,6 +23,8 @@ import {
 	type AccountRecoveryDrill,
 	AccountRecoveryDrillType,
 	accountRecoveryDrillWording,
+	type AlternateRecovery,
+	alternateRecoveryToolingPhrase,
 	type GuardianPolicy,
 	GuardianPolicyType,
 	GuardianType,
@@ -51,6 +54,7 @@ import { pickWorstRating, unrated } from '../common'
 
 export type AccountRecoveryMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
+	alternateRecovery: AlternateRecovery | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 	drills: {
 		configured: AccountRecoveryDrill[]
@@ -106,6 +110,7 @@ function evaluateGuardianRecoveryPolicy(
 				`),
 				metadata: {
 					minimumGuardianPolicy: guardianPolicy,
+					alternateRecovery: null,
 					outcomes,
 					drills: null,
 				},
@@ -125,6 +130,7 @@ function evaluateGuardianRecoveryPolicy(
 				),
 				metadata: {
 					minimumGuardianPolicy: guardianPolicy,
+					alternateRecovery: null,
 					outcomes,
 					drills: null,
 				},
@@ -144,6 +150,7 @@ function evaluateGuardianRecoveryPolicy(
 			`),
 			metadata: {
 				minimumGuardianPolicy: guardianPolicy,
+				alternateRecovery: null,
 				outcomes,
 				drills: null,
 			},
@@ -235,6 +242,7 @@ function evaluateAccountRecoveryDrills(
 					`),
 					metadata: {
 						minimumGuardianPolicy: null,
+						alternateRecovery: null,
 						outcomes: null,
 						drills: { configured, missing: [] },
 					},
@@ -252,7 +260,12 @@ function evaluateAccountRecoveryDrills(
 					{{WALLET_NAME}} does not run all recommended periodic
 					account recovery check-ups.
 				`),
-				metadata: { minimumGuardianPolicy: null, outcomes: null, drills: { configured, missing } },
+				metadata: {
+					minimumGuardianPolicy: null,
+					alternateRecovery: null,
+					outcomes: null,
+					drills: { configured, missing },
+				},
 			},
 			details: accountRecoveryDetailsContent({}),
 			howToImprove: drillsHowToImprove(missing),
@@ -274,6 +287,7 @@ function evaluateAccountRecoveryDrills(
 				`),
 				metadata: {
 					minimumGuardianPolicy: null,
+					alternateRecovery: null,
 					outcomes: null,
 					drills: { configured: [], missing: [] },
 				},
@@ -293,6 +307,7 @@ function evaluateAccountRecoveryDrills(
 			`),
 			metadata: {
 				minimumGuardianPolicy: null,
+				alternateRecovery: null,
 				outcomes: null,
 				drills: { configured: [], missing: recommendedDrillTypes },
 			},
@@ -337,13 +352,65 @@ function getRecommendedDrillTypes(
 	]
 }
 
+function evaluateWithoutGuardianRecovery(
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
+	alternateRecovery: Support<WithRef<AlternateRecovery>> | null,
+): Evaluation<AccountRecoveryMetadata> {
+	if (alternateRecovery !== null && isSupported(alternateRecovery)) {
+		ctx.addRef(alternateRecovery)
+
+		return ctx.build({
+			outcome: {
+				id: 'alternate_recovery_only',
+				displayName: 'No guardian-based account recovery',
+				rating: Rating.FAIL,
+				shortExplanation: sentence(`
+					{{WALLET_NAME}} does not implement guardian-based account recovery.
+					Its alternate recovery method ${alternateRecoveryToolingPhrase(alternateRecovery)}.
+				`),
+				metadata: {
+					minimumGuardianPolicy: null,
+					alternateRecovery: { type: alternateRecovery.type, entity: alternateRecovery.entity },
+					outcomes: null,
+					drills: null,
+				},
+			},
+			details: accountRecoveryDetailsContent({}),
+		})
+	}
+
+	return ctx.build({
+		outcome: {
+			id: 'no_guardian_recovery',
+			displayName: 'No account recovery mechanism',
+			rating: Rating.FAIL,
+			shortExplanation: sentence(`
+				{{WALLET_NAME}} does not implement guardian-based account recovery.
+				The user will lose access to their account if they lose their seed phrase.
+			`),
+			metadata: {
+				minimumGuardianPolicy: null,
+				alternateRecovery: null,
+				outcomes: null,
+				drills: null,
+			},
+		},
+		details: accountRecoveryDetailsContent({}),
+	})
+}
+
 function evaluateAccountRecovery(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	accountRecovery: AccountRecovery,
 	accountSupport: AccountSupport,
 ): Evaluation<AccountRecoveryMetadata> {
 	if (accountRecovery.drills === null) {
-		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
+		return unrated(ctx, {
+			minimumGuardianPolicy: null,
+			alternateRecovery: null,
+			outcomes: null,
+			drills: null,
+		})
 	}
 
 	ctx.addRef(accountRecovery.guardianRecovery)
@@ -358,23 +425,7 @@ function evaluateAccountRecovery(
 
 	const guardianEval = isSupported(accountRecovery.guardianRecovery)
 		? evaluateGuardianRecoveryPolicy(ctx, accountRecovery.guardianRecovery.minimumGuardianPolicy)
-		: ctx.build({
-				outcome: {
-					id: 'no_guardian_recovery',
-					displayName: 'No account recovery mechanism',
-					rating: Rating.FAIL,
-					shortExplanation: sentence(`
-						{{WALLET_NAME}} does not implement guardian-based account recovery.
-						The user will lose access to their account if they lose their seed phrase.
-					`),
-					metadata: {
-						minimumGuardianPolicy: null,
-						outcomes: null,
-						drills: null,
-					},
-				},
-				details: accountRecoveryDetailsContent({}),
-			})
+		: evaluateWithoutGuardianRecovery(ctx, accountRecovery.alternateRecovery)
 
 	// `pickWorstRating` returns one sub-evaluation wholesale, so whichever
 	// side "wins" the worst rating would otherwise silently drop the other
@@ -383,6 +434,7 @@ function evaluateAccountRecovery(
 	// object first so the details view always has the full picture.
 	const mergedMetadata: AccountRecoveryMetadata = {
 		minimumGuardianPolicy: guardianEval.outcome.metadata.minimumGuardianPolicy,
+		alternateRecovery: guardianEval.outcome.metadata.alternateRecovery,
 		outcomes: guardianEval.outcome.metadata.outcomes,
 		drills: drillsEval.outcome.metadata.drills,
 	}
@@ -497,6 +549,27 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
+						guardianRecovery: notSupported,
+						drills: notSupported,
+					},
+					exampleEoaAccountSupport,
+				),
+			),
+			exampleRating(
+				paragraph(`
+					The wallet does not implement guardian-based recovery. It lets the
+					user set up a separate recovery key, but using that key requires a
+					web app that only the wallet developer hosts.
+				`),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						alternateRecovery: supported<WithRef<AlternateRecovery>>({
+							ref: refNotNecessary,
+							type: AccountManagementTooling.USING_PROPRIETARY_HOSTED_WEB_APP,
+							entity: exampleWalletDevelopmentCompany,
+						}),
 						guardianRecovery: notSupported,
 						drills: notSupported,
 					},
@@ -521,6 +594,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -556,6 +630,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -596,6 +671,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -636,6 +712,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -689,6 +766,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -746,7 +824,12 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		// Account support data is also required, to determine which specific
 		// account recovery drills are expected of the wallet.
 		if (ctx.features.security.accountRecovery === null || ctx.features.accountSupport === null) {
-			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
+			return unrated(ctx, {
+				minimumGuardianPolicy: null,
+				alternateRecovery: null,
+				outcomes: null,
+				drills: null,
+			})
 		}
 
 		return evaluateAccountRecovery(

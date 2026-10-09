@@ -8,7 +8,7 @@ import type { SoftwareWallet } from '@/data/software-wallets'
 import { coinbaseEip7702ProxyContract } from '@/data/wallet-contracts/coinbase-eip7702-proxy'
 import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
 import type { WalletAnalytics } from '@/schema/features'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -104,9 +104,9 @@ export const baseApp: SoftwareWallet = {
 				},
 				contract: coinbaseSmartWalletContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				keyRotationTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
+					AccountManagementTooling.USING_PROPRIETARY_STANDALONE_APP,
 			}),
 			safe: notSupported,
 		},

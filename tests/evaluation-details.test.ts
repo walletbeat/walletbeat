@@ -93,6 +93,7 @@ const metadataBoundCases = {
 		details: accountRecoveryDetails,
 		validOutcome: outcomeWithMetadata({
 			minimumGuardianPolicy: null,
+			alternateRecovery: null,
 			outcomes: null,
 			drills: null,
 		}),

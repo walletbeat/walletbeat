@@ -14,9 +14,9 @@ import {
 } from '@/schema/eip-support'
 import { type ResolvedFeatures, resolveFeatures } from '@/schema/features'
 import {
+	AccountManagementTooling,
 	type AccountSupport,
 	AccountType,
-	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
 import {
 	CallDataDisplay,
@@ -127,9 +127,9 @@ describe('walletEipSupport', () => {
 					contract: 'UNKNOWN',
 					controllingSharesInSelfCustodyByDefault: 'YES',
 					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+						AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 					keyRotationTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+						AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				}),
 				eip7702: notSupported,
 				safe: notSupported,

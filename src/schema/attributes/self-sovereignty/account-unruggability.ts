@@ -267,6 +267,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 					},
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: notSupported,
 						drills: notSupported,
 					},
@@ -285,6 +286,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 							MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE,
 					},
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: notSupported,
 						drills: notSupported,
 					},
@@ -302,6 +304,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 					},
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -338,6 +341,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 					},
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
@@ -380,6 +384,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 					},
 					{
+						alternateRecovery: notSupported,
 						guardianRecovery: supported({
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {

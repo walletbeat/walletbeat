@@ -18,13 +18,25 @@
 	import Typography from '@/components/Typography.svelte'
 	import {
 		accountRecoveryDrillWording,
+		alternateRecoveryToolingPhrase,
 		guardianPolicyMarkdown,
 	} from '@/schema/features/security/account-recovery'
 	import { isAccountRecoverable } from '@/schema/features/guardian-scenario/guardian-scenario-common'
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
-{#if metadata.outcomes === null}
+{#if metadata.outcomes === null && metadata.alternateRecovery !== null}
+	<Typography
+		content={{
+			contentType: ContentType.MARKDOWN,
+			markdown: trimWhitespacePrefix(`
+				{{WALLET_NAME}} does not implement guardian-based account recovery.
+				Its alternate recovery method ${alternateRecoveryToolingPhrase(metadata.alternateRecovery)}.
+			`),
+		}}
+		strings={{ WALLET_NAME: wallet.metadata.displayName }}
+	/>
+{:else if metadata.outcomes === null}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
