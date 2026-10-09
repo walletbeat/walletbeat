@@ -219,6 +219,46 @@
 		undefined
 	)
 
+	// Mobile cards have no hover, so tapping a petal opens a drawer under the flower instead of a tooltip.
+	let mobilePetal: {
+		walletId: string
+		attributeGroupId: _AttributeGroupId
+		attributeId?: string
+	} | undefined = $state(
+		undefined
+	)
+
+	const mobilePetalSliceId = (petal: NonNullable<typeof mobilePetal>) => (
+		`m_${petal.walletId}_ag_${petal.attributeGroupId}${petal.attributeId ? `_a_${petal.attributeId}` : ''}`
+	)
+
+	const toggleMobilePetal = async (wallet: RatedWallet<_AttributeGroupId>, sliceId: string, card: HTMLElement) => {
+		const match = sliceId.match(/_ag_([^_]+)(?:_a_(.+))?$/)
+		const attributeGroupId = match?.[1]
+
+		if (attributeGroupId === undefined || !isRatedEvaluationTreeGroup(attributeGroupId, wallet.overall)) return
+
+		const petal = {
+			walletId: wallet.metadata.id,
+			attributeGroupId,
+			...(match?.[2] && { attributeId: match[2] }),
+		}
+
+		if (mobilePetal && mobilePetalSliceId(mobilePetal) === mobilePetalSliceId(petal)) {
+			mobilePetal = undefined
+			return
+		}
+
+		mobilePetal = petal
+
+		// Keep the wallet's name, flower and drawer in view together.
+		await tick()
+		card.scrollIntoView({
+			block: card.offsetHeight > window.innerHeight ? 'start' : 'nearest',
+			behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+		})
+	}
+
 	let sortedColumn: Column<RatedWallet<_AttributeGroupId>> | undefined = $state(
 		undefined
 	)
@@ -293,6 +333,7 @@
 	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
+	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/urls'
 	import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
@@ -371,7 +412,7 @@
 
 
 	// Actions
-	import type { ComponentProps } from 'svelte'
+	import { type ComponentProps, tick } from 'svelte'
 
 	let toggleFilterById: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilterById'] = $state()
 	let toggleFilter: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilter'] = $state()
@@ -1676,8 +1717,11 @@
 			{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)) : null}
 			{@const cardSupportedVariants = [Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE].filter(v => v in wallet.variants)}
 			{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+			{@const petal = mobilePetal?.walletId === wallet.metadata.id ? mobilePetal : undefined}
+			{@const cardId = `mobile-wallet-card-${walletListUiId}-${wallet.metadata.id}`}
+			{@const drawerId = `${cardId}-drawer`}
 
-			<div class="mobile-wallet-card">
+			<div class="mobile-wallet-card" id={cardId}>
 				<!-- Header: rank · logo · name + variant icons -->
 				<div class="mobile-card-header">
 					<span class="mobile-card-rank">{i + 1}.</span>
@@ -1750,6 +1794,13 @@
 								labelSize: 9,
 							}
 						]}
+						highlightedSliceId={petal ? mobilePetalSliceId(petal) : null}
+						onSliceClick={sliceId => {
+							const card = document.getElementById(cardId)
+
+							if (card) void toggleMobilePetal(wallet, sliceId, card)
+						}}
+
 						slices={
 							displayedAttributeGroups.map(attrGroup => {
 								const evalGroup = wallet.overall[attrGroup.id]
@@ -1789,6 +1840,59 @@
 						}
 					/>
 				</div>
+
+				{#if petal}
+					{@const petalGroup = attributeGroupList.find(attrGroup => attrGroup.id === petal.attributeGroupId)}
+					{@const petalAttribute = petal.attributeId !== undefined ? wallet.overall[petal.attributeGroupId]?.[petal.attributeId] : undefined}
+
+					{#if petalGroup}
+						<div
+							class="mobile-petal-drawer"
+							id={drawerId}
+							role="region"
+							aria-label={`${wallet.metadata.displayName}: ${petalAttribute?.attribute.displayName ?? petalGroup.displayName}`}
+							data-column="gap-3"
+						>
+							{#if petalAttribute}
+								<WalletAttributeSummary
+									{wallet}
+									{ladders}
+									attribute={petalAttribute}
+									variant={selectedVariant}
+									summaryType={WalletAttributeSummaryType.Rating}
+									isInTooltip
+								/>
+							{:else}
+								<WalletAttributeGroupSummary
+									{wallet}
+									attributeGroup={petalGroup}
+									summaryType={WalletAttributeGroupSummaryType.None}
+									isInTooltip
+								/>
+							{/if}
+
+							<div class="mobile-petal-drawer-actions" data-row="gap-4">
+								<a
+									href={getWalletUrl(wallet, {
+										variant: selectedVariant,
+										attributeAnchor: slugifyCamelCase(petal.attributeId ?? petal.attributeGroupId),
+									})}
+								>
+									See {wallet.metadata.displayName}'s {petalAttribute?.attribute.displayName ?? petalGroup.displayName} details →
+								</a>
+
+								<button
+									type="button"
+									class="mobile-petal-drawer-close"
+									aria-controls={drawerId}
+									onclick={() => {
+										mobilePetal = undefined
+									}}
+								>Close</button>
+							</div>
+						</div>
+					{/if}
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -2329,5 +2433,32 @@
 		display: flex;
 		justify-content: center;
 		zoom: 0.42;
+	}
+
+	/* Spans the card under the header and flower. */
+	.mobile-petal-drawer {
+		grid-column: 1 / -1;
+		animation: mobile-petal-drawer-in 0.2s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation: none;
+		}
+	}
+
+	.mobile-petal-drawer-actions {
+		justify-content: space-between;
+		align-items: center;
+		font-size: 0.875rem;
+	}
+
+	.mobile-petal-drawer-close {
+		color: var(--text-secondary);
+	}
+
+	@keyframes mobile-petal-drawer-in {
+		from {
+			opacity: 0;
+			transform: translateY(-0.5rem);
+		}
 	}
 </style>
