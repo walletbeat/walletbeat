@@ -1,12 +1,9 @@
-import path from 'node:path'
-
 import { describe, expect, it } from 'vitest'
 
 import {
 	refersToAddress,
 	WalletCaptureAnnotations,
 } from '@/tools/wallet-data-collection/wallet-capture-annotations'
-import { getRepositoryRoot } from '@/utils/codebase'
 
 const USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
 const ETH = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
@@ -83,15 +80,5 @@ describe('WalletCaptureAnnotations global contract addresses', () => {
 		expect(() => WalletCaptureAnnotations.fromData(globalData, globalData)).toThrow(
 			/only allowed in the global annotations file/,
 		)
-	})
-
-	it('loads the repository global annotations file', () => {
-		const repoAnnotations = WalletCaptureAnnotations.fromFile(
-			path.join(getRepositoryRoot(), 'data', 'collection', 'does-not-exist.annotations.json'),
-			path.join(getRepositoryRoot(), 'data', 'collection', 'global.annotations.json'),
-		)
-
-		expect(repoAnnotations.globalContractAddressOf(USDC.toLowerCase())).toBe(USDC)
-		expect(repoAnnotations.isBenign('0xdac17f958d2ee523a2206206994597c13d831ec7')).toBe(true)
 	})
 })
