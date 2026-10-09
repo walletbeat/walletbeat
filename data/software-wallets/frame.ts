@@ -95,7 +95,6 @@ export const frame: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			// Frame has no built-in swap, bridge or onramp; swaps go through external apps with Frame as an injected wallet, so Frame takes no convenience fees.
 			ref: [
 				{
 					explanation:
@@ -138,13 +137,21 @@ export const frame: SoftwareWallet = {
 		security: {
 			accountRecovery: {
 				drills: notSupported,
-				// Recovery is only by re-importing the user's own seed phrase, private key or keystore, or using a hardware wallet; no social, cloud or vendor-assisted recovery exists in the code.
-				// Source: https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/app/dash/Notify/index.js
-				guardianRecovery: notSupported,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Recovery is only by re-importing the user's own seed phrase, private key or keystore, or using a hardware wallet; no social, cloud, or vendor-assisted recovery exists in the code.",
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/app/dash/Notify/index.js',
+					},
+				}),
 			},
-			// No bug bounty, SECURITY.md or disclosure policy in either repo or on frame.sh / docs.frame.sh.
-			// Source: https://github.com/floating/frame
-			bugBountyProgram: notSupported,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						'No bug bounty, SECURITY.md, or disclosure policy in either repository or on the Frame website and documentation.',
+					url: 'https://github.com/floating/frame',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -235,7 +242,6 @@ export const frame: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: {
-					// The extension is signed only by the Chrome Web Store and Firefox Add-ons.
 					[Variant.BROWSER]: notSupported,
 					[Variant.DESKTOP]: supported<ArtifactSigningDetails>({
 						ref: [
@@ -250,8 +256,13 @@ export const frame: SoftwareWallet = {
 					}),
 				},
 				dependencyLocking: {
-					// The extension commits package-lock.json but has no CI, and the README builds with `npm install`.
-					[Variant.BROWSER]: notSupported,
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: {
+							explanation:
+								'The extension commits package-lock.json but has no CI, and the README builds with `npm install`.',
+							url: 'https://github.com/frame-labs/frame-extension',
+						},
+					}),
 					[Variant.DESKTOP]: supported({
 						ref: [
 							{
@@ -262,25 +273,32 @@ export const frame: SoftwareWallet = {
 						],
 					}),
 				},
-				// Desktop gates install scripts with @lavamoat/allow-scripts but has no runtime LavaMoat policy; the extension has neither.
-				// Source: https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json
-				dependencySandboxing: notSupported,
+				dependencySandboxing: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Desktop gates install scripts with @lavamoat/allow-scripts but has no runtime LavaMoat policy; the extension has neither.',
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json',
+					},
+				}),
 				dependencyVulnerabilityScanning: {
 					[Variant.BROWSER]: notSupported,
-					// Dependabot security update PRs are opened for the desktop repo (repository setting), but several remain unmerged, e.g. #1658 (Electron, 2023).
 					[Variant.DESKTOP]: supported({
 						ref: [
 							{
 								explanation:
-									'Dependabot security update pull requests are opened for the desktop repository.',
+									'Dependabot security update pull requests are opened for the desktop repository, but several remain unmerged, such as this Electron update from 2023.',
 								url: 'https://github.com/floating/frame/pull/1658',
 							},
 						],
 					}),
 				},
 				hasPublicChangelog: {
-					// The extension repository has no release notes or changelog.
-					[Variant.BROWSER]: notSupported,
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: {
+							explanation: 'The extension repository has no release notes or changelog.',
+							url: 'https://github.com/frame-labs/frame-extension',
+						},
+					}),
 					[Variant.DESKTOP]: supported({
 						ref: 'https://github.com/floating/frame/releases',
 					}),
@@ -295,7 +313,6 @@ export const frame: SoftwareWallet = {
 					],
 				}),
 				repositoryChangeControls: {
-					// The extension repository's master branch is unprotected and has no rulesets.
 					[Variant.BROWSER]: {
 						ref: [
 							{
@@ -312,9 +329,12 @@ export const frame: SoftwareWallet = {
 					// Desktop branches are protected, but whether reviews are required is not visible to non-admins.
 					[Variant.DESKTOP]: null,
 				},
-				// No reproducible build process is documented for either variant.
-				// Source: https://github.com/floating/frame
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation: 'No reproducible build process is documented for either variant.',
+						url: 'https://github.com/floating/frame',
+					},
+				}),
 			},
 		},
 		walletCall: null,
