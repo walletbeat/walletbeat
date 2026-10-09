@@ -121,6 +121,7 @@
 		"cmap",
 		"CocoaPods",
 		"codegen",
+		"CodeQL",
 		"coinbase",
 		"Coinkite",
 		"CoinList",
@@ -178,6 +179,7 @@
 		"dejavu",
 		"delegatable",
 		"delegator",
+		"Dependabot",
 		"deprioritized",
 		"Devcon",
 		"Devconnect",
@@ -195,6 +197,7 @@
 		"EAL6",
 		"EAL7",
 		"Earthfast",
+		"EAS",
 		"Edgeserver",
 		"EF",
 		"EIP",
@@ -772,6 +775,7 @@
 		"resources/contracts/images/**"
 	],
 	"patterns": [
+		{ "name": "1kx", "pattern": "/\\b1kx\\b/g" },
 		{ "name": "4everland", "pattern": "/\\b4everland\\b/gi" },
 		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
 		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
@@ -807,6 +811,7 @@
 		}
 	],
 	"ignoreRegExpList": [
+		"1kx",
 		"4everland",
 		"backdoor",
 		"Bitcoin addresses",

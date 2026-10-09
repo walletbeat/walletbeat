@@ -373,14 +373,17 @@ export const safe: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Dependabot runs weekly for npm and GitHub Actions dependencies, and merges to protected branches require CodeQL code scanning.',
+								'Dependabot runs weekly for npm and GitHub Actions dependencies, and pull requests merged into protected branches require CodeQL code scanning.',
 							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/dependabot.yml',
 						},
 					],
 				}),
 				hasPublicChangelog: {
 					[Variant.BROWSER]: supported({
-						ref: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
+						ref: {
+							label: 'Safe{Wallet} releases',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
+						},
 					}),
 					[Variant.MOBILE]: supported({
 						ref: {
@@ -403,7 +406,7 @@ export const safe: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Organization rulesets on main, dev and release branches require a pull request with one approving code-owner review, CodeQL code scanning and signed commits, and block deletion and force-pushes; tag rulesets block deletion and rewrites of all tags.',
+								'Organization rule sets on main, dev, and release branches require a pull request with one approving code-owner review, CodeQL code scanning and signed commits, and block deletion and force-pushes. Tag rule sets block deletion and rewrites of all tags.',
 							url: 'https://api.github.com/repos/safe-global/safe-wallet-monorepo/rules/branches/dev',
 						},
 					],
