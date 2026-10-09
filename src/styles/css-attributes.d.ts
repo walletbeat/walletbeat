@@ -376,10 +376,12 @@ declare global {
 		 * ### Placement
 		 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
 		 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+		 * - `[data-list-item-rating]` is an optional attribute on a row that also has `[data-list-item-marker]`: it draws the rating as a glyph in a filled circle, and the marker string stays as the fallback.
 		 *
 		 * ### Tokens
 		 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
 		 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+		 * - rating glyph: `pass`, `partial`, `fail`, `unrated`, `exempt` via `[data-list-item-rating]`
 		 *
 		 * ### CSS Variables
 		 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -399,6 +401,13 @@ declare global {
 		 *   <ul>
 		 *     <li data-list-item-marker="*">First step</li>
 		 *     <li data-list-item-marker="1.">Second step</li>
+		 *   </ul>
+		 *   ```
+		 * - Rating glyph with an emoji fallback (`[data-list-item-rating]`):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item-marker="✅" data-list-item-rating="pass">Criterion met</li>
+		 *     <li data-list-item-marker="❌" data-list-item-rating="fail">Criterion not met</li>
 		 *   </ul>
 		 *   ```
 		 *
@@ -449,10 +458,12 @@ declare global {
 		 * ### Placement
 		 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
 		 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+		 * - `[data-list-item-rating]` is an optional attribute on a row that also has `[data-list-item-marker]`: it draws the rating as a glyph in a filled circle, and the marker string stays as the fallback.
 		 *
 		 * ### Tokens
 		 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
 		 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+		 * - rating glyph: `pass`, `partial`, `fail`, `unrated`, `exempt` via `[data-list-item-rating]`
 		 *
 		 * ### CSS Variables
 		 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -472,6 +483,13 @@ declare global {
 		 *   <ul>
 		 *     <li data-list-item-marker="*">First step</li>
 		 *     <li data-list-item-marker="1.">Second step</li>
+		 *   </ul>
+		 *   ```
+		 * - Rating glyph with an emoji fallback (`[data-list-item-rating]`):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item-marker="✅" data-list-item-rating="pass">Criterion met</li>
+		 *     <li data-list-item-marker="❌" data-list-item-rating="fail">Criterion not met</li>
 		 *   </ul>
 		 *   ```
 		 *
@@ -522,10 +540,12 @@ declare global {
 		 * ### Placement
 		 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
 		 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+		 * - `[data-list-item-rating]` is an optional attribute on a row that also has `[data-list-item-marker]`: it draws the rating as a glyph in a filled circle, and the marker string stays as the fallback.
 		 *
 		 * ### Tokens
 		 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
 		 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+		 * - rating glyph: `pass`, `partial`, `fail`, `unrated`, `exempt` via `[data-list-item-rating]`
 		 *
 		 * ### CSS Variables
 		 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -547,11 +567,100 @@ declare global {
 		 *     <li data-list-item-marker="1.">Second step</li>
 		 *   </ul>
 		 *   ```
+		 * - Rating glyph with an emoji fallback (`[data-list-item-rating]`):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item-marker="✅" data-list-item-rating="pass">Criterion met</li>
+		 *     <li data-list-item-marker="❌" data-list-item-rating="fail">Criterion not met</li>
+		 *   </ul>
+		 *   ```
 		 *
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
 		 */
 		'data-list-item-marker'?: string | boolean
+
+		/**
+		 * ## [data-list-item-rating]
+		 *
+		 * List layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.
+		 *
+		 * ### Placement
+		 * - On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).
+		 *
+		 * ### Tokens
+		 * - list gap: `gap-0` … `gap-6`
+		 *
+		 * ### CSS Variables
+		 * - `--list-markerGap`
+		 * - `--list-gap`
+		 * - `--list-marker-inlineSize`
+		 *
+		 * ### Examples
+		 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
+		 *   ```html
+		 *   <ul>
+		 *     <li>First item</li>
+		 *     <li>Second item</li>
+		 *   </ul>
+		 *   ```
+		 * - Tighter list gap (`gap-0`; default without a token is `0.5lh`):
+		 *   ```html
+		 *   <ul data-list="gap-0">
+		 *     <li>First</li>
+		 *     <li>Second</li>
+		 *   </ul>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`
+		 *
+		 * ---
+		 *
+		 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
+		 *
+		 * ### Placement
+		 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
+		 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+		 * - `[data-list-item-rating]` is an optional attribute on a row that also has `[data-list-item-marker]`: it draws the rating as a glyph in a filled circle, and the marker string stays as the fallback.
+		 *
+		 * ### Tokens
+		 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
+		 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+		 * - rating glyph: `pass`, `partial`, `fail`, `unrated`, `exempt` via `[data-list-item-rating]`
+		 *
+		 * ### CSS Variables
+		 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
+		 *
+		 * ### Examples
+		 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item="gap-4">
+		 *       <p>Lead</p>
+		 *       <p>Detail</p>
+		 *     </li>
+		 *   </ul>
+		 *   ```
+		 * - Custom marker string (`[data-list-item-marker]`):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item-marker="*">First step</li>
+		 *     <li data-list-item-marker="1.">Second step</li>
+		 *   </ul>
+		 *   ```
+		 * - Rating glyph with an emoji fallback (`[data-list-item-rating]`):
+		 *   ```html
+		 *   <ul>
+		 *     <li data-list-item-marker="✅" data-list-item-rating="pass">Criterion met</li>
+		 *     <li data-list-item-marker="❌" data-list-item-rating="fail">Criterion not met</li>
+		 *   </ul>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
+		 */
+		'data-list-item-rating'?: string | boolean
 
 		/**
 		 * ## [data-pressable]
