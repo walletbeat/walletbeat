@@ -11,7 +11,12 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -141,9 +146,14 @@ export const nufi: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			// No bug bounty or disclosure policy: nu.fi/.well-known/security.txt returns 404, no Immunefi or HackerOne program exists, and the terms have no disclosure clause.
-			// Source: https://nu.fi/terms-and-conditions
-			bugBountyProgram: notSupported,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						"No bug bounty or disclosure policy: NuFi's `/.well-known/security.txt` returns 404, no bug bounty platform lists a NuFi program, and the terms have no disclosure clause.",
+					label: 'NuFi terms and conditions',
+					url: 'https://nu.fi/terms-and-conditions',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -214,20 +224,19 @@ export const nufi: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// Only the Chrome Web Store's own signing; no release artifacts or published signatures, and the web app is served directly.
 				artifactSigning: notSupported,
 				dependencyLocking: null,
 				// No LavaMoat or SES markers in the shipped v35.2.0 bundle.
 				dependencySandboxing: notSupported,
 				dependencyVulnerabilityScanning: null,
-				// The public changelog exists but lags the shipped version (latest entry 31.0.0 from December 2025; the extension ships 35.2.0).
 				hasPublicChangelog: supported({
 					ref: {
+						explanation:
+							'The public changelog lags the shipped version: its latest entry is 31.0.0 from December 2025, while the extension ships 35.2.0.',
 						label: 'NuFi changelog',
 						url: 'https://support.nu.fi/support/solutions/articles/80001016927-changelog',
 					},
 				}),
-				// Closed source: builds cannot be inspected or reproduced.
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				reproducibleBuilds: notSupported,
