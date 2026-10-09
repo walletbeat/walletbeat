@@ -2,12 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { eip712 } from '@/data/eips/eip-712'
 import { erc4337 } from '@/data/eips/erc-4337'
-import { EipPrefix, EipStatus } from '@/schema/eips'
+import { EipPrefix, EipStatus, eipStatusLabel } from '@/schema/eips'
 import {
 	checkEip,
 	type EipCheckResultDrift,
 	EipMismatchField,
 	EipStatusCheckKind,
+	mapUpstreamStatus,
 } from '@/tools/eip-status-checker/eip-status-checker-lib'
 
 function upstreamSpec(status: string, category?: string): string {
@@ -37,6 +38,12 @@ function expectDrift(result: Awaited<ReturnType<typeof checkEip>>): EipCheckResu
 
 afterEach(() => {
 	vi.restoreAllMocks()
+})
+
+describe('mapUpstreamStatus', () => {
+	it.each(Object.values(EipStatus))('maps the upstream spelling of %s back to it', status => {
+		expect(mapUpstreamStatus(eipStatusLabel[status])).toBe(status)
+	})
 })
 
 describe('EIP status checker drift detection', () => {
