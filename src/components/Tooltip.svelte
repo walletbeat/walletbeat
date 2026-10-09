@@ -80,11 +80,8 @@
 	const useButtonTrigger = (node: HTMLElement) => {
 		triggerElement = node
 
-		// A button behind the content is positioned (as all buttons are), so it
-		// paints over its non-positioned siblings. When the wrapper handles hover,
-		// make it static so the content stays on top. A button around the content
-		// keeps its position, because forcing `static` on many inline triggers
-		// makes Chromium paint long pages blank.
+		// When the wrapper handles hover, a button behind the content is made
+		// static so it doesn't paint over the content.
 		$effect(() => {
 			if(buttonTriggerPlacement === 'behind' && hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
