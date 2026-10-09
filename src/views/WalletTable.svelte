@@ -807,11 +807,10 @@
 									isDefault: focusedAttributeGroup?.id === attrGroup.id,
 									defaultDirection: SortDirection.Descending,
 									// When this group sets the ranking, break ties the same way the overall rating does.
-									...(focusedAttributeGroup?.id === attrGroup.id && {
-										compare: (_scoreA: unknown, _scoreB: unknown, walletA: RatedWallet<_AttributeGroupId>, walletB: RatedWallet<_AttributeGroupId>) => (
-											compareFocusedGroup(walletA, walletB)
-										),
-									}),
+									compare: focusedAttributeGroup?.id === attrGroup.id ?
+										(_scoreA, _scoreB, walletA, walletB) => compareFocusedGroup(walletA, walletB)
+									:
+										undefined,
 								},
 
 								align: ColumnAlignment.Center,
@@ -2041,10 +2040,7 @@
 		margin-inline: -1em;
 	}
 
-	/*
-	 * In a row the flower is an at-a-glance summary; at full size it made every
-	 * row ~270px tall. Hovering a petal or expanding the row shows details.
-	 */
+	/* In a row the flower is an at-a-glance summary; hovering a petal or expanding the row shows details. */
 	:global(.wallet-overall-rating-pie) {
 		zoom: 0.48;
 	}
@@ -2075,6 +2071,10 @@
 
 			column-gap: 2rem;
 			row-gap: 1rem;
+		}
+
+		:global(form.menu:not(:has(> [data-filter-group]))) {
+			display: none;
 		}
 
 		:global([data-filter-group] > .group) {
@@ -2341,5 +2341,6 @@
 		display: flex;
 		justify-content: center;
 		zoom: 0.42;
+		content-visibility: auto;
 	}
 </style>
