@@ -10,9 +10,8 @@
 		type WalletLadderEvaluation,
 	} from '@/schema/stages'
 	import { isTypographicContent } from '@/types/content'
-	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/urls'
-	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
+	import { attributesById, getCriterionAttributeAnchor, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
 	// Props
@@ -200,7 +199,8 @@
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
-					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
+					{@const attributeAnchor = getCriterionAttributeAnchor(criterion, evaluation.rating)}
+					{@const attributeLink = attributeAnchor ? getWalletUrl(wallet, { attributeAnchor }) : null}
 					{@const criterionRatingMeta = stageCriterionRatings[evaluation.rating]}
 
 					<li

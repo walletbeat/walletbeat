@@ -9,6 +9,7 @@ import {
 	type WalletStageCriterion,
 } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
+import { slugifyCamelCase } from '@/types/utils/text'
 
 /**
  * Map of stage IDs to stage objects (using the first occurrence across all ladders).
@@ -157,6 +158,25 @@ export const isAttributeUsedInStage = <
 export const getCriterionAttributeId = <_AttributeGroupId extends string>(
 	criterion: WalletStageCriterion<_AttributeGroupId>,
 ): string | null => getEvaluateFunctionAttributeId(criterion.evaluate)
+
+/**
+ * Get the wallet page anchor of the attribute section that a stage criterion
+ * is evaluated on. Wallet pages render no section for attributes the wallet is
+ * exempt from, so EXEMPT criteria have no anchor.
+ * @param criterion The criterion to get the anchor for
+ * @param rating The criterion's rating for the wallet
+ * @returns The attribute section anchor if the wallet page renders it, null otherwise
+ */
+export const getCriterionAttributeAnchor = <_AttributeGroupId extends string>(
+	criterion: WalletStageCriterion<_AttributeGroupId>,
+	rating: StageCriterionRating,
+): string | null => {
+	const attributeId = getCriterionAttributeId(criterion)
+
+	return attributeId === null || rating === StageCriterionRating.EXEMPT
+		? null
+		: slugifyCamelCase(attributeId)
+}
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.

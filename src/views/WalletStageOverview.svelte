@@ -9,7 +9,7 @@
 		type WalletLadderEvaluation,
 	} from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
-	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
+	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeAnchor, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
 	/** Aggregate statuses for stages and stage groups (must match StageCountsStatus in stage-attributes) */
 	enum StageStatus {
@@ -99,7 +99,6 @@
 
 	// Functions
 	import { isTypographicContent } from '@/types/content'
-	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/urls'
 
 
@@ -237,7 +236,8 @@
 										{@const criterionRating = criterionEvaluation?.rating ?? StageCriterionRating.UNRATED}
 										{@const criterionRatingMeta = stageCriterionRatings[criterionRating]}
 										{@const attributeId = getCriterionAttributeId(criterion)}
-										{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
+										{@const attributeAnchor = getCriterionAttributeAnchor(criterion, criterionRating)}
+										{@const attributeLink = attributeAnchor ? getWalletUrl(wallet, { attributeAnchor }) : null}
 										{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 										{@const attributeName = attribute?.displayName ?? attributeId}
 										{@const attributeTitle = attribute?.displayName ?? attributeId}
