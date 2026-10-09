@@ -17,7 +17,12 @@ import {
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
@@ -323,7 +328,6 @@ export const bitget: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// App-store and Chrome Web Store signing only; no published signatures or release artifacts.
 				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: {
@@ -332,13 +336,16 @@ export const bitget: SoftwareWallet = {
 					[Variant.MOBILE]: null,
 				},
 				dependencyVulnerabilityScanning: null,
-				// Only store release notes; no public changelog for either variant.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Closed source: "Build cannot be done because the source code is not publicly available."
-				// Source: https://walletscrutiny.com/android/com.bitkeep.wallet/
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The app is closed source. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/android/com.bitkeep.wallet/',
+					},
+				}),
 			},
 		},
 		walletCall: notSupported,
