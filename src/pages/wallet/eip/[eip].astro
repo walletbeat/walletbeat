@@ -125,7 +125,7 @@ const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 	import { eipFinalForLabel } from '@/schema/eips'
 	import { assertCalendarDate, daysSince } from '@/types/date'
 
-	// The page is prerendered, so recompute "Final for N days" in the
+	// The page is built ahead of time, so recompute "Final for N days" in the
 	// visitor's browser to keep it current between builds.
 	for (const element of document.querySelectorAll<HTMLElement>('[data-final-since]')) {
 		const finalizedDate = element.dataset.finalSince
