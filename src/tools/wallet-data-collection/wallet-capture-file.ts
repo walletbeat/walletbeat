@@ -1950,12 +1950,9 @@ export class WalletDataStrings {
 	 * @returns The strings known to carry user data, ordered by longest string
 	 * first. Useful for string matching.
 	 *
-	 * These come from the capture file's user data store rather than from the
-	 * strings gathered so far. Every user-data-carrying string gathered here
-	 * gets its pieces from that store anyway (see `add`), but a declared string
-	 * may not have been gathered on its own yet, or ever: an address may only
-	 * appear embedded in longer strings (e.g. `eip155:1:0x...`), and the
-	 * per-request `WalletDataStrings` start out empty.
+	 * These come from the capture file's user data store, so they include
+	 * declared strings that only appear embedded in longer strings (e.g. an
+	 * address in `eip155:1:0x...`).
 	 */
 	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<UserDataString> {
 		return this.captureFile.userData.longestFirstUserInfoOnlyStrings()
