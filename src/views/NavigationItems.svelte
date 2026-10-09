@@ -323,7 +323,14 @@
 		{@const iconShape = depth === 0 ? 'circle' : ''}
 		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
 			<span data-icon="grayscale">
-				<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+				<img
+					src={item.icon.slice('ICON_WALLET_IMG:'.length)}
+					alt=""
+					width="32"
+					height="32"
+					loading="lazy"
+					decoding="async"
+				/>
 			</span>
 		{:else if item.icon in LUCIDE_ICONS}
 			<span data-icon={iconShape}>

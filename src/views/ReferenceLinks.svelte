@@ -326,7 +326,10 @@
 										<img
 											src={image.url}
 											alt={image.label}
+											width="128"
+											height="96"
 											loading="lazy"
+											decoding="async"
 										/>
 									</a>
 								{/each}
