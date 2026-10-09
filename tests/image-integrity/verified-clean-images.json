@@ -200,7 +200,7 @@
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/family.png": {
-		"hash": "bdea08cca8efa676101139da7014e5035bcc7bfad7e4338d1c0b1283931299b2",
+		"hash": "742594f682ec700eb660c5fc18a2b080b94f0a94cdbbdcc251f810385ea674a8",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/images/wallets/firefly.jpg": {
