@@ -1,4 +1,5 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -35,7 +36,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, type WithRef } from '@/schema/reference'
@@ -84,9 +90,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman],
+		contributors: [h3rman, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-14',
+		lastUpdated: '2026-10-09',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -585,7 +591,24 @@ export const gemwallet: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
-		walletCall: null,
+		walletCall: notSupportedWithRef({
+			ref: [
+				{
+					explanation:
+						'Gem connects to apps through WalletConnect. Its EVM request handler supports signing, sending transactions and switching or adding chains, but not the EIP-5792 methods. Requests for methods outside its list are rejected as unsupported.',
+					urls: [
+						{
+							label: 'Gem features: WalletConnect',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/docs/FEATURES.md',
+						},
+						{
+							label: 'WalletConnect method identifiers',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/core/crates/primitives/src/wallet_connector.rs',
+						},
+					],
+				},
+			],
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,
