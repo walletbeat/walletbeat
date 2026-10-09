@@ -68,15 +68,9 @@
 
 	// Actions
 
-	// Scope-header/context lines can push the highlighted (referenced) lines
-	// below the fold of the fixed-height snippet box, so scroll them into view
-	// the first time the box comes near the viewport. Measuring at mount
-	// instead forced a layout of the whole page in the middle of hydration,
-	// and couldn't center boxes that start out hidden (collapsed sources or
-	// cards), since hidden boxes have nothing to measure.
-	// Scrolls the box itself (rather than `scrollIntoView`) so only the
-	// snippet box scrolls, not the page, and instantly, so a box coming into
-	// view doesn't visibly scroll by itself.
+	// Centers the highlighted (referenced) lines in the fixed-height snippet box
+	// the first time the box comes near the viewport. Only the box scrolls, not
+	// the page.
 	const highlightScrollTop = (pre: HTMLElement): number | undefined => {
 		const highlighted = pre.querySelectorAll<HTMLElement>('.row.highlighted')
 
@@ -103,8 +97,7 @@
 
 		highlightObserver ??= new IntersectionObserver(
 			entries => {
-				// Measure every box that came into range before scrolling any,
-				// so a batch of boxes costs one layout rather than one each.
+				// Measure every box that came into range before scrolling any.
 				const scrolls = entries
 					.filter(entry => entry.isIntersecting)
 					.map(entry => entry.target)
