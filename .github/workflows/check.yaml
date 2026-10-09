@@ -93,9 +93,7 @@ jobs:
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        # `choco install` exits 0 with "installed 0/0 packages" when the
-        # community feed errors out before resolving anything, so retry and
-        # check that every package really got installed.
+        # `choco install` can exit 0 without installing anything, so check each package.
         run: |
           $packages = @(Get-Content deploy/windows-packages.txt | Where-Object { $_.Trim() })
           foreach ($attempt in 1..3) {
