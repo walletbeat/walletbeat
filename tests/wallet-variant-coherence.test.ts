@@ -21,38 +21,52 @@ interface VariantSentinelField {
 	sentinel: string
 
 	/**
-	 * Returns the field's value for the given wallet, or `null` if the field
-	 * is not filled in (or does not apply to this type of wallet).
+	 * Whether the wallet's value for this field is the sentinel, or `null` if
+	 * the field is not filled in (or does not apply to this type of wallet).
 	 */
-	getValue: (wallet: BaseWallet<AttributeGroupId>) => unknown
+	isSentinel: (wallet: BaseWallet<AttributeGroupId>) => boolean | null
+}
+
+function variantSentinelField<T>(
+	name: string,
+	variant: Variant,
+	sentinel: NoInfer<T> & string,
+	getValue: (wallet: BaseWallet<AttributeGroupId>) => T | null | undefined,
+): VariantSentinelField {
+	return {
+		name,
+		variant,
+		sentinel,
+		isSentinel: wallet => {
+			const value = getValue(wallet)
+
+			return value === null || value === undefined ? null : value === sentinel
+		},
+	}
 }
 
 const variantSentinelFields: VariantSentinelField[] = [
-	{
-		name: 'security.securityBestPractices.browser',
-		variant: Variant.BROWSER,
-		sentinel: 'NOT_A_BROWSER_EXTENSION',
-		getValue: wallet => wallet.features.security.securityBestPractices?.browser ?? null,
-	},
-	{
-		name: 'security.securityBestPractices.mobile',
-		variant: Variant.MOBILE,
-		sentinel: 'NOT_A_MOBILE_APP',
-		getValue: wallet => wallet.features.security.securityBestPractices?.mobile ?? null,
-	},
-	{
-		name: 'security.securityBestPractices.desktop',
-		variant: Variant.DESKTOP,
-		sentinel: 'NOT_A_DESKTOP_APP',
-		getValue: wallet => wallet.features.security.securityBestPractices?.desktop ?? null,
-	},
-	{
-		name: 'integration.browser',
-		variant: Variant.BROWSER,
-		sentinel: 'NOT_A_BROWSER_WALLET',
-		getValue: wallet =>
-			isWalletSoftwareFeatures(wallet.features) ? wallet.features.integration.browser : null,
-	},
+	variantSentinelField(
+		'security.securityBestPractices.browser',
+		Variant.BROWSER,
+		'NOT_A_BROWSER_EXTENSION',
+		wallet => wallet.features.security.securityBestPractices?.browser,
+	),
+	variantSentinelField(
+		'security.securityBestPractices.mobile',
+		Variant.MOBILE,
+		'NOT_A_MOBILE_APP',
+		wallet => wallet.features.security.securityBestPractices?.mobile,
+	),
+	variantSentinelField(
+		'security.securityBestPractices.desktop',
+		Variant.DESKTOP,
+		'NOT_A_DESKTOP_APP',
+		wallet => wallet.features.security.securityBestPractices?.desktop,
+	),
+	variantSentinelField('integration.browser', Variant.BROWSER, 'NOT_A_BROWSER_WALLET', wallet =>
+		isWalletSoftwareFeatures(wallet.features) ? wallet.features.integration.browser : null,
+	),
 ]
 
 /**
@@ -68,13 +82,9 @@ const knownIncoherentFields = new Set<string>(['family:integration.browser'])
 
 /** Whether the field's value is consistent with the wallet's variants. */
 function isCoherent(wallet: BaseWallet<AttributeGroupId>, field: VariantSentinelField): boolean {
-	const value = field.getValue(wallet)
+	const isSentinel = field.isSentinel(wallet)
 
-	if (value === null) {
-		return true
-	}
-
-	return (value === field.sentinel) === (wallet.variants[field.variant] !== true)
+	return isSentinel === null || isSentinel === (wallet.variants[field.variant] !== true)
 }
 
 describe('wallet variant coherence', () => {
