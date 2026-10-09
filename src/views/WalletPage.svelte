@@ -2200,6 +2200,22 @@
 			}
 		}
 
+		/*
+		 * Show attribute petals only for the group being read (it holds the
+		 * :target-current link) or hovered/focused; the group petals' gradients
+		 * summarize the rest. Without :target-current (non-Chromium) nothing would
+		 * mark the group being read, so every petal stays visible there.
+		 * Hidden petals still take hover, so pointing where they sit reveals them,
+		 * and the delay bridges the gaps between petals.
+		 */
+		@supports selector(:target-current) {
+			:global(#wallet-page .pie-navigation .navigation-items menu[data-navigation-depth='0'] > li:not(:hover, :focus-within, :has(a:target-current)) menu[data-navigation-depth='1'] > li > a) {
+				---slice-scale: 0.85;
+				opacity: 0;
+				transition-delay: 0.3s;
+			}
+		}
+
 		@media (max-width: 1024px) {
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
 				---pie-target-angle: 0.375turn;
