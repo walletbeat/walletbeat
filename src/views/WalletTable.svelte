@@ -21,7 +21,7 @@
 	import { erc4337 } from '@/data/eips/erc-4337'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import type { AttributeTree } from '@/schema/attribute-groups'
-	import { type Attribute, type OutcomeMetadata, Rating, ratingIcons } from '@/schema/attributes'
+	import { type Attribute, type EvaluatedAttribute, type OutcomeMetadata, Rating, ratingIcons } from '@/schema/attributes'
 	import { AccountType } from '@/schema/features/account-support'
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { Variant } from '@/schema/variants'
@@ -263,25 +263,9 @@
 		})
 	)
 
-	const attributesExemptForAllWallets = $derived(
-		new Set(
-			attributeGroupList.flatMap(attrGroup =>
-				attrGroup.attributes
-					.map(({ attribute }) => attribute.id)
-					.filter(attributeId => {
-						const walletsWithAttribute = filteredWallets.filter(wallet =>
-							wallet.overall[attrGroup.id]?.[attributeId] !== undefined
-						)
-						return (
-							walletsWithAttribute.length > 0 &&
-							walletsWithAttribute.every(wallet =>
-								wallet.overall[attrGroup.id]?.[attributeId]?.evaluation?.outcome?.rating === Rating.EXEMPT
-							)
-						)
-					})
-					.map(attributeId => `${attrGroup.id}.${attributeId}`)
-			)
-		)
+	// EXEMPT attributes do not apply to a wallet, so flowers leave them out.
+	const isShownAsPetal = (attribute: EvaluatedAttribute<OutcomeMetadata>) => (
+		attribute.evaluation.outcome.rating !== Rating.EXEMPT
 	)
 
 
@@ -1218,6 +1202,19 @@
 									displayedAttributeGroups.map(attrGroup => {
 										const evalGroup = wallet.overall[attrGroup.id]
 										const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
+										const petalAttributes = (
+											evalGroup ?
+												evaluatedAttributesEntries(evalGroup)
+													.filter(([attributeId, attribute]) => (
+														isShownAsPetal(attribute)
+														&& (
+															overallFilteredAttributeIds === null
+															|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+														)
+													))
+											:
+												[]
+										)
 
 										return {
 											id: `attrGroup_${attrGroup.id}`,
@@ -1232,19 +1229,10 @@
 											),
 											gradient: attributeGroupFlowerGradient,
 											weight: 1,
-											...evalGroup && {
+											// A group whose attributes are all EXEMPT keeps its petal, without attribute petals.
+											...petalAttributes.length > 0 && {
 												children: (
-													evaluatedAttributesEntries(evalGroup)
-														.filter(([attributeId, attribute]) => (
-															(
-																attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT
-																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
-															)
-															&& (
-																overallFilteredAttributeIds === null
-																|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
-															)
-														))
+													petalAttributes
 														.map(([attributeId, attribute]) => ({
 															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
 															color: ratingToColor(attribute.evaluation.outcome.rating),
@@ -1256,9 +1244,6 @@
 																	arcLabel: '',
 																	arcIconId: attribute.attribute.icon,
 																	ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
-															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
-																opacity: 0.33,
-															},
 														}))
 												),
 											},
@@ -1394,10 +1379,7 @@
 						{@const evalEntries = (
 							evaluatedAttributesEntries(evalGroup)
 								.filter(([attributeId, attribute]) => (
-									(
-										attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT
-										|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
-									)
+									isShownAsPetal(attribute)
 									&& (
 										filteredAttributeIds === null
 										|| filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
@@ -1480,9 +1462,6 @@
 												arcLabel: '',
 												arcIconId: attribute.attribute.icon,
 												ariaLabel: `${attribute.attribute.displayName}${tooltipSuffix ?? ''}: ${attribute.evaluation.outcome.rating}`,
-												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
-													opacity: 0.33,
-												},
 											}
 										}
 									)
@@ -1754,6 +1733,16 @@
 							displayedAttributeGroups.map(attrGroup => {
 								const evalGroup = wallet.overall[attrGroup.id]
 								const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
+								const petalAttributes = (
+									evalGroup ?
+										evaluatedAttributesEntries(evalGroup)
+											.filter(([attributeId, attribute]) => (
+												isShownAsPetal(attribute)
+												&& (overallFilteredAttributeIds === null || overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
+											))
+									:
+										[]
+								)
 								return {
 									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
@@ -1762,13 +1751,9 @@
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
 									gradient: attributeGroupFlowerGradient,
 									weight: 1,
-									...evalGroup && {
+									...petalAttributes.length > 0 && {
 										children: (
-											evaluatedAttributesEntries(evalGroup)
-												.filter(([attributeId, attribute]) => (
-													(attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT || !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`))
-													&& (overallFilteredAttributeIds === null || overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
-												))
+											petalAttributes
 												.map(([attributeId, attribute]) => ({
 													id: `m_${wallet.metadata.id}_ag_${attrGroup.id}_a_${attributeId}`,
 													color: ratingToColor(attribute.evaluation.outcome.rating),
@@ -1780,7 +1765,6 @@
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
 													ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
-													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
 												}))
 										),
 									},
