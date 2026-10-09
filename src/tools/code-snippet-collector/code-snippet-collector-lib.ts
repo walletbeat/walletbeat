@@ -1,67 +1,30 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-import { allWallets, assertValidWalletName } from '@/data/wallets'
+import { allWallets } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
-	isSnippetSource,
-	parseGitHubBlobUrl,
 	rawGitHubContentUrl,
-	snippetRelativePath,
 	type StoredSnippetContent,
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
-import { collectAllRefs } from '@/schema/reference'
 import { getErrorMessage } from '@/types/errors'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 
+import { findWalletSnippetOccurrences, type SnippetOccurrence } from './snippet-occurrences'
+
 /** Lines of context stored immediately before/after the referenced range. */
 const CONTEXT_LINE_COUNT = 4
-
-/** One line-anchored, commit-pinned GitHub blob URL found in a wallet's ref data. */
-export interface SnippetOccurrence {
-	walletId: string
-	source: CodeSnippetSource
-	/** The URL as written in the reference. */
-	url: string
-	/** Period-delimited field path (from the wallet root) the URL was found under. */
-	fieldPath: string
-	/** Repository-relative path of the snippet file this URL maps to. */
-	snippetPath: string
-}
 
 /**
  * Find every line-anchored, commit-pinned GitHub blob URL among wallet data
  * refs, paired with the wallet ID it was found under.
  */
 export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
-	const occurrences: SnippetOccurrence[] = []
-
-	for (const collected of collectAllRefs(allWallets)) {
-		const walletName = assertValidWalletName(collected.walletName)
-		const walletId = allWallets[walletName].metadata.id
-
-		for (const fq of collected.fullyQualifiedRefs) {
-			for (const urlEntry of fq.urls) {
-				const source = parseGitHubBlobUrl(urlEntry.url)
-
-				if (!isSnippetSource(source)) {
-					continue
-				}
-
-				occurrences.push({
-					fieldPath: collected.fieldPath,
-					snippetPath: snippetRelativePath(walletId, source),
-					source,
-					url: urlEntry.url,
-					walletId,
-				})
-			}
-		}
-	}
-
-	return occurrences
+	return Object.entries(allWallets).flatMap(([walletName, wallet]) =>
+		findWalletSnippetOccurrences(walletName, wallet),
+	)
 }
 
 /** A line's leading whitespace, used as its indentation. */
