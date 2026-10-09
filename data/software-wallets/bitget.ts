@@ -125,7 +125,7 @@ export const bitget: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'BitKeep (now Bitget Wallet) raised a $15M Series A in May 2022 with Dragonfly Capital as lead investor.',
+						'BitKeep (now Bitget Wallet) raised a $15M Series A round in May 2022 with Dragonfly Capital as lead investor.',
 					url: 'https://web3.bitget.com/en/blog/articles/6644',
 				},
 				{
