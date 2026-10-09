@@ -15,8 +15,7 @@ const COLOR_TYPES_WITH_COLOR: Set<number> = new Set([2, 3, 6])
 /**
  * Ancillary chunks that affect how the image is displayed (color space,
  * gamma, HDR metadata, physical pixel size, orientation). These are copied
- * as-is from the original file into the re-encoded one, so re-encoding never
- * changes how the image renders.
+ * as-is from the original file into the re-encoded one.
  *
  * Every other ancillary chunk (text, timestamps, background color hints,
  * significant bits, application-private chunks) does not affect rendering
@@ -143,8 +142,7 @@ function loadPixels(png: Buffer, header: PngHeader): ReturnType<typeof sharp> {
  *
  * The pixel values, bit depth and every chunk that affects rendering (see
  * `PRESERVED_CHUNK_TYPES`) are kept. An alpha channel that is fully opaque is
- * dropped. Palette images are returned unchanged, since re-encoding them as
- * truecolor would make them larger.
+ * dropped. Palette images are returned unchanged.
  *
  * The result may be larger than the input; callers decide whether to use it.
  */

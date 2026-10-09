@@ -15,9 +15,7 @@ import { hasSamePixels, isWorthRecompressing, recompressPng } from './png-optimi
  * With no arguments, every PNG tracked by git is processed. A file is only
  * rewritten when the recompressed version saves enough to fail the
  * `png-optimized` image integrity test (see `isWorthRecompressing`) and
- * decodes to exactly the same pixels. Smaller savings are not worth adding a
- * new copy of the file to the git history. File names and formats never
- * change.
+ * decodes to exactly the same pixels. File names and formats never change.
  */
 const execFileAsync = promisify(execFile)
 const repositoryRoot = getRepositoryRoot()
