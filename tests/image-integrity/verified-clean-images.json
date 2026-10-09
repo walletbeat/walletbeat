@@ -135,6 +135,10 @@
 		"hash": "0a7a84dbd45b5ca049612cceae644271d22fcded25064e845760f7a87a1727ba",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/images/entities/safepal.svg": {
+		"hash": "3c94f1ac1c2251f6afceba9985cf19678648523f42df4b5245d10a42325ef825",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/slowmist.png": {
 		"hash": "dd45661ffb6b18f48eb41e79c8543c84ab38caf0a342ff74b865179da6818c3a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -281,6 +285,10 @@
 	},
 	"public/images/wallets/safe.svg": {
 		"hash": "b585a7c804cda44c869922f55ef2d6c4619d6abc8d2e44a7eb36de336b59d4bc",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/safepal.svg": {
+		"hash": "3c94f1ac1c2251f6afceba9985cf19678648523f42df4b5245d10a42325ef825",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/trezor.svg": {
