@@ -1,8 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
-	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
+
+	// Stored code snippets for this page, provided by the island's root component.
+	const codeSnippetForUrl = getCodeSnippetLookup()
 
 
 	// Props
