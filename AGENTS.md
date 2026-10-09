@@ -14,7 +14,7 @@ pnpm install         # Install dependencies
 pnpm dev             # Start development server (http://localhost:4321 by default)
 pnpm dev:background  # Start development server, daemonize it, and print its URL; useful for keeping server running past single-turn execution.
 
-# Quality checks (run after code changes)
+# Quality checks (run before committing, not after every edit)
 pnpm check:quick  # Fast checks (lint, syntax, spelling, misc)
 pnpm check:all    # Comprehensive checks (includes Astro check)
 
@@ -64,11 +64,28 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 
 ### Code quality
 
-- Always run `pnpm check:quick` after changes
-- Run `pnpm check:all` before considering tasks complete
-- Fix prettier issues with `pnpm lint`
+- Don't run checks after every edit; they are slow. Run `pnpm lint` then `pnpm check:quick` once before each commit
+- Run `pnpm check:all` before considering tasks complete or opening a PR
+- Fix prettier issues with `pnpm lint` rather than formatting by hand
 - Never use `eslint-disable` or `as any` workarounds
 - Add spelling exceptions to `.cspell.json` only for valid terms
+- Reuse helpers and common libraries. Chances are the problem you are trying to solve (argument parsing, codebase traversal, or grammar checking) was already faced by some other part of the codebase. Do not reinvent the wheel.
+
+### Comments
+
+Code comments must not be temporal. This means they must stand the test of time. They must assist any and all *future* readers of the codebase, not a reviewer of the change being done in the present. Comments describing why something works a certain way are good when that would otherwise be non-obvious, but comments describing the specific problem that some particular line was added fix are completely irrelevant. If a problem is likely to reoccur in the future, the correct fix is not a comment describing the problem, but a test verifying that the problem never happens again.
+
+Bad comment: "Check for URLs with line numbers first, because the deep search below used to take minutes without it.": Who cares how long it used to take? What does "URLs with line numbers" even mean?
+Good comment: "Cheap pre-filter to remove most entries prior to the more expensive deep search later.": Good, explains the structure of the code and why a pre-filter pass exists.
+
+### Test scope
+
+Like comments, tests must stand the test of time. Tests that exercise a very narrow bug that is never likely to reoccur are useless and consume CI time for every future PR for no reason. They are at best a fix development aid while implementing a fix, but do not belong in the fix PR itself.
+Tests that are worthwhile are tests that assert *classes of problems* as a whole.
+
+Bad test: A test that verifies that a Markdown string generation function ends with a period (because it used not to, by accident). This is never going to resurface as a bug. The test is overfitting.
+Good test: Run the output of this Markdown string generation function through the grammar checker pipeline. This will catch this and similar errors in this function (or any of the ones it may call), now and in the future.
+Better test: Verify that all generated Markdown on the site uses correct punctuation and grammar. This will catch such errors across the entire codebase, now, and in the future, and avoids having to develop individual Markdown-generator-function-specific tests.
 
 ### Commit signing
 
