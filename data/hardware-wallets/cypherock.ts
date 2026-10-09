@@ -74,7 +74,7 @@ export const cypherockWallet: HardwareWallet = {
 					{
 						explanation:
 							'The EVM app decodes only transaction types 0, 1 and 2; any other type is rejected as unknown, and message signing covers only eth_sign, personal_sign and EIP-712.',
-						url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/apps/evm_family/evm_txn_helpers.c',
+						url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/apps/evm_family/evm_txn_helpers.c',
 					},
 				],
 			}),
@@ -82,7 +82,7 @@ export const cypherockWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"New wallets get a 24-word BIP-39 seed; Ethereum accounts use BIP-44 paths such as m/44'/60'/0'/0/i.",
+							"New wallets get a 24-word BIP-39 seed; Ethereum accounts use BIP-44 paths such as `m/44'/60'/0'/0/i`.",
 						url: 'https://docs.cypherock.com/design-decisions/cypherock-is-bip39-compliant',
 					},
 					{
@@ -198,11 +198,11 @@ export const cypherockWallet: HardwareWallet = {
 			duressResistance: null,
 			firmware: {
 				// Updates need on-device confirmation, two of four vendor signatures, and refuse lower versions.
-				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/main/docs/bootloader.md
+				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/docs/bootloader.md
 				// The application firmware is source-available (MIT with Commons Clause); the bootloader and the X1 Card applet are closed.
 				// Source: https://docs.cypherock.com/cypherock-x1-features/open-source-with-secure-elements
 				// Reproducible builds are documented, and WalletScrutiny rated releases reproducible up to v0.6.1282 (2024-12-10).
-				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/main/VERIFY.md
+				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/VERIFY.md
 				// Unsigned firmware is rejected and wiped; locally built images can't be installed.
 				// Source: https://docs.cypherock.com/security-overview/physical-attacks/flashing-malicious-firmware
 				type: FirmwareType.PARTIAL,
@@ -212,13 +212,13 @@ export const cypherockWallet: HardwareWallet = {
 				firmwareOpenSource: FirmwareType.PARTIAL,
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
-				url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/docs/bootloader.md',
+				url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/docs/bootloader.md',
 			},
 			keysHandling: {
 				ref: [
 					{
 						explanation:
-							'Entropy from the MCU and the secure element random number generators is combined on the X1 Vault; the seed is split into 2-of-5 Shamir shares (Vault plus four X1 Cards) and rebuilt on the Vault for signing.',
+							'Entropy from the main chip and the secure element random number generators is combined on the X1 Vault; the seed is split into 2-of-5 Shamir shares (Vault plus four X1 Cards) and rebuilt on the Vault for signing.',
 						url: 'https://docs.cypherock.com/getting-started/how-cypherock-generates-your-24-word-seed-phrase',
 					},
 				],
@@ -259,7 +259,7 @@ export const cypherockWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: {
 				// Device provisioning (key derivation, secure element configuration, server registration of device public keys) is documented; factory physical security is not.
-				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/main/docs/device_provision_auth.md
+				// Source: https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/docs/device_provision_auth.md
 				// The Keylabs audit covered architecture, hardware and firmware, not manufacturing.
 				// Source: https://www.cypherock.com/keylabs.pdf
 				// The ultrasonically welded enclosure shows marks if forced open; Cypherock rejects tamper tapes and stickers.
@@ -279,7 +279,7 @@ export const cypherockWallet: HardwareWallet = {
 				hardwareVerification: SupplyChainFactoryType.FAIL,
 				tamperEvidence: SupplyChainFactoryType.PARTIAL,
 				tamperResistance: SupplyChainFactoryType.PARTIAL,
-				url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/docs/device_provision_auth.md',
+				url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/5b11739d5a3e4c47181cdc28dbe168a97847db45/docs/device_provision_auth.md',
 			},
 			transactionLegibility: {
 				ref: [
