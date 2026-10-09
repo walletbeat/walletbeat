@@ -68,12 +68,13 @@ export const onekeyWallet: HardwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			// Signing is limited to registered delegation contracts (OKX, MetaMask, Simple7702 and the revoke address) and to self-sponsored transactions.
-			// Source: https://github.com/OneKeyHQ/firmware-pro/blob/main/core/src/apps/ethereum/onekey/sign_tx_eip7702.py
+			// Source: https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/src/apps/ethereum/onekey/sign_tx_eip7702.py
 			eip7702: supported({
 				ref: [
 					{
 						explanation:
 							'Firmware v4.16.0 (2025-09-15) "Added support for EIP-7702 transaction signing".',
+						label: 'OneKey Pro firmware release notes',
 						url: 'https://github.com/OneKeyHQ/firmware-pro/releases/tag/v4.16.0',
 					},
 				],
@@ -83,8 +84,9 @@ export const onekeyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Ethereum accounts use the BIP-44 path m/44'/60'/0'/0/i by default from a BIP-39 seed; Ledger Live style paths are also accepted.",
-						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/core/src/apps/ethereum/keychain.py',
+							"Ethereum accounts use the BIP-44 path `m/44'/60'/0'/0/i` by default from a BIP-39 seed; Ledger Live style paths are also accepted.",
+						label: 'OneKey firmware Ethereum keychain',
+						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/src/apps/ethereum/keychain.py',
 					},
 					{
 						explanation:
@@ -122,8 +124,8 @@ export const onekeyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'OneKey Pro firmware: "core - GPLv3 ... crypto - mostly MIT ... all other files - GPLv3". The secure element firmware is not published.',
-						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/LICENSE.md',
+							'OneKey Pro firmware: "core - GPLv3 … crypto - mostly MIT … all other files - GPLv3". The secure element firmware is not published.',
+						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/LICENSE.md',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -160,7 +162,7 @@ export const onekeyWallet: HardwareWallet = {
 			privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
 			transactionPrivacy: {
 				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the firmware Ethereum app, and no private transfer mode in the OneKey App docs.
-				// Source: https://github.com/OneKeyHQ/firmware-pro/tree/main/core/src/apps/ethereum
+				// Source: https://github.com/OneKeyHQ/firmware-pro/tree/251a1b762065357059f80f32b28cb502609510d3/core/src/apps/ethereum
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
@@ -180,8 +182,8 @@ export const onekeyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'OneKey bug bounty policy: reports by email or BugRap; firmware rewards from $0 to $5,000 by severity, with a quality multiplier.',
-						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/SECURITY.md',
+							'OneKey bug bounty policy: reports by email or Bugrap; firmware rewards from $0 to $5,000 by severity, with a quality multiplier.',
+						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/SECURITY.md',
 					},
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
@@ -194,7 +196,7 @@ export const onekeyWallet: HardwareWallet = {
 						{
 							explanation:
 								'"OneKey will not pursue legal action against researchers who: Act in good faith and comply with this program\'s rules".',
-							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/SECURITY.md',
+							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/SECURITY.md',
 						},
 					],
 				}),
@@ -203,8 +205,8 @@ export const onekeyWallet: HardwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Reward tables in USD: firmware Critical $3,000-5,000, High $1,000-3,000, Medium $100-1,000, Low $0-100; app, SDK and website tiers are lower.',
-							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/SECURITY.md',
+								'Reward tables in USD: firmware Critical $3,000–5,000, High $1,000–3,000, Medium $100–1,000, Low $0–100; app, SDK, and website tiers are lower.',
+							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/SECURITY.md',
 						},
 					],
 					currency: 'USD',
@@ -216,14 +218,14 @@ export const onekeyWallet: HardwareWallet = {
 			duressResistance: null,
 			firmware: {
 				// The bootloader requires 4 of 7 OneKey signatures, asks "Install firmware by OneKey?" on the device, and refuses downgrades ("Firmware downgrade not allowed!").
-				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/main/core/embed/emmc_wrapper/emmc_commands.c
+				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/embed/emmc_wrapper/emmc_commands.c
 				// MCU firmware is GPLv3, but the secure element firmware is closed (chip vendor IP) and a prebuilt fingerprint library is linked in.
-				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/main/LICENSE.md
+				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/LICENSE.md
 				// OneKey documents a reproducible build of the MCU image (Nix, tag v4.14.0); WalletScrutiny still lists the Pro as source-available, not reproducible.
 				// Source: https://help.onekey.so/en/articles/12025839
 				// Source: https://walletscrutiny.com/hardware/onekey.pro/
-				// Only images signed by OneKey keys are accepted; there is no third-party firmware path.
-				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/main/core/embed/bootloader/main.c
+				// Only images signed by OneKey keys are accepted; there is no path for firmware from other parties.
+				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/embed/bootloader/main.c
 				type: FirmwareType.PARTIAL,
 				customFirmware: FirmwareType.FAIL,
 				details:
@@ -237,8 +239,9 @@ export const onekeyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'On-device wallet creation takes 32 bytes from the secure element random number generator (optionally mixed with the MCU generator); no host entropy is requested in that flow.',
-						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/main/core/src/apps/management/reset_device/__init__.py',
+							'On-device wallet creation takes 32 bytes from the secure element random number generator (optionally mixed with the main chip generator); no host entropy is requested in that flow.',
+						label: 'OneKey firmware wallet reset flow',
+						url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/src/apps/management/reset_device/__init__.py',
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -280,11 +283,11 @@ export const onekeyWallet: HardwareWallet = {
 				// "The device has a holographic anti-tamper seal... Peeling off the holographic anti-tamper seal will leave obvious marks"; the box has a self-destruct label.
 				// Source: https://help.onekey.so/en/articles/11461083-authenticate-onekey-pro
 				// Published schematics cover only 2020-era boards, not the Pro.
-				// Source: https://github.com/OneKeyHQ/firmware-classic1s/tree/master/docs/pcb
+				// Source: https://github.com/OneKeyHQ/firmware-classic1s/tree/885e51d3eb3980cb05fdaa75afb69c6e2f3a5690/docs/pcb
 				// "Built with 4 EAL 6+ Secure Elements"; "Auto-wipe if intrusion is detected, such as firmware modification."
 				// Source: https://onekey.so/products/onekey-pro-hardware-wallet/
 				// The SDK sends a challenge signed by a secure element certificate to OneKey's verification service, but OneKey's blog says device verification checks the serial number and "does not interact with the secure chip".
-				// Source: https://github.com/OneKeyHQ/hardware-js-sdk/blob/onekey/packages/core/src/api/device/DeviceVerify.ts
+				// Source: https://github.com/OneKeyHQ/hardware-js-sdk/blob/3e497ff4337faf02cc1c0a22f111ea60870386b4/packages/core/src/api/device/DeviceVerify.ts
 				// Source: https://onekey.so/blog/ecosystem/anti-counterfeiting-verification-of-onekey-devices/
 				type: SupplyChainFactoryType.FAIL,
 				details:
@@ -357,14 +360,14 @@ export const onekeyWallet: HardwareWallet = {
 				reproducibleBuilds: null,
 			},
 			reputation: {
-				// In-house hardware design on firmware forked from Trezor's open-source code; secure elements from a third-party chip vendor.
+				// In-house hardware design on firmware forked from Trezor's open-source code; secure elements from an external chip vendor.
 				// Source: https://github.com/OneKeyHQ/firmware-pro
 				// Discontinued models keep support: Mini feature updates ended June 2025, with security patches promised to continue.
 				// Source: https://help.onekey.so/hc/en-us/articles/8934154578831-Get-started-with-OneKey-Mini
 				// CVE-2023-25758 (Touch and Mini secure element bus, found by an outside research firm) was acknowledged and fixed, but OneKey has no security advisory page or GitHub advisories.
 				// Source: https://nvd.nist.gov/vuln/detail/CVE-2023-25758
 				// Bug bounty with published reward tables and safe harbor.
-				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/main/SECURITY.md
+				// Source: https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/SECURITY.md
 				type: ReputationType.PARTIAL,
 				availability: ReputationType.PASS,
 				bugBounty: ReputationType.PASS,
