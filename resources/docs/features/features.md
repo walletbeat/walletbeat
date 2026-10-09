@@ -168,6 +168,9 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	/** Level of configurability for chains. */
 	chainConfigurability: VariantFeature<Support<WithRef<Nullable<ChainConfigurability>>>>
 
+	/** Does the wallet offer public Ethereum testnets out of the box? */
+	testnetSupport: VariantFeature<TestnetSupport>
+
 	/** Integration inside browsers, mobile phones, etc. */
 	integration: WalletIntegration
 
@@ -306,6 +309,7 @@ A set of features about a specific wallet variant. All features are resolved to 
     - `reproducibleBuilds` (`ResolvedFeature<ReproducibleBuilds>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
+- `testnetSupport` (`ResolvedFeature<TestnetSupport>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
 - `multiAddress` (`ResolvedFeature<Support>`)
 - `integration` (`WalletIntegration`)
@@ -3526,6 +3530,18 @@ Customization options that exist for chains.
 - `l1` (`Support<SingleChainConfigurability & SelfHostedNodeL1BasicOperationsSupport>`): Does the wallet support using Ethereum L1 at all? To test: check if the wallet lists Ethereum mainnet as an available network and can send transactions on it.
 - `nonL1` (`Support<SingleChainConfigurability>`): Does the wallet support non-L1 Ethereum chains? (e.g. The wallet allows switching to or adding Arbitrum, Base, Optimism, or other L2s.)
 - `customChainRpcEndpoint` (`Support`): Does the wallet support adding custom chains? (e.g. The wallet has an "Add network" option where you can input a custom chain ID, RPC URL, and currency symbol — beyond just editing existing chains.)
+
+---
+
+### Type: `TestnetSupport`
+
+Does the wallet offer at least one public Ethereum testnet (e.g. Sepolia) that the user can switch to without entering chain details? Turning on a "show testnets" setting counts as built in. Adding a testnet as a custom chain is covered by `ChainConfigurability.customChainRpcEndpoint` instead.
+
+To test: open the wallet's network selector and settings, and check whether a public Ethereum testnet can be selected without typing in a chain ID or RPC URL.
+
+```typescript
+type TestnetSupport = WithRef<Support>
+```
 
 ---
 

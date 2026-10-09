@@ -356,6 +356,7 @@ export const imtoken: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			/* TODO: Fill in; partial data: {

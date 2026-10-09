@@ -36,7 +36,10 @@ import type {
 	SoftwareTransactionLegibilityImplementation,
 } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
-import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
+import type {
+	ChainConfigurability,
+	TestnetSupport,
+} from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
 import type { PermissionsManagementSupport } from './features/self-sovereignty/permissions-management'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
@@ -249,6 +252,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	/** Level of configurability for chains. */
 	chainConfigurability: VariantFeature<Support<WithRef<Nullable<ChainConfigurability>>>>
 
+	/** Does the wallet offer public Ethereum testnets out of the box? */
+	testnetSupport: VariantFeature<TestnetSupport>
+
 	/** Integration inside browsers, mobile phones, etc. */
 	integration: WalletIntegration
 
@@ -434,6 +440,7 @@ export interface ResolvedFeatures {
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
+	testnetSupport: ResolvedFeature<TestnetSupport>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
 	integration: WalletIntegration
@@ -676,6 +683,7 @@ export function resolveFeatures(
 		chainConfigurability: nullable<Support<WithRef<ChainConfigurability>>>(
 			softwareFeat('chainConfigurability', features => features.chainConfigurability),
 		),
+		testnetSupport: softwareFeat('testnetSupport', features => features.testnetSupport),
 		accountSupport: baseFeat('accountSupport', features => features.accountSupport),
 		multiAddress: baseFeat('multiAddress', features => features.multiAddress),
 		integration: isWalletSoftwareFeatures(features)
