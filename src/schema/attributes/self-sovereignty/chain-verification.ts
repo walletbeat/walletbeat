@@ -61,7 +61,7 @@ function noChainVerification(
 
 	return ctx.build({
 		outcome: {
-			id: 'no_chain_verification',
+			id: canConfigureL1 ? 'no_chain_verification_l1_rpc_configurable' : 'no_chain_verification',
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey
 			displayName: 'No L1 chain state verification',

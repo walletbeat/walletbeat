@@ -62,12 +62,18 @@ export interface PngChunk {
 	bytes: Buffer
 }
 
-/** The fields of a PNG `IHDR` chunk that matter for re-encoding. */
+/** The data field of a PNG chunk, without its length, type and CRC. */
+export function pngChunkData(chunk: PngChunk): Buffer {
+	return chunk.bytes.subarray(8, chunk.bytes.length - 4)
+}
+
+/** The fields of a PNG `IHDR` chunk that matter for decoding and re-encoding. */
 export interface PngHeader {
 	width: number
 	height: number
 	bitDepth: number
 	colorType: number
+	interlaceMethod: number
 }
 
 /**
@@ -116,6 +122,7 @@ export function readPngHeader(chunks: PngChunk[]): PngHeader {
 		height: ihdr.bytes.readUInt32BE(12),
 		bitDepth: ihdr.bytes[16],
 		colorType: ihdr.bytes[17],
+		interlaceMethod: ihdr.bytes[20],
 	}
 }
 
