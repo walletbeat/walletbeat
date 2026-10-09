@@ -83,7 +83,8 @@ export const bitboxWallet: HardwareWallet = {
 					{
 						explanation:
 							'The BitBox02 Ethereum protocol only defines legacy (EIP-155) and EIP-1559 (type 2) transaction payloads; there is no type-4 or authorization-list message.',
-						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/master/messages/eth.proto',
+						label: 'BitBox02 Ethereum protocol messages',
+						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/messages/eth.proto',
 					},
 				],
 			}),
@@ -92,7 +93,7 @@ export const bitboxWallet: HardwareWallet = {
 					{
 						explanation:
 							"Ethereum accounts use the BIP-44 path m/44'/60'/0'/0/n (up to 100 accounts) from a BIP-39 seed.",
-						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/master/src/rust/bitbox02-rust/src/hww/api/ethereum/keypath.rs',
+						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/rust/bitbox02-rust/src/hww/api/ethereum/keypath.rs',
 					},
 					{
 						explanation:
@@ -102,7 +103,8 @@ export const bitboxWallet: HardwareWallet = {
 					{
 						explanation:
 							'The Ethereum API returns public keys and signatures only; it has no private key export.',
-						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/master/messages/eth.proto',
+						label: 'BitBox02 Ethereum protocol messages',
+						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/messages/eth.proto',
 					},
 				],
 				canExportPrivateKey: false,
@@ -147,7 +149,8 @@ export const bitboxWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'SIX FinTech Ventures, the venture arm of the Swiss stock exchange operator, made an undisclosed investment in Shift Crypto (now BitBox Swiss) in 2018.',
+						'SIX Fintech Ventures, the venture arm of the Swiss stock exchange operator, made an undisclosed investment in Shift Crypto (now BitBox Swiss) in 2018.',
+					label: 'Fintech News Switzerland',
 					url: 'https://fintechnews.ch/fintech/six-fintech-venture-finds-first-investments-vestr-and-shift-cryptosecurity/',
 				},
 			],
@@ -268,7 +271,7 @@ export const bitboxWallet: HardwareWallet = {
 			duressResistance: null,
 			firmware: {
 				// Production devices only boot firmware carrying valid Shift Crypto signatures (2 of 3 keys); unsigned firmware stays in the bootloader. Firmware that skips verification is only possible on separate developer bootloader builds marked "DEV DEVICE / NOT FOR VALUE".
-				// Source: https://github.com/BitBoxSwiss/bitbox02-firmware/blob/master/src/bootloader/bootloader.c
+				// Source: https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/bootloader/bootloader.c
 				type: FirmwareType.PASS,
 				customFirmware: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.PASS,
@@ -279,8 +282,8 @@ export const bitboxWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The seed is generated on the device from the secure chip and MCU random number generators plus factory entropy, with host and password entropy mixed in.',
-						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/master/src/rust/bitbox02-rust/src/keystore.rs',
+							'The seed is generated on the device from the secure chip and microcontroller random number generators plus factory entropy, with host and password entropy mixed in.',
+						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/rust/bitbox02-rust/src/keystore.rs',
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -303,7 +306,7 @@ export const bitboxWallet: HardwareWallet = {
 				// Source: https://support.bitbox.swiss/en_US/verifying-the-bitbox02-packaging
 				// PCB schematics, BOM and x-ray for BitBox02 hardware v2.1 (2020) are published in the firmware repository; no schematic or BOM is published for BitBox02 Nova.
 				// Source: https://github.com/BitBoxSwiss/bitbox02-firmware
-				// A secure chip (a Microchip part on BitBox02, a third-party EAL6+ part on Nova) limits unlock attempts; the MCU and secure chip are covered with epoxy.
+				// A secure chip (a Microchip part on BitBox02, an EAL6+ part from an external vendor on Nova) limits unlock attempts; the MCU and secure chip are covered with epoxy.
 				// Source: https://bitbox.swiss/bitbox02/security-features/
 				// A key generated on the secure chip is signed during factory setup, and the BitBoxApp checks it before every unlock.
 				// Source: https://blog.bitbox.swiss/en/supply-chain-attacks/
@@ -377,7 +380,7 @@ export const bitboxWallet: HardwareWallet = {
 				reproducibleBuilds: null,
 			},
 			reputation: {
-				// The BitBox line started in 2015 (BitBox01); BitBox02 was released in 2019 and BitBox02 Nova in 2025. Hardware and firmware are designed in-house; MCU and secure chips are third-party.
+				// The BitBox line started in 2015 (BitBox01); BitBox02 was released in 2019 and BitBox02 Nova in 2025. Hardware and firmware are designed in-house; MCU and secure chips come from external vendors.
 				// Source: https://bitbox.swiss/about/
 				// BitBox01 updates ended in November 2020, about a year after it stopped selling; the original BitBox02 is still supported alongside Nova.
 				// Source: https://guides.shiftcrypto.ch/bitbox01/eol-faqs/
