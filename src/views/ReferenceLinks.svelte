@@ -70,13 +70,18 @@
 
 	// Scope-header/context lines can push the highlighted (referenced) lines
 	// below the fold of the fixed-height snippet box, so scroll them into view
-	// as soon as the box mounts. Sets `pre.scrollTop` directly (rather than
-	// `scrollIntoView`) so only the snippet box scrolls, not the page.
-	const scrollToHighlight = (pre: HTMLElement) => {
+	// the first time the box comes near the viewport. Measuring at mount
+	// instead forced a layout of the whole page in the middle of hydration,
+	// and couldn't center boxes that start out hidden (collapsed sources or
+	// cards), since hidden boxes have nothing to measure.
+	// Scrolls the box itself (rather than `scrollIntoView`) so only the
+	// snippet box scrolls, not the page, and instantly, so a box coming into
+	// view doesn't visibly scroll by itself.
+	const highlightScrollTop = (pre: HTMLElement): number | undefined => {
 		const highlighted = pre.querySelectorAll<HTMLElement>('.row.highlighted')
 
 		if (highlighted.length === 0) {
-			return
+			return undefined
 		}
 
 		const first = highlighted[0]
@@ -86,7 +91,46 @@
 		const lastBottom = last.getBoundingClientRect().bottom - preTop + pre.scrollTop
 		const center = (firstTop + lastBottom) / 2
 
-		pre.scrollTop = Math.max(0, center - pre.clientHeight / 2)
+		return Math.max(0, center - pre.clientHeight / 2)
+	}
+
+	let highlightObserver: IntersectionObserver | undefined
+
+	const scrollToHighlight = (pre: HTMLElement) => {
+		if (pre.querySelector('.row.highlighted') === null) {
+			return
+		}
+
+		highlightObserver ??= new IntersectionObserver(
+			entries => {
+				// Measure every box that came into range before scrolling any,
+				// so a batch of boxes costs one layout rather than one each.
+				const scrolls = entries
+					.filter(entry => entry.isIntersecting)
+					.map(entry => entry.target)
+					.filter(box => box instanceof HTMLElement)
+					.map(box => {
+						highlightObserver?.unobserve(box)
+
+						return { box, scrollTop: highlightScrollTop(box) }
+					})
+
+				for (const { box, scrollTop } of scrolls) {
+					if (scrollTop !== undefined) {
+						box.scrollTo({ top: scrollTop, behavior: 'instant' })
+					}
+				}
+			},
+			{ rootMargin: '50% 0px' },
+		)
+
+		highlightObserver.observe(pre)
+
+		return {
+			destroy: () => {
+				highlightObserver?.unobserve(pre)
+			},
+		}
 	}
 
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
@@ -388,7 +432,7 @@
 			inline-size: 100%;
 			max-inline-size: 100%;
 			min-inline-size: 0;
-			/* About 12 lines; the box scrolls itself to the highlighted lines on mount. */
+			/* About 12 lines; the box scrolls itself to the highlighted lines when first shown. */
 			max-block-size: 20em;
 			overflow: auto;
 
