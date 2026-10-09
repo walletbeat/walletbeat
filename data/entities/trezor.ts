@@ -17,9 +17,7 @@ export const trezor: CorporateEntity & WalletDeveloper = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/trezor',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Czech Republic',
 	linkedin: 'https://www.linkedin.com/company/trezor-by-satoshilabs/',
 	privacyPolicy: 'https://trezor.io/privacy-policy',

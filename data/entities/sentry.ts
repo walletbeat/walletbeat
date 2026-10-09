@@ -17,9 +17,7 @@ export const sentry: CorporateEntity & OffchainDataProvider = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/sentry',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'San Francisco, California, United States',
 	linkedin: 'https://linkedin.com/company/getsentry',
 	privacyPolicy: 'https://sentry.io/privacy/',
