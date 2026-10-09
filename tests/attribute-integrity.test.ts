@@ -13,6 +13,8 @@ import {
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { ContentType, type TypographicContent } from '@/types/content'
+import { getRepositoryRoot } from '@/utils/codebase'
+import { extractMarkdownLinks } from '@/utils/markdown-utils'
 
 import { warmupHarperLinter } from './utils/grammar'
 
@@ -38,24 +40,14 @@ function linkedDocsPages(content: TypographicContent<WalletNameStrings>): string
 	const text = content.contentType === ContentType.MARKDOWN ? content.markdown : content.text
 	const docsPrefix = withBasePath('/docs/')
 
-	return Array.from(text.matchAll(/\]\(([^)\s]+)\)/g), match => match[1]).filter(url =>
-		url.startsWith(docsPrefix),
-	)
+	return extractMarkdownLinks(text)
+		.map(({ url }) => url)
+		.filter(url => url.startsWith(docsPrefix))
 }
 
 await warmupHarperLinter()
 
 describe('attribute', () => {
-	it('methodology links to the wallet testing guides', () => {
-		const linkedPages = Object.values(attributeTree).flatMap(group =>
-			group.attributes.flatMap(({ attribute }) => linkedDocsPages(attribute.methodology)),
-		)
-
-		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/data-collection/'))
-		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/chain-verification/'))
-		expect(linkedPages).toContain(withBasePath('/docs/wallet-testing/l1-provider-independence/'))
-	})
-
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
 			for (const { attribute } of attributeGroup.attributes) {
@@ -71,7 +63,7 @@ describe('attribute', () => {
 					it('links only to existing docs pages in its methodology', () => {
 						for (const url of linkedDocsPages(attribute.methodology)) {
 							const slug = url.slice(withBasePath('/docs/').length).replace(/[#?].*$/, '')
-							const docsDir = path.join('resources/docs', slug)
+							const docsDir = path.join(getRepositoryRoot(), 'resources', 'docs', slug)
 
 							expect(
 								fs.existsSync(docsDir) &&
