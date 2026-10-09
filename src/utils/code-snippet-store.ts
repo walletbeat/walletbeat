@@ -1,101 +1,89 @@
-import type { SnippetRow } from '@/schema/code-snippets'
-import { snippetFileName } from '@/schema/code-snippets'
+import type { AttributeGroupId } from '@/schema/attribute-tree'
+import {
+	isSnippetRow,
+	snippetFileName,
+	snippetRelativePath,
+	type SnippetRow,
+} from '@/schema/code-snippets'
+import type { FullyQualifiedReference } from '@/schema/reference'
+import type { BaseWallet } from '@/schema/wallet'
+import {
+	findWalletSnippetOccurrences,
+	type SnippetOccurrence,
+} from '@/tools/code-snippet-collector/snippet-occurrences'
 import { type CodeSnippetIndex, codeSnippetSourceForUrl } from '@/utils/code-snippet-index'
 
 /**
  * All stored snippet files, syntax-highlighted and bundled at build time
- * (each module's default export is an array of `SnippetRow`s — see
- * vite-plugin-code-snippet-highlight.mjs), keyed by snippet filename only
- * (the wallet ID segment is dropped, see `CodeSnippetIndex`).
+ * (each module's default export is an array of `SnippetRow`s, see
+ * vite-plugin-code-snippet-highlight.mjs), keyed by `/` followed by their
+ * repository-relative path.
  *
- * This bundles every wallet's snippets (about 1.9 MB of highlighted HTML), so
- * import this module only from server-rendered `.astro` code, never from a
- * component that hydrates on the client.
+ * This bundles every wallet's snippets, so import this module only from
+ * server-rendered `.astro` code, never from a component that hydrates on the
+ * client.
  */
-const snippetsByFileName = new Map<string, SnippetRow[]>()
+const snippetModules: Record<string, unknown> = import.meta.glob(
+	'/public/references/wallets/*/code/*.snippet',
+	{ eager: true, import: 'default' },
+)
 
-function isSnippetRow(row: unknown): row is SnippetRow {
-	if (typeof row !== 'object' || row === null || !('type' in row)) {
-		return false
+/** The rows of the stored snippet at `snippetPath`, or undefined if none is stored. */
+function storedSnippetRows(snippetPath: string): SnippetRow[] | undefined {
+	const rows = snippetModules[`/${snippetPath}`]
+
+	if (rows === undefined) {
+		return undefined
 	}
 
-	if (row.type === 'gap') {
-		return true
-	}
-
-	return (
-		row.type === 'line' &&
-		'number' in row &&
-		typeof row.number === 'number' &&
-		'html' in row &&
-		typeof row.html === 'string' &&
-		'highlighted' in row &&
-		typeof row.highlighted === 'boolean'
-	)
-}
-
-for (const [modulePath, rows] of Object.entries(
-	import.meta.glob('/public/references/wallets/*/code/*.snippet', {
-		eager: true,
-		import: 'default',
-	}),
-)) {
 	if (!Array.isArray(rows) || !rows.every(isSnippetRow)) {
-		throw new Error(`Snippet file did not import as an array of snippet rows: ${modulePath}`)
+		throw new Error(`Snippet file did not import as an array of snippet rows: ${snippetPath}`)
 	}
 
-	const fileName = modulePath.split('/').pop()
-
-	if (fileName === undefined) {
-		throw new Error(`Cannot extract filename from snippet module path: ${modulePath}`)
-	}
-
-	snippetsByFileName.set(fileName, rows)
+	return rows
 }
 
-/**
- * Collect the stored code snippets for every reference URL found anywhere in
- * `values` (searched recursively through arrays, plain objects, maps and
- * sets), so a page can pass its island exactly the snippets it renders.
- */
-export function codeSnippetsReferencedBy(...values: unknown[]): CodeSnippetIndex {
+function codeSnippetIndex(
+	occurrences: Array<Pick<SnippetOccurrence, 'source' | 'snippetPath'>>,
+): CodeSnippetIndex {
 	const index: CodeSnippetIndex = {}
-	const visited = new WeakSet<object>()
 
-	const visit = (value: unknown): void => {
-		if (typeof value === 'string') {
-			// Cheap pre-filter: snippet URLs always carry a line anchor.
-			const source = value.includes('#L') ? codeSnippetSourceForUrl(value) : null
+	for (const { source, snippetPath } of occurrences) {
+		const rows = storedSnippetRows(snippetPath)
 
-			if (source !== null) {
-				const fileName = snippetFileName(source)
-				const rows = snippetsByFileName.get(fileName)
-
-				if (rows !== undefined) {
-					index[fileName] = rows
-				}
-			}
-
-			return
+		if (rows !== undefined) {
+			index[snippetFileName(source)] = rows
 		}
-
-		if (typeof value !== 'object' || value === null || visited.has(value)) {
-			return
-		}
-
-		visited.add(value)
-
-		const children: Iterable<unknown> =
-			value instanceof Map || value instanceof Set ? value.values() : Object.values(value)
-
-		for (const child of children) {
-			visit(child)
-		}
-	}
-
-	for (const value of values) {
-		visit(value)
 	}
 
 	return index
+}
+
+/** The stored code snippets for every snippet URL in a wallet's data refs. */
+export function codeSnippetsForWallet(
+	walletName: string,
+	wallet: BaseWallet<AttributeGroupId>,
+): CodeSnippetIndex {
+	return codeSnippetIndex(findWalletSnippetOccurrences(walletName, wallet))
+}
+
+/**
+ * The stored code snippets for every snippet URL in `references`, taken from
+ * the data of the wallet with ID `walletId`.
+ */
+export function codeSnippetsForReferences(
+	walletId: string,
+	references: FullyQualifiedReference[],
+): CodeSnippetIndex {
+	return codeSnippetIndex(
+		references.flatMap(reference =>
+			reference.urls.flatMap(({ url }) => {
+				const source = codeSnippetSourceForUrl(url)
+
+				return source === null
+					? []
+					: [{ source, snippetPath: snippetRelativePath(walletId, source) }]
+			}),
+		),
+	)
 }

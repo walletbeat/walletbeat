@@ -1,9 +1,8 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, attributeTreeForWallet, isValidWalletSlug } from '@/data/wallets'
-import { getNewsForWallet } from '@/data/news'
+import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { codeSnippetsReferencedBy } from '@/utils/code-snippet-store'
+import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
 
 // Routes
 export const prerender = true
@@ -21,13 +20,14 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
-// Only the code snippets this page renders, so the island's client bundle
-// doesn't carry every wallet's snippets.
-const codeSnippets = codeSnippetsReferencedBy(
-	wallet,
-	attributeTreeForWallet(wallet),
-	getNewsForWallet(wallet.metadata.id),
-)
+const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
+
+if (walletEntry === undefined) {
+	throw new Error(`no wallet data for slug "${walletName}"`)
+}
+
+const [walletDataName, walletData] = walletEntry
+const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
