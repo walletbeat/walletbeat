@@ -350,6 +350,22 @@ function _isEthereumAddress(s: string): boolean {
 	return s.length === 42 && s.startsWith('0x', 0)
 }
 
+/**
+ * @returns `s` lowercased if it is an Ethereum address, `null` otherwise.
+ * EIP-55 checksum casing is cosmetic, so addresses are compared in lowercase.
+ */
+function _lowercaseIfEthereumAddress(s: string): string | null {
+	return /^0x[0-9a-f]{40}$/i.test(s) ? s.toLowerCase() : null
+}
+
+/**
+ * Lowercases ASCII letters only, so that indices into the result are also
+ * valid indices into `s` (full Unicode lowercasing can change the length).
+ */
+function _asciiLowerCase(s: string): string {
+	return s.replace(/[A-Z]+/g, letters => letters.toLowerCase())
+}
+
 function _extractEthereumValues(
 	text: string,
 ): { addresses: Erc55Address[]; txids: string[] } | null {
@@ -875,6 +891,12 @@ export class UserDataString {
 	public readonly pieces: ReadonlySet<UserInfo>
 	public readonly source: 'CAPTURE_INFO' | 'MANUAL' | 'EPHEMERAL'
 
+	/**
+	 * `str` lowercased if it is an Ethereum address, `null` otherwise.
+	 * Computed once here since it is used for every substring match.
+	 */
+	public readonly lowercaseAddress: string | null
+
 	constructor(
 		str: string,
 		pieces: Iterable<UserInfo>,
@@ -882,6 +904,7 @@ export class UserDataString {
 	) {
 		this.str = str
 		this.length = str.length
+		this.lowercaseAddress = _lowercaseIfEthereumAddress(str)
 		this.pieces = new Set(pieces)
 		this.source = source
 
@@ -970,6 +993,9 @@ export class UserDataString {
  */
 export class UserDataStringStore {
 	private readonly _index: Map<string, UserDataString> = new Map()
+	/** Every casing on record for each Ethereum address, keyed by lowercase address. */
+	private readonly _addressCasings: Map<string, Set<string>> = new Map()
+	private _longestFirst: UserDataString[] | null = null
 
 	public static newStore(): UserDataStringStore {
 		return new UserDataStringStore()
@@ -995,10 +1021,55 @@ export class UserDataStringStore {
 		} else {
 			this._index.set(item.str, existing.withMerged(...item.pieces))
 		}
+
+		if (item.lowercaseAddress !== null) {
+			const casings = this._addressCasings.get(item.lowercaseAddress) ?? new Set<string>()
+
+			casings.add(item.str)
+			this._addressCasings.set(item.lowercaseAddress, casings)
+		}
+
+		this._longestFirst = null
 	}
 
 	public get(str: string): UserDataString | undefined {
 		return this._index.get(str)
+	}
+
+	/**
+	 * Like `get`, but Ethereum addresses match regardless of casing. If the
+	 * same address is on record under several casings, their pieces are merged.
+	 */
+	public lookup(str: string): UserDataString | undefined {
+		const lowercaseAddress = _lowercaseIfEthereumAddress(str)
+
+		if (lowercaseAddress === null) {
+			return this._index.get(str)
+		}
+
+		const pieces = Array.from(this._addressCasings.get(lowercaseAddress) ?? []).flatMap(casing =>
+			Array.from(this._index.get(casing)?.pieces ?? []),
+		)
+
+		if (pieces.length === 0) {
+			return undefined
+		}
+
+		return new UserDataString(str, pieces, 'EPHEMERAL')
+	}
+
+	/**
+	 * @returns The strings on record that carry user data, ordered by longest
+	 * string first. Useful for string matching.
+	 */
+	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<UserDataString> {
+		if (this._longestFirst === null) {
+			this._longestFirst = Array.from(this._index.values())
+				.filter(s => s.pieces.size > 0)
+				.sort((a, b) => b.length - a.length)
+		}
+
+		return this._longestFirst
 	}
 
 	public toJSON(): EncodedUserDataStringStore {
@@ -1657,15 +1728,19 @@ export class WalletDataString {
 	): Promise<WalletDataString[] | null> {
 		const strLength = str.length
 		const substrings: (WalletDataStringBreadcrumb & { type: 'SUBSTRING' })[] = []
+		// Only computed if needed, as most user data strings are not addresses.
+		let lowercaseStr: string | null = null
 
 		for (const existing of strings.longestFirstUserInfoOnlyStrings()) {
-			const existingStr = existing.str.str
-
-			if (existingStr.length >= strLength) {
+			if (existing.length >= strLength) {
 				continue
 			}
 
-			const bits = str.split(existingStr)
+			// Ethereum addresses match regardless of casing.
+			const existingStr = existing.lowercaseAddress ?? existing.str
+			const haystack =
+				existing.lowercaseAddress === null ? str : (lowercaseStr ??= _asciiLowerCase(str))
+			const bits = haystack.split(existingStr)
 
 			if (bits.length <= 1) {
 				continue
@@ -1819,7 +1894,6 @@ export class WalletDataStrings {
 	public readonly captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
 	private _highestScoreFirstStrings: WalletDataString[] | null = null
-	private _longestFirstStrings: WalletDataString[] | null = null
 	private _highestFrequencyFirstStrings: WalletDataString[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
@@ -1838,7 +1912,7 @@ export class WalletDataStrings {
 		if (existing) {
 			existing.addOccurrencesFrom(s)
 		} else {
-			const ud = this.captureFile.userData.get(s.str.str)
+			const ud = this.captureFile.userData.lookup(s.str.str)
 
 			if (ud !== undefined) {
 				s.addUserInfoFrom(ud)
@@ -1848,7 +1922,6 @@ export class WalletDataStrings {
 		}
 
 		this._highestScoreFirstStrings = null
-		this._longestFirstStrings = null
 		this._highestFrequencyFirstStrings = null
 	}
 
@@ -1874,16 +1947,18 @@ export class WalletDataStrings {
 	}
 
 	/**
-	 * @returns The set of strings, ordered by longest string first. Useful for string matching.
+	 * @returns The strings known to carry user data, ordered by longest string
+	 * first. Useful for string matching.
+	 *
+	 * These come from the capture file's user data store rather than from the
+	 * strings gathered so far. Every user-data-carrying string gathered here
+	 * gets its pieces from that store anyway (see `add`), but a declared string
+	 * may not have been gathered on its own yet, or ever: an address may only
+	 * appear embedded in longer strings (e.g. `eip155:1:0x...`), and the
+	 * per-request `WalletDataStrings` start out empty.
 	 */
-	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
-		if (this._longestFirstStrings === null) {
-			this._longestFirstStrings = Array.from(this._strings.values())
-				.filter(s => s.str.pieces.size > 0)
-				.sort((a, b) => b.str.str.length - a.str.str.length)
-		}
-
-		return this._longestFirstStrings
+	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<UserDataString> {
+		return this.captureFile.userData.longestFirstUserInfoOnlyStrings()
 	}
 
 	/**
