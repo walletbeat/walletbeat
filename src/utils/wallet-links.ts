@@ -37,7 +37,7 @@ const socialLabels: Record<string, string> = {
 }
 
 /** Compare URLs loosely, so `https://www.example.com/` and `https://example.com` count as one link. */
-function urlKey(url: string): string {
+export function urlKey(url: string): string {
 	const parsed = new URL(url)
 
 	return `${parsed.hostname.replace(/^www\./, '')}${parsed.pathname.replace(/\/+$/, '')}${parsed.search}`
