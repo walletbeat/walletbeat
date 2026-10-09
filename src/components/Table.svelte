@@ -19,6 +19,9 @@
 		sort?: {
 			isDefault?: boolean
 			defaultDirection: SortDirection
+			/** Maps the cell value to what is ordered; `null`/`undefined` sort last. */
+			rank?: (value: _CellValue) => unknown
+			/** Ascending comparison; missing values never reach it. */
 			compare?: (a: _CellValue, b: _CellValue, rowA: _RowValue, rowB: _RowValue) => number
 		}
 
@@ -60,10 +63,7 @@
 		End = 'End',
 	}
 
-	export enum SortDirection {
-		Ascending = 'asc',
-		Descending = 'desc',
-	}
+	export { SortDirection } from './table-sort'
 
 	type SortState<
 		_ColumnId extends Value = Value,
@@ -73,6 +73,7 @@
 	}
 
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
+	import { SortDirection, sortRows } from './table-sort'
 
 	// State
 	export class TableState<
@@ -147,58 +148,20 @@
 			false
 		)
 
-		rowsAscending = $derived.by(() => {
-			if (!this.sortState) return this.rows
-
-			const { columnId } = this.sortState
-			const column = this.#columnsById.get(columnId)
-
-			if(!column) return this.rows
-
-			return (
-				this.rows
-					?.toSorted((rowValueA, rowValueB) => {
-						const a = column.value(rowValueA)
-						const b = column.value(rowValueB)
-
-						return (
-							(
-								a !== undefined && b !== undefined ?
-									column.sort?.compare ?
-										column.sort.compare(a, b, rowValueA, rowValueB)
-									:
-										typeof a === 'string' && typeof b === 'string' ?
-											a.localeCompare(b)
-										: a < b ?
-											-1
-										: a > b ?
-											1
-										:
-											0
-								: a === undefined ?
-									1
-								: b === undefined ?
-									-1
-								:
-									0
-							)
-						)
-					})
-				)
-		})
-
 		rowsSorted = $derived.by(() => {
 			if (!this.sortState) return this.rows
 
-			const { direction } = this.sortState
+			const { columnId, direction } = this.sortState
+			const column = this.#columnsById.get(columnId)
 
-			let result = this.rowsAscending
+			if(!column || !this.rows) return this.rows
 
-			if(!result) return result
-
-			if (direction === SortDirection.Descending) {
-				result = result.toReversed()
-			}
+			let result = sortRows(this.rows, {
+				direction,
+				value: column.value,
+				rank: column.sort?.rank,
+				compare: column.sort?.compare,
+			})
 
 			if(this.displaceDisabledRows && this.rowIsDisabled)
 				result = result.toSorted((rowValueA, rowValueB) => {
