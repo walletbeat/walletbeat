@@ -144,7 +144,7 @@
 											]
 												.filter(segment => segment)
 												.map(listItem => `\n* ${listItem}`)
-												.join('')}`
+												.join('')}\n\n`
 										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
 											? ' checking the contract or transaction data against a database of known scams.'
 											: outcome.metadata.scamAlerts.contractTransactionWarning
