@@ -7,6 +7,7 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -27,6 +28,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -53,7 +55,7 @@ export const onekeyWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://developer.onekey.so/'],
 			repositories: ['https://github.com/OneKeyHQ'],
@@ -110,8 +112,36 @@ export const onekeyWallet: HardwareWallet = {
 			ref: [
 				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
 				'https://developer.onekey.so/connect-to-software/using-walletconnect',
+				{
+					explanation:
+						'The OneKey hardware SDK is published on npm under a permissive open-source license and covers Ethereum transactions, personal messages and EIP-712 typed data; the developer docs list no API key or registration step.',
+					urls: [
+						{
+							label: 'Hardware SDK core package',
+							url: 'https://github.com/OneKeyHQ/hardware-js-sdk/blob/3e497ff4337faf02cc1c0a22f111ea60870386b4/packages/core/package.json',
+						},
+						{
+							label: 'EVM signing methods',
+							url: 'https://developer.onekey.so/en/hardware-sdk/signers/evm/',
+						},
+					],
+				},
+				{
+					explanation:
+						'The OneKey Pro firmware is GPLv3 and signs for networks it has no definition for.',
+					urls: [
+						{
+							label: 'Firmware license',
+							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/LICENSE.md',
+						},
+						{
+							label: 'Ethereum keychain',
+							url: 'https://github.com/OneKeyHQ/firmware-pro/blob/251a1b762065357059f80f32b28cb502609510d3/core/src/apps/ethereum/keychain.py',
+						},
+					],
+				},
 			],
-			requiresManufacturerConsent: null,
+			requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' },
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
@@ -151,14 +181,39 @@ export const onekeyWallet: HardwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'The OneKey App can add or batch-create multiple accounts per network, and MetaMask and Rabby can import several OneKey addresses.',
+					urls: [
+						{
+							label: 'Add accounts in the OneKey App',
+							url: 'https://help.onekey.so/en/articles/11461171',
+						},
+						{
+							label: 'Use OneKey with MetaMask',
+							url: 'https://help.onekey.so/en/articles/11461106-how-to-use-metamask-wallet-with-onekey-hardware-wallets',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
 				usage: null,
 			},
 			dataCollection: null,
-			hardwarePrivacy: null,
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PARTIAL,
+				details:
+					'Bluetooth uses LE Secure Connections with a pairing code, and Air Gap mode turns off Bluetooth, USB and NFC. The OneKey App, whose source is public under a source-available license, sends addresses and extended public keys to OneKey servers by default.',
+				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				phoningHome: HardwarePrivacyType.PARTIAL,
+				url: 'https://help.onekey.so/en/articles/11461237-user-data-protection',
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
 			transactionPrivacy: {
 				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the firmware Ethereum app, and no private transfer mode in the OneKey App docs.
@@ -330,7 +385,14 @@ export const onekeyWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PARTIAL,
+				details:
+					'Works with MetaMask over QR codes and with Rabby, OKX Wallet and NuFi. Setup guides list the OneKey App, firmware updates and the genuine check go through OneKey, and the Rabby extension loads the SDK frame from a OneKey server.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PARTIAL,
+				url: 'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
+			},
 		},
 		transparency: {
 			maintenance: {
