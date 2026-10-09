@@ -1,7 +1,9 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, isValidWalletSlug } from '@/data/wallets'
+import { allRatedWalletsBySlug, attributeTreeForWallet, isValidWalletSlug } from '@/data/wallets'
+import { getNewsForWallet } from '@/data/news'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { codeSnippetsReferencedBy } from '@/utils/code-snippet-store'
 
 // Routes
 export const prerender = true
@@ -19,6 +21,13 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
+// Only the code snippets this page renders, so the island's client bundle
+// doesn't carry every wallet's snippets.
+const codeSnippets = codeSnippetsReferencedBy(
+	wallet,
+	attributeTreeForWallet(wallet),
+	getNewsForWallet(wallet.metadata.id),
+)
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -47,6 +56,6 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<WalletPageContext walletId={wallet.metadata.id} client:idle />
+		<WalletPageContext walletId={wallet.metadata.id} codeSnippets={codeSnippets} client:idle />
 	</main>
 </Layout>
