@@ -466,7 +466,9 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 						)
 					}
 
-					return components.join('\n')
+					// A blank line between components; after a single newline, Markdown
+					// would continue the previous component's last list item.
+					return components.join('\n\n')
 				})(),
 			)
 	}
