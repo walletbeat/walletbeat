@@ -112,7 +112,7 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'The Elytro extension monorepo is licensed under GPL-3.0.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/main/LICENSE',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -122,13 +122,13 @@ export const elytro: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Soul Wallet (renamed Elytro) raised a $3M seed round in 2023 from investors including Struck Crypto, Game7DAO, NGC Ventures, Alchemy and Signum Capital.',
+						'Soul Wallet (renamed Elytro) raised a $3M seed round in 2023 from investors including Struck Crypto, Game7, NGC Ventures, Alchemy and Signum Capital.',
 					url: 'https://techcrunch.com/2023/03/16/soul-wallet-crypto-wallet/',
 				},
 				{
 					explanation:
-						'The extension has no built-in swap or bridge; it links out to third-party apps, and Elytro says users pay only network fees.',
-					url: 'https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/constants/dapps.ts',
+						'The extension has no built-in swap or bridge; it links out to external apps, and Elytro says users pay only network fees.',
+					url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/constants/dapps.ts',
 				},
 			],
 			revenueBreakdownIsPublic: false,
@@ -165,7 +165,7 @@ export const elytro: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			// The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro's terms say "No bug‑bounty commitment ... no bounty or reward is due unless we expressly agree in writing."
-			// Source: https://github.com/Elytro-eth/soul-wallet-contract/blob/develop/bug-bounty.md
+			// Source: https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md
 			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
@@ -176,8 +176,8 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The extension generates the owner key locally with viem generatePrivateKey (browser CSPRNG) and stores it encrypted with AES-GCM under a PBKDF2-derived passcode key.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/background/services/keyring.ts',
+							'The extension generates the owner key locally with viem `generatePrivateKey` (browser CSPRNG) and stores it encrypted with AES-GCM under a PBKDF2-derived passcode key.',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/background/services/keyring.ts',
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -236,7 +236,7 @@ export const elytro: SoftwareWallet = {
 					],
 				}),
 				// SES lockdown() hardens JavaScript built-ins, but there are no LavaMoat policies or per-package compartments.
-				// Source: https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/src/utils/security.ts
+				// Source: https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts
 				dependencySandboxing: notSupported,
 				// No Dependabot, Snyk or Socket configuration.
 				dependencyVulnerabilityScanning: notSupported,
@@ -245,7 +245,7 @@ export const elytro: SoftwareWallet = {
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				// Builds need private API keys and bump the version automatically; no reproducible build process is documented.
-				// Source: https://github.com/Elytro-eth/Elytro/blob/main/apps/extension/CONFIGURATION.md
+				// Source: https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md
 				reproducibleBuilds: notSupported,
 			},
 		},
