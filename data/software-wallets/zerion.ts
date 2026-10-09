@@ -83,7 +83,7 @@ export const zerion: SoftwareWallet = {
 		coinspectId: 'zerion',
 		contributors: [lucemans, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -486,7 +486,15 @@ export const zerion: SoftwareWallet = {
 				ventureCapital: true, // $22.5M across seed, Series A and Series B
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Both the browser extension and the mobile app can add wallets: new addresses from the current recovery phrase (the same wallet group) or a new one, imported wallets, Ledger devices and watch-only addresses.',
+					url: 'https://help.zerion.io/en/articles/8653430-add-an-additional-wallet-to-zerion',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
