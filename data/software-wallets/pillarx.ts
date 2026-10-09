@@ -186,7 +186,7 @@ export const pillarx: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rulesets on main block deletion and force-pushes and require a pull request with one approving review; no required status checks or tag protection.',
+									'Rule sets on main block deletion and force-pushes and require a pull request with one approving review; no required status checks or tag protection.',
 								url: 'https://api.github.com/repos/pillarwallet/x/rules/branches/main',
 							},
 						],
