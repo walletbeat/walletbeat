@@ -83,8 +83,8 @@
 		// A button behind the content is positioned (as all buttons are), so it
 		// paints over its non-positioned siblings. When the wrapper handles hover,
 		// make it static so the content stays on top. A button around the content
-		// keeps its position: forcing `static` on many inline triggers left
-		// Chromium painting long pages blank.
+		// keeps its position, because forcing `static` on many inline triggers
+		// makes Chromium paint long pages blank.
 		$effect(() => {
 			if(buttonTriggerPlacement === 'behind' && hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
