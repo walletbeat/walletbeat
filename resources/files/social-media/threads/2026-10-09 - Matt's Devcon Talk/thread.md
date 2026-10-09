@@ -2,7 +2,7 @@ Beyond Clear Signing: What Else Should Wallets Do?
 
 Walletbeat contributor @0xmattmatt will take the stage at @EFDevcon 8 on Users, Builders, and Agents track 👇
 
-![Beyound Clear Signing](./beyond_clear_signing.png)
+![Beyound Clear Signing](./beyond_clear_signing.jpg)
 
 ---
 
