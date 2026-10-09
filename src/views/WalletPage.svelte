@@ -53,6 +53,7 @@
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
+	import { getWalletLinkGroups } from '@/utils/wallet-links'
 
 
 	// Props
@@ -320,6 +321,8 @@
 		return map
 	})
 
+	const walletLinkGroups = $derived(getWalletLinkGroups(wallet))
+
 	const overallScore = $derived(
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
@@ -349,6 +352,8 @@
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
+	import ChevronDownIcon from 'lucide-static/icons/chevron-down.svg?raw'
+	import LinkIcon from 'lucide-static/icons/link.svg?raw'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -585,36 +590,62 @@
 						</div>
 					{/if}
 
-					<nav
-						class="wallet-links"
-						data-row="start gap-2 wrap"
-						data-row-item="wrap-end"
-						aria-label="Wallet links"
-					>
-						{#if wallet.metadata.urls?.websites?.[0] !== undefined}
-							<a
+					{#if walletLinkGroups.length > 0}
+						<div
+							class="wallet-links"
+							data-row-item="wrap-end"
+						>
+							<button
+								type="button"
 								class="wallet-link"
-								href={getUrl(wallet.metadata.urls.websites[0])}
-								target="_blank"
-								rel="noopener noreferrer"
+								popovertarget="wallet-links-menu"
+								style:anchor-name="--wallet-links"
 							>
-								<span data-icon="wbicons-simple browser_integration" aria-hidden="true"></span>
-								Website
-							</a>
-						{/if}
+								<span class="wallet-link-icon" aria-hidden="true">{@html LinkIcon}</span>
+								Links
+								<span class="wallet-link-icon wallet-links-chevron" aria-hidden="true">{@html ChevronDownIcon}</span>
+							</button>
 
-						{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
-							<a
-								class="wallet-link"
-								href={getUrl(wallet.metadata.urls.repositories[0])}
-								target="_blank"
-								rel="noopener noreferrer"
+							<nav
+								id="wallet-links-menu"
+								class="wallet-links-menu"
+								popover="auto"
+								data-card="padding-2 radius-6"
+								data-column="gap-2"
+								aria-label="Wallet links"
 							>
-								<span data-icon="wbicons-simple code_repository" aria-hidden="true"></span>
-								Source code
-							</a>
-						{/if}
-					</nav>
+								{#each walletLinkGroups as group (group.id)}
+									<section data-column="gap-0">
+										<p class="wallet-links-group-label" id="wallet-links-{group.id}">{group.label}</p>
+
+										<ul
+											data-list="unstyled"
+											data-column="gap-0"
+											aria-labelledby="wallet-links-{group.id}"
+										>
+											{#each group.links as link (link.url)}
+												<li>
+													<a
+														href={link.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														data-link="camouflaged"
+														data-row="gap-4"
+														onclick={event => {
+															event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover()
+														}}
+													>
+														<span>{link.label}</span>
+														<span class="wallet-links-hint">{link.hint}</span>
+													</a>
+												</li>
+											{/each}
+										</ul>
+									</section>
+								{/each}
+							</nav>
+						</div>
+					{/if}
 				</div>
 
 				{#if !hasSingleVariant(wallet.variants)}
@@ -2989,10 +3020,81 @@
 			border-color: var(--text-primary);
 			text-decoration: none;
 		}
+	}
 
-		[data-icon] {
-			--icon-size: 1.1em;
+	button.wallet-link {
+		background-color: transparent;
+		font-size: inherit;
+	}
+
+	.wallet-link-icon {
+		display: inline-flex;
+
+		:global(svg) {
+			inline-size: 1.1em;
+			block-size: 1.1em;
 		}
+	}
+
+	.wallet-links-chevron {
+		transition-property: rotate;
+
+		.wallet-links:has(:popover-open) & {
+			rotate: 180deg;
+		}
+	}
+
+	.wallet-links-menu {
+		position-anchor: --wallet-links;
+		position-area: block-end span-inline-start;
+		position-try-fallbacks: flip-inline, flip-block;
+		inset: auto;
+		margin-block: 0.5em;
+
+		min-inline-size: 16em;
+		max-inline-size: calc(100vw - 2em);
+		max-block-size: min(80vh, 40em);
+		overflow: auto;
+
+		border: 1px solid var(--border-color);
+		box-shadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+
+		/* `[data-card]` sets `display`, which would otherwise override the closed popover's `display: none`. */
+		&:not(:popover-open) {
+			display: none;
+		}
+
+		/* Without anchor positioning, fall back to the default centered popover. */
+		@supports not (anchor-name: --wallet-links) {
+			inset: 0;
+			margin: auto;
+		}
+
+		a {
+			padding: 0.5em 0.75em;
+			border-radius: 0.5em;
+
+			transition-property: background-color, color;
+
+			&:is(:hover, :focus-visible) {
+				background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
+			}
+		}
+	}
+
+	.wallet-links-group-label {
+		padding: 0.5em 0.75em 0.25em;
+		color: var(--text-secondary);
+		font-size: 0.75em;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.wallet-links-hint {
+		color: var(--text-secondary);
+		font-size: smaller;
+		font-weight: 400;
 	}
 
 	.wallet-overview-note {
