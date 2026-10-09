@@ -9,7 +9,10 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
-import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
+import {
+	type HardwarePrivacyImplementation,
+	HardwarePrivacyType,
+} from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -224,26 +227,44 @@ export const trezorWallet: HardwareWallet = {
 				usage: null,
 			},
 			dataCollection: null,
-			// Trezor Safe 5 connects over USB-C only and has no radio. Trezor Safe 7 adds Bluetooth, secured
-			// with the Trezor Host Protocol.
-			// Source: https://trezor.io/trezor-safe-5
-			// Source: https://trezor.io/trezor-safe-7
-			// The device has no network access of its own. By default, Trezor Suite connects to Trezor-run
-			// backend servers and fetches firmware and definitions from data.trezor.io; users can switch
-			// to their own backend server and route Suite through Tor.
-			// Source: https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node
-			// Source: https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/packages/connect-data/files/coins-eth.json#L2-L6
-			// Trezor Suite's source is public under the Trezor Reference Source License.
-			// Source: https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/LICENSE.md
-			hardwarePrivacy: {
+			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
 				type: HardwarePrivacyType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'Trezor Safe 5 connects over USB-C and has no radio. Trezor Safe 7 adds Bluetooth, secured with the Trezor Host Protocol.',
+						urls: [
+							{ label: 'Trezor Safe 5', url: 'https://trezor.io/trezor-safe-5' },
+							{ label: 'Trezor Safe 7', url: 'https://trezor.io/trezor-safe-7' },
+						],
+					},
+					{
+						explanation:
+							'By default, Trezor Suite connects to backend servers run by Trezor; users can switch to their own backend server and route Suite through Tor.',
+						urls: [
+							{
+								label: 'Connect Trezor Suite to your own node',
+								url: 'https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node',
+							},
+							{
+								label: 'Default Ethereum backend',
+								url: 'https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/packages/connect-data/files/coins-eth.json#L2-L6',
+							},
+						],
+					},
+					{
+						explanation:
+							'Trezor Suite source code is public under the Trezor Reference Source License.',
+						url: 'https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/LICENSE.md',
+					},
+				],
 				details:
 					'The Safe 5 has no radio and no network access of its own. Trezor Suite, whose source is public, uses Trezor-run servers by default and can be switched to a custom backend server and Tor.',
 				inspectableRemoteCalls: HardwarePrivacyType.PASS,
 				phoningHome: HardwarePrivacyType.PARTIAL,
 				url: 'https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node',
 				wirelessPrivacy: HardwarePrivacyType.PASS,
-			},
+			}),
 			privacyPolicy: 'https://trezor.io/privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
