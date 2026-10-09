@@ -299,7 +299,7 @@
 	}
 
 	/* Expanded detail */
-	.eip-detail {
+	details[data-card] > .eip-detail {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
