@@ -1,4 +1,4 @@
-![Wallet Stage Definitions](./cover.png)
+![Wallet Stages](./wallet_stages.png)
  
 # Stage Evaluation Framework for Ethereum Wallets  
 
