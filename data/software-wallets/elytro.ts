@@ -104,8 +104,6 @@ export const elytro: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		// The extension monorepo is GPL-3.0, but it depends on @elytro/sdk and other packages fetched from npm whose source repository (Elytro-eth/elytro-wallet-lib) is no longer public.
-		// Source: https://registry.npmjs.org/@elytro/sdk
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -113,6 +111,11 @@ export const elytro: SoftwareWallet = {
 					{
 						explanation: 'The Elytro extension monorepo is licensed under GPL-3.0.',
 						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE',
+					},
+					{
+						explanation:
+							'The extension depends on `@elytro/sdk` and other packages fetched from npm whose source repository (`Elytro-eth/elytro-wallet-lib`) is not public.',
+						url: 'https://registry.npmjs.org/@elytro/sdk',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -164,9 +167,13 @@ export const elytro: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			// The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro's terms say "No bug‑bounty commitment ... no bounty or reward is due unless we expressly agree in writing."
-			// Source: https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md
-			bugBountyProgram: notSupported,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						'The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro\'s terms say "No bug‑bounty commitment … no bounty or reward is due unless we expressly agree in writing."',
+					url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -223,9 +230,7 @@ export const elytro: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// Only the Chrome Web Store's own signing; no release assets or published signatures.
 				artifactSigning: notSupported,
-				// pnpm-lock.yaml is committed, but the repository has no CI workflows, so nothing enforces it.
 				dependencyLocking: notSupportedWithRef({
 					ref: [
 						{
@@ -235,18 +240,24 @@ export const elytro: SoftwareWallet = {
 						},
 					],
 				}),
-				// SES lockdown() hardens JavaScript built-ins, but there are no LavaMoat policies or per-package compartments.
-				// Source: https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts
-				dependencySandboxing: notSupported,
-				// No Dependabot, Snyk or Socket configuration.
+				dependencySandboxing: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Hardened JavaScript (`lockdown()` from the `ses` package) protects JavaScript built-in objects, but there are no LavaMoat policies or per-package compartments.',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts',
+					},
+				}),
 				dependencyVulnerabilityScanning: notSupported,
-				// No GitHub releases, tags or changelog for the extension.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Builds need private API keys and bump the version automatically; no reproducible build process is documented.
-				// Source: https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Builds need private API keys and bump the version automatically; no reproducible build process is documented.',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md',
+					},
+				}),
 			},
 		},
 		walletCall: null,
