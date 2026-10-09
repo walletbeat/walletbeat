@@ -178,7 +178,7 @@
 		margin-left: auto;
 		font-size: 0.8rem;
 		color: var(--text-secondary);
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 
 	/* EIP list */
@@ -274,7 +274,7 @@
 
 		&[data-status='FINAL'] {
 			background: color-mix(in srgb, #4ade80 15%, transparent);
-			color: #4ade80;
+			color: light-dark(oklch(from #4ade80 0.48 c h), #4ade80);
 		}
 
 		&[data-status='DRAFT'] {
@@ -284,22 +284,22 @@
 
 		&[data-status='REVIEW'] {
 			background: color-mix(in srgb, #a78bfa 15%, transparent);
-			color: #a78bfa;
+			color: light-dark(oklch(from #a78bfa 0.48 c h), #a78bfa);
 		}
 
 		&[data-status='LIVING'] {
 			background: color-mix(in srgb, #38bdf8 15%, transparent);
-			color: #38bdf8;
+			color: light-dark(oklch(from #38bdf8 0.48 c h), #38bdf8);
 		}
 
 		&[data-status='LAST_CALL'] {
 			background: color-mix(in srgb, #facc15 15%, transparent);
-			color: #facc15;
+			color: light-dark(oklch(from #facc15 0.48 c h), #facc15);
 		}
 	}
 
 	/* Expanded detail */
-	.eip-detail {
+	details[data-card] > .eip-detail {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
@@ -380,7 +380,7 @@
 	.empty {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
-		opacity: 0.6;
+		opacity: 0.7;
 		padding: 2rem 0;
 		text-align: center;
 	}
