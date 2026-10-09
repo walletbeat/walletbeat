@@ -39,7 +39,7 @@
 			</div>
 
 			{#if eip.finalizedDate !== null}
-				<!-- `data-final-since` lets pages refresh the day count client-side, so it does not go stale between builds. -->
+				<!-- `data-final-since` lets pages refresh the day count client-side. -->
 				<span class="final-since">
 					<strong data-final-since={eip.finalizedDate}>{eipFinalForLabel(daysSince(eip.finalizedDate))}</strong>,
 					since <time datetime={eip.finalizedDate}>{
