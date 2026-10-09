@@ -139,6 +139,10 @@
 		"hash": "dd45661ffb6b18f48eb41e79c8543c84ab38caf0a342ff74b865179da6818c3a",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/images/entities/trustWallet.svg": {
+		"hash": "8d061fb735928e5050e88a0dab04ce30b231e0770e7411dbbd63fb42f5f94c67",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/uniswapLabs.svg": {
 		"hash": "f558ef12e11e7e79a272449a4dc9c42d09b09c4433ea2ffdd799ed17db706ab0",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -285,6 +289,10 @@
 	},
 	"public/images/wallets/trezor.svg": {
 		"hash": "6765523805c5f15d0549e8a2cc8f97720e98acf196af748962a25815214cf488",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/trust-wallet.svg": {
+		"hash": "8d061fb735928e5050e88a0dab04ce30b231e0770e7411dbbd63fb42f5f94c67",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/uniswap-wallet.svg": {
