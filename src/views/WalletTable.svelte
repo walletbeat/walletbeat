@@ -801,11 +801,10 @@
 									isDefault: focusedAttributeGroup?.id === attrGroup.id,
 									defaultDirection: SortDirection.Descending,
 									// When this group sets the ranking, break ties the same way the overall rating does.
-									...(focusedAttributeGroup?.id === attrGroup.id && {
-										compare: (_scoreA: unknown, _scoreB: unknown, walletA: RatedWallet<_AttributeGroupId>, walletB: RatedWallet<_AttributeGroupId>) => (
-											compareFocusedGroup(walletA, walletB)
-										),
-									}),
+									compare: focusedAttributeGroup?.id === attrGroup.id ?
+										(_scoreA, _scoreB, walletA, walletB) => compareFocusedGroup(walletA, walletB)
+									:
+										undefined,
 								},
 
 								align: ColumnAlignment.Center,
