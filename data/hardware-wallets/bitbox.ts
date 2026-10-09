@@ -462,42 +462,24 @@ export const bitboxWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
+			// BitBox lists Rabby, MEW and NuFi as compatible wallets for Ethereum. MetaMask does not support the
+			// BitBox02.
+			// Source: https://support.bitbox.swiss/en_US/bitbox02-supported-third-party-wallets-compatibility
+			// Rabby and MEW pair with the device directly, but BitBox guides ask users to set up the wallet and
+			// update firmware in the BitBoxApp.
+			// Source: https://support.bitbox.swiss/en_US/why-pairing-bitbox02-with-bitboxapp-is-essential
+			// Source: https://support.bitbox.swiss/en_US/myetherwallet-bitbox02-connect
+			// Source: https://support.bitbox.swiss/en_US/update-bitbox02-firmware
+			// Unless a custom backend is configured, the BitBoxApp connects to backend infrastructure operated by
+			// Shift Crypto.
+			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing
 			interoperability: {
 				type: InteroperabilityType.PARTIAL,
-				ref: [
-					{
-						explanation:
-							'BitBox lists Rabby, MEW and NuFi as compatible wallets for Ethereum. MetaMask does not support the BitBox02.',
-						url: 'https://support.bitbox.swiss/en_US/bitbox02-supported-third-party-wallets-compatibility',
-					},
-					{
-						explanation:
-							'Rabby and MEW pair with the device directly, but BitBox guides ask users to set up the wallet and update firmware in the BitBoxApp.',
-						urls: [
-							{
-								label: 'Pairing with the BitBoxApp',
-								url: 'https://support.bitbox.swiss/en_US/why-pairing-bitbox02-with-bitboxapp-is-essential',
-							},
-							{
-								label: 'Connect to MEW',
-								url: 'https://support.bitbox.swiss/en_US/myetherwallet-bitbox02-connect',
-							},
-							{
-								label: 'Update firmware',
-								url: 'https://support.bitbox.swiss/en_US/update-bitbox02-firmware',
-							},
-						],
-					},
-					{
-						explanation:
-							'Unless a custom backend is configured, the BitBoxApp connects to backend infrastructure operated by Shift Crypto.',
-						url: 'https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing',
-					},
-				],
 				details:
 					'Works with Rabby, MEW and NuFi. Setup and firmware updates go through the BitBoxApp, which uses Shift Crypto servers by default.',
 				interoperability: InteroperabilityType.PASS,
 				noSupplierLinkage: InteroperabilityType.PARTIAL,
+				url: 'https://support.bitbox.swiss/en_US/bitbox02-supported-third-party-wallets-compatibility',
 			},
 		},
 		transparency: {
