@@ -2023,6 +2023,11 @@
 			row-gap: 1rem;
 		}
 
+		/* A filter set with no groups to show (e.g. Embedded) would still add a column gap. */
+		:global(form.menu:not(:has(> [data-filter-group]))) {
+			display: none;
+		}
+
 		:global([data-filter-group] > .group) {
 			flex-flow: row wrap;
 			gap: 0.375rem;
