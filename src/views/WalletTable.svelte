@@ -1750,10 +1750,6 @@
 		}
 	}
 
-	:global(#content:has(.wallet-table)) {
-		container: wallet-table / inline-size;
-	}
-
 	/* Wide: filter groups are anchored to the header cell they filter.
 	 * Narrow: the same groups occupy a sticky layer outside the table heading. */
 	.filters {
@@ -1790,6 +1786,7 @@
 	:global(#layout:has(.wallet-table)) {
 		/* Native fixed anchors must share the viewport coordinate system. */
 		--scrollContainer-perspective: none;
+		container-name: wallet-table;
 	}
 
 	.filter-popover {
