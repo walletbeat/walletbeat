@@ -1323,6 +1323,7 @@ export const rabby: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupportedWithRef({
 			ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',

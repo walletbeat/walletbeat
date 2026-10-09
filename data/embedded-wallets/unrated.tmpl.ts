@@ -84,6 +84,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 	},
 	variants: {

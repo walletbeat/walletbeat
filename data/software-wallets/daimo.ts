@@ -469,6 +469,7 @@ export const daimo: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupported,
 	},

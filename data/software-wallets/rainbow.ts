@@ -1704,6 +1704,7 @@ export const rainbow: SoftwareWallet = {
 				// rebuild the released artifacts and confirm a bit-for-bit match.
 				reproducibleBuilds: notSupported,
 			},
+			softwareUpdates: null,
 		},
 		// EIP-5792 is supported by the browser extension only, and only for accounts with an EIP-7702 delegation.
 		walletCall: {

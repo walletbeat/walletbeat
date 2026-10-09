@@ -1130,6 +1130,7 @@ export const metamask: SoftwareWallet = {
 				// reproduced. The mobile app publishes no reproducible-build tooling at all.
 				reproducibleBuilds: notSupported,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: refTodo,

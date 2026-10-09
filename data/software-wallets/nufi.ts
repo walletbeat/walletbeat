@@ -212,6 +212,7 @@ export const nufi: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: refTodo,

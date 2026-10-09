@@ -63,6 +63,7 @@ import type {
 	ReproducibleBuilds,
 } from './features/transparency/release-transparency'
 import type { ReputationSupport } from './features/transparency/reputation'
+import type { SoftwareUpdates } from './features/transparency/software-updates'
 import type { WithRef } from './reference'
 import {
 	type AtLeastOneTrueVariant,
@@ -261,6 +262,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		/** How new versions of the wallet reach users. */
+		softwareUpdates: VariantFeature<Nullable<SoftwareUpdates>>
 	}
 
 	/**
@@ -356,6 +360,9 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		/** How new versions of the wallet reach users. */
+		softwareUpdates: VariantFeature<Nullable<SoftwareUpdates>>
 	}
 }
 
@@ -419,6 +426,7 @@ export interface ResolvedFeatures {
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
 		orderflowPractices: ResolvedFeature<OrderflowPractices>
+		softwareUpdates: ResolvedFeature<SoftwareUpdates>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
 		releaseTransparency: {
@@ -621,6 +629,16 @@ export function resolveFeatures(
 					softwareFeat(
 						'transparency.orderflowPractices',
 						features => features.transparency.orderflowPractices,
+					),
+			),
+			softwareUpdates: nullable(
+				embeddedFeat(
+					'transparency.softwareUpdates',
+					features => features.transparency.softwareUpdates,
+				) ??
+					softwareFeat(
+						'transparency.softwareUpdates',
+						features => features.transparency.softwareUpdates,
 					),
 			),
 			reputation: hardwareFeat(

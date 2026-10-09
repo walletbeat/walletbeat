@@ -334,6 +334,7 @@ export const safe: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: {

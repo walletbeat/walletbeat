@@ -315,6 +315,7 @@ export const okx: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: refTodo,

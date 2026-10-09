@@ -307,6 +307,7 @@ export const bitget: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupported,
 	},

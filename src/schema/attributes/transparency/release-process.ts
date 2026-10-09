@@ -6,12 +6,18 @@ import {
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
-import { isSupported } from '@/schema/features/support'
+import { isSupported, notSupported } from '@/schema/features/support'
 import { isSourcePubliclyVisible } from '@/schema/features/transparency/license'
+import {
+	developerControlsInstalledVersion,
+	type SoftwareUpdates,
+	UpdateInstallation,
+} from '@/schema/features/transparency/software-updates'
+import { refNotNecessary } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { mdParagraph, paragraph, sentence } from '@/types/content'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -138,6 +144,46 @@ function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 		details: paragraph(
 			`{{WALLET_NAME}} satisfies all release process signals across the basic and advanced groups: ${commaListFormat(supportedSignals)}.`,
 		),
+	})
+}
+
+function developerUpdateControls(softwareUpdates: SoftwareUpdates): string {
+	return commaListFormat(
+		[
+			softwareUpdates.installation === UpdateInstallation.AUTOMATIC_WITHOUT_OPT_OUT
+				? 'installs updates automatically without a way to opt out'
+				: null,
+			isSupported(softwareUpdates.remoteVersionBlocking)
+				? 'can remotely block older versions from being used'
+				: null,
+		].filter(control => control !== null),
+	)
+}
+
+function partialDeveloperControlledUpdates(
+	ctx: EvaluationContext,
+	supportedSignals: string[],
+	softwareUpdates: SoftwareUpdates,
+): Evaluation {
+	return ctx.build({
+		outcome: {
+			id: 'partial_developer_controlled_updates',
+			rating: Rating.PARTIAL,
+			score: 0.8,
+			displayName: 'Transparent release process, developer-controlled updates',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} meets release process transparency requirements, but its developer decides which version users run.',
+			),
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} satisfies all release process signals (${commaListFormat(supportedSignals)}), but it ${developerUpdateControls(softwareUpdates)}.`,
+		),
+		howToImprove: mdParagraph(`
+			**{{WALLET_NAME}}** should let users decide when to install updates, and should
+			not remotely disable older versions. When the developer decides which version
+			users run, a compromised release reaches every user before anyone has had a
+			chance to vet it.
+		`),
 	})
 }
 
@@ -327,7 +373,7 @@ export const releaseProcess: Attribute = {
 		between versions are documented.
 		Without these signals, a compromised or tampered release may go undetected.
 	`),
-	methodology: mdParagraph(`
+	methodology: markdown(`
 		Four binary signals are assessed, grouped into two categories:
 
 		**Basic**:
@@ -340,10 +386,19 @@ export const releaseProcess: Attribute = {
 		   source, or the build can run fully offline. Verifying this independently requires access to
 		   public source code.
 
-		A wallet **passes** when both basic signals and both advanced signals are present.
+		A wallet **passes** when both basic signals and both advanced signals are present,
+		and users can choose which version of the wallet they run.
 		Partial coverage earns a **partial** rating, based on which groups are satisfied.
 		Basic signals alone score lower than advanced signals alone, reflecting stronger trust from
 		advanced-group evidence. No signals at all earns a **fail**.
+
+		A wallet that has all four signals is rated **partial** if its developer decides
+		which version users run. This is the case if the wallet installs updates without
+		a way to opt out, including wallet code served from the developer's servers each
+		time it loads. It is also the case if the developer can remotely block older
+		versions from being used. Updates delivered through app stores, browser extension
+		stores or package managers follow the platform's update settings, so they do not
+		count against the wallet.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -358,6 +413,20 @@ export const releaseProcess: Attribute = {
 			),
 		),
 		partial: [
+			exampleRating(
+				paragraph(
+					'The wallet has a public changelog, reproducible or hermetic builds, signed artifacts, and locked dependencies, but installs updates automatically without a way to opt out.',
+				),
+				partialDeveloperControlledUpdates(
+					EvaluationContext.forTest(() => releaseProcess),
+					['public changelog', 'reproducible builds', 'artifact signing', 'dependency locking'],
+					{
+						installation: UpdateInstallation.AUTOMATIC_WITHOUT_OPT_OUT,
+						remoteVersionBlocking: notSupported,
+						ref: refNotNecessary,
+					},
+				),
+			),
 			exampleRating(
 				paragraph(
 					'The wallet has a public changelog and dependency locking, but lacks both artifact signing and reproducible or hermetic builds.',
@@ -514,8 +583,17 @@ export const releaseProcess: Attribute = {
 					return partialBasicPassAdvancedFail(ctx, supportedSignals)
 				case 'partial':
 					return partialBasicPassAdvancedPartial(ctx, supportedSignals, advancedSignals)
-				case 'pass':
+				case 'pass': {
+					const softwareUpdates = ctx.features.transparency.softwareUpdates
+
+					if (softwareUpdates !== null && developerControlsInstalledVersion(softwareUpdates)) {
+						ctx.addRef(softwareUpdates)
+
+						return partialDeveloperControlledUpdates(ctx, supportedSignals, softwareUpdates)
+					}
+
 					return pass(ctx, supportedSignals)
+				}
 			}
 		} else {
 			switch (advancedSignals.level) {
