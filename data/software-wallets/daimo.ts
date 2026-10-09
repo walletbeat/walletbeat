@@ -382,9 +382,13 @@ export const daimo: SoftwareWallet = {
 		security: {
 			accountRecovery: {
 				drills: null,
-				// Recovery is by adding user-held backup keys (passkey, security key or seed phrase) to the on-chain account; there is no guardian or vendor-assisted recovery.
-				// Source: https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts
-				guardianRecovery: notSupported,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Recovery is by adding backup keys held by the user (passkey, security key or seed phrase) to the onchain account; there is no guardian or vendor-assisted recovery.',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts',
+					},
+				}),
 			},
 			bugBountyProgram: null,
 			duressResistance: null,
@@ -471,8 +475,13 @@ export const daimo: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// Builds were made and signed on the Expo EAS service and distributed through the app stores; no signatures or release artifacts were published.
-				artifactSigning: notSupported,
+				artifactSigning: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Builds were made and signed on the Expo EAS service and distributed through the app stores; no signatures or release artifacts were published.',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+					},
+				}),
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -482,11 +491,8 @@ export const daimo: SoftwareWallet = {
 						},
 					],
 				}),
-				// No LavaMoat or other runtime dependency isolation.
 				dependencySandboxing: notSupported,
-				// No Dependabot, Snyk, Socket or Renovate configuration in the repository.
 				dependencyVulnerabilityScanning: notSupported,
-				// No GitHub releases or changelog; the only tag is `audit-1`.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupportedWithRef({
 					ref: [
@@ -498,7 +504,6 @@ export const daimo: SoftwareWallet = {
 					],
 				}),
 				repositoryChangeControls: null,
-				// No reproducible build process is documented, and WalletScrutiny has no entry.
 				reproducibleBuilds: notSupported,
 			},
 		},
