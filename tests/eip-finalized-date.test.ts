@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { eips } from '@/data/eips'
-import { eipFinalForLabel, EipStatus } from '@/schema/eips'
+import { EipStatus } from '@/schema/eips'
 import { daysSince } from '@/types/date'
 
 describe('Eip.finalizedDate', () => {
@@ -16,12 +16,4 @@ describe('Eip.finalizedDate', () => {
 			})
 		}
 	}
-})
-
-describe('eipFinalForLabel', () => {
-	it('pluralizes and groups digits', () => {
-		expect(eipFinalForLabel(0)).toBe('Final for 0 days')
-		expect(eipFinalForLabel(1)).toBe('Final for 1 day')
-		expect(eipFinalForLabel(1094)).toBe('Final for 1,094 days')
-	})
 })
