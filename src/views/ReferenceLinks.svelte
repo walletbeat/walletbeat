@@ -205,13 +205,14 @@
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
 
-						<p class="explanation">
+						<!-- Markdown renders its own <p>, which cannot nest inside a <p>. -->
+						<div class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
 								<br>
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</p>
+						</div>
 					{/if}
 
 					{#if linkUrls.length === 1}
@@ -378,7 +379,25 @@
 	}
 
 	h4 {
-		font-size: 1em;
+		font-size: 0.8em;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-secondary);
+		opacity: 0.75;
+	}
+
+	/* A lone reference renders as a paragraph, without a bullet. */
+	.references .references-list:has(> :only-child) {
+		padding-inline-start: 0;
+
+		> li {
+			padding-inline-start: 0;
+
+			&::before {
+				content: none;
+			}
+		}
 	}
 
 	cite {
@@ -415,6 +434,11 @@
 
 	.inline-image {
 		margin: 0;
+
+		figcaption a {
+			color: var(--text-secondary);
+			font-weight: 500;
+		}
 
 		img {
 			display: block;
