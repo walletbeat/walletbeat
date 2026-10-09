@@ -1105,8 +1105,7 @@ Issued At: ${new Date().toISOString()}`;
 
 	/*
 	 * Primary action inside the test panes. Tabs that style their own buttons
-	 * win (this stays at class specificity); the Transactions and Signatures
-	 * panes relied on it being styled and rendered a plain field-like button.
+	 * win (this stays at class specificity).
 	 */
 	.main-content :global(:where(button[data-pressable]:not([data-pressable~='secondary']))) {
 		align-self: flex-start;
