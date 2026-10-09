@@ -120,7 +120,7 @@
 		font-size: 0.82rem;
 		font-weight: 500;
 		padding: 0.35em 0.9em;
-		border: 1px solid var(--border);
+		border: 1px solid var(--border-color);
 		border-radius: 99px;
 		background: transparent;
 		color: var(--text-secondary);
@@ -254,7 +254,7 @@
 		flex-direction: column;
 		gap: 1rem;
 		padding-top: 1rem;
-		border-top: 1px solid var(--border);
+		border-top: 1px solid var(--border-color);
 		margin-top: 0.875rem;
 	}
 
