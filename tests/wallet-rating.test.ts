@@ -1,10 +1,13 @@
-import { describe, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { hardwareWalletAttributeTree, hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWalletAttributeTree, softwareWallets } from '@/data/software-wallets'
-import type { AttributeTree } from '@/schema/attribute-groups'
+import { type AttributeTree, evaluateAttributes } from '@/schema/attribute-groups'
+import { resolveFeatures } from '@/schema/features'
 import { hardwareLadders, type Ladders, softwareLadders } from '@/schema/ladders'
-import { type BaseWallet, rateWallet } from '@/schema/wallet'
+import type { Variant } from '@/schema/variants'
+import { type BaseWallet, rateWallet, type ResolvedWallet } from '@/schema/wallet'
+import { nonEmptyValues } from '@/types/utils/non-empty'
 
 type WalletMapTestCase = {
 	attributeTree: AttributeTree<string>
@@ -34,8 +37,16 @@ describe('wallets', () => {
 			for (const walletName in walletMap) {
 				const wallet = walletMap[walletName]
 
-				it(`can rate ${walletName}`, () => {
-					rateWallet(attributeTree, ladders, wallet)
+				it(`can rate ${walletName} without modifying its per-variant evaluations`, () => {
+					const rated = rateWallet(attributeTree, ladders, wallet)
+
+					for (const resolved of nonEmptyValues<Variant, ResolvedWallet<string>>(rated.variants)) {
+						const features = resolveFeatures(wallet.features, wallet.variants, resolved.variant)
+
+						expect(resolved.attributes, `variant ${resolved.variant}`).toEqual(
+							evaluateAttributes(attributeTree, features, wallet.metadata),
+						)
+					}
 				})
 			}
 		})
