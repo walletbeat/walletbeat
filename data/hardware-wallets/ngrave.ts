@@ -77,7 +77,7 @@ export const ngrave: HardwareWallet = {
 					},
 					{
 						explanation:
-							'The secret can be shown again on the device: "Go to Settings → Display secret key, enter your PIN code and then select Mnemonic or NGRAVE wallet." Only extended public keys are exported to LIQUID.',
+							'The secret can be shown again on the device: "Go to Settings → Display secret key, enter your PIN code and then select Mnemonic or NGRAVE wallet." Only extended public keys are exported to the LIQUID app.',
 						url: 'https://support.ngrave.io/hc/en-us/articles/4409561273745',
 					},
 				],
@@ -219,7 +219,7 @@ export const ngrave: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			// No public audit report of NGRAVE's firmware or device found (vendor site, help center, GitHub, WalletScrutiny, web search). The EAL7 certificate belongs to the third-party secure OS NGRAVE embeds, and EAL5+ to the secure element chip.
+			// No public audit report of NGRAVE's firmware or device found (vendor site, help center, GitHub, WalletScrutiny, web search). The EAL7 certificate belongs to the secure OS from an external vendor that NGRAVE embeds, and EAL5+ to the secure element chip.
 			// Source: https://ngrave.io/en/blog/the-vision-of-open-source-from-our-cto
 			publicSecurityAudits: [],
 			secureElement: supported({
@@ -310,7 +310,7 @@ export const ngrave: HardwareWallet = {
 				reproducibleBuilds: null,
 			},
 			reputation: {
-				// Founded in 2018; ZERO has shipped since 2021 with its own design, OS and key backup scheme, using third-party ST chips and a third-party secure OS. Firmware v1.8 shipped in August 2026.
+				// Founded in 2018; ZERO has shipped since 2021 with its own design, OS and key backup scheme, using ST chips and a secure OS from external vendors. Firmware v1.8 shipped in August 2026.
 				// Source: https://ngrave.io/en/press/crypto-hardware-wallet-ngrave-raises-6m-seed-round
 				// In January 2026 a group of investors acquired the company's core assets; the operator is now a new Belgian company.
 				// Source: https://ngrave.io/en/terms-and-conditions
