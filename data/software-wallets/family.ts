@@ -19,7 +19,7 @@ export const family: SoftwareWallet = {
 		coinspectId: 'family',
 		contributors: [lucemans, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://family.co/docs'],
 			socials: {
@@ -107,7 +107,19 @@ export const family: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'A Wallet Group is a collection of individual wallet addresses generated from a single Secret Recovery Phrase.',
+					url: 'https://family.co/support/wallet-groups',
+				},
+				{
+					explanation: 'Users switch between wallets from the Mission Control screen.',
+					url: 'https://family.co/support/switch-wallets',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -115,7 +127,7 @@ export const family: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://family.co/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -160,7 +172,17 @@ export const family: SoftwareWallet = {
 				},
 			],
 			scamAlerts: null,
-			securityBestPractices: null,
+			// The app's source is not public: the app repositories named in the Zellic audit are not
+			// publicly accessible, and github.com/family hosts only ConnectKit and a forked crypto library.
+			// The app is iOS-only, and the App Store build can only be downloaded with an Apple ID, so
+			// neither an Android manifest nor the Info.plist is publicly available.
+			// Source: https://family.co/media/family-wallet-audit-report-2024.pdf
+			// Source: https://github.com/family
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
@@ -182,14 +204,18 @@ export const family: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				// App Store signing only; no developer-published signatures or attestations.
+				artifactSigning: notSupported,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				// family.co/changelog lists ConnectKit releases only; app release notes appear only in the App Store.
+				// Source: https://family.co/changelog
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// The app's source is not public, so its builds cannot be reproduced independently.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
