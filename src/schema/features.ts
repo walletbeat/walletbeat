@@ -213,8 +213,8 @@ export interface WalletBaseFeatures {
  * answer is known to be "none". See the `/data` encoding rule in
  * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
-export type WalletSoftwareFeatures = WalletBaseFeatures & {
-	security: WalletBaseFeatures['security'] & {
+export type WalletSoftwareFeatures = Omit<WalletBaseFeatures, 'security'> & {
+	security: Omit<WalletBaseFeatures['security'], 'transactionLegibility'> & {
 		/** Support for alerting the user about potential scams. */
 		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
 
@@ -223,8 +223,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			VariantFeature<SoftwareTransactionLegibilityImplementation>
+		transactionLegibility: VariantFeature<SoftwareTransactionLegibilityImplementation>
 	}
 
 	/** Privacy features. */
@@ -295,16 +294,15 @@ export function isWalletSoftwareFeatures(
  * answer is known to be "none". See the `/data` encoding rule in
  * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
-export type WalletHardwareFeatures = WalletBaseFeatures & {
-	security: WalletBaseFeatures['security'] & {
+export type WalletHardwareFeatures = Omit<WalletBaseFeatures, 'security'> & {
+	security: Omit<WalletBaseFeatures['security'], 'transactionLegibility'> & {
 		firmware: VariantFeature<FirmwareSupport>
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			VariantFeature<HardwareTransactionLegibilityImplementation>
+		transactionLegibility: VariantFeature<HardwareTransactionLegibilityImplementation>
 	}
 	privacy: WalletBaseFeatures['privacy'] & {
 		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>

@@ -7,8 +7,26 @@ export type Supported<T extends object = object> = T & {
 	support: 'SUPPORTED'
 }
 
-/** The feature is supported. */
-export function supported<T extends object = object>(supportData: T): Supported<T> {
+/** The fields of each supported variant of `S`, without the `support` field. */
+type SupportedFields<S> = S extends Supported ? Omit<S, 'support'> : never
+
+/**
+ * The data that `supported(...)` takes for a feature of type `T`.
+ * When `T` is a `Support<...>` type, this is the payload of its supported
+ * variants; otherwise `T` is the payload itself.
+ */
+type SupportedData<T> = [Extract<T, Supported>] extends [never]
+	? Extract<T, object>
+	: SupportedFields<Extract<T, Supported>>
+
+/**
+ * The feature is supported.
+ * The type of `supportData` comes from where the result is used rather than
+ * from `supportData` itself, so that fields unknown to the schema are flagged.
+ */
+export function supported<T = object>(
+	supportData: NoInfer<SupportedData<T>>,
+): Supported<SupportedData<T>> {
 	if (Object.hasOwn(supportData, 'support')) {
 		throw new Error(
 			'Do not include a `support` field in the object passed to `supported(...)`; that field is implicitly added.',
