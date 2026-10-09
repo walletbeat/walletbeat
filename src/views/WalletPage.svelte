@@ -2358,6 +2358,8 @@
 		.attribute > details > summary {
 			view-timeline-name: var(---pie-timeline, none);
 			view-timeline-axis: block;
+			/* Measure against the scroll padding, where in-page links land. */
+			view-timeline-inset: auto;
 		}
 
 		article {
