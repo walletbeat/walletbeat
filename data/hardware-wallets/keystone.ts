@@ -8,6 +8,7 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -30,6 +31,7 @@ import {
 	DataLocation,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -57,7 +59,7 @@ export const keystoneWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://support.keyst.one/'],
 			repositories: ['https://github.com/KeystoneHQ'],
@@ -111,8 +113,34 @@ export const keystoneWallet: HardwareWallet = {
 			safe: notSupported,
 		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
-			ref: 'https://guide.keyst.one/docs/keystone',
-			requiresManufacturerConsent: null,
+			ref: [
+				'https://guide.keyst.one/docs/keystone',
+				{
+					explanation:
+						'Keystone signs Ethereum transactions, personal messages and typed data requested over the ERC-4527 QR code standard, which is in the public domain. The firmware is MIT-licensed and only checks that a request matches the device master fingerprint.',
+					urls: [
+						{
+							label: 'ERC-4527',
+							url: 'https://github.com/ethereum/ERCs/blob/f4df3d0537d54d05dc428ff10243171ba26073a8/ERCS/erc-4527.md',
+						},
+						{
+							label: 'Keystone 3 Ethereum signing',
+							url: 'https://github.com/KeystoneHQ/keystone3-firmware/blob/6ef9ddd3445efddc7398ff9beff75d80834d6c87/rust/rust_c/src/ethereum/mod.rs',
+						},
+					],
+				},
+				{
+					explanation:
+						'Wallets that are not in the device menu can connect with the generic pairing code; Ambire tells users to pick the MetaMask entry.',
+					url: 'https://help.ambire.com/en/articles/14612715-how-to-connect-ambire-wallet-to-keystone',
+				},
+				{
+					explanation:
+						'The contract metadata the device uses to decode transactions is published under the MIT license for any software or hardware wallet to use.',
+					url: 'https://github.com/KeystoneHQ/Smart-Contract-Metadata-Registry/blob/52fe6eb977e401cf3b862a44b508082b97e0634c/README.md',
+				},
+			],
+			requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' },
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
@@ -158,14 +186,39 @@ export const keystoneWallet: HardwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Keystone shares extended public keys with companion wallets, which show a batch of addresses to choose from; one device can also hold up to three wallets.',
+					urls: [
+						{
+							label: 'Connect to Rabby',
+							url: 'https://guide.keyst.one/docs/rabby',
+						},
+						{
+							label: 'Three seed phrase wallets',
+							url: 'https://guide.keyst.one/docs/3-seed-phrase-wallet-options',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
 				usage: null,
 			},
 			dataCollection: null,
-			hardwarePrivacy: null,
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PARTIAL,
+				details:
+					'No wireless radios, and the device itself never connects to the network. Used with independent wallets, no Keystone server is needed. The optional Keystone Nexus app collects wallet data and its source is not public.',
+				inspectableRemoteCalls: HardwarePrivacyType.PARTIAL,
+				phoningHome: HardwarePrivacyType.PASS,
+				url: 'https://keyst.one/privacy-promises',
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://keyst.one/privacy-policy',
 			transactionPrivacy: {
 				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the Ethereum firmware; the Nexus app only offers plain send, receive and swap.
@@ -335,7 +388,14 @@ export const keystoneWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PASS,
+				details:
+					'Works with many independent wallets over an open QR code standard, without a Keystone account, app or server.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PASS,
+				url: 'https://keyst.one/supported-wallets-and-assets',
+			},
 		},
 		transparency: {
 			maintenance: {
