@@ -156,6 +156,7 @@ export const baseApp: SoftwareWallet = {
 		},
 		chainConfigurability: notSupported,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {
