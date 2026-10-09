@@ -5,7 +5,13 @@ import type { WalletSecurityNews } from '@/types/content/news'
  * Compiled from individual news files
  */
 export const allWalletSecurityNews: WalletSecurityNews[] = [
+	(await import('./2020-01-31-kraken-trezor-voltage-glitch-seed-extraction')).default,
+	(await import('./2020-07-29-ledger-e-commerce-database-breach')).default,
+	(await import('./2022-06-15-demonic-metamask-seed-phrase-on-disk')).default,
 	(await import('./2022-08-11-slope-wallet-sentry-seed-phrase-leak')).default,
+	(await import('./2023-12-14-ledger-connect-kit-supply-chain-attack')).default,
+	(await import('./2024-01-17-trezor-support-portal-breach')).default,
+	(await import('./2025-02-21-safe-wallet-bybit-hack')).default,
 	(await import('./2025-12-25-browser-extension-v268-incident')).default,
 	(await import('./2026-01-06-global-e-breach')).default,
 	(await import('./2026-05-20-bankrbot-hack')).default,
