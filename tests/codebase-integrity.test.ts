@@ -69,7 +69,6 @@ const ALLOWED_BARE_FILENAMES = new Set([
 	'Makefile',
 	'agentsignore',
 	'checkpoint',
-	'upstream-commit',
 	'torrc',
 	'.editorconfig',
 	'.gitattributes',
