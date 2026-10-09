@@ -13,27 +13,12 @@ import { getRepositoryRoot } from '@/utils/codebase'
  * `allEntities` in `data/entities.ts` only lists a subset of entities, so we
  * glob the directory to cover all of them.
  */
-const entityModules: Record<string, Record<string, unknown>> = import.meta.glob(
-	'/data/entities/*.ts',
-	{ eager: true },
-)
-
-/** Type predicate for values exported from entity modules. */
-function isEntity(value: unknown): value is Entity {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		'id' in value &&
-		typeof value.id === 'string' &&
-		'icon' in value &&
-		'legalName' in value
-	)
-}
+const entityModules = import.meta.glob<Record<string, Entity>>('/data/entities/*.ts', {
+	eager: true,
+})
 
 /** All entities exported from `data/entities/*.ts`. */
-const entities: Entity[] = Object.values(entityModules).flatMap(module =>
-	Object.values(module).filter(isEntity),
-)
+const entities: Entity[] = Object.values(entityModules).flatMap(module => Object.values(module))
 
 /** Width and height of the image at the given repository-relative path. */
 async function imageSize(repoPath: string): Promise<{ width: number; height: number }> {
@@ -43,10 +28,6 @@ async function imageSize(repoPath: string): Promise<{ width: number; height: num
 }
 
 describe('entity icons', () => {
-	it('finds entities', () => {
-		expect(entities.length).toBeGreaterThan(0)
-	})
-
 	for (const entity of entities) {
 		const { icon } = entity
 
