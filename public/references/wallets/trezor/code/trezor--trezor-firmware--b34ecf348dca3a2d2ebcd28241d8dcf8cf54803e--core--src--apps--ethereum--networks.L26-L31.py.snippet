@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 26,
+	"highlightLastLine": 31,
+	"segments": [
+		{
+			"lines": [
+				"if TYPE_CHECKING:"
+			],
+			"startLine": 13
+		},
+		{
+			"lines": [
+				"    NetworkInfoTuple = tuple["
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"        str,  # name",
+				"    ]",
+				"    # fmt: on",
+				"",
+				"UNKNOWN_NETWORK = EthereumNetworkInfo(",
+				"    chain_id=0,",
+				"    slip44=0,",
+				"    symbol=\"UNKN\",",
+				"    name=\"Unknown network\",",
+				")",
+				"",
+				"",
+				"def by_chain_id(chain_id: int) -> EthereumNetworkInfo:",
+				"    for n in _networks_iterator():"
+			],
+			"startLine": 22
+		}
+	]
+}

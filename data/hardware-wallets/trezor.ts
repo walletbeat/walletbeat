@@ -9,6 +9,7 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -16,6 +17,11 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -28,6 +34,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -70,7 +77,7 @@ export const trezorWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://trezor.io/learn'],
 			repositories: ['https://github.com/trezor/trezor-suite'],
@@ -130,8 +137,29 @@ export const trezorWallet: HardwareWallet = {
 			safe: notSupported,
 		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
-			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
-			requiresManufacturerConsent: null,
+			ref: [
+				'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+				{
+					explanation:
+						'Trezor Connect only asks integrators for a manifest with an email address and app URL, which Trezor uses to identify the integration and contact the developer if necessary.',
+					url: 'https://connect.trezor.io/10/methods/other/init/',
+				},
+				{
+					explanation:
+						'Network and token definitions shown on the device are generated from public token and network registries and signed by Trezor. Without a definition, the firmware still signs and shows an unknown network.',
+					urls: [
+						{
+							label: 'External definitions',
+							url: 'https://github.com/trezor/trezor-firmware/blob/b34ecf348dca3a2d2ebcd28241d8dcf8cf54803e/docs/common/external-definitions.md',
+						},
+						{
+							label: 'Unknown network fallback',
+							url: 'https://github.com/trezor/trezor-firmware/blob/b34ecf348dca3a2d2ebcd28241d8dcf8cf54803e/core/src/apps/ethereum/networks.py#L26-L31',
+						},
+					],
+				},
+			],
+			requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' },
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
@@ -181,14 +209,41 @@ export const trezorWallet: HardwareWallet = {
 				ventureCapital: false,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'On Ethereum and EVM networks, Trezor Suite lets users add accounts freely, and the device places no limit on the number of accounts.',
+					url: 'https://trezor.io/guides/trezor-suite/trezor-suite-desktop/multiple-accounts-in-trezor-suite',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
 				usage: null,
 			},
 			dataCollection: null,
-			hardwarePrivacy: null,
+			// Trezor Safe 5 connects over USB-C only and has no radio. Trezor Safe 7 adds Bluetooth, secured
+			// with the Trezor Host Protocol.
+			// Source: https://trezor.io/trezor-safe-5
+			// Source: https://trezor.io/trezor-safe-7
+			// The device has no network access of its own. By default, Trezor Suite connects to Trezor-run
+			// backend servers and fetches firmware and definitions from data.trezor.io; users can switch
+			// to their own backend server and route Suite through Tor.
+			// Source: https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node
+			// Source: https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/packages/connect-data/files/coins-eth.json#L2-L6
+			// Trezor Suite's source is public under the Trezor Reference Source License.
+			// Source: https://github.com/trezor/trezor-suite/blob/3d661e0867210b9dc16a8f5c1c13b00bebd5a223/LICENSE.md
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PARTIAL,
+				details:
+					'The Safe 5 has no radio and no network access of its own. Trezor Suite, whose source is public, uses Trezor-run servers by default and can be switched to a custom backend server and Tor.',
+				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				phoningHome: HardwarePrivacyType.PARTIAL,
+				url: 'https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node',
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://trezor.io/privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -229,7 +284,54 @@ export const trezorWallet: HardwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								'Trezor recommends setting a PIN during setup; users who skip it can set one later in device settings.',
+							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/pin-protection-on-trezor-devices',
+						},
+					],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.OPTIONAL,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
+					},
+				},
+				duressMode: supported({
+					ref: [
+						{
+							explanation:
+								'A wipe code entered at the PIN prompt immediately erases all private data and resets the device, with no confirmation step.',
+							url: 'https://trezor.io/learn/security-privacy/personal-security-standards/set-up-a-wipe-code-to-erase-your-trezor',
+						},
+						{
+							explanation:
+								'Every passphrase opens a different wallet, and after a reboot the device gives no indication of how many passphrases it has been used with.',
+							urls: [
+								{
+									label: 'What is a passphrase',
+									url: 'https://trezor.io/guides/backups-recovery/advanced-wallets/what-is-a-passphrase',
+								},
+								{
+									label: 'Bug bounty scope: plausible deniability',
+									url: 'https://trezor.io/other/partner-portal/for-developers/trezor-bug-bounty-program-scope-rules-and-rewards',
+								},
+							],
+						},
+					],
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.SELF_DESTRUCT]: true,
+						[DuressAction.ONCHAIN_LOCKDOWN]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
+				}),
+			},
 			firmware: {
 				// Firmware updates need an on-device confirmation; the bootloader checks Ed25519 signatures on every boot and enforces downgrade protection.
 				// Source: https://github.com/trezor/trezor-firmware/blob/6ab39e95cf45d4b25b3f677806012ac660ae7a51/docs/core/misc/boot.md
@@ -330,7 +432,30 @@ export const trezorWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'Trezor lists independent wallets that support its devices, including MetaMask, Rabby and Ambire.',
+						url: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+					},
+					{
+						explanation:
+							'Web apps reach the device through Trezor Suite Desktop over a local WebSocket when it is running, and otherwise through a Suite Web popup hosted by Trezor.',
+						url: 'https://connect.trezor.io/10/',
+					},
+					{
+						explanation:
+							'By default, Trezor Suite connects to servers run by Trezor; users can switch to their own backend server.',
+						url: 'https://trezor.io/guides/trezor-suite/connect-trezor-suite-to-your-own-node',
+					},
+				],
+				details:
+					'Works with many independent wallets. Web integrations through Trezor Connect and Trezor Suite contact Trezor-run servers by default; custom backends and Tor are available in Suite.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PARTIAL,
+			},
 		},
 		transparency: {
 			maintenance: {
