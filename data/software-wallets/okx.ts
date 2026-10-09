@@ -273,6 +273,7 @@ export const okx: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: {
 				ref: [
 					{

@@ -464,6 +464,7 @@ export const gemwallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: {
 				ref: [
 					{

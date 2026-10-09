@@ -134,6 +134,7 @@ export const pillarx: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {

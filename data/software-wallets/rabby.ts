@@ -1138,6 +1138,7 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			// Rabby's browser extension exposes inspection and revocation for
 			// ERC-20, ERC-721, and ERC-1155 token approvals directly in the popup
 			// UI (a recent integration; previously this opened a separate tab to a

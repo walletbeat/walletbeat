@@ -157,6 +157,9 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
 		permissionsManagement: VariantFeature<PermissionsManagementSupport>
+
+		/** Ability to inspect and remove the account's EIP-7702 delegation. */
+		delegationRevocation: VariantFeature<DelegationRevocationSupport>
 	}
 
 	/** Ecosystem features. */
@@ -290,6 +293,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
   - `permissionsManagement` (`ResolvedFeature<PermissionsManagementSupport>`)
+  - `delegationRevocation` (`ResolvedFeature<DelegationRevocationSupport>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `orderflowPractices` (`ResolvedFeature<OrderflowPractices>`)
@@ -3603,6 +3607,47 @@ How the wallet helps users inspect, constrain, and revoke delegated spending aut
 
 ```typescript
 type PermissionsManagementSupport = WithRef<PermissionsManagement>
+```
+
+---
+
+### Enum: `DelegationRevocationScope`
+
+Which EIP-7702 delegations the user can remove from within the wallet.
+
+- `CANNOT_REVOKE` = `(auto)`: The wallet offers no way to remove the account's delegation.
+- `OWN_DELEGATE_CONTRACT_ONLY` = `(auto)`: The wallet can only remove a delegation to its own delegate contract.
+- `ANY_DELEGATE_CONTRACT` = `(auto)`: The wallet can remove a delegation to any contract, including one set by another wallet or app.
+
+---
+
+### Interface: `DelegationRevocation`
+
+How the wallet lets users inspect and remove the EIP-7702 delegation of their account, e.g. to take back control after delegating it to a malicious contract. Removing a delegation means signing an EIP-7702 authorization that delegates the account to the zero address.
+
+To test:
+
+- `showsCurrentDelegate`: From another wallet or a script, delegate the
+  test account to a contract that is not the wallet's own delegate
+  contract. Check whether the wallet shows the account as delegated and
+  names or links that contract.
+- `revocation`: Look in the account settings for a "Revoke delegation",
+  "Switch back to a standard account" or similar option. Try it with the
+  account delegated to the wallet's own delegate contract, then to a
+  contract set by another wallet, and check on a block explorer that the
+  account no longer has delegated code.
+
+- `showsCurrentDelegate` (`boolean`): Does the wallet show which contract the account is currently delegated to, including a contract set by another wallet or app?
+- `revocation` (`DelegationRevocationScope`): Which delegations can the user remove from within the wallet?
+
+---
+
+### Type: `DelegationRevocationSupport`
+
+EIP-7702 delegation revocation support, or `EIP_7702_NOT_SUPPORTED` for wallets that cannot sign EIP-7702 authorizations at all.
+
+```typescript
+type DelegationRevocationSupport = 'EIP_7702_NOT_SUPPORTED' | WithRef<DelegationRevocation>
 ```
 
 ---

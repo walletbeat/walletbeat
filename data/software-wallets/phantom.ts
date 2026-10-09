@@ -413,6 +413,7 @@ export const phantom: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: {
 				ref: [
 					{
