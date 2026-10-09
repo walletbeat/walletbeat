@@ -32,8 +32,11 @@ const secondaryNavigationItems = [
 		if (!(event.target instanceof Element) || event.target.closest('#theme-toggle') === null) {
 			return
 		}
-		document.documentElement.style.colorScheme =
-			document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
+		// The scheme in effect: the stored choice, or else the system's.
+		const currentColorScheme =
+			document.documentElement.style.colorScheme ||
+			(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+		document.documentElement.style.colorScheme = currentColorScheme === 'dark' ? 'light' : 'dark'
 		localStorage.setItem('theme', document.documentElement.style.colorScheme)
 		document
 			.querySelector('meta[name="color-scheme"]')
@@ -55,7 +58,13 @@ const secondaryNavigationItems = [
 		</button>
 
 		<a href='/' class='logo'>
-			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
+			<img
+				src='/logo.svg'
+				alt='Walletbeat'
+				width='516'
+				height='126'
+				data-safari='invert-lightness'
+			/>
 		</a>
 
 		<button type='button' id='theme-toggle' data-icon='circle' data-stack>
@@ -95,6 +104,7 @@ const secondaryNavigationItems = [
 
 				img {
 					display: block;
+					width: auto;
 					height: 2.35rem;
 				}
 			}

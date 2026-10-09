@@ -130,7 +130,7 @@ const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses are staggered across time',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} staggers requests about multiple addresses over time time, which makes it harder to correlate your addresses.',
+				'{{WALLET_NAME}} staggers requests about multiple addresses over time, which makes it harder to correlate your addresses.',
 			),
 		},
 		details: paragraph(`
@@ -317,7 +317,7 @@ export const multiAddressCorrelation: Attribute = {
 			up the requests such that each request only contains one address, then
 			sending these requests over different proxy circuits in a manner that
 			staggers the requests over time. This ensures that the receiving
-			endpoint cannot correlate addressed based on timing or IP address.
+			endpoint cannot correlate addresses based on timing or IP address.
 		* Wallets may distribute requests across multiple RPC endpoints owned by
 			separate entities for each wallet address, preventing each entity from
 			learning more than one wallet address.
