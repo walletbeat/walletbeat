@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { allRatedWallets } from '@/data/wallets'
-import type { Evaluation } from '@/schema/attributes'
+import type { Evaluation, OutcomeMetadata } from '@/schema/attributes'
 import {
 	securityAuditsAndBounties,
 	type SecurityAuditsMetadata,
@@ -9,17 +9,26 @@ import {
 import { securityAuditId } from '@/schema/features/security/security-audits'
 import { Variant } from '@/schema/variants'
 import type { RatedWallet, ResolvedWallet } from '@/schema/wallet'
+import { isSecurityAuditsMetadata } from '@/types/content/security-audits-details'
 import { nonEmptyValues } from '@/types/utils/non-empty'
 
-function auditIds(evaluation: Evaluation<SecurityAuditsMetadata> | undefined): string[] {
-	return (evaluation?.outcome.metadata?.securityAudits ?? []).map(securityAuditId).sort()
+function isSecurityAuditsEvaluation<_Evaluation extends Evaluation<OutcomeMetadata>>(
+	evaluation: _Evaluation,
+): evaluation is _Evaluation & Evaluation<SecurityAuditsMetadata> {
+	return isSecurityAuditsMetadata(evaluation.outcome.metadata)
+}
+
+function auditIds(evaluation: Evaluation<OutcomeMetadata> | undefined): string[] {
+	const metadata = evaluation?.outcome.metadata
+	const audits = isSecurityAuditsMetadata(metadata) ? metadata.securityAudits : []
+
+	return audits.map(securityAuditId).sort()
 }
 
 function variantAuditsEvaluation(
 	resolved: ResolvedWallet<string>,
-): Evaluation<SecurityAuditsMetadata> | undefined {
-	return resolved.attributes.security?.securityAuditsAndBounties?.evaluation as
-		Evaluation<SecurityAuditsMetadata> | undefined
+): Evaluation<OutcomeMetadata> | undefined {
+	return resolved.attributes.security?.securityAuditsAndBounties?.evaluation
 }
 
 describe('securityAuditsAndBounties aggregate', () => {
@@ -52,8 +61,7 @@ describe('securityAuditsAndBounties aggregate', () => {
 				}
 			}
 
-			const overall = wallet.overall.security?.securityAuditsAndBounties?.evaluation as
-				Evaluation<SecurityAuditsMetadata> | undefined
+			const overall = wallet.overall.security?.securityAuditsAndBounties?.evaluation
 
 			if (overall !== undefined) {
 				expect(auditIds(overall)).toEqual([...allIds].sort())
@@ -76,10 +84,7 @@ describe('securityAuditsAndBounties aggregate', () => {
 		expect(browserOnlyIds.length).toBeGreaterThan(0)
 
 		const mobileIds = auditIds(mobile === undefined ? undefined : variantAuditsEvaluation(mobile))
-		const overallIds = auditIds(
-			phantom.overall.security.securityAuditsAndBounties
-				.evaluation as Evaluation<SecurityAuditsMetadata>,
-		)
+		const overallIds = auditIds(phantom.overall.security.securityAuditsAndBounties.evaluation)
 
 		for (const id of browserOnlyIds) {
 			expect(mobileIds).not.toContain(id)
@@ -99,7 +104,12 @@ describe('securityAuditsAndBounties aggregate', () => {
 		const mobileEvaluation = variantAuditsEvaluation(mobile)
 		const browserEvaluation = variantAuditsEvaluation(browser)
 
-		if (mobileEvaluation === undefined || browserEvaluation === undefined) {
+		if (
+			mobileEvaluation === undefined ||
+			browserEvaluation === undefined ||
+			!isSecurityAuditsEvaluation(mobileEvaluation) ||
+			!isSecurityAuditsEvaluation(browserEvaluation)
+		) {
 			throw new Error('Phantom must have security audit evaluations')
 		}
 
