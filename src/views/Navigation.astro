@@ -32,7 +32,7 @@ const secondaryNavigationItems = [
 		if (!(event.target instanceof Element) || event.target.closest('#theme-toggle') === null) {
 			return
 		}
-		// Start from the scheme in effect: with no stored choice, that's the system's.
+		// The scheme in effect: the stored choice, or else the system's.
 		const currentColorScheme =
 			document.documentElement.style.colorScheme ||
 			(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
