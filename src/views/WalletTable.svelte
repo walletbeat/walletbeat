@@ -219,7 +219,7 @@
 		undefined
 	)
 
-	// Mobile cards have no hover, so tapping a petal opens a drawer under the flower instead of a tooltip.
+	// The petal tapped on a mobile card, whose details open in a drawer under the flower.
 	let mobilePetal: {
 		walletId: string
 		attributeGroupId: _AttributeGroupId
