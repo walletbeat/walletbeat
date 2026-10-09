@@ -674,10 +674,17 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 				}
 			}
 		}
-		worstEvaluation.outcome.metadata = {
-			securityAudits: allAudits,
-		}
 
-		return worstEvaluation
+		// `pickWorstRating` returns one of the per-variant evaluations as-is,
+		// so build a new evaluation rather than overwriting that variant's audits.
+		return {
+			...worstEvaluation,
+			outcome: {
+				...worstEvaluation.outcome,
+				metadata: {
+					securityAudits: allAudits,
+				},
+			},
+		}
 	},
 }
