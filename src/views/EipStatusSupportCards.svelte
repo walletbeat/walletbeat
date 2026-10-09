@@ -129,11 +129,11 @@
 								</span>
 
 								<div class="wallet-heading" data-row-item="flexible" data-row="start gap-2">
-									<h5>
+									<h4>
 										<a data-link="camouflaged" href={card.url}>
 											{card.displayName}
 										</a>
-									</h5>
+									</h4>
 
 									<span
 										class="status-tag"
@@ -245,7 +245,7 @@
 	.wallet-heading {
 		min-inline-size: 0;
 
-		h5 {
+		h4 {
 			flex-shrink: 1;
 			font-size: 0.9rem;
 			font-weight: 600;
