@@ -16,9 +16,15 @@ type Props = {
 	 * If specified, rewrite URL to this as the page loads.
 	 */
 	rewriteUrlTo?: string
+
+	/**
+	 * Preload the `wbicons-complex` icon font.
+	 * Only enable on pages that render complex icons above the fold.
+	 */
+	preloadComplexIcons?: boolean
 }
 
-const { metadata, rewriteUrlTo } = Astro.props
+const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
@@ -38,7 +44,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
-		<Font cssVariable='--fontFamily-wbicons-complex' preload />
+		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
 

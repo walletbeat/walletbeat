@@ -3,6 +3,7 @@
 	import { type EipStatusSupportCard, EipSupportStatus } from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
+	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 
 	const statusColor: Record<EipSupportStatus, string> = {
 		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
@@ -48,10 +49,15 @@
 	let {
 		title,
 		cards,
+		codeSnippets = {},
 	}: {
 		title?: string
 		cards: EipStatusSupportCard[]
+		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
+		codeSnippets?: CodeSnippetIndex
 	} = $props()
+
+	setCodeSnippetContext(() => codeSnippets)
 
 
 	// Functions
