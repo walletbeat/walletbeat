@@ -9,6 +9,7 @@ import { WalletProfile } from '@/schema/features/profile'
 import {
 	type ScamAlertLeaks,
 	type ScamAlerts,
+	type SecretKeyBackup,
 	type UnlimitedApprovalWarningBenchmarks,
 	UnlimitedApprovalWarningBenchmarkSpenders,
 } from '@/schema/features/security/scam-alerts'
@@ -19,6 +20,7 @@ import {
 	type Support,
 	supported,
 } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -38,8 +40,26 @@ export type ScamAlertSupport = WithRef<{
 	listFeature: string
 }>
 
+/**
+ * Ratings of the safety measures around showing secret key material.
+ * A measure is `null` when it does not apply to the wallet variant or when
+ * its data is not known.
+ */
+export interface SecretKeyBackupSupport {
+	secretSensitivityWarning:
+		| (ScamAlertSupport & {
+				feature: 'secretSensitivityWarning'
+		  })
+		| null
+	secretScreenCaptureBlocking:
+		| (ScamAlertSupport & {
+				feature: 'secretScreenCaptureBlocking'
+		  })
+		| null
+}
+
 export type ScamPreventionMetadata =
-	| {
+	| (SecretKeyBackupSupport & {
 			scamAlerts: ScamAlerts
 			scamUrlWarning: ScamAlertSupport & {
 				feature: 'scamUrlWarning'
@@ -53,7 +73,7 @@ export type ScamPreventionMetadata =
 			unlimitedApprovalWarning: ScamAlertSupport & {
 				feature: 'unlimitedApprovalWarning'
 			}
-	  }
+	  })
 	| { scamAlerts: null }
 
 /**
@@ -248,15 +268,66 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	}
 }
 
+/**
+ * Rates the safety measures around showing secret key material.
+ * They only apply to wallets that show secret key material at all.
+ * Screen capture blocking only applies to mobile apps, as browser extensions
+ * cannot block screen capture.
+ */
+function rateSecretKeyBackup(
+	secretKeyBackup: SecretKeyBackup | null,
+	variant: Variant,
+): SecretKeyBackupSupport {
+	if (secretKeyBackup === null || !isSupported(secretKeyBackup)) {
+		return { secretSensitivityWarning: null, secretScreenCaptureBlocking: null }
+	}
+
+	const { sensitivityWarning, screenCaptureBlocking, ref } = secretKeyBackup
+
+	return {
+		secretSensitivityWarning: {
+			feature: 'secretSensitivityWarning',
+			humanFeature: 'the sensitivity of seed phrases and private keys',
+			listFeature:
+				'Warning you about the sensitivity of your seed phrase or private keys before showing them',
+			required: false,
+			supported: isSupported(sensitivityWarning),
+			privacyPreserving: true,
+			ref,
+		},
+		secretScreenCaptureBlocking:
+			variant === Variant.MOBILE
+				? {
+						feature: 'secretScreenCaptureBlocking',
+						humanFeature: 'screenshots of seed phrases and private keys',
+						listFeature:
+							'Blocking screenshots and screen recording while your seed phrase or private keys are on screen',
+						required: false,
+						supported: isSupported(screenCaptureBlocking),
+						privacyPreserving: true,
+						ref,
+					}
+				: null,
+	}
+}
+
+/** Secret key backup measures for examples where none apply. */
+const noSecretKeyBackupSupport: SecretKeyBackupSupport = {
+	secretSensitivityWarning: null,
+	secretScreenCaptureBlocking: null,
+}
+
 function evaluateScamAlerts(
 	ctx: EvaluationContext<ScamPreventionMetadata>,
 	walletProfile: WalletProfile,
 	scamAlerts: ScamAlerts,
+	secretKeyBackupSupport: SecretKeyBackupSupport,
 ): Evaluation<ScamPreventionMetadata> {
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
 	const unlimitedApprovalWarning = rateUnlimitedApprovalWarning(scamAlerts)
+	const { secretSensitivityWarning, secretScreenCaptureBlocking } = secretKeyBackupSupport
 
 	const metadata: ScamPreventionMetadata = {
 		scamAlerts,
@@ -264,7 +335,12 @@ function evaluateScamAlerts(
 		contractTransactionWarning,
 		scamUrlWarning,
 		unlimitedApprovalWarning,
+		secretSensitivityWarning,
+		secretScreenCaptureBlocking,
 	}
+	const secretKeyBackupFeatures = [secretSensitivityWarning, secretScreenCaptureBlocking].filter(
+		sas => sas !== null,
+	)
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
 			case WalletProfile.GENERIC:
@@ -273,9 +349,10 @@ function evaluateScamAlerts(
 					contractTransactionWarning,
 					scamUrlWarning,
 					unlimitedApprovalWarning,
+					...secretKeyBackupFeatures,
 				]
 			case WalletProfile.PAYMENTS:
-				return [sendTransactionWarning, scamUrlWarning]
+				return [sendTransactionWarning, scamUrlWarning, ...secretKeyBackupFeatures]
 		}
 	})()
 
@@ -518,9 +595,17 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 		* Connecting to an app that is known to be a scam
 		* Granting unlimited ERC-20 token approval
 
+		Wallets that show the user a seed phrase or private key (e.g. to back
+		it up) are also rated on whether they:
+
+		* Warn the user about the sensitivity of the seed phrase or private key
+			before showing it
+		* Block screenshots and screen recording while it is on screen (mobile
+			apps only, as browser extensions cannot block screen capture)
+
 		For payments-focused wallets that do not support interacting with
 		arbitrary contracts or external applications, only the payment scenario
-		applies.
+		and the seed phrase and private key measures apply.
 
 		Note that wallets should only *warn* the user about such scenarios, not
 		outright *prevent* the user from making such transactions, as preventing
@@ -584,6 +669,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						sendTransactionWarning: notSupported,
 						unlimitedApprovalWarning: notSupported,
 					},
+					noSecretKeyBackupSupport,
 				),
 			),
 			exampleRating(
@@ -604,6 +690,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						sendTransactionWarning: notSupported,
 						unlimitedApprovalWarning: notSupported,
 					},
+					noSecretKeyBackupSupport,
 				),
 			),
 		],
@@ -632,6 +719,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						}),
 						unlimitedApprovalWarning: notSupported,
 					},
+					noSecretKeyBackupSupport,
 				),
 			),
 			exampleRating(
@@ -674,6 +762,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 							leaksUserIp: false,
 						}),
 					},
+					noSecretKeyBackupSupport,
 				),
 			),
 			exampleRating(
@@ -724,6 +813,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 							leaksUserIp: false,
 						}),
 					},
+					noSecretKeyBackupSupport,
 				),
 			),
 		],
@@ -767,6 +857,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						leaksUserIp: false,
 					}),
 				},
+				noSecretKeyBackupSupport,
 			),
 		),
 	},
@@ -793,7 +884,12 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 			return unrated(ctx, { scamAlerts: null })
 		}
 
-		return evaluateScamAlerts(ctx, ctx.features.profile, ctx.features.security.scamAlerts)
+		return evaluateScamAlerts(
+			ctx,
+			ctx.features.profile,
+			ctx.features.security.scamAlerts,
+			rateSecretKeyBackup(ctx.features.security.secretKeyBackup, ctx.features.variant),
+		)
 	},
 	aggregate: pickWorstRating<ScamPreventionMetadata>,
 }

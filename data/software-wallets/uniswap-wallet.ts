@@ -546,6 +546,7 @@ export const uniswapWallet: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: [

@@ -25,7 +25,11 @@ import type { HardwareWalletSupport } from './features/security/hardware-wallet-
 import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
-import type { ScamAlerts } from './features/security/scam-alerts'
+import type {
+	ScamAlerts,
+	SecretKeyBackup,
+	SecretKeyBackupSafety,
+} from './features/security/scam-alerts'
 import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SecurityBestPracticesData } from './features/security/security-best-practices'
@@ -218,6 +222,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Support for alerting the user about potential scams. */
 		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
 
+		/** Safety measures around showing the user their seed phrase or private keys. */
+		secretKeyBackup: VariantFeature<Support<WithRef<Nullable<SecretKeyBackupSafety>>>>
+
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
@@ -381,6 +388,7 @@ export interface ResolvedFeatures {
 
 	security: {
 		scamAlerts: ResolvedFeature<ScamAlerts>
+		secretKeyBackup: ResolvedFeature<SecretKeyBackup>
 		publicSecurityAudits: SecurityAudit[] | null
 		lightClient: {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
@@ -512,6 +520,9 @@ export function resolveFeatures(
 		security: {
 			scamAlerts: nullable(
 				softwareFeat('security.scamAlerts', features => features.security.scamAlerts),
+			),
+			secretKeyBackup: nullable<SecretKeyBackup>(
+				softwareFeat('security.secretKeyBackup', features => features.security.secretKeyBackup),
 			),
 			publicSecurityAudits:
 				features.security.publicSecurityAudits === null

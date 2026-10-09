@@ -805,6 +805,7 @@ export const zerion: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
