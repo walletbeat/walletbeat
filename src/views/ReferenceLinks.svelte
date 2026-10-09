@@ -18,7 +18,14 @@
 	// Internal state
 	let lightbox = $state<{ open: (url: string) => void }>()
 
+	// Long lists show their first few references until expanded. A list is only
+	// cut when that hides at least two references, so "show all" is never for one.
+	const collapsedCount = 2
+	let showAll = $state(false)
+
 	// (Derived)
+	const isCollapsible = $derived(references.length > collapsedCount + 1)
+	const isCollapsed = $derived(isCollapsible && !showAll)
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -258,7 +265,10 @@
 					{/if}
 				{/snippet}
 
-				<li data-list-item="gap-2">
+				<li
+					data-list-item="gap-2"
+					hidden={isCollapsed && index >= collapsedCount}
+				>
 					{#if imageUrls.length > 1 && refImages.length > 0}
 						<div data-row="start gap-4 align-start">
 							<div data-row-item="flexible" data-column="gap-2">
@@ -291,6 +301,17 @@
 				</li>
 			{/each}
 		</ul>
+
+		{#if isCollapsible}
+			<button
+				class="references-toggle"
+				type="button"
+				aria-expanded={showAll}
+				onclick={() => { showAll = !showAll }}
+			>
+				{showAll ? 'Show fewer sources' : `Show all ${totalUrls} sources`}
+			</button>
+		{/if}
 
 		<ImageLightbox
 			bind:this={lightbox}
@@ -367,7 +388,8 @@
 			inline-size: 100%;
 			max-inline-size: 100%;
 			min-inline-size: 0;
-			max-block-size: 32em;
+			/* About 12 lines; the box scrolls itself to the highlighted lines on mount. */
+			max-block-size: 20em;
 			overflow: auto;
 
 			padding: 0.75em 1em;
@@ -448,6 +470,18 @@
 		.line-content {
 			flex: 1;
 		}
+	}
+
+	.references-list > li[hidden] {
+		display: none;
+	}
+
+	.references-toggle {
+		align-self: start;
+		margin-block-start: 0.75em;
+		padding-inline: 1em;
+		border-radius: 999em;
+		font-weight: 600;
 	}
 
 	.thumbnail {
