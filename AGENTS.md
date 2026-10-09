@@ -14,7 +14,7 @@ pnpm install         # Install dependencies
 pnpm dev             # Start development server (http://localhost:4321 by default)
 pnpm dev:background  # Start development server, daemonize it, and print its URL; useful for keeping server running past single-turn execution.
 
-# Quality checks (run after code changes)
+# Quality checks (run before committing, not after every edit)
 pnpm check:quick  # Fast checks (lint, syntax, spelling, misc)
 pnpm check:all    # Comprehensive checks (includes Astro check)
 
@@ -64,9 +64,9 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 
 ### Code quality
 
-- Always run `pnpm check:quick` after changes
-- Run `pnpm check:all` before considering tasks complete
-- Fix prettier issues with `pnpm lint`
+- Don't run checks after every edit; they are slow. Run `pnpm lint` then `pnpm check:quick` once before each commit
+- Run `pnpm check:all` before considering tasks complete or opening a PR
+- Fix prettier issues with `pnpm lint` rather than formatting by hand
 - Never use `eslint-disable` or `as any` workarounds
 - Add spelling exceptions to `.cspell.json` only for valid terms
 - Reuse helpers and common libraries. Chances are the problem you are trying to solve (argument parsing, codebase traversal, or grammar checking) was already faced by some other part of the codebase. Do not reinvent the wheel.
