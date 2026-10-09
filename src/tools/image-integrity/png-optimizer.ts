@@ -1,9 +1,14 @@
-import { execFile } from 'node:child_process'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
-import { promisify } from 'node:util'
 
-import { getRepositoryRoot } from '@/utils/codebase'
+import { cac } from 'cac'
+
+import {
+	CodebaseEntryType,
+	crawlCodebase,
+	getRepositoryRoot,
+	GitIgnoredFiles,
+} from '@/utils/codebase'
 
 import { hasSamePixels, isWorthRecompressing, recompressPng } from './png-optimizer-lib'
 
@@ -12,25 +17,33 @@ import { hasSamePixels, isWorthRecompressing, recompressPng } from './png-optimi
  *
  * Usage: `pnpm tsx src/tools/image-integrity/png-optimizer.ts [file.png ...]`
  *
- * With no arguments, every PNG tracked by git is processed. A file is only
+ * With no arguments, every PNG in the repository is processed. A file is only
  * rewritten when the recompressed version saves enough to fail the
  * `png-optimized` image integrity test (see `isWorthRecompressing`) and
  * decodes to exactly the same pixels. File names and formats never change.
  */
-const execFileAsync = promisify(execFile)
 const repositoryRoot = getRepositoryRoot()
 
-async function trackedPngFiles(): Promise<string[]> {
-	const { stdout } = await execFileAsync('git', ['ls-files', '-z', '*.png', '*.PNG'], {
-		cwd: repositoryRoot,
-		maxBuffer: 64 * 1024 * 1024,
+async function repositoryPngFiles(): Promise<string[]> {
+	const files: string[] = []
+
+	await crawlCodebase({
+		ignore: ['.git', await GitIgnoredFiles()],
+		baseTraversalFn: entry => {
+			if (
+				entry.type === CodebaseEntryType.FILE &&
+				path.extname(entry.path).toLowerCase() === '.png'
+			) {
+				files.push(entry.path)
+			}
+		},
 	})
 
-	return stdout.split('\0').filter(file => file !== '')
+	return files.sort()
 }
 
-const args = process.argv.slice(2)
-const files = args.length > 0 ? args : await trackedPngFiles()
+const { args } = cac('png-optimizer').parse()
+const files = args.length > 0 ? [...args] : await repositoryPngFiles()
 let totalBefore = 0
 let totalAfter = 0
 let rewritten = 0

@@ -1,5 +1,7 @@
 import sharp from 'sharp'
 
+import { detectImageFormat } from './image-integrity-lib'
+
 /** The 8-byte signature every PNG file starts with. */
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 
@@ -68,17 +70,12 @@ export interface PngHeader {
 	colorType: number
 }
 
-/** Whether a buffer starts with the PNG signature. */
-export function isPng(buffer: Buffer): boolean {
-	return buffer.length >= PNG_SIGNATURE.length && buffer.subarray(0, 8).equals(PNG_SIGNATURE)
-}
-
 /**
  * Split a PNG file into its chunks, up to and including `IEND`. Any bytes
  * after `IEND` are ignored.
  */
 export function parsePngChunks(png: Buffer): PngChunk[] {
-	if (!isPng(png)) {
+	if (detectImageFormat(png) !== 'png') {
 		throw new Error('not a PNG file')
 	}
 

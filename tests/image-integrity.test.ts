@@ -21,7 +21,6 @@ import {
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
 import {
 	hasSamePixels,
-	isPng,
 	isWorthRecompressing,
 	parsePngChunks,
 	readPngHeader,
@@ -276,7 +275,8 @@ const SVG_OPTIMIZED_TEST: ImageTest = {
 const PNG_OPTIMIZED_TEST: ImageTest = {
 	name: 'png-optimized',
 	requiresInkscape: false,
-	appliesTo: entry => extensionOf(entry.filePath) === '.png' && isPng(entry.raw),
+	appliesTo: entry =>
+		extensionOf(entry.filePath) === '.png' && detectImageFormat(entry.raw) === 'png',
 	run: async entry => {
 		const originalSize = entry.raw.length
 		const optimizedSize = (await recompressPng(entry.raw)).length
