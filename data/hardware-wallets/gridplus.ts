@@ -21,6 +21,10 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -34,6 +38,7 @@ import {
 	DataLocation,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -58,7 +63,7 @@ export const gridplusWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.gridplus.io/'],
 			repositories: ['https://github.com/GridPlus'],
@@ -112,8 +117,24 @@ export const gridplusWallet: HardwareWallet = {
 			safe: notSupported,
 		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
-			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
-			requiresManufacturerConsent: null,
+			ref: [
+				'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+				{
+					explanation:
+						'"The GridPlus SDK lets any application establish a connection and interact with a GridPlus Lattice1 device as a remote signer." Apps pair using a code shown on the device screen.',
+					url: 'https://docs.gridplus.io/resources/developer-resources',
+				},
+				{
+					explanation: 'The GridPlus SDK is MIT-licensed.',
+					url: 'https://github.com/GridPlus/gridplus-sdk/blob/ba9cecdd7bea47c98e33dee70e954e6a3a14be59/LICENSE',
+				},
+				{
+					explanation:
+						'The SDK fetches ABIs for calldata decoding from Etherscan-family block explorers, with the 4byte signature directory as a fallback, rather than from GridPlus.',
+					url: 'https://github.com/GridPlus/gridplus-sdk/blob/ba9cecdd7bea47c98e33dee70e954e6a3a14be59/packages/docs/docs/tutorials/calldataDecoding.md',
+				},
+			],
+			requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' },
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
@@ -156,7 +177,19 @@ export const gridplusWallet: HardwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'The SDK returns up to 10 sequential addresses per request from a configurable start path, and each address becomes a separate account in wallets such as MetaMask.',
+					url: 'https://github.com/GridPlus/gridplus-sdk/blob/ba9cecdd7bea47c98e33dee70e954e6a3a14be59/packages/docs/docs/addresses.md',
+				},
+				{
+					explanation: '"Each address will create a new standalone MetaMask account."',
+					url: 'https://docs.gridplus.io/apps-and-integrations/metamask/connecting-to-metamask',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -229,7 +262,29 @@ export const gridplusWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								'A 4 to 6 digit device PIN is required during setup; a lockout timer starts after 3 incorrect attempts and doubles with each further one.',
+							url: 'https://docs.gridplus.io/setup/lattice1',
+						},
+					],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
+					},
+				},
+				// The firmware reference lists PIN, SafeCard PIN and sleep-timer settings and no duress PIN,
+				// decoy wallet or wipe credential.
+				// Source: https://docs.gridplus.io/lattice1/lattice1-firmware-reference
+				duressMode: notSupported,
+			},
 			firmware: {
 				// Source: gridplus team responses fileverse document
 				type: FirmwareType.FAIL,
@@ -324,7 +379,35 @@ export const gridplusWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'GridPlus documents integrations with independent wallets including MetaMask, Rabby, NuFi, Frame and Ambire.',
+						url: 'https://docs.gridplus.io/lattice1/lattice1-introduction',
+					},
+					{
+						explanation:
+							'By default the Lattice1 connects to and routes requests through GridPlus cloud infrastructure, end-to-end encrypted. Users can run their own endpoint instead.',
+						url: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager/connecting-your-lattice-to-your-own-private-endpoint',
+					},
+					{
+						explanation:
+							'With a self-hosted Lattice Connect V2 endpoint the device stays connected to GridPlus cloud; disconnecting it fully requires changing settings over SSH.',
+						url: 'https://github.com/GridPlus/lattice-connect-v2/blob/646115eb82ddc53f4554748fea37ef8a777162e8/README.md',
+					},
+					{
+						explanation:
+							'The SDK sends requests to `https://signing.gridpl.us` unless the app sets another base URL.',
+						url: 'https://github.com/GridPlus/gridplus-sdk/blob/ba9cecdd7bea47c98e33dee70e954e6a3a14be59/packages/sdk/src/constants.ts#L148',
+					},
+				],
+				details:
+					'Works with several independent wallets through an open SDK, without a GridPlus account. App-to-device traffic goes through GridPlus servers by default; a self-hosted relay is possible but the device stays connected to GridPlus cloud unless reconfigured over SSH.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PARTIAL,
+			},
 		},
 		transparency: {
 			maintenance: {
