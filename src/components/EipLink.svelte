@@ -22,8 +22,7 @@
 
 
 	// Context
-	// EIP details may themselves contain EIP links; render those as plain
-	// links rather than nesting tooltips (and their buttons) inside each other.
+	// EIP links inside EIP details render as plain links.
 	const isNested = getContext<boolean | undefined>(insideEipLinkContextKey) === true
 	setContext(insideEipLinkContextKey, true)
 
@@ -39,11 +38,7 @@
 
 
 {#if eip && !isNested}
-	<!--
-		`hoverTriggerPlacement="button"` keeps the trigger's own positioning.
-		The default ('around') forces `position: static` on it, which on long
-		pages with many inline EIP links left Chromium painting a blank page.
-	-->
+	<!-- `hoverTriggerPlacement="button"` keeps the trigger's own positioning. -->
 	<Tooltip
 		placement="block-end"
 		hoverTriggerPlacement="button"
