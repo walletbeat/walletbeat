@@ -1623,6 +1623,14 @@
 		"hash": "3a40fba76842fa7634354267b3825ad1082bab663fc16668b2b07ffa506c7e82",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-6 - Walletbeat Rating Philosophy/rating-philosophy.png": {
+		"hash": "2b89cc2f51f21d80efcb18d6ad7f93ab1417ed0fb5045c4fe837fac2590ba6a9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-6 - Walletbeat Rating Philosophy/walletbeat-socials.png": {
+		"hash": "1a6b8f75976fe478368cc3785105fcad5d2b8301020309c1e6eb93da1b442d10",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
