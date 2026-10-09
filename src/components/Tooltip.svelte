@@ -80,8 +80,10 @@
 	const useButtonTrigger = (node: HTMLElement) => {
 		triggerElement = node
 
+		// When the wrapper handles hover, a button behind the content is made
+		// static so it doesn't paint over the content.
 		$effect(() => {
-			if(hoverTriggerPlacement === 'around')
+			if(buttonTriggerPlacement === 'behind' && hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
 			else
 				node.style.removeProperty('position')
