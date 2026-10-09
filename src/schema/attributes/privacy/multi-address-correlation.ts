@@ -1,5 +1,6 @@
 import {
 	type Attribute,
+	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
@@ -7,6 +8,7 @@ import {
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
+	CollectionPolicy,
 	type DataCollectionByEntity,
 	dataCollectionForAllSupportedFlows,
 	type Endpoint,
@@ -99,6 +101,32 @@ const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should first ensure that it never makes requests containing multiple addresses simultaneously. Next, it should ensure that these requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
+		),
+	})
+
+const optionalBulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
+			id: 'optional_bulk_requests',
+			rating: Rating.PARTIAL,
+			displayName: 'Multiple addresses are correlatable when optional features are enabled',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} makes bulk requests containing multiple addresses when some optional features are enabled.',
+			),
+		},
+		details: paragraph(`
+			By default, {{WALLET_NAME}} does not send your addresses to external
+			providers in a way that lets them be correlated. However, some features
+			that are off by default (either enabled by the user or offered to the
+			user through a prompt) make requests that contain multiple addresses
+			simultaneously. Once such a feature is enabled, the external provider
+			can correlate your addresses.
+		`),
+		impact: paragraph(
+			'If you enable these optional features in {{WALLET_NAME}} while using multiple addresses, an external provider will be able to correlate them.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should ensure that optional features never make requests containing multiple addresses simultaneously, and stagger and proxy per-address requests to prevent correlation.',
 		),
 	})
 
@@ -301,6 +329,11 @@ export const multiAddressCorrelation: Attribute = {
 		  the same user. Similar correlations are also possible by IP and/or
 			time-based correlation of requests that each contain one wallet address.
 
+		Bulk requests about multiple wallet addresses are also taken into account
+		when they only happen after the user enables an optional feature (either
+		on their own or when prompted by the wallet). Such wallets cannot get a
+		passing rating.
+
 		In order to prevent this information from being revealed, wallets can
 		use a variety of strategies:
 
@@ -356,6 +389,12 @@ export const multiAddressCorrelation: Attribute = {
 			),
 			exampleRating(
 				paragraph(
+					'By default, the wallet only makes requests about one wallet address at a time. However, an optional feature that the user can enable refreshes multiple address balances by grouping all of these addresses in the same request.',
+				),
+				optionalBulkRequests(EvaluationContext.forTest(() => multiAddressCorrelation)),
+			),
+			exampleRating(
+				paragraph(
 					"The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation. The receiving endpoint may still correlate these addresses through IP-address-based correlation.",
 				),
 				staggeredRequests(EvaluationContext.forTest(() => multiAddressCorrelation)),
@@ -408,11 +447,23 @@ export const multiAddressCorrelation: Attribute = {
 
 		let worstHandling: DataCollectionByEntity | null = null
 		let worstHandlingScore = -1
+		let hasOptionalBulkRequests = false
 
 		for (const collected of dataCollection) {
 			const dataCollection = qualifiedDataCollectionWithEndpoint(collected.dataCollection)
 
 			if (!collectedByDefault(dataCollection[WalletInfo.ACCOUNT_ADDRESS])) {
+				// Requests that only happen once the user enables an optional
+				// feature still correlate addresses if they contain several at once.
+				if (
+					dataCollection[WalletInfo.ACCOUNT_ADDRESS] !== CollectionPolicy.NEVER &&
+					dataCollection.multiAddress?.type ===
+						MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES
+				) {
+					ctx.addRef(collected)
+					hasOptionalBulkRequests = true
+				}
+
 				continue
 			}
 
@@ -430,7 +481,7 @@ export const multiAddressCorrelation: Attribute = {
 		}
 
 		if (worstHandling === null) {
-			return unrated(ctx)
+			return hasOptionalBulkRequests ? optionalBulkRequests(ctx) : unrated(ctx)
 		}
 
 		const worstCollection = qualifiedDataCollectionWithEndpoint(worstHandling.dataCollection)
@@ -438,6 +489,10 @@ export const multiAddressCorrelation: Attribute = {
 		if (!isQualifiedDataCollectionWithMultiAddress(worstCollection)) {
 			return unrated(ctx)
 		}
+
+		// Optional bulk requests prevent an otherwise passing rating.
+		const passUnlessOptionalBulkRequests = (evaluation: Evaluation): Evaluation =>
+			hasOptionalBulkRequests ? optionalBulkRequests(ctx) : evaluation
 
 		const handling = worstCollection.multiAddress
 
@@ -450,7 +505,7 @@ export const multiAddressCorrelation: Attribute = {
 				// If the wallet has a concept of a singular "active address" and only
 				// ever makes requests about it, then other addresses are never exposed
 				// and therefore not correlatable.
-				return activeAddressOnly(ctx)
+				return passUnlessOptionalBulkRequests(activeAddressOnly(ctx))
 			case MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES:
 				// If the wallet makes a single request with multiple addresses,
 				// they are clearly correlatable.
@@ -463,13 +518,13 @@ export const multiAddressCorrelation: Attribute = {
 				if (handling.destination === 'ISOLATED') {
 					// The wallet makes requests to different endpoints for each
 					// address, so they are not correlatable.
-					return uniqueDestinations(ctx)
+					return passUnlessOptionalBulkRequests(uniqueDestinations(ctx))
 				}
 
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// The wallet mitigates correlation both at the network level and by
 					// time. Not correlated.
-					return staggeredAndSeparateCircuits(ctx)
+					return passUnlessOptionalBulkRequests(staggeredAndSeparateCircuits(ctx))
 				}
 
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing !== 'STAGGERED') {
