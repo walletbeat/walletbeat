@@ -19,6 +19,7 @@ import {
 	UserFlow,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -26,6 +27,11 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -36,6 +42,7 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 } from '@/schema/features/security/transaction-legibility'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { MaintenanceType } from '@/schema/features/transparency/maintenance'
@@ -60,7 +67,7 @@ export const bitboxWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://bitbox.swiss/dev/'],
 			repositories: ['https://github.com/BitBoxSwiss/bitbox02-firmware'],
@@ -126,8 +133,27 @@ export const bitboxWallet: HardwareWallet = {
 						'BitBox blog post explaining WalletConnect integration for secure app connections',
 					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
 				},
+				{
+					explanation:
+						'BitBox publishes Apache-2.0 libraries for integrating the BitBox02 into other wallets, covering Ethereum transactions, personal messages and EIP-712 typed data. Pairing happens between the device and the integrating app.',
+					urls: [
+						{
+							label: 'bitbox-api (Rust and TypeScript)',
+							url: 'https://github.com/BitBoxSwiss/bitbox-api-rs/blob/db3f923c1b109fc75b7c37ab90856756ee6beec3/Cargo.toml',
+						},
+						{
+							label: 'Ethereum signing API',
+							url: 'https://github.com/BitBoxSwiss/bitbox-api-rs/blob/db3f923c1b109fc75b7c37ab90856756ee6beec3/src/eth.rs',
+						},
+					],
+				},
+				{
+					explanation:
+						'The BitBox Bridge app allows browser extensions to connect and asks the user before allowing any other website.',
+					url: 'https://github.com/BitBoxSwiss/bitbox-bridge/blob/63385207a0fb37f9bd7f0ff351214981a9b76d75/CHANGELOG.md',
+				},
 			],
-			requiresManufacturerConsent: null,
+			requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' },
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.RABBY]: true,
@@ -167,7 +193,24 @@ export const bitboxWallet: HardwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'The BitBoxApp supports up to five Ethereum accounts per wallet, and the firmware accepts address indexes 0 to 99 on the standard Ethereum path, which independent wallets such as Rabby use.',
+					urls: [
+						{
+							label: 'Manage accounts in the BitBoxApp',
+							url: 'https://support.bitbox.swiss/en_US/manage-accounts-bitboxapp',
+						},
+						{
+							label: 'Firmware key path limits',
+							url: 'https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/rust/bitbox02-rust/src/hww/api/ethereum/keypath.rs',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -233,7 +276,31 @@ export const bitboxWallet: HardwareWallet = {
 					collected: [],
 				},
 			},
-			hardwarePrivacy: null,
+			// The BitBox02 connects over USB-C only. The BitBox02 Nova adds Bluetooth Low Energy with LE Secure
+			// Connections and authenticated pairing; Bluetooth can be disabled from a USB host. On both, the app
+			// and device encrypt and authenticate traffic with the Noise protocol and a pairing code confirmed on
+			// both screens.
+			// Source: https://bitbox.swiss/bitbox02/threat-model/
+			// Source: https://blog.bitbox.swiss/en/whisper-how-the-secure-bluetooth-integration-of-the-bitbox02-nova-works/
+			// Source: https://support.bitbox.swiss/en_US/nova/enable-or-disable-bluetooth-bitbox02-nova-desktop
+			// The device has no network access of its own. Unless a custom backend is configured, the BitBoxApp
+			// uses Shift Crypto servers, checks for updates and fetches exchange rates from them, and retrieves
+			// Ethereum data through an Etherscan proxy hosted by Shift Crypto. A custom node is only available for
+			// Bitcoin; a Tor proxy covers all backend traffic on desktop.
+			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing
+			// Source: https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/042faba65b813deacba7df9591e06444f1ea7636/backend/coins/eth/etherscan/etherscan.go
+			// Source: https://support.bitbox.swiss/en_US/privacy/bitboxapp-tor-setup
+			// The BitBoxApp source is public under the Apache License 2.0.
+			// Source: https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/042faba65b813deacba7df9591e06444f1ea7636/LICENSE
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PARTIAL,
+				details:
+					'The device has no network access of its own, and the app-device link is end-to-end encrypted. The open-source BitBoxApp uses Shift Crypto servers by default, including an Etherscan proxy for Ethereum data that cannot be replaced; Tor is available on desktop.',
+				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				phoningHome: HardwarePrivacyType.PARTIAL,
+				url: 'https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing',
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://bitbox.swiss/policies/privacy-policy/',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -268,7 +335,54 @@ export const bitboxWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								'The device password is mandatory during initial setup and cannot be disabled. After 10 incorrect attempts, the device resets to factory settings.',
+							urls: [
+								{
+									label: 'Device password vs. optional passphrase',
+									url: 'https://support.bitbox.swiss/en_US/device-password/device-password-vs-optional-passphrase',
+								},
+								{
+									label: 'Device password',
+									url: 'https://support.bitbox.swiss/en_US/device-password/bitbox-device-password',
+								},
+							],
+						},
+					],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
+					},
+				},
+				duressMode: supported({
+					ref: [
+						{
+							explanation:
+								'The optional passphrase creates additional hidden wallets and, according to BitBox support, enables plausible deniability.',
+							url: 'https://support.bitbox.swiss/en_US/device-password/device-password-vs-optional-passphrase',
+						},
+						{
+							explanation:
+								'BitBox names the BIP39 passphrase as a way to unlock a different wallet under duress, but does not guarantee plausible deniability.',
+							url: 'https://support.bitbox.swiss/en_US/blog-content/how-we-do-security-assessments',
+						},
+					],
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.SELF_DESTRUCT]: false,
+						[DuressAction.ONCHAIN_LOCKDOWN]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
+				}),
+			},
 			firmware: {
 				// Production devices only boot firmware carrying valid Shift Crypto signatures (2 of 3 keys); unsigned firmware stays in the bootloader. Firmware that skips verification is only possible on separate developer bootloader builds marked "DEV DEVICE / NOT FOR VALUE".
 				// Source: https://github.com/BitBoxSwiss/bitbox02-firmware/blob/d19a195e8880a8dc23ec246472a6f0113a3fc8b2/src/bootloader/bootloader.c
@@ -348,7 +462,43 @@ export const bitboxWallet: HardwareWallet = {
 			userSafety: null,
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'BitBox lists Rabby, MEW and NuFi as compatible wallets for Ethereum. MetaMask does not support the BitBox02.',
+						url: 'https://support.bitbox.swiss/en_US/bitbox02-supported-third-party-wallets-compatibility',
+					},
+					{
+						explanation:
+							'Rabby and MEW pair with the device directly, but BitBox guides ask users to set up the wallet and update firmware in the BitBoxApp.',
+						urls: [
+							{
+								label: 'Pairing with the BitBoxApp',
+								url: 'https://support.bitbox.swiss/en_US/why-pairing-bitbox02-with-bitboxapp-is-essential',
+							},
+							{
+								label: 'Connect to MEW',
+								url: 'https://support.bitbox.swiss/en_US/myetherwallet-bitbox02-connect',
+							},
+							{
+								label: 'Update firmware',
+								url: 'https://support.bitbox.swiss/en_US/update-bitbox02-firmware',
+							},
+						],
+					},
+					{
+						explanation:
+							'Unless a custom backend is configured, the BitBoxApp connects to backend infrastructure operated by Shift Crypto.',
+						url: 'https://support.bitbox.swiss/en_US/privacy/bitboxapp-data-sharing',
+					},
+				],
+				details:
+					'Works with Rabby, MEW and NuFi. Setup and firmware updates go through the BitBoxApp, which uses Shift Crypto servers by default.',
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PARTIAL,
+			},
 		},
 		transparency: {
 			maintenance: {
