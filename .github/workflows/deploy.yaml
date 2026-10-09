@@ -40,7 +40,7 @@ jobs:
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: choco install $(cat deploy/windows-packages.txt) -y
+        run: ./deploy/install-windows-packages.ps1
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
