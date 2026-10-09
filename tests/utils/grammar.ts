@@ -3,6 +3,7 @@ import { binaryInlined } from 'harper.js/binaryInlined'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
+import { stripEipMagicUrls } from '@/schema/eips'
 import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getCSpellPatterns, getCSpellWords } from '@/tests/utils/cspell'
 import {
@@ -755,6 +756,11 @@ export async function contentGrammarLint(content: TypographicContent) {
 		case ContentType.MARKDOWN:
 			return await grammarLint(content.markdown, { language: 'markdown' })
 		case ContentType.TEXT:
+			expect(
+				content.text,
+				'Plain-text content renders EIP Markdown links verbatim; use Markdown content instead',
+			).toBe(stripEipMagicUrls(content.text))
+
 			return await grammarLint(content.text, { language: 'plaintext' })
 	}
 }
