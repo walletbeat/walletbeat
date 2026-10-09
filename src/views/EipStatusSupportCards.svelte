@@ -9,6 +9,7 @@
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
+	import { type ImageSizeIndex, setImageSizeContext } from '@/utils/image-size-index'
 
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
 	// backgrounds; solid text needs its own, legible color.
@@ -49,6 +50,7 @@
 		title,
 		cards,
 		codeSnippets = {},
+		imageSizes = {},
 	}: {
 		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
 		id?: string
@@ -56,9 +58,12 @@
 		cards: EipStatusSupportCard[]
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
+		// The dimensions of the images these cards reference (see `imageSizesForReferences`).
+		imageSizes?: ImageSizeIndex
 	} = $props()
 
 	setCodeSnippetContext(() => codeSnippets)
+	setImageSizeContext(() => imageSizes)
 
 
 	// Functions
