@@ -485,10 +485,6 @@
 			display: block;
 			inline-size: max-content;
 			min-inline-size: 100%;
-
-			font-family:
-				ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-				'Courier New', monospace;
 		}
 
 		.row {
