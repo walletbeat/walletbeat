@@ -2287,5 +2287,6 @@
 		display: flex;
 		justify-content: center;
 		zoom: 0.42;
+		content-visibility: auto;
 	}
 </style>
