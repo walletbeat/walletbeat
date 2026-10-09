@@ -4008,7 +4008,12 @@ export class WalletCaptureFile {
 	}
 
 	public isBenignString(str: string): boolean {
-		return this.annotations.isBenign(str)
+		// Swapped tokens reveal the user's assets, so well-known token addresses
+		// are only benign when they are not among them.
+		return this.annotations.isBenign(
+			str,
+			this.captureInfo.flatMap(info => info.swapTokenAddresses),
+		)
 	}
 
 	public async gatherStrings(): Promise<WalletDataStrings> {
