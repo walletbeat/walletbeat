@@ -205,8 +205,7 @@
 									<span>{@html CodeIcon}</span>
 								</a>
 							</figcaption>
-							<!-- The snippet box scrolls, so keyboard users need to be able to focus it.
-								A group rather than a region: a landmark per snippet would flood landmark navigation. -->
+							<!-- The snippet box scrolls, so it is focusable. -->
 							<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 							<pre
 								use:scrollToHighlight
