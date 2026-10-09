@@ -25,8 +25,19 @@ export enum PasskeyVerificationLibrary {
 	/** OpenZeppelin's P-256 verifier. */
 	OPEN_ZEPPELIN_P256_VERIFIER = 'OPEN_ZEPPELIN_P256_VERIFIER',
 
-	/** WebAuthn.sol — a Solidity library for onchain WebAuthn verification. */
+	/**
+	 * Base's WebAuthn.sol (https://github.com/base/webauthn-sol) — a Solidity
+	 * library for onchain WebAuthn verification.
+	 * For Solady's WebAuthn.sol, use SOLADY_WEB_AUTHN instead.
+	 */
 	WEB_AUTHN_SOL = 'WEB_AUTHN_SOL',
+
+	/**
+	 * Solady's WebAuthn.sol
+	 * (https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol),
+	 * which verifies P-256 signatures with Solady's P256.sol.
+	 */
+	SOLADY_WEB_AUTHN = 'SOLADY_WEB_AUTHN',
 
 	/**
 	 * A verifier library not listed above.
@@ -50,6 +61,8 @@ export function passkeyLibraryName(library: PasskeyVerificationLibrary): string 
 			return 'OpenZeppelin P256 Verifier'
 		case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
 			return 'WebAuthn.sol'
+		case PasskeyVerificationLibrary.SOLADY_WEB_AUTHN:
+			return 'Solady WebAuthn.sol'
 		case PasskeyVerificationLibrary.OTHER:
 			return 'an unrecognized library'
 	}

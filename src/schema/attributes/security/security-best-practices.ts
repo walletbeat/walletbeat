@@ -722,6 +722,7 @@ function evaluatePasskeySubEval(
 		case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
 		case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
 		case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
+		case PasskeyVerificationLibrary.SOLADY_WEB_AUTHN:
 			return ctx.build({
 				outcome: {
 					id: 'passkey_pass',
