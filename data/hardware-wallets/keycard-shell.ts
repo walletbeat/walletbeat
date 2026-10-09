@@ -81,7 +81,7 @@ export const keycardShell: HardwareWallet = {
 					{
 						explanation:
 							'Firmware v1.4.0 signs only legacy, EIP-2930 and EIP-1559 Ethereum transactions; other types return ERR_UNSUPPORTED, and there is no raw-hash signing for authorization tuples.',
-						url: 'https://github.com/keycard-tech/keycard-shell/blob/v1.4.0/app/core/core_eth.c',
+						url: 'https://github.com/keycard-tech/keycard-shell/blob/d46001f2ad18c617f8788d959755304d0f19593a/app/core/core_eth.c',
 					},
 				],
 			}),
@@ -89,7 +89,7 @@ export const keycardShell: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"BIP-39 (12 or 24 words) or SLIP-39 backups; the Ethereum default path is m/44'/60'/0'/0/N.",
+							"BIP-39 (12 or 24 words) or SLIP-39 backups; the Ethereum default path is `m/44'/60'/0'/0/N`.",
 						url: 'https://docs.keycard.tech/en/help/other-derivation-path-support',
 					},
 					{
@@ -191,7 +191,7 @@ export const keycardShell: HardwareWallet = {
 			},
 			privacyPolicy: 'https://keycard.tech/legal/privacy-policy',
 			transactionPrivacy: {
-				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the firmware; transfers are made by third-party wallets using the Shell as a QR signer.
+				// No stealth address, RAILGUN, Privacy Pools or Tornado Cash code in the firmware; transfers are made by other wallets using the Shell as a QR signer.
 				// Source: https://docs.keycard.tech/en/help/faq
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -276,7 +276,7 @@ export const keycardShell: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			// No public third-party audit of the Shell firmware, bootloader or Keycard applet found. The card chip (EAL6+) and MCU (PSA Level 3) certifications are chip-level, not audits of Keycard code.
+			// No public independent audit of the Shell firmware, bootloader or Keycard applet found. The card chip (EAL6+) and MCU (PSA Level 3) certifications are chip-level, not audits of Keycard code.
 			// Source: https://docs.keycard.tech/en/developers/hardware-specification
 			publicSecurityAudits: [],
 			secureElement: supported({
@@ -303,7 +303,7 @@ export const keycardShell: HardwareWallet = {
 				// No packaging seals: Keycard says seals "can create a false sense of security and can be cloned" and relies on cryptographic verification.
 				// Source: https://docs.keycard.tech/en/blog/keycard-shell-verification-what-verify-actually-proves-and-why-it-matters
 				// Schematics, PCB files, fabrication files and BOM for the serial run are published in the repository.
-				// Source: https://github.com/keycard-tech/keycard-shell/tree/master/hardware/shell/serial_run
+				// Source: https://github.com/keycard-tech/keycard-shell/tree/587d0a17d7e961f451a805187b05de86bf2862f0/hardware/shell/serial_run
 				// Keys live on the Keycard (NXP smart card chip, CC EAL6+); the Shell's MCU has a write-protected bootloader. No mesh or epoxy is documented.
 				// Source: https://docs.keycard.tech/en/developers/hardware-specification
 				// "During verification, the Shell signs a one-time QR challenge and includes its device certificate"; cards carry a factory-signed certificate.
