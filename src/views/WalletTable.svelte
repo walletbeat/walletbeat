@@ -1987,10 +1987,7 @@
 		margin-inline: -1em;
 	}
 
-	/*
-	 * In a row the flower is an at-a-glance summary; at full size it made every
-	 * row ~270px tall. Hovering a petal or expanding the row shows details.
-	 */
+	/* In a row the flower is an at-a-glance summary; hovering a petal or expanding the row shows details. */
 	:global(.wallet-overall-rating-pie) {
 		zoom: 0.48;
 	}
