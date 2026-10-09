@@ -21,6 +21,7 @@ export const pillarx: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',
 		urls: {
+			webapps: ['https://pillarx.app'],
 			websites: ['https://pillarx.app'],
 		},
 	},
