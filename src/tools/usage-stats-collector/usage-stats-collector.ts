@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import { allWallets } from '@/data/wallets'
+import { getUrl } from '@/schema/url'
 import { getErrorMessage } from '@/types/errors'
 import { getRepositoryRoot } from '@/utils/codebase'
 
@@ -42,7 +43,7 @@ if (args.includes('--help') || args.some(arg => arg !== '--dry-run')) {
 
 const wallets: WalletUsageSources[] = Object.values(allWallets).map(wallet => ({
 	id: wallet.metadata.id,
-	repositories: wallet.metadata.urls?.repositories ?? [],
+	repositories: (wallet.metadata.urls?.repositories ?? []).map(url => getUrl(url)),
 	firefoxAddonSlug: firefoxAddonSlugs[wallet.metadata.id] ?? null,
 }))
 
