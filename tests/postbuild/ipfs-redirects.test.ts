@@ -4,6 +4,7 @@ import * as path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+	IPFS_NOT_FOUND_PAGE,
 	IPFS_REDIRECTS_FILENAME,
 	IPFS_REDIRECTS_MAX_BYTES,
 	ipfsRedirectsFileStatuses,
@@ -76,6 +77,11 @@ async function distPaths(): Promise<string[]> {
 	return paths
 }
 
+/** The catch-all rule that serves the 404 page; it only ever applies to missing paths. */
+function isNotFoundFallback(rule: ParsedRule): boolean {
+	return rule.from === '/*' && rule.to === IPFS_NOT_FOUND_PAGE && rule.status === 404
+}
+
 describe('IPFS _redirects', () => {
 	it('fits within the size limit gateways parse', () => {
 		if (!fs.existsSync(redirectsFile)) {
@@ -132,13 +138,15 @@ describe('IPFS _redirects', () => {
 
 	it('every rule source is absent from the build output, so gateways apply it', async () => {
 		const paths = await distPaths()
-		const violations = readRules().flatMap(rule => {
-			const regex = fromPatternRegex(rule.from)
+		const violations = readRules()
+			.filter(rule => !isNotFoundFallback(rule))
+			.flatMap(rule => {
+				const regex = fromPatternRegex(rule.from)
 
-			return paths
-				.filter(sitePath => regex.test(sitePath))
-				.map(sitePath => `${rule.line}: ${sitePath} exists in dist/`)
-		})
+				return paths
+					.filter(sitePath => regex.test(sitePath))
+					.map(sitePath => `${rule.line}: ${sitePath} exists in dist/`)
+			})
 
 		expect(violations).toEqual([])
 	})
