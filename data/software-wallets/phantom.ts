@@ -132,22 +132,21 @@ export const phantom: SoftwareWallet = {
 		chainAbstraction: {
 			bridging: {
 				builtInBridging: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'By default, Phantom aggregates swap fees into a single displayed amount.',
+							file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-default-view.png',
+							label: 'Phantom swap default fee view',
+						},
+						{
+							explanation:
+								'Hovering over the fee reveals a comprehensive breakdown of all fees for a single swap.',
+							file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-hover.png',
+							label: 'Phantom swap fee hover breakdown',
+						},
+					],
 					feesLargerThan1bps: {
-						ref: [
-							{
-								explanation:
-									'By default, Phantom aggregates swap fees into a single displayed amount.',
-								file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-default-view.png',
-								label: 'Phantom swap default fee view',
-							},
-							{
-								explanation:
-									'Hovering over the fee reveals a comprehensive breakdown of all fees for a single swap.',
-								file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-hover.png',
-								label: 'Phantom swap fee hover breakdown',
-							},
-						],
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
@@ -164,18 +163,16 @@ export const phantom: SoftwareWallet = {
 					file: 'public/references/wallets/phantom/screenshots/2026-08-26-token-dashboard.png',
 					label: 'Phantom token dashboard',
 				},
-				ether: supported({
-					ref: refTodo,
+				ether: {
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 				globalAccountValue: featureSupported,
 				perChainAccountValue: notSupported,
-				usdc: supported({
-					ref: refTodo,
+				usdc: {
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: notSupported,

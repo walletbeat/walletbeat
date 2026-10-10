@@ -132,8 +132,8 @@ A set of features for any software wallet.
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
-type WalletSoftwareFeatures = WalletBaseFeatures & {
-	security: WalletBaseFeatures['security'] & {
+type WalletSoftwareFeatures = Omit<WalletBaseFeatures, 'security'> & {
+	security: Omit<WalletBaseFeatures['security'], 'transactionLegibility'> & {
 		/** Support for alerting the user about potential scams. */
 		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
 
@@ -142,8 +142,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			VariantFeature<SoftwareTransactionLegibilityImplementation>
+		transactionLegibility: VariantFeature<SoftwareTransactionLegibilityImplementation>
 	}
 
 	/** Privacy features. */
@@ -206,16 +205,15 @@ A set of features for any hardware wallet.
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
-type WalletHardwareFeatures = WalletBaseFeatures & {
-	security: WalletBaseFeatures['security'] & {
+type WalletHardwareFeatures = Omit<WalletBaseFeatures, 'security'> & {
+	security: Omit<WalletBaseFeatures['security'], 'transactionLegibility'> & {
 		firmware: VariantFeature<FirmwareSupport>
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			VariantFeature<HardwareTransactionLegibilityImplementation>
+		transactionLegibility: VariantFeature<HardwareTransactionLegibilityImplementation>
 	}
 	privacy: WalletBaseFeatures['privacy'] & {
 		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>

@@ -140,18 +140,16 @@ export const baseApp: SoftwareWallet = {
 			},
 			crossChainBalances: {
 				ref: refTodo, // Source: Base team responses via Fileverse questionnaire (Q7, Q8, Q9)
-				ether: supported({
-					ref: refTodo,
+				ether: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 				globalAccountValue: featureSupported,
 				perChainAccountValue: featureSupported,
-				usdc: supported({
-					ref: refTodo,
+				usdc: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: notSupported,

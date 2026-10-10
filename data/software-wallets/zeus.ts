@@ -208,17 +208,18 @@ export const zeus: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: supported({
-				ref: [
-					{
-						explanation:
-							'Zeus uses a username and password to derive the master HD wallet. Recovery is only possible by using the same username and password.',
-						url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
-					},
-				],
+			accountRecovery: {
 				drills: null,
-				guardianRecovery: notSupported,
-			}),
+				guardianRecovery: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'Zeus uses a username and password to derive the master HD wallet. Recovery is only possible by using the same username and password.',
+							url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
+						},
+					],
+				}),
+			},
 			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: null,
@@ -267,7 +268,7 @@ export const zeus: SoftwareWallet = {
 				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
-			transactionLegibility: supported({
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -296,7 +297,7 @@ export const zeus: SoftwareWallet = {
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				transactionSimulations: null,
-			}),
+			},
 		},
 		selfSovereignty: {
 			permissionsManagement: null,

@@ -150,7 +150,6 @@ export const uniswapWallet: SoftwareWallet = {
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: false,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
@@ -189,20 +188,19 @@ export const uniswapWallet: SoftwareWallet = {
 			bridging: {
 				/** Does the wallet have a built-in bridging feature? */
 				builtInBridging: supported({
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-default.png',
+							label:
+								'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
+						},
+						{
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-comprehensive.png',
+							label:
+								'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
+						},
+					],
 					feesLargerThan1bps: {
-						ref: [
-							{
-								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-default.png',
-								label:
-									'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
-							},
-							{
-								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-comprehensive.png',
-								label:
-									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
-							},
-						],
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
@@ -213,28 +211,30 @@ export const uniswapWallet: SoftwareWallet = {
 				suggestedBridging: notSupported,
 			},
 			crossChainBalances: {
-				ref: {
-					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-tokens-aggregated.png',
-					label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
-				},
-				ether: supported({
-					ref: {
+				ref: [
+					{
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-tokens-aggregated.png',
+						label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
+					},
+					{
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-eth-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain ETH balances',
 					},
-					crossChainSumView: featureSupported,
-					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
-				globalAccountValue: featureSupported,
-				perChainAccountValue: notSupported,
-				usdc: supported({
-					ref: {
+					{
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-usdc-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain USDC balances',
 					},
+				],
+				ether: {
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
