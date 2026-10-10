@@ -502,6 +502,7 @@ export const baseApp: SoftwareWallet = {
 				// Source: https://walletscrutiny.com/mobile/org.toshi/
 				reproducibleBuilds: notSupported,
 			},
+			softwareUpdates: null,
 		},
 		// Base App accounts run Coinbase Smart Wallet logic, which exposes
 		// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a

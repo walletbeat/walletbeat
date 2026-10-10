@@ -177,6 +177,7 @@ export const mtpelerin: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: null,
 	},

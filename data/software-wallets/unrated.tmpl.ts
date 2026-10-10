@@ -123,6 +123,7 @@ export const unratedTemplate: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: null,
 	},

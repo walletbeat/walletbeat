@@ -120,6 +120,7 @@ import {
 	type ArtifactSigningDetails,
 	RepositoryChangeControlState,
 } from '@/schema/features/transparency/release-transparency'
+import { UpdateInstallation } from '@/schema/features/transparency/software-updates'
 import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -908,6 +909,11 @@ export const completedTemplate: SoftwareWallet = {
 					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				reproducibleBuilds: supported({ ref: refTodo }),
+			},
+			softwareUpdates: {
+				ref: refTodo,
+				installation: UpdateInstallation.PLATFORM_MANAGED,
+				remoteVersionBlocking: notSupported,
 			},
 		},
 		walletCall: supported({
