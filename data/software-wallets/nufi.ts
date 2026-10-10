@@ -221,7 +221,7 @@ export const nufi: SoftwareWallet = {
 				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
-				// No LavaMoat or SES markers in the shipped v35.2.0 bundle.
+				// To retest: search the shipped extension bundle for LavaMoat or SES markers.
 				dependencySandboxing: notSupported,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: supported({
