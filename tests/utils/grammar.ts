@@ -311,8 +311,9 @@ function collectGitHubLabelRanges(text: string): { start: number; end: number }[
 			// Line-range chars: "L" followed by digits/dashes
 			// Path separators and trailing slashes
 			// Spaces between parts
+			// Backticks of inline code, as Markdown renders the pin (e.g. "keychain.py `@6ab39e9`")
 
-			if (/[\w.\-\s]/.test(ch)) {
+			if (/[\w.\-\s`]/.test(ch)) {
 				pos--
 			} else {
 				break
