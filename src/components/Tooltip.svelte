@@ -29,6 +29,7 @@
 	// Props
 	let {
 		title,
+		ariaLabel,
 		placement = 'block-end',
 		buttonTriggerPlacement = 'around',
 		hoverTriggerPlacement = 'around',
@@ -41,6 +42,8 @@
 		...restProps
 	}: HTMLAttributes<HTMLDivElement> & {
 		title?: string
+		/** Accessible name for the trigger button. Needed when `buttonTriggerPlacement` is `'behind'`, where the button has no content. */
+		ariaLabel?: string
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		buttonTriggerPlacement?: 'around' | 'behind'
 		hoverTriggerPlacement?: 'around' | 'button'
@@ -238,6 +241,7 @@
 			<button
 				type="button"
 				{title}
+				aria-label={ariaLabel}
 				data-tooltip-trigger
 				style:anchor-name={anchorName}
 				popovertarget={popoverId}
