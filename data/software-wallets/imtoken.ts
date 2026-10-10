@@ -397,6 +397,7 @@ export const imtoken: SoftwareWallet = {
 			releaseTransparency: {
 				// App-store signing only; the Android APK SHA-256 hashes published in the help center are integrity checks, not signatures.
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
