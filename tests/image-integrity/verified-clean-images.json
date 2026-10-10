@@ -55,6 +55,10 @@
 		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/clave.png": {
+		"hash": "5d2dffe71c5d1ea53578bef434ff10d143dd2f91f1d8b8c0391c1b7460e83573",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/images/entities/coinbase.svg": {
 		"hash": "d451b6ab3368559fc2d6c03e89668bf745e91fc8417150c44ab7b11076c088e9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -182,6 +186,10 @@
 	"public/images/wallets/bitget.svg": {
 		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/clave.png": {
+		"hash": "5d2dffe71c5d1ea53578bef434ff10d143dd2f91f1d8b8c0391c1b7460e83573",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/images/wallets/cypherock.svg": {
 		"hash": "01d46eacc61d583a8249e55df6c3a8eeda2fe0cbd62ea05bece39a5b98edecb9",
