@@ -38,10 +38,10 @@
 				<div>
 					<div data-row="start gap-2">
 						<a data-link="camouflaged" href="#security-news">
-							<h3 data-row="start gap-2">
+							<h2 data-row="start gap-2">
 								<span data-icon="📰" aria-hidden="true"></span>
 								Security News
-							</h3>
+							</h2>
 						</a>
 					</div>
 
@@ -76,7 +76,7 @@
 				<details data-card="padding-5 secondary radius-4" data-column="gap-0">
 					<summary data-row="gap-2">
 						<div data-column="gap-1" data-row-item="flexible">
-							<h4>{newsItem.title}</h4>
+							<h3>{newsItem.title}</h3>
 							<div class="news-meta" data-row="start gap-2 wrap">
 								<span
 									class="news-badge news-type"
@@ -167,7 +167,8 @@
 						display: grid;
 						gap: 0.5rem;
 
-						h3 {
+						h2 {
+							font-size: 1.17em;
 							font-weight: 600;
 						}
 					}
@@ -191,7 +192,8 @@
 			overflow: hidden;
 
 			summary {
-				h4 {
+				h3 {
+					font-size: 1em;
 					max-width: 60ch;
 					word-wrap: break-word;
 					overflow-wrap: break-word;
