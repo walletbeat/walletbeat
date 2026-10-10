@@ -52,6 +52,27 @@ export interface StoredSnippetContent {
 export type SnippetRow =
 	{ type: 'gap' } | { type: 'line'; number: number; html: string; highlighted: boolean }
 
+/** Type predicate for `SnippetRow`. */
+export function isSnippetRow(row: unknown): row is SnippetRow {
+	if (typeof row !== 'object' || row === null || !('type' in row)) {
+		return false
+	}
+
+	if (row.type === 'gap') {
+		return true
+	}
+
+	return (
+		row.type === 'line' &&
+		'number' in row &&
+		typeof row.number === 'number' &&
+		'html' in row &&
+		typeof row.html === 'string' &&
+		'highlighted' in row &&
+		typeof row.highlighted === 'boolean'
+	)
+}
+
 /** The `L123` / `L123-L456` filename and URL-fragment suffix for a snippet. */
 function snippetLineSuffix(source: CodeSnippetSource): string {
 	if (source.firstLine === source.lastLine) {
