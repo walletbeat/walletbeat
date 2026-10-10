@@ -187,6 +187,8 @@ This is useful to avoid repetitive flagging of user data during the `review-requ
 By going through these strings contained in network requests, things like tracking cookies, EOA addresses, wallet-connect domains, etc. can be tagged as corresponding to one or more pieces of user-identifying information (or simply as `TRACKING_IDENTIFIER` when repeated across requests).
 The benefit of doing so is that requests containing these strings will be automatically identified as carrying this user information without having to repeat yourself.
 
+Well-known contract addresses (popular tokens, the `0xEeee...EEeE` native ETH placeholder) are listed under `globalContractAddresses` in `data/collection/global.annotations.json`. Strings referring to them, in full or truncated form (such as `0xA0b8...eB48`), are treated as benign and skipped, except for the token addresses you recorded as swapped in `capture-info`: those are user data (`ASSETS`).
+
 Alternatively, you can use the `mark-string` subcommand to mark a given string as carrying a given piece of user information. `review-strings` is just a pretty UI over it.
 
 #### `mark-string` subcommand

@@ -10,6 +10,7 @@ import {
 import { type AtLeastOneTrueVariant } from '@/schema/variants'
 import { isInVocabulary } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
+import { assertErc55Address, type Erc55Address } from '@/types/utils/ethereum-address'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -30,8 +31,20 @@ import {
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
+	/** Only allowed in the global annotations file. */
+	globalContractAddresses?: EncodedGlobalContractAddress[]
 	matchers: EncodedWalletRequestMatcher[]
 	benignStrings: string[]
+}
+
+/**
+ * A well-known contract address (e.g. a popular token) that shows up in
+ * wallet traffic regardless of who the user is.
+ */
+export interface EncodedGlobalContractAddress {
+	/** Human-readable label, e.g. "USDC (Ethereum)". */
+	name: string
+	address: Erc55Address
 }
 
 export interface EncodedWalletRequestMatcher {
@@ -79,6 +92,42 @@ const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
 	// Strings of one or two word characters (letters, digits, underscore)
 	/^\w{1,2}$/,
 ]
+
+/**
+ * A full Ethereum address (with or without "0x"), or a UI-truncated form of one
+ * such as "0xA0b8...eB48" or "0xEeeeeEeeeEeEeeE...".
+ * Truncated forms must keep at least 4 hex characters after "0x".
+ */
+const FULL_ADDRESS_REGEXP = /^(?:0x)?([0-9a-f]{40})$/i
+const TRUNCATED_ADDRESS_REGEXP = /^0x([0-9a-f]{4,39})(?:\.\.\.|…)([0-9a-f]{0,36})$/i
+
+/**
+ * @returns Whether `str` refers to `address`, either in full (in any letter case)
+ *     or in truncated form.
+ */
+export function refersToAddress(str: string, address: Erc55Address): boolean {
+	const addressHex = address.slice(2).toLowerCase()
+	const full = FULL_ADDRESS_REGEXP.exec(str)
+
+	if (full !== null) {
+		return full[1].toLowerCase() === addressHex
+	}
+
+	const truncated = TRUNCATED_ADDRESS_REGEXP.exec(str)
+
+	if (truncated === null) {
+		return false
+	}
+
+	const prefix = truncated[1].toLowerCase()
+	const suffix = truncated[2].toLowerCase()
+
+	return (
+		prefix.length + suffix.length < addressHex.length &&
+		addressHex.startsWith(prefix) &&
+		addressHex.endsWith(suffix)
+	)
+}
 
 export interface SaveOptions {
 	/** Verify existing file contents instead of saving. */
@@ -206,6 +255,7 @@ export class WalletCaptureAnnotations {
 	private readonly path: string | null
 	private readonly globalPath: string | null
 	private matchers: WalletRequestMatcher[]
+	private readonly globalContractAddresses: EncodedGlobalContractAddress[]
 	private globalBenignStrings: Set<string>
 	private benignStrings: Set<string>
 
@@ -229,7 +279,7 @@ export class WalletCaptureAnnotations {
 					})
 				}
 
-				data = WalletCaptureAnnotations.parseEncoded(parsed, '$')
+				data = WalletCaptureAnnotations.parseEncoded(parsed, '$', false)
 			}
 		}
 
@@ -237,7 +287,11 @@ export class WalletCaptureAnnotations {
 		let global: EncodedWalletCaptureAnnotations
 
 		try {
-			global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw) as unknown, 'global$')
+			global = WalletCaptureAnnotations.parseEncoded(
+				JSON.parse(globalRaw) as unknown,
+				'global$',
+				true,
+			)
 		} catch (e) {
 			throw new Error(`Invalid JSON in annotations file ${globalPath}: ${getErrorMessage(e)}`, {
 				cause: e,
@@ -248,14 +302,48 @@ export class WalletCaptureAnnotations {
 	}
 
 	public static fromData(data: unknown, globalData: unknown): WalletCaptureAnnotations {
-		const parsed = WalletCaptureAnnotations.parseEncoded(data, '$')
-		const global = WalletCaptureAnnotations.parseEncoded(globalData, '$')
+		const parsed = WalletCaptureAnnotations.parseEncoded(data, '$', false)
+		const global = WalletCaptureAnnotations.parseEncoded(globalData, 'global$', true)
 
 		return new WalletCaptureAnnotations(null, null, parsed, global)
 	}
 
-	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
+	private static parseEncoded(
+		v: unknown,
+		at: string,
+		isGlobal: boolean,
+	): EncodedWalletCaptureAnnotations {
 		const root = expectRecord(v, at)
+
+		if (!isGlobal && root.globalContractAddresses !== undefined) {
+			throw new Error(
+				`${at}.globalContractAddresses is only allowed in the global annotations file`,
+			)
+		}
+
+		const seenContractAddresses = new Set<Erc55Address>()
+		const globalContractAddresses = expectArray(
+			root.globalContractAddresses === undefined ? [] : root.globalContractAddresses,
+			`${at}.globalContractAddresses`,
+		).map((v, i): EncodedGlobalContractAddress => {
+			const contractAt = `${at}.globalContractAddresses[${i}]`
+			const obj = expectRecord(v, contractAt)
+			const name = expectString(obj.name, `${contractAt}.name`)
+
+			if (name.trim() === '') {
+				throw new Error(`${contractAt}.name cannot be empty`)
+			}
+
+			const address = assertErc55Address(expectString(obj.address, `${contractAt}.address`))
+
+			if (seenContractAddresses.has(address)) {
+				throw new Error(`duplicate contract address ${address} at ${contractAt}.address`)
+			}
+
+			seenContractAddresses.add(address)
+
+			return { name, address }
+		})
 		const matchersArr = expectArray(
 			root.matchers === undefined ? [] : root.matchers,
 			`${at}.matchers`,
@@ -321,6 +409,7 @@ export class WalletCaptureAnnotations {
 		})
 
 		return {
+			globalContractAddresses,
 			matchers,
 			benignStrings,
 		}
@@ -356,6 +445,7 @@ export class WalletCaptureAnnotations {
 		this.matchers = global.matchers
 			.map(m => toMatcher(m, true))
 			.concat(data.matchers.map(m => toMatcher(m, false)))
+		this.globalContractAddresses = global.globalContractAddresses ?? []
 		this.globalBenignStrings = new Set()
 		this.benignStrings = new Set()
 
@@ -370,6 +460,9 @@ export class WalletCaptureAnnotations {
 
 	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
 		return {
+			...(global && this.globalContractAddresses.length > 0
+				? { globalContractAddresses: this.globalContractAddresses }
+				: {}),
 			matchers: this.matchers.filter(m => m.isGlobal === global).map(m => m.toJSON()),
 			benignStrings: Array.from(global ? this.globalBenignStrings : this.benignStrings).toSorted(),
 		}
@@ -397,7 +490,26 @@ export class WalletCaptureAnnotations {
 		;(global ? this.globalBenignStrings : this.benignStrings).add(str)
 	}
 
-	public isBenign(str: string): boolean {
+	/**
+	 * @returns The well-known contract address that `str` refers to (in full or
+	 *     truncated form), or null if it does not refer to any of them.
+	 */
+	public globalContractAddressOf(str: string): Erc55Address | null {
+		for (const contract of this.globalContractAddresses) {
+			if (refersToAddress(str, contract.address)) {
+				return contract.address
+			}
+		}
+
+		return null
+	}
+
+	/**
+	 * @param userAssetAddresses Token addresses that are user data for this
+	 *     capture (e.g. the tokens swapped during it). These are not considered
+	 *     benign even if they are well-known contract addresses.
+	 */
+	public isBenign(str: string, userAssetAddresses: readonly Erc55Address[] = []): boolean {
 		for (const benignRegexp of GLOBAL_BENIGN_REGULAR_EXPRESSIONS) {
 			if (benignRegexp.test(str)) {
 				return true
@@ -408,7 +520,16 @@ export class WalletCaptureAnnotations {
 			return true
 		}
 
-		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
+		if (this.globalBenignStrings.has(str) || this.benignStrings.has(str)) {
+			return true
+		}
+
+		const contractAddress = this.globalContractAddressOf(str)
+
+		return (
+			contractAddress !== null &&
+			!userAssetAddresses.some(a => a.toLowerCase() === contractAddress.toLowerCase())
+		)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {
