@@ -65,14 +65,18 @@
 				<div class="detail-section">
 					<span class="detail-label">🏷️ Domain:</span>
 					<div class="domain-box">
-						<div class="domain-item">
-							<span class="domain-key">Name:</span>
-							{selectedSig.domain.name}
-						</div>
-						<div class="domain-item">
-							<span class="domain-key">Version:</span>
-							{selectedSig.domain.version}
-						</div>
+						{#if selectedSig.domain.name !== undefined}
+							<div class="domain-item">
+								<span class="domain-key">Name:</span>
+								{selectedSig.domain.name}
+							</div>
+						{/if}
+						{#if selectedSig.domain.version !== undefined}
+							<div class="domain-item">
+								<span class="domain-key">Version:</span>
+								{selectedSig.domain.version}
+							</div>
+						{/if}
 						<div class="domain-item">
 							<span class="domain-key">Chain ID:</span>
 							{selectedSig.domain.chainId}
@@ -81,10 +85,12 @@
 							<span class="domain-key">Verifying Contract:</span>
 							{selectedSig.domain.verifyingContract}
 						</div>
-						<div class="domain-item">
-							<span class="domain-key">Salt:</span>
-							{selectedSig.domain.salt}
-						</div>
+						{#if selectedSig.domain.salt !== undefined}
+							<div class="domain-item">
+								<span class="domain-key">Salt:</span>
+								{selectedSig.domain.salt}
+							</div>
+						{/if}
 					</div>
 				</div>
 

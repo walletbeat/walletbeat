@@ -28,11 +28,11 @@ export interface TestSignature {
 	requirements?: string[]
 	message?: string
 	domain?: {
-		name: string
-		version: string
+		name?: string
+		version?: string
 		chainId: number
 		verifyingContract: `0x${string}`
-		salt: `0x${string}`
+		salt?: `0x${string}`
 	}
 	types?: Record<
 		string,
@@ -180,6 +180,23 @@ export const testTransactions: TestTransaction[] = [
 		],
 	},
 ]
+
+/** EIP-712 types of a Safe multisig transaction (Safe v1.3.0 and later). */
+const safeTxTypes: TestSignature['types'] = {
+	SafeTx: [
+		{ name: 'to', type: 'address' },
+		{ name: 'value', type: 'uint256' },
+		{ name: 'data', type: 'bytes' },
+		{ name: 'operation', type: 'uint8' },
+		{ name: 'safeTxGas', type: 'uint256' },
+		{ name: 'baseGas', type: 'uint256' },
+		{ name: 'gasPrice', type: 'uint256' },
+		{ name: 'gasToken', type: 'address' },
+		{ name: 'refundReceiver', type: 'address' },
+		{ name: 'nonce', type: 'uint256' },
+	],
+}
+
 export const testSignatures: TestSignature[] = [
 	{
 		id: 'message-1',
@@ -239,6 +256,66 @@ export const testSignatures: TestSignature[] = [
 			'The domain clearly indicates this is for testing only',
 			'No financial transactions or approvals are authorized',
 			'This signature is safe for testing purposes',
+		],
+	},
+	{
+		id: 'safe-tx-1',
+		name: 'Safe Transaction: Aave Supply',
+		type: 'typed',
+		description:
+			'A Safe multisig transaction (SafeTx, EIP-712), the message a Safe owner signs to approve it. Tests whether the wallet shows the Aave supply() call nested in its data field.',
+		domain: {
+			chainId: 1,
+			verifyingContract: '0x0000000000000000000000000000000000000000',
+		},
+		types: safeTxTypes,
+		primaryType: 'SafeTx',
+		messageData: {
+			to: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2', // Aave V3 Pool
+			value: 0,
+			data: '0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000027100000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000',
+			operation: 0,
+			safeTxGas: 0,
+			baseGas: 0,
+			gasPrice: 0,
+			gasToken: '0x0000000000000000000000000000000000000000',
+			refundReceiver: '0x0000000000000000000000000000000000000000',
+			nonce: 0,
+		},
+		requirements: [
+			'The verifying contract is the zero address, so this signature cannot execute on any Safe',
+			'No transactions or approvals are authorized by this signature',
+			'This is for testing and educational purposes only',
+		],
+	},
+	{
+		id: 'safe-tx-2',
+		name: 'Safe Transaction: MultiSend Approve + Supply',
+		type: 'typed',
+		description:
+			'A Safe multisig transaction (SafeTx, EIP-712) that batches a USDC approval and an Aave supply through MultiSendCallOnly. Tests whether the wallet shows both calls packed in the multiSend() data.',
+		domain: {
+			chainId: 1,
+			verifyingContract: '0x0000000000000000000000000000000000000000',
+		},
+		types: safeTxTypes,
+		primaryType: 'SafeTx',
+		messageData: {
+			to: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2', // Safe MultiSendCallOnly v1.4.1
+			value: 0,
+			data: '0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000017200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000027100087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000027100000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+			operation: 1,
+			safeTxGas: 0,
+			baseGas: 0,
+			gasPrice: 0,
+			gasToken: '0x0000000000000000000000000000000000000000',
+			refundReceiver: '0x0000000000000000000000000000000000000000',
+			nonce: 0,
+		},
+		requirements: [
+			'The verifying contract is the zero address, so this signature cannot execute on any Safe',
+			'No transactions or approvals are authorized by this signature',
+			'This is for testing and educational purposes only',
 		],
 	},
 ]
