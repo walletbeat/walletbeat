@@ -114,6 +114,7 @@ export const family: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			secretKeyBackup: null,
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},

@@ -197,6 +197,7 @@ export const bitget: SoftwareWallet = {
 				sendTransactionWarning: notSupported,
 				unlimitedApprovalWarning: null,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

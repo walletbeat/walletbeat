@@ -414,6 +414,7 @@ export const baseApp: SoftwareWallet = {
 			},
 			// The mobile app is closed source: "Build cannot be done because the source code is not publicly available."
 			// Source: https://walletscrutiny.com/mobile/org.toshi/
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: 'NOT_A_BROWSER_EXTENSION',
 				desktop: 'NOT_A_DESKTOP_APP',
