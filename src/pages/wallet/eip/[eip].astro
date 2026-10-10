@@ -23,6 +23,7 @@ import { getWalletUrl } from '@/utils/urls'
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
 import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
+import EipSupportIconGrids from '@/views/EipSupportIconGrids.svelte'
 import Navigation from '@/views/Navigation.astro'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 
@@ -107,6 +108,19 @@ const embeddedCards = eipStatusSupportCards(
 		<header data-scroll-item='inline-detached padding-match-start'>
 			<EipDetails eip={eip} headingLevel={1} />
 		</header>
+
+		{
+			softwareCards.length > 0 && (
+				<section
+					class='at-a-glance'
+					data-scroll-item='inline-detached padding-match-start'
+					data-column='gap-4'
+				>
+					<h2>Software Wallet Support at a Glance</h2>
+					<EipSupportIconGrids cards={softwareCards} eipLabel={eipShortLabel(eip)} />
+				</section>
+			)
+		}
 
 		{
 			softwareCards.length > 0 && (
