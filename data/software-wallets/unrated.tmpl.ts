@@ -29,6 +29,7 @@ export const unratedTemplate: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: null,
 		addressResolution: {
 			ref: refTodo,

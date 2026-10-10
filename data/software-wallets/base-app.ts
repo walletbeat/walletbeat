@@ -65,6 +65,7 @@ export const baseApp: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			// New accounts created via passkey onboarding are ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
 			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.

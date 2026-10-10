@@ -2,7 +2,7 @@ import { prefixError } from '@/types/errors'
 import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nullable'
 
 import type { Entity } from './entity'
-import type { AccountSupport } from './features/account-support'
+import type { AccountImport, AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
 import type { AppConnectionSupport } from './features/ecosystem/hw-app-connection-support'
@@ -252,6 +252,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	/** Integration inside browsers, mobile phones, etc. */
 	integration: WalletIntegration
 
+	/** Which existing account secrets the wallet can import. */
+	accountImport: VariantFeature<AccountImport>
+
 	/** How the wallet resolves Ethereum addresses. */
 	addressResolution: VariantFeature<Nullable<WithRef<AddressResolution>>>
 
@@ -350,6 +353,9 @@ export function isWalletEmbeddedFeatures(
  * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
 export type WalletEmbeddedFeatures = WalletBaseFeatures & {
+	/** Which existing account secrets the wallet can import. */
+	accountImport: VariantFeature<AccountImport>
+
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 	}
@@ -434,6 +440,7 @@ export interface ResolvedFeatures {
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
+	accountImport: ResolvedFeature<AccountImport>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
 	integration: WalletIntegration
@@ -676,6 +683,9 @@ export function resolveFeatures(
 		chainConfigurability: nullable<Support<WithRef<ChainConfigurability>>>(
 			softwareFeat('chainConfigurability', features => features.chainConfigurability),
 		),
+		accountImport:
+			embeddedFeat('accountImport', features => features.accountImport) ??
+			softwareFeat('accountImport', features => features.accountImport),
 		accountSupport: baseFeat('accountSupport', features => features.accountSupport),
 		multiAddress: baseFeat('multiAddress', features => features.multiAddress),
 		integration: isWalletSoftwareFeatures(features)

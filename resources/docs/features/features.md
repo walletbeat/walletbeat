@@ -171,6 +171,9 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	/** Integration inside browsers, mobile phones, etc. */
 	integration: WalletIntegration
 
+	/** Which existing account secrets the wallet can import. */
+	accountImport: VariantFeature<AccountImport>
+
 	/** How the wallet resolves Ethereum addresses. */
 	addressResolution: VariantFeature<Nullable<WithRef<AddressResolution>>>
 
@@ -241,6 +244,9 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 ```typescript
 type WalletEmbeddedFeatures = WalletBaseFeatures & {
+	/** Which existing account secrets the wallet can import. */
+	accountImport: VariantFeature<AccountImport>
+
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 	}
@@ -306,6 +312,7 @@ A set of features about a specific wallet variant. All features are resolved to 
     - `reproducibleBuilds` (`ResolvedFeature<ReproducibleBuilds>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
+- `accountImport` (`ResolvedFeature<AccountImport>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
 - `multiAddress` (`ResolvedFeature<Support>`)
 - `integration` (`WalletIntegration`)
@@ -419,6 +426,41 @@ To test:
 
 - `keyDerivation` (`| { type: 'NONSTANDARD' } | { type: 'BIP32' seedPhrase: 'NONSTANDARD' | 'BIP39' derivationPath: 'NONSTANDARD' | 'BIP44' canExportSeedPhrase: boolean }`): Type of standards used to deterministically derive private keys.
 - `canExportPrivateKey` (`boolean`): Can the wallet export EOA private keys directly?
+
+---
+
+### Type: `AccountImport`
+
+Which existing account secrets the wallet lets users import.
+
+To test:
+
+- `seedPhrase`: During onboarding, look for an "Import wallet", "I already
+  have a wallet" or "Restore" option. Import a BIP-39 seed phrase created
+  in another wallet and verify the same address is derived.
+- `privateKey`: During onboarding, in the account switcher and in Settings,
+  look for an "Import private key" or "Import account" option. Import a raw
+  private key exported from another wallet and verify the same address
+  appears.
+- `privateKey.beforeAccountCreation`: On a fresh install, check whether
+  the private key import option is offered before the wallet has created
+  or imported a seed phrase.
+
+```typescript
+type AccountImport = WithRef<{
+	/** Can the user import an existing BIP-39 seed phrase? */
+	seedPhrase: Support
+
+	/** Can the user import a raw EOA private key? */
+	privateKey: Support<{
+		/**
+		 * Is private key import offered on a fresh install, before the wallet
+		 * has created or imported a seed phrase?
+		 */
+		beforeAccountCreation: boolean
+	}>
+}>
+```
 
 ---
 

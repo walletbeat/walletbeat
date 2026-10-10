@@ -59,6 +59,7 @@ export const elytro: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: notSupported,

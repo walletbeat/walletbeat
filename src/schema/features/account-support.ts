@@ -206,6 +206,35 @@ export interface AccountTypeEoa {
 	canExportPrivateKey: boolean
 }
 
+/**
+ * Which existing account secrets the wallet lets users import.
+ *
+ * To test:
+ * - `seedPhrase`: During onboarding, look for an "Import wallet", "I already
+ *   have a wallet" or "Restore" option. Import a BIP-39 seed phrase created
+ *   in another wallet and verify the same address is derived.
+ * - `privateKey`: During onboarding, in the account switcher and in Settings,
+ *   look for an "Import private key" or "Import account" option. Import a raw
+ *   private key exported from another wallet and verify the same address
+ *   appears.
+ * - `privateKey.beforeAccountCreation`: On a fresh install, check whether
+ *   the private key import option is offered before the wallet has created
+ *   or imported a seed phrase.
+ */
+export type AccountImport = WithRef<{
+	/** Can the user import an existing BIP-39 seed phrase? */
+	seedPhrase: Support
+
+	/** Can the user import a raw EOA private key? */
+	privateKey: Support<{
+		/**
+		 * Is private key import offered on a fresh install, before the wallet
+		 * has created or imported a seed phrase?
+		 */
+		beforeAccountCreation: boolean
+	}>
+}>
+
 interface AccountTypeMultifactor {
 	/**
 	 * When setting up the wallet, does the user own enough shares in their

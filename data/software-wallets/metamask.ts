@@ -114,6 +114,7 @@ export const metamask: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: supported({
