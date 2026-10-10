@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { trailOfBits } from '@/data/entities/trail-of-bits'
 import type { SoftwareWallet } from '@/data/software-wallets'
@@ -115,9 +116,9 @@ export const uniswapWallet: SoftwareWallet = {
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
 		coinspectId: 'uniswap',
-		contributors: [ren2140],
+		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-04-04',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
@@ -810,6 +811,7 @@ export const uniswapWallet: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -829,7 +831,26 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension package has no LavaMoat or SES dependency, and the shipped v1.84.0.2 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app package has no LavaMoat, SES or other dependency isolation.',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json',
+							},
+						],
+					}),
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported<MustRef<{}>>({
 					ref: [

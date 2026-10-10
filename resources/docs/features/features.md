@@ -101,7 +101,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
-  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
+  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
   - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
@@ -182,6 +182,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
+
 		/** How new versions of the wallet reach users. */
 		softwareUpdates: VariantFeature<Nullable<SoftwareUpdates>>
 	}
@@ -252,6 +257,11 @@ type WalletEmbeddedFeatures = WalletBaseFeatures & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
+
 		/** How new versions of the wallet reach users. */
 		softwareUpdates: VariantFeature<Nullable<SoftwareUpdates>>
 	}
@@ -305,6 +315,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
     - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
+    - `dependencyAgeGate` (`ResolvedFeature<DependencyAgeGate>`)
     - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
     - `dependencySandboxing` (`ResolvedFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
@@ -1298,7 +1309,7 @@ type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FL
 
 ### Interface: `DataCollection`
 
-A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
+A collection of data that a wallet collects. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
@@ -4138,6 +4149,23 @@ type ArtifactSigning = Support<ArtifactSigningDetails>
 
 ---
 
+### Type: `DependencyAgeGate`
+
+Whether routine dependency updates only pick up dependency releases that are at least a minimum age, so that a compromised release has time to be detected and pulled before the wallet adopts it. One-off updates for security fixes may bypass the minimum age.
+
+To test: look in the wallet's source repository for a minimum release age setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in `.github/dependabot.yml`. Set to `notSupported` if routine updates have no minimum age.
+
+```typescript
+type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
+```
+
+---
+
 ### Type: `DependencyLocking`
 
 Whether the wallet's release builds enforce a lockfile (or equivalent) for locked dependency resolution.
@@ -4168,6 +4196,18 @@ type DependencySandboxing = Support<WithRef<{}>>
 
 ---
 
+### Enum: `RepositoryChangeControlState`
+
+Whether a repository change control is in place, and whether that can be checked publicly. A `null` value means the control has not been looked into yet.
+
+- `VERIFIABLY_PRESENT` = `'VERIFIABLY_PRESENT'`: The control is in place, and anyone can check this. (e.g. A GitHub ruleset that is visible on the repository's public rules page or rulesets API.)
+- `VERIFIABLY_ABSENT` = `'VERIFIABLY_ABSENT'`: The control is not in place, and anyone can check this. (e.g. The public rulesets do not include it, and the public branch API shows no classic branch protection providing it.)
+- `CLAIMED_PRESENT` = `'CLAIMED_PRESENT'`: The wallet developer states that the control is in place, but this cannot be checked publicly. (e.g. A classic branch protection rule, which only repository admins can see.)
+- `CLAIMED_ABSENT` = `'CLAIMED_ABSENT'`: The wallet developer states that the control is not in place. This cannot be checked publicly, but a developer has no incentive to claim not to have a control, so it is as strong as `VERIFIABLY_ABSENT`.
+- `UNVERIFIABLE` = `'UNVERIFIABLE'`: The wallet developer makes no statement either way, and whether the control is in place cannot be checked publicly.
+
+---
+
 ### Type: `RepositoryChangeControls`
 
 Observable repository-level change controls for the wallet's source repository.
@@ -4175,15 +4215,15 @@ Observable repository-level change controls for the wallet's source repository.
 ```typescript
 type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
+	requiredReview: RepositoryChangeControlState
 	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
+	requiredChecks: RepositoryChangeControlState
 	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
+	forcePushBlocked: RepositoryChangeControlState
 	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
+	branchDeletionBlocked: RepositoryChangeControlState
 	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
+	tagsImmutable: RepositoryChangeControlState
 }>
 ```
 

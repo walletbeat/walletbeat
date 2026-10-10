@@ -377,10 +377,12 @@ export const releaseProcess: Attribute = {
 		Four binary signals are assessed, grouped into two categories:
 
 		**Basic**:
+
 		1. **Public changelog**: the wallet publishes release notes or a changelog.
 		2. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
 
 		**Advanced**:
+
 		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
 		4. **Reproducible or hermetic builds**: independent parties can verify that build output matches
 		   source, or the build can run fully offline. Verifying this independently requires access to
