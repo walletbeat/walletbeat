@@ -1502,7 +1502,16 @@
 					inset-block: calc(var(---wallet-page-block-offset) + 4rem) 0;
 					inline-size: var(---wallet-page-navigation-inline-size);
 					translate: -100% 0;
-					transition: translate 0.3s var(--ease-out-expo);
+					/*
+					 * Hidden while off-canvas, so its links leave the tab order and the
+					 * accessibility tree. Visibility flips to hidden only once the slide-out
+					 * has finished. Focusing the flower still opens the drawer, and Tab then
+					 * continues into it.
+					 */
+					visibility: hidden;
+					transition:
+						translate 0.3s var(--ease-out-expo),
+						visibility 0.3s;
 					background-color: var(--background-secondary);
 					overflow-y: auto;
 					min-block-size: 0;
@@ -1515,6 +1524,7 @@
 
 				&:focus-within > nav:not(.pie-navigation) {
 					translate: 0 0;
+					visibility: visible;
 				}
 			}
 		}
