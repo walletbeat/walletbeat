@@ -4160,6 +4160,18 @@ type DependencySandboxing = Support<WithRef<{}>>
 
 ---
 
+### Enum: `RepositoryChangeControlState`
+
+Whether a repository change control is in place, and whether that can be checked publicly. A `null` value means the control has not been looked into yet.
+
+- `VERIFIABLY_PRESENT` = `'VERIFIABLY_PRESENT'`: The control is in place, and anyone can check this. (e.g. A GitHub ruleset that is visible on the repository's public rules page or rulesets API.)
+- `VERIFIABLY_ABSENT` = `'VERIFIABLY_ABSENT'`: The control is not in place, and anyone can check this. (e.g. The public rulesets do not include it, and the public branch API shows no classic branch protection providing it.)
+- `CLAIMED_PRESENT` = `'CLAIMED_PRESENT'`: The wallet developer states that the control is in place, but this cannot be checked publicly. (e.g. A classic branch protection rule, which only repository admins can see.)
+- `CLAIMED_ABSENT` = `'CLAIMED_ABSENT'`: The wallet developer states that the control is not in place. This cannot be checked publicly, but a developer has no incentive to claim not to have a control, so it is as strong as `VERIFIABLY_ABSENT`.
+- `UNVERIFIABLE` = `'UNVERIFIABLE'`: The wallet developer makes no statement either way, and whether the control is in place cannot be checked publicly.
+
+---
+
 ### Type: `RepositoryChangeControls`
 
 Observable repository-level change controls for the wallet's source repository.
@@ -4167,15 +4179,15 @@ Observable repository-level change controls for the wallet's source repository.
 ```typescript
 type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
+	requiredReview: RepositoryChangeControlState
 	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
+	requiredChecks: RepositoryChangeControlState
 	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
+	forcePushBlocked: RepositoryChangeControlState
 	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
+	branchDeletionBlocked: RepositoryChangeControlState
 	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
+	tagsImmutable: RepositoryChangeControlState
 }>
 ```
 
