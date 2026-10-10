@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
@@ -213,9 +214,9 @@ export const ambire: SoftwareWallet = {
 		displayName: 'Ambire',
 		tableName: 'Ambire',
 		coinspectId: 'ambire',
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-22',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -1180,7 +1181,24 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: supported({
+					ref: [
+						{
+							explanation:
+								'Production Chromium and Safari builds use @lavamoat/webpack with a committed policy, running dependencies in SES compartments under lockdown; the shipped v6.21.10 extension includes the LavaMoat runtime in background.js and main.js.',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/shared.js',
+						},
+						{
+							explanation: 'Committed LavaMoat policy for the webpack build.',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/lavamoat/webpack/policy.json',
+						},
+						{
+							explanation:
+								'LavaMoat is enabled only for production builds where `WEB_ENGINE` is `webkit` (Chromium and Safari); Firefox builds and the in-page and content-script entries run without it.',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',
