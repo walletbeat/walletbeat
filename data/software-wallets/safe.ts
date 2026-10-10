@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { ackee } from '@/data/entities/ackee'
 import { certora } from '@/data/entities/certora'
@@ -22,9 +23,18 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -34,12 +44,15 @@ export const safe: SoftwareWallet = {
 		displayName: 'Safe',
 		tableName: 'Safe',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [nconsigny],
+		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://docs.safe.global/'],
-			repositories: ['https://github.com/safe-fndn'],
+			repositories: [
+				'https://github.com/safe-global/safe-wallet-monorepo',
+				'https://github.com/safe-fndn',
+			],
 			websites: ['https://safe.global'],
 		},
 	},
@@ -111,9 +124,10 @@ export const safe: SoftwareWallet = {
 			walletAppLicense: {
 				ref: [
 					{
-						explanation: 'Safe uses the LGPL-3.0 license for its source code',
+						explanation:
+							'The Safe{Wallet} monorepo (web and mobile apps) is licensed under GPL-3.0.',
 						label: 'Safe License File',
-						url: 'https://github.com/safe-global/safe-wallet-monorepo',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -138,6 +152,11 @@ export const safe: SoftwareWallet = {
 				},
 				{
 					explanation:
+						'The Safe Ecosystem Foundation raised a $100M strategic round led by 1kx in 2022, with Tiger Global, Blockchain Capital and others.',
+					url: 'https://safefoundation.org/blog/gnosis-safe-raises-usd100-million-led-by-1kx-to-unlock-digital-asset',
+				},
+				{
+					explanation:
 						'SAFE tokenomics and governance scope; currently primarily used for SafeDAO treasury resource allocation (e.g., grants).',
 					url: 'https://safefoundation.org/blog/safe-tokenomics',
 				},
@@ -152,7 +171,7 @@ export const safe: SoftwareWallet = {
 				publicOffering: false,
 				selfFunded: false,
 				transparentConvenienceFees: true,
-				ventureCapital: false,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -325,15 +344,97 @@ export const safe: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: {
+					[Variant.BROWSER]: supported<ArtifactSigningDetails>({
+						ref: [
+							{
+								explanation:
+									'Web release tags are GPG-signed by a CI-held key, and the release tarball gets a GitHub build provenance attestation (actions/attest, Sigstore).',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/workflows/web-tag-release.yml',
+							},
+						],
+						publication: 'SIGSTORE_REKOR',
+						signer: 'BUILD_INFRA_IDENTITY',
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Safe{Mobile} is built on the Expo EAS cloud service and signed for the app stores; no signatures or attestations are published.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/apps/mobile/eas.json',
+						},
+					}),
+				},
 				dependencyAgeGate: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
-				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'yarn.lock is committed and CI installs with `yarn install --immutable`; npm packages must be at least 7 days old.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/actions/yarn/action.yml',
+						},
+					],
+				}),
+				dependencySandboxing: notSupportedWithRef({
+					ref: {
+						explanation:
+							'No runtime dependency isolation such as LavaMoat. `.yarnrc.yml` sets `enableScripts: false`, which blocks install scripts but does not sandbox dependencies at runtime.',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.yarnrc.yml',
+					},
+				}),
+				dependencyVulnerabilityScanning: supported({
+					ref: [
+						{
+							explanation:
+								'Dependabot runs weekly for npm and GitHub Actions dependencies, and pull requests merged into protected branches require CodeQL code scanning.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/dependabot.yml',
+						},
+					],
+				}),
+				hasPublicChangelog: {
+					[Variant.BROWSER]: supported({
+						ref: {
+							label: 'Safe{Wallet} releases',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
+						},
+					}),
+					[Variant.MOBILE]: supported({
+						ref: {
+							explanation:
+								'Safe{Mobile} release notes are published with each App Store version (e.g. 1.0.16, 2026-09-29).',
+							url: 'https://apps.apple.com/us/app/safe-mobile/id6748754793',
+						},
+					}),
+				},
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The web release build installs dependencies and injects build-time secrets (API keys) during the build job; mobile builds run on the Expo EAS cloud service.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/workflows/web-tag-release.yml',
+						},
+					],
+				}),
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'Organization rule sets on main, dev, and release branches require a pull request with one approving code-owner review, CodeQL code scanning and signed commits, and block deletion and force-pushes. Tag rule sets block deletion and rewrites of all tags.',
+							url: 'https://api.github.com/repos/safe-global/safe-wallet-monorepo/rules/branches/dev',
+						},
+					],
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+				},
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'No reproducible build process is documented, and WalletScrutiny has no entry for Safe{Wallet}.',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo',
+					},
+				}),
 			},
 		},
 		walletCall: supported({
