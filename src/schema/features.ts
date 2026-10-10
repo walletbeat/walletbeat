@@ -144,7 +144,7 @@ export interface WalletBaseFeatures {
 	privacy: {
 		/**
 		 * Data collection information.
-		 * See /docs/mitmproxy-guide for how to collect this.
+		 * See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 		 */
 		dataCollection: VariantFeature<DataCollection>
 
