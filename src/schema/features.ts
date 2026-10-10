@@ -54,6 +54,7 @@ import type {
 	ArtifactSigning,
 	ArtifactSigningDetails,
 	ArtifactSigningPayload,
+	DependencyAgeGate,
 	DependencyLocking,
 	DependencySandboxing,
 	DependencyVulnerabilityScanning,
@@ -144,7 +145,7 @@ export interface WalletBaseFeatures {
 	privacy: {
 		/**
 		 * Data collection information.
-		 * See /docs/mitmproxy-guide for how to collect this.
+		 * See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 		 */
 		dataCollection: VariantFeature<DataCollection>
 
@@ -261,6 +262,11 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 
 	/**
@@ -356,6 +362,11 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 }
 
@@ -423,6 +434,7 @@ export interface ResolvedFeatures {
 		maintenance: ResolvedFeature<MaintenanceSupport>
 		releaseTransparency: {
 			artifactSigning: ResolvedFeature<ArtifactSigning>
+			dependencyAgeGate: ResolvedFeature<DependencyAgeGate>
 			dependencyLocking: ResolvedFeature<DependencyLocking>
 			dependencySandboxing: ResolvedFeature<DependencySandboxing>
 			dependencyVulnerabilityScanning: ResolvedFeature<DependencyVulnerabilityScanning>
@@ -638,6 +650,15 @@ export function resolveFeatures(
 						features => features.transparency.releaseTransparency.artifactSigning,
 					),
 				),
+				dependencyAgeGate:
+					embeddedFeat(
+						'transparency.releaseTransparency.dependencyAgeGate',
+						features => features.transparency.releaseTransparency.dependencyAgeGate,
+					) ??
+					softwareFeat(
+						'transparency.releaseTransparency.dependencyAgeGate',
+						features => features.transparency.releaseTransparency.dependencyAgeGate,
+					),
 				dependencyLocking: baseFeat(
 					'transparency.releaseTransparency.dependencyLocking',
 					features => features.transparency.releaseTransparency.dependencyLocking,

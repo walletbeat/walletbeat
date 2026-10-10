@@ -149,6 +149,7 @@ export function codeSnippetHighlight() {
 				const tokenLines = highlighter.codeToTokensWithThemes(segment.lines.join('\n'), {
 					lang: /** @type {import('shiki').BundledLanguage | 'text'} */ (language),
 					themes,
+					tokenizeTimeLimit: 0,
 				})
 
 				tokenLines.forEach((lineTokens, lineIndex) => {
