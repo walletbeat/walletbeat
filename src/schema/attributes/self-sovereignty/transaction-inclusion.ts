@@ -41,7 +41,7 @@ function transactionSubmissionEvaluation(
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return ctx.build({
 			outcome: {
-				id: 'no_l2_transaction_inclusion_support',
+				id: `no_l2_transaction_inclusion_support_${supportsL1Broadcast.toLowerCase()}`,
 				rating: Rating.FAIL,
 				displayName: 'No L2 force-inclusion support',
 				shortExplanation: sentence(
