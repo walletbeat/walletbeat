@@ -361,6 +361,7 @@ export const safe: SoftwareWallet = {
 						},
 					}),
 				},
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
