@@ -1041,6 +1041,7 @@ export const metamask: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BUILD_INFRA_IDENTITY',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{

@@ -180,6 +180,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 
 	/**
@@ -247,6 +252,11 @@ type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 }
 ```
@@ -297,6 +307,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
     - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
+    - `dependencyAgeGate` (`ResolvedFeature<DependencyAgeGate>`)
     - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
     - `dependencySandboxing` (`ResolvedFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
@@ -4126,6 +4137,23 @@ type ArtifactSigningDetails = WithRef<ArtifactSigningPayload>
 
 ```typescript
 type ArtifactSigning = Support<ArtifactSigningDetails>
+```
+
+---
+
+### Type: `DependencyAgeGate`
+
+Whether routine dependency updates only pick up dependency releases that are at least a minimum age, so that a compromised release has time to be detected and pulled before the wallet adopts it. One-off updates for security fixes may bypass the minimum age.
+
+To test: look in the wallet's source repository for a minimum release age setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in `.github/dependabot.yml`. Set to `notSupported` if routine updates have no minimum age.
+
+```typescript
+type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
 ```
 
 ---

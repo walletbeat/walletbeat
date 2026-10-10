@@ -893,6 +893,7 @@ export const completedTemplate: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BOTH',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({ ref: refTodo }),
 				dependencySandboxing: supported({ ref: refTodo }),
 				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
