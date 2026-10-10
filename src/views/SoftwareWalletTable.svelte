@@ -7,7 +7,9 @@
 	import { softwareLadders } from '@/schema/ladders'
 	import WalletTable from './WalletTable.svelte'
 
-	const wallets = Object.values(ratedSoftwareWallets)
+	const wallets = Object.values(ratedSoftwareWallets).filter(
+		wallet => wallet.metadata.discontinued === undefined,
+	)
 
 
 	// Props
