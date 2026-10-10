@@ -5,6 +5,7 @@ import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -208,11 +209,11 @@ export const pillarx: SoftwareWallet = {
 								url: 'https://api.github.com/repos/pillarwallet/x/rules/branches/main',
 							},
 						],
-						branchDeletionBlocked: true,
-						forcePushBlocked: true,
-						requiredChecks: false,
-						requiredReview: true,
-						tagsImmutable: false,
+						branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+						forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+						requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+						requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+						tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 					},
 					// Mobile repo branches are protected, but details are not visible to non-admins.
 					[Variant.MOBILE]: null,
