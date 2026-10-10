@@ -20,7 +20,7 @@ describe('rewriteUrl', () => {
 	})
 
 	it('maps a src/pages markdown file to its site route', () => {
-		expect(rewriteUrl('/src/pages/about/about.md', '/')).toEqual({
+		expect(rewriteUrl('/src/pages/about/_about.md', '/')).toEqual({
 			url: '/about/',
 			matched: true,
 		})

@@ -482,6 +482,7 @@ export const daimo: SoftwareWallet = {
 						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
 					},
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
