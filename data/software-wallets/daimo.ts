@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { SoftwareWallet } from '@/data/software-wallets'
@@ -26,7 +27,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
@@ -47,9 +53,9 @@ export const daimo: SoftwareWallet = {
 		displayName: 'Daimo',
 		tableName: 'Daimo',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		pseudonymType: {
 			plural: 'Daimo usernames',
 			singular: 'Daimo username',
@@ -374,7 +380,16 @@ export const daimo: SoftwareWallet = {
 		},
 		profile: WalletProfile.PAYMENTS,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: null,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Recovery is by adding backup keys held by the user (passkey, security key or seed phrase) to the onchain account; there is no guardian or vendor-assisted recovery.',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts',
+					},
+				}),
+			},
 			bugBountyProgram: null,
 			duressResistance: null,
 			hardwareWalletSupport: {
@@ -460,15 +475,37 @@ export const daimo: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Builds were made and signed on the Expo EAS service and distributed through the app stores; no signatures or release artifacts were published.',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+					},
+				}),
 				dependencyAgeGate: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'package-lock.json is committed and the CI and release workflows install with `npm ci`.',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+						},
+					],
+				}),
+				dependencySandboxing: notSupported,
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'Production builds run on the Expo EAS cloud service with `eas-version: latest`, fetching tools and dependencies during the build.',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+						},
+					],
+				}),
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: notSupported,
