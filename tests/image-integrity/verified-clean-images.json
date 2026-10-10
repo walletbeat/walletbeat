@@ -47,6 +47,10 @@
 		"hash": "e9e75fcfc51c870acf2b1f4cedf4cb3bb0d1cdad9c07760a01c8355ee2a59e6b",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/anon.svg": {
+		"hash": "a9f1d0baaccf6c3ea3216f67da4fac14b69a8193b469185fdc7b9c0b8f7c051e",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/apple.svg": {
 		"hash": "f856b2270608a00928cc180b28b30d0472c3dcc7ece2dfd08663a351bc127f89",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -169,6 +173,10 @@
 	},
 	"public/images/wallets/ambire.svg": {
 		"hash": "7d158b1cd8c4bfcf6d83ffe6913e54a59764666096b13de91fa0a878aff515d6",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/anon-wallet.svg": {
+		"hash": "a9f1d0baaccf6c3ea3216f67da4fac14b69a8193b469185fdc7b9c0b8f7c051e",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/base-app.svg": {
