@@ -141,10 +141,12 @@
 	filter: Filter<typeof items[number]>,
 	count: number
 )}
-	<span
-		data-icon
-		aria-hidden="true"
-	>{@html filter.icon}</span>
+	{#if filter.icon}
+		<span
+			data-icon
+			aria-hidden="true"
+		>{@html filter.icon}</span>
+	{/if}
 
 	<span
 		class="label"

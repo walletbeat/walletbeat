@@ -662,7 +662,7 @@
 
 <style>
 	.container {
-		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
+		--table-backgroundColor: light-dark(#fdfdfd, var(--background-secondary));
 		--table-outerBorderColor: var(--border-color);
 		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
 		--table-outerBorderWidth: 1px;
