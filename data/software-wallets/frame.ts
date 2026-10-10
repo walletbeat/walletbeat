@@ -255,6 +255,7 @@ export const frame: SoftwareWallet = {
 						signer: 'DEVELOPER_KEY',
 					}),
 				},
+				dependencyAgeGate: null,
 				dependencyLocking: {
 					[Variant.BROWSER]: notSupportedWithRef({
 						ref: {

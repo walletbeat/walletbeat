@@ -256,7 +256,6 @@
 	[data-stage-criterion-rating] {
 		&[data-stage-criterion-rating="EXEMPT"] {
 			text-decoration: line-through;
-			opacity: 0.6;
 		}
 	}
 </style>
