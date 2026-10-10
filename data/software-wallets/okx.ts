@@ -9,6 +9,11 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -42,7 +47,7 @@ export const okx: SoftwareWallet = {
 		coinspectId: 'okx',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			extensions: [
 				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -144,7 +149,7 @@ export const okx: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://web3.okx.com/help/okx-web3-ecosystem-privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -190,7 +195,77 @@ export const okx: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'The browser extension connects to Keystone by scanning its QR code with the camera.',
+							url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
+						},
+						{
+							explanation:
+								'OneKey documents that the OKX Wallet extension only adds OneKey hardware wallets over a USB cable.',
+							url: 'https://help.onekey.so/en/articles/11461103-how-to-use-okx-web3-wallet-with-onekey-hardware-wallets',
+						},
+						{
+							explanation:
+								'Trezor lists OKX Wallet among the desktop wallets that work with Trezor devices through Trezor Connect.',
+							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/trezor-connect',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'The app connects to Keystone by scanning its QR code, and to other hardware wallets over Bluetooth.',
+							urls: [
+								{
+									label: 'Connect Keystone to OKX Wallet',
+									url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
+								},
+								{
+									label: 'Manage your wallet in the app',
+									url: 'https://web3.okx.com/help/how-do-i-manage-my-wallet-app',
+								},
+							],
+						},
+						{
+							explanation:
+								'OneKey documents that the OKX mobile app only adds OneKey hardware wallets over Bluetooth.',
+							url: 'https://help.onekey.so/en/articles/11461103-how-to-use-okx-web3-wallet-with-onekey-hardware-wallets',
+						},
+						{
+							explanation:
+								'OKX announced in February 2023 that the iOS and Android apps connect to Ledger hardware wallets over Bluetooth.',
+							url: 'https://www.coincarp.com/exchange/announcement/okex-13317066449933-connecting-ledger-hardware-wallet-to-okx-wallet-is-now-available-in-app/',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+					},
+				},
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
