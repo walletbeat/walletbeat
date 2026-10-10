@@ -26,6 +26,9 @@ export const ipfsRedirectsFileStatuses: ReadonlySet<number> = new Set([
 	200, 301, 302, 303, 307, 308, 404, 410, 451,
 ])
 
+/** Site page that gateways serve, with status 404, for paths that don't exist. */
+export const IPFS_NOT_FOUND_PAGE = '/404.html'
+
 /** Maximum size of a `_redirects` file that gateways will parse. */
 export const IPFS_REDIRECTS_MAX_BYTES = 64 * 1024
 
@@ -124,8 +127,15 @@ function astroRedirectToIpfsRule(route: IntegrationResolvedRoute): IpfsRedirectR
 	}
 }
 
-function formatIpfsRedirectsFile(rules: IpfsRedirectRule[]): string {
-	return rules.map(rule => `${rule.from} ${rule.to} ${rule.status}\n`).join('')
+function formatIpfsRedirectsFile(rules: IpfsRedirectRule[], notFoundPage: string | null): string {
+	const lines = rules.map(rule => `${rule.from} ${rule.to} ${rule.status}`)
+
+	// Gateways apply the first matching rule, so the catch-all goes last.
+	if (notFoundPage !== null) {
+		lines.push(`/* ${notFoundPage} 404`)
+	}
+
+	return lines.map(line => `${line}\n`).join('')
 }
 
 /** Removes `dir` and its ancestors up to (excluding) `root` while they are empty. */
@@ -147,7 +157,8 @@ async function removeEmptyDirectories(dir: string, root: string): Promise<void> 
  *
  * Writes the redirects to `_redirects` and removes the meta-refresh pages
  * that Astro generates for them, because gateways only apply `_redirects`
- * rules to paths that do not exist in the site's content.
+ * rules to paths that do not exist in the site's content. When the site has a
+ * 404 page, a final catch-all rule makes gateways serve it for unknown paths.
  */
 export function ipfsRedirects(): AstroIntegration {
 	let redirectRoutes: IntegrationResolvedRoute[] = []
@@ -159,10 +170,6 @@ export function ipfsRedirects(): AstroIntegration {
 				redirectRoutes = routes.filter(route => route.type === 'redirect')
 			},
 			'astro:build:done': async ({ dir, assets, logger }) => {
-				if (redirectRoutes.length === 0) {
-					return
-				}
-
 				const distDir = path.resolve(fileURLToPath(dir))
 				const redirectsFile = path.join(distDir, IPFS_REDIRECTS_FILENAME)
 
@@ -183,8 +190,16 @@ export function ipfsRedirects(): AstroIntegration {
 					}
 				}
 
-				await writeFile(redirectsFile, formatIpfsRedirectsFile(rules))
-				logger.info(`Wrote ${rules.length} rules to ${IPFS_REDIRECTS_FILENAME}.`)
+				const notFoundPage = existsSync(path.join(distDir, IPFS_NOT_FOUND_PAGE))
+					? IPFS_NOT_FOUND_PAGE
+					: null
+
+				if (rules.length === 0 && notFoundPage === null) {
+					return
+				}
+
+				await writeFile(redirectsFile, formatIpfsRedirectsFile(rules, notFoundPage))
+				logger.info(`Wrote ${rules.length} redirect rules to ${IPFS_REDIRECTS_FILENAME}.`)
 			},
 		},
 	}
