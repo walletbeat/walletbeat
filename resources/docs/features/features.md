@@ -4221,6 +4221,16 @@ type RepositoryChangeControls = WithRef<{
 
 ---
 
+### Type: `RepositoryChangeControl`
+
+The name of an individual control in `RepositoryChangeControls`.
+
+```typescript
+type RepositoryChangeControl = Exclude<keyof RepositoryChangeControls, 'ref'>
+```
+
+---
+
 ## `src/schema/features/transparency/reputation.ts`
 
 ### Enum: `ReputationType`
