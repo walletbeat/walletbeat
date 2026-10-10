@@ -1,3 +1,4 @@
+import { eip7702 } from '@/data/eips/eip-7702'
 import {
 	type Attribute,
 	type Evaluation,
@@ -7,8 +8,12 @@ import {
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
+import { eipMarkdownLink } from '@/schema/eips'
 import {
 	BuiltInSwapDefaultApprovalBehavior,
+	type DelegationRevocation,
+	DelegationRevocationScope,
+	type DelegationRevocationSupport,
 	hasBuiltInSwap,
 	type PermissionsManagementSupport,
 	SpendingApprovalsControl,
@@ -233,18 +238,100 @@ function approvalsManagementEvaluation(
 	}
 }
 
-function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport): Evaluation {
+/**
+ * Evaluates whether the user can see and remove the account's EIP-7702
+ * delegation from within the wallet.
+ */
+function delegationRevocationEvaluation(
+	ctx: EvaluationContext,
+	delegationRevocation: DelegationRevocation,
+): Evaluation {
+	const { revocation, showsCurrentDelegate } = delegationRevocation
+
+	if (revocation === DelegationRevocationScope.CANNOT_REVOKE) {
+		return ctx.build({
+			outcome: {
+				id: 'cannot_revoke_delegation',
+				rating: Rating.FAIL,
+				displayName: 'Cannot revoke account delegation',
+				shortExplanation: sentence(
+					"{{WALLET_NAME}} does not let you revoke your account's EIP-7702 delegation.",
+				),
+			},
+			details: paragraph(
+				"{{WALLET_NAME}} provides no way to remove your account's EIP-7702 delegation once it is set.",
+			),
+			impact: paragraph(
+				'If your account is delegated to a malicious or buggy contract, you cannot take back control of it from {{WALLET_NAME}}.',
+			),
+			howToImprove: paragraph(
+				"{{WALLET_NAME}} should let users revoke their account's EIP-7702 delegation, whichever contract it points to.",
+			),
+		})
+	}
+
+	if (revocation === DelegationRevocationScope.ANY_DELEGATE_CONTRACT && showsCurrentDelegate) {
+		return ctx.build({
+			outcome: {
+				id: 'can_inspect_and_revoke_delegation',
+				rating: Rating.PASS,
+				displayName: 'Can inspect and revoke account delegation',
+				shortExplanation: sentence(
+					"{{WALLET_NAME}} lets you inspect and revoke your account's EIP-7702 delegation.",
+				),
+			},
+			details: paragraph(
+				'{{WALLET_NAME}} shows which contract your account is delegated to and lets you revoke the delegation, including one set by another wallet or app.',
+			),
+		})
+	}
+
+	return ctx.build({
+		outcome: {
+			id: 'partial_delegation_revocation',
+			rating: Rating.PARTIAL,
+			displayName: 'Limited account delegation revocation',
+			shortExplanation: sentence(
+				"{{WALLET_NAME}} only partially lets you inspect and revoke your account's EIP-7702 delegation.",
+			),
+		},
+		details: paragraph(
+			revocation === DelegationRevocationScope.OWN_DELEGATE_CONTRACT_ONLY
+				? '{{WALLET_NAME}} can only revoke a delegation to its own delegate contract, not one set by another wallet or app.'
+				: '{{WALLET_NAME}} can revoke any delegation, but does not show which contract your account is currently delegated to.',
+		),
+		impact: paragraph(
+			'If your account is delegated to a malicious contract, {{WALLET_NAME}} may not help you notice or remove it.',
+		),
+		howToImprove: paragraph(
+			"{{WALLET_NAME}} should show the account's current delegate contract and let users revoke any delegation.",
+		),
+	})
+}
+
+function evaluate(
+	ctx: EvaluationContext,
+	control: PermissionsManagementSupport,
+	delegationRevocation: DelegationRevocationSupport | null,
+): Evaluation {
 	const { approvalsManagement, builtInSwapApprovals } = control
 
 	const approvalsEvaluation = approvalsManagementEvaluation(ctx, approvalsManagement)
 
-	if (!hasBuiltInSwap(builtInSwapApprovals)) {
-		return approvalsEvaluation
+	const tokenEvaluation = hasBuiltInSwap(builtInSwapApprovals)
+		? pickWorstRating([swapApprovalsEvaluation(ctx, builtInSwapApprovals), approvalsEvaluation])
+		: approvalsEvaluation
+
+	if (delegationRevocation === null || delegationRevocation === 'EIP_7702_NOT_SUPPORTED') {
+		return tokenEvaluation
 	}
 
-	const swapEvaluation = swapApprovalsEvaluation(ctx, builtInSwapApprovals)
+	ctx.addRef(delegationRevocation)
 
-	return pickWorstRating([swapEvaluation, approvalsEvaluation])
+	return pickWorstRating([
+		delegationRevocationEvaluation(ctx, delegationRevocation),
+		tokenEvaluation,
+	])
 }
 
 export const permissionsManagement: Attribute = {
@@ -287,6 +374,16 @@ export const permissionsManagement: Attribute = {
 		user can edit the amount down before signing, even if the wallet
 		otherwise supports inspecting and revoking approvals well.
 
+		Wallets that can sign ${eipMarkdownLink(eip7702)} authorizations are
+		also evaluated on whether users can see which contract their account
+		is delegated to, and remove that delegation from within the wallet.
+		This includes a delegation set by another wallet or app, so that users
+		can take back control of their account after delegating it to a
+		malicious contract. Revoking any delegation while showing the current
+		delegate contract passes. Revoking only the wallet's own delegation,
+		or not showing the current delegate contract, is a partial rating.
+		Having no way to revoke the delegation fails.
+
 		As Account Abstraction becomes more prevalent, this methodology
 		will also grow to encompass the management of more complex account permissions.
 	`),
@@ -308,6 +405,7 @@ export const permissionsManagement: Attribute = {
 					}),
 					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 				},
+				null,
 			),
 		),
 		partial: exampleRating(
@@ -323,6 +421,7 @@ export const permissionsManagement: Attribute = {
 					}),
 					builtInSwapApprovals: 'NO_BUILT_IN_SWAP',
 				},
+				null,
 			),
 		),
 		fail: exampleRating(
@@ -340,6 +439,7 @@ export const permissionsManagement: Attribute = {
 					}),
 					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED,
 				},
+				null,
 			),
 		),
 	},
@@ -354,7 +454,7 @@ export const permissionsManagement: Attribute = {
 
 		ctx.addRef(feature)
 
-		return evaluate(ctx, feature)
+		return evaluate(ctx, feature, ctx.features.selfSovereignty.delegationRevocation)
 	},
 	aggregate: pickWorstRating,
 }

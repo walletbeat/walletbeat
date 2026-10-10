@@ -422,6 +422,7 @@ export const baseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			// Base App exposes in-app ERC-20 token approval management via a "Token
 			// Approvals" screen (verified in-app, Base App v29.94.123). Users can
 			// inspect and revoke individual approvals directly in the wallet UI,

@@ -276,6 +276,7 @@ export const safe: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
