@@ -59,7 +59,7 @@ function evaluateTransactionBatching(
 				token approval transactions need to be submitted separately from
 				the transactions that spend these tokens.
 			`),
-			howToImprove: sentence(`
+			howToImprove: mdSentence(`
 				{{WALLET_NAME}} should support smart accounts, such as
 				${eipMarkdownLink(eip7702)} accounts.
 			`),
@@ -83,7 +83,7 @@ function evaluateTransactionBatching(
 				For example, this means token approval transactions need to be
 				submitted separately from the transactions that spend these tokens.
 			`),
-			howToImprove: sentence(`
+			howToImprove: mdSentence(`
 				{{WALLET_NAME}} should implement ${eipMarkdownLinkAndTitle(eip5792)}.
 			`),
 		})
