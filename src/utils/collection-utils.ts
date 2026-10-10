@@ -301,9 +301,10 @@ function parentUrl(urlPrefix: `/${string}`, s: string | undefined): string | und
 		return undefined
 	}
 
-	return `${urlPrefix}/${s
+	const parentSegments = s
 		.split('/')
 		.slice(0, -1)
 		.filter(p => p !== '')
-		.join('/')}/`
+
+	return [urlPrefix, ...parentSegments].join('/') + '/'
 }
