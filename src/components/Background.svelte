@@ -128,17 +128,12 @@
 		left: -50vw;
 		z-index: var(--blob-z-index);
 
-		@media (prefers-reduced-motion: reduce) {
-			& * {
-				animation: none;
-			}
-		}
-
 		@media (max-width: 600px) and (pointer: coarse) {
 			display: none;
 		}
 	}
 
+	/* Each blob layer animates between its `from` and `to` values. */
 	.background-blob .opacity {
 		animation: blob-opacity var(--opacity-duration) var(--transition-blob) 0s alternate infinite;
 	}
@@ -221,6 +216,15 @@
 		to {
 			filter: hue-rotate(var(--hue-to));
 		}
+	}
+
+	/*
+	 * The blob animations stay paused on their first frame. A moving
+	 * full-viewport background has to be re-composited on every frame, together
+	 * with every `backdrop-filter` above it. Remove this rule to let the blobs drift.
+	 */
+	.background-blob :is(.opacity, .translation-x, .translation-y, .rotation, .scale-x, .scale-y, .hue) {
+		animation-play-state: paused;
 	}
 
 	.background-blob .blob {
