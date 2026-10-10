@@ -3,6 +3,7 @@
 import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { walletOgImage } from '@/utils/wallet-og-image'
 
 // Routes
 export const prerender = true
@@ -51,6 +52,7 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 			'wallet',
 		],
 		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
+		image: walletOgImage(wallet),
 	}}
 	preloadComplexIcons
 >
