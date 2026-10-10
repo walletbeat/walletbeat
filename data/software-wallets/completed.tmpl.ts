@@ -835,6 +835,9 @@ export const completedTemplate: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: supported({
+			ref: refTodo,
+		}),
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
