@@ -25,6 +25,7 @@
 	import { AccountType } from '@/schema/features/account-support'
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { Variant } from '@/schema/variants'
+	import type { WalletTableFocus } from '@/types/wallet-table'
 	import { isRatedEvaluationTreeGroup, type RatedWallet } from '@/schema/wallet'
 
 
@@ -37,6 +38,7 @@
 		wallets,
 		attributeTree,
 		summaryVisualization = SummaryVisualization.Stage,
+		focus,
 	}: {
 		tableId?: string,
 		title?: string
@@ -45,7 +47,28 @@
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
 		summaryVisualization?: SummaryVisualization
+		/**
+		 * Rank by one attribute group instead of the overall rating, with that
+		 * group's attributes expanded. `summaryHref` links back to the overview.
+		 */
+		focus?: WalletTableFocus
 	} = $props()
+
+	const focusedAttributeGroup = $derived(
+		focus ? Object.values(attributeTree).find(group => group.id === focus.attributeGroupId) ?? null : null
+	)
+
+	const focusedGroupScore = (wallet: RatedWallet<_AttributeGroupId>) => {
+		const evalGroup = focusedAttributeGroup ? wallet.overall[focusedAttributeGroup.id] : undefined
+
+		return (evalGroup && focusedAttributeGroup ? calculateAttributeGroupScore(focusedAttributeGroup, evalGroup)?.score : null) ?? -1
+	}
+
+	// Ascending; unrated groups sort lowest, ties fall back to the overall ranking.
+	const compareFocusedGroup = (walletA: RatedWallet<_AttributeGroupId>, walletB: RatedWallet<_AttributeGroupId>) => (
+		focusedGroupScore(walletA) - focusedGroupScore(walletB)
+		|| walletStageThenScoreCompare(walletA, walletB)
+	)
 
 	const walletListUiId = $props.id()
 	const walletListSelectId = `wallet-list-select-${walletListUiId}`
@@ -438,6 +461,13 @@
 			<div class="title-group" data-column="gap-1">
 				<h2>{title}</h2>
 
+				{#if focusedAttributeGroup && focus}
+					<p class="title-focus">
+						Ranked by <strong>{focusedAttributeGroup.displayName}</strong>, with its attributes
+						shown. <a href={focus.summaryHref}>See all ratings</a>
+					</p>
+				{/if}
+
 				{#if titleDisclaimer}
 					<p class="title-disclaimer">{titleDisclaimer}</p>
 				{/if}
@@ -768,7 +798,13 @@
 								},
 
 								sort: {
+									isDefault: focusedAttributeGroup?.id === attrGroup.id,
 									defaultDirection: SortDirection.Descending,
+									// When this group sets the ranking, break ties the same way the overall rating does.
+									compare: focusedAttributeGroup?.id === attrGroup.id ?
+										(_scoreA, _scoreB, walletA, walletB) => compareFocusedGroup(walletA, walletB)
+									:
+										undefined,
 								},
 
 								align: ColumnAlignment.Center,
@@ -787,7 +823,7 @@
 											},
 										}))
 								),
-								isDefaultExpanded: false,
+								isDefaultExpanded: focusedAttributeGroup?.id === attrGroup.id,
 							}))
 					)
 
@@ -833,7 +869,7 @@
 									value: wallet => getWalletScore(wallet),
 
 									sort: {
-										isDefault: true,
+										isDefault: !focusedAttributeGroup,
 										defaultDirection: SortDirection.Descending,
 										// Stages always take precedence over attribute scores when sorting:
 										// a stage 1 wallet should never appear below a stage 0 wallet
@@ -847,12 +883,12 @@
 									align: ColumnAlignment.Center,
 
 									subcolumns: attrGroupColumns,
-									isDefaultExpanded: false,
+									isDefaultExpanded: !!focusedAttributeGroup,
 								}
 							:
 								{
 									...attrGroupColumns[0],
-									isDefaultExpanded: false,
+									isDefaultExpanded: !!focusedAttributeGroup,
 								}
 						),
 					] as Column<RatedWallet<_AttributeGroupId>>[]
@@ -1633,7 +1669,7 @@
 
 	<!-- Mobile wallet cards (shown only on mobile, replaces table) -->
 	<div class="mobile-wallet-list">
-		{#each filteredWallets.toSorted((walletA, walletB) => -walletStageThenScoreCompare(walletA, walletB)) as wallet, i}
+		{#each filteredWallets.toSorted((walletA, walletB) => -(focusedAttributeGroup ? compareFocusedGroup(walletA, walletB) : walletStageThenScoreCompare(walletA, walletB))) as wallet, i}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 			{@const score = getWalletScore(wallet)}
 			{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)) : null}
@@ -1834,6 +1870,11 @@
 				}
 			}
 		}
+	}
+
+	.title-focus {
+		color: var(--text-secondary);
+		font-size: 0.95rem;
 	}
 
 	.title-disclaimer {
@@ -2289,5 +2330,8 @@
 		justify-content: center;
 		zoom: 0.42;
 		content-visibility: auto;
+		/* Reserve the pie's rendered height while it is skipped, so cards below don't shift when it renders:
+		   2 * padding + 2 * (radius + outer level offset) = 2 * 8 + 2 * (100 + 0.45 * 100) */
+		contain-intrinsic-size: auto 306px;
 	}
 </style>

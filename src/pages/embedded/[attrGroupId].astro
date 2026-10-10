@@ -38,7 +38,7 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 
 <Layout
 	metadata={{
-		title: `${attrGroup.displayName} - Walletbeat`,
+		title: `Ethereum Embedded Wallets ${attrGroup.displayName} - Walletbeat`,
 		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
 		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
@@ -46,7 +46,11 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
+		<EmbeddedWalletTable
+			client:visible
+			title='Embedded Wallets'
+			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/embedded/summary/' }}
+		/>
 	</main>
 </Layout>
 

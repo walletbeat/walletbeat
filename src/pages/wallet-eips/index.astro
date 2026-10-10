@@ -3,7 +3,11 @@ import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
 import WalletEipList from '@/components/WalletEipList.svelte'
-import { eips } from 'data/eips'
+import { eips as trackedEips } from 'data/eips'
+import { eipDirectoryEntries } from '@/utils/eip-directory'
+
+// Tracked EIPs with the wallets implementing them, computed at build time.
+const eips = eipDirectoryEntries(trackedEips)
 ---
 
 <Layout
