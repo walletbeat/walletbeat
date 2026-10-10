@@ -24,9 +24,14 @@ import {
 	SpendingApprovalsControl,
 } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
@@ -120,13 +125,7 @@ export const okx: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
@@ -417,18 +416,21 @@ export const okx: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				// App-store and extension-store signing only; no published signatures or release artifacts.
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				// No public changelog found for the app or extension beyond store release notes.
 				hasPublicChangelog: notSupported,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				// Only the signing SDKs are open source; the apps are not: "Build cannot be done because the source code is not publicly available."
-				// Source: https://walletscrutiny.com/android/com.okx.wallet/
-				reproducibleBuilds: notSupported,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Only the signing SDKs are open source; the apps are not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/android/com.okx.wallet/',
+					},
+				}),
 			},
 		},
 		walletCall: supported({
