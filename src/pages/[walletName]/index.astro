@@ -9,6 +9,7 @@ import {
 } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { imageSizesForWallet } from '@/utils/image-size-store'
 import { walletOgImage } from '@/utils/wallet-og-image'
 
 // Routes
@@ -35,6 +36,7 @@ if (walletEntry === undefined) {
 
 const [walletDataName, walletData] = walletEntry
 const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
+const imageSizes = await imageSizesForWallet(walletDataName, walletData)
 const walletOfType = walletOfTypeBySlug(walletName)
 
 if (walletOfType === undefined) {
@@ -74,6 +76,7 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 			{walletOfType}
 			hardwareModels={allHardwareModels}
 			codeSnippets={codeSnippets}
+			imageSizes={imageSizes}
 			client:idle
 		/>
 	</main>
