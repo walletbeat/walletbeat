@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -10,7 +11,12 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -23,9 +29,9 @@ export const nufi: SoftwareWallet = {
 		displayName: 'NuFi',
 		tableName: 'NuFi',
 		coinspectId: 'nu-fi',
-		contributors: [gabrielkerekes, mattmatt],
+		contributors: [gabrielkerekes, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-08-11',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://nufi.gitbook.io/'],
 			extensions: [
@@ -134,7 +140,14 @@ export const nufi: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						"No bug bounty or disclosure policy: NuFi's `/.well-known/security.txt` returns 404, no bug bounty platform lists a NuFi program, and the terms have no disclosure clause.",
+					label: 'NuFi terms and conditions',
+					url: 'https://nu.fi/terms-and-conditions',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -164,7 +177,9 @@ export const nufi: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			// No public independent audit of NuFi's wallet code found (nu.fi, support.nu.fi, changelog, GitHub, web search).
+			// Source: https://nu.fi/features/security
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
@@ -203,15 +218,23 @@ export const nufi: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
-				dependencySandboxing: null,
+				// To retest: search the shipped extension bundle for LavaMoat or SES markers.
+				dependencySandboxing: notSupported,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: supported({
+					ref: {
+						explanation:
+							'The public changelog lags the shipped version: its latest entry is 31.0.0 from December 2025, while the extension ships 35.2.0.',
+						label: 'NuFi changelog',
+						url: 'https://support.nu.fi/support/solutions/articles/80001016927-changelog',
+					},
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
