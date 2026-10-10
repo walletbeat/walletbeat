@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
@@ -89,9 +90,9 @@ export const rabby: SoftwareWallet = {
 		displayName: 'Rabby',
 		tableName: 'Rabby',
 		coinspectId: 'rabby-wallet',
-		contributors: [polymutex, nconsigny, mattmatt, ren2140],
+		contributors: [polymutex, nconsigny, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-31',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/android/app/src/main/AndroidManifest.xml',
@@ -1314,7 +1315,26 @@ export const rabby: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension has no LavaMoat or SES dependency in its build, and the shipped v0.94.11 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/package.json',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app has no LavaMoat, SES or other dependency isolation configured.',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/package.json',
+							},
+						],
+					}),
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/RabbyHub/Rabby/releases',
