@@ -204,7 +204,7 @@ export const defaultNavigationItems = [
 	{
 		id: 'hardware-wallets',
 		title: 'Hardware Wallets',
-		href: '/hww/summary/',
+		href: '/hardware-wallets/summary/',
 		icon: 'wallet_hardware',
 		children: [
 			{
@@ -220,7 +220,7 @@ export const defaultNavigationItems = [
 							title: attrGroup.displayName,
 							icon: attrGroup.icon,
 							iconVariant: 'emoji' as const,
-							href: `/hww/${attrGroup.id}/`,
+							href: `/hardware-wallets/${attrGroup.id}/`,
 						}),
 					),
 				],
