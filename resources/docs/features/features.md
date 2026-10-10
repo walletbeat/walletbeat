@@ -2416,7 +2416,8 @@ Not visible in the UI — identify by inspecting the wallet's smart contract sou
 - `FRESH_CRYPTO_LIB` = `'FRESH_CRYPTO_LIB'`: FreshCryptoLib — a P-256 verification library.
 - `DAIMO_P256_VERIFIER` = `'DAIMO_P256_VERIFIER'`: Daimo's P-256 verifier contract.
 - `OPEN_ZEPPELIN_P256_VERIFIER` = `'OPEN_ZEPPELIN_P256_VERIFIER'`: OpenZeppelin's P-256 verifier.
-- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: WebAuthn.sol — a Solidity library for onchain WebAuthn verification.
+- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: Base's WebAuthn.sol (https://github.com/base/webauthn-sol) — a Solidity library for onchain WebAuthn verification. For Solady's WebAuthn.sol, use SOLADY_WEB_AUTHN instead.
+- `SOLADY_WEB_AUTHN` = `'SOLADY_WEB_AUTHN'`: Solady's WebAuthn.sol (https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol), which verifies P-256 signatures with Solady's P256.sol.
 - `OTHER` = `'OTHER'`: A verifier library not listed above. Set `libraryUrl` to the repository or documentation URL.
 
 ---
