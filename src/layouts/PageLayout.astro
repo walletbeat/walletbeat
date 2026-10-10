@@ -21,9 +21,12 @@ type Props = {
 
 	/** Link to the parent page, shown above the title. */
 	parentUrl?: string
+
+	/** Use a wider column, for tools and multi-pane content. */
+	wide?: boolean
 }
 
-const { metadata, title = metadata.title, description, parentUrl } = Astro.props
+const { metadata, title = metadata.title, description, parentUrl, wide = false } = Astro.props
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
@@ -34,7 +37,12 @@ import { defaultNavigationItems } from '@/constants/navigation'
 <Layout metadata={metadata}>
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-column='gap-8'
+		data-page-width={wide ? 'wide' : undefined}
+	>
 		<header id='top' data-scroll-item='inline-detached padding-match-start' data-column='gap-4'>
 			{
 				parentUrl && (
@@ -61,6 +69,10 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			--scrollItem-inlineDetached-maxSize: 52rem;
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		&[data-page-width='wide'][data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 76rem;
 		}
 
 		line-height: 1.4;

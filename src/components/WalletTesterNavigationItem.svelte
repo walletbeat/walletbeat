@@ -50,8 +50,16 @@
 
 <style>
 	.sidebar-item {
+		/* The global button rule lays children out in a row; stack title over description. */
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.2rem;
 		width: 100%;
 		padding: 0.75rem 1rem;
+		font-size: 1rem;
+		line-height: 1.4;
+		border: 1px solid transparent;
 		background-color: transparent;
 		border: none;
 		border-radius: 0.5rem;
@@ -91,7 +99,6 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
-		margin-bottom: 0.25rem;
 	}
 
 	.sidebar-item-title {
