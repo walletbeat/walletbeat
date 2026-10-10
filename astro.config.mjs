@@ -7,11 +7,12 @@ import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig, fontProviders } from 'astro/config'
 
-import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
+import { ipfsRedirects } from './src/utils/astro-ipfs-redirects'
 import {
 	createStripFirstH1Plugin,
 	createUrlRewritePlugin,
 } from './src/utils/satteri-url-rewrite-plugin'
+import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
 
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
@@ -23,8 +24,8 @@ export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
 	site: process.env.SITE_URL ?? 'https://wallet.page', // Set your production site URL here
 	output: 'static',
-	// Legacy `/hww/` and `/embedded/` wallet type URLs; static output turns these
-	// into meta-refresh pages.
+	// Legacy `/hww/` and `/embedded/` wallet type URLs. `ipfsRedirects()` serves
+	// these as HTTP redirects on IPFS gateways.
 	redirects: {
 		'/hww/summary': '/hardware-wallets/summary',
 		'/hww/[attrGroupId]': '/hardware-wallets/[attrGroupId]',
@@ -46,6 +47,7 @@ export default defineConfig({
 								}),
 							]
 						: []),
+					ipfsRedirects(),
 				],
 	),
 	vite: {
