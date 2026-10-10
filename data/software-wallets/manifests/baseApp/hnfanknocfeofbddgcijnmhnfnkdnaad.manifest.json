@@ -1,0 +1,50 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"name": "Coinbase Wallet extension",
+	"description": "Coinbase Wallet extension is the safest and easiest way to use crypto apps in your browser.",
+	"manifest_version": 3,
+	"version": "3.149.0",
+	"minimum_chrome_version": "102",
+	"permissions": ["activeTab", "alarms", "scripting", "storage"],
+	"host_permissions": [
+		"https://*/*",
+		"http://localhost/*",
+		"http://127.0.0.1/*",
+		"http://0.0.0.0/*"
+	],
+	"icons": {
+		"16": "prod/icon16.png",
+		"48": "prod/icon48.png",
+		"128": "prod/icon128.png"
+	},
+	"action": {
+		"default_icon": {
+			"16": "prod/icon16.png",
+			"48": "prod/icon48.png",
+			"128": "prod/icon128.png"
+		},
+		"default_popup": "index.html?inPageRequest=false"
+	},
+	"background": {
+		"service_worker": "service.js"
+	},
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"checkExtensionContext.txt",
+				"requestProvider.js",
+				"requestSolanaProvider.js",
+				"requestRelay.js",
+				"siteWarning.html",
+				"forceUpdate.html",
+				"forceUpdate.js",
+				"js/web-controller-sdk.js",
+				"js/web-view-sdk.js"
+			],
+			"matches": ["*://*/*"]
+		}
+	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
+	}
+}
