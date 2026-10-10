@@ -59,71 +59,76 @@
 
 				<div
 					data-scroll-item="inline-detached padding-match-end"
-					data-column="gap-5"
+					data-column="gap-0"
 					style:--accent={stageColor}
 				>
-					{#if isTypographicContent(stage.description)}
-						<p class="stage-description">
-							<Typography content={stage.description} />
-						</p>
-					{/if}
-
-					{#each stage.criteriaGroups as criteriaGroup (criteriaGroup.id)}
-						<details
-							open
-							data-card="padding-5 radius-4"
-						>
-							<summary>
-								<div data-row="wrap">
-									<h3
-										class="criteria-group-title"
-										data-row-item="flexible basis-2"
-									>
-										{#if isTypographicContent(criteriaGroup.description)}
-											<Typography content={criteriaGroup.description} />
-										{:else}
-											{criteriaGroup.id}
-										{/if}
-									</h3>
-								</div>
-							</summary>
-
-							<div>
-								<ul
-									class="criteria-list"
-									data-card="padding-4"
-									data-list="gap-4"
-								>
-									{#each criteriaGroup.criteria as criterion (criterion.id)}
-										{@const attributeId = getCriterionAttributeId(criterion)}
-										{@const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null}
-
-										<li
-											data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
-										>
-											<div data-column="gap-1">
-												<strong>{criterion.displayName}</strong>
-
-												<span class="criterion-description">
-													{#if isTypographicContent(criterion.description)}
-														<Typography content={criterion.description} />
-													{:else}
-														{criterion.id}
-													{/if}
-												</span>
-
-												{#if isTypographicContent(criterion.rationale)}
-													<span class="criterion-rationale">
-														<Typography content={criterion.rationale} />
-													</span>
-												{/if}
-											</div>
-										</li>
-									{/each}
-								</ul>
+					<div
+						class="stage-card"
+						data-card="radius-6 padding-6"
+						data-column="gap-0"
+					>
+						{#if isTypographicContent(stage.description)}
+							<div class="stage-description">
+								<Typography content={stage.description} />
 							</div>
-						</details>
-					{/each}
+						{/if}
+
+						{#each stage.criteriaGroups as criteriaGroup (criteriaGroup.id)}
+							<details
+								class="criteria-group"
+								open
+							>
+								<summary>
+									<div data-row="wrap">
+										<h3
+											class="criteria-group-title"
+											data-row-item="flexible basis-2"
+										>
+											{#if isTypographicContent(criteriaGroup.description)}
+												<Typography content={criteriaGroup.description} />
+											{:else}
+												{criteriaGroup.id}
+											{/if}
+										</h3>
+									</div>
+								</summary>
+
+								<div>
+									<ul
+										class="criteria-list"
+										data-list="gap-4"
+									>
+										{#each criteriaGroup.criteria as criterion (criterion.id)}
+											{@const attributeId = getCriterionAttributeId(criterion)}
+											{@const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null}
+
+											<li
+												data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
+											>
+												<div data-column="gap-1">
+													<strong>{criterion.displayName}</strong>
+
+													<span class="criterion-description">
+														{#if isTypographicContent(criterion.description)}
+															<Typography content={criterion.description} />
+														{:else}
+															{criterion.id}
+														{/if}
+													</span>
+
+													{#if isTypographicContent(criterion.rationale)}
+														<span class="criterion-rationale">
+															<Typography content={criterion.rationale} />
+														</span>
+													{/if}
+												</div>
+											</li>
+										{/each}
+									</ul>
+								</div>
+							</details>
+						{/each}
+					</div>
 				</div>
 			</section>
 		{/each}
@@ -138,7 +143,7 @@
 			--scrollItem-inlineDetached-paddingStart: 2rem;
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
 			--scrollItem-inlineDetached-paddingEnd: 2rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 2rem;
 		}
 
 		line-height: 1.6;
@@ -163,7 +168,6 @@
 		--sticky-backgroundColor: var(--background-primary);
 		--sticky-backdropFilter: none;
 
-		margin-bottom: 1.25rem;
 		padding-block: 0.75rem;
 	}
 
@@ -174,13 +178,47 @@
 		line-height: 1.5;
 	}
 
+	.stage-card {
+		border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+		box-shadow:
+			0 1px 2px rgb(19 10 43 / 0.04),
+			0 12px 32px -16px rgb(19 10 43 / 0.12);
+	}
+
 	.stage-description {
+		padding-block-end: 1.25rem;
 		color: var(--text-secondary);
+
+		:global(p) {
+			margin: 0;
+		}
+	}
+
+	/* Criteria groups are divided rows inside the stage card, not cards of their own. */
+	.criteria-group {
+		border-block-start: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+
+		> summary {
+			padding-block: 1rem;
+		}
+
+		> :not(summary) {
+			padding-block-end: 1.25rem;
+		}
+
+		/* The card's own padding closes the last group. */
+		&:last-child > :not(summary) {
+			padding-block-end: 0;
+		}
 	}
 
 	.criteria-group-title {
 		font-size: 1rem;
-		font-weight: normal;
+		font-weight: 600;
+
+		:global(p) {
+			margin: 0;
+		}
 	}
 
 	.criterion-description {
@@ -194,12 +232,6 @@
 
 	.criteria-list {
 		--list-marker-fontFamily: var(--fontFamily-wbicons-simple);
-	}
-
-	details {
-		&[data-card] {
-			--card-backgroundColor: color-mix(in srgb, var(--accent) 5%, var(--background-primary));
-		}
 	}
 
 	li {
