@@ -33,6 +33,7 @@
 	let {
 		tableId,
 		title,
+		titleLevel = 2,
 		titleDisclaimer,
 		ladders,
 		wallets,
@@ -42,6 +43,8 @@
 	}: {
 		tableId?: string,
 		title?: string
+		/** Heading level of `title`: 1 on pages where the table is the main content. */
+		titleLevel?: 1 | 2
 		titleDisclaimer?: string
 		ladders?: Ladders<_AttributeGroupId>
 		wallets: RatedWallet<_AttributeGroupId>[]
@@ -53,6 +56,9 @@
 		 */
 		focus?: WalletTableFocus
 	} = $props()
+
+	// Wallet names are headings one level below the table title.
+	const walletNameTag = $derived(`h${titleLevel + 1}`)
 
 	const focusedAttributeGroup = $derived(
 		focus ? Object.values(attributeTree).find(group => group.id === focus.attributeGroupId) ?? null : null
@@ -459,7 +465,7 @@
 	>
 		{#if title}
 			<div class="title-group" data-column="gap-1">
-				<h2>{title}</h2>
+				<svelte:element this={`h${titleLevel}`}>{title}</svelte:element>
 
 				{#if focusedAttributeGroup && focus}
 					<p class="title-focus">
@@ -980,9 +986,9 @@
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
 									<div data-row="gap-3 start wrap">
-										<h3>
+										<svelte:element this={walletNameTag}>
 											<a data-link="camouflaged" href={walletUrl}>{displayName}</a>
-										</h3>
+										</svelte:element>
 
 										{#if 'hardware' in wallet.variants}
 											{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
@@ -1690,9 +1696,9 @@
 					</div>
 
 					<div class="mobile-name-and-variants">
-						<h3 class="mobile-card-name">
+						<svelte:element this={walletNameTag} class="mobile-card-name">
 							<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
-						</h3>
+						</svelte:element>
 
 						{#if stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null}
 							<span class="mobile-card-stage">
@@ -1872,6 +1878,11 @@
 		}
 	}
 
+	.title-group > h1 {
+		/* Same size as the h2 title on pages with their own h1. */
+		font-size: 1.5em;
+	}
+
 	.title-focus {
 		color: var(--text-secondary);
 		font-size: 0.95rem;
@@ -1947,7 +1958,8 @@
 
 			.name {
 
-				h3 {
+				:is(h2, h3) {
+					font-size: 1.17em;
 					font-weight: 600;
 				}
 			}
