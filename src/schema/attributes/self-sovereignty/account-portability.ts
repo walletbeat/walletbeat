@@ -10,6 +10,8 @@ import {
 } from '@/schema/attributes'
 import { eipMarkdownLink } from '@/schema/eips'
 import {
+	AccountManagementTooling,
+	accountManagementToolingDependency,
 	type AccountSupport,
 	AccountType,
 	type AccountType7702,
@@ -17,7 +19,6 @@ import {
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
 	type AccountTypeSafe, // add this
-	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
 import { isSupported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
@@ -129,8 +130,8 @@ function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 	}
 
 	if (
-		mpc.tokenTransferTransactionGeneration ===
-		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
+		accountManagementToolingDependency(mpc.tokenTransferTransactionGeneration) ===
+		'MAINTAINER_INFRASTRUCTURE'
 	) {
 		return ctx.build({
 			outcome: {
@@ -155,8 +156,8 @@ function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 	}
 
 	if (
-		mpc.tokenTransferTransactionGeneration ===
-		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
+		accountManagementToolingDependency(mpc.tokenTransferTransactionGeneration) ===
+		'PROPRIETARY_SOFTWARE'
 	) {
 		return ctx.build({
 			outcome: {
@@ -201,7 +202,7 @@ function evaluateMultifactor(
 ): Evaluation {
 	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
 
-	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
+	if (multifactor.keyRotationTransactionGeneration === AccountManagementTooling.IMPOSSIBLE) {
 		return ctx.build({
 			outcome: {
 				id: `${multifactorType}_cannot_rotate_authority`,
@@ -226,8 +227,8 @@ function evaluateMultifactor(
 
 	if (multifactor.controllingSharesInSelfCustodyByDefault === 'NO') {
 		if (
-			multifactor.keyRotationTransactionGeneration ===
-			TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
+			accountManagementToolingDependency(multifactor.keyRotationTransactionGeneration) ===
+			'MAINTAINER_INFRASTRUCTURE'
 		) {
 			return ctx.build({
 				outcome: {
@@ -256,8 +257,8 @@ function evaluateMultifactor(
 		}
 
 		if (
-			multifactor.keyRotationTransactionGeneration ===
-			TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
+			accountManagementToolingDependency(multifactor.keyRotationTransactionGeneration) ===
+			'PROPRIETARY_SOFTWARE'
 		) {
 			return ctx.build({
 				outcome: {
@@ -283,8 +284,8 @@ function evaluateMultifactor(
 	}
 
 	if (
-		multifactor.tokenTransferTransactionGeneration ===
-		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
+		accountManagementToolingDependency(multifactor.tokenTransferTransactionGeneration) ===
+		'MAINTAINER_INFRASTRUCTURE'
 	) {
 		return ctx.build({
 			outcome: {
@@ -309,8 +310,8 @@ function evaluateMultifactor(
 	}
 
 	if (
-		multifactor.tokenTransferTransactionGeneration ===
-		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
+		accountManagementToolingDependency(multifactor.tokenTransferTransactionGeneration) ===
+		'PROPRIETARY_SOFTWARE'
 	) {
 		return ctx.build({
 			outcome: {
@@ -336,8 +337,7 @@ function evaluateMultifactor(
 
 	if (
 		multifactor.controllingSharesInSelfCustodyByDefault === 'NO' &&
-		multifactor.keyRotationTransactionGeneration ===
-			TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP
+		accountManagementToolingDependency(multifactor.keyRotationTransactionGeneration) === 'NONE'
 	) {
 		return ctx.build({
 			outcome: {
@@ -371,7 +371,7 @@ function evaluateMultifactor(
 }
 
 function evaluateSafe(ctx: EvaluationContext, safe: AccountTypeSafe): Evaluation {
-	if (safe.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
+	if (safe.keyRotationTransactionGeneration === AccountManagementTooling.IMPOSSIBLE) {
 		return ctx.build({
 			outcome: {
 				id: 'safe_cannot_rotate_authority',
@@ -543,8 +543,7 @@ export const accountPortability: Attribute = {
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
 						initialKeyGeneration: 'ON_USER_DEVICE',
-						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+						tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 					},
 				),
 			),
@@ -560,8 +559,7 @@ export const accountPortability: Attribute = {
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
-						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+						tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 					},
 				),
 			),
@@ -576,9 +574,8 @@ export const accountPortability: Attribute = {
 					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
-						keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
-						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+						keyRotationTransactionGeneration: AccountManagementTooling.IMPOSSIBLE,
+						tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
 				),
@@ -594,10 +591,8 @@ export const accountPortability: Attribute = {
 					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
-						keyRotationTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
-						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+						keyRotationTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
+						tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
 				),
@@ -613,10 +608,8 @@ export const accountPortability: Attribute = {
 					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
-						keyRotationTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
-						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+						keyRotationTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
+						tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
 				),
@@ -653,7 +646,7 @@ export const accountPortability: Attribute = {
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
+							AccountManagementTooling.USING_PROPRIETARY_STANDALONE_APP,
 					},
 				),
 			),
@@ -669,9 +662,9 @@ export const accountPortability: Attribute = {
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
 						keyRotationTransactionGeneration:
-							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+							AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+							AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
 				),
@@ -712,7 +705,7 @@ export const accountPortability: Attribute = {
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+							AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 				),
 			),
@@ -728,9 +721,9 @@ export const accountPortability: Attribute = {
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						keyRotationTransactionGeneration:
-							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+							AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 						tokenTransferTransactionGeneration:
-							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+							AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
 				),

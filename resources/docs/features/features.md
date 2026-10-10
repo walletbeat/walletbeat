@@ -339,26 +339,45 @@ Set of possible account types.
 
 ---
 
-### Enum: `TransactionGenerationCapability`
+### Enum: `AccountManagementTooling`
 
-The ability (or lack thereof) to generate a transaction of a specific type.
+The tooling required to carry out an account management operation, such as generating a transaction of a specific type or recovering the account (or the lack of any such tooling).
 
-- `RELYING_ON_EXTERNAL_API` = `'RELYING_ON_EXTERNAL_API'`: The process to generate such a transaction relies on an external API.
-- `USING_PROPRIETARY_STANDALONE_APP` = `'USING_PROPRIETARY_STANDALONE_APP'`: The process to generate such a transaction requires the use of a standalone proprietary application.
-- `USING_OPEN_SOURCE_STANDALONE_APP` = `'USING_OPEN_SOURCE_STANDALONE_APP'`: The process to generate such a transaction requires the use of an open-source standalone application.
-- `IMPOSSIBLE` = `'IMPOSSIBLE'`: It is not possible to generate such a transaction.
+- `RELYING_ON_EXTERNAL_API` = `'RELYING_ON_EXTERNAL_API'`: The process relies on an external API.
+- `USING_PROPRIETARY_STANDALONE_APP` = `'USING_PROPRIETARY_STANDALONE_APP'`: The process requires the use of a standalone proprietary application.
+- `USING_OPEN_SOURCE_STANDALONE_APP` = `'USING_OPEN_SOURCE_STANDALONE_APP'`: The process requires the use of an open-source standalone application.
+- `USING_PROPRIETARY_HOSTED_WEB_APP` = `'USING_PROPRIETARY_HOSTED_WEB_APP'`: The process requires the use of a proprietary web app that is only available as hosted by its maintainer.
+- `USING_SELF_HOSTABLE_WEB_APP` = `'USING_SELF_HOSTABLE_WEB_APP'`: The process requires the use of a web app that the user can host and run themselves, without relying on its maintainer's infrastructure.
+- `IMPOSSIBLE` = `'IMPOSSIBLE'`: It is not possible to carry out the operation.
 
 ---
 
-### Type: `PossibleTransactionGenerationCapability`
+### Type: `PossibleAccountManagementTooling`
 
-The ability to generate a transaction of a specific type.
+Tooling with which an account management operation can be carried out.
 
 ```typescript
-type PossibleTransactionGenerationCapability = Exclude<
-	TransactionGenerationCapability,
-	TransactionGenerationCapability.IMPOSSIBLE
+type PossibleAccountManagementTooling = Exclude<
+	AccountManagementTooling,
+	AccountManagementTooling.IMPOSSIBLE
 >
+```
+
+---
+
+### Type: `AccountManagementToolingDependency`
+
+What carrying out an account management operation depends on, beyond the user's own devices, when using the given tooling.
+
+- `MAINTAINER_INFRASTRUCTURE`: Services operated by the tooling's
+  maintainer must be available and cooperative.
+- `PROPRIETARY_SOFTWARE`: The user can run the tooling themselves, but
+  cannot inspect or modify it.
+- `NONE`: The user can run the tooling themselves without restriction.
+
+```typescript
+type AccountManagementToolingDependency =
+	'MAINTAINER_INFRASTRUCTURE' | 'PROPRIETARY_SOFTWARE' | 'NONE'
 ```
 
 ---
@@ -459,7 +478,7 @@ type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 	 * This implies that the code to create such a transaction is open-source
 	 * and does not rely on any network request to a proprietary API or service.
 	 */
-	keyRotationTransactionGeneration: TransactionGenerationCapability
+	keyRotationTransactionGeneration: AccountManagementTooling
 }
 ```
 
@@ -2010,6 +2029,15 @@ For wallets supporting social recovery (guardian-based), what policy does it use
 
 ---
 
+### Interface: `AlternateRecovery`
+
+A way to recover the account that does not rely on guardians, such as an additional user-held key that can rotate the keys controlling the account.
+
+- `type` (`PossibleAccountManagementTooling`): The tooling the user needs in order to carry out the recovery. To identify: follow the wallet's recovery documentation and note where the recovery transaction is created and signed (e.g. a web page hosted by the wallet developer, or an app the user can run themselves).
+- `entity` (`Entity`): The entity that maintains this tooling.
+
+---
+
 ### Interface: `AccountRecovery`
 
 How the wallet makes it possible for the user to recover their account.
@@ -2019,6 +2047,7 @@ Note: account recovery features generally cannot be fully verified through hands
 1. Walk through the wallet's recovery/backup settings UI to see what options are presented to the user. 2. Read the wallet's official security or recovery documentation for the high-level policy (guardian types, thresholds, timelocks). 3. Inspect the wallet's source code or published security audits for technical details that are not visible in the UI (e.g. where the recovery secret is reconstituted, or smart contract thresholds).
 
 - `guardianRecovery` (`Support<WithRef<GuardianRecovery>>`): If the wallet supports "social recovery" (guardian-based), what policy does it use for the guardians? To identify: look for a "Recovery", "Backup", or "Guardian" section in the wallet's security settings. If no such feature exists, set to not supported. If it exists, fill in `GuardianRecovery` using the wallet's documentation and source code as described above.
+- `alternateRecovery` (`Support<WithRef<AlternateRecovery>> | null`): If the wallet supports a way to recover the account without guardians (e.g. a separately-stored recovery key registered as an additional owner of a smart account), what tooling does it rely on? To identify: look for a "Recovery key" or similar option in the wallet's security settings and documentation. If no such feature exists, set to not supported. Set to `null` if this has not been researched yet.
 - `drills` (`Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null`): Drills the wallet runs to ensure that users will be able to successfully recover their accounts. Wallets that support must implement at least one drill type. Set to `null` if this has not been rated yet.
 
 ---

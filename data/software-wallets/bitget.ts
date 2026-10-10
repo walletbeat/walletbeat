@@ -149,6 +149,7 @@ export const bitget: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: null,
 				guardianRecovery: notSupported,
 			},

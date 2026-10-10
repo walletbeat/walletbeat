@@ -5,7 +5,7 @@ import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
@@ -292,10 +292,9 @@ export const ambire: SoftwareWallet = {
 				},
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 			safe: supported({
 				ref: {
@@ -304,9 +303,9 @@ export const ambire: SoftwareWallet = {
 				},
 				canDeployNew: false,
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				keyRotationTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
-				tokenTransferTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				tokenTransferTransactionGeneration: AccountManagementTooling.RELYING_ON_EXTERNAL_API,
 			}),
 		},
 		addressResolution: {
@@ -775,6 +774,7 @@ export const ambire: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: notSupported,
 				// Supported in v1 but not v2.
 				guardianRecovery: notSupported,

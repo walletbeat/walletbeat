@@ -4,7 +4,7 @@ import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
@@ -185,11 +185,10 @@ export const rabby: SoftwareWallet = {
 				ref: refTodo,
 				canDeployNew: false,
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 		},
 		addressResolution: {
@@ -498,6 +497,7 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: notSupported,
 				guardianRecovery: notSupported,
 			},
