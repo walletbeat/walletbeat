@@ -100,7 +100,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
-  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
+  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
   - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
@@ -1290,7 +1290,7 @@ type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FL
 
 ### Interface: `DataCollection`
 
-A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
+A collection of data that a wallet collects. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
@@ -2783,6 +2783,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
 - `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `FAVICON` = `'favicon'`: Load website favicons from the browser's favicon cache via `_favicon/` URLs.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
