@@ -1,0 +1,63 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"name": "Infinex",
+	"description": "Infinex is a new kind of wallet.\nPasskey-first on every device. Bring your wallets, assets, and apps together in one place.",
+	"version": "0.0.46",
+	"icons": {
+		"16": "/icon16.png",
+		"32": "/icon32.png",
+		"48": "/icon48.png",
+		"128": "/icon128.png"
+	},
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmf8Ir8Un9Ck/XtZHNdDRY9ZqPLifFvG8uPr7ZHEQNAtZKgO/pN+EPmY3yx7iDeF2nbccdRY9p6usIgyPr5/1W6USXxn2dw4FO/niPuZAFOsC+otU/jZgbfXDURz2R+YhptcAWVeEuw/0mChcBt8UHizo3DhVU8CN//2ehpmtSpzC2wH0iv1HPRcf4o1tM7LSIBLeYVKNp/pE7g4ODdC99nj2W/MDtioLseWtZkGsgvcAif5ODxOHqAi1Z7hMKLg89aHanKBvtXw3RyKE/iJzfIDoNofNNZOl9n4RvTaYVVSicbo3rjFO316PfCvZ5y2UOJlgSMJ99yyB4TIWe+xSnQIDAQAB",
+	"permissions": ["storage", "activeTab", "scripting", "tabs", "cookies", "sidePanel"],
+	"host_permissions": ["*://*/*"],
+	"externally_connectable": {
+		"matches": [
+			"https://app.local/*",
+			"https://connect.app.local/*",
+			"https://app.test.infinex.xyz/*",
+			"https://app.staging.infinex.xyz/*",
+			"https://app.infinex.xyz/*",
+			"https://connect.app.test.infinex.xyz/*",
+			"https://connect.app.staging.infinex.xyz/*",
+			"https://connect.app.infinex.xyz/*"
+		]
+	},
+	"web_accessible_resources": [
+		{
+			"resources": ["inpage.js", "inpage-metamask.js", "banners/*"],
+			"matches": ["*://*/*"]
+		}
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"action": {
+		"default_icon": {
+			"16": "/icon16.png",
+			"32": "/icon32.png",
+			"64": "/icon64.png",
+			"128": "/icon128.png"
+		},
+		"default_title": "Infinex",
+		"default_popup": "popup.html"
+	},
+	"side_panel": {
+		"default_path": "sidepanel.html"
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"all_frames": true,
+			"run_at": "document_start",
+			"js": ["content-scripts/bridge.js"]
+		},
+		{
+			"matches": ["<all_urls>"],
+			"run_at": "document_idle",
+			"js": ["content-scripts/token-extractor.js"]
+		}
+	]
+}
