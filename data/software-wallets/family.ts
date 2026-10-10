@@ -139,9 +139,13 @@ export const family: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			// No bug bounty or disclosure policy: family.co/security, /bug-bounty and /.well-known/security.txt return 404, and no Immunefi or HackerOne program exists for Family.
-			// Source: https://family.co/terms
-			bugBountyProgram: notSupported,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						'No bug bounty or disclosure policy: the `/security`, `/bug-bounty` and `/.well-known/security.txt` paths on family.co return 404, and no bug bounty platform lists a program for Family.',
+					url: 'https://family.co/terms',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -199,6 +203,7 @@ export const family: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,

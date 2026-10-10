@@ -1,7 +1,20 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
+import { withBasePath } from '@/base-url'
 import { attributeTree } from '@/schema/attribute-tree'
-import { type Evaluation, type OutcomeMetadata, Rating, ratingToText } from '@/schema/attributes'
+import {
+	type Evaluation,
+	type OutcomeMetadata,
+	Rating,
+	ratingToText,
+	type WalletNameStrings,
+} from '@/schema/attributes'
+import { ContentType, type TypographicContent } from '@/types/content'
+import { getRepositoryRoot } from '@/utils/codebase'
+import { extractMarkdownLinks } from '@/utils/markdown-utils'
 
 import { warmupHarperLinter } from './utils/grammar'
 
@@ -22,6 +35,16 @@ function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
 	)
 }
 
+/** Site-relative docs page paths linked from a piece of markdown or text content. */
+function linkedDocsPages(content: TypographicContent<WalletNameStrings>): string[] {
+	const text = content.contentType === ContentType.MARKDOWN ? content.markdown : content.text
+	const docsPrefix = withBasePath('/docs/')
+
+	return extractMarkdownLinks(text)
+		.map(({ url }) => url)
+		.filter(url => url.startsWith(docsPrefix))
+}
+
 await warmupHarperLinter()
 
 describe('attribute', () => {
@@ -36,6 +59,18 @@ describe('attribute', () => {
 						expect(
 							attributeGroup.attributes.filter(row => row.attribute.id === attribute.id).length,
 						).toBe(1)
+					})
+					it('links only to existing docs pages in its methodology', () => {
+						for (const url of linkedDocsPages(attribute.methodology)) {
+							const slug = url.slice(withBasePath('/docs/').length).replace(/[#?].*$/, '')
+							const docsDir = path.join(getRepositoryRoot(), 'resources', 'docs', slug)
+
+							expect(
+								fs.existsSync(docsDir) &&
+									fs.readdirSync(docsDir).some(file => file.endsWith('.md')),
+								`${url} does not match a page under resources/docs`,
+							).toBe(true)
+						}
 					})
 					const ratingScale = attribute.ratingScale
 

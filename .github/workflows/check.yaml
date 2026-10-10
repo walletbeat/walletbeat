@@ -92,8 +92,8 @@ jobs:
         run: brew install --cask $(cat deploy/macos-packages.txt)
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
-        shell: pwsh
-        run: choco install $(cat deploy/windows-packages.txt) -y
+        shell: bash
+        run: ./deploy/install-windows-packages.sh
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
