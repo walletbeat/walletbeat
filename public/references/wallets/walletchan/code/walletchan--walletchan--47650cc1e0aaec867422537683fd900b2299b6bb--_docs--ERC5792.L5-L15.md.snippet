@@ -1,0 +1,30 @@
+{
+	"highlightFirstLine": 5,
+	"highlightLastLine": 15,
+	"segments": [
+		{
+			"lines": [
+				"# ERC-5792 Batch Transaction Support",
+				"",
+				"## Overview",
+				"",
+				"ERC-5792 enables dapps to submit multiple calls as a batch transaction.",
+				"WalletChan exposes it only for account types whose current execution path can",
+				"preserve the requested semantics:",
+				"",
+				"| Account Type | Batching Mode | Strategy |",
+				"|---|---|---|",
+				"| `privateKey` / `seedPhrase` | **Atomic when eligible; sequential fallback** | EIP-7702 + ERC-7821 when a compatible delegate resolves; otherwise ordered individual transactions unless atomic execution is required |",
+				"| `safe` | **Safe proposal** | Creates a multisig proposal and keeps the bundle pending until real Safe execution |",
+				"| `bankr` | **Atomic** | ERC-7821 encoding → one supported Bankr transaction |",
+				"| `ledger` / `impersonator` | **Unsupported** | No ERC-5792 capability is advertised |",
+				"",
+				"One-call requests use the normal single-transaction path. Sequential fallback",
+				"still reduces wallet prompts to one reviewed decision and assigns ordered",
+				"nonces, while atomic paths keep the calls in one onchain execution.",
+				""
+			],
+			"startLine": 1
+		}
+	]
+}
