@@ -103,6 +103,7 @@ export const okx: SoftwareWallet = {
 		},
 		chainConfigurability: notSupported,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {

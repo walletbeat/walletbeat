@@ -89,6 +89,7 @@ export const elytro: SoftwareWallet = {
 		chainAbstraction: null,
 		chainConfigurability: null,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {

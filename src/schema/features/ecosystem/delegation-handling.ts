@@ -1,3 +1,5 @@
+import type { WithRef } from '@/schema/reference'
+
 import type { Support, Supported } from '../support'
 
 /** When does the wallet offer to perform the delegation? */
@@ -81,3 +83,39 @@ export type DelegationHandling =
 					crossChainGas: Support
 				}
 			})
+
+/**
+ * Whether an app's EIP-5792 call batch (`wallet_sendCalls`) can cause the
+ * wallet to set an EIP-7702 delegation on an account that is not yet
+ * delegated, and if so, how the confirmation screen presents it.
+ * Apps cannot choose the delegate contract: the wallet delegates the account
+ * to its own delegate contract while executing the batch, typically after
+ * reporting the `atomic` capability as `ready`.
+ *
+ * To test: with an EOA that has never been delegated, send a batch of
+ * several calls from an app, e.g. the "EIP-7702 Multi-Call" transaction on
+ * the Walletbeat test playground (`/test/`). Set to `notSupported` if the
+ * wallet rejects the batch or runs it without delegating the account (check
+ * on a block explorer that the account has no delegated code afterwards).
+ * Otherwise:
+ * - `delegationDisclosed`: Check whether the confirmation screen states that
+ *   approving the batch also delegates (or "upgrades") the account.
+ * - `batchCallDetailsIdenticalToDelegatedFlow`: Send the same batch again
+ *   once the account is delegated, and compare how the batch's calls are
+ *   shown in both confirmation screens.
+ */
+export type AppTriggeredDelegationDetails = WithRef<{
+	/**
+	 * Does the batch's confirmation screen tell the user that approving it
+	 * also sets an EIP-7702 delegation on their account?
+	 */
+	delegationDisclosed: boolean
+
+	/**
+	 * Are the batch's calls shown with the same level of detail as the
+	 * same batch sent from an account that is already delegated?
+	 */
+	batchCallDetailsIdenticalToDelegatedFlow: boolean
+}>
+
+export type AppTriggeredDelegation = Support<AppTriggeredDelegationDetails>

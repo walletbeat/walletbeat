@@ -16,6 +16,7 @@ import {
 	type AccountType4337,
 	type AccountType7702,
 } from '@/schema/features/account-support'
+import type { AppTriggeredDelegationDetails } from '@/schema/features/ecosystem/delegation-handling'
 import type { WalletCallIntegration } from '@/schema/features/ecosystem/integration'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -145,6 +146,69 @@ function evaluateTransactionBatching(
 	})
 }
 
+/**
+ * Evaluates how the wallet presents an EIP-7702 delegation that an app's call
+ * batch causes it to set. Returns null when the delegation is disclosed and
+ * does not obscure the batch's calls.
+ */
+function evaluateAppTriggeredDelegation(
+	ctx: EvaluationContext,
+	appTriggeredDelegation: AppTriggeredDelegationDetails,
+): Evaluation | null {
+	if (!appTriggeredDelegation.delegationDisclosed) {
+		return ctx.build({
+			outcome: {
+				id: 'undisclosed_app_triggered_delegation',
+				displayName: 'Undisclosed account delegation in batches',
+				rating: Rating.FAIL,
+				shortExplanation: sentence(
+					"{{WALLET_NAME}} can delegate your account while executing an app's transaction batch without telling you.",
+				),
+			},
+			details: mdParagraph(`
+				When an app sends a transaction batch for an account that is not
+				yet delegated, {{WALLET_NAME}} sets an ${eipMarkdownLink(eip7702)}
+				delegation on the account as part of executing the batch.
+				The confirmation screen does not tell the user about this delegation.
+			`),
+			impact: paragraph(
+				'Users approve a change to how their account works without being told, which makes the transaction confirmation screen less trustworthy.',
+			),
+			howToImprove: sentence(`
+				{{WALLET_NAME}} should state on the batch's confirmation screen
+				that approving it also delegates the account.
+			`),
+		})
+	}
+
+	if (!appTriggeredDelegation.batchCallDetailsIdenticalToDelegatedFlow) {
+		return ctx.build({
+			outcome: {
+				id: 'app_triggered_delegation_obscures_batch',
+				displayName: 'Account delegation obscures batch details',
+				rating: Rating.PARTIAL,
+				shortExplanation: sentence(
+					"{{WALLET_NAME}} shows fewer details about an app's transaction batch when the batch also delegates your account.",
+				),
+			},
+			details: mdParagraph(`
+				When an app sends a transaction batch for an account that is not
+				yet delegated, {{WALLET_NAME}} sets an ${eipMarkdownLink(eip7702)}
+				delegation on the account as part of executing the batch, and says
+				so on the confirmation screen. However, the batch's calls are shown
+				with less detail than the same batch sent from an account that is
+				already delegated.
+			`),
+			howToImprove: sentence(`
+				{{WALLET_NAME}} should show the batch's calls with the same level
+				of detail whether or not the batch also delegates the account.
+			`),
+		})
+	}
+
+	return null
+}
+
 export const transactionBatching: Attribute = {
 	id: 'transactionBatching',
 	icon: 'transaction_batching',
@@ -174,6 +238,15 @@ export const transactionBatching: Attribute = {
 		- Implement ${eipMarkdownLinkAndTitle(eip5792)}.
 		- Support atomic transaction bundles, as per the \`atomic\` capability
 		  declared in \`wallet_getCapabilities\`.
+
+		Apps cannot choose a delegate contract. However, when an app sends a
+		batch for an account that is not yet delegated, the wallet may delegate
+		the account to its own delegate contract while executing the batch.
+		When it does, the batch's confirmation screen must say that the account
+		is being delegated; otherwise the wallet fails. The delegation must also
+		not reduce the detail shown about the batch's calls, compared to the
+		same batch sent from an already-delegated account; otherwise the rating
+		is at most partial.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -295,7 +368,26 @@ export const transactionBatching: Attribute = {
 			return unrated(ctx)
 		}
 
-		return evaluateTransactionBatching(ctx, ctx.features.accountSupport, ctx.features.walletCall)
+		const evaluation = evaluateTransactionBatching(
+			ctx,
+			ctx.features.accountSupport,
+			ctx.features.walletCall,
+		)
+		const { appTriggeredDelegation } = ctx.features.ecosystem
+
+		if (
+			appTriggeredDelegation === null ||
+			!isSupported<AppTriggeredDelegationDetails>(appTriggeredDelegation)
+		) {
+			return evaluation
+		}
+
+		ctx.addRef(appTriggeredDelegation)
+		const delegationEvaluation = evaluateAppTriggeredDelegation(ctx, appTriggeredDelegation)
+
+		return delegationEvaluation === null
+			? evaluation
+			: pickWorstRating([evaluation, delegationEvaluation])
 	},
 	aggregate: pickWorstRating,
 }

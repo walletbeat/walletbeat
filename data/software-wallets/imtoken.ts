@@ -131,6 +131,7 @@ export const imtoken: SoftwareWallet = {
 		},
 		chainConfigurability: null,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {
