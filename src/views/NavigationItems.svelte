@@ -250,6 +250,8 @@
 			style:--slice-labelSize={item.sliceStyle?.labelSize}
 			style:--slice-labelSizeScale={item.sliceStyle?.labelSizeScale}
 			style:--slice-labelR={item.sliceStyle?.labelR}
+			style:--slice-fill={item.sliceStyle?.fill}
+			style:--slice-labelBackground={item.sliceStyle?.labelBackground}
 			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
 			{@render navigationIcon(item, depth)}

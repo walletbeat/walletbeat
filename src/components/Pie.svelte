@@ -13,6 +13,7 @@
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
+	import { pieSliceFill, pieSliceLabelBackground } from './pie-gradient'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -94,102 +95,10 @@
 
 
 	// Functions
-	type GradientStops = { color: string; position: number }[]
+	const sliceFill = (slice: ComputedSlice) => (
+		pieSliceFill(slice, 'var(--pie-originX) var(--pie-originY)')
+	)
 
-	/** A gradient slice's color stops (radius in px), or a single flat color. */
-	const sliceGradientStops = (slice: ComputedSlice): GradientStops | string => {
-		const children = slice.children
-		const gradient = slice.gradient
-
-		if (!children?.length || !gradient) return slice.color
-
-		const colorWeights = gradient.colors
-			.map(color => ({
-				color,
-				weight: children
-					.filter(child => child.color === color)
-					.reduce((sum, child) => sum + child.weight, 0),
-			}))
-			.filter(({ weight }) => weight > 0)
-
-		if (colorWeights.length <= 1) {
-			const color = colorWeights[0]?.color ?? slice.color
-
-			return color === gradient.transparentStopColor ? 'var(--rating-unrated)' : color
-		}
-
-		const areaRadiusStops = gradient.areaRadiusStops
-		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
-		const minimumStopGap = Math.min(8, (slice.computed.outerR - slice.computed.innerR) / Math.max(colorWeights.length - 1, 1))
-		const stopPositions = colorWeights
-			.map(({ weight }, index, weights) => {
-				const areaFraction = (weights.slice(0, index).reduce((sum, entry) => sum + entry.weight, 0) + weight / 2) / totalWeight
-				const scaledStopIndex = areaRadiusStops ? areaFraction * (areaRadiusStops.length - 1) : 0
-				const stopIndex = Math.floor(scaledStopIndex)
-				const normalizedRadius = (
-					areaRadiusStops ?
-						areaRadiusStops[stopIndex] + (
-							areaRadiusStops[Math.min(stopIndex + 1, areaRadiusStops.length - 1)] - areaRadiusStops[stopIndex]
-						) * (scaledStopIndex - stopIndex)
-					:
-						Math.sqrt(
-							(
-								slice.computed.innerR ** 2
-								+ (slice.computed.outerR ** 2 - slice.computed.innerR ** 2) * areaFraction
-							),
-					)
-				)
-
-				return areaRadiusStops ? slice.computed.innerR + (slice.computed.outerR - slice.computed.innerR) * normalizedRadius : normalizedRadius
-			})
-			.reduce<number[]>(
-				(stops, stop, index) => [
-					...stops,
-					Math.max(stop, index === 0 ? slice.computed.innerR : stops[index - 1] + minimumStopGap),
-				],
-				[],
-			)
-			.reduceRight<number[]>(
-				(stops, stop, index) => [
-					Math.min(
-						stop,
-						index === colorWeights.length - 1 ? slice.computed.outerR : stops[0] - minimumStopGap,
-					),
-					...stops,
-				],
-				[],
-			)
-
-		return colorWeights.map(({ color }, index) => ({
-			color: color === gradient.transparentStopColor ? 'transparent' : color,
-			position: stopPositions[index],
-		}))
-	}
-
-	const sliceFill = (slice: ComputedSlice) => {
-		const stops = sliceGradientStops(slice)
-
-		if (typeof stops === 'string') return stops
-
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${stops.map(({ color, position }) => `${color} ${position}px`).join(', ')}), var(--rating-unrated)`
-	}
-
-	/**
-	 * The fill color under the slice's label, so the label's ink can contrast
-	 * with what is actually drawn there rather than with the slice's nominal
-	 * color (gradient slices can be mostly unrated grey around the label).
-	 */
-	const sliceLabelBackground = (slice: ComputedSlice) => {
-		const stops = sliceGradientStops(slice)
-
-		if (typeof stops === 'string') return stops
-
-		const nearest = stops.reduce((best, stop) => (
-			Math.abs(stop.position - slice.computed.labelR) < Math.abs(best.position - slice.computed.labelR) ? stop : best
-		))
-
-		return nearest.color === 'transparent' ? 'var(--rating-unrated)' : nearest.color
-	}
 
 	// State
 	const computedSlices = $derived(
@@ -253,7 +162,7 @@
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
-		style:--slice-labelBackground={sliceLabelBackground(slice)}
+		style:--slice-labelBackground={pieSliceLabelBackground(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 
