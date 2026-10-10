@@ -4,6 +4,7 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import {
 	type Guardian,
 	guardianEntity,
+	guardianMarkdown,
 	type GuardianPolicy,
 	GuardianPolicyType,
 	guardiansInclude,
@@ -134,7 +135,12 @@ export function evaluateGuardianShareLostScenario(
 						return {
 							scenario,
 							outcomeId: 'secret_split_required_guardian',
-							recovery: accountCannotBeRecovered(sentence('Recovery is no longer possible.')),
+							recovery: accountCannotBeRecovered(
+								sentence(`
+									Recovery is no longer possible. ${guardianMarkdown(requiredGuardian)}
+									is required for every recovery, and no other guardian can stand in for it.
+								`),
+							),
 							takeover: accountCannotBeTakenOver,
 							howToImprove: sentence(`
 								{{WALLET_NAME}} should diversify the role of guardians to ensure
