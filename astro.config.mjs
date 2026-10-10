@@ -55,12 +55,12 @@ export default defineConfig({
 			options: {
 				variants: [
 					{
-						src: ['./src/assets/fonts/avenir-lt-std-roman.otf'],
+						src: ['./src/assets/fonts/avenir-lt-std-roman.woff2'],
 						weight: '400',
 						style: 'normal',
 					},
 					{
-						src: ['./src/assets/fonts/avenir-lt-std-heavy.otf'],
+						src: ['./src/assets/fonts/avenir-lt-std-heavy.woff2'],
 						weight: '700',
 						style: 'normal',
 					},
