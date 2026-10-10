@@ -20,7 +20,10 @@ import {
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { type ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 export const frame: SoftwareWallet = {
@@ -321,11 +324,11 @@ export const frame: SoftwareWallet = {
 								url: 'https://api.github.com/repos/frame-labs/frame-extension/branches/master',
 							},
 						],
-						branchDeletionBlocked: false,
-						forcePushBlocked: false,
-						requiredChecks: false,
-						requiredReview: false,
-						tagsImmutable: false,
+						branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+						forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+						requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+						requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+						tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 					},
 					// Desktop branches are protected, but whether reviews are required is not visible to non-admins.
 					[Variant.DESKTOP]: null,
