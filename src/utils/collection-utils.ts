@@ -306,6 +306,5 @@ function parentUrl(urlPrefix: `/${string}`, s: string | undefined): string | und
 		.slice(0, -1)
 		.filter(p => p !== '')
 
-	// A first-level directory's parent is the collection root (`/docs/`, not `/docs//`).
 	return [urlPrefix, ...parentSegments].join('/') + '/'
 }
