@@ -815,6 +815,7 @@ export const zerion: SoftwareWallet = {
 				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: 'SOURCE_NOT_AVAILABLE',
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: notSupportedWithRef({

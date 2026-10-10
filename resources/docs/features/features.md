@@ -47,6 +47,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/secure-element.ts`](#srcschemafeaturessecuritysecure-elementts)
 - [`src/schema/features/security/security-audits.ts`](#srcschemafeaturessecuritysecurity-auditsts)
 - [`src/schema/features/security/security-best-practices.ts`](#srcschemafeaturessecuritysecurity-best-practicests)
+- [`src/schema/features/security/security-libraries.ts`](#srcschemafeaturessecuritysecurity-librariests)
 - [`src/schema/features/security/supply-chain-diy.ts`](#srcschemafeaturessecuritysupply-chain-diyts)
 - [`src/schema/features/security/supply-chain-factory.ts`](#srcschemafeaturessecuritysupply-chain-factoryts)
 - [`src/schema/features/security/transaction-legibility.ts`](#srcschemafeaturessecuritytransaction-legibilityts)
@@ -136,6 +137,9 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		/** Support for alerting the user about potential scams. */
 		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
+
+		/** External libraries the wallet uses directly for key and signature cryptography. */
+		securityLibraries: VariantFeature<SecurityLibraries>
 
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
@@ -272,6 +276,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `firmware` (`ResolvedFeature<FirmwareSupport>`)
   - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
   - `securityBestPractices` (`ResolvedFeature<SecurityBestPracticesData>`)
+  - `securityLibraries` (`ResolvedFeature<SecurityLibraries>`)
   - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
@@ -2938,6 +2943,34 @@ Security best-practices data for a wallet, broken down by variant.
 
 - `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP' | 'SOURCE_NOT_AVAILABLE'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
 - `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP' | 'SOURCE_NOT_AVAILABLE'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
+
+---
+
+## `src/schema/features/security/security-libraries.ts`
+
+### Interface: `SecurityLibrary`
+
+An external library that the wallet's own code calls directly to generate or derive keys (e.g. BIP-32, BIP-39), sign or verify signatures, or encrypt key material at rest.
+
+Out of scope: cryptography provided by the platform the wallet runs on (TLS, WebCrypto, operating system keystores, secure enclaves), and libraries that the wallet only uses through another listed library.
+
+- `name` (`string`): Package or project name, e.g. `@noble/curves`.
+- `url` (`Url`): Source repository or homepage of the library.
+- `audits` (`Url[]`): Public reports of independent security audits of the library. Empty if no public audit report is known.
+
+---
+
+### Type: `SecurityLibraries`
+
+The security libraries that the wallet depends on directly.
+
+To test: in the wallet's source repository, look through the direct dependencies of each variant (e.g. `package.json`, `Podfile`, `build.gradle`, `Cargo.toml`) for libraries matching the scope of `SecurityLibrary`, and link the manifest in `ref`. List audit reports that the library's maintainers or auditors publish. Leave as `null` when the wallet's source code is not public.
+
+```typescript
+type SecurityLibraries = WithRef<{
+	libraries: NonEmptyArray<SecurityLibrary>
+}>
+```
 
 ---
 

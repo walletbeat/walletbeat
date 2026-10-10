@@ -198,6 +198,7 @@ export const bitget: SoftwareWallet = {
 				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
