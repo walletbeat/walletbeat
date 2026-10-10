@@ -19,12 +19,19 @@ import {
 	SpendingApprovalsControl,
 } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import { minimalsm } from '../contributors/minimalsm'
+import { slowMist } from '../entities/slowmist'
 import { okx7702DelegatorContract } from '../wallet-contracts/okx-7702-delegator'
 
 export const okx: SoftwareWallet = {
@@ -33,9 +40,9 @@ export const okx: SoftwareWallet = {
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
 		coinspectId: 'okx',
-		contributors: [mattmatt],
+		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-01-28',
+		lastUpdated: '2026-10-08',
 		urls: {
 			extensions: [
 				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -189,7 +196,35 @@ export const okx: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			// Both 2023 audits cover the Web3 wallet inside the OKX exchange app (iOS 6.15.0, Android 6.14.0), not the standalone OKX Wallet app or the extension; no Medium-or-higher findings.
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation:
+								'SlowMist audit of OKX Web3 Wallet iOS (app 6.15.0), 2023.05.16–2023.06.06: "we found 8 suggestion vulnerabilities. All the findings have been confirmed."',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/ca4ff9fe9f633c174c09fd189658902d9e3619d0/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OKX/SlowMist%20Audit%20Report%20-%20OKX%20Web3%20Wallet%20iOS_en-us.pdf',
+						},
+					],
+					auditDate: '2023-06-06',
+					auditor: slowMist,
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: [
+						{
+							explanation:
+								'SlowMist audit of OKX MPC Wallet (Android, app 6.14.0), 2023.05.16–2023.06.06: "we found 9 suggestions and 1 low risk. All the findings have been confirmed."',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/ca4ff9fe9f633c174c09fd189658902d9e3619d0/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OKX/SlowMist%20Audit%20Report%20-%20OKX%20MPC%20Wallet(Android)_en-us.pdf',
+						},
+					],
+					auditDate: '2023-06-06',
+					auditor: slowMist,
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+			],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
@@ -306,15 +341,21 @@ export const okx: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Only the signing SDKs are open source; the apps are not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/android/com.okx.wallet/',
+					},
+				}),
 			},
 		},
 		walletCall: supported({
