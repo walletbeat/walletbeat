@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { cantina } from '@/data/entities/cantina'
 import { certora } from '@/data/entities/certora'
@@ -35,7 +36,7 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -45,9 +46,9 @@ export const baseApp: SoftwareWallet = {
 		displayName: 'Base App',
 		tableName: 'Base App',
 		coinspectId: 'coinbase-wallet',
-		contributors: [ren2140],
+		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-03-19',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],
 			extensions: [],
@@ -165,13 +166,7 @@ export const baseApp: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		// Coinbase is the parent company funding Base App development. Public via
 		// direct listing on Nasdaq (COIN, April 2021), so publicOffering captures
 		// the public-equity-funded nature. Base App's in-app swap UI displays a
@@ -417,14 +412,13 @@ export const baseApp: SoftwareWallet = {
 				sendTransactionWarning: notSupported,
 				unlimitedApprovalWarning: null,
 			},
-			// Base App is closed-source; no public URL hosts the AndroidManifest.xml
-			// or Info.plist, so the `pnpm collect:manifests` tool cannot fetch them.
-			// Filling this out requires manually extracting the manifests from the
-			// published APK/IPA. What we know without extraction: for new passkey
-			// accounts (the smart-wallet path), keyStorageMechanism would be
-			// PASSKEY_MANAGED — the WebAuthn passkey lives in the iOS Secure
-			// Enclave or Android Keystore and no private key is stored by the app.
-			securityBestPractices: null,
+			// The mobile app is closed source: "Build cannot be done because the source code is not publicly available."
+			// Source: https://walletscrutiny.com/mobile/org.toshi/
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
@@ -494,14 +488,19 @@ export const baseApp: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				// App-store signing only; no developer-published signatures or release artifacts.
+				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				// Only generic store release notes; no public changelog for the app.
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Closed source: "Build cannot be done because the source code is not publicly available."
+				// Source: https://walletscrutiny.com/mobile/org.toshi/
+				reproducibleBuilds: notSupported,
 			},
 		},
 		// Base App accounts run Coinbase Smart Wallet logic, which exposes
