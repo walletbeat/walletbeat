@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { mako } from '@/data/contributors/mako'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -24,12 +25,16 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -48,9 +53,9 @@ export const imtoken: SoftwareWallet = {
 		displayName: 'imToken',
 		tableName: 'imToken',
 		coinspectId: 'im-token',
-		contributors: [mako, mattmatt],
+		contributors: [mako, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-28',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://docs.token.im/'],
 			repositories: ['https://github.com/consenlabs/token-core-monorepo'],
@@ -243,7 +248,16 @@ export const imtoken: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: null,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Recovery is only by importing the user's own mnemonic, private key or keystore: \"If you lost your mnemonic phrase and you haven't backed it up, it can't be retrieved.\" No cloud, social or vendor-assisted recovery is documented for the mobile app.",
+						url: 'https://support.token.im/hc/en-us/articles/360003123113',
+					},
+				}),
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
@@ -285,7 +299,22 @@ export const imtoken: SoftwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'"imToken uses the system-provided secure random source on iOS and Android to generate private keys locally"; private keys "are never transmitted over any network."',
+						url: 'https://support.token.im/hc/en-us/articles/51636016918553',
+					},
+					{
+						explanation:
+							'The open-source TokenCore library generates the 12-word BIP-39 mnemonic on the device (`tiny-bip39`, seeded from the OS random source).',
+						url: 'https://github.com/consenlabs/token-core-monorepo/blob/eeda742a035ca0d74664956bf715b8c4c6574ffb/token-core/tcx-primitive/src/rand.rs',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: notSupported,
 			},
@@ -366,15 +395,22 @@ export const imtoken: SoftwareWallet = {
 			},*/
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				// App-store signing only; the Android APK SHA-256 hashes published in the help center are integrity checks, not signatures.
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Only the TokenCore library is open source; the app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/mobile/im.token.app/',
+					},
+				}),
 			},
 		},
 		walletCall: null,
