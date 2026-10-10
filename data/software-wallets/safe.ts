@@ -31,7 +31,10 @@ import {
 } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
-import { type ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -419,11 +422,11 @@ export const safe: SoftwareWallet = {
 							url: 'https://api.github.com/repos/safe-global/safe-wallet-monorepo/rules/branches/dev',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: true,
-					requiredReview: true,
-					tagsImmutable: true,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
