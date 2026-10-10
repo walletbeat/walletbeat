@@ -94,7 +94,7 @@
 							? `**{{WALLET_NAME}}** helps you stay safe when sending funds by ${
 									outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning &&
 									outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
-										? 'warning you when sending funds to an address you have not sent or received funds from in the past, and allowing you to build a contact book of addresses and warning you when sending funds to addresses not in it.'
+										? 'warning you when sending funds to an address you have not sent or received funds from in the past. It also lets you build a contact book of addresses and warns you when sending funds to addresses not in it.'
 										: outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning
 											? 'warning you when sending funds to an address you have not sent or received funds from in the past.'
 											: outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
