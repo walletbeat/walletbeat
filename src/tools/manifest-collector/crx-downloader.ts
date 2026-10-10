@@ -40,9 +40,7 @@ function extractZipFromCrx(crxBuffer: Buffer): Buffer {
 async function downloadCrx(extensionId: string): Promise<Buffer> {
 	// Chrome Web Store CRX download endpoint.
 	// The `x` parameter is a URL-encoded query string for the extension update check.
-	// `prodversion` is the requesting Chrome version; the store serves nothing to
-	// versions below an extension's `minimum_chrome_version`, so ask as a version
-	// newer than any release.
+	// `prodversion` is the Chrome version the request reports.
 	const innerQuery = encodeURIComponent(`id=${extensionId}&installsource=ondemand&uc`)
 	const url =
 		'https://clients2.google.com/service/update2/crx' +
