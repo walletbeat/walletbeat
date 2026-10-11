@@ -80,8 +80,13 @@ export const walletchan: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The WalletChan browser extension source (apps/extension) and its releases from v4.0.0 onward are licensed under GPL-3.0-only. Other components of the monorepo (website, docs, shared packages) remain MIT.',
+							'The WalletChan browser extension source (`apps/extension`) and its releases from v4.0.0 onward are licensed under GPL-3.0-only.',
 						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/apps/extension/LICENSE.md',
+					},
+					{
+						explanation:
+							'The repository is licensed by component: the browser extension source under GPL-3.0-only for v4.0.0 and later releases, and all other source under the MIT License unless a component contains its own license.',
+						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/LICENSE.md',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
