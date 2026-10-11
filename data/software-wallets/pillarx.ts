@@ -190,7 +190,7 @@ export const pillarx: SoftwareWallet = {
 					ref: {
 						explanation:
 							'No LavaMoat or install-script allow list; `.npmrc` sets `ignore-scripts=false`.',
-						url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc#L4',
+						url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc',
 					},
 				}),
 				dependencyVulnerabilityScanning: notSupportedWithRef({
