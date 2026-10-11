@@ -476,11 +476,18 @@ export const daimo: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupportedWithRef({
-					ref: {
-						explanation:
-							'Builds were made and signed on the Expo EAS service and distributed through the app stores; no signatures or release artifacts were published.',
-						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
-					},
+					ref: [
+						{
+							explanation:
+								'The `publish-apk` job builds the Android app on Expo EAS and uploads the resulting `.apk` file to GitHub Releases when a `v*` tag is pushed. It uploads no separate signature or attestation.',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L130-L166',
+						},
+						{
+							explanation:
+								'The repository has no releases, so the `publish-apk` job has never published a build.',
+							url: 'https://github.com/daimo-eth/daimo/releases',
+						},
+					],
 				}),
 				dependencyAgeGate: null,
 				dependencyLocking: supported({
