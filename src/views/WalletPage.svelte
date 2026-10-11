@@ -52,7 +52,6 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
-	import { getWalletDataFileUrl } from '@/utils/urls'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
@@ -349,27 +348,19 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
-	// Attributes Walletbeat can't rate yet for lack of data (exempt ones don't apply).
-	const ratedAttributeCounts = $derived.by(() => {
-		const applicable = Object.values(attributeTree).flatMap(attrGroup => {
+	const unratedAttributes = $derived(
+		Object.values(attributeTree).flatMap(attrGroup => {
 			const evalGroup = evalTree[attrGroup.id]
 
 			if (!evalGroup) return []
 
-			return attrGroup.attributes.flatMap(({ attribute }) => {
-				const evalAttr = evalGroup[attribute.id]
+			return attrGroup.attributes
+				.filter(({ attribute }) => evalGroup[attribute.id]?.evaluation.outcome.rating === Rating.UNRATED)
+				.map(({ attribute }) => attribute)
+		}),
+	)
 
-				return evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT ?
-						[{ attribute, rating: evalAttr.evaluation.outcome.rating }]
-					:	[]
-			})
-		})
-		const unrated = applicable
-			.filter(({ rating }) => rating === Rating.UNRATED)
-			.map(({ attribute }) => attribute)
-
-		return { total: applicable.length, unrated }
-	})
+	let isUnratedListOpen = $state(false)
 
 	const allPageReferences = $derived.by(() => {
 		const refs = Object.values(attributeTree).flatMap(attrGroup => {
@@ -662,62 +653,27 @@
 							</p>
 						{/if}
 					{/if}
+
+					{#if unratedAttributes.length > 0}
+						<p>
+							{unratedAttributes.length === 1 ? '1 attribute has' : `${unratedAttributes.length} attributes have`}
+							not been evaluated yet, as Walletbeat does not have the necessary information on
+							{wallet.metadata.displayName}.
+							The <a href="/docs/contribute/wallet-data/">wallet data guide</a> explains how to contribute it.
+						</p>
+
+						<details bind:open={isUnratedListOpen}>
+							<summary data-row="start gap-2">{isUnratedListOpen ? 'Collapse' : 'Expand'}</summary>
+							<p>
+								{#each unratedAttributes as attribute, i (attribute.id)}
+									{i > 0 ? ', ' : ''}<a href={`#${slugifyCamelCase(attribute.id)}`}>{attribute.displayName}</a>
+								{/each}.
+							</p>
+						</details>
+					{/if}
 				</div>
 			</section>
 		</header>
-
-		{#if ratedAttributeCounts.unrated.length > 0}
-			{@const { total, unrated } = ratedAttributeCounts}
-			{@const dataFileUrl = getWalletDataFileUrl(wallet)}
-
-			<!-- The column wrapper carries the gutters; the card's own padding would override them. -->
-			<div data-scroll-item="inline-detached" data-column>
-				<aside
-					class="unrated-summary"
-					data-card="radius-6 padding-5"
-					data-column="gap-3"
-					data-compact={unrated.length * 2 < total ? true : undefined}
-					aria-labelledby="unrated-summary-title"
-					style:---rated-share={(total - unrated.length) / total}
-				>
-					<div data-row="align-start gap-4 wrap">
-						<div data-column="gap-1" data-row-item="flexible basis-3">
-							<h2 id="unrated-summary-title">
-								{unrated.length} of {total} attributes aren't rated yet
-							</h2>
-							<p>
-								Walletbeat doesn't have the data to assess these for {wallet.metadata.displayName}.
-								If you know the wallet, you can help fill them in.
-							</p>
-						</div>
-
-						<nav class="unrated-summary-actions" data-row="start gap-2 wrap" aria-label="Contribute">
-							{#if dataFileUrl}
-								<a class="unrated-summary-action-primary" href={dataFileUrl} target="_blank" rel="noopener noreferrer">
-									Edit {wallet.metadata.displayName}'s data
-								</a>
-							{/if}
-							<a href="/docs/contribute/wallet-data/">How to contribute</a>
-						</nav>
-					</div>
-
-					<div class="unrated-summary-meter" aria-hidden="true"></div>
-
-					<details class="unrated-summary-list">
-						<summary>Show which {unrated.length === 1 ? 'one' : `${unrated.length}`}</summary>
-						<ul data-list="unstyled" data-row="start gap-2 wrap">
-							{#each unrated as attribute (attribute.id)}
-								<li>
-									<a href={`#${slugifyCamelCase(attribute.id)}`} data-badge="small">
-										{attribute.displayName}
-									</a>
-								</li>
-							{/each}
-						</ul>
-					</details>
-				</aside>
-			</div>
-		{/if}
 
 		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
@@ -3165,100 +3121,6 @@
 			:global(p) {
 				margin: 0;
 			}
-		}
-	}
-
-	.unrated-summary {
-		border: 1px dashed color-mix(in srgb, var(--text-primary) 25%, transparent);
-		background-color: color-mix(in srgb, var(--background-secondary) 70%, transparent);
-
-		h2 {
-			font-size: 1.15rem;
-			font-weight: 600;
-		}
-
-		p {
-			max-inline-size: 60ch;
-			color: var(--text-secondary);
-			font-size: 0.95rem;
-			text-wrap: pretty;
-		}
-
-		/* Mostly-rated wallets get a one-line note rather than a call to action. */
-		&[data-compact] {
-			--card-padding: 1em;
-
-			h2 {
-				font-size: 1rem;
-			}
-
-			p,
-			.unrated-summary-meter {
-				display: none;
-			}
-
-			.unrated-summary-action-primary {
-				border-color: color-mix(in srgb, var(--border-color) 80%, transparent);
-				background-color: transparent;
-				color: var(--text-primary);
-			}
-		}
-	}
-
-	.unrated-summary-actions a {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.5em 0.95em;
-		border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
-		border-radius: 999em;
-		color: var(--text-primary);
-		font-size: 0.9rem;
-		font-weight: 600;
-		white-space: nowrap;
-
-		&:hover {
-			border-color: var(--text-primary);
-			text-decoration: none;
-		}
-
-		&.unrated-summary-action-primary {
-			border-color: transparent;
-			background-color: var(--text-primary);
-			color: var(--background-primary);
-		}
-	}
-
-	/* Share of applicable attributes that are rated. */
-	.unrated-summary-meter {
-		block-size: 0.375rem;
-		border-radius: 999px;
-		background:
-			linear-gradient(
-				to right,
-				var(--rating-pass) calc(var(---rated-share) * 100%),
-				transparent 0
-			),
-			color-mix(in srgb, var(--border-color) 55%, transparent);
-	}
-
-	.unrated-summary-list {
-		> summary {
-			justify-content: start;
-			gap: 0.4em;
-			font-size: 0.875rem;
-			font-weight: 600;
-			color: var(--text-secondary);
-		}
-
-		> ul {
-			padding-block-start: 0.75rem;
-		}
-
-		a[data-badge] {
-			--accent: var(--rating-unrated);
-
-			color: var(--text-primary);
-			font-weight: 500;
 		}
 	}
 

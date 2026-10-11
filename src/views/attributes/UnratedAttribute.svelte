@@ -2,7 +2,6 @@
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
-	import { getWalletDataFileUrl } from '@/utils/urls'
 
 
 	// Props
@@ -12,7 +11,16 @@
 		wallet: RatedWallet<string>
 	} = $props()
 
-	const githubUrl = $derived(getWalletDataFileUrl(wallet))
+	const githubUrl = $derived(
+		wallet.types.SOFTWARE ?
+			`https://github.com/walletbeat/walletbeat/tree/beta/data/software-wallets/${wallet.metadata.id}.ts`
+		: wallet.types.HARDWARE ?
+			`https://github.com/walletbeat/walletbeat/tree/beta/data/hardware-wallets/${wallet.metadata.id}.ts`
+		: wallet.types.EMBEDDED ?
+			`https://github.com/walletbeat/walletbeat/tree/beta/data/embedded-wallets/${wallet.metadata.id}.ts`
+		:
+			''
+	)
 
 
 	// Components
