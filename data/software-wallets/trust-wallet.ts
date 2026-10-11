@@ -105,9 +105,13 @@ export const trustWallet: SoftwareWallet = {
 			coreLicense: {
 				ref: [
 					{
-						explanation:
-							'Trust Wallet Core, the cryptographic wallet library that is "a core part of the popular Trust Wallet", is published under the Apache 2.0 license.',
+						explanation: 'Trust Wallet Core is published under the Apache License 2.0.',
 						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/LICENSE',
+					},
+					{
+						explanation:
+							'The README describes Trust Wallet Core as a library "implementing low-level cryptographic wallet functionality" and says "It is a core part of the popular Trust Wallet".',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/README.md#L3-L5',
 					},
 				],
 				license: FOSSLicense.APACHE_2_0,
