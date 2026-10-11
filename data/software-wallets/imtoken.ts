@@ -309,7 +309,16 @@ export const imtoken: SoftwareWallet = {
 					{
 						explanation:
 							'The open-source TokenCore library generates the 12-word BIP-39 mnemonic on the device (`tiny-bip39`, seeded from the OS random source).',
-						url: 'https://github.com/consenlabs/token-core-monorepo/blob/eeda742a035ca0d74664956bf715b8c4c6574ffb/token-core/tcx-primitive/src/rand.rs',
+						urls: [
+							{
+								label: 'Mnemonic generation',
+								url: 'https://github.com/consenlabs/token-core-monorepo/blob/eeda742a035ca0d74664956bf715b8c4c6574ffb/token-core/tcx-primitive/src/rand.rs#L1-L5',
+							},
+							{
+								label: 'BIP-39 library dependency',
+								url: 'https://github.com/consenlabs/token-core-monorepo/blob/eeda742a035ca0d74664956bf715b8c4c6574ffb/token-core/tcx-primitive/Cargo.toml#L24',
+							},
+						],
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
