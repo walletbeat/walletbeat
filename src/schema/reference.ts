@@ -18,8 +18,10 @@
  */
 
 import type { allWallets } from '@/data/wallets'
+import type { AttributeGroupId } from '@/schema/attribute-tree'
 import type { DataSource } from '@/schema/data-sources'
 import type { Entity } from '@/schema/entity'
+import type { BaseWallet } from '@/schema/wallet'
 import type { CalendarDate } from '@/types/date'
 import {
 	assertNonEmptyArray,
@@ -390,11 +392,14 @@ export interface CollectedRef {
 }
 
 /**
- * Recursively traverse wallet data objects and collect every `ref` field,
+ * Recursively traverse a wallet's data and collect every `ref` field,
  * returning the wallet name, the period-delimited field path, and the
  * fully-qualified references.
  */
-export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
+export function collectWalletRefs(
+	walletName: string,
+	wallet: BaseWallet<AttributeGroupId>,
+): CollectedRef[] {
 	const results: CollectedRef[] = []
 
 	const findRefs = (path: string[], x: unknown): void => {
@@ -416,23 +421,29 @@ export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
 
 		if (hasRefs(x)) {
 			results.push({
-				walletName: path[0],
+				walletName,
 				fieldPath: path.join(''),
 				fullyQualifiedRefs: toFullyQualified(x.ref),
 			})
 		}
 
 		for (const [key, val] of Object.entries(x)) {
-			findRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
+			findRefs(path.concat([`.${key}`]), val)
 		}
 	}
 
-	for (const [walletName, wallet] of Object.entries(wallets)) {
-		findRefs([walletName], wallet)
-	}
+	findRefs([walletName], wallet)
 
 	return results
 }
+
+/** `collectWalletRefs` for every wallet in `wallets`. */
+export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
+	return Object.entries(wallets).flatMap(([walletName, wallet]) =>
+		collectWalletRefs(walletName, wallet),
+	)
+}
+
 /** Extract references out of `withRef`. */
 export function refs(withRef: WithRef<unknown>): FullyQualifiedReference[] {
 	if (isNoRef(withRef.ref)) {

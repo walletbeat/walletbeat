@@ -6,6 +6,7 @@ export const erc7831: Eip = {
 	formalTitle: 'Multi-Chain Addressing',
 	// Address resolution is a software wallet feature.
 	appliesTo: allVariantsForWalletType(WalletType.SOFTWARE),
+	finalizedDate: null,
 	icon: 'ICON_GLOBE',
 	number: '7831',
 	prefix: EipPrefix.ERC,
