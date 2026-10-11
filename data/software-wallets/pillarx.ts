@@ -173,7 +173,16 @@ export const pillarx: SoftwareWallet = {
 						{
 							explanation:
 								'The web CI workflows install with `npm i` rather than `npm ci`, and the mobile CircleCI build runs `yarn install` without `--frozen-lockfile`, so committed lockfiles are not enforced.',
-							url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows/unit-tests.yml',
+							urls: [
+								{
+									label: 'Web CI install',
+									url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows/unit-tests.yml#L11',
+								},
+								{
+									label: 'Mobile CircleCI install',
+									url: 'https://github.com/pillarwallet/pillarwallet/blob/ff3047e05ee01024f2b230aad846af50849042a9/.circleci/config.yml#L155-L164',
+								},
+							],
 						},
 					],
 				}),
@@ -181,7 +190,7 @@ export const pillarx: SoftwareWallet = {
 					ref: {
 						explanation:
 							'No LavaMoat or install-script allow list; `.npmrc` sets `ignore-scripts=false`.',
-						url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc',
+						url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc#L4',
 					},
 				}),
 				dependencyVulnerabilityScanning: notSupportedWithRef({

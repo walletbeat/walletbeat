@@ -1,0 +1,18 @@
+{
+	"highlightFirstLine": 4,
+	"highlightLastLine": 4,
+	"segments": [
+		{
+			"lines": [
+				"# Disable git operations during npm install to prevent issues in CI/CD environments",
+				"# This fixes the git config error during Cloudflare Pages deployment",
+				"unsafe-perm=true",
+				"ignore-scripts=false",
+				"",
+				"# Configure git to use system config only",
+				"git-tag-version=false"
+			],
+			"startLine": 1
+		}
+	]
+}
