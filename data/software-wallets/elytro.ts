@@ -168,11 +168,19 @@ export const elytro: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: notSupportedWithRef({
-				ref: {
-					explanation:
-						'The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro\'s terms say "No bug‑bounty commitment … no bounty or reward is due unless we expressly agree in writing."',
-					url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md#L1-L7',
-				},
+				ref: [
+					{
+						explanation:
+							'Section 3.4 of the terms says: "No bug‑bounty commitment. We appreciate responsible disclosure, but no bounty or reward is due unless we expressly agree in writing."',
+						label: 'Elytro Terms of Use',
+						url: 'https://elytro.notion.site/elytro-terms-of-use',
+					},
+					{
+						explanation:
+							'The archived `soul-wallet-contract` repository describes the Soul Wallet bug bounty program, which covers the `soulwallet-core` and `soul-wallet-contract` repositories as of August 20th, 2024, for critical and high-severity bugs with rewards of up to $50,000.',
+						url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md#L1-L7',
+					},
+				],
 			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
