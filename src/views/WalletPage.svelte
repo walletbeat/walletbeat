@@ -348,6 +348,20 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
+	const unratedAttributes = $derived(
+		Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) return []
+
+			return attrGroup.attributes
+				.filter(({ attribute }) => evalGroup[attribute.id]?.evaluation.outcome.rating === Rating.UNRATED)
+				.map(({ attribute }) => attribute)
+		}),
+	)
+
+	let isUnratedListOpen = $state(false)
+
 	const allPageReferences = $derived.by(() => {
 		const refs = Object.values(attributeTree).flatMap(attrGroup => {
 			const evalGroup = evalTree[attrGroup.id]
@@ -638,6 +652,24 @@
 								{/if}
 							</p>
 						{/if}
+					{/if}
+
+					{#if unratedAttributes.length > 0}
+						<p>
+							{unratedAttributes.length === 1 ? '1 attribute has' : `${unratedAttributes.length} attributes have`}
+							not been evaluated yet, as Walletbeat does not have the necessary information on
+							{wallet.metadata.displayName}.
+							The <a href="/docs/contribute/wallet-data/">wallet data guide</a> explains how to contribute it.
+						</p>
+
+						<details bind:open={isUnratedListOpen}>
+							<summary data-row="start gap-2">{isUnratedListOpen ? 'Collapse' : 'Expand'}</summary>
+							<p>
+								{#each unratedAttributes as attribute, i (attribute.id)}
+									{i > 0 ? ', ' : ''}<a href={`#${slugifyCamelCase(attribute.id)}`}>{attribute.displayName}</a>
+								{/each}.
+							</p>
+						</details>
 					{/if}
 				</div>
 			</section>
@@ -3088,6 +3120,26 @@
 
 			:global(p) {
 				margin: 0;
+			}
+		}
+	}
+
+	/*
+	 * Consecutive collapsed unrated cards read as one list: no gap between them,
+	 * shared dividers, and rounded corners only at the ends of the run.
+	 */
+	.attribute[data-rating='unrated']:has(> details:not([open])) {
+		&:has(+ .attribute[data-rating='unrated'] > details:not([open])) > details {
+			border-end-start-radius: 0;
+			border-end-end-radius: 0;
+		}
+
+		& + .attribute[data-rating='unrated']:has(> details:not([open])) {
+			margin-block-start: calc(-1.25em - 1px);
+
+			> details {
+				border-start-start-radius: 0;
+				border-start-end-radius: 0;
 			}
 		}
 	}
