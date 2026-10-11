@@ -60,7 +60,7 @@ export function passkeyLibraryName(library: PasskeyVerificationLibrary): string 
 		case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
 			return 'OpenZeppelin P256 Verifier'
 		case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
-			return 'WebAuthn.sol'
+			return 'Base WebAuthn.sol'
 		case PasskeyVerificationLibrary.SOLADY_WEB_AUTHN:
 			return 'Solady WebAuthn.sol'
 		case PasskeyVerificationLibrary.OTHER:

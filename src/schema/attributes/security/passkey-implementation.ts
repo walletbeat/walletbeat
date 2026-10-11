@@ -180,8 +180,8 @@ function webAuthnSolImplementation(
 		outcome: {
 			id: 'web_authn_sol_implementation',
 			rating: Rating.PASS,
-			displayName: 'Audited passkey implementation (WebAuthn.sol)',
-			shortExplanation: mdSentence('{{WALLET_NAME}} implements passkeys using WebAuthn.sol.'),
+			displayName: 'Audited passkey implementation (Base WebAuthn.sol)',
+			shortExplanation: mdSentence('{{WALLET_NAME}} implements passkeys using Base WebAuthn.sol.'),
 			metadata: {
 				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
 				libraryUrl:
@@ -252,7 +252,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 			- [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib)
 			- [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier)
 			- [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
-			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
+			- [Base WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
 			- [Solady WebAuthn.sol](https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol), [audited](https://github.com/Vectorized/solady/blob/main/audits/cantina-spearbit-coinbase-solady-report.pdf) as part of Solady
 
 		2. **Partial**: Using libraries that work but are less optimal:
@@ -306,7 +306,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 			),
 			exampleRating(
 				mdParagraph(
-					"The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.",
+					"The wallet implements passkeys using [Base WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.",
 				),
 				webAuthnSolImplementation(
 					EvaluationContext.forTest(() => passkeyImplementation),
