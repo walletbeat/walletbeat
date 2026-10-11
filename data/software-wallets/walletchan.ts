@@ -124,7 +124,7 @@ export const walletchan: SoftwareWallet = {
 					{
 						explanation:
 							'WalletChan supports Ledger hardware accounts in Chromium browsers over WebHID. Firefox builds do not offer Ledger setup.',
-						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/_docs/LEDGER.md',
+						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/_docs/LEDGER.md#L1-L3',
 					},
 				],
 				wallets: {
@@ -171,7 +171,7 @@ export const walletchan: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The repository keeps a Keep a Changelog-format CHANGELOG.md for the browser extension.',
-						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/CHANGELOG.md',
+						url: 'https://github.com/walletchan/walletchan/blob/47650cc1e0aaec867422537683fd900b2299b6bb/CHANGELOG.md#L1-L7',
 					},
 				}),
 				hermeticBuilds: null,
