@@ -6,6 +6,7 @@ export const erc7828: Eip = {
 	formalTitle: 'Chain-specific addresses using ENS',
 	// Address resolution is a software wallet feature.
 	appliesTo: allVariantsForWalletType(WalletType.SOFTWARE),
+	finalizedDate: null,
 	icon: 'ICON_AT_SIGN',
 	number: '7828',
 	prefix: EipPrefix.ERC,

@@ -1168,6 +1168,7 @@ export const ambire: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{

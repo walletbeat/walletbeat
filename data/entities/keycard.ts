@@ -7,7 +7,7 @@ import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
  * - Legal entity: Status Research & Development Deutschland GmbH
  * - Contact: legal@status.im
  * - Address: ℅ Cormoran GmbH, Am Zirkus 2, 10117 Berlin, Germany
- * - Terms of use: https://keycard.tech/legal/terms-of-use
+ * - Terms of service: https://keycard.tech/policies/terms-of-service
  */
 export const keycard: CorporateEntity & WalletDeveloper = {
 	id: 'keycard',
@@ -29,7 +29,7 @@ export const keycard: CorporateEntity & WalletDeveloper = {
 	icon: { extension: 'svg' },
 	jurisdiction: 'Germany',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
-	privacyPolicy: 'https://keycard.tech/legal/privacy-policy',
+	privacyPolicy: 'https://keycard.tech/policies/privacy-policy',
 	repoUrl: 'https://github.com/keycard-tech',
 	twitter: 'https://x.com/Keycard_',
 	url: 'https://keycard.tech/',
