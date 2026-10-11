@@ -386,7 +386,7 @@ export const daimo: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Recovery is by adding backup keys held by the user (passkey, security key or seed phrase) to the onchain account; there is no guardian or vendor-assisted recovery.',
-						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts#L4-L23',
 					},
 				}),
 			},
@@ -479,16 +479,19 @@ export const daimo: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Builds were made and signed on the Expo EAS service and distributed through the app stores; no signatures or release artifacts were published.',
-						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
 					},
 				}),
 				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
-							explanation:
-								'package-lock.json is committed and the CI and release workflows install with `npm ci`.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+							explanation: 'package-lock.json is committed and CI installs with `npm ci`.',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/ci.yml#L21-L24',
+						},
+						{
+							explanation: 'The release workflow also installs with `npm ci`.',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L115-L116',
 						},
 					],
 				}),
@@ -500,7 +503,7 @@ export const daimo: SoftwareWallet = {
 						{
 							explanation:
 								'Production builds run on the Expo EAS cloud service with `eas-version: latest`, fetching tools and dependencies during the build.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
 						},
 					],
 				}),
