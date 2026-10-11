@@ -110,7 +110,7 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'The Elytro extension monorepo is licensed under GPL-3.0.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE#L1-L2',
 					},
 					{
 						explanation:
@@ -131,7 +131,7 @@ export const elytro: SoftwareWallet = {
 				{
 					explanation:
 						'The extension has no built-in swap or bridge; it links out to external apps, and Elytro says users pay only network fees.',
-					url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/constants/dapps.ts',
+					url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/constants/dapps.ts#L28-L39',
 				},
 			],
 			revenueBreakdownIsPublic: false,
@@ -171,7 +171,7 @@ export const elytro: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The only program was the 2024 Soul Wallet contract bounty in an archived repository; Elytro\'s terms say "No bug‑bounty commitment … no bounty or reward is due unless we expressly agree in writing."',
-					url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md',
+					url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/bug-bounty.md#L1-L7',
 				},
 			}),
 			duressResistance: null,
@@ -184,7 +184,16 @@ export const elytro: SoftwareWallet = {
 					{
 						explanation:
 							'The extension generates the owner key locally with viem `generatePrivateKey` (browser CSPRNG) and stores it encrypted with AES-GCM under a PBKDF2-derived passcode key.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/background/services/keyring.ts',
+						urls: [
+							{
+								label: 'Key generation',
+								url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/background/services/keyring.ts#L62-L83',
+							},
+							{
+								label: 'Vault encryption',
+								url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/passworder.ts#L25-L52',
+							},
+						],
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -245,7 +254,7 @@ export const elytro: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Hardened JavaScript (`lockdown()` from the `ses` package) protects JavaScript built-in objects, but there are no LavaMoat policies or per-package compartments.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts#L19-L43',
 					},
 				}),
 				dependencyVulnerabilityScanning: notSupported,
@@ -256,7 +265,16 @@ export const elytro: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Builds need private API keys and bump the version automatically; no reproducible build process is documented.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md',
+						urls: [
+							{
+								label: 'Required API keys',
+								url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md#L19-L39',
+							},
+							{
+								label: 'Version bump on build',
+								url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/package.json#L11-L15',
+							},
+						],
 					},
 				}),
 			},
