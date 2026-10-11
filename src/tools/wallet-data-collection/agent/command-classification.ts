@@ -1,7 +1,58 @@
 /** Classification library for bash command lines for the wallet-data-collection harness. */
+import path from 'node:path'
+
+import { getRepositoryRoot } from '../../../utils/codebase'
+import { ARBITRARY_COMMAND_ENV, OPEN_MUTATION_ENV } from '../read-only'
 
 /** The one command the agent may run through bash without being marked arbitrary. */
 export const AGENT_INVOCATION_COMMAND = 'pnpm wallet-data-collection:agent'
+
+/**
+ * The environment variables the harness itself controls and the agent must never
+ * inspect or set. Referencing any of them in a command is a gaming attempt that
+ * terminates the session.
+ */
+export const RESTRICTED_ENV_VARS = [
+	ARBITRARY_COMMAND_ENV,
+	OPEN_MUTATION_ENV,
+	'WALLETBEAT_ENV',
+] as const
+
+/** True when a command references a harness-controlled environment variable. */
+export function referencesRestrictedEnvVar(command: string): boolean {
+	return RESTRICTED_ENV_VARS.some(variable => command.includes(variable))
+}
+
+/**
+ * True when a command is a domain classification (`mark-domain` or `mark-domain-update`).
+ * Domain mappings are repo-global, so a single change can affect requests across multiple
+ * wallets; such changes are the ones that warrant justification when they go cross-wallet.
+ */
+export function isDomainClassificationCommand(command: string): boolean {
+	return /\bmark-domain\b/.test(command)
+}
+
+/**
+ * Build the environment injected into every bash command run by the harness.
+ * Always sets `WALLETBEAT_ENV=AGENT`; sets the open-mutation env var while an open
+ * mutation is outstanding, and the arbitrary-command env var for arbitrary commands.
+ */
+export function buildAgentEnv(
+	baseEnv: NodeJS.ProcessEnv,
+	opts: { isArbitrary: boolean; openMutationActive: boolean },
+): NodeJS.ProcessEnv {
+	const env: NodeJS.ProcessEnv = { ...baseEnv, WALLETBEAT_ENV: 'AGENT' }
+
+	if (opts.openMutationActive) {
+		env[OPEN_MUTATION_ENV] = 'true'
+	}
+
+	if (opts.isArbitrary) {
+		env[ARBITRARY_COMMAND_ENV] = 'true'
+	}
+
+	return env
+}
 
 /**
  * Shell metacharacters that must never appear in a segment. Rejecting them anywhere
@@ -137,7 +188,69 @@ function isAllowedSideCommand(segment: string): boolean {
 	const firstSpace = segment.search(/\s/)
 	const commandWord = firstSpace === -1 ? segment : segment.slice(0, firstSpace)
 
+	// `cd` is only allowed when it is exactly `cd <single-path>` and that path resolves
+	// to the repository root; anything else is arbitrary.
+	if (commandWord === 'cd') {
+		return isAllowedCdCommand(segment)
+	}
+
 	return ALLOWED_SIDE_COMMANDS.has(commandWord)
+}
+
+/**
+ * True when `segment` is a valid `cd`: exactly one path argument (quoted or unquoted, no
+ * flags, no extra tokens) that resolves to the repository root. A `cd` that is more
+ * complex or points elsewhere is rejected as arbitrary.
+ */
+function isAllowedCdCommand(segment: string): boolean {
+	const rest = segment.slice(2).trim()
+
+	if (rest === '') {
+		return false
+	}
+
+	let arg: string
+	const first = rest[0]
+
+	if (first === "'" || first === '"') {
+		// The whole rest must be a single quoted string.
+		const closing = rest.indexOf(first, 1)
+
+		if (closing === -1 || rest.slice(closing + 1).trim() !== '') {
+			return false
+		}
+
+		arg = rest.slice(1, closing)
+	} else {
+		// A single unquoted token: no whitespace and not a flag.
+		if (/\s/.test(rest) || rest.startsWith('-')) {
+			return false
+		}
+
+		arg = rest
+	}
+
+	// The path must resolve to the same directory as the repository root.
+	const repoRoot = getRepositoryRoot()
+
+	return path.resolve(repoRoot, arg) === path.resolve(repoRoot)
+}
+
+/**
+ * Redact the repository-root path passed to a `cd` in a command, replacing it with the
+ * placeholder `/walletbeat` (e.g. `cd /media/.../walletbeat` → `cd /walletbeat`). Only a
+ * `cd` whose single argument resolves to the repository root is redacted; the surrounding
+ * quote style is preserved.
+ */
+export function redactCdPath(command: string): string {
+	const repoRoot = getRepositoryRoot()
+	const escaped = repoRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	const re = new RegExp(`(\\bcd[ \\t]+)(['"]?)${escaped}\\/?\\2`, 'g')
+
+	return command.replace(
+		re,
+		(_match, prefix: string, quote: string) => `${prefix}${quote}/walletbeat${quote}`,
+	)
 }
 
 /**

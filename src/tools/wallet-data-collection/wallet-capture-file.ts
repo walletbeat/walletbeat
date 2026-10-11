@@ -64,6 +64,7 @@ import {
 	type WalletCaptureAnnotations,
 	type WalletRequestMatcher,
 } from './wallet-capture-annotations'
+import { requestIdToString } from './wallet-capture-classification-audit-log'
 
 export enum RecordedOnlyFlow {
 	IDLE_PRE_INSTALL = 'IDLE_PRE_INSTALL',
@@ -2520,6 +2521,15 @@ export class WalletRequest {
 		return this._key
 	}
 
+	/** The canonical request ID: `walletId:walletVariant:sessionTime`. */
+	public requestIdString(): string {
+		return requestIdToString({
+			walletId: this._captureFile.identity.walletId,
+			walletVariant: this._captureFile.identity.walletVariant,
+			sessionTime: this.sessionTime.toNumber(),
+		})
+	}
+
 	public domains(): NonEmptyArray<string> {
 		const refererDomain = this.refererDomain()
 
@@ -2861,6 +2871,24 @@ export interface WalletCaptureFileIdentity {
 	walletType: WalletType
 	walletVariant: Variant
 	walletId: string
+}
+
+/**
+ * The classification fingerprint of a single request, resolved across the whole
+ * repository so it can be diffed to detect classification changes. Canonical and
+ * deterministic (sorted arrays) so `JSON.stringify` equality is a valid diff.
+ */
+export interface WalletRequestClassification {
+	/** Sorted, deduped purposes from matcher + manual review. */
+	purposes: DataCollectionPurpose[]
+	/** Sorted `{ userInfo, policy }` resolved via request.userInfo + matcher policy. */
+	userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }>
+	/** Operator + intermediaries resolved from the domain mapping, as `{ entityId, role }`. */
+	receivingEntities: Array<{ entityId: string; role: EntityRole }>
+	/** True when the request is NOT_WALLET_INITIATED (directly or by proxy). */
+	notWalletInitiated: boolean
+	/** True when the request's domain has no entity mapping (unclassifiable). */
+	unclassifiable: boolean
 }
 
 export class WalletCaptureFile {
@@ -3488,6 +3516,25 @@ export class WalletCaptureFile {
 		return this.flows[flow] ?? null
 	}
 
+	/** Returns every request across all recorded flows (excluding `NOT_SUPPORTED` flows). */
+	public getRequests(): WalletRequest[] {
+		const requests: WalletRequest[] = []
+
+		for (const flow of recordedFlow.items) {
+			const resolved = this.getFlow(flow)
+
+			if (resolved === null || resolved === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const request of resolved.requests) {
+				requests.push(request)
+			}
+		}
+
+		return requests
+	}
+
 	/** Returns the list of capture-info entries recorded so far (possibly empty). */
 	public getCaptureInfo(): CaptureInfo[] {
 		return this.captureInfo
@@ -3801,6 +3848,110 @@ export class WalletCaptureFile {
 
 	public findMatcherForReq(request: WalletRequest): WalletRequestMatcher | null {
 		return this.annotations.matches(request)
+	}
+
+	/**
+	 * Resolve the full classification fingerprint of a single request, mirroring the
+	 * per-request body of {@link processFlowRequests}. The result is canonical (sorted
+	 * arrays, deterministic key order) so that `JSON.stringify` equality is a valid diff.
+	 *
+	 * A request whose domain has no entity mapping is *unclassifiable* and is represented
+	 * with `unclassifiable: true` (and empty `receivingEntities`), so that a `mark-domain`
+	 * change that makes the domain resolvable registers as a classification change.
+	 */
+	public async resolveRequestClassification(
+		request: WalletRequest,
+	): Promise<WalletRequestClassification> {
+		const resolved = entitiesForDomain(request.domain)
+		const notWalletInitiated = request.isNotWalletInitiated()
+
+		if (resolved === null) {
+			return {
+				purposes: [],
+				userData: [],
+				receivingEntities: [],
+				notWalletInitiated,
+				unclassifiable: true,
+			}
+		}
+
+		const matcher = this.findMatcherForReq(request)
+		const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
+
+		const receivingEntities: Array<{ entityId: string; role: EntityRole }> = [
+			{ entityId: resolved.operator.id, role: EntityRole.OPERATOR },
+			...resolved.intermediaries.map(entity => ({
+				entityId: entity.id,
+				role: EntityRole.INTERMEDIARY,
+			})),
+		]
+
+		const purposes = new Set<DataCollectionPurpose>()
+
+		if (!notWalletInitiated) {
+			if (
+				matcher !== null &&
+				matcher.purposes !== 'NOT_WALLET_INITIATED' &&
+				matcher.purposes !== null
+			) {
+				for (const purpose of setItems(matcher.purposes)) {
+					purposes.add(purpose)
+				}
+			}
+
+			const extraPurposes = request.review.getExtraPurposes()
+
+			if (extraPurposes !== 'NOT_WALLET_INITIATED') {
+				for (const purpose of extraPurposes) {
+					purposes.add(purpose)
+				}
+			}
+		}
+
+		const userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }> = []
+
+		if (!notWalletInitiated) {
+			for (const [userInfo, policy] of userInfos.entries()) {
+				if (policy !== null) {
+					userData.push({ userInfo, policy })
+				}
+			}
+		}
+
+		// Canonicalize so the fingerprint is deterministic and can be diffed.
+		const purposesSorted = [...purposes].sort((a, b) => a.localeCompare(b))
+
+		const userDataSorted = userData
+			.map(entry => ({ userInfo: entry.userInfo, policy: entry.policy }))
+			.sort((a, b) => {
+				const infoCmp = compareUserInfo(a.userInfo, b.userInfo)
+
+				if (infoCmp !== 0) {
+					return infoCmp
+				}
+
+				return a.policy.localeCompare(b.policy)
+			})
+
+		const receivingEntitiesSorted = receivingEntities
+			.map(entry => ({ entityId: entry.entityId, role: entry.role }))
+			.sort((a, b) => {
+				const idCmp = a.entityId.localeCompare(b.entityId)
+
+				if (idCmp !== 0) {
+					return idCmp
+				}
+
+				return a.role.localeCompare(b.role)
+			})
+
+		return {
+			purposes: purposesSorted,
+			userData: userDataSorted,
+			receivingEntities: receivingEntitiesSorted,
+			notWalletInitiated,
+			unclassifiable: false,
+		}
 	}
 
 	/**

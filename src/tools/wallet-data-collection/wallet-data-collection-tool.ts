@@ -14,13 +14,9 @@ import {
 	dataCollectionPurpose,
 	userInfoEnums,
 } from '@/schema/features/privacy/data-collection'
-import { type Variant, variantEnum } from '@/schema/variants'
-import { variantToWalletType, WalletType, walletTypes } from '@/schema/wallet-types'
-import {
-	assertStringHasPrefix,
-	assertStringHasPrefixAndSuffix,
-	trimWhitespacePrefix,
-} from '@/types/utils/text'
+import { variantEnum } from '@/schema/variants'
+import { WalletType, walletTypes } from '@/schema/wallet-types'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import { recordedFlow } from './wallet-capture-file'
@@ -40,6 +36,7 @@ import {
 	handleCheck,
 	handleDeleteCapture,
 	handleExplainRequest,
+	handleJustify,
 	handleLintFix,
 	handleListWalletIds,
 	handleMarkDomain,
@@ -48,7 +45,9 @@ import {
 	handleMarkString,
 	handleReviewRequests,
 	handleReviewStrings,
+	handleRollback,
 	handleSearch,
+	justifyOptions,
 	markDomainOptions,
 	markDomainUpdateOptions,
 	markFlowUnsupportedOptions,
@@ -375,6 +374,32 @@ cli
 		handleListWalletIds()
 	})
 
+// The `justify` and `rollback` subcommands are only visible to the agent harness (which
+// sets WALLETBEAT_ENV=AGENT); they are hidden from humans and CI.
+if (process.env.WALLETBEAT_ENV === DataCollectionActor.AGENT) {
+	cli
+		.command(
+			'justify',
+			'Justify the impact of an open-mutation classification change on up to 16 requests',
+		)
+		.option('--request-id <ids>', 'Comma-separated walletId:walletVariant:sessionTime request IDs')
+		.option('--url <url>', 'Exact URL (domain + path + query) of the request(s) being justified')
+		.option('--rationale <rationale>', 'A non-empty string or a LooseReference JSON object')
+		.example(
+			"  $ pnpm wallet-data-collection:agent justify --request-id='metamask:BROWSER:123456789012345' --url='https://infura.io/v3/abc123?key=val' --rationale='Detected as TRACKING_IDENTIFIER'",
+		)
+		.action(async options => {
+			await handleJustify(justifyOptions.process(options))
+		})
+
+	cli
+		.command('rollback', 'Roll back the current open-mutation classification change')
+		.example('  $ pnpm wallet-data-collection:agent rollback')
+		.action(async () => {
+			await handleRollback()
+		})
+}
+
 cli
 	.command('agent [prompt...]', 'Run the wallet-data-collection agent harness')
 	.usage(
@@ -387,6 +412,10 @@ cli
 		"  $ pnpm wallet-data-collection agent 'Classify network traffic for the MetaMask browser extension'",
 	)
 	.action((...args) => {
+		if (process.env.WALLETBEAT_ENV === 'AGENT') {
+			throw new Error('Cannot run this command while already running as agent.')
+		}
+
 		const options = agentOptions.process(args[1] ?? {})
 		// Forward every positional argument that follows the `agent` subcommand to the
 		// harness. The harness uses them as Pi's initial prompt.
@@ -396,9 +425,10 @@ cli
 		const piPkgDir = path.join(agentDir, 'node_modules', '@earendil-works', 'pi-coding-agent')
 
 		// Forward the wallet options to the harness as environment variables so it can add
-		// wallet context to the system prompt and restrict which files it may edit. The
-		// options were already validated by `agentOptions.process`. They are parsed by cac
-		// and removed from `cli.args`, so they are never passed through as part of the prompt.
+		// wallet context to the system prompt. The options were already validated by
+		// `agentOptions.process`. They are parsed by cac and removed from `cli.args`, so
+		// they are never passed through as part of the prompt. The harness derives its
+		// allowed-edit set from these same wallet context vars.
 		if (options.id) {
 			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ID = options.id
 		}
@@ -409,56 +439,6 @@ cli
 
 		if (options.type) {
 			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_TYPE = options.type
-		}
-
-		function computeAllowedEditFiles(
-			id: string,
-			variant: Variant | null | undefined,
-			type: WalletType | null | undefined,
-		): Array<`/${string}`> {
-			const repoRoot = getRepositoryRoot()
-			const variants = variant == null ? variantEnum.items : [variant]
-			const types = type == null ? walletTypes.items : [type]
-			const files: Array<`/${string}`> = []
-
-			const pushIfExists = (rel: string): void => {
-				if (existsSync(path.join(repoRoot, rel.slice(1)))) {
-					files.push(assertStringHasPrefix(rel, '/'))
-				}
-			}
-
-			// Repo-global data the agent may edit regardless of the wallet.
-			files.push(assertStringHasPrefixAndSuffix('/data/entities/', { prefix: '/', suffix: '/' }))
-			pushIfExists('/data/collection/global.annotations.json')
-			pushIfExists('/data/entities.ts')
-
-			for (const v of variants) {
-				for (const t of types) {
-					if (variantToWalletType(v) !== t) {
-						continue
-					}
-
-					const walletDir = `/data/${t.toLowerCase()}-wallets/collection/${id}`
-					const walletId = id
-
-					pushIfExists(`${walletDir}/${walletId}.${v.toLowerCase()}.capture.json`)
-					pushIfExists(`${walletDir}/${walletId}.annotations.json`)
-					pushIfExists(
-						`${walletDir}/${walletId}.${v.toLowerCase()}.datacollection.autogenerated.json`,
-					)
-					pushIfExists(`${walletDir}/${walletId}.datacollection.autogenerated.ts`)
-				}
-			}
-
-			return files
-		}
-
-		if (options.id) {
-			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES = computeAllowedEditFiles(
-				options.id,
-				options.variant,
-				options.type,
-			).join(',')
 		}
 
 		if (!existsSync(path.join(piPkgDir, 'package.json'))) {

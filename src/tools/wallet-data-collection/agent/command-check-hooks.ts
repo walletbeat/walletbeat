@@ -14,6 +14,9 @@ import path from 'node:path'
 
 import type { BashOperations } from '@earendil-works/pi-coding-agent'
 
+import { type Variant, variantEnum } from '../../../schema/variants'
+import { variantToWalletType, type WalletType, walletTypes } from '../../../schema/wallet-types'
+import { assertNonEmptyArray } from '../../../types/utils/non-empty'
 import { assertStringHasPrefix } from '../../../types/utils/text'
 import {
 	CodebaseEntryType,
@@ -22,9 +25,14 @@ import {
 	normalizePath,
 	type PathPredicate,
 } from '../../../utils/codebase'
-import { ARBITRARY_COMMAND_ENV } from '../read-only'
-import { WalletCaptureAnnotations } from '../wallet-capture-annotations'
-import { WalletCaptureFile } from '../wallet-capture-file'
+import { AUDIT_LOG_RELATIVE_PATH } from '../read-only'
+import {
+	requestIdToString,
+	WalletCaptureClassificationAuditLogFile,
+	type WalletCaptureImpactedRequestId,
+} from '../wallet-capture-classification-audit-log'
+import { WalletCaptureFile, type WalletRequestClassification } from '../wallet-capture-file'
+import { allRequestClassifications, loadAnnotationsForCapture } from '../wallet-capture-repo'
 import {
 	type BashOperationsOptions,
 	type BashPostHook,
@@ -33,7 +41,19 @@ import {
 	type BashPreHookResult,
 	createHookBashOperations,
 } from './bash-hooks'
-import { isPlainAgentInvocation } from './command-classification'
+import {
+	buildAgentEnv,
+	isDomainClassificationCommand,
+	isPlainAgentInvocation,
+	redactCdPath,
+	referencesRestrictedEnvVar,
+	RESTRICTED_ENV_VARS,
+} from './command-classification'
+import {
+	diffClassifications,
+	mergeJustifyIntoOpenMutation,
+	type OpenMutationState,
+} from './wallet-capture-classification'
 
 /** A repo-relative path, e.g. `/src` or `/package.json`. */
 type RepoRelativePath = `/${string}`
@@ -43,6 +63,9 @@ type RepoRelativePath = `/${string}`
  * this marker to render hook messages in a distinct (error) style.
  */
 export const COMMAND_CHECK_HOOK_MARKER = '[command-check-hooks]'
+
+/** The audit-log path as a repo-relative path (leading `/`). */
+const AUDIT_LOG_REL: RepoRelativePath = `/${AUDIT_LOG_RELATIVE_PATH}`
 
 /**
  * Build the error message appended to a reverted arbitrary command's output. It tells the
@@ -76,6 +99,49 @@ export function buildCommandCheckErrorMessage(files: ReadonlySet<RepoRelativePat
 		`${COMMAND_CHECK_HOOK_MARKER} A modified file was outside the allowed edit set or failed validation;`,
 		'reverted all changes to the scoped repo paths from backup-tree.bak. Offending file(s):',
 		list,
+	].join('\n')
+}
+
+/**
+ * Build the message appended when a command causes request classifications to change and
+ * an open mutation is opened. It instructs the agent to run `check` to find the impacted
+ * request IDs, then justify or roll back.
+ */
+export function buildOpenMutationMessage(
+	impacted: ReadonlyArray<WalletCaptureImpactedRequestId>,
+): string {
+	return [
+		`${COMMAND_CHECK_HOOK_MARKER} This command changed the classification of ${impacted.length} request(s) across the repository.`,
+		'Run `pnpm wallet-data-collection:agent check` to list the impacted request IDs, then `justify` or `rollback` them before making further classification changes.',
+		'You will need to do so even if you have justified prior classification changes to the same requests.',
+	].join('\n')
+}
+
+/**
+ * Build the message appended when a command tries to write a non-audit file while an open
+ * mutation is outstanding (the write is rejected and reverted).
+ */
+export function buildOpenMutationNonAuditMessage(files: ReadonlyArray<RepoRelativePath>): string {
+	const list = [...files]
+		.sort((a, b) => a.localeCompare(b))
+		.map(file => `  - ${file}`)
+		.join('\n')
+
+	return [
+		`${COMMAND_CHECK_HOOK_MARKER} While an open mutation is outstanding, only ${AUDIT_LOG_RELATIVE_PATH} may be written;`,
+		'reverted all other changes. Offending file(s):',
+		list,
+	].join('\n')
+}
+
+/**
+ * Build the message appended when the audit log was not appended with exactly one valid
+ * entry (the audit-log change is reverted).
+ */
+export function buildInvalidAuditAppendMessage(): string {
+	return [
+		`${COMMAND_CHECK_HOOK_MARKER} The audit log was not appended with exactly one valid entry;`,
+		'reverted the audit log change. Run `pnpm wallet-data-collection:agent check` to see the outstanding impact.',
 	].join('\n')
 }
 
@@ -134,8 +200,62 @@ function isCaptureFile(rel: RepoRelativePath): boolean {
 	return path.basename(rel).endsWith('.capture.json')
 }
 
+/** True when every impacted request belongs to the same wallet. */
+function isSingleWalletImpact(impacted: WalletCaptureImpactedRequestId[]): boolean {
+	return new Set(impacted.map(id => id.walletId)).size === 1
+}
+
 /** Snapshot of the repo: Mapping from repo-root-relative filenames to hashes. */
 type RepoSnapshot = Record<RepoRelativePath, string>
+
+/**
+ * True if `rel` is a repo-global data path the agent may edit regardless of the wallet:
+ * the entity-mapping directory, the global annotations file, or the entity registry.
+ */
+function isGlobalEditPath(rel: RepoRelativePath): boolean {
+	return (
+		rel.startsWith('/data/entities/') ||
+		rel === '/data/collection/global.annotations.json' ||
+		rel === '/data/entities.ts'
+	)
+}
+
+/**
+ * True if `rel` is one of the wallet's capture / annotations / datacollection files for
+ * the given wallet context, i.e. a variant whose `variantToWalletType` matches a type in
+ * `types`.
+ */
+function isWalletEditPath(
+	rel: RepoRelativePath,
+	walletId: string,
+	variant: Variant | null,
+	type: WalletType | null,
+): boolean {
+	const variants = variant == null ? variantEnum.items : [variant]
+	const types = type == null ? walletTypes.items : [type]
+
+	for (const v of variants) {
+		for (const t of types) {
+			if (variantToWalletType(v) !== t) {
+				continue
+			}
+
+			const walletDir = `/data/${t.toLowerCase()}-wallets/collection/${walletId}`
+			const suffix = `.${v.toLowerCase()}`
+
+			if (
+				rel === `${walletDir}/${walletId}${suffix}.capture.json` ||
+				rel === `${walletDir}/${walletId}.annotations.json` ||
+				rel === `${walletDir}/${walletId}${suffix}.datacollection.autogenerated.json` ||
+				rel === `${walletDir}/${walletId}.datacollection.autogenerated.ts`
+			) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
 
 /**
  * The agent-process-level state and operations for the command-check harness.
@@ -150,7 +270,6 @@ export class WalletDataCollectionAgent {
 	readonly repoRoot: string
 	private readonly agentDir: string
 	private readonly backupTreeDir: string
-	private readonly globalAnnotationsPath: string
 	private readonly scope: Set<RepoRelativePath>
 
 	/**
@@ -161,47 +280,69 @@ export class WalletDataCollectionAgent {
 	lastSnapshot: RepoSnapshot | null = null
 
 	/**
-	 * The set of repo-relative paths the harness is allowed to edit.
-	 * Entries ending with `/` are directory prefixes: any file under
-	 * them is allowed. Non-prefix entries are exact file paths.
+	 * Whether an edit allowlist is active (a wallet context is provided).
 	 */
-	readonly allowedEditFiles: Set<RepoRelativePath>
-
-	/** Whether an edit allowlist is active (the env var is set, even if empty). */
 	readonly hasAllowedRestriction: boolean
+
+	/** Wallet context used to derive the allowed-edit rule (see {@link isAllowedEdit}). */
+	private readonly walletId: string | undefined
+	private readonly walletVariant: Variant | null
+	private readonly walletType: WalletType | null
+
+	/** Absolute path to the classification audit log. */
+	readonly auditLogPath: string
+
+	/**
+	 * Non-null while an open mutation is outstanding. Holds the frozen pre-mutation
+	 * classification cache and repo snapshot (used for rollback) plus the set of
+	 * impacted request IDs already justified.
+	 */
+	openMutation: null | (OpenMutationState & { frozenSnapshot: RepoSnapshot })
+
+	/**
+	 * Classification fingerprints across all wallets, as of the most recent validated
+	 * (pre-command) state. Updated after each non-arbitrary command that writes a file.
+	 */
+	classificationCache: Map<string, WalletRequestClassification>
+
+	/** The in-memory audit log, kept in sync as entries are appended or reloaded. */
+	auditLog: WalletCaptureClassificationAuditLogFile
 
 	constructor() {
 		this.repoRoot = getRepositoryRoot()
 		this.agentDir = path.join(this.repoRoot, 'src/tools/wallet-data-collection/agent')
 		this.backupTreeDir = path.join(this.agentDir, 'backup-tree.bak')
-		this.globalAnnotationsPath = path.join(
-			this.repoRoot,
-			'data',
-			'collection',
-			'global.annotations.json',
-		)
+		this.auditLogPath = path.join(this.repoRoot, AUDIT_LOG_RELATIVE_PATH)
 		this.scope = this.buildScope()
-		this.allowedEditFiles = this.parseAllowedEditFiles()
-		this.hasAllowedRestriction =
-			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES !== undefined
+
+		const walletId = process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ID
+		const walletVariant = process.env.WALLETBEAT_WALLET_DATA_COLLECTION_VARIANT
+		const walletType = process.env.WALLETBEAT_WALLET_DATA_COLLECTION_TYPE
+
+		this.walletId = walletId
+		this.walletVariant =
+			walletVariant !== undefined && variantEnum.is(walletVariant) ? walletVariant : null
+		this.walletType = walletType !== undefined && walletTypes.is(walletType) ? walletType : null
+		this.hasAllowedRestriction = walletId !== undefined
+
+		this.openMutation = null
+		this.classificationCache = new Map()
+		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath)
 	}
 
 	/**
-	 * True if `rel` is an explicitly allowed file or lives under an allowed directory
-	 * prefix.
+	 * True if the repo-relative path `rel` is within the agent's allowed-edit set.
 	 */
 	isAllowedEdit(rel: RepoRelativePath): boolean {
-		for (const allowed of this.allowedEditFiles) {
-			if (allowed.endsWith('/')) {
-				if (rel.startsWith(allowed)) {
-					return true
-				}
-			} else if (rel === allowed) {
-				return true
-			}
+		if (!this.hasAllowedRestriction || this.walletId === undefined) {
+			// Without a wallet context the agent is not scoped, so no restriction applies.
+			return true
 		}
 
-		return false
+		return (
+			isGlobalEditPath(rel) ||
+			isWalletEditPath(rel, this.walletId, this.walletVariant, this.walletType)
+		)
 	}
 
 	/**
@@ -213,23 +354,36 @@ export class WalletDataCollectionAgent {
 	async initialize(): Promise<void> {
 		const snapshot = await this.snapshotRepo()
 
-		// When an edit allowlist is configured, every allowed file must be present in the
-		// initial snapshot, otherwise the harness would be told it may edit a file that
-		// does not exist.
-		for (const rel of this.allowedEditFiles) {
-			if (rel.endsWith('/')) {
-				continue
-			}
-
-			if (snapshot[rel] === undefined) {
-				throw new Error(
-					`[command-check-hooks] Allowed edit file ${rel} is missing from the initial snapshot`,
-				)
-			}
-		}
-
 		this.syncBackup(snapshot, this.snapshotBackupHashes())
 		this.lastSnapshot = snapshot
+
+		// Load the audit log (the source of truth across process restarts) and compute the
+		// initial classification cache across all wallets.
+		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath)
+		this.classificationCache = await allRequestClassifications(this.repoRoot)
+
+		// Recover an orphaned open-mutation left by a prior harness run: resume in
+		// open-mutation mode, restoring the un-justified set from the log.
+		const open = this.auditLog.getOpenMutation()
+
+		if (open !== null) {
+			const impactedStrings = open.impacted.map(requestIdToString)
+			const unjustified = this.auditLog.getUnjustifiedImpacted()
+			const unjustifiedStrings = new Set(unjustified.map(requestIdToString))
+			const justified: Set<string> = new Set(
+				impactedStrings.filter((id: string) => !unjustifiedStrings.has(id)),
+			)
+
+			this.openMutation = {
+				command: open.command,
+				impacted: open.impacted,
+				justified,
+				frozenClassificationCache: this.classificationCache,
+				// The pre-mutation repo state is not recoverable after a restart; a rollback
+				// reverts to the current (already-mutated) state, which is a safe no-op.
+				frozenSnapshot: snapshot,
+			}
+		}
 	}
 
 	/**
@@ -295,16 +449,26 @@ export class WalletDataCollectionAgent {
 	 * `currentScopedKeys` is the set of repo-relative paths (leading `/`) present after
 	 * the command; any of them with no backup is treated as newly added and removed.
 	 */
-	revertRepo(currentScopedKeys: RepoRelativePath[]): void {
+	revertRepo(
+		currentScopedKeys: RepoRelativePath[],
+		options: { excludePaths?: ReadonlySet<RepoRelativePath> } = {},
+	): void {
+		const excluded = options.excludePaths ?? new Set<RepoRelativePath>()
 		const bakFiles = walkFiles(this.backupTreeDir)
 		const bakFileSet = new Set<RepoRelativePath>(
 			bakFiles.map(f => assertStringHasPrefix(`/${path.relative(this.backupTreeDir, f)}`, '/')),
 		)
 
 		// Copy back every backed-up file first (overwrites modified files, restores deleted
-		// ones).
+		// ones), skipping any path that must not be reverted (e.g. the audit log).
 		for (const bakFile of bakFiles) {
 			const rel = path.relative(this.backupTreeDir, bakFile)
+			const key = assertStringHasPrefix(`/${rel}`, '/')
+
+			if (excluded.has(key)) {
+				continue
+			}
+
 			const dst = path.join(this.repoRoot, rel)
 
 			fs.mkdirSync(path.dirname(dst), { recursive: true })
@@ -313,6 +477,10 @@ export class WalletDataCollectionAgent {
 
 		// Then remove any file the command added that has no backup.
 		for (const key of currentScopedKeys) {
+			if (excluded.has(key)) {
+				continue
+			}
+
 			if (!bakFileSet.has(key)) {
 				fs.rmSync(path.join(this.repoRoot, key.slice(1)))
 			}
@@ -326,7 +494,7 @@ export class WalletDataCollectionAgent {
 	async isCaptureFileLoadable(capturePath: RepoRelativePath): Promise<boolean> {
 		try {
 			const absPath = path.join(this.repoRoot, capturePath.slice(1))
-			const annotations = this.loadAnnotationsForCapture(absPath)
+			const annotations = loadAnnotationsForCapture(absPath)
 
 			await WalletCaptureFile.fromFile(null, absPath, annotations)
 
@@ -405,46 +573,6 @@ export class WalletDataCollectionAgent {
 
 		return Object.fromEntries(hashes)
 	}
-
-	/**
-	 * Parse `WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES` (a comma-separated set
-	 * of repo-root-relative `/${string}` paths) into a Set of `/${string}` keys. Returns
-	 * an empty set when the env var is unset or empty.
-	 */
-	private parseAllowedEditFiles(): Set<RepoRelativePath> {
-		const raw = process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES
-		const set = new Set<RepoRelativePath>()
-
-		if (raw === undefined) {
-			return set
-		}
-
-		for (const rel of raw.split(',')) {
-			const trimmed = rel.trim()
-
-			if (trimmed === '') {
-				continue
-			}
-
-			set.add(assertStringHasPrefix(normalizePath(trimmed), '/'))
-		}
-
-		return set
-	}
-
-	/**
-	 * Resolve the {@link WalletCaptureAnnotations} for a capture file. `capturePath` is
-	 * the absolute path to the capture file; its sibling `<walletId>.annotations.json`
-	 * supplies wallet-specific annotations and the repo-global
-	 * `data/collection/global.annotations.json` supplies the rest.
-	 */
-	private loadAnnotationsForCapture(capturePath: string): WalletCaptureAnnotations {
-		const dir = path.dirname(capturePath)
-		const walletId = path.basename(dir)
-		const annotationsPath = path.join(dir, `${walletId}.annotations.json`)
-
-		return WalletCaptureAnnotations.fromFile(annotationsPath, this.globalAnnotationsPath)
-	}
 }
 
 /**
@@ -489,27 +617,32 @@ export class WalletDataCollectionBash {
 		command: string,
 		options?: BashOperationsOptions,
 	): Promise<BashPreHookResult<WalletDataCollectionBash>> {
-		// The agent must never reference the sentinel.
-		if (command.includes(ARBITRARY_COMMAND_ENV)) {
+		// The agent must never reference the sentinel or the env vars the harness controls.
+		if (referencesRestrictedEnvVar(command)) {
 			process.stderr.write(
-				`Refusing to run: the command references ${ARBITRARY_COMMAND_ENV}, which the agent is not allowed to inspect or set. The agent attempted to game the command restriction. Terminating the session.\n`,
+				`Refusing to run: the command references a harness-controlled environment variable (${RESTRICTED_ENV_VARS.join(', ')}), which the agent is not allowed to inspect or set. The agent attempted to game the command restriction. Terminating the session.\n`,
 			)
 			process.exit(1)
 		}
 
 		const preSnapshot = await this.agent.snapshotRepo()
 
-		this.agent.syncBackup(preSnapshot, this.agent.lastSnapshot ?? {})
+		// While an open mutation is outstanding, freeze the backup tree so it retains the
+		// pre-open-mutation state (needed for a later rollback). The audit log is never
+		// reverted, so it is deliberately excluded from this freeze.
+		if (this.agent.openMutation === null) {
+			this.agent.syncBackup(preSnapshot, this.agent.lastSnapshot ?? {})
+		}
+
 		this.agent.lastSnapshot = preSnapshot
 		this.originalCommand = command
 		this.preHashes = preSnapshot
 		this.isArbitraryCommand = !isPlainAgentInvocation(command)
 
-		const env: NodeJS.ProcessEnv = { ...options?.env, WALLETBEAT_ENV: 'AGENT' }
-
-		if (this.isArbitraryCommand) {
-			env[ARBITRARY_COMMAND_ENV] = 'true'
-		}
+		const env = buildAgentEnv(options?.env ?? {}, {
+			isArbitrary: this.isArbitraryCommand,
+			openMutationActive: this.agent.openMutation !== null,
+		})
 
 		return {
 			command,
@@ -522,11 +655,16 @@ export class WalletDataCollectionBash {
 	}
 
 	/**
-	 * Post-run hook: detect capture files the command added, modified, or deleted, validate
-	 * each still-present modified capture file via {@link WalletCaptureFile}, and revert the
-	 * scoped paths from `backup-tree.bak` if any is invalid. An arbitrary command may not edit
-	 * any snapshot file, so every change is reverted with a directive to edit via a plain
-	 * `pnpm wallet-data-collection:agent` command instead.
+	 * Post-run hook: detect the files the command added, modified, or deleted, then:
+	 *
+	 * - An arbitrary command may not edit any snapshot file, so every change is reverted
+	 *   with a directive to edit via a plain `pnpm wallet-data-collection:agent` command.
+	 * - While an open mutation is outstanding, only `collection.audit.json` may be written;
+	 *   a `justify`/`rollback` append is validated and dispatched, and any other write is
+	 *   reverted.
+	 * - Otherwise, validate capture files and, if the command changed any request's
+	 *   classification across the whole repository, open a mutation (append an
+	 *   `open-mutation` entry) that the agent must then justify or roll back.
 	 */
 	async runPostHook({
 		output,
@@ -536,21 +674,8 @@ export class WalletDataCollectionBash {
 		exitCode: number | null
 	}): Promise<BashPostHookResult | void> {
 		const currentHashes = await this.agent.snapshotRepo()
-
-		// Determine which files changed during the command (added, modified, or deleted).
-		const changedFiles: Array<RepoRelativePath> = []
-
-		for (const [key, hash] of Object.entries(currentHashes)) {
-			if (this.preHashes[assertStringHasPrefix(key, '/')] !== hash) {
-				changedFiles.push(assertStringHasPrefix(key, '/'))
-			}
-		}
-
-		for (const key of Object.keys(this.preHashes)) {
-			if (!(key in currentHashes)) {
-				changedFiles.push(assertStringHasPrefix(key, '/'))
-			}
-		}
+		const changedFiles = this.computeChangedFiles(currentHashes)
+		const auditChanged = changedFiles.some(file => file === AUDIT_LOG_REL)
 
 		// An arbitrary command may not edit any file in the snapshot: revert every change.
 		if (this.isArbitraryCommand) {
@@ -567,7 +692,102 @@ export class WalletDataCollectionBash {
 			return
 		}
 
+		// While an open mutation is outstanding, only the audit log may be written.
+		if (this.agent.openMutation !== null) {
+			return this.handleOpenMutationPostHook({ output, changedFiles, auditChanged, currentHashes })
+		}
+
+		if (changedFiles.length === 0) {
+			return
+		}
+
 		// Collect the files that triggered the revert, so the hook message can name them.
+		const offendingFiles = await this.computeOffendingFiles(changedFiles, currentHashes)
+
+		if (offendingFiles.size > 0) {
+			this.agent.revertRepo(Object.keys(currentHashes).map(key => assertStringHasPrefix(key, '/')))
+
+			return {
+				output: output + `\n${buildCommandCheckErrorMessage(offendingFiles)}`,
+			}
+		}
+
+		// Compute the classification diff across all wallets. A command that only wrote the
+		// audit log (with no open mutation) is not a classification change, so skip it.
+		const after = await allRequestClassifications(this.agent.repoRoot)
+		const frozen = this.agent.classificationCache
+		const impacted = diffClassifications(frozen, after)
+
+		this.agent.classificationCache = after
+
+		if (impacted.length === 0) {
+			return
+		}
+
+		// A domain classification (`mark-domain` / `mark-domain-update`) that affects only a
+		// single wallet does not need justification; only a cross-wallet domain change opens
+		// a mutation. Other classification changes always open a mutation.
+		if (isDomainClassificationCommand(this.originalCommand) && isSingleWalletImpact(impacted)) {
+			return
+		}
+
+		// Append an `open-mutation` entry and enter open-mutation mode. The recorded
+		// command has any `cd <repo-root>` path redacted to `/walletbeat`.
+		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+		const command = redactCdPath(this.originalCommand)
+
+		auditLog.appendEntry({
+			type: 'open-mutation',
+			command,
+			impacted: assertNonEmptyArray(impacted),
+			unixMillis: Date.now(),
+		})
+		await auditLog.save()
+
+		this.agent.auditLog = auditLog
+		this.agent.openMutation = {
+			command,
+			impacted,
+			justified: new Set(),
+			frozenClassificationCache: frozen,
+			frozenSnapshot: currentHashes,
+		}
+
+		return {
+			output: `${output}\n${buildOpenMutationMessage(impacted)}`,
+		}
+	}
+
+	/**
+	 * Compute the repo-relative paths (leading `/`) that changed between the pre-hook
+	 * snapshot and `currentHashes`.
+	 */
+	private computeChangedFiles(currentHashes: RepoSnapshot): RepoRelativePath[] {
+		const changedFiles: Array<RepoRelativePath> = []
+
+		for (const [key, hash] of Object.entries(currentHashes)) {
+			if (this.preHashes[assertStringHasPrefix(key, '/')] !== hash) {
+				changedFiles.push(assertStringHasPrefix(key, '/'))
+			}
+		}
+
+		for (const key of Object.keys(this.preHashes)) {
+			if (!(key in currentHashes)) {
+				changedFiles.push(assertStringHasPrefix(key, '/'))
+			}
+		}
+
+		return changedFiles
+	}
+
+	/**
+	 * Collect the files that violate the allowed-edit restriction or fail capture
+	 * validation, so the hook message can name them.
+	 */
+	private async computeOffendingFiles(
+		changedFiles: RepoRelativePath[],
+		currentHashes: RepoSnapshot,
+	): Promise<Set<RepoRelativePath>> {
 		const offendingFiles = new Set<RepoRelativePath>()
 
 		// With an edit allowlist configured, any change to a file outside it is a violation.
@@ -601,12 +821,109 @@ export class WalletDataCollectionBash {
 			}
 		}
 
-		if (offendingFiles.size > 0) {
+		return offendingFiles
+	}
+
+	/**
+	 * Post-hook handling while an open mutation is outstanding: reject any write other
+	 * than `collection.audit.json`, and validate + dispatch a `justify`/`rollback` append.
+	 */
+	private async handleOpenMutationPostHook({
+		output,
+		changedFiles,
+		auditChanged,
+		currentHashes,
+	}: {
+		output: string
+		changedFiles: RepoRelativePath[]
+		auditChanged: boolean
+		currentHashes: RepoSnapshot
+	}): Promise<BashPostHookResult | void> {
+		const openMutation = this.agent.openMutation
+
+		if (openMutation === null) {
+			return
+		}
+
+		const nonAuditChanged = changedFiles.filter(file => file !== AUDIT_LOG_REL)
+
+		// Any write other than the audit log is rejected and reverted.
+		if (nonAuditChanged.length > 0) {
 			this.agent.revertRepo(Object.keys(currentHashes).map(key => assertStringHasPrefix(key, '/')))
 
 			return {
-				output: output + `\n${buildCommandCheckErrorMessage(offendingFiles)}`,
+				output: `${output}\n${buildOpenMutationNonAuditMessage(nonAuditChanged)}`,
 			}
+		}
+
+		if (!auditChanged) {
+			return
+		}
+
+		// The audit log was written; validate that exactly one valid entry was appended.
+		const previousCount = this.agent.auditLog.entryCount
+		const previousTip = this.agent.auditLog.lastTip
+		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+		const appended = auditLog.validateAppend(previousCount, previousTip)
+
+		if (appended === null) {
+			// Invalid append: restore the audit log from the harness's in-memory copy.
+			await this.agent.auditLog.save()
+
+			return {
+				output: `${output}\n${buildInvalidAuditAppendMessage()}`,
+			}
+		}
+
+		this.agent.auditLog = auditLog
+
+		if (appended.type === 'justify') {
+			const { nextState, autoClose } = mergeJustifyIntoOpenMutation(openMutation, appended)
+
+			if (autoClose) {
+				// Auto-append `close-mutation` (harness-only) and close the open mutation.
+				const closeLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+
+				closeLog.appendEntry({ type: 'close-mutation', unixMillis: Date.now() })
+				await closeLog.save()
+
+				this.agent.auditLog = closeLog
+				this.agent.openMutation = null
+
+				// The mutation is complete; re-sync the backup to the current state.
+				this.agent.syncBackup(currentHashes, this.agent.lastSnapshot ?? {})
+				this.agent.lastSnapshot = currentHashes
+
+				return
+			}
+
+			this.agent.openMutation = {
+				...nextState,
+				frozenSnapshot: openMutation.frozenSnapshot,
+			}
+
+			return
+		}
+
+		if (appended.type === 'rollback') {
+			// Revert the repo to the pre-open-mutation state, excluding the audit log (the
+			// log is never reverted).
+			this.agent.revertRepo(
+				Object.keys(currentHashes).map(key => assertStringHasPrefix(key, '/')),
+				{ excludePaths: new Set<RepoRelativePath>([AUDIT_LOG_REL]) },
+			)
+			this.agent.classificationCache = openMutation.frozenClassificationCache
+			this.agent.openMutation = null
+
+			return
+		}
+
+		// An `open-mutation` or `close-mutation` from bash is never valid; the harness
+		// owns those. Revert the audit log to the in-memory state.
+		await this.agent.auditLog.save()
+
+		return {
+			output: `${output}\n${buildInvalidAuditAppendMessage()}`,
 		}
 	}
 }

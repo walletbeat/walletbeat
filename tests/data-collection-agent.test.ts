@@ -1,6 +1,106 @@
 import { describe, expect, it } from 'vitest'
 
-import { isPlainAgentInvocation } from '@/tools/wallet-data-collection/agent/command-classification'
+import {
+	buildAgentEnv,
+	isDomainClassificationCommand,
+	isPlainAgentInvocation,
+	redactCdPath,
+	referencesRestrictedEnvVar,
+} from '@/tools/wallet-data-collection/agent/command-classification'
+import { getRepositoryRoot } from '@/utils/codebase'
+
+/** `cd <repo-root>` — the only `cd` a plain agent invocation allows. */
+const cdRepo = `cd ${getRepositoryRoot()}`
+
+describe('isDomainClassificationCommand', () => {
+	it('detects mark-domain and mark-domain-update', () => {
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y',
+			),
+		).toBe(true)
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent mark-domain-update --domain=x',
+			),
+		).toBe(true)
+	})
+
+	it('returns false for other commands', () => {
+		expect(isDomainClassificationCommand('pnpm wallet-data-collection:agent check')).toBe(false)
+		expect(
+			isDomainClassificationCommand('pnpm wallet-data-collection:agent explain-request --domain=x'),
+		).toBe(false)
+		expect(
+			isDomainClassificationCommand('pnpm wallet-data-collection:agent mark-string --string=x'),
+		).toBe(false)
+	})
+})
+
+describe('referencesRestrictedEnvVar', () => {
+	it('detects the arbitrary-command sentinel', () => {
+		expect(
+			referencesRestrictedEnvVar('echo $WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND'),
+		).toBe(true)
+	})
+
+	it('detects the open-mutation env var', () => {
+		expect(referencesRestrictedEnvVar('WALLETBEAT_WALLET_DATA_COLLECTION_OPEN_MUTATION')).toBe(true)
+	})
+
+	it('detects WALLETBEAT_ENV', () => {
+		expect(referencesRestrictedEnvVar('echo $WALLETBEAT_ENV')).toBe(true)
+		expect(referencesRestrictedEnvVar('WALLETBEAT_ENV=HUMAN')).toBe(true)
+	})
+
+	it('accepts ordinary agent commands', () => {
+		expect(referencesRestrictedEnvVar('pnpm wallet-data-collection:agent check')).toBe(false)
+		expect(
+			referencesRestrictedEnvVar(
+				'pnpm wallet-data-collection:agent justify --request-id=a --url=https://x.com/y',
+			),
+		).toBe(false)
+	})
+})
+
+describe('buildAgentEnv', () => {
+	it('always sets WALLETBEAT_ENV=AGENT', () => {
+		const env = buildAgentEnv({}, { isArbitrary: false, openMutationActive: false })
+
+		expect(env.WALLETBEAT_ENV).toBe('AGENT')
+	})
+
+	it('sets the arbitrary-command env var only for arbitrary commands', () => {
+		const arbitrary = buildAgentEnv({}, { isArbitrary: true, openMutationActive: false })
+
+		expect(arbitrary.WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND).toBe('true')
+		expect(arbitrary.WALLETBEAT_WALLET_DATA_COLLECTION_OPEN_MUTATION).toBeUndefined()
+
+		const plain = buildAgentEnv({}, { isArbitrary: false, openMutationActive: false })
+
+		expect(plain.WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND).toBeUndefined()
+	})
+
+	it('sets the open-mutation env var only while a mutation is open', () => {
+		const open = buildAgentEnv({}, { isArbitrary: false, openMutationActive: true })
+
+		expect(open.WALLETBEAT_WALLET_DATA_COLLECTION_OPEN_MUTATION).toBe('true')
+		expect(open.WALLETBEAT_WALLET_DATA_COLLECTION_ARBITRARY_COMMAND).toBeUndefined()
+
+		const closed = buildAgentEnv({}, { isArbitrary: false, openMutationActive: false })
+
+		expect(closed.WALLETBEAT_WALLET_DATA_COLLECTION_OPEN_MUTATION).toBeUndefined()
+	})
+
+	it('preserves the base environment', () => {
+		const env = buildAgentEnv(
+			{ PATH: '/usr/bin' },
+			{ isArbitrary: false, openMutationActive: false },
+		)
+
+		expect(env.PATH).toBe('/usr/bin')
+	})
+})
 
 describe('isPlainAgentInvocation', () => {
 	describe('single agent invocation', () => {
@@ -25,7 +125,7 @@ describe('isPlainAgentInvocation', () => {
 	describe('chains of && / ; / |', () => {
 		it('accepts a chain with one agent command and allowed side commands', () => {
 			expect(
-				isPlainAgentInvocation("cd /tmp && pnpm wallet-data-collection:agent --id='metamask'"),
+				isPlainAgentInvocation(` ${cdRepo} && pnpm wallet-data-collection:agent --id='metamask'`),
 			).toBe(true)
 			expect(isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='metamask'; pwd")).toBe(
 				true,
@@ -48,7 +148,7 @@ describe('isPlainAgentInvocation', () => {
 		it('accepts a chain mixing multiple allowed side commands', () => {
 			expect(
 				isPlainAgentInvocation(
-					"cd /tmp && echo hi && pwd && cat a.json && grep x && head file && tail file && pnpm wallet-data-collection:agent --id='metamask'",
+					` ${cdRepo} && echo hi && pwd && cat a.json && grep x && head file && tail file && pnpm wallet-data-collection:agent --id='metamask'`,
 				),
 			).toBe(true)
 		})
@@ -58,7 +158,7 @@ describe('isPlainAgentInvocation', () => {
 			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent || pwd')).toBe(true)
 			expect(
 				isPlainAgentInvocation(
-					"cd /tmp || pnpm wallet-data-collection:agent --id='metamask' || echo fallback",
+					` ${cdRepo} || pnpm wallet-data-collection:agent --id='metamask' || echo fallback`,
 				),
 			).toBe(true)
 			expect(
@@ -89,14 +189,14 @@ describe('isPlainAgentInvocation', () => {
 			).toBe(false)
 			expect(
 				isPlainAgentInvocation(
-					'cd /tmp && pnpm wallet-data-collection:agent && pnpm wallet-data-collection:agent',
+					` ${cdRepo} && pnpm wallet-data-collection:agent && pnpm wallet-data-collection:agent`,
 				),
 			).toBe(false)
 		})
 
 		it('rejects a chain with no agent command', () => {
 			expect(isPlainAgentInvocation('echo hi && pwd')).toBe(false)
-			expect(isPlainAgentInvocation('cd /tmp && cat file')).toBe(false)
+			expect(isPlainAgentInvocation(`${cdRepo} && cat file`)).toBe(false)
 		})
 
 		it('rejects a chain with a disallowed side command', () => {
@@ -185,7 +285,7 @@ describe('isPlainAgentInvocation', () => {
 		it('accepts a chain using stdout/stderr dup redirection', () => {
 			expect(
 				isPlainAgentInvocation(
-					"cd /tmp && pnpm wallet-data-collection:agent --id='metamask' 2>&1 | head -40",
+					` ${cdRepo} && pnpm wallet-data-collection:agent --id='metamask' 2>&1 | head -40`,
 				),
 			).toBe(true)
 			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent 2>&1; pwd')).toBe(true)
@@ -259,6 +359,81 @@ describe('isPlainAgentInvocation', () => {
 			expect(isPlainAgentInvocation('echo hi')).toBe(false)
 			expect(isPlainAgentInvocation('pwd')).toBe(false)
 			expect(isPlainAgentInvocation('cat file')).toBe(false)
+		})
+	})
+
+	describe('cd argument validation', () => {
+		it('accepts cd to the repository root', () => {
+			expect(isPlainAgentInvocation(` ${cdRepo} && pnpm wallet-data-collection:agent`)).toBe(true)
+		})
+
+		it('accepts a quoted cd to the repository root', () => {
+			expect(
+				isPlainAgentInvocation(`cd '${getRepositoryRoot()}' && pnpm wallet-data-collection:agent`),
+			).toBe(true)
+		})
+
+		it('rejects cd to a different real path', () => {
+			expect(isPlainAgentInvocation('cd /tmp && pnpm wallet-data-collection:agent')).toBe(false)
+			expect(isPlainAgentInvocation('cd /var && pnpm wallet-data-collection:agent')).toBe(false)
+		})
+
+		it('rejects cd to a subdirectory of the repo root', () => {
+			expect(
+				isPlainAgentInvocation(
+					`cd ${getRepositoryRoot()}/sub && pnpm wallet-data-collection:agent`,
+				),
+			).toBe(false)
+		})
+
+		it('rejects a bare cd with no argument', () => {
+			expect(isPlainAgentInvocation('cd && pnpm wallet-data-collection:agent')).toBe(false)
+		})
+
+		it('rejects cd with a flag', () => {
+			expect(
+				isPlainAgentInvocation(
+					`cd --flag ${getRepositoryRoot()} && pnpm wallet-data-collection:agent`,
+				),
+			).toBe(false)
+		})
+
+		it('rejects cd with more than one argument', () => {
+			expect(isPlainAgentInvocation('cd /a /b && pnpm wallet-data-collection:agent')).toBe(false)
+		})
+	})
+
+	describe('redactCdPath', () => {
+		const repoRoot = getRepositoryRoot()
+
+		it('redacts a cd to the repo root', () => {
+			expect(redactCdPath(`cd ${repoRoot} && pnpm wallet-data-collection:agent check`)).toBe(
+				'cd /walletbeat && pnpm wallet-data-collection:agent check',
+			)
+		})
+
+		it('redacts a cd with a trailing slash', () => {
+			expect(redactCdPath(`cd ${repoRoot}/ && pnpm wallet-data-collection:agent check`)).toBe(
+				'cd /walletbeat && pnpm wallet-data-collection:agent check',
+			)
+		})
+
+		it('redacts a quoted cd to the repo root, preserving quotes', () => {
+			expect(redactCdPath(`cd '${repoRoot}' && pnpm wallet-data-collection:agent check`)).toBe(
+				"cd '/walletbeat' && pnpm wallet-data-collection:agent check",
+			)
+		})
+
+		it('leaves a cd to a different path unchanged', () => {
+			expect(redactCdPath('cd /tmp && pnpm wallet-data-collection:agent check')).toBe(
+				'cd /tmp && pnpm wallet-data-collection:agent check',
+			)
+		})
+
+		it('leaves a command with no cd unchanged', () => {
+			expect(redactCdPath('pnpm wallet-data-collection:agent check')).toBe(
+				'pnpm wallet-data-collection:agent check',
+			)
 		})
 	})
 })

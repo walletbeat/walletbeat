@@ -26,5 +26,13 @@ If you feel overwhelmed by the sheer amount of tasks in front of you as reported
 
 If you are unsure about a string's categorization or confused about what to do, you can always ask the user for guidance using the `ask_user` tool.
 
-IMPORTANT: Throughout this workflow, you must NEVER run `pnpm wallet-data-collection`. Always run `pnpm wallet-data-collection:agent` instead.
-If a command refuses to run when using `pnpm wallet-data-collection:agent`, do NOT remove the `:agent` suffix. Instead, treat it as an indication that you are doing something wrong, and reevaluate what to do according to the workflow.
+## Classify, then justify
+
+All classification operations are performed via the `pnpm wallet-data-collection:agent` command. After such a command succeeds and modifies the classification of one or more requests, each such affected request's classification impact will need to be justified. You will need to use the following commands to do so:
+
+  - `pnpm wallet-data-collection:agent check`: Show outstanding changes that need justification (or rollback).
+  - `pnpm wallet-data-collection:agent justify --request-id=<ids> --url=<exact-url> --rationale=<reason>`: Confirm the impact a classification change has had on up to 16 requests that share the same exact URL. The `--url` must match the exact URL (domain, path, and query string) of every request being justified; if the requests have different URLs, call `justify` once per unique URL. The rationale can either be a human explanation (e.g. "Detected as `TRACKING_IDENTIFIER` due to presence of Google Analytics cookie `_ga_DVLGXM0NH8=...`", "Benign due to being a common technical term and not a uniquely-identifying string"), or a `LooseReference` object (see `src/schema/reference.ts`) expressed as JSON.
+	- `pnpm wallet-data-collection:agent rollback` Roll back to the earlier pre-classification state. Use this if you find that one or more of the impacted requests shouldn't actually have been classified as such.
+
+Any other write operation will be rejected until all impacted requests are justified, or the change is rolled back.
+Why is this necessary? Some matchers can be very broad and match unintended requests you hadn't noticed were matching (e.g. if acting on partial data); additionally, some classification changes (e.g. domain-to-entity mapping, globally-benign strings, global matchers) can have impacts beyond the wallet you are classifying. By going over every single impacted entry, you are required to explicitly acknowledge the impact of the classification changes you are adding. This gives you the opportunity to back out of any change if you find that the classification change you caused was overly broad.

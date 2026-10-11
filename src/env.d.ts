@@ -35,11 +35,5 @@ declare namespace NodeJS {
 		 * Wallet type passed via the `--type` flag to the `agent` subcommand.
 		 */
 		WALLETBEAT_WALLET_DATA_COLLECTION_TYPE?: string
-
-		/**
-		 * Comma-separated set of repo-root-relative capture file paths the `agent`
-		 * harness is allowed to edit, derived from the `--id`/`--variant`/`--type` flags.
-		 */
-		WALLETBEAT_WALLET_DATA_COLLECTION_ALLOWED_EDIT_FILES?: string
 	}
 }
