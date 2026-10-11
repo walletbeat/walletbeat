@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 51,
+	"highlightLastLine": 62,
+	"segments": [
+		{
+			"lines": [
+				"interface AddressContext {"
+			],
+			"startLine": 44
+		},
+		{
+			"lines": [
+				"  contacts: Record<string, Contact>",
+				"  signers: Record<string, { name?: string | null; value: string }>",
+				"}",
+				"",
+				"function resolveIncompleteAddress(trimmed: string): RecipientValidationResult | undefined {",
+				"  if (!trimmed) {",
+				"    return { state: 'empty', isValid: false, canContinue: false }",
+				"  }",
+				"",
+				"  if (trimmed.length < 42 || !isAddress(trimmed)) {",
+				"    const state = trimmed.length < 42 ? 'typing' : 'invalid'",
+				"    return { state, isValid: false, canContinue: false }",
+				"  }",
+				"",
+				"  return undefined",
+				"}",
+				"",
+				"function resolveKnownAddress(trimmed: string, ctx: AddressContext): RecipientValidationResult | undefined {",
+				"  if (sameAddress(trimmed, ctx.activeSafeAddress)) {",
+				"    return { state: 'self-send', isValid: true, canContinue: true }"
+			],
+			"startLine": 47
+		}
+	]
+}
