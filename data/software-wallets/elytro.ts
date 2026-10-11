@@ -110,7 +110,7 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'The Elytro extension monorepo is licensed under GPL-3.0.',
-						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE#L1-L2',
+						url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE',
 					},
 					{
 						explanation:
