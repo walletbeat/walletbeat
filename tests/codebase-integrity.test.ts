@@ -521,6 +521,7 @@ describe('codebase integrity', () => {
 			'[walletName]',
 			'[...slug]',
 			'[...path].[ext].ts',
+			'_about.md',
 		])
 
 		const componentsFailed: string[] = []
