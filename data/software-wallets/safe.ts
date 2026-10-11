@@ -188,7 +188,7 @@ export const safe: SoftwareWallet = {
 						explanation:
 							'The Safe{Wallet} monorepo (web and mobile apps) is licensed under GPL-3.0.',
 						label: 'Safe License File',
-						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/LICENSE#L1-L2',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
