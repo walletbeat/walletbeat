@@ -401,6 +401,8 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
 	// Same as above but also applies to host-matched pages, used when rules must cover specific app domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	// Loads site icons from the browser's favicon cache, used to show which app is connected or requesting a signature.
+	[BrowserExtensionPermission.FAVICON]: Rating.PASS,
 	// Firebase Cloud Messaging for push notifications, used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
 	// OAuth2 token retrieval via the browser's identity API, used for optional social login flows.
