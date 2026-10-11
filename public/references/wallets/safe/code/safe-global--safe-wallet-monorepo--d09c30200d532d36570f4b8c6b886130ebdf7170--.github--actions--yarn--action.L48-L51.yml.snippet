@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 48,
+	"highlightLastLine": 51,
+	"segments": [
+		{
+			"lines": [
+				"runs:"
+			],
+			"startLine": 19
+		},
+		{
+			"lines": [
+				"  steps:"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"    - name: Echo cache hit",
+				"      shell: bash",
+				"      run: |",
+				"        echo \"Yarn cache hit: ${{ steps.restore-yarn-types.outputs.cache-hit-yarn }}\"",
+				"",
+				"    - name: Yarn install",
+				"      if: steps.restore-yarn-types.outputs.cache-hit-yarn != 'true'",
+				"      shell: bash",
+				"      run: yarn install --immutable",
+				"",
+				"    - name: Yarn after-install to generate contracts types",
+				"      if: steps.restore-yarn-types.outputs.cache-hit-yarn != 'true' && inputs.after-install == 'true'",
+				"      shell: bash"
+			],
+			"startLine": 43
+		}
+	]
+}

@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 39,
+	"highlightLastLine": 48,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  tag:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    steps:",
+				"      - name: Checkout"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"        with:",
+				"          ref: main",
+				"          fetch-depth: 0",
+				"          token: ${{ secrets.RELEASE_BOT_TOKEN }}",
+				"",
+				"      - name: Import GPG key",
+				"        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0",
+				"        with:",
+				"          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}",
+				"          passphrase: ${{ secrets.GPG_PASSPHRASE }}",
+				"          git_user_signingkey: true",
+				"          git_tag_gpgsign: true",
+				"          git_config_global: true",
+				"          git_committer_name: 'GH Signer Bot'",
+				"          git_committer_email: 'gh-signer-bot@safe.global'",
+				"",
+				"      - name: Verify PR commits are in main",
+				"        if: github.event.pull_request.merged != true",
+				"        env:"
+			],
+			"startLine": 34
+		}
+	]
+}

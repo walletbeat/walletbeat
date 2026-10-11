@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 69,
+	"highlightLastLine": 71,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  tag:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"      - name: Extract version"
+			],
+			"startLine": 62
+		},
+		{
+			"lines": [
+				"        run: |",
+				"          NEW_VERSION=$(node -p 'require(\"./apps/web/package.json\").version')",
+				"          echo \"version=web-v$NEW_VERSION\" >> $GITHUB_OUTPUT",
+				"          echo \"version_number=$NEW_VERSION\" >> $GITHUB_OUTPUT",
+				"",
+				"      - name: Create a git tag",
+				"        if: steps.version.outputs.version",
+				"        run: git tag -s ${{ steps.version.outputs.version }} -m \"${{ steps.version.outputs.version }}\" && git push --tags",
+				"",
+				"      - name: Trigger Docker Hub release",
+				"        if: steps.version.outputs.version",
+				"        run: gh workflow run web-deploy-dockerhub.yml -f tag=${{ steps.version.outputs.version }}"
+			],
+			"startLine": 64
+		}
+	]
+}
