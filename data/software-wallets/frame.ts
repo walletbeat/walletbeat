@@ -91,7 +91,7 @@ export const frame: SoftwareWallet = {
 					{
 						explanation:
 							'Frame desktop is GPL-3.0 ("Copyright (C) 2021 Frame Labs, Inc."); the companion browser extension (frame-labs/frame-extension) is also GPL-3.0.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE#L1-L4',
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
