@@ -91,7 +91,7 @@ export const frame: SoftwareWallet = {
 					{
 						explanation:
 							'Frame desktop is GPL-3.0 ("Copyright (C) 2021 Frame Labs, Inc."); the companion browser extension (frame-labs/frame-extension) is also GPL-3.0.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE',
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE#L1-L4',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -144,7 +144,7 @@ export const frame: SoftwareWallet = {
 					ref: {
 						explanation:
 							"Recovery is only by re-importing the user's own seed phrase, private key or keystore, or using a hardware wallet; no social, cloud, or vendor-assisted recovery exists in the code.",
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/app/dash/Notify/index.js',
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/app/dash/Accounts/index.js#L81-L117',
 					},
 				}),
 			},
@@ -181,7 +181,16 @@ export const frame: SoftwareWallet = {
 					{
 						explanation:
 							'Hot signer secrets (an imported seed or private key) are encrypted locally with AES-256 using a scrypt-derived key and stored in the app data folder; hardware signers keep keys on the device.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/main/signers/hot/HotSigner/worker.js',
+						urls: [
+							{
+								label: 'Encryption',
+								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/main/signers/hot/HotSigner/worker.js#L107-L131',
+							},
+							{
+								label: 'Storage location',
+								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/main/signers/hot/HotSigner/index.js#L14-L17',
+							},
+						],
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -251,7 +260,16 @@ export const frame: SoftwareWallet = {
 							{
 								explanation:
 									'Release builds are code-signed in CI with Frame Labs Apple Developer (notarized) and Windows certificates and published as GitHub release assets; Linux builds are unsigned and no detached signatures are published.',
-								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml',
+								urls: [
+									{
+										label: 'Signing certificates',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L37-L59',
+									},
+									{
+										label: 'Publish to GitHub releases',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L86-L91',
+									},
+								],
 							},
 						],
 						publication: 'GITHUB_RELEASE',
@@ -272,7 +290,7 @@ export const frame: SoftwareWallet = {
 							{
 								explanation:
 									'package-lock.json is committed and CI installs with `npm ci` (the `setup:ci` script).',
-								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json',
+								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json#L10',
 							},
 						],
 					}),
@@ -281,7 +299,7 @@ export const frame: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Desktop gates install scripts with @lavamoat/allow-scripts but has no runtime LavaMoat policy; the extension has neither.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json',
+						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json#L10-L12',
 					},
 				}),
 				dependencyVulnerabilityScanning: {
@@ -312,7 +330,7 @@ export const frame: SoftwareWallet = {
 						{
 							explanation:
 								'The desktop release workflow runs `apt update`, `pip install` and `npm ci` on GitHub-hosted runners during the build; the extension has no build workflow.',
-							url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml',
+							url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L67-L78',
 						},
 					],
 				}),
