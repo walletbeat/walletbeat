@@ -208,6 +208,8 @@ export type MultiAddressHandling =
 			 *   request).
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
+
+			// TODO: Presence of reused tracking identifiers across requests.
 	  }
 
 /**
@@ -938,7 +940,7 @@ export type Collection<T extends UserInfo> = NonEmptyRecord<T, CollectionPolicy>
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 
 /** A partially-known set of personal info collected, with reference information. */
@@ -967,7 +969,7 @@ export type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 
 /**
@@ -979,8 +981,13 @@ export function qualifiedDataCollection<T extends UserInfo>(
 	userInfo: Collection<T>,
 ): QualifiedDataCollection {
 	const get = (info: UserInfo): CollectionPolicy | undefined => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because L is guaranteed to be non-empty.
-		return (userInfo as WithRef<NonEmptyRecord<UserInfo, CollectionPolicy>>)[info]
+		const policy = (userInfo as Record<string, unknown>)[info as string]
+
+		if (policy === undefined) {
+			return undefined
+		}
+
+		return collectionPolicyEnum.assert(policy)
 	}
 	const first = (...ls: Array<CollectionPolicy | undefined>): CollectionPolicy | undefined =>
 		ls.find(l => l !== undefined)
@@ -1153,7 +1160,7 @@ export type DataCollectionForUserFlowOrUnsupported =
 
 /**
  * A collection of data that a wallet collects.
- * See /docs/mitmproxy-guide for how to collect this.
+ * See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
  */
 export interface DataCollection {
 	/** What data is collected when installing the wallet? */
