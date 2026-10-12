@@ -13,26 +13,79 @@ import { getRepositoryRoot } from '@/utils/codebase'
 const cdRepo = `cd ${getRepositoryRoot()}`
 
 describe('isDomainClassificationCommand', () => {
-	it('detects mark-domain and mark-domain-update', () => {
+	const domainMappingFile = '/data/entities/domains/entity-domains.json'
+
+	it('detects mark-domain and mark-domain-update when only the mapping file changed', () => {
 		expect(
 			isDomainClassificationCommand(
 				'pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y',
+				[domainMappingFile],
 			),
 		).toBe(true)
 		expect(
 			isDomainClassificationCommand(
 				'pnpm wallet-data-collection:agent mark-domain-update --domain=x',
+				[domainMappingFile],
 			),
 		).toBe(true)
 	})
 
-	it('returns false for other commands', () => {
-		expect(isDomainClassificationCommand('pnpm wallet-data-collection:agent check')).toBe(false)
+	it('detects the subcommand even with a cd prefix', () => {
 		expect(
-			isDomainClassificationCommand('pnpm wallet-data-collection:agent explain-request --domain=x'),
+			isDomainClassificationCommand(
+				`${cdRepo} && pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y`,
+				[domainMappingFile],
+			),
+		).toBe(true)
+	})
+
+	it('returns false when the command did not change only the mapping file', () => {
+		// No files changed at all.
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y',
+				[],
+			),
+		).toBe(false)
+		// The mapping file plus some other file changed.
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y',
+				[domainMappingFile, '/data/software-wallets/ambire.ts'],
+			),
+		).toBe(false)
+		// Some other single file changed.
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent mark-domain --domain=x --entity=y',
+				['/data/software-wallets/ambire.ts'],
+			),
+		).toBe(false)
+	})
+
+	it('returns false for other subcommands even when the mapping file changed', () => {
+		expect(
+			isDomainClassificationCommand('pnpm wallet-data-collection:agent check', [domainMappingFile]),
 		).toBe(false)
 		expect(
-			isDomainClassificationCommand('pnpm wallet-data-collection:agent mark-string --string=x'),
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent explain-request --domain=x',
+				[domainMappingFile],
+			),
+		).toBe(false)
+		expect(
+			isDomainClassificationCommand('pnpm wallet-data-collection:agent mark-string --string=x', [
+				domainMappingFile,
+			]),
+		).toBe(false)
+	})
+
+	it('does not mistake a mark-domain mention inside an argument for the subcommand', () => {
+		expect(
+			isDomainClassificationCommand(
+				'pnpm wallet-data-collection:agent check --domain=mark-domain',
+				[domainMappingFile],
+			),
 		).toBe(false)
 	})
 })
@@ -119,6 +172,113 @@ describe('isPlainAgentInvocation', () => {
 
 		it('accepts an agent invocation with quoted arguments', () => {
 			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --id="metamask"')).toBe(true)
+		})
+	})
+
+	describe('subcommand requirement', () => {
+		const domainMappingFile = '/data/entities/domains/entity-domains.json'
+
+		it('accepts an agent invocation with a subcommand', () => {
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent check')).toBe(true)
+			expect(
+				isPlainAgentInvocation(
+					"pnpm wallet-data-collection:agent mark-domain --domain='x' --entity='y'",
+				),
+			).toBe(true)
+		})
+
+		it('accepts a subcommand following leading global flags', () => {
+			expect(
+				isPlainAgentInvocation("pnpm wallet-data-collection:agent --id='metamask' check"),
+			).toBe(true)
+			// Global flags before the subcommand, plus more flags after it.
+			expect(
+				isPlainAgentInvocation(
+					"pnpm wallet-data-collection:agent --id='metamask' --variant='BROWSER' check --format=SUMMARY",
+				),
+			).toBe(true)
+			expect(
+				isPlainAgentInvocation(
+					"pnpm wallet-data-collection:agent --id='metamask' --variant='BROWSER' mark-domain --domain='x' --entity='y'",
+				),
+			).toBe(true)
+		})
+
+		it('extracts the subcommand past leading global flags', () => {
+			// A domain classification with global flags before the subcommand is still recognized
+			// as one, proving the subcommand is extracted correctly past the flags.
+			expect(
+				isDomainClassificationCommand(
+					"pnpm wallet-data-collection:agent --id='metamask' --variant='BROWSER' mark-domain --domain='x' --entity='y'",
+					[domainMappingFile],
+				),
+			).toBe(true)
+			expect(
+				isDomainClassificationCommand(
+					"pnpm wallet-data-collection:agent --id='metamask' --variant='BROWSER' check",
+					[domainMappingFile],
+				),
+			).toBe(false)
+		})
+
+		it('accepts space-separated global flags before and after the subcommand', () => {
+			// Space-separated global flags before the subcommand.
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --id metamask check')).toBe(
+				true,
+			)
+			// Space-separated global flags after the subcommand.
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent check --id metamask')).toBe(
+				true,
+			)
+			// A mix of space-separated global flags before and after the subcommand.
+			expect(
+				isPlainAgentInvocation(
+					'pnpm wallet-data-collection:agent --id metamask check --variant BROWSER',
+				),
+			).toBe(true)
+			// A mix of equals and space-separated forms.
+			expect(
+				isPlainAgentInvocation(
+					"pnpm wallet-data-collection:agent --id='metamask' check --variant BROWSER",
+				),
+			).toBe(true)
+		})
+
+		it('accepts a space-separated global flag with no subcommand', () => {
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --id metamask')).toBe(true)
+		})
+
+		it('extracts the subcommand past space-separated global flags', () => {
+			// The subcommand is extracted even when a space-separated flag value precedes it.
+			expect(
+				isDomainClassificationCommand(
+					'pnpm wallet-data-collection:agent --id metamask --variant BROWSER mark-domain --domain=x --entity=y',
+					[domainMappingFile],
+				),
+			).toBe(true)
+			expect(
+				isDomainClassificationCommand('pnpm wallet-data-collection:agent --id metamask check', [
+					domainMappingFile,
+				]),
+			).toBe(false)
+		})
+
+		it('accepts a recognized no-subcommand invocation', () => {
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --help')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent -h')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --version')).toBe(true)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent -v')).toBe(true)
+		})
+
+		it('rejects a bare invocation that is not a recognized no-subcommand form', () => {
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --garbage')).toBe(false)
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --id=')).toBe(false)
+		})
+
+		it('rejects a subcommand mention inside an argument', () => {
+			expect(isPlainAgentInvocation('pnpm wallet-data-collection:agent --domain=mark-domain')).toBe(
+				false,
+			)
 		})
 	})
 

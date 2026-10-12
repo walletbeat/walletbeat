@@ -24,12 +24,150 @@ export function referencesRestrictedEnvVar(command: string): boolean {
 }
 
 /**
- * True when a command is a domain classification (`mark-domain` or `mark-domain-update`).
- * Domain mappings are repo-global, so a single change can affect requests across multiple
- * wallets; such changes are the ones that warrant justification when they go cross-wallet.
+ * The repo-relative (leading `/`) path of the global domain-to-entity mapping file that
+ * the `mark-domain` / `mark-domain-update` subcommands write. A domain classification
+ * change is recognized as such only when this file is the sole file it updates.
  */
-export function isDomainClassificationCommand(command: string): boolean {
-	return /\bmark-domain\b/.test(command)
+export const DOMAIN_MAPPING_FILE_REL = '/data/entities/domains/entity-domains.json'
+
+/** Global flags of the agent tool that take a value (`--flag value` or `--flag=value`). */
+const VALUE_GLOBAL_FLAGS: readonly string[] = ['--id', '--variant', '--type', '--actor']
+
+/** Global flags of the agent tool that take no value. */
+const NO_VALUE_GLOBAL_FLAGS: readonly string[] = ['--help', '-h', '--version', '-v']
+
+/**
+ * Classify a token as a recognized global flag of the agent tool:
+ * - `'none'` for a no-value flag (`--help`, `-h`, `--version`, `-v`);
+ * - `'space'` for a value-taking flag in `--flag` form, whose value is the next token;
+ * - `'inline'` for a value-taking flag with a non-empty inline value (`--flag=value`);
+ * - `null` when the token is not a recognized global flag.
+ */
+function globalFlagKind(token: string): 'none' | 'space' | 'inline' | null {
+	if (NO_VALUE_GLOBAL_FLAGS.includes(token)) {
+		return 'none'
+	}
+
+	for (const flag of VALUE_GLOBAL_FLAGS) {
+		if (token === flag) {
+			return 'space'
+		}
+
+		if (token.startsWith(`${flag}=`) && token.length > flag.length + 1) {
+			return 'inline'
+		}
+	}
+
+	return null
+}
+
+/**
+ * Extract the agent tool's subcommand token from `command`, or `null` when the command
+ * does not invoke the agent tool or invokes it without a subcommand. The agent tool is
+ * invoked as `pnpm wallet-data-collection:agent [global-flags] <subcommand> [options]`, so
+ * the subcommand is the first token that is neither a global flag nor the value of one, and
+ * it may appear before or after global flags (e.g. `--id metamask check` and
+ * `check --variant BROWSER` both yield `check`). The command is segmented on chain
+ * separators, so a `mark-domain` mention inside an argument to a different command is not
+ * mistaken for the subcommand.
+ */
+function agentSubcommand(command: string): string | null {
+	const segments = splitCommandSegments(command.trim())
+
+	if (segments === null) {
+		return null
+	}
+
+	for (const rawSegment of segments) {
+		const segment = rawSegment.trim()
+
+		if (!isAgentCommand(segment)) {
+			continue
+		}
+
+		const tokens = segment.slice(AGENT_INVOCATION_COMMAND.length).trim().split(/\s+/)
+
+		for (let i = 0; i < tokens.length; i++) {
+			const token = tokens[i]
+
+			if (token === '') {
+				continue
+			}
+
+			const kind = globalFlagKind(token)
+
+			// A `--flag value` global flag consumes the following value token.
+			if (kind === 'space') {
+				i++
+				continue
+			}
+
+			if (kind === 'inline' || kind === 'none' || token.startsWith('-')) {
+				continue
+			}
+
+			// The first non-flag token is the subcommand.
+			return token
+		}
+
+		return null
+	}
+
+	return null
+}
+
+/**
+ * True when `segment` is a recognized invocation of the agent tool with no subcommand.
+ */
+function isNoSubcommandAgentInvocation(segment: string): boolean {
+	const tokens = segment.slice(AGENT_INVOCATION_COMMAND.length).trim().split(/\s+/)
+
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i]
+
+		if (token === '') {
+			continue
+		}
+
+		const kind = globalFlagKind(token)
+
+		if (kind === 'space') {
+			// A `--flag value` global flag must have a following value token.
+			if (i + 1 >= tokens.length) {
+				return false
+			}
+
+			i++
+			continue
+		}
+
+		if (kind === 'inline' || kind === 'none') {
+			continue
+		}
+
+		// Not a recognized global flag → not a recognized no-subcommand invocation.
+		return false
+	}
+
+	return true
+}
+
+/**
+ * True when a command is a domain classification: the agent subcommand is `mark-domain`
+ * or `mark-domain-update` AND the command updated only the global domain-entity mapping
+ * file (and no other file) between the pre-hook snapshot and the current one.
+ */
+export function isDomainClassificationCommand(
+	command: string,
+	changedFiles: readonly string[],
+): boolean {
+	const subcommand = agentSubcommand(command)
+
+	if (subcommand !== 'mark-domain' && subcommand !== 'mark-domain-update') {
+		return false
+	}
+
+	return changedFiles.length === 1 && changedFiles[0] === DOMAIN_MAPPING_FILE_REL
 }
 
 /**
@@ -388,6 +526,7 @@ export function isPlainAgentInvocation(command: string): boolean {
 	}
 
 	let agentCount = 0
+	let agentSegment: string | null = null
 
 	for (const rawSegment of segments) {
 		const segment = rawSegment.trim()
@@ -403,10 +542,15 @@ export function isPlainAgentInvocation(command: string): boolean {
 
 		if (isAgentCommand(segment)) {
 			agentCount++
+			agentSegment = segment
 		} else if (!isAllowedSideCommand(segment)) {
 			return false
 		}
 	}
 
-	return agentCount === 1
+	if (agentCount !== 1 || agentSegment === null) {
+		return false
+	}
+
+	return agentSubcommand(command) !== null || isNoSubcommandAgentInvocation(agentSegment)
 }

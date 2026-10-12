@@ -726,8 +726,13 @@ export class WalletDataCollectionBash {
 
 		// A domain classification (`mark-domain` / `mark-domain-update`) that affects only a
 		// single wallet does not need justification; only a cross-wallet domain change opens
-		// a mutation. Other classification changes always open a mutation.
-		if (isDomainClassificationCommand(this.originalCommand) && isSingleWalletImpact(impacted)) {
+		// a mutation. A command is only a domain classification when its subcommand is
+		// `mark-domain` / `mark-domain-update` and it updated solely the domain-entity
+		// mapping file. Other classification changes always open a mutation.
+		if (
+			isDomainClassificationCommand(this.originalCommand, changedFiles) &&
+			isSingleWalletImpact(impacted)
+		) {
 			return
 		}
 
