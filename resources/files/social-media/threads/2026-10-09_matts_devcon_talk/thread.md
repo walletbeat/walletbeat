@@ -42,9 +42,9 @@ Bringing these mechanisms into real wallets strengthens security and self-custod
 
 --- 
 
-Check out @0xMattmatt's latestes talks 
+Check out @0xMattmatt's latest talk
 
-At @BerlinMeetup, he covered what CROPS alignment actually looks like in practice for modern wallets 🔍    
+At @BerlinMeetup, he and @polymutex covered what CROPS alignment for modern wallets actually looks like in practice 🔍
 https://youtu.be/2rIVB8WH_-I?si=tnBuRi7viaiI55XQ
 
 ---
@@ -56,11 +56,7 @@ https://www.youtube.com/watch?v=zOL73Ll_6N0&t=1956s
 
 ---
 
-Why should we listen to us about wallets?
-
-Walletbeat is a rating system for Ethereum wallets. A place where users know what to expect from a wallet, developers have a clear standard to build toward, and wallets compete on Ethereum values.
-
-See you in @EFDevcon Why should we listen to us about wallets?
+Why should you listen to us about wallets?
 
 Walletbeat is a rating system for Ethereum wallets. A place where users know what to expect from a wallet, developers have a clear standard to build toward, and wallets compete on Ethereum values.
 
