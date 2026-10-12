@@ -2,9 +2,9 @@
  * Classification diff and open-mutation state-machine helpers for the
  * wallet-data-collection harness.
  *
- * The state-machine transitions (open-mutation detection, justify merge, auto-close,
- * CLI validation) are kept as pure functions so they can be unit-tested without a live
- * Pi session. The file-system side effects (revert / audit-log append / syncBackup)
+ * The transitions (open-mutation detection, justify merge, auto-close, CLI
+ * validation) are pure functions so they can be unit-tested without a live Pi
+ * session. File-system side effects (revert / audit-log append / syncBackup)
  * live in the harness's post-hook.
  */
 import {
@@ -17,9 +17,7 @@ import {
 } from '../wallet-capture-classification-audit-log'
 import type { WalletRequestClassification } from '../wallet-capture-file'
 
-/**
- * The frozen state held while an open mutation is outstanding.
- */
+/** The frozen state held while an open mutation is outstanding. */
 export interface OpenMutationState {
 	/** The bash command that caused the change. */
 	command: string
@@ -32,10 +30,9 @@ export interface OpenMutationState {
 }
 
 /**
- * Compute the request IDs whose classification changed between two fingerprint maps.
- * IDs present in one but not the other are treated as changed (e.g. a newly added
- * capture file's requests went from absent to present). Results are sorted for
- * determinism.
+ * The request IDs whose classification differs between two fingerprint maps.
+ * IDs present in only one map count as changed (e.g. a newly added capture
+ * file's requests went from absent to present). Sorted for determinism.
  */
 export function diffClassifications(
 	before: ReadonlyMap<string, WalletRequestClassification>,
@@ -85,8 +82,8 @@ export function mergeJustifyIntoOpenMutation(
 }
 
 /**
- * True when a request ID is in the open-mutation's impacted list and has not yet
- * been justified (used by the CLI's `justify` validation).
+ * True when a request ID is in the open-mutation's impacted list and has not
+ * yet been justified (used by the CLI's `justify` validation).
  */
 export function isUnjustifiedImpacted(
 	openMutation: OpenMutationEntry,

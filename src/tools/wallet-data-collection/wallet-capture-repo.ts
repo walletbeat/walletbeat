@@ -1,5 +1,5 @@
 /**
- * Shared helpers to enumerate every wallet capture file in the repository and its
+ * Helpers to enumerate every wallet capture file in the repository and its
  * requests.
  */
 import fs from 'node:fs'
@@ -49,9 +49,9 @@ function walkCaptureFiles(dir: string): string[] {
 }
 
 /**
- * Resolve the {@link WalletCaptureAnnotations} for a capture file: the sibling
- * `<walletId>.annotations.json` supplies wallet-specific annotations and the repo-global
- * `data/collection/global.annotations.json` supplies the rest.
+ * The {@link WalletCaptureAnnotations} for a capture file: the sibling
+ * `<walletId>.annotations.json` supplies wallet-specific annotations and the
+ * repo-global `data/collection/global.annotations.json` supplies the rest.
  */
 export function loadAnnotationsForCapture(capturePath: string): WalletCaptureAnnotations {
 	const dir = path.dirname(capturePath)
@@ -68,10 +68,11 @@ export function loadAnnotationsForCapture(capturePath: string): WalletCaptureAnn
 }
 
 /**
- * Reload the in-memory domain-to-entity mapping from `data/entities/domains/entity-domains.json`.
- * The harness is a long-lived process that imported the mapping once; a CLI child process
- * (e.g. `mark-domain`) rewrites the JSON in its own process, so the harness must re-read it
- * before computing classifications to see the change.
+ * Reload the in-memory domain-to-entity mapping from
+ * `data/entities/domains/entity-domains.json`. The harness is a long-lived
+ * process that imported the mapping once; a CLI child (e.g. `mark-domain`)
+ * rewrites the JSON in its own process, so the harness must re-read it before
+ * computing classifications to see the change.
  */
 export function reloadDomainMapping(repoRoot: string): void {
 	const jsonPath = path.join(repoRoot, 'data', 'entities', 'domains', 'entity-domains.json')
@@ -152,8 +153,8 @@ export async function allRequests(repoRoot: string): Promise<WalletRequest[]> {
 }
 
 /**
- * The set of `walletId:walletVariant:sessionTime` strings across all capture files in
- * the repository.
+ * The set of `walletId:walletVariant:sessionTime` strings across all capture
+ * files in the repository.
  */
 export async function allRequestIds(repoRoot: string): Promise<Set<string>> {
 	const ids = new Set<string>()
@@ -174,14 +175,14 @@ export async function allRequestIds(repoRoot: string): Promise<Set<string>> {
 }
 
 /**
- * The classification fingerprint of every request across all capture files in the
- * repository, keyed by `walletId:walletVariant:sessionTime`.
+ * The classification fingerprint of every request across all capture files in
+ * the repository, keyed by `walletId:walletVariant:sessionTime`.
  */
 export async function allRequestClassifications(
 	repoRoot: string,
 ): Promise<Map<string, WalletRequestClassification>> {
-	// The harness is a long-lived process; reload the on-disk domain mapping so a
-	// CLI child's `mark-domain` change is reflected in the classification diff.
+	// Reload the on-disk domain mapping so a CLI child's `mark-domain` change is
+	// reflected in the classification diff.
 	reloadDomainMapping(repoRoot)
 
 	const classifications = new Map<string, WalletRequestClassification>()
