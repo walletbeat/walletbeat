@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 130,
+	"highlightLastLine": 156,
+	"segments": [
+		{
+			"lines": [
+				"export function useKeycardOperation<T>(): UseKeycardOperation<T> {"
+			],
+			"startLine": 90
+		},
+		{
+			"lines": [
+				"  const successMessageRef = useRef<string | undefined>(undefined);",
+				"  // The session's retryUnsafeRef, assigned each render because it only exists further down.",
+				"  const retryUnsafeHolderRef = useRef<{ current: boolean } | null>(null);",
+				"",
+				"  const verifyPin = useCallback(",
+				"    async (",
+				"      cmdSet: Commandset,",
+				"      setStatus: (s: string) => void,",
+				"    ): Promise<void> => {",
+				"      setStatus('Verifying PIN...');",
+				"      const pinResp = await cmdSet.verifyPIN(pinRef.current);",
+				"      console.log(",
+				"        `[Keycard] verifyPIN SW: 0x${pinResp.sw.toString(16).toUpperCase()}`,",
+				"      );",
+				"      try {",
+				"        pinResp.checkAuthOK();",
+				"      } catch (e) {",
+				"        if (e instanceof WrongPINException) {",
+				"          const attempts = e.getRetryAttempts();",
+				"          if (attempts === 0) {",
+				"            pinRef.current = '';",
+				"            setPinBlocked(true);",
+				"            throw new Error(PIN_BLOCKED_STATUS);",
+				"          }",
+				"          setPinError(`PIN is not valid. ${attemptsLeft(attempts)}.`);",
+				"        }",
+				"        pinRef.current = '';",
+				"        throw e;",
+				"      }",
+				"    },",
+				"    [],",
+				"  );",
+				"",
+				"  // False when interrupted for the pairing password.",
+				"  const runAutoPair = useCallback("
+			],
+			"startLine": 126
+		}
+	]
+}

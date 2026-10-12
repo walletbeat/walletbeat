@@ -1,0 +1,67 @@
+{
+	"highlightFirstLine": 71,
+	"highlightLastLine": 107,
+	"segments": [
+		{
+			"lines": [
+				"export async function exportKeysForTarget<E extends ExportPlanEntry>(",
+				"  cmdSet: Commandset,",
+				"  entries: readonly E[],",
+				"  setStatus: (s: string) => void = () => {},",
+				"  cache?: ExportResumeCache,",
+				"): Promise<ExportKeysResult<E>> {"
+			],
+			"startLine": 51
+		},
+		{
+			"lines": [
+				"",
+				"  let masterFingerprint = cache?.masterFingerprint ?? null;",
+				"  if (masterFingerprint === null) {",
+				"    setStatus('Reading master key...');",
+				"    const masterResp = await cmdSet.exportKey(0, true, 'm', false);",
+				"    masterResp.checkOK();",
+				"    masterFingerprint = fingerprintFromExportResponse(masterResp.data);",
+				"    if (cache) {",
+				"      cache.masterFingerprint = masterFingerprint;",
+				"    }",
+				"  }",
+				"",
+				"  const parentFingerprints =",
+				"    cache?.parentFingerprints ?? new Map<string, number>();",
+				"  parentFingerprints.set('m', masterFingerprint);",
+				"",
+				"  const keys: ExportedKey<E>[] = [];",
+				"  for (const [index, entry] of entries.entries()) {",
+				"    // Paths are unique within a target and the entry is the same constant, so narrowing to E is safe.",
+				"    const cached = cache?.keys.get(entry.derivationPath);",
+				"    if (cached) {",
+				"      keys.push(cached as ExportedKey<E>);",
+				"      continue;",
+				"    }",
+				"",
+				"    setStatus(`Exporting key ${index + 1} of ${entries.length}...`);",
+				"",
+				"    let parentFingerprint = parentFingerprints.get(entry.parentPath);",
+				"    if (parentFingerprint === undefined) {",
+				"      const parentResp = await cmdSet.exportKey(",
+				"        0,",
+				"        true,",
+				"        entry.parentPath,",
+				"        false,",
+				"      );",
+				"      parentResp.checkOK();",
+				"      parentFingerprint = fingerprintFromExportResponse(parentResp.data);",
+				"      parentFingerprints.set(entry.parentPath, parentFingerprint);",
+				"    }",
+				"",
+				"    const resp = await cmdSet.exportExtendedKey(0, entry.derivationPath, false);",
+				"    resp.checkOK();",
+				"    const key: ExportedKey<E> = {",
+				"      entry,",
+				"      exportRespData: resp.data,"
+			],
+			"startLine": 67
+		}
+	]
+}

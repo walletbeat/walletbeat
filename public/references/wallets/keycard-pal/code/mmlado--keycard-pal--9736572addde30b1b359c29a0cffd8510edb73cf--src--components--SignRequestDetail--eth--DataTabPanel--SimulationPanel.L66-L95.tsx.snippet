@@ -1,0 +1,61 @@
+{
+	"highlightFirstLine": 66,
+	"highlightLastLine": 95,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 38
+		},
+		{
+			"lines": [
+				"  if (state.phase === 'error') {"
+			],
+			"startLine": 56
+		},
+		{
+			"lines": [
+				"    );",
+				"  }",
+				"",
+				"  const { data } = state;",
+				"  const reverted = data.status === 'reverted';",
+				"",
+				"  return (",
+				"    <View style={styles.result}>",
+				"      <View",
+				"        style={[",
+				"          styles.chip,",
+				"          reverted ? styles.chipReverted : styles.chipSuccess,",
+				"        ]}",
+				"      >",
+				"        <Text",
+				"          style={[",
+				"            styles.chipText,",
+				"            reverted ? styles.chipTextReverted : styles.chipTextSuccess,",
+				"          ]}",
+				"        >",
+				"          {reverted ? 'Reverted' : 'Success'}",
+				"        </Text>",
+				"      </View>",
+				"",
+				"      {reverted && data.revertReason ? (",
+				"        <Text style={styles.revertReason}>{data.revertReason}</Text>",
+				"      ) : null}",
+				"",
+				"      {data.assetChanges.length > 0 && (",
+				"        <View style={styles.assetSection}>",
+				"          <Text style={styles.sectionLabel}>Asset changes</Text>",
+				"          {data.assetChanges.map((c, i) => (",
+				"            <AssetChangeRow key={i} change={c} />",
+				"          ))}",
+				"        </View>",
+				"      )}",
+				"",
+				"      {data.traceUrl ? ("
+			],
+			"startLine": 62
+		}
+	]
+}
