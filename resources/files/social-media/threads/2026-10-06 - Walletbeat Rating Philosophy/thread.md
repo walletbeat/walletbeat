@@ -40,7 +40,6 @@ The bar will rise as technology progresses.
 
 ---
 
-If you want to know more about the values, please visit 
-https://beta.walletbeat.eth.limo/about/
+If you want to know more about these values, please visit https://beta.walletbeat.eth.limo/about/
 
 ![Walletbeat Socials](./walletbeat-socials.png)
