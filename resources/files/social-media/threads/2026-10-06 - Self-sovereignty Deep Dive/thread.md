@@ -13,7 +13,7 @@ L1 Provider Independence 🏠
 
 Can the wallet be used without relying on its default provider for interacting with the L1 chain?
 
-wallets must allow the user to configure the L1 RPC endpoint to a self-hosted node before any request is made to that endpoint.
+Wallets must allow the user to configure the L1 RPC endpoint to a self-hosted node before any request is made to that endpoint.
 
 ---
 
