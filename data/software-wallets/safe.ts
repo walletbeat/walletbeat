@@ -123,7 +123,7 @@ export const safe: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'SafeDAO has received ecosystem grants; example Optimism grant proposal in the Optimism governance forum.',
+						'SafeDAO has received ecosystem grants. This Optimism governance forum post is an example grant proposal.',
 					url: 'https://gov.optimism.io/t/draft-gf-phase-1-proposal-old-template-safe/3400',
 				},
 				{
@@ -133,12 +133,12 @@ export const safe: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Community‑Aligned Fees: revenue (e.g., Native Swaps) pledged to SafeDAO; fee approach is explained publicly.',
+						'Community‑Aligned Fees: revenue (e.g., Native Swaps) pledged to SafeDAO. The fee approach is explained publicly.',
 					url: 'https://safefoundation.org/blog/safedao-community-aligned-fees-introduction',
 				},
 				{
 					explanation:
-						'SAFE tokenomics and governance scope; currently primarily used for SafeDAO treasury resource allocation (e.g., grants).',
+						'SAFE tokenomics and governance scope. The token is currently used primarily for SafeDAO treasury resource allocation (e.g., grants).',
 					url: 'https://safefoundation.org/blog/safe-tokenomics',
 				},
 			],

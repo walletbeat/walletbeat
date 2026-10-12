@@ -12,6 +12,7 @@ import {
 } from '@/schema/reference'
 import { CodebaseEntryType, crawlCodebase, GitIgnoredFiles } from '@/utils/codebase'
 
+import { referencePunctuationTellViolations } from './utils/ai-tells'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
@@ -151,6 +152,12 @@ describe('reference integrity', () => {
 								}
 							}
 						}
+					})
+
+					it('explanation and label fields avoid AI-tell punctuation', () => {
+						const violations = referencePunctuationTellViolations(fqRefs)
+
+						expect(violations, violations.join('\n')).toEqual([])
 					})
 
 					it('no URL uses the www.github.com hostname', () => {

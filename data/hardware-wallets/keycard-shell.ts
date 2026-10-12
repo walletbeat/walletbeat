@@ -69,7 +69,7 @@ export const keycardShell: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Blog announces ERC-4527 + BC-UR support; lists MetaMask, Rabby, imToken, Bitget, UniSat, Nunchuk, Sparrow, Specter',
+						'Blog post announcing ERC-4527 + BC-UR support. It lists MetaMask, Rabby, imToken, Bitget, UniSat, Nunchuk, Sparrow, and Specter.',
 					url: 'https://keycard.tech/blog/announcing-keycard-shell',
 				},
 				{
@@ -191,7 +191,7 @@ export const keycardShell: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Keycard is a BIP-32 HD wallet running on JavaCard; keys generated and stored on secure element',
+							'Keycard is a BIP-32 HD wallet running on JavaCard. Keys are generated and stored on the secure element.',
 						url: 'https://github.com/keycard-tech/status-keycard',
 					},
 					{

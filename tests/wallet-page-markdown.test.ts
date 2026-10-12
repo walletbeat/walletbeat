@@ -26,6 +26,7 @@ import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
+import { aiWordDensityViolations } from './utils/ai-tells'
 import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
@@ -229,6 +230,12 @@ describe('walletPageMarkdown', () => {
 
 			it('passes harper.js grammar check', async () => {
 				await grammarLint(md, { language: 'markdown' })
+			})
+
+			it('does not overuse AI-ish words', () => {
+				const violations = aiWordDensityViolations(md)
+
+				expect(violations, violations.join('\n')).toEqual([])
 			})
 
 			it('produces valid markdown', async () => {

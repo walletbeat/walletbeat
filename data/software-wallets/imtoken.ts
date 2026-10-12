@@ -147,7 +147,7 @@ export const imtoken: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'imToken publishes its core code under the Apache 2.0 open-source license; the app itself is proprietary.',
+							'imToken publishes its core code under the Apache 2.0 open-source license, but the app itself is proprietary.',
 						url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE',
 					},
 				],

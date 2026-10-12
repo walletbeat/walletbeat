@@ -140,7 +140,7 @@ interface AbstractLinter {
 
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
 
-function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
+export function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
 	const before = text.substring(0, start)
 	const lastLinkStart = before.lastIndexOf('](')
 
@@ -164,7 +164,7 @@ function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
 /**
  * Check if a given position falls inside a standalone URL (e.g. `https://example.com/path`).
  */
-function isInsideUrl(text: string, start: number): boolean {
+export function isInsideUrl(text: string, start: number): boolean {
 	const urlRegex = /\bhttps?:\/\/[^\s,)'"\]]+/gi
 
 	for (const match of text.matchAll(urlRegex)) {

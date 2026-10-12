@@ -4,6 +4,7 @@ import { allWalletSecurityNews, getNewsForWallet } from '@/data/news'
 import { allWallets } from '@/data/wallets'
 import { toFullyQualified } from '@/schema/reference'
 
+import { referencePunctuationTellViolations } from './utils/ai-tells'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
@@ -45,6 +46,12 @@ describe('wallet security news', () => {
 						}
 					}
 				}
+			})
+
+			it('reference explanation and label fields avoid AI-tell punctuation', () => {
+				const violations = referencePunctuationTellViolations(toFullyQualified(news.ref))
+
+				expect(violations, violations.join('\n')).toEqual([])
 			})
 		})
 	}
