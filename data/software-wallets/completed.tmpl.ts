@@ -69,11 +69,12 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { EthereumL1LightClient } from '@/schema/features/security/light-client'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import type {
-	ContractTransactionWarning,
-	ScamUrlWarning,
-	SendTransactionWarning,
-	UnlimitedApprovalWarning,
+import {
+	type ContractTransactionWarning,
+	type ScamUrlWarning,
+	type SendTransactionWarning,
+	type UnlimitedApprovalWarning,
+	UnlimitedApprovalWarningBenchmarkSpenders,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -115,7 +116,10 @@ import {
 	OrderflowDisclosureLevel,
 	type OrderflowPracticesPageContents,
 } from '@/schema/features/transparency/orderflow'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -699,7 +703,15 @@ export const completedTemplate: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: {
+						[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+							featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+							featureSupported,
+					},
 				}),
 			},
 			securityBestPractices: {
@@ -881,6 +893,7 @@ export const completedTemplate: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BOTH',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({ ref: refTodo }),
 				dependencySandboxing: supported({ ref: refTodo }),
 				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
@@ -888,11 +901,11 @@ export const completedTemplate: SoftwareWallet = {
 				hermeticBuilds: supported({ ref: refTodo }),
 				repositoryChangeControls: {
 					ref: refTodo,
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: true,
-					requiredReview: true,
-					tagsImmutable: true,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				reproducibleBuilds: supported({ ref: refTodo }),
 			},

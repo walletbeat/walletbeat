@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 149,
+	"highlightLastLine": 149,
+	"segments": [
+		{
+			"lines": [
+				"}: Props) => {"
+			],
+			"startLine": 40
+		},
+		{
+			"lines": [
+				"  useEffect(() => {"
+			],
+			"startLine": 119
+		},
+		{
+			"lines": [
+				"",
+				"    // Debounce domain resolving",
+				"    const timeout = setTimeout(() => {",
+				"      // Must be set here, not before the timer — guard on line 107 must only block re-runs while the Promise is in-flight, not during the debounce window.",
+				"      resolveDomain({ domain: trimmedAddress })",
+				"        .then((result) => {",
+				"          if (latestFieldValueRef.current !== fieldValue) return",
+				"          setAddressState({",
+				"            fieldValue,"
+			],
+			"startLine": 145
+		}
+	]
+}

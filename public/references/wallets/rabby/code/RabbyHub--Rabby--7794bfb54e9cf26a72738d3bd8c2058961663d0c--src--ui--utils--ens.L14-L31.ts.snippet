@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 14,
+	"highlightLastLine": 31,
+	"segments": [
+		{
+			"lines": [
+				"): Promise<{ addr: string; name: string } | null> => {",
+				"  const input = name?.trim();",
+				"  if (!input) return null;",
+				"",
+				"  const ethServerId = findChainByID(1)?.serverId || 'eth';",
+				"  const ensClient = createPublicClient({",
+				"    chain: mainnet,",
+				"    transport: custom({",
+				"      request: async ({ method, params }) =>",
+				"        wallet.requestETHRpc(",
+				"          {",
+				"            method,",
+				"            params: (params || []) as any[],",
+				"          },",
+				"          ethServerId",
+				"        ),",
+				"    }),",
+				"  });",
+				"",
+				"  try {",
+				"    const normalizedName = normalize(input);",
+				"    const addr = await ensClient.getEnsAddress({",
+				"      name: normalizedName,",
+				"    });",
+				"    if (!addr) return null;",
+				"    return {"
+			],
+			"startLine": 10
+		}
+	]
+}

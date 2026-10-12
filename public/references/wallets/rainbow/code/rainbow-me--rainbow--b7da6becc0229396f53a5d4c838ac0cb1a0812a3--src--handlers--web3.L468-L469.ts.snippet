@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 468,
+	"highlightLastLine": 469,
+	"segments": [
+		{
+			"lines": [
+				"export const resolveNameOrAddress = async (nameOrAddress: string): Promise<string | null> => {",
+				"  if (!isHexString(nameOrAddress)) {",
+				"    if (isUnstoppableAddressFormat(nameOrAddress)) {",
+				"      const resolvedAddress = await resolveUnstoppableDomain(nameOrAddress);",
+				"      return resolvedAddress;",
+				"    }",
+				"    const p = getProvider({ chainId: ChainId.mainnet });",
+				"    const resolvedAddress = await p?.resolveName(nameOrAddress);",
+				"",
+				"    return resolvedAddress;",
+				"  }",
+				"  return nameOrAddress;"
+			],
+			"startLine": 462
+		}
+	]
+}

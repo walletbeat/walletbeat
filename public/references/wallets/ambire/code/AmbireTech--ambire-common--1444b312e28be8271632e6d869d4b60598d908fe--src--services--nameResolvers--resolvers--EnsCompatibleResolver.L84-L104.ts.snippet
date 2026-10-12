@@ -1,0 +1,46 @@
+{
+	"highlightFirstLine": 84,
+	"highlightLastLine": 104,
+	"segments": [
+		{
+			"lines": [
+				"export abstract class EnsCompatibleResolver implements NameResolver {"
+			],
+			"startLine": 39
+		},
+		{
+			"lines": [
+				"  requiredChainId(networkMode: NetworkMode): string | undefined {",
+				"    return this.chainId[networkMode]",
+				"  }",
+				"",
+				"  protected providerFor(ctx: ResolveContext) {",
+				"    return ctx.getProvider(this.chainId[ctx.networkMode])",
+				"  }",
+				"",
+				"  async resolve(domain: string, ctx: ResolveContext): Promise<ForwardResolution | null> {",
+				"    const provider = this.providerFor(ctx)",
+				"    if (!provider) return null",
+				"",
+				"    return resolveENSDomain({",
+				"      provider,",
+				"      domain,",
+				"      options: {",
+				"        universalResolverAddress: this.universalResolver,",
+				"        expiry: this.expiryConfig",
+				"          ? {",
+				"              baseRegistrar: this.expiryConfig.baseRegistrar,",
+				"              nameWrapper: this.expiryConfig.nameWrapper[ctx.networkMode]",
+				"            }",
+				"          : null",
+				"      }",
+				"    })",
+				"  }",
+				"",
+				"  async reverse(addresses: string[], ctx: ResolveContext): Promise<ReverseLookupResult> {",
+				"    const provider = this.providerFor(ctx)"
+			],
+			"startLine": 80
+		}
+	]
+}

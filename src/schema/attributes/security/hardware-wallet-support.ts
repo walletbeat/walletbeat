@@ -8,6 +8,7 @@ import {
 } from '@/schema/attributes'
 import {
 	HardwareWalletConnection,
+	hardwareWalletConnectionEnum,
 	hardwareWalletConnectionIsOnlyWalletConnect,
 	type HardwareWalletSupport,
 	HardwareWalletType,
@@ -19,11 +20,30 @@ import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { nonEmptyDedup } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type HardwareWalletSupportMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
+}
+
+function supportedHardwareWalletsId(hardwareWalletSupport: HardwareWalletSupport): string {
+	const wallets = hardwareWalletType.fullRecord(hardwareWalletSupport.wallets, notSupported)
+
+	return hardwareWalletType
+		.recordKeys(wallets)
+		.flatMap(w => {
+			const support = wallets[w]
+
+			return isSupported(support)
+				? [
+						`${w}_${nonEmptyDedup(hardwareWalletConnectionEnum.reorderNonEmpty(support.connectionTypes)).join('_')}`,
+					]
+				: []
+		})
+		.join('__')
+		.toLowerCase()
 }
 
 function noHardwareWalletSupport(
@@ -58,7 +78,7 @@ function indirectHardwareWalletSupport(
 ): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'indirect_hardware_wallet_support',
+			id: `indirect_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PARTIAL,
 			displayName: 'Indirect hardware wallet support',
 			shortExplanation: sentence(`
@@ -90,7 +110,7 @@ function directHardwareWalletSupport(
 ): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'direct_hardware_wallet_support',
+			id: `direct_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PASS,
 			displayName: 'Supports hardware wallets',
 			shortExplanation: sentence('{{WALLET_NAME}} supports hardware wallets.'),

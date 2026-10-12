@@ -39,3 +39,4 @@ description: "A log of positive social media mentions as a result of Walletbeat'
 - https://x.com/BitgetWallet/status/2098287920767791242
 - http://x.com/TheCapHimself/status/2098191712950567263
 - https://x.com/web3privacy/status/2099798758242296192
+- https://x.com/GemWallet/status/2107384097618452826

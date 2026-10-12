@@ -1,7 +1,9 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, isValidWalletSlug } from '@/data/wallets'
+import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { walletOgImage } from '@/utils/wallet-og-image'
 
 // Routes
 export const prerender = true
@@ -19,6 +21,14 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
+const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
+
+if (walletEntry === undefined) {
+	throw new Error(`no wallet data for slug "${walletName}"`)
+}
+
+const [walletDataName, walletData] = walletEntry
+const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -42,11 +52,13 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 			'wallet',
 		],
 		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
+		image: walletOgImage(wallet),
 	}}
+	preloadComplexIcons
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<WalletPageContext walletId={wallet.metadata.id} client:idle />
+		<WalletPageContext walletId={wallet.metadata.id} codeSnippets={codeSnippets} client:idle />
 	</main>
 </Layout>

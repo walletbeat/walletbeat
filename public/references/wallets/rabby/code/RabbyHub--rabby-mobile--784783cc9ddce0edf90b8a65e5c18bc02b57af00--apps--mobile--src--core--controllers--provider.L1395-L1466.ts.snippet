@@ -1,0 +1,131 @@
+{
+	"highlightFirstLine": 1395,
+	"highlightLastLine": 1466,
+	"segments": [
+		{
+			"lines": [
+				"class ProviderController extends BaseController {"
+			],
+			"startLine": 543
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 770
+		},
+		{
+			"lines": [
+				"    try {"
+			],
+			"startLine": 1094
+		},
+		{
+			"lines": [
+				"      try {"
+			],
+			"startLine": 1298
+		},
+		{
+			"lines": [
+				"        if (",
+				"          !findChain({ enum: chain })?.isTestnet ||",
+				"          isGasAccount ||",
+				"          isGasLess",
+				"        ) {"
+			],
+			"startLine": 1302
+		},
+		{
+			"lines": [
+				"          } else {"
+			],
+			"startLine": 1329
+		},
+		{
+			"lines": [
+				"            const defaultRPC = await customRPCServiceApi.getDefaultRPC(",
+				"              chainServerId,",
+				"            );",
+				"",
+				"            if (defaultRPC?.txPushToRPC && !isGasLess && !isGasAccount) {",
+				"              let fePushedError: any = null;",
+				"",
+				"              const rawTx = isTempoTx",
+				"                ? tempoSerializedRawTx",
+				"                : serializedSignedTx ||",
+				"                  bytesToHex(",
+				"                    TransactionFactory.fromTxData(txDataWithRSV, {",
+				"                      common,",
+				"                    }).serialize(),",
+				"                  );",
+				"              if (!rawTx) {",
+				"                throw new Error('tempo transaction serialize failed');",
+				"              }",
+				"",
+				"              try {",
+				"                const [fePushedHash, url] =",
+				"                  await customRPCServiceApi.defaultRPCSubmitTxWithFallback(",
+				"                    chainServerId,",
+				"                    'eth_sendRawTransaction',",
+				"                    [rawTx],",
+				"                  );",
+				"",
+				"                hash = fePushedHash;",
+				"",
+				"                console.log('push tx id', fePushedHash);",
+				"",
+				"                params.frontend_push_result = {",
+				"                  success: true,",
+				"                  has_pushed: true,",
+				"                  raw_tx: rawTx,",
+				"                  url,",
+				"                  return_tx_id: fePushedHash!,",
+				"                };",
+				"",
+				"                openapi.submitTxV2(params).catch(error => {",
+				"                  console.log('ignore BE error', error);",
+				"                });",
+				"              } catch (fePushError) {",
+				"                fePushedError =",
+				"                  fePushError ?? new Error('Frontend RPC push failed');",
+				"                const urls =",
+				"                  await customRPCServiceApi.getDefaultRPCByChainServerId(",
+				"                    chainServerId,",
+				"                  );",
+				"                params.frontend_push_result = {",
+				"                  success: false,",
+				"                  has_pushed: true,",
+				"                  url: urls?.rpcUrl?.[0] || '',",
+				"                  error_msg:",
+				"                    typeof fePushError === 'object'",
+				"                      ? (fePushError as any)?.message",
+				"                      : String(fePushError),",
+				"                };",
+				"              }",
+				"              if (fePushedError) {",
+				"                adoptBE7702Params();",
+				"                try {",
+				"                  const res = await openapi.submitTxV2(params);",
+				"                  hash = res?.tx_id;",
+				"                } catch (bePushError) {",
+				"                  // both pushes failed: surface the RPC error, it's closer to the node",
+				"                  console.log('BE push failed after FE push failed', {",
+				"                    bePushError,",
+				"                  });",
+				"                  throw fePushedError;",
+				"                }",
+				"              }",
+				"            } else {",
+				"              adoptBE7702Params();",
+				"              const res = await openapi.submitTxV2(params);",
+				"              if (res.access_token) {",
+				"                handleGasAccountLoginSuccess(",
+				"                  res.access_token,",
+				"                  currentAccount,",
+				"                ).catch(error => {"
+			],
+			"startLine": 1391
+		}
+	]
+}

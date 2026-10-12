@@ -182,7 +182,7 @@ describe('codebase integrity', () => {
 		const symlinks: (CodebaseEntry & { type: CodebaseEntryType.SYMLINK })[] = []
 
 		await crawlCodebase({
-			ignore: ['.git', 'node_modules'],
+			ignore: ['.git', 'node_modules', await GitIgnoredFiles()],
 			complexTraversalFn: async (entryBase, getFullEntry) => {
 				if (entryBase.type === CodebaseEntryType.SYMLINK) {
 					const entry = await getFullEntry()
@@ -522,6 +522,7 @@ describe('codebase integrity', () => {
 			'[walletName]',
 			'[...slug]',
 			'[...path].[ext].ts',
+			'_about.md',
 			'APPEND_SYSTEM.md',
 		])
 

@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
@@ -67,6 +68,7 @@ import {
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -80,9 +82,9 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		coinspectId: 'zerion',
-		contributors: [lucemans, mattmatt, ren2140],
+		contributors: [lucemans, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-31',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -164,16 +166,79 @@ export const zerion: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+			[Variant.BROWSER]: {
+				ref: {
+					explanation:
+						"The browser extension supports sending funds to ENS names using Zerion's servers.",
+					url: [
+						{
+							label: 'Browser extension looking up a recipient name',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/ui/components/ReceiverAddressDialog/ReceiverAddressDialog.tsx#L132',
+						},
+						{
+							label: "Browser extension looking up names through Zerion's servers",
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/name-service/index.ts#L47-L54',
+						},
+					],
+				},
+				chainSpecificAddressing: {
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+					}),
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'OFFCHAIN',
-				offchainDataVerifiability: 'NOT_VERIFIABLE',
-				offchainProviderConnection: 'DIRECT_CONNECTION',
-			}),
+			[Variant.MOBILE]: {
+				ref: [
+					{
+						explanation:
+							"The mobile app supports sending funds to ENS names using Zerion's servers.",
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-recipient.png',
+						label: 'Mobile app finding vitalik.eth as a recipient',
+					},
+					{
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-lookup-capture.png',
+						label:
+							"Network capture of the mobile app looking up an ENS name through Zerion's servers",
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					}),
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
+			},
 		},
 		chainAbstraction: {
 			bridging: {
@@ -973,6 +1038,7 @@ export const zerion: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -982,7 +1048,19 @@ export const zerion: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension has no LavaMoat or SES dependency in its build, and the shipped v1.45.2 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/dc9be458cd0e08be170058ba256bd4144e362f0a/package.json',
+							},
+						],
+					}),
+					// The mobile app source is not public.
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
@@ -1008,11 +1086,11 @@ export const zerion: SoftwareWallet = {
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: false,
-					requiredReview: false,
-					tagsImmutable: false,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 				},
 				reproducibleBuilds: null,
 			},

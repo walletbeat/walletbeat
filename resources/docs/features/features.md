@@ -100,7 +100,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
-  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
+  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
   - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
@@ -180,6 +180,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 
 	/**
@@ -247,6 +252,11 @@ type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 }
 ```
@@ -297,6 +307,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
     - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
+    - `dependencyAgeGate` (`ResolvedFeature<DependencyAgeGate>`)
     - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
     - `dependencySandboxing` (`ResolvedFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
@@ -501,20 +512,14 @@ To test:
 
 - `canDeployNew`: Go through the wallet's UI and check whether it offers
   a flow to deploy a new Safe contract.
-- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
-  or remove an owner using only the wallet's native UI (no extra modules).
-  Check whether the wallet generates the `addOwnerWithThreshold` /
-  `removeOwner` transaction directly.
-- `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  replace an owner key using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `swapOwner` transaction
-  directly.
-- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+- `keyRotationTransactionGeneration`: In an existing Safe, attempt to
+  replace an owner key. Check whether the `swapOwner` transaction can be
+  generated using an open-source standalone app, only a proprietary
+  standalone app, only an external API, or not at all.
+- `supportedOwners`: Try connecting the wallet to Safes with 1,
   2, and many owners and note the limits.
 
 - `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
-- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
-- `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
 - `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
 
   - SINGLE_SIGNER: only single-owner Safes are supported.
@@ -790,10 +795,10 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 
 Which methods of address resolution a wallet supports.
 
-- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
+- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `wallet.ensdao.eth` in the send address field. If it resolves, it is supported.
 - `chainSpecificAddressing` (object): Chain-specific address lookups.
-  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves.
-  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves.
+  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `wallet.ensdao.eth@ethereum` in the send address field and check if it resolves.
+  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `wallet.ensdao.eth:ethereum` in the send address field and check if it resolves.
 
 ---
 
@@ -1296,7 +1301,7 @@ type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FL
 
 ### Interface: `DataCollection`
 
-A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
+A collection of data that a wallet collects. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
@@ -2546,16 +2551,45 @@ type SendTransactionWarning = WithRef<
 
 ---
 
+### Enum: `UnlimitedApprovalWarningBenchmarkSpenders`
+
+Benchmark spenders for unlimited ERC-20 token approvals.
+
+Each entry is a concrete, pinned on-chain address. Instead of describing a category of spender, we grant unlimited approval to this specific address and evaluate whether the wallet warns.
+
+- `PUBLIC_EOA` = `'PUBLIC_EOA'`: A publicly attributable Ethereum EOA belonging to an individual, rather than a protocol, application, or contract
+- `UNISWAP_V3_ROUTER` = `'UNISWAP_V3_ROUTER'`: Uniswap V3 SwapRouter, 0xE592427A0AEce92De3Edee1F18E0157C05861564: A verified, widely-used, reputable contract.
+- `PINK_PHISHING_ADDRESS` = `'PINK_PHISHING_ADDRESS'`: 0x9fA7bB759641FCd37fe4aE41f725e0f653f2C726, labeled "PinkDrainer: Wallet 2" on Etherscan. Pink Drainer was a scam-as-a-service operation that stole over $85M from more than 21,000 victims across 2023–2024 before its operators shut it down in May 2024. Stays valid as a benchmark as long as this address remains publicly flagged.
+- `CONTRACT_NOT_INTERACTED_BEFORE` = `'CONTRACT_NOT_INTERACTED_BEFORE'`: A contract the test wallet has never interacted with before. Any real contract works, as long as the tester's wallet has no prior history with it. Walletbeat's own testing contracts is a convenient default, since it's guaranteed untouched until deliberately used for this benchmark.
+- `RECENTLY_DEPLOYED_CONTRACT` = `'RECENTLY_DEPLOYED_CONTRACT'`: A contract that was only recently deployed onchain. Any real contract works, as long as it was deployed shortly before testing. Walletbeat's own testing contracts is a convenient default, since it can be redeployed on demand.
+
+---
+
+### Type: `UnlimitedApprovalWarningBenchmarks`
+
+Per-benchmark data on whether the wallet warns for that specific unlimited-approval spender.
+
+`null` means the benchmark has not been tested yet for the wallet.
+
+```typescript
+type UnlimitedApprovalWarningBenchmarks = Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	Support | null
+>
+```
+
+---
+
 ### Type: `UnlimitedApprovalWarning`
 
 ```typescript
 type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Which unlimited-approval benchmark spenders the wallet is known to
+		 * warn on.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address
@@ -2760,6 +2794,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
 - `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `FAVICON` = `'favicon'`: Load website favicons from the browser's favicon cache via `_favicon/` URLs.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
@@ -4106,6 +4141,23 @@ type ArtifactSigning = Support<ArtifactSigningDetails>
 
 ---
 
+### Type: `DependencyAgeGate`
+
+Whether routine dependency updates only pick up dependency releases that are at least a minimum age, so that a compromised release has time to be detected and pulled before the wallet adopts it. One-off updates for security fixes may bypass the minimum age.
+
+To test: look in the wallet's source repository for a minimum release age setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in `.github/dependabot.yml`. Set to `notSupported` if routine updates have no minimum age.
+
+```typescript
+type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
+```
+
+---
+
 ### Type: `DependencyLocking`
 
 Whether the wallet's release builds enforce a lockfile (or equivalent) for locked dependency resolution.
@@ -4136,6 +4188,18 @@ type DependencySandboxing = Support<WithRef<{}>>
 
 ---
 
+### Enum: `RepositoryChangeControlState`
+
+Whether a repository change control is in place, and whether that can be checked publicly. A `null` value means the control has not been looked into yet.
+
+- `VERIFIABLY_PRESENT` = `'VERIFIABLY_PRESENT'`: The control is in place, and anyone can check this. (e.g. A GitHub ruleset that is visible on the repository's public rules page or rulesets API.)
+- `VERIFIABLY_ABSENT` = `'VERIFIABLY_ABSENT'`: The control is not in place, and anyone can check this. (e.g. The public rulesets do not include it, and the public branch API shows no classic branch protection providing it.)
+- `CLAIMED_PRESENT` = `'CLAIMED_PRESENT'`: The wallet developer states that the control is in place, but this cannot be checked publicly. (e.g. A classic branch protection rule, which only repository admins can see.)
+- `CLAIMED_ABSENT` = `'CLAIMED_ABSENT'`: The wallet developer states that the control is not in place. This cannot be checked publicly, but a developer has no incentive to claim not to have a control, so it is as strong as `VERIFIABLY_ABSENT`.
+- `UNVERIFIABLE` = `'UNVERIFIABLE'`: The wallet developer makes no statement either way, and whether the control is in place cannot be checked publicly.
+
+---
+
 ### Type: `RepositoryChangeControls`
 
 Observable repository-level change controls for the wallet's source repository.
@@ -4143,15 +4207,15 @@ Observable repository-level change controls for the wallet's source repository.
 ```typescript
 type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
+	requiredReview: RepositoryChangeControlState
 	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
+	requiredChecks: RepositoryChangeControlState
 	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
+	forcePushBlocked: RepositoryChangeControlState
 	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
+	branchDeletionBlocked: RepositoryChangeControlState
 	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
+	tagsImmutable: RepositoryChangeControlState
 }>
 ```
 

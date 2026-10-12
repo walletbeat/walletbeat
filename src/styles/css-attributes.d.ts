@@ -246,18 +246,19 @@ declare global {
 		/**
 		 * ## [data-icon]
 		 *
-		 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-complex`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+		 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-complex`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds; add `grayscale` for image icons that should appear muted until a parent resets `--icon-grayscale-filter` (e.g. on hover).
 		 *
 		 * ### Tokens
 		 * - shape: `circle`, `filled`
 		 * - source: `wbicons-complex`
-		 * - effect: `shadow`
+		 * - effect: `shadow`, `grayscale`
 		 *
 		 * ### CSS Variables
 		 * - `--icon-content`
 		 * - `--icon-size`
 		 * - `--icon-navigation-borderColor`
 		 * - `--icon-navigation-color`
+		 * - `--icon-grayscale-filter` — filter applied by `grayscale`; set to `none` to show the icon in color.
 		 *
 		 * ### Examples
 		 * ```html
@@ -265,6 +266,7 @@ declare global {
 		 * <span data-icon="wbicons-complex security"></span>
 		 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 		 * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
+		 * <span data-icon="grayscale"><img src="/images/wallets/rabby.svg" alt="" /></span>
 		 * ```
 		 *
 		 * ### Source

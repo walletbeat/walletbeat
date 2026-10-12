@@ -1,4 +1,42 @@
 import type { AttributeGroup } from '@/schema/attribute-groups.ts'
+import { accountAbstraction } from '@/schema/attributes/ecosystem/account-abstraction.ts'
+import { addressResolution } from '@/schema/attributes/ecosystem/address-resolution.ts'
+import { browserIntegration } from '@/schema/attributes/ecosystem/browser-integration.ts'
+import { chainAbstraction } from '@/schema/attributes/ecosystem/chain-abstraction.ts'
+import { hardwareWalletInteroperability } from '@/schema/attributes/ecosystem/hardware-wallet-interoperability.ts'
+import { appConnectionSupport } from '@/schema/attributes/ecosystem/hw-app-connection-support.ts'
+import { transactionBatching } from '@/schema/attributes/ecosystem/transaction-batching.ts'
+import { addressCorrelation } from '@/schema/attributes/privacy/address-correlation.ts'
+import { appIsolation } from '@/schema/attributes/privacy/app-isolation.ts'
+import { hardwarePrivacy } from '@/schema/attributes/privacy/hardware-privacy.ts'
+import { multiAddressCorrelation } from '@/schema/attributes/privacy/multi-address-correlation.ts'
+import { privacyHygiene } from '@/schema/attributes/privacy/privacy-hygiene.ts'
+import { privateTransfers } from '@/schema/attributes/privacy/private-transfers.ts'
+import { accountRecovery } from '@/schema/attributes/security/account-recovery.ts'
+import { duressResistance } from '@/schema/attributes/security/duress-resistance.ts'
+import { firmware } from '@/schema/attributes/security/firmware.ts'
+import { hardwareWalletSupport } from '@/schema/attributes/security/hardware-wallet-support.ts'
+import { scamPrevention } from '@/schema/attributes/security/scam-prevention.ts'
+import { securityAuditsAndBounties } from '@/schema/attributes/security/security-audits-bounties'
+import { securityBestPractices } from '@/schema/attributes/security/security-best-practices.ts'
+import { supplyChainDIY } from '@/schema/attributes/security/supply-chain-diy.ts'
+import { supplyChainFactory } from '@/schema/attributes/security/supply-chain-factory.ts'
+import { transactionLegibility } from '@/schema/attributes/security/transaction-legibility.ts'
+import { userSafety } from '@/schema/attributes/security/user-safety.ts'
+import { accountPortability } from '@/schema/attributes/self-sovereignty/account-portability.ts'
+import { accountUnruggability } from '@/schema/attributes/self-sovereignty/account-unruggability.ts'
+import { chainVerification } from '@/schema/attributes/self-sovereignty/chain-verification.ts'
+import { interoperability } from '@/schema/attributes/self-sovereignty/interoperability.ts'
+import { l1ProviderIndependence } from '@/schema/attributes/self-sovereignty/l1-provider-independence.ts'
+import { permissionsManagement } from '@/schema/attributes/self-sovereignty/permissions-management.ts'
+import { transactionInclusion } from '@/schema/attributes/self-sovereignty/transaction-inclusion.ts'
+import { feeTransparency } from '@/schema/attributes/transparency/fee-transparency.ts'
+import { funding } from '@/schema/attributes/transparency/funding.ts'
+import { maintenance } from '@/schema/attributes/transparency/maintenance.ts'
+import { openSource } from '@/schema/attributes/transparency/open-source.ts'
+import { orderflowTransparency } from '@/schema/attributes/transparency/orderflow-transparency.ts'
+import { releaseProcess } from '@/schema/attributes/transparency/release-process.ts'
+import { reputation } from '@/schema/attributes/transparency/reputation.ts'
 import { sentence } from '@/types/content'
 
 export enum AttributeGroupId {
@@ -16,60 +54,51 @@ const attributeGroupDefinitions = [
 		displayName: 'Security',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/security/security-audits-bounties'))
-					.securityAuditsAndBounties,
+				attribute: securityAuditsAndBounties,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/scam-prevention.ts')).scamPrevention,
+				attribute: scamPrevention,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/chain-verification.ts'))
-					.chainVerification,
+				attribute: chainVerification,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/transaction-legibility.ts'))
-					.transactionLegibility,
+				attribute: transactionLegibility,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/hardware-wallet-support.ts'))
-					.hardwareWalletSupport,
+				attribute: hardwareWalletSupport,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/security-best-practices.ts'))
-					.securityBestPractices,
+				attribute: securityBestPractices,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/supply-chain-diy.ts'))
-					.supplyChainDIY,
+				attribute: supplyChainDIY,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/supply-chain-factory.ts'))
-					.supplyChainFactory,
+				attribute: supplyChainFactory,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/firmware.ts')).firmware,
+				attribute: firmware,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/user-safety.ts')).userSafety,
+				attribute: userSafety,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/account-recovery.ts'))
-					.accountRecovery,
+				attribute: accountRecovery,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/duress-resistance.ts'))
-					.duressResistance,
+				attribute: duressResistance,
 				weight: 1.0,
 			},
 		],
@@ -82,31 +111,27 @@ const attributeGroupDefinitions = [
 		displayName: 'Privacy',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/privacy/address-correlation.ts'))
-					.addressCorrelation,
+				attribute: addressCorrelation,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/privacy/multi-address-correlation.ts'))
-					.multiAddressCorrelation,
+				attribute: multiAddressCorrelation,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/privacy/private-transfers.ts'))
-					.privateTransfers,
+				attribute: privateTransfers,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/privacy/hardware-privacy.ts'))
-					.hardwarePrivacy,
+				attribute: hardwarePrivacy,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/privacy/app-isolation.ts')).appIsolation,
+				attribute: appIsolation,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/privacy/privacy-hygiene.ts')).privacyHygiene,
+				attribute: privacyHygiene,
 				weight: 1.0,
 			},
 		],
@@ -119,29 +144,23 @@ const attributeGroupDefinitions = [
 		displayName: 'Self-sovereignty',
 		attributes: [
 			{
-				attribute: (
-					await import('@/schema/attributes/self-sovereignty/l1-provider-independence.ts')
-				).l1ProviderIndependence,
+				attribute: l1ProviderIndependence,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/account-portability.ts'))
-					.accountPortability,
+				attribute: accountPortability,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/transaction-inclusion.ts'))
-					.transactionInclusion,
+				attribute: transactionInclusion,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/account-unruggability.ts'))
-					.accountUnruggability,
+				attribute: accountUnruggability,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/permissions-management.ts'))
-					.permissionsManagement,
+				attribute: permissionsManagement,
 				weight: 1.0,
 			},
 		],
@@ -156,30 +175,27 @@ const attributeGroupDefinitions = [
 		displayName: 'Transparency',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/transparency/open-source.ts')).openSource,
+				attribute: openSource,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/funding.ts')).funding,
+				attribute: funding,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/fee-transparency.ts'))
-					.feeTransparency,
+				attribute: feeTransparency,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/release-process.ts'))
-					.releaseProcess,
+				attribute: releaseProcess,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/orderflow-transparency.ts'))
-					.orderflowTransparency,
+				attribute: orderflowTransparency,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/reputation.ts')).reputation,
+				attribute: reputation,
 				weight: 1.0,
 			},
 		],
@@ -194,44 +210,35 @@ const attributeGroupDefinitions = [
 		displayName: 'Ecosystem',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/account-abstraction.ts'))
-					.accountAbstraction,
+				attribute: accountAbstraction,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/address-resolution.ts'))
-					.addressResolution,
+				attribute: addressResolution,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/browser-integration.ts'))
-					.browserIntegration,
+				attribute: browserIntegration,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/chain-abstraction.ts'))
-					.chainAbstraction,
+				attribute: chainAbstraction,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/transaction-batching.ts'))
-					.transactionBatching,
+				attribute: transactionBatching,
 				weight: 1.0,
 			},
 			{
-				attribute: (
-					await import('@/schema/attributes/ecosystem/hardware-wallet-interoperability.ts')
-				).hardwareWalletInteroperability,
+				attribute: hardwareWalletInteroperability,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/self-sovereignty/interoperability.ts'))
-					.interoperability,
+				attribute: interoperability,
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/ecosystem/hw-app-connection-support.ts'))
-					.appConnectionSupport,
+				attribute: appConnectionSupport,
 				weight: 1.0,
 			},
 		],
@@ -244,7 +251,7 @@ const attributeGroupDefinitions = [
 		displayName: 'Maintenance',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/transparency/maintenance.ts')).maintenance,
+				attribute: maintenance,
 				weight: 1.0,
 			},
 		],

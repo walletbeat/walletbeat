@@ -2202,5 +2202,9 @@
 	.mobile-card-pie {
 		display: flex;
 		justify-content: center;
+		content-visibility: auto;
+		/* Reserve the pie's rendered height while it is skipped, so cards below don't shift when it renders:
+		   2 * padding + 2 * (radius + outer level offset) = 2 * 8 + 2 * (100 + 0.45 * 100) */
+		contain-intrinsic-size: auto 306px;
 	}
 </style>
