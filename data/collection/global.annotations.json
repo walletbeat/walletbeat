@@ -154,5 +154,36 @@
 			"purposes": "NOT_WALLET_INITIATED"
 		}
 	],
-	"benignStrings": ["AWSALB", "engagement_time_msec", "rbisource", "x-api-ver"]
+	"benignStrings": [
+		"0x50c4e75a512f2a14a7b304787adf79c4531a5909",
+		"0x942f9CE5D9a33a82F88D233AEb3292E680230348",
+		"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+		"=",
+		"?",
+		"AMP_MKTG_0000000000",
+		"AWSALB",
+		"IiJCkFpAdSSG-SBXAqcp1wRk83tquWz3OgTdaY_2DgM",
+		"JTdCJTdE",
+		"__cflb",
+		"__hstc",
+		"_ga_BLC6FNVWFY",
+		"_ga_DVLGXM0NH8",
+		"_ga_FB0VDSHHFN",
+		"_gcl_au",
+		"_twpid",
+		"apikey",
+		"attrs",
+		"bips",
+		"colno",
+		"engagement_time_msec",
+		"hubspotutk",
+		"jsonrpc",
+		"lineno",
+		"rawTxn",
+		"rbisource",
+		"sigs",
+		"x-api-ver",
+		"x-app-env",
+		"x-permit2-disabled"
+	]
 }
