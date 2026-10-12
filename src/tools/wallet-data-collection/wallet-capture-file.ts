@@ -15,8 +15,10 @@ import {
 	type DataCollectionForFlowWithOnchainData,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	type EndpointCollection,
 	EntityRole,
 	leastConfigurableCollectionPolicy,
+	type MultiAddressHandling,
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
@@ -56,6 +58,11 @@ import {
 	stableJSONStringify,
 } from '@/utils/json'
 
+import {
+	type AddressBearingRequest,
+	classifyEntityMultiAddressHandling,
+	type EntityRequests,
+} from './multi-address-classification'
 import { removeFile, writeFileAtomically } from './read-only'
 import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
@@ -2443,6 +2450,48 @@ export class WalletRequest {
 	}
 
 	/**
+	 * Returns the subset of the given wallet addresses that this request
+	 * carries, either in its query, cookies, headers, trailers, or payload.
+	 *
+	 * Only the wallet's *own* addresses should be passed in, so that other
+	 * addresses that merely appear in the traffic (contracts, recipients, etc.)
+	 * are not counted as the wallet's addresses for multi-address correlation.
+	 *
+	 * Matching is case-insensitive and tolerant of the `0x` prefix, so that a
+	 * wallet address appearing as a substring of a larger encoded payload (e.g.
+	 * RLP-encoded calldata) is still detected.
+	 */
+	public async walletAddressesPresent(
+		walletAddresses: ReadonlySet<Erc55Address>,
+	): Promise<Erc55Address[]> {
+		if (walletAddresses.size === 0) {
+			return []
+		}
+
+		// Build the request's strings once, then check each wallet address
+		// against them. This avoids re-parsing the request per address.
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const stringValues = reqStrings.strings().map(s => s.str.str.toLowerCase())
+
+		const present: Erc55Address[] = []
+
+		for (const walletAddr of walletAddresses) {
+			const addr = walletAddr.toLowerCase()
+
+			const found = stringValues.some(v => v.includes(addr))
+
+			if (found) {
+				present.push(walletAddr)
+			}
+		}
+
+		return present
+	}
+
+	/**
 	 * True when this request is directly identified as NOT_WALLET_INITIATED,
 	 * either by a matching request matcher or by manual review.
 	 */
@@ -3101,6 +3150,13 @@ export class WalletCaptureFile {
 			[UserFlow.APP_CONNECTION]: null,
 		}
 
+		// The set of the wallet's own addresses that appear anywhere across all
+		// flows. This is a wallet-wide property: whether the wallet manages a
+		// single address (ACTIVE_ADDRESS_ONLY) or multiple addresses depends on
+		// the union of addresses it references across every flow, not on any
+		// single flow in isolation.
+		const totalWalletAddressesSeen = await this.computeWalletAddressesSeen()
+
 		for (const recFlow of recordedFlow.items) {
 			const flow = this.getFlow(recFlow)
 
@@ -3121,7 +3177,11 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = await this.processFlowRequests(flow, options.strict ?? false)
+			const collected = await this.processFlowRequests(
+				flow,
+				options.strict ?? false,
+				totalWalletAddressesSeen,
+			)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -3143,11 +3203,36 @@ export class WalletCaptureFile {
 	}
 
 	/**
+	 * Compute the set of the wallet's own addresses that appear across all
+	 * recorded flows.
+	 */
+	private async computeWalletAddressesSeen(): Promise<Set<Erc55Address>> {
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
+		const seen = new Set<Erc55Address>()
+
+		for (const request of this.getRequests()) {
+			const carried = await request.walletAddressesPresent(walletOwnAddressesSet)
+
+			for (const addr of carried) {
+				seen.add(addr)
+			}
+		}
+
+		return seen
+	}
+
+	/**
 	 * Process flow requests to build DataCollectionByEntity array.
+	 *
+	 * @param totalWalletAddressesSeen The set of the wallet's own addresses
+	 *   seen across all flows. Used to determine whether the wallet manages a
+	 *   single address (ACTIVE_ADDRESS_ONLY) or multiple addresses.
 	 */
 	private async processFlowRequests(
 		flow: WalletCaptureFlow,
 		strict: boolean,
+		totalWalletAddressesSeen: ReadonlySet<Erc55Address>,
 	): Promise<WithRef<DataCollectionByEntity>[]> {
 		const maybeThrow = (error: string) => {
 			if (strict) {
@@ -3163,8 +3248,18 @@ export class WalletCaptureFile {
 				role: EntityRole
 				info: Map<UserInfo, CollectionPolicy>
 				purposes: Set<DataCollectionPurpose>
+				/** The wallet's own addresses observed by this entity. */
+				walletAddresses: Set<Erc55Address>
+				/** The address-bearing requests observed by this entity. */
+				addressRequests: AddressBearingRequest[]
 			}
 		>()
+
+		// The set of the wallet's own addresses that appear anywhere in this
+		// flow. Used to determine which of the wallet's own addresses this
+		// request carries.
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
 
 		for (const request of flow.requests) {
 			const resolved = entitiesForDomain(request.domain)
@@ -3205,6 +3300,13 @@ export class WalletCaptureFile {
 				purposes.add(purpose)
 			}
 
+			// Determine which of the wallet's own addresses this request
+			// carries. Only the wallet's own addresses (recorded in capture
+			// info) count, so that token contracts, transaction recipients,
+			// and other non-wallet addresses are not mistaken for the user's
+			// wallet addresses.
+			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
+
 			// The data is seen by the operator and by every intermediary on the
 			// way there, so record one receipt per entity with its role.
 			const receivingEntities: Array<{ entity: Entity; role: EntityRole }> = [
@@ -3225,11 +3327,26 @@ export class WalletCaptureFile {
 						role,
 						info: new Map<UserInfo, CollectionPolicy>(),
 						purposes: new Set<DataCollectionPurpose>(),
+						walletAddresses: new Set<Erc55Address>(),
+						addressRequests: [],
 					}
 					perEntity.set(perEntityKey, entData)
 				}
 
 				for (const [info, policy] of userInfos.entries()) {
+					// Only report ACCOUNT_ADDRESS as collected when the request
+					// actually carries one of the wallet's own addresses. The
+					// capture's userData store may tag strings as ACCOUNT_ADDRESS
+					// that are not the user's wallet addresses (e.g. token
+					// contract addresses, transaction recipients, or addresses
+					// embedded in RLP-encoded calldata). Such false positives
+					// must not be treated as the wallet address being collected,
+					// otherwise the address-correlation and multi-address
+					// attributes would over-report.
+					if (info === WalletInfo.ACCOUNT_ADDRESS && carriedWalletAddresses.length === 0) {
+						continue
+					}
+
 					if (policy === null) {
 						maybeThrow(`Cannot figure out collection policy of request: ${request.toString()}`)
 						continue
@@ -3246,6 +3363,17 @@ export class WalletCaptureFile {
 
 				for (const purpose of purposes) {
 					entData.purposes.add(purpose)
+				}
+
+				if (carriedWalletAddresses.length > 0) {
+					for (const addr of carriedWalletAddresses) {
+						entData.walletAddresses.add(addr)
+					}
+
+					entData.addressRequests.push({
+						addresses: assertNonEmptyArray(carriedWalletAddresses),
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
 				}
 			}
 		}
@@ -3266,26 +3394,50 @@ export class WalletCaptureFile {
 				continue
 			}
 
+			// Classify how the wallet handles fetching data for multiple wallet
+			// addresses, based on the address-bearing requests this entity
+			// observed. Only the wallet's own addresses (from capture info) are
+			// considered.
+			const multiAddress = ((): MultiAddressHandling | undefined => {
+				if (entData.walletAddresses.size === 0) {
+					return undefined
+				}
+
+				const entityRequests: EntityRequests = {
+					addresses: assertNonEmptyArray(Array.from(entData.walletAddresses)),
+					requests: entData.addressRequests,
+				}
+
+				return (
+					classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests) ??
+					undefined
+				)
+			})()
+
+			const dataCollection: EndpointCollection = {
+				// TODO: Implement support for other values here once any wallet supports this...
+				endpoint: RegularEndpoint,
+				...nonEmptyMapToRecord(userInfos, info => {
+					const policy = entData.info.get(info)
+
+					if (policy === undefined) {
+						maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
+
+						return CollectionPolicy.ALWAYS
+					}
+
+					return policy
+				}),
+			}
+
+			if (multiAddress !== undefined) {
+				dataCollection.multiAddress = multiAddress
+			}
+
 			const row: WithRef<DataCollectionByEntity> = {
 				byEntity: entData.entity,
 				role: entData.role,
-				dataCollection: {
-					// TODO: Implement support for other values here once any wallet supports this...
-					endpoint: RegularEndpoint,
-					// TODO: Handle multiAddress.
-					multiAddress: undefined,
-					...nonEmptyMapToRecord(userInfos, info => {
-						const policy = entData.info.get(info)
-
-						if (policy === undefined) {
-							maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
-
-							return CollectionPolicy.ALWAYS
-						}
-
-						return policy
-					}),
-				},
+				dataCollection,
 				purposes: purposes,
 				ref: refNotNecessary,
 			}
@@ -3538,6 +3690,30 @@ export class WalletCaptureFile {
 	/** Returns the list of capture-info entries recorded so far (possibly empty). */
 	public getCaptureInfo(): CaptureInfo[] {
 		return this.captureInfo
+	}
+
+	/**
+	 * Returns the set of the wallet's own addresses recorded in capture info.
+	 *
+	 * This is the authoritative set of addresses that belong to the user being
+	 * captured. Only these addresses should be treated as the wallet's own
+	 * addresses for the purpose of multi-address correlation; any other
+	 * addresses that merely appear in the traffic (token contracts, transaction
+	 * recipients, addresses embedded in RLP-encoded calldata, etc.) are not the
+	 * user's wallet addresses.
+	 */
+	public walletOwnAddresses(): NonEmptyArray<Erc55Address> | null {
+		const addresses = new Set<Erc55Address>()
+
+		for (const info of this.captureInfo) {
+			for (const addr of info.walletAddresses) {
+				addresses.add(ethereumErc55Address(addr))
+			}
+		}
+
+		const allAddresses = Array.from(addresses)
+
+		return isNonEmptyArray(allAddresses) ? allAddresses : null
 	}
 
 	/** Replaces the full list of capture-info entries. */
