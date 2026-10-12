@@ -327,7 +327,7 @@ export class WalletDataCollectionAgent {
 
 		this.openMutation = null
 		this.classificationCache = new Map()
-		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath)
+		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath, null)
 	}
 
 	/**
@@ -359,7 +359,7 @@ export class WalletDataCollectionAgent {
 
 		// Load the audit log (the source of truth across process restarts) and compute the
 		// initial classification cache across all wallets.
-		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath)
+		this.auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.auditLogPath, null)
 		this.classificationCache = await allRequestClassifications(this.repoRoot)
 
 		// Recover an orphaned open-mutation left by a prior harness run: resume in
@@ -369,8 +369,8 @@ export class WalletDataCollectionAgent {
 		if (open !== null) {
 			const impactedStrings = open.impacted.map(requestIdToString)
 			const unjustified = this.auditLog.getUnjustifiedImpacted()
-			const unjustifiedStrings = new Set(unjustified.map(requestIdToString))
-			const justified: Set<string> = new Set(
+			const unjustifiedStrings = new Set<string>(unjustified.map(requestIdToString))
+			const justified: Set<`${string}:${string}:${string}`> = new Set(
 				impactedStrings.filter((id: string) => !unjustifiedStrings.has(id)),
 			)
 
@@ -738,7 +738,7 @@ export class WalletDataCollectionBash {
 
 		// Append an `open-mutation` entry and enter open-mutation mode. The recorded
 		// command has any `cd <repo-root>` path redacted to `/walletbeat`.
-		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath, null)
 		const command = redactCdPath(this.originalCommand)
 
 		auditLog.appendEntry({
@@ -868,7 +868,7 @@ export class WalletDataCollectionBash {
 		// The audit log was written; validate that exactly one valid entry was appended.
 		const previousCount = this.agent.auditLog.entryCount
 		const previousTip = this.agent.auditLog.lastTip
-		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+		const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath, null)
 		const appended = auditLog.validateAppend(previousCount, previousTip)
 
 		if (appended === null) {
@@ -887,7 +887,10 @@ export class WalletDataCollectionBash {
 
 			if (autoClose) {
 				// Auto-append `close-mutation` (harness-only) and close the open mutation.
-				const closeLog = WalletCaptureClassificationAuditLogFile.fromFile(this.agent.auditLogPath)
+				const closeLog = WalletCaptureClassificationAuditLogFile.fromFile(
+					this.agent.auditLogPath,
+					null,
+				)
 
 				closeLog.appendEntry({ type: 'close-mutation', unixMillis: Date.now() })
 				await closeLog.save()

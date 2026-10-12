@@ -1171,16 +1171,20 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 	return issues.length
 }
 
+const maxUnjustifiedRequestsShown = 32
+const maxJustifiedRequestBatchSize = 16
+
 /**
  * The open-mutation `check` pre-check: when an open mutation is outstanding, list the
- * un-justified request IDs (up to 32 at a time) and instruct the agent to justify or
- * roll back. Returns the number of outstanding issues (so `check` short-circuits), or
+ * un-justified request IDs instruct the agent to justify or roll back.
+ * Returns the number of outstanding issues (so `check` short-circuits), or
  * `null` when there is no open mutation.
  */
 async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 	const repoRoot = repoDir()
 	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
 		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		null,
 	)
 	const open = auditLog.getOpenMutation()
 
@@ -1200,7 +1204,7 @@ async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 	// requests can be displayed with full detail (reusing `displayRequestInfo`).
 	const requestsById = new Map<string, WalletRequest>()
 
-	for (const { captureFile } of await enumerateCaptureFiles(repoRoot)) {
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
 		for (const request of captureFile.getRequests()) {
 			requestsById.set(request.requestIdString(), request)
 		}
@@ -1211,7 +1215,7 @@ async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 	)
 	log('')
 
-	for (const impactedId of unjustified.slice(0, 32)) {
+	for (const impactedId of unjustified.slice(0, maxUnjustifiedRequestsShown)) {
 		const id = requestIdToString(impactedId)
 		const request = requestsById.get(id)
 
@@ -1234,9 +1238,9 @@ async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 		log('')
 	}
 
-	if (unjustified.length > 32) {
+	if (unjustified.length > maxUnjustifiedRequestsShown) {
 		log(
-			`  ... and ${unjustified.length - 32} more. The rest will be shown after some of the above requests have been justified.`,
+			`  ... and ${unjustified.length - maxUnjustifiedRequestsShown} more. The rest will be shown after some of the above requests have been justified.`,
 		)
 		log(
 			'Do not attempt to enumerate more requests. Start working on the above immediately instead.',
@@ -1245,7 +1249,7 @@ async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 
 	log('')
 	log(
-		'Use `pnpm wallet-data-collection:agent justify --request-id=<ids> --url=<exact-url> --rationale=<reason>` to justify up to 16 requests with the same URL at a time, or `pnpm wallet-data-collection:agent rollback` to abandon the change.',
+		`Use \`pnpm wallet-data-collection:agent justify --request-id=<ids> --url=<exact-url> --rationale=<reason>\` to justify up to ${maxJustifiedRequestBatchSize} requests with the same URL at a time, or \`pnpm wallet-data-collection:agent rollback\` to abandon the change.`,
 	)
 
 	return unjustified.length
@@ -1253,8 +1257,7 @@ async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
 
 /**
  * Parse a `--rationale` argument into a non-empty string or a non-empty array of
- * `LooseReference`. A value that parses as JSON (a `LooseReference` object or an array
- * of them) is used as-is; anything else is treated as a plain string.
+ * `LooseReference`.
  */
 function parseRationale(raw: string): string | NonEmptyArray<LooseReference> {
 	const trimmed = raw.trim()
@@ -1263,10 +1266,15 @@ function parseRationale(raw: string): string | NonEmptyArray<LooseReference> {
 		throw new Error('rationale must be non-empty')
 	}
 
-	// Try to parse as JSON (a `LooseReference` object or an array of them).
-	try {
-		const parsed: unknown = JSON.parse(trimmed) as unknown
+	let parsed: unknown
 
+	try {
+		parsed = JSON.parse(trimmed) as unknown
+	} catch {
+		parsed = null
+	}
+
+	if (parsed !== null) {
 		if (typeof parsed === 'string') {
 			if (parsed.trim() === '') {
 				throw new Error('rationale must be non-empty')
@@ -1280,16 +1288,18 @@ function parseRationale(raw: string): string | NonEmptyArray<LooseReference> {
 				throw new Error('rationale must be non-empty')
 			}
 
-			if (parsed.every(item => isLooseReference(item))) {
-				return assertNonEmptyArray(parsed)
+			if (!parsed.every(item => isLooseReference(item))) {
+				throw new Error('not a valid array of LooseReference objects')
 			}
+
+			return assertNonEmptyArray(parsed)
 		}
 
-		if (isLooseReference(parsed)) {
-			return assertNonEmptyArray([parsed])
+		if (!isLooseReference(parsed)) {
+			throw new Error('not a valid LooseReference object')
 		}
-	} catch {
-		// Not JSON; fall through to treat as a plain string.
+
+		return assertNonEmptyArray([parsed])
 	}
 
 	return trimmed
@@ -1311,28 +1321,25 @@ export async function handleJustify(opts: JustifyOptions): Promise<void> {
 		throw new Error('must supply at least one request ID')
 	}
 
-	if (requestIds.length > 16) {
-		throw new Error('may not justify more than 16 requests at once')
+	if (requestIds.length > maxJustifiedRequestBatchSize) {
+		throw new Error(`may not justify more than ${maxJustifiedRequestBatchSize} requests at once`)
 	}
 
 	const rationale = parseRationale(opts.rationale)
 	const repoRoot = repoDir()
 
-	// Build a request lookup by request ID so each justified request can be checked
-	// against the supplied `--url`.
-	const requestsById = new Map<string, WalletRequest>()
+	const requestsById = new Map<`${string}:${string}:${string}`, WalletRequest>()
 
-	for (const { captureFile } of await enumerateCaptureFiles(repoRoot)) {
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
 		for (const request of captureFile.getRequests()) {
 			requestsById.set(request.requestIdString(), request)
 		}
 	}
 
-	// Validate every ID: it must be well-formed, exist, be an un-justified impacted
-	// request of the latest open mutation, and its exact URL must match `--url`.
 	const validIds = await allRequestIds(repoRoot)
 	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
 		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		validIds,
 	)
 	const open = auditLog.getOpenMutation()
 
@@ -1390,7 +1397,7 @@ export async function handleJustify(opts: JustifyOptions): Promise<void> {
  * result is always a valid URL). URL matching via `urlMatchesRequest` is tolerant of
  * encoding differences, so an agent may supply the URL with either encoded or raw values.
  */
-export function serializeQuery(query: UserDataDict): string {
+function serializeQuery(query: UserDataDict): string {
 	const parts: string[] = []
 
 	for (const [key, values] of Object.entries(query)) {
@@ -1405,7 +1412,7 @@ export function serializeQuery(query: UserDataDict): string {
 /**
  * The exact URL of a `WalletRequest`: `scheme://domain/path?query`.
  */
-export function requestUrl(request: WalletRequest): string {
+function requestUrl(request: WalletRequest): string {
 	const scheme = request.scheme ?? 'https'
 	const query = serializeQuery(request.query)
 
@@ -1413,10 +1420,9 @@ export function requestUrl(request: WalletRequest): string {
 }
 
 /**
- * True when `url` matches the exact URL of `request` — the same domain, path, and query
- * string (ignoring scheme and query-parameter order).
+ * True when `url` matches the exact URL of `request`.
  */
-export function urlMatchesRequest(url: string, request: WalletRequest): boolean {
+function urlMatchesRequest(url: string, request: WalletRequest): boolean {
 	let parsed: URL
 
 	try {
@@ -1467,6 +1473,7 @@ export async function handleRollback(): Promise<void> {
 	const repoRoot = repoDir()
 	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
 		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		null,
 	)
 	const open = auditLog.getOpenMutation()
 
@@ -2082,8 +2089,6 @@ function displayRequestInfo(
 		)
 	}
 
-	// When displaying a request for the agent (e.g. `search` / open-mutation `check`),
-	// lead with its canonical request ID so it can be referenced in `justify`.
 	if (options.showRequestId === true) {
 		log(`${header('ID')}${chalk.bold(request.requestIdString())}`)
 	}

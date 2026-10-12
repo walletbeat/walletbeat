@@ -19,7 +19,6 @@ import path from 'node:path'
 import { isLooseReference, type LooseReference } from '@/schema/reference'
 import { getErrorMessage } from '@/types/errors'
 import { assertNonEmptyArray, isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
-import { getRepositoryRoot } from '@/utils/codebase'
 import {
 	expectArray,
 	expectNumber,
@@ -95,12 +94,12 @@ export { AUDIT_LOG_RELATIVE_PATH }
 export { isAuditLogPath }
 
 /** Compute the SHA-256 hex digest of `data`. */
-export function sha256(data: string): string {
+function sha256(data: string): string {
 	return createHash('sha256').update(data).digest('hex')
 }
 
 /** Compute the `tip` of an entry given the previous tip and its `unixMillis`. */
-export function computeTip(previousTip: string | null, unixMillis: number): string {
+function computeTip(previousTip: string | null, unixMillis: number): string {
 	return sha256(`${previousTip ?? ''}||${unixMillis}`)
 }
 
@@ -113,7 +112,7 @@ export function isNonEmptyRationaleString(value: unknown): value is string {
  * True when `value` is a valid `rationale`: either a non-empty string or a
  * non-empty array of `LooseReference` objects.
  */
-export function isRationale(value: unknown): value is string | NonEmptyArray<LooseReference> {
+function isRationale(value: unknown): value is string | NonEmptyArray<LooseReference> {
 	if (isNonEmptyRationaleString(value)) {
 		return true
 	}
@@ -126,7 +125,7 @@ export function isRationale(value: unknown): value is string | NonEmptyArray<Loo
 }
 
 /** True when `x` is a string of the form `walletId:walletVariant:sessionTime`. */
-export function isRequestIdString(x: string): boolean {
+function isRequestIdString(x: string): x is `${string}:${string}:${string}` {
 	const parts = x.split(':')
 
 	return (
@@ -137,7 +136,9 @@ export function isRequestIdString(x: string): boolean {
 /**
  * Format an impacted request ID as `walletId:walletVariant:sessionTime`.
  */
-export function requestIdToString(id: WalletCaptureImpactedRequestId): string {
+export function requestIdToString(
+	id: WalletCaptureImpactedRequestId,
+): `${string}:${string}:${string}` {
 	return `${id.walletId}:${id.walletVariant}:${id.sessionTime}`
 }
 
@@ -172,11 +173,12 @@ export function requestIdEquals(
 }
 
 /** The set of `walletId:walletVariant:sessionTime` strings in `ids`. */
-function requestIdStrings(ids: readonly WalletCaptureImpactedRequestId[]): Set<string> {
+function requestIdStrings(
+	ids: readonly WalletCaptureImpactedRequestId[],
+): Set<`${string}:${string}:${string}`> {
 	return new Set(ids.map(requestIdToString))
 }
 
-/** Decode a single entry from a JSON record, validating its shape. */
 function decodeEntry(raw: unknown, at: string): WalletCaptureClassificationAuditLogEntry {
 	const record = expectRecord(raw, at)
 	const type = expectString(record.type, `${at}.type`)
@@ -377,10 +379,7 @@ export function validateLogSequence(
 	return errors
 }
 
-/**
- * Parse and validate the audit log from a JSON string. `validRequestIds` is used to
- * validate that every referenced request exists (pass `null` to skip that check).
- */
+/** Parse and validate the audit log from a JSON string. */
 export function parseAuditLog(
 	text: string,
 	validRequestIds: ReadonlySet<string> | null,
@@ -432,12 +431,12 @@ export class WalletCaptureClassificationAuditLogFile {
 
 	/**
 	 * Load the audit log from `path`, creating an empty log when the file does not
-	 * exist. `validRequestIds` (optional) validates that every referenced request
-	 * exists. Throws on malformed content or an invalid sequence.
+	 * exist. `validRequestIds`, if non-null, validates that every referenced
+	 * request exists. Throws on malformed content or an invalid sequence.
 	 */
 	public static fromFile(
 		filePath: string,
-		validRequestIds?: ReadonlySet<string> | null,
+		validRequestIds: ReadonlySet<`${string}:${string}:${string}`> | null,
 	): WalletCaptureClassificationAuditLogFile {
 		const abs = path.resolve(filePath)
 
@@ -513,8 +512,7 @@ export class WalletCaptureClassificationAuditLogFile {
 	 * Verify that a single valid entry was appended relative to the given previous
 	 * state: the entry count grew by exactly one and the new last entry's `tip`
 	 * matches `sha256(previousTip||unixMillis)`. Returns the appended entry when
-	 * valid, or `null` otherwise. Used by the harness to double-check a bash-originated
-	 * write to the audit log.
+	 * valid, or `null` otherwise.
 	 */
 	public validateAppend(
 		previousEntryCount: number,
@@ -578,8 +576,8 @@ export class WalletCaptureClassificationAuditLogFile {
 	 * justified in a <em>prior, already-closed</em> mutation does not count as justified
 	 * for the current one.
 	 */
-	public getJustifiedImpacted(): Set<string> {
-		const justified = new Set<string>()
+	public getJustifiedImpacted(): Set<`${string}:${string}:${string}`> {
+		const justified = new Set<`${string}:${string}:${string}`>()
 		const openIndex = this.findOpenMutationIndex()
 
 		if (openIndex === -1) {
@@ -654,16 +652,4 @@ export class WalletCaptureClassificationAuditLogFile {
 	public stableString(): string {
 		return stableJSONStringify(this.toJSON())
 	}
-}
-
-/**
- * Load the audit log, or create an empty one if the file does not exist.
- */
-export function loadAuditLog(
-	validRequestIds?: ReadonlySet<string> | null,
-): WalletCaptureClassificationAuditLogFile {
-	const repoRoot = getRepositoryRoot()
-	const absPath = path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH)
-
-	return WalletCaptureClassificationAuditLogFile.fromFile(absPath, validRequestIds ?? null)
 }

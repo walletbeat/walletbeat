@@ -41,10 +41,7 @@ export function isAuditLogPath(absPath: string): boolean {
 
 /**
  * True when the wallet data collection tool is running in read-only mode (the
- * arbitrary-command env var is set). In this mode the tool parses and validates normally,
- * but every file mutation is refused with an error: subcommands that would change a file
- * on disk compute the new content, compare it against the existing file, and throw rather
- * than write.
+ * arbitrary-command env var is set).
  */
 export function isReadOnlyMode(): boolean {
 	return process.env[ARBITRARY_COMMAND_ENV] !== undefined

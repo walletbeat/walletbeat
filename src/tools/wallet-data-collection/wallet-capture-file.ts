@@ -2450,16 +2450,7 @@ export class WalletRequest {
 	}
 
 	/**
-	 * Returns the subset of the given wallet addresses that this request
-	 * carries, either in its query, cookies, headers, trailers, or payload.
-	 *
-	 * Only the wallet's *own* addresses should be passed in, so that other
-	 * addresses that merely appear in the traffic (contracts, recipients, etc.)
-	 * are not counted as the wallet's addresses for multi-address correlation.
-	 *
-	 * Matching is case-insensitive and tolerant of the `0x` prefix, so that a
-	 * wallet address appearing as a substring of a larger encoded payload (e.g.
-	 * RLP-encoded calldata) is still detected.
+	 * Returns the subset of the given wallet addresses in this request.
 	 */
 	public async walletAddressesPresent(
 		walletAddresses: ReadonlySet<Erc55Address>,
@@ -2571,7 +2562,7 @@ export class WalletRequest {
 	}
 
 	/** The canonical request ID: `walletId:walletVariant:sessionTime`. */
-	public requestIdString(): string {
+	public requestIdString(): `${string}:${string}:${string}` {
 		return requestIdToString({
 			walletId: this._captureFile.identity.walletId,
 			walletVariant: this._captureFile.identity.walletVariant,
@@ -3151,10 +3142,7 @@ export class WalletCaptureFile {
 		}
 
 		// The set of the wallet's own addresses that appear anywhere across all
-		// flows. This is a wallet-wide property: whether the wallet manages a
-		// single address (ACTIVE_ADDRESS_ONLY) or multiple addresses depends on
-		// the union of addresses it references across every flow, not on any
-		// single flow in isolation.
+		// flows.
 		const totalWalletAddressesSeen = await this.computeWalletAddressesSeen()
 
 		for (const recFlow of recordedFlow.items) {
@@ -3226,8 +3214,7 @@ export class WalletCaptureFile {
 	 * Process flow requests to build DataCollectionByEntity array.
 	 *
 	 * @param totalWalletAddressesSeen The set of the wallet's own addresses
-	 *   seen across all flows. Used to determine whether the wallet manages a
-	 *   single address (ACTIVE_ADDRESS_ONLY) or multiple addresses.
+	 *   seen across all flows.
 	 */
 	private async processFlowRequests(
 		flow: WalletCaptureFlow,
@@ -3255,9 +3242,6 @@ export class WalletCaptureFile {
 			}
 		>()
 
-		// The set of the wallet's own addresses that appear anywhere in this
-		// flow. Used to determine which of the wallet's own addresses this
-		// request carries.
 		const walletOwnAddresses = this.walletOwnAddresses()
 		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
 
@@ -3300,11 +3284,6 @@ export class WalletCaptureFile {
 				purposes.add(purpose)
 			}
 
-			// Determine which of the wallet's own addresses this request
-			// carries. Only the wallet's own addresses (recorded in capture
-			// info) count, so that token contracts, transaction recipients,
-			// and other non-wallet addresses are not mistaken for the user's
-			// wallet addresses.
 			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
 
 			// The data is seen by the operator and by every intermediary on the
@@ -3334,19 +3313,6 @@ export class WalletCaptureFile {
 				}
 
 				for (const [info, policy] of userInfos.entries()) {
-					// Only report ACCOUNT_ADDRESS as collected when the request
-					// actually carries one of the wallet's own addresses. The
-					// capture's userData store may tag strings as ACCOUNT_ADDRESS
-					// that are not the user's wallet addresses (e.g. token
-					// contract addresses, transaction recipients, or addresses
-					// embedded in RLP-encoded calldata). Such false positives
-					// must not be treated as the wallet address being collected,
-					// otherwise the address-correlation and multi-address
-					// attributes would over-report.
-					if (info === WalletInfo.ACCOUNT_ADDRESS && carriedWalletAddresses.length === 0) {
-						continue
-					}
-
 					if (policy === null) {
 						maybeThrow(`Cannot figure out collection policy of request: ${request.toString()}`)
 						continue
@@ -3394,13 +3360,9 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			// Classify how the wallet handles fetching data for multiple wallet
-			// addresses, based on the address-bearing requests this entity
-			// observed. Only the wallet's own addresses (from capture info) are
-			// considered.
-			const multiAddress = ((): MultiAddressHandling | undefined => {
+			const multiAddress = ((): MultiAddressHandling | null => {
 				if (entData.walletAddresses.size === 0) {
-					return undefined
+					return null
 				}
 
 				const entityRequests: EntityRequests = {
@@ -3408,15 +3370,13 @@ export class WalletCaptureFile {
 					requests: entData.addressRequests,
 				}
 
-				return (
-					classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests) ??
-					undefined
-				)
+				return classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests)
 			})()
 
 			const dataCollection: EndpointCollection = {
-				// TODO: Implement support for other values here once any wallet supports this...
+				// TODO: Implement support for other values here once any wallet supports this, i.e. Kohaku wallet.
 				endpoint: RegularEndpoint,
+				multiAddress,
 				...nonEmptyMapToRecord(userInfos, info => {
 					const policy = entData.info.get(info)
 
@@ -3428,10 +3388,6 @@ export class WalletCaptureFile {
 
 					return policy
 				}),
-			}
-
-			if (multiAddress !== undefined) {
-				dataCollection.multiAddress = multiAddress
 			}
 
 			const row: WithRef<DataCollectionByEntity> = {
@@ -3603,6 +3559,7 @@ export class WalletCaptureFile {
 		variants.sort((a, b) => a.localeCompare(b))
 
 		const wantLines: string[] = [
+			"import { Variant } from '@/schema/variants'",
 			"import { capturedWalletDataCollection } from '@/tools/wallet-data-collection/data-collection-for-wallet-lib.ts'",
 			'',
 		]
@@ -3616,7 +3573,7 @@ export class WalletCaptureFile {
 
 		wantLines.push('')
 		wantLines.push(
-			`const ${dataCollectionVarName} = capturedWalletDataCollection([${variants.map(variant => `${variant.toLowerCase()}Data`).join(', ')}])`,
+			`const ${dataCollectionVarName} = capturedWalletDataCollection({ ${variants.map(variant => `[Variant.${variant}]: ${variant.toLowerCase()}Data`).join(', ')} })`,
 		)
 		wantLines.push('')
 		wantLines.push(`export default ${dataCollectionVarName}`)
@@ -3694,13 +3651,6 @@ export class WalletCaptureFile {
 
 	/**
 	 * Returns the set of the wallet's own addresses recorded in capture info.
-	 *
-	 * This is the authoritative set of addresses that belong to the user being
-	 * captured. Only these addresses should be treated as the wallet's own
-	 * addresses for the purpose of multi-address correlation; any other
-	 * addresses that merely appear in the traffic (token contracts, transaction
-	 * recipients, addresses embedded in RLP-encoded calldata, etc.) are not the
-	 * user's wallet addresses.
 	 */
 	public walletOwnAddresses(): NonEmptyArray<Erc55Address> | null {
 		const addresses = new Set<Erc55Address>()
@@ -4030,10 +3980,6 @@ export class WalletCaptureFile {
 	 * Resolve the full classification fingerprint of a single request, mirroring the
 	 * per-request body of {@link processFlowRequests}. The result is canonical (sorted
 	 * arrays, deterministic key order) so that `JSON.stringify` equality is a valid diff.
-	 *
-	 * A request whose domain has no entity mapping is *unclassifiable* and is represented
-	 * with `unclassifiable: true` (and empty `receivingEntities`), so that a `mark-domain`
-	 * change that makes the domain resolvable registers as a classification change.
 	 */
 	public async resolveRequestClassification(
 		request: WalletRequest,

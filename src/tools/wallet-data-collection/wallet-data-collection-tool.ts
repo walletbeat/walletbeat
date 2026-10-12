@@ -425,10 +425,7 @@ cli
 		const piPkgDir = path.join(agentDir, 'node_modules', '@earendil-works', 'pi-coding-agent')
 
 		// Forward the wallet options to the harness as environment variables so it can add
-		// wallet context to the system prompt. The options were already validated by
-		// `agentOptions.process`. They are parsed by cac and removed from `cli.args`, so
-		// they are never passed through as part of the prompt. The harness derives its
-		// allowed-edit set from these same wallet context vars.
+		// wallet context to the system prompt.
 		if (options.id) {
 			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ID = options.id
 		}

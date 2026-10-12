@@ -38,13 +38,8 @@ export interface EntityRequests {
 
 /**
  * Two requests sent within this many milliseconds are considered simultaneous.
- * The window is a heuristic: a wallet that refreshes multiple addresses
- * back-to-back produces requests within a few milliseconds of each other,
- * while one that waits between requests produces requests further apart. It is
- * generous because captures often batch several requests together even when
- * the wallet intends them as separate logical operations.
  */
-export const SIMULTANEOUS_WINDOW_MS = 10_000
+export const SIMULTANEOUS_WINDOW_MS = 300_000
 
 /**
  * Classify how a wallet handles fetching data for multiple wallet addresses,
@@ -115,9 +110,6 @@ export function classifyEntityMultiAddressHandling(
  * staggered, based on the session-relative times of the requests.
  */
 function classifyTiming(requests: AddressBearingRequest[]): 'SIMULTANEOUS' | 'STAGGERED' {
-	// Only cross-address timing matters for correlation: repeated requests for
-	// the same address, no matter how far apart, reveal nothing about whether
-	// distinct addresses belong to the same user.
 	const crossAddressPairs: Array<[number, number]> = []
 
 	for (let i = 0; i < requests.length; i++) {

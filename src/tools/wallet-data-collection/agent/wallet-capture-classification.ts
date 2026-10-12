@@ -24,7 +24,7 @@ export interface OpenMutationState {
 	/** The request IDs impacted across the entire repository. */
 	impacted: WalletCaptureImpactedRequestId[]
 	/** Request IDs already justified in this open-mutation (as `walletId:walletVariant:sessionTime`). */
-	justified: Set<string>
+	justified: Set<`${string}:${string}:${string}`>
 	/** Classification cache as of the pre-command state (restored on rollback). */
 	frozenClassificationCache: Map<string, WalletRequestClassification>
 }

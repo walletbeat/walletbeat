@@ -19,14 +19,6 @@ import {
 } from './wallet-capture-file'
 import { recordedFlow } from './wallet-capture-file'
 
-/** A capture file plus its loaded {@link WalletCaptureFile} instance. */
-export interface EnumeratedCaptureFile {
-	/** Absolute path to the capture file. */
-	path: string
-	/** The loaded capture file. */
-	captureFile: WalletCaptureFile
-}
-
 /** Recursively collect every `*.capture.json` under `dir`. */
 function walkCaptureFiles(dir: string): string[] {
 	if (!fs.existsSync(dir)) {
@@ -69,10 +61,7 @@ export function loadAnnotationsForCapture(capturePath: string): WalletCaptureAnn
 
 /**
  * Reload the in-memory domain-to-entity mapping from
- * `data/entities/domains/entity-domains.json`. The harness is a long-lived
- * process that imported the mapping once; a CLI child (e.g. `mark-domain`)
- * rewrites the JSON in its own process, so the harness must re-read it before
- * computing classifications to see the change.
+ * `data/entities/domains/entity-domains.json`.
  */
 export function reloadDomainMapping(repoRoot: string): void {
 	const jsonPath = path.join(repoRoot, 'data', 'entities', 'domains', 'entity-domains.json')
@@ -93,10 +82,9 @@ export function reloadDomainMapping(repoRoot: string): void {
 }
 
 /**
- * Enumerate every capture file in the repository, loading each via
- * {@link WalletCaptureFile}.
+ * Enumerate every capture file in the repository.
  */
-export async function enumerateCaptureFiles(repoRoot: string): Promise<EnumeratedCaptureFile[]> {
+export async function enumerateCaptureFiles(repoRoot: string): Promise<WalletCaptureFile[]> {
 	const collectionDirs: string[] = []
 
 	for (const typeDir of fs.readdirSync(path.join(repoRoot, 'data'))) {
@@ -111,7 +99,7 @@ export async function enumerateCaptureFiles(repoRoot: string): Promise<Enumerate
 		}
 	}
 
-	const results: EnumeratedCaptureFile[] = []
+	const results: WalletCaptureFile[] = []
 
 	for (const collectionDir of collectionDirs) {
 		for (const capturePath of walkCaptureFiles(collectionDir)) {
@@ -119,7 +107,7 @@ export async function enumerateCaptureFiles(repoRoot: string): Promise<Enumerate
 				const annotations = loadAnnotationsForCapture(capturePath)
 				const captureFile = await WalletCaptureFile.fromFile(null, capturePath, annotations)
 
-				results.push({ path: capturePath, captureFile })
+				results.push(captureFile)
 			} catch (e) {
 				throw new Error(`Cannot load capture file ${capturePath}: ${getErrorMessage(e)}`, {
 					cause: e,
@@ -135,7 +123,7 @@ export async function enumerateCaptureFiles(repoRoot: string): Promise<Enumerate
 export async function allRequests(repoRoot: string): Promise<WalletRequest[]> {
 	const requests: WalletRequest[] = []
 
-	for (const { captureFile } of await enumerateCaptureFiles(repoRoot)) {
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
 		for (const flow of recordedFlow.items) {
 			const resolved = captureFile.getFlow(flow)
 
@@ -156,10 +144,12 @@ export async function allRequests(repoRoot: string): Promise<WalletRequest[]> {
  * The set of `walletId:walletVariant:sessionTime` strings across all capture
  * files in the repository.
  */
-export async function allRequestIds(repoRoot: string): Promise<Set<string>> {
-	const ids = new Set<string>()
+export async function allRequestIds(
+	repoRoot: string,
+): Promise<Set<`${string}:${string}:${string}`>> {
+	const ids = new Set<`${string}:${string}:${string}`>()
 
-	for (const { captureFile } of await enumerateCaptureFiles(repoRoot)) {
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
 		for (const request of captureFile.getRequests()) {
 			ids.add(
 				requestIdToString({
@@ -180,14 +170,12 @@ export async function allRequestIds(repoRoot: string): Promise<Set<string>> {
  */
 export async function allRequestClassifications(
 	repoRoot: string,
-): Promise<Map<string, WalletRequestClassification>> {
-	// Reload the on-disk domain mapping so a CLI child's `mark-domain` change is
-	// reflected in the classification diff.
+): Promise<Map<`${string}:${string}:${string}`, WalletRequestClassification>> {
 	reloadDomainMapping(repoRoot)
 
-	const classifications = new Map<string, WalletRequestClassification>()
+	const classifications = new Map<`${string}:${string}:${string}`, WalletRequestClassification>()
 
-	for (const { captureFile } of await enumerateCaptureFiles(repoRoot)) {
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
 		for (const request of captureFile.getRequests()) {
 			const requestId = requestIdToString({
 				walletId: captureFile.identity.walletId,
