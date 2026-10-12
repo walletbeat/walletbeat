@@ -1,4 +1,443 @@
 {
-	"matchers": [],
-	"benignStrings": []
+	"matchers": [
+		{
+			"domain": "www.googleapis.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/chromewebstore/v1.1/*"
+		},
+		{
+			"domain": "www.google-analytics.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/g/collect",
+			"refererDomain": "chromewebstore.google.com"
+		},
+		{
+			"domain": "token.safebrowsing.apple",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_call",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_blockNumber",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_chainId",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getBlockByNumber",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getCode",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getTransactionCount",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_maxPriorityFeePerGas",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
+			"method": "eth_estimateGas",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
+			"method": "eth_fillTransaction",
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"TRANSACTION_BROADCAST"
+			],
+			"method": "eth_sendRawTransaction",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "rainbowjiumask.dataplane.rudderstack.com",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"policy": "BY_DEFAULT"
+		},
+		{
+			"domain": "o331974.ingest.sentry.io",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "metadata.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP",
+				"ASSET_METADATA"
+			],
+			"path": "/v1/graph",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "firebaseinstallations.googleapis.com",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP",
+				"ASSET_METADATA"
+			],
+			"path": "/v1/assets/*",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/transactions/ListTransactions",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/wallets/delegation/WalletStatus",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "addys.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP",
+				"ASSET_METADATA"
+			],
+			"path": "/v3/summary",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "rainbowme-res.cloudinary.com",
+			"purposes": [
+				"STATIC_ASSETS"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "img.p.rainbow.me",
+			"purposes": [
+				"STATIC_ASSETS"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "token-search.rainbow.me",
+			"purposes": [
+				"ASSET_METADATA"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "swap.p.rainbow.me",
+			"purposes": [
+				"SWAP_QUOTE"
+			],
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "encrypted-tbn0.gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "metadata.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/meteorology/v1/gas/*",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/transactions/GetTransactionByHash",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "ohttp-relay-safebrowsing-chrome.google.fastly-edge.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/wallets/delegation/NetworkStatus",
+			"policy": "ALWAYS"
+		},
+		{
+			"domain": "gs-loc.apple.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		}
+	],
+	"benignStrings": [
+		"#808088",
+		"#E8EAF5",
+		"$2,745.09",
+		"-0.32%",
+		"007627a0-e6e9-4e7a-bbda-163c2d4f8ffa",
+		"02515adcae8e4a51b2488ca0d97effe6",
+		"039a79a192eab5b7b790bd814fbe899b",
+		"03c88f658aec42a1aedf2d3176573972",
+		"047a67c1-6a70-459d-9e68-ab3e6cb7e4ed",
+		"04c39d00-f889-4183-81b1-e4db9dcc9bda",
+		"058882f4-2c65-4b4c-801c-b60d4437cbfc",
+		"0704c39d-00f8-4971-8381-b1e4db9dcc9b",
+		"08133773-93e4-4f00-b18d-36c0daac3e40",
+		"090704c3-9d00-4889-b183-81b1e4db9dcc",
+		"0a39809d-4948-4cc7-b968-fdd1b53cdbb1",
+		"0b576a8d973b27828556066a1fdbfaaf",
+		"0cbf55c815af41ad84d89298f1031e5b",
+		"0d4437cb-fcfb-4253-a8da-9ef395670f1c",
+		"0e13253f-345c-49a2-90bd-df2c605fb75d",
+		"0f090704-c39d-40f8-8971-8381b1e4db9d",
+		"0f5e25bc7bd509b879afa90a99d6b25a",
+		"0x00000000009726632680FB29d3F7A9734E3010E2",
+		"0xb7d6ca640000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000003c00000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000014782d62617463682d676174657761793a74727565000000000000000000000000",
+		"1134528a-21fe-447a-a7c1-6a70b59d1e68",
+		"13253f34-5c89-42d0-bddf-2c605fb75d12",
+		"13377393-e43f-40b1-8d36-c0daac3e4067",
+		"17e58d9d-d552-4866-983e-fe0813377393",
+		"1:498863290995:web:1795fd361b17fcfd770806",
+		"1ad4f40bfa0445cf8b7f20ae8d8b1bd3",
+		"1b0f0907-04c3-4d00-b889-718381b1e4db",
+		"1cb60d44-37cb-4cfb-b253-68da9ef39567",
+		"1e68ab3e-6cb7-44ed-b605-8882f42c65eb",
+		"21fe047a-67c1-4a70-b59d-1e68ab3e6cb7",
+		"22f217e5-8d9d-4552-9866-d83efe081337",
+		"253f345c-89a2-40bd-9f2c-605fb75d1268",
+		"264f8be1-3fc3-41a6-8869-38c5a05b1de7",
+		"2c65eb4c-c01c-460d-8437-cbfcfb325368",
+		"325368da-9ef3-4567-8f1c-b7f7ce886a61",
+		"34528a21-fe04-4a67-816a-70b59d1e68ab",
+		"355fc4ca2b03bde5e6e69c6ac7478a9f",
+		"377393e4-3f00-418d-b6c0-daac3e406720",
+		"37cbfcfb-3253-48da-9ef3-95670f1cb7f7",
+		"3e6cb7e4-edb6-4588-82f4-2c65eb4cc01c",
+		"3efe0813-3773-43e4-bf00-b18d36c0daac",
+		"3f345c89-a2d0-4ddf-ac60-5fb75d1268a7",
+		"4437cbfc-fb32-4368-9a9e-f395670f1cb7",
+		"48af2f1d696141cca1045e07b2d035b4",
+		"4a5bcdcf-0a39-409d-8948-0cc73968fdd1",
+		"4cc01cb6-0d44-47cb-bcfb-325368da9ef3",
+		"4f1b0f09-0704-439d-80f8-89718381b1e4",
+		"4f8be13f-c3f1-46c8-a938-c5a05b1de79f",
+		"528a21fe-047a-47c1-aa70-b59d1e68ab3e",
+		"529866d8-3efe-4813-b773-93e43f00b18d",
+		"5368da9e-f395-470f-9cb7-f7ce886a6123",
+		"5NlNaDKBB93vNb2o5VQTaiuhHAY",
+		"5bcdcf0a-3980-4d49-880c-c73968fdd1b5",
+		"5dd06c9f5644d3e74ed947ae56151254",
+		"64113452-8a21-4e04-ba67-c16a70b59d1e",
+		"64c8301c9df248b4aa3aa5ac02b38389",
+		"6552ea28fbd5c279c1f2e829edfdd1f4",
+		"65eb4cc0-1cb6-4d44-b7cb-fcfb325368da",
+		"66d83efe-0813-4773-93e4-3f00b18d36c0",
+		"67007627-a0e6-494e-babb-da163c2d4f8f",
+		"67c16a70-b59d-4e68-ab3e-6cb7e4edb605",
+		"68ab3e6c-b7e4-4db6-8588-82f42c65eb4c",
+		"68da9ef3-9567-4f1c-b7f7-ce886a6123b8",
+		"6958fd3290c59b70eaf6b7301a5cd527",
+		"69670076-27a0-46e9-8e7a-bbda163c2d4f",
+		"6a70b59d-1e68-4b3e-acb7-e4edb6058882",
+		"6cb7e4ed-b605-4882-b42c-65eb4cc01cb6",
+		"6efe8e727647e07d6567aae47c062da2",
+		"70b59d1e-68ab-4e6c-b7e4-edb6058882f4",
+		"718381b1-e4db-4dcc-9bda-85fe31da2490",
+		"7393e43f-00b1-4d36-80da-ac3e40672056",
+		"77f17a3c03510f9ff9716f6cc42cd134",
+		"7a67c16a-70b5-4d1e-a8ab-3e6cb7e4edb6",
+		"80997c1376375603",
+		"81518a67181c2017",
+		"82089d1eb1a0ff0a",
+		"82423a0004f409f4",
+		"82a4410e9561a98a40270ba8eeb0298d",
+		"82f42c65-eb4c-401c-b60d-4437cbfcfb32",
+		"8381b1e4-db9d-4c9b-9a85-fe31da24904e",
+		"85a569a1ab3c49fc",
+		"85f0ed94cd85a445",
+		"865a649ce70994ac",
+		"87ecd1cc77b8bb00",
+		"883ec141656d0ec5",
+		"8882f42c-65eb-4cc0-9cb6-0d4437cbfcfb",
+		"89718381-b1e4-4b9d-8c9b-da85fe31da24",
+		"8a21fe04-7a67-416a-b0b5-9d1e68ab3e6c",
+		"8be13fc3-f1a6-4869-b8c5-a05b1de79fa4",
+		"8c469ac28262017c",
+		"8c7976010bd1178b",
+		"8d9dd552-9866-483e-be08-13377393e43f",
+		"8dba01f75ef29e0f",
+		"8eb6b210e9306f6e",
+		"90b13dea9ad98e9d",
+		"91f71fe5d75111a0",
+		"9213a094c010202a5f6732a05f8c0529",
+		"92f8e2b1ec2f45c98562c5b9e368be37",
+		"93199fcea5087c78",
+		"936c0c88b555dd4a",
+		"93e43f00-b18d-46c0-9aac-3e40672056da",
+		"9451f7425a1f4cd5",
+		"94bc8741f1e9c2b9",
+		"9570414c5c17932d",
+		"95dcaf03aa8960ae3f94d84116db5508",
+		"961e46c9dc1852e7",
+		"9685304ea9fbd079",
+		"970e1325-3f34-4c89-a2d0-bddf2c605fb7",
+		"974710de660d2883",
+		"977eb3da01d3d157",
+		"979c1c703b8541f2a69a35b4c5e71c69",
+		"9866d83e-fe08-4337-b393-e43f00b18d36",
+		"9893dd01100260b3",
+		"9a429f6fa89b581e",
+		"9c366c0785ef7376",
+		"9d1e68ab-3e6c-47e4-adb6-058882f42c65",
+		"9d39c87d9e0b5b3f",
+		"9dd55298-66d8-4efe-8813-377393e43f00",
+		"9ddd0bab61f6d767",
+		"9e0b507f6b15cd7a",
+		"9e85fb6c3557b5da",
+		"9ed7f81c16df4459",
+		"=",
+		"AIzaSyD0WcwACxldS8tIbpff_SRDhBZZjb1k3Rw",
+		"Basic MmRZYTB5U05VV0w2WXdoVFZKQU42VGlwWlkyOg",
+		"Basic MmRZYTB5U05VV0w2WXdoVFZKQU42VGlwWlkyOg==",
+		"Bearer M78fjeG4nxVurAkaNUBuJQYpRwBDfWUXpDGeFBVodVKrqbx982s92xCNbTDM64FP",
+		"Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe",
+		"Bearer cYTvNiT7WQaQXCXVsbBn7H9cyxboFCQ3",
+		"CKmdygEIk6HLAQiGoM0BCK/ilDA",
+		"POST https://rainbowjiumask.dataplane.rudderstack.com/v1/batch",
+		"POST https://rpc.rainbow.me/v1/1/B9kBlwE2Hpw0COb7pWj6rpnk69fqSGGRc3fQ5nZ2LzeFS1G2VRxBQilZWbxAZkXI",
+		"a00c42b0062bbcc3f22be916e3c14957",
+		"a02b37e0f5e20895",
+		"a04efdb9d0712fc7",
+		"a09e4a06bbea97c4",
+		"a0cbc4e2f6c9da43",
+		"a1829c5e73a04170",
+		"a1b88c18687c2b39",
+		"a209b3de605995c9",
+		"a2fd5cc7f10fa49d",
+		"a5c265dc9af4ae8a",
+		"a9dd4b6dbc394766",
+		"aa5a41747bb6b649",
+		"aa9d76b89f1f9af9",
+		"ab3e6cb7-e4ed-4605-8882-f42c65eb4cc0",
+		"ac841b77d1630eb9179e328863c63ff4",
+		"adc5bfcfc23041bdb1f69c1d1deb35dd",
+		"ae83a929db55786c",
+		"b2e1536cc7bfdbdb",
+		"b4e0264f-8be1-4fc3-b1a6-c86938c5a05b",
+		"b4e2153b6883a1f3",
+		"b51e7bff0f054e7f",
+		"b59d1e68-ab3e-4cb7-a4ed-b6058882f42c",
+		"b6058882-f42c-45eb-8cc0-1cb60d4437cb",
+		"b60d4437-cbfc-4b32-9368-da9ef395670f",
+		"b61793b32461168a",
+		"b75029a74e1f2c46",
+		"b7e386f3fe244efeafefc2791a61e424",
+		"b7e4edb6-0588-42f4-ac65-eb4cc01cb60d",
+		"b9a4db0dcdf9cb3b",
+		"b9c36d0c8daa2599",
+		"ba449da2d1e60129",
+		"ba784e9ebedc9e35d1c91697c67b42ec",
+		"bb162b85dff2bc10",
+		"bba48eca3952d19f",
+		"bc027b64bbca1f1b",
+		"bc3bb0ea1eac574bcef80d98dff27ec8",
+		"be7c022f5fde0ec69445de5fd024647e",
+		"bf9dc7101c908eb7",
+		"button._28iyjl0._28iyjl7._28iyjl5._28iyjl6m._28iyjlmm._28iyjl76._28iyjlqy._28iyjl7l._28iyjl89._28iyjljx._28iyjl9x._28iyjlk8._28iyjl85.lt-dc.dt-dc._1frwosw2",
+		"c01cb60d-4437-4bfc-bb32-5368da9ef395",
+		"c16a70b5-9d1e-48ab-be6c-b7e4edb60588",
+		"c39d00f8-8971-4381-b1e4-db9dcc9bda85",
+		"c4fd43658941c04c8764133c7bceaf45",
+		"c811c0b8004f430c83921df6d6868899",
+		"ca2c696d1b7f4fba922db342ef0b3781",
+		"cbfcfb32-5368-4a9e-b395-670f1cb7f7ce",
+		"cdcf0a39-809d-4948-8cc7-3968fdd1b53c",
+		"cf0a3980-9d49-480c-8739-68fdd1b53cdb",
+		"chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/popup.html",
+		"d5529866-d83e-4e08-9337-7393e43f00b1",
+		"d83efe08-1337-4393-a43f-00b18d36c0da",
+		"dd1c7e233f094138a43cdb64be4f89ec",
+		"e0264f8b-e13f-43f1-a6c8-6938c5a05b1d",
+		"e0385dc2e021f09662a8b50586cfe158",
+		"e43f00b1-8d36-40da-ac3e-40672056da75",
+		"e4edb605-8882-442c-a5eb-4cc01cb60d44",
+		"e58d9dd5-5298-46d8-befe-0813377393e4",
+		"e9dbdc493550ecb01c370054f5d643d1",
+		"eb4cc01c-b60d-4437-8bfc-fb325368da9e",
+		"edb60588-82f4-4c65-ab4c-c01cb60d4437",
+		"eee61177d66b61980332e7ebfb13ee84",
+		"eyJ2ZXJzaW9uIjoyLCJoZWFydGJlYXRzIjpbeyJhZ2VudCI6ImZpcmUtY29yZS8wLjE0LjAgZmlyZS1jb3JlLWVzbTIwMjAvMC4xNC4wIGZpcmUtanMvIGZpcmUtanMtYWxsLWFwcC8xMi4wLjAgZmlyZS1paWQvMC42LjE5IGZpcmUtaWlkLWVzbTIwMjAvMC42LjE5IGZpcmUtcmMvMC42LjYgZmlyZS1yYy1lc20yMDIwLzAuNi42IiwiZGF0ZXMiOlsiMjAyNi0wOS0yMiJdfV19",
+		"f04f1b0f-0907-44c3-9d00-f889718381b1",
+		"f110d82fc1ca4367bf6f019235a534ed",
+		"f217e58d-9dd5-4298-a6d8-3efe08133773",
+		"f42c65eb-4cc0-4cb6-8d44-37cbfcfb3253",
+		"f7aea62b881ebd758e6a1ab4089a1e77",
+		"f7dff1a9536e3245f10f4e1fe58e1146",
+		"fb325368-da9e-4395-a70f-1cb7f7ce886a",
+		"fb6eb02162cf964effaf091c5aeb99b3",
+		"fcfb3253-68da-4ef3-9567-0f1cb7f7ce88",
+		"fe047a67-c16a-40b5-9d1e-68ab3e6cb7e4",
+		"fe081337-7393-443f-80b1-8d36c0daac3e",
+		"https://addys.p.rainbow.me/v3/summary",
+		"https://rpc.rainbow.me/v1/1/B9kBlwE2Hpw0COb7pWj6rpnk69fqSGGRc3fQ5nZ2LzeFS1G2VRxBQilZWbxAZkXI",
+		"input._28iyjl0._28iyjl4._28iyjl5._28iyjla._28iyjlgo._28iyjlhv._28iyjlj2._28iyjlfh._28iyjlkg._28iyjlqg._28iyjlqj._28iyjlqk._28iyjlsb._28iyjl7l._28iyjl78._28iyjlk8.lt-dc.dt-dc._10vj57r0._10vj57r1._28iyjl1c2._28iyjl1d0._28iyjl1di._28iyjl1ct._10vj57r6._10vj57r7",
+		"pageload",
+		"{ Q0: token( address: \"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\" chainID: 1 currency: \"USD\" ) { colors { primary fallback shadow } decimals iconUrl name networks symbol price { value relativeChange24h } } }",
+		"{ Q0: token(address: \"eth\" chainID: 1 currency: \"USD\") { colors { primary fallback shadow } decimals iconUrl name networks symbol price { value relativeChange24h } } }"
+	]
 }

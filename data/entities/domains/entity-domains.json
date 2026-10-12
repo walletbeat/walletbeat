@@ -1,6 +1,13 @@
 {
+	"addys.p.rainbow.me": {
+		"intermediaries": [
+			"aws"
+		],
+		"operator": "rainbow"
+	},
 	"apple.com": "apple",
 	"debank.com": "debank",
+	"fastly-edge.com": "fastly",
 	"google-analytics.com": "alphabet",
 	"google.com": "alphabet",
 	"googleapis.com": "alphabet",
@@ -9,8 +16,47 @@
 	"gstatic.com": "alphabet",
 	"gvt1.com": "alphabet",
 	"hyperliquid.xyz": "hyperFoundation",
+	"img.p.rainbow.me": {
+		"intermediaries": [
+			"aws"
+		],
+		"operator": "rainbow"
+	},
+	"metadata.p.rainbow.me": {
+		"intermediaries": [
+			"aws"
+		],
+		"operator": "rainbow"
+	},
+	"platform.p.rainbow.me": {
+		"intermediaries": [
+			"aws"
+		],
+		"operator": "rainbow"
+	},
 	"rabby.io": "debank",
+	"rainbow.me": "rainbow",
+	"rainbowme-res.cloudinary.com": {
+		"intermediaries": [
+			"cloudinary"
+		],
+		"operator": "rainbow"
+	},
+	"rpc.rainbow.me": {
+		"intermediaries": [
+			"cloudflare"
+		],
+		"operator": "rainbow"
+	},
+	"rudderstack.com": "rudderstack",
+	"safebrowsing.apple": "apple",
 	"sentry.io": "sentry",
+	"token-search.rainbow.me": {
+		"operator": "rainbow",
+		"intermediaries": [
+			"cloudflare"
+		]
+	},
 	"walletbeat.eth": "walletbeat",
 	"walletbeat.eth.limo": "walletbeat",
 	"walletbeat.eth.link": "walletbeat",

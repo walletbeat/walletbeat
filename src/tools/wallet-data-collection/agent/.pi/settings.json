@@ -1,4 +1,6 @@
 {
 	"defaultTools": ["bash"],
-	"enableSkillCommands": false
+	"enableSkillCommands": false,
+	"defaultProvider": "openai-codex",
+	"defaultModel": "gpt-5.5"
 }
