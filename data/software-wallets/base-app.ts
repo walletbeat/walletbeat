@@ -490,6 +490,7 @@ export const baseApp: SoftwareWallet = {
 			releaseTransparency: {
 				// App-store signing only; no developer-published signatures or release artifacts.
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,

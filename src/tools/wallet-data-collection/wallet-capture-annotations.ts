@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import path from 'node:path'
 
 import {
 	CollectionPolicy,
@@ -27,6 +26,7 @@ import {
 	isSameJson,
 } from '@/utils/json'
 
+import { writeFileAtomically } from './read-only'
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
@@ -434,10 +434,6 @@ export class WalletCaptureAnnotations {
 			throw new Error('WalletCaptureAnnotations built without a path; cannot save.')
 		}
 
-		const dir = path.dirname(this.path)
-
-		await fs.promises.mkdir(dir, { recursive: true })
-
 		const content = JSON.stringify(this.toJSON(false), null, '\t') + '\n'
 
 		// Check if content differs from what's on disk
@@ -466,18 +462,12 @@ export class WalletCaptureAnnotations {
 			}
 		} else {
 			if (needsWrite) {
-				const tmp = `${this.path}.tmp`
-
-				await fs.promises.writeFile(tmp, content, 'utf8')
-				await fs.promises.rename(tmp, this.path)
+				await writeFileAtomically(this.path, content)
 				changed.push(this.path)
 			}
 
 			if (globalNeedsWrite) {
-				const tmp = `${this.globalPath}.tmp`
-
-				await fs.promises.writeFile(tmp, globalContent, 'utf8')
-				await fs.promises.rename(tmp, this.globalPath)
+				await writeFileAtomically(this.globalPath, globalContent)
 				changed.push(this.globalPath)
 			}
 		}
