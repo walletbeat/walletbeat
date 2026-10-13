@@ -48,8 +48,8 @@ function aiProseLint(match: RegExpMatchArray, message: string): Lint {
 
 /** Apply reference punctuation rules and contextual word-frequency rules. */
 export const aiTellsLinter: AbstractLinter = {
-	lint(text, lintOptions, kind = GrammarTextKind.GENERAL, extractedProse): Promise<Lint[]> {
-		const { prose } = extractedProse ?? extractProse(text, lintOptions?.language)
+	lint(text, lintOptions, kind = GrammarTextKind.GENERAL): Promise<Lint[]> {
+		const { prose } = extractProse(text, lintOptions?.language)
 		const lints: Lint[] = []
 
 		if (

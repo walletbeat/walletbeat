@@ -179,8 +179,16 @@ function getRegexpLinter({
 	}
 }
 
+export const harperGrammarLinter: AbstractLinter = {
+	async lint(text, lintOptions): Promise<Lint[]> {
+		const linter = await getHarperLinter()
+
+		return linter.lint(text, lintOptions)
+	},
+}
+
 const grammarLinters: (() => Promise<AbstractLinter>)[] = [
-	getHarperLinter,
+	() => Promise.resolve(harperGrammarLinter),
 	() => Promise.resolve(aiTellsLinter),
 	getRegexpLinter({
 		name: 'dApp', // Replace dApp and dApps
@@ -326,7 +334,7 @@ export async function grammarLintMessages(
 	for (const grammarLinterFn of grammarLinters) {
 		const linter = await grammarLinterFn()
 
-		let linterLints = await linter.lint(trimmedText, lintOptions, kind, extractedProse)
+		let linterLints = await linter.lint(trimmedText, lintOptions, kind)
 
 		// AI prose diagnostics already originate in masked prose, and vocabulary and
 		// generated-label exemptions do not exempt authored AI prose. Other diagnostics are

@@ -1,10 +1,9 @@
-import * as harper from 'harper.js'
 import { describe, expect, it, vi } from 'vitest'
 
 import * as markdownUtils from '@/utils/markdown-utils'
 
 import { aiTellsLinter } from './utils/ai-tells'
-import { grammarLintMessages } from './utils/grammar'
+import { grammarLintMessages, harperGrammarLinter } from './utils/grammar'
 import { formatLintMessages, GrammarTextKind, type Lint } from './utils/linter'
 
 function aiProseMessages(messages: string[]): string[] {
@@ -99,26 +98,6 @@ describe('AI prose linter', () => {
 		expect(await aiTellsLinter.lint(text, { language: 'plaintext' })).toHaveLength(3)
 	})
 
-	it.each(Object.values(GrammarTextKind))(
-		'extracts prose once in the grammar pipeline for %s',
-		async kind => {
-			const extract = vi.spyOn(markdownUtils, 'extractProse')
-
-			try {
-				const messages = await grammarLintMessages(
-					'gate gated gating `gate gated gating`',
-					{ language: 'markdown' },
-					kind,
-				)
-
-				expect(extract).toHaveBeenCalledTimes(1)
-				expect(aiProseMessages(messages)).toHaveLength(3)
-			} finally {
-				extract.mockRestore()
-			}
-		},
-	)
-
 	it.each(['`details`', 'https://wallet.invalid/details'])(
 		'preserves diagnostics starting in prose and spanning %s',
 		async nonProse => {
@@ -139,8 +118,8 @@ describe('AI prose linter', () => {
 				message: () => 'Non-prose diagnostic.',
 			}))
 			const lint = vi
-				.spyOn(harper.LocalLinter.prototype, 'lint')
-				.mockResolvedValue([sentenceLint, ...nonProseLints] as unknown as harper.Lint[])
+				.spyOn(harperGrammarLinter, 'lint')
+				.mockResolvedValue([sentenceLint, ...nonProseLints])
 
 			try {
 				const messages = await grammarLintMessages(text, { language: 'markdown' })

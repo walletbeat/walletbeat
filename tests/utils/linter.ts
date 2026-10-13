@@ -1,7 +1,5 @@
 import * as harper from 'harper.js'
 
-import type { ExtractedProse } from '@/utils/markdown-utils'
-
 /** The purpose of the text being checked, independent of its markup format. */
 export enum GrammarTextKind {
 	GENERAL = 'GENERAL',
@@ -20,21 +18,30 @@ export interface Span {
 }
 
 export interface Lint {
+	/**
+	 * Get the content of the source material pointed to by [`Self::span`]
+	 */
 	get_problem_text(): string
+	/**
+	 * Get a string representing the general category of the lint.
+	 */
 	lint_kind_pretty(): string
+	/**
+	 * Get an array of any suggestions that may resolve the issue.
+	 */
 	suggestions(): Suggestion[]
+	/**
+	 * Get the location of the problematic text.
+	 */
 	span(): Span
+	/**
+	 * Get a description of the error.
+	 */
 	message(): string
 }
 
 export interface AbstractLinter {
-	/** Reuse source exclusions prepared for the same text and language when supplied. */
-	lint(
-		text: string,
-		lintOptions?: harper.LintOptions,
-		kind?: GrammarTextKind,
-		extractedProse?: ExtractedProse,
-	): Promise<Lint[]>
+	lint(text: string, lintOptions?: harper.LintOptions, kind?: GrammarTextKind): Promise<Lint[]>
 }
 
 /** Format diagnostics with source locations, highlighted text, and suggestions. */
