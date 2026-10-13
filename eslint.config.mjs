@@ -4,10 +4,11 @@ import eslintPluginImport from 'eslint-plugin-import'
 import eslintPluginPrettier from 'eslint-plugin-prettier'
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort'
 import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-order'
+import svelte from 'eslint-plugin-svelte'
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
-import svelte from 'eslint-plugin-svelte'
+
 import svelteConfig from './svelte.config.js'
 
 // Note: If you want to use eslint-comments rules, you need to install and import eslint-plugin-eslint-comments
@@ -31,6 +32,10 @@ export default [
 		ignores: [
 			// Ignore generated files
 			'src/generated/**',
+
+			// Backup snapshot of the repo for the wallet-data-collection agent's command-check
+			// harness; it contains stale copies that should never be linted.
+			'src/tools/wallet-data-collection/agent/backup-tree.bak/**',
 
 			// svelte-eslint-parser incorrectly fails to parse valid CSS/template syntax in these files.
 			// Ignored — we will not rewrite valid CSS/template to satisfy a broken parser.
