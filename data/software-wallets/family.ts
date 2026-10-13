@@ -19,7 +19,7 @@ export const family: SoftwareWallet = {
 		coinspectId: 'family',
 		contributors: [lucemans, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://family.co/docs'],
 			socials: {
@@ -107,7 +107,19 @@ export const family: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'A Wallet Group is a collection of individual wallet addresses generated from a single Secret Recovery Phrase.',
+					url: 'https://family.co/support/wallet-groups',
+				},
+				{
+					explanation: 'Users switch between wallets from the Mission Control screen.',
+					url: 'https://family.co/support/switch-wallets',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -115,7 +127,7 @@ export const family: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://family.co/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -164,7 +176,11 @@ export const family: SoftwareWallet = {
 				},
 			],
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
@@ -186,15 +202,27 @@ export const family: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The changelog on family.co lists releases of the Family wallet-connection library only; app release notes appear only in the App Store listing.',
+						url: 'https://family.co/changelog',
+					},
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The app repositories named in the Zellic audit are not public, and the Family GitHub organization hosts only a wallet-connection library and a forked library.',
+						url: 'https://github.com/family',
+					},
+				}),
 			},
 		},
 		walletCall: null,
