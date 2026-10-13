@@ -39,10 +39,10 @@ export const keystoneWallet: HardwareWallet = {
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
-				id: 'keystone-pro',
-				name: 'Keystone Pro',
+				id: 'keystone-3-pro',
+				name: 'Keystone 3 Pro',
 				isFlagship: true,
-				url: 'https://keyst.one/pro',
+				url: 'https://keyst.one/shop/products/keystone-3-pro',
 			},
 		],
 		iconExtension: 'svg',
@@ -51,7 +51,7 @@ export const keystoneWallet: HardwareWallet = {
 			docs: ['https://support.keyst.one/'],
 			repositories: ['https://github.com/KeystoneHQ'],
 			socials: {
-				facebook: 'https://web.facebook.com/people/Keystone-Wallet/',
+				facebook: 'https://www.facebook.com/people/Keystone-Wallet/61558817937104/',
 				farcaster: 'https://farcaster.xyz/keystonewallet',
 				reddit: 'https://www.reddit.com/r/KeystoneWallet/',
 				telegram: 'https://t.me/KeystoneWallet',

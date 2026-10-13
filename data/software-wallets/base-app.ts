@@ -45,7 +45,7 @@ import {
 	supported,
 } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -195,13 +195,7 @@ export const baseApp: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		// Coinbase is the parent company funding Base App development. Public via
 		// direct listing on Nasdaq (COIN, April 2021), so publicOffering captures
 		// the public-equity-funded nature. Base App's in-app swap UI displays a
@@ -563,6 +557,7 @@ export const baseApp: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,

@@ -1,8 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
-	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
+
+	// Stored code snippets for this page, provided by the island's root component.
+	const codeSnippetForUrl = getCodeSnippetLookup()
 
 
 	// Props
@@ -26,6 +29,7 @@
 	// (Derived)
 	const isCollapsible = $derived(references.length > collapsedCount + 1)
 	const isCollapsed = $derived(isCollapsible && !showAll)
+	const shownReferences = $derived(isCollapsed ? references.slice(0, collapsedCount) : references)
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -157,15 +161,15 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<h5>
+		<h4>
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</h5>
+		</h4>
 
 		<ul class="references-list" data-list="gap-2">
-			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
+			{#each shownReferences as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
 				{@const refSnippets = codeSnippetEntries(ref.urls)}
@@ -242,7 +246,14 @@
 									<span>{@html CodeIcon}</span>
 								</a>
 							</figcaption>
-							<pre use:scrollToHighlight><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
+							<!-- The snippet box scrolls, so it is focusable. -->
+							<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+							<pre
+								use:scrollToHighlight
+								tabindex="0"
+								role="group"
+								aria-label={`Code: ${url.label}`}
+							><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
 						</figure>
 					{/each}
 
@@ -302,10 +313,7 @@
 					{/if}
 				{/snippet}
 
-				<li
-					data-list-item="gap-2"
-					hidden={isCollapsed && index >= collapsedCount}
-				>
+				<li data-list-item="gap-2">
 					{#if imageUrls.length > 1 && refImages.length > 0}
 						<div data-row="start gap-4 align-start">
 							<div data-row-item="flexible" data-column="gap-2">
@@ -326,7 +334,10 @@
 										<img
 											src={image.url}
 											alt={image.label}
+											width="128"
+											height="96"
 											loading="lazy"
+											decoding="async"
 										/>
 									</a>
 								{/each}
@@ -364,7 +375,7 @@
 		line-height: 1.7;
 	}
 
-	h5 {
+	h4 {
 		font-size: 1em;
 	}
 
@@ -456,16 +467,22 @@
 			&:hover::-webkit-scrollbar-thumb {
 				background-color: var(--border-color);
 			}
+
+			&:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+				scrollbar-width: thin;
+			}
+
+			&:focus-visible::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+			}
 		}
 
 		code {
 			display: block;
 			inline-size: max-content;
 			min-inline-size: 100%;
-
-			font-family:
-				ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-				'Courier New', monospace;
 		}
 
 		.row {
@@ -507,10 +524,6 @@
 		.line-content {
 			flex: 1;
 		}
-	}
-
-	.references-list > li[hidden] {
-		display: none;
 	}
 
 	.references-toggle {
