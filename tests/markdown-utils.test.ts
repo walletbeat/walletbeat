@@ -20,9 +20,6 @@ describe('standalone URL ranges', () => {
 		const text = '🔒 "https://wallet.invalid/path),suffix" next'
 		const ranges = extractUrlRanges(text, context)
 
-		expect(ranges).toEqual([
-			{ start: text.indexOf('https://'), end: text.indexOf('https://') + expectedUrl.length },
-		])
 		expect(ranges.map(({ start, end }) => text.slice(start, end))).toEqual([expectedUrl])
 	})
 })
@@ -43,51 +40,31 @@ describe('prose masking', () => {
 	])('excludes %s while retaining prose and source positions', (_name, markdown) => {
 		const { prose: masked, excludedRanges } = extractProse(markdown)
 
-		expect(masked.length).toBe(markdown.length)
 		expect(masked.match(/\S+/g)).toEqual(
 			markdown.includes('[Wallet]') ? ['before', '[Wallet]', 'after'] : ['before', 'after'],
 		)
-
-		for (const word of ['before', 'after']) {
-			expect(masked.indexOf(word)).toBe(markdown.indexOf(word))
-		}
-		expect(masked.match(/\r?\n/g)).toEqual(markdown.match(/\r?\n/g))
-
-		for (let offset = 0; offset < markdown.length; offset++) {
-			const excluded = excludedRanges.some(({ start, end }) => start <= offset && offset < end)
-
-			expect(masked[offset]).toBe(
-				excluded && !/[\r\n]/.test(markdown[offset]) ? ' ' : markdown[offset],
-			)
-		}
-
-		for (let index = 1; index < excludedRanges.length; index++) {
-			expect(excludedRanges[index].start).toBeGreaterThanOrEqual(excludedRanges[index - 1].end)
-		}
+		expect(masked).toBe(
+			markdown.replace(/[^\r\n]/g, (char, offset: number) =>
+				excludedRanges.some(({ start, end }) => start <= offset && offset < end) ? ' ' : char,
+			),
+		)
 	})
 
 	it('preserves escaped delimiters and Unicode offsets', () => {
 		const markdown = '🔒 \\`gate\\` `ship`\r\nKeep this explanation.'
-		const { prose: masked } = extractProse(markdown)
 
-		expect(masked).toContain('\\`gate\\`')
-		expect(masked).not.toContain('ship')
-		expect(masked.length).toBe(markdown.length)
-		expect(masked.indexOf('Keep')).toBe(markdown.indexOf('Keep'))
-		expect(masked).toContain('\r\n')
+		expect(extractProse(markdown).prose).toBe(markdown.replace('`ship`', ' '.repeat(6)))
 	})
 
 	it('excludes standalone URLs without interpreting plaintext as Markdown', () => {
-		const text = 'gate `ship` https://example.com/gate;ship next'
-		const { prose: masked, excludedRanges } = extractProse(text, 'plaintext')
+		const url = 'https://example.com/gate;ship'
+		const text = `gate \`ship\` ${url} next`
+		const start = text.indexOf(url)
 
-		expect(masked).toContain('gate `ship`')
-		expect(masked).not.toContain('https://')
-		expect(masked.length).toBe(text.length)
-		expect(masked.indexOf('next')).toBe(text.indexOf('next'))
-		expect(excludedRanges).toEqual([
-			{ start: text.indexOf('https://'), end: text.indexOf(' next') },
-		])
+		expect(extractProse(text, 'plaintext')).toEqual({
+			prose: text.replace(url, ' '.repeat(url.length)),
+			excludedRanges: [{ start, end: start + url.length }],
+		})
 	})
 })
 

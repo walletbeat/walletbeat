@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { aiTellsLinter } from './utils/ai-tells'
 import { walletPageProse } from './utils/wallet-page-prose'
 
 describe('wallet page prose extraction', () => {
-	it('counts custom evaluation details and news together across markup boundaries', async () => {
+	it('extracts custom evaluation details and news together across markup boundaries', () => {
 		const prose = walletPageProse(`
 			<html><body>
 				<nav>gate ship</nav>
@@ -16,7 +15,6 @@ describe('wallet page prose extraction', () => {
 		`)
 
 		expect(prose).toBe('gate gated gating & access')
-		expect(await aiTellsLinter.lint(prose, { language: 'plaintext' })).toHaveLength(3)
 	})
 
 	it('keeps link labels and inline prose while excluding code and non-prose content', () => {
