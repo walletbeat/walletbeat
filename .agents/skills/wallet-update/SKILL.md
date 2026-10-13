@@ -183,7 +183,7 @@ ref: refNotNecessary
 supported<WithRef<ChainConfigurability>>({ ... })
 ```
 
-Reference `label` and `explanation` fields must not contain semicolons or em dashes (`references-integrity.test.ts` enforces this). Write separate sentences instead. Avoid AI-ish words such as "gate" and "ship". `wallet-page-markdown.test.ts` fails when a wallet page uses them too often.
+Reference `label` and `explanation` fields must not contain semicolons or em dashes. Write separate sentences instead. Avoid AI-ish words such as "gate" and "ship".
 
 References often point to wallet code, which should ideally be formatted as GitHub links. When this is the case, the following rules apply:
 
