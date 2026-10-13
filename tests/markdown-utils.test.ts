@@ -1,11 +1,63 @@
 import { describe, expect, it } from 'vitest'
 
 import { ContentType, type MarkdownContent } from '@/types/content'
-import { collapseToSingleLine, rewriteMarkdownURLs } from '@/utils/markdown-utils'
+import {
+	collapseToSingleLine,
+	maskMarkdownNonProse,
+	maskUrls,
+	rewriteMarkdownURLs,
+} from '@/utils/markdown-utils'
 
 function makeContent(markdown: string): MarkdownContent<null> {
 	return { contentType: ContentType.MARKDOWN, markdown }
 }
+
+describe('prose masking', () => {
+	it.each([
+		['inline code', 'before `gate; ship—` after'],
+		['multiple backticks', 'before ``gate ` ship;—`` after'],
+		['backtick fences', 'before\n\n```ts\ngate; ship—\n```\n\nafter'],
+		['tilde fences', 'before\n\n~~~ts\ngate; ship—\n~~~\n\nafter'],
+		['indented code', 'before\n\n    gate; ship—\n\nafter'],
+		['nested destination parentheses', 'before [Wallet](https://example.com/gate_(ship);) after'],
+		['link titles', 'before [Wallet](/gate "ship;—") after'],
+		['reference links', 'before [Wallet][gate]\n\n[gate]: /ship "gate;—"\n\nafter'],
+		['autolinks', 'before <https://example.com/gate;ship> after'],
+	])('excludes %s while retaining prose and source positions', (_name, markdown) => {
+		const masked = maskMarkdownNonProse(markdown)
+
+		expect(masked.length).toBe(markdown.length)
+		expect(masked.match(/\S+/g)).toEqual(
+			markdown.includes('[Wallet]') ? ['before', '[Wallet]', 'after'] : ['before', 'after'],
+		)
+
+		for (const word of ['before', 'after']) {
+			expect(masked.indexOf(word)).toBe(markdown.indexOf(word))
+		}
+		expect(masked.match(/\r?\n/g)).toEqual(markdown.match(/\r?\n/g))
+	})
+
+	it('preserves escaped delimiters and Unicode offsets', () => {
+		const markdown = '🔒 \\`gate\\` `ship`\r\nKeep this explanation.'
+		const masked = maskMarkdownNonProse(markdown)
+
+		expect(masked).toContain('\\`gate\\`')
+		expect(masked).not.toContain('ship')
+		expect(masked.length).toBe(markdown.length)
+		expect(masked.indexOf('Keep')).toBe(markdown.indexOf('Keep'))
+		expect(masked).toContain('\r\n')
+	})
+
+	it('excludes standalone URLs without interpreting plaintext as Markdown', () => {
+		const text = 'gate `ship` https://example.com/gate;ship next'
+		const masked = maskUrls(text)
+
+		expect(masked).toContain('gate `ship`')
+		expect(masked).not.toContain('https://')
+		expect(masked.length).toBe(text.length)
+		expect(masked.indexOf('next')).toBe(text.indexOf('next'))
+	})
+})
 
 describe('collapseToSingleLine', () => {
 	it('collapses whitespace and trims', () => {

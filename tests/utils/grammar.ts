@@ -12,6 +12,17 @@ import {
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+import { isInsideMarkdownLinkUrl, isInsideUrl } from '@/utils/markdown-utils'
+
+import { aiTellsLinter } from './ai-tells'
+import {
+	type AbstractLinter,
+	formatLintMessages,
+	GrammarTextKind,
+	type Lint,
+	type Span,
+	type Suggestion,
+} from './linter'
 
 /**
  * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
@@ -101,83 +112,7 @@ export async function warmupHarperLinter() {
 	await getHarperLinter()
 }
 
-interface Suggestion {
-	get_replacement_text(): string
-	kind(): harper.SuggestionKind
-}
-
-interface Span {
-	start: number
-	end: number
-}
-
-interface Lint {
-	/**
-	 * Get the content of the source material pointed to by [`Self::span`]
-	 */
-	get_problem_text(): string
-	/**
-	 * Get a string representing the general category of the lint.
-	 */
-	lint_kind_pretty(): string
-	/**
-	 * Get an array of any suggestions that may resolve the issue.
-	 */
-	suggestions(): Suggestion[]
-	/**
-	 * Get the location of the problematic text.
-	 */
-	span(): Span
-	/**
-	 * Get a description of the error.
-	 */
-	message(): string
-}
-
-interface AbstractLinter {
-	lint(text: string, lintOptions?: harper.LintOptions): Promise<Lint[]>
-}
-
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
-
-export function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
-	const before = text.substring(0, start)
-	const lastLinkStart = before.lastIndexOf('](')
-
-	if (lastLinkStart === -1) {
-		return false
-	}
-
-	const urlStart = lastLinkStart + 2
-	const afterLinkStart = text.substring(urlStart)
-	const closeParen = afterLinkStart.indexOf(')')
-
-	if (closeParen === -1) {
-		return true
-	}
-
-	const urlEnd = urlStart + closeParen
-
-	return start >= urlStart && start < urlEnd
-}
-
-/**
- * Check if a given position falls inside a standalone URL (e.g. `https://example.com/path`).
- */
-export function isInsideUrl(text: string, start: number): boolean {
-	const urlRegex = /\bhttps?:\/\/[^\s,)'"\]]+/gi
-
-	for (const match of text.matchAll(urlRegex)) {
-		const urlStart = match.index ?? 0
-		const urlEnd = urlStart + match[0].length
-
-		if (start >= urlStart && start < urlEnd) {
-			return true
-		}
-	}
-
-	return false
-}
 
 function getRegexpLinter({
 	name,
@@ -254,6 +189,7 @@ function getRegexpLinter({
 
 const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 	getHarperLinter,
+	() => Promise.resolve(aiTellsLinter),
 	getRegexpLinter({
 		name: 'dApp', // Replace dApp and dApps
 		regExp: /\bdapps?\b/gi,
@@ -383,6 +319,7 @@ function isInCspellWords(word: string): boolean {
 export async function grammarLintMessages(
 	text: string,
 	lintOptions?: harper.LintOptions,
+	kind = GrammarTextKind.GENERAL,
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
 
@@ -396,17 +333,20 @@ export async function grammarLintMessages(
 	for (const grammarLinterFn of grammarLinters) {
 		const linter = await grammarLinterFn()
 
-		lints = lints.concat(await linter.lint(trimmedText, lintOptions))
+		let linterLints = await linter.lint(trimmedText, lintOptions, kind)
+
+		// Spelling exceptions and generated-label heuristics do not exempt authored AI prose.
+		if (linter !== aiTellsLinter) {
+			linterLints = linterLints.filter(
+				lint =>
+					!isInsideMarkdownLinkUrl(trimmedText, lint.span().start) &&
+					!overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges) &&
+					!overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
+			)
+		}
+
+		lints = lints.concat(linterLints)
 	}
-
-	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
-	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
-
-	// Ignore lints that fall inside text that is part of an ignored text range.
-	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
-	lints = lints.filter(
-		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
-	)
 
 	// Suppress Word Choice false positives for "setup" used as a noun.
 	lints = lints.filter(
@@ -693,50 +633,16 @@ export async function grammarLintMessages(
 		return charAfterEtc.toUpperCase() !== charAfterEtc
 	})
 
-	const message: string[] = []
-
-	for (const lint of lints) {
-		const before = trimmedText.substring(Math.max(0, lint.span().start - 16), lint.span().start)
-		const after = trimmedText.substring(
-			lint.span().end,
-			Math.min(trimmedText.length, lint.span().end + 16),
-		)
-		const badText = trimmedText.substring(lint.span().start, lint.span().end)
-		const span = `…${before}𜱭${badText}𜱫${after}…`
-
-		message.push(
-			`- ${lint.span().start}:${lint.span().end} (${JSON.stringify(span)}): ${lint.lint_kind_pretty()}: ${lint.message()}`,
-		)
-
-		if (lint.suggestions().length !== 0) {
-			message.push('  Consider:')
-
-			for (const sug of lint.suggestions()) {
-				switch (sug.kind()) {
-					case harper.SuggestionKind.Remove:
-						message.push(`   - Remove: "${lint.get_problem_text()}"`)
-						break
-					case harper.SuggestionKind.InsertAfter:
-						message.push(
-							`   - After "${lint.get_problem_text()}", insert "${sug.get_replacement_text()}"`,
-						)
-						break
-					case harper.SuggestionKind.Replace:
-						message.push(
-							`   - Replace: "${lint.get_problem_text()}" with "${sug.get_replacement_text()}"`,
-						)
-						break
-				}
-			}
-		}
-	}
-
-	return message
+	return formatLintMessages(trimmedText, lints)
 }
 
 /** Lint a string for grammar errors. */
-export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
-	const message = await grammarLintMessages(text, lintOptions)
+export async function grammarLint(
+	text: string,
+	lintOptions?: harper.LintOptions,
+	kind = GrammarTextKind.GENERAL,
+) {
+	const message = await grammarLintMessages(text, lintOptions, kind)
 
 	if (message.length > 0) {
 		// This assertion will never match and makes no sense on its own.

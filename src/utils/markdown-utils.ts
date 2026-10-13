@@ -1,3 +1,5 @@
+import { parse, postprocess, preprocess } from 'micromark'
+
 import { stringHasPrefix } from '@/types/utils/text'
 
 import {
@@ -7,6 +9,80 @@ import {
 	type MarkdownContentWithFrontmatter,
 } from '../types/content'
 import type { Strings } from '../types/utils/string-templates'
+
+/** Check whether a source position belongs to a Markdown link destination. */
+export function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
+	const before = text.substring(0, start)
+	const lastLinkStart = before.lastIndexOf('](')
+
+	if (lastLinkStart === -1) {
+		return false
+	}
+
+	const urlStart = lastLinkStart + 2
+	const closeParen = text.substring(urlStart).indexOf(')')
+
+	if (closeParen === -1) {
+		return true
+	}
+
+	return start >= urlStart && start < urlStart + closeParen
+}
+
+const standaloneUrlRegExp = /\bhttps?:\/\/[^\s,)'"\]]+/gi
+
+/** Check whether a source position belongs to a standalone HTTP(S) URL. */
+export function isInsideUrl(text: string, start: number): boolean {
+	for (const match of text.matchAll(standaloneUrlRegExp)) {
+		if (start >= match.index && start < match.index + match[0].length) {
+			return true
+		}
+	}
+
+	return false
+}
+
+/** Mask standalone URLs with spaces, preserving source offsets. */
+export function maskUrls(text: string): string {
+	return text.replace(standaloneUrlRegExp, match => ' '.repeat(match.length))
+}
+
+const nonProseTokenTypes = new Set([
+	'codeText',
+	'codeFenced',
+	'codeIndented',
+	'resource',
+	'reference',
+	'definition',
+	'autolink',
+])
+
+/**
+ * Mask code, link destinations, and URLs while retaining visible link labels.
+ * Spaces preserve UTF-16 offsets and line endings for source diagnostics.
+ */
+export function maskMarkdownNonProse(markdown: string): string {
+	const events = postprocess(
+		parse()
+			.document()
+			.write(preprocess()(markdown, undefined, true)),
+	)
+	const parts: string[] = []
+	let cursor = 0
+
+	for (const [phase, token] of events) {
+		if (phase !== 'enter' || !nonProseTokenTypes.has(token.type) || token.start.offset < cursor) {
+			continue
+		}
+
+		parts.push(markdown.slice(cursor, token.start.offset))
+		parts.push(markdown.slice(token.start.offset, token.end.offset).replace(/[^\r\n]/g, ' '))
+		cursor = token.end.offset
+	}
+	parts.push(markdown.slice(cursor))
+
+	return maskUrls(parts.join(''))
+}
 
 /**
  * Extract all markdown-style links from a document.

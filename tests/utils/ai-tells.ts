@@ -4,18 +4,12 @@
  * sound generated, and untrustworthy as a consequence.
  */
 
-import type { FullyQualifiedReference } from '@/schema/reference'
+import { maskMarkdownNonProse, maskUrls } from '@/utils/markdown-utils'
 
-import { isInsideMarkdownLinkUrl, isInsideUrl } from './grammar'
-
-interface PunctuationTell {
-	name: string
-	regExp: RegExp
-	advice: string
-}
+import { type AbstractLinter, GrammarTextKind, type Lint } from './linter'
 
 /** Punctuation banned in reference `explanation` and `label` fields. */
-const refPunctuationTells: PunctuationTell[] = [
+const refPunctuationTells = [
 	{
 		name: 'semicolon',
 		regExp: /;/g,
@@ -28,109 +22,70 @@ const refPunctuationTells: PunctuationTell[] = [
 	},
 ]
 
-function isInsideInlineCode(text: string, start: number): boolean {
-	for (const match of text.matchAll(/`[^`]*`/g)) {
-		const codeStart = match.index ?? 0
-
-		if (start > codeStart && start < codeStart + match[0].length) {
-			return true
-		}
-	}
-
-	return false
-}
-
-/** Return a human-readable message for each banned punctuation mark in `text`. */
-export function refPunctuationTellViolations(text: string): string[] {
-	const violations: string[] = []
-
-	for (const tell of refPunctuationTells) {
-		for (const match of text.matchAll(tell.regExp)) {
-			const start = match.index ?? 0
-
-			if (
-				isInsideUrl(text, start) ||
-				isInsideMarkdownLinkUrl(text, start) ||
-				isInsideInlineCode(text, start)
-			) {
-				continue
-			}
-
-			violations.push(`${tell.name} in "${text}". ${tell.advice}`)
-		}
-	}
-
-	return violations
-}
-
-/** Check every explanation and URL label in fully qualified references. */
-export function referencePunctuationTellViolations(refs: FullyQualifiedReference[]): string[] {
-	return refs.flatMap(ref => [
-		...(ref.explanation ? refPunctuationTellViolations(ref.explanation) : []),
-		...ref.urls.flatMap(url => (url.label ? refPunctuationTellViolations(url.label) : [])),
-	])
-}
-
-interface WordFamily {
-	name: string
-	regExp: RegExp
-}
-
-/** Words that read as AI-generated when repeated across a page. */
-const aiWordFamilies: WordFamily[] = [
+/** Words that read as AI-generated when repeated within a body of text. */
+const aiWordFamilies = [
 	{ name: 'gate', regExp: /\bgat(?:e|es|ed|ing)\b/gi },
 	{ name: 'ship', regExp: /\bship(?:s|ped|ping)?\b/gi },
 ]
 
-/** A word family may occur this many times on any page, however short. */
+/** A word family may occur this many times, however short the text. */
 const maxOccurrencesBeforeDensityCheck = 2
 
-/** Above the floor, a word family may not exceed this many occurrences per 1000 words. */
+/** Above the floor, the limit is this many occurrences per 1000 prose words. */
 const maxOccurrencesPer1000Words = 1
 
-/** Remove the parts of Markdown that are not prose: URLs, link targets, and inline code contents. */
-function markdownProse(markdown: string): string {
-	return markdown
-		.replace(/\]\([^)]*\)/g, ']')
-		.replace(/https?:\/\/\S+/g, '')
-		.replace(/`[^`]*`/g, '`…`')
+function aiProseLint(match: RegExpMatchArray, message: string): Lint {
+	const start = match.index ?? 0
+
+	return {
+		get_problem_text: () => match[0],
+		lint_kind_pretty: () => 'AI prose',
+		suggestions: () => [],
+		span: () => ({ start, end: start + match[0].length }),
+		message: () => message,
+	}
 }
 
-function snippetAround(text: string, start: number, length: number): string {
-	const snippetRadius = 40
-
-	return text
-		.slice(Math.max(0, start - snippetRadius), start + length + snippetRadius)
-		.replace(/\s+/g, ' ')
-		.trim()
-}
-
-/** Return a human-readable message for each word family overused in `markdown`. */
-export function aiWordDensityViolations(markdown: string): string[] {
-	const prose = markdownProse(markdown)
-	const wordCount = (prose.match(/\b[a-z][a-z'-]*\b/gi) ?? []).length
-	const violations: string[] = []
-
-	for (const family of aiWordFamilies) {
-		const matches = Array.from(prose.matchAll(family.regExp))
-		const per1000Words = (matches.length * 1000) / wordCount
+/** Apply reference punctuation rules and contextual word-frequency rules. */
+export const aiTellsLinter: AbstractLinter = {
+	lint(text, lintOptions, kind = GrammarTextKind.GENERAL): Promise<Lint[]> {
+		const prose =
+			(lintOptions?.language ?? 'markdown') === 'markdown'
+				? maskMarkdownNonProse(text)
+				: maskUrls(text)
+		const lints: Lint[] = []
 
 		if (
-			matches.length > maxOccurrencesBeforeDensityCheck &&
-			per1000Words > maxOccurrencesPer1000Words
+			kind === GrammarTextKind.REFERENCE_LABEL ||
+			kind === GrammarTextKind.REFERENCE_EXPLANATION
 		) {
-			const snippets = matches.map(
-				match => `  - "...${snippetAround(prose, match.index, match[0].length)}..."`,
-			)
+			for (const tell of refPunctuationTells) {
+				for (const match of prose.matchAll(tell.regExp)) {
+					lints.push(aiProseLint(match, `Avoid ${tell.name} in reference prose. ${tell.advice}`))
+				}
+			}
+		}
 
-			violations.push(
-				`"${family.name}" occurs ${matches.length} times in ${wordCount} words ` +
+		const wordCount = (prose.match(/\b[a-z][a-z'-]*\b/gi) ?? []).length
+
+		for (const family of aiWordFamilies) {
+			const matches = Array.from(prose.matchAll(family.regExp))
+			const per1000Words = (matches.length * 1000) / wordCount
+
+			if (
+				matches.length > maxOccurrencesBeforeDensityCheck &&
+				per1000Words > maxOccurrencesPer1000Words
+			) {
+				const message =
+					`"${family.name}" occurs ${matches.length} times in ${wordCount} words ` +
 					`(${per1000Words.toFixed(2)} per 1000 words, above the limit of ` +
 					`${maxOccurrencesPer1000Words} once past ${maxOccurrencesBeforeDensityCheck} occurrences). ` +
-					`Reword some of these:\n${snippets.join('\n')}`,
-			)
-		}
-	}
+					'Reword some of these occurrences.'
 
-	return violations
+				lints.push(...matches.map(match => aiProseLint(match, message)))
+			}
+		}
+
+		return Promise.resolve(lints)
+	},
 }

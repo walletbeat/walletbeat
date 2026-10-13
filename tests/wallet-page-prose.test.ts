@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { aiWordDensityViolations } from './utils/ai-tells'
+import { aiTellsLinter } from './utils/ai-tells'
 import { walletPageProse } from './utils/wallet-page-prose'
 
 describe('wallet page prose extraction', () => {
-	it('counts custom evaluation details and news together across markup boundaries', () => {
+	it('counts custom evaluation details and news together across markup boundaries', async () => {
 		const prose = walletPageProse(`
 			<html><body>
 				<nav>gate ship</nav>
@@ -16,10 +16,10 @@ describe('wallet page prose extraction', () => {
 		`)
 
 		expect(prose).toBe('gate gated gating & access')
-		expect(aiWordDensityViolations(prose)).toHaveLength(1)
+		expect(await aiTellsLinter.lint(prose, { language: 'plaintext' })).toHaveLength(3)
 	})
 
-	it('keeps link labels and inline prose while excluding code and non-prose content', () => {
+	it('keeps link labels and inline prose while excluding code and non-prose content', async () => {
 		const prose = walletPageProse(`
 			<html><body><main id="wallet-page"><article>
 				<p><a href="https://example.com/gate/ship">Wallet</a> <em>fund</em>ing</p>
@@ -30,7 +30,7 @@ describe('wallet page prose extraction', () => {
 		`)
 
 		expect(prose).toBe('Wallet funding details')
-		expect(aiWordDensityViolations(prose)).toEqual([])
+		expect(await aiTellsLinter.lint(prose, { language: 'plaintext' })).toEqual([])
 	})
 
 	it('rejects missing reports instead of treating them as empty prose', () => {

@@ -4,8 +4,8 @@ import { allWalletSecurityNews, getNewsForWallet } from '@/data/news'
 import { allWallets } from '@/data/wallets'
 import { toFullyQualified } from '@/schema/reference'
 
-import { referencePunctuationTellViolations } from './utils/ai-tells'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
+import { GrammarTextKind } from './utils/linter'
 
 await warmupHarperLinter()
 
@@ -42,16 +42,26 @@ describe('wallet security news', () => {
 				for (const fq of toFullyQualified(news.ref)) {
 					for (const urlEntry of fq.urls) {
 						if (urlEntry.label) {
-							await grammarLint(urlEntry.label, { language: 'plaintext' })
+							await grammarLint(
+								urlEntry.label,
+								{ language: 'markdown' },
+								GrammarTextKind.REFERENCE_LABEL,
+							)
 						}
 					}
 				}
 			})
 
-			it('reference explanation and label fields avoid AI-tell punctuation', () => {
-				const violations = referencePunctuationTellViolations(toFullyQualified(news.ref))
-
-				expect(violations, violations.join('\n')).toEqual([])
+			it('reference explanations pass grammar lint', async () => {
+				for (const fq of toFullyQualified(news.ref)) {
+					if (fq.explanation) {
+						await grammarLint(
+							fq.explanation,
+							{ language: 'markdown' },
+							GrammarTextKind.REFERENCE_EXPLANATION,
+						)
+					}
+				}
 			})
 		})
 	}

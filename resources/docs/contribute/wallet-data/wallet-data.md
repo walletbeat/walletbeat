@@ -545,7 +545,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 }
 ```
 
-Reference `label` and `explanation` fields must not contain semicolons or em dashes, as these are common tells of AI-generated prose. Split the clauses into separate sentences instead. Tests also flag wallet pages that overuse AI-ish words such as "gate" and "ship".
+Reference `label` and `explanation` prose must not contain semicolons or em dashes, as these are common tells of AI-generated prose. Split the clauses into separate sentences instead. URLs and code are exempt. Grammar checks also flag overuse of "gate" and "ship" word families relative to the amount of prose.
 
 Alternatively, you may use `ref: refTodo` as a placeholder for references that you have not yet gathered. You can also use `refNotNecessary` for references that are self-evident. _For example, Walletbeat tracks whether a wallet supports **Safe multisigs**. It is obvious that **Safe Wallet** supports them, so `ref: refNotNecessary` would be appropriate there, but this would not be obvious for other wallets._
 
