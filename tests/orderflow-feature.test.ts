@@ -37,6 +37,7 @@ const invalidOrderflowAuctionRow: DataCollectionByEntity = {
 	dataCollection: {
 		[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.NEVER,
 		endpoint: RegularEndpoint,
+		multiAddress: null,
 	},
 	purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
 	role: EntityRole.OPERATOR,
@@ -145,6 +146,7 @@ describe('orderflow data-collection helpers', () => {
 			dataCollection: {
 				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 				endpoint: RegularEndpoint,
+				multiAddress: null,
 			},
 			purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
 			role: EntityRole.OPERATOR,
@@ -160,6 +162,7 @@ describe('orderflow data-collection helpers', () => {
 						dataCollection: {
 							[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
 							endpoint: RegularEndpoint,
+							multiAddress: null,
 						},
 						purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
 						role: EntityRole.OPERATOR,
@@ -187,6 +190,7 @@ describe('orderflow data-collection helpers', () => {
 			dataCollection: {
 				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 				endpoint: fullEnclaveEndpoint,
+				multiAddress: null,
 			},
 			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
 			role: EntityRole.OPERATOR,
@@ -198,6 +202,7 @@ describe('orderflow data-collection helpers', () => {
 			dataCollection: {
 				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
 				endpoint: RegularEndpoint,
+				multiAddress: null,
 			},
 			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
 			role: EntityRole.OPERATOR,

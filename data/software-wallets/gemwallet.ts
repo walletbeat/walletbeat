@@ -554,6 +554,7 @@ export const gemwallet: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported<WithRef<{}>>({
 					ref: [
 						{

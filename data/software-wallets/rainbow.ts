@@ -1631,6 +1631,7 @@ export const rainbow: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{

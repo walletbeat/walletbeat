@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	type Evaluation,
@@ -108,6 +109,9 @@ export const chainVerification: Attribute = {
 	methodology: markdown(`
 		Wallets are evaluated based on whether or not they integrate a light
 		client for verification of Ethereum L1 state.
+
+		See the [chain verification testing guide](${withBasePath('/docs/wallet-testing/chain-verification/')})
+		for how Walletbeat tests whether a wallet verifies the chain data it receives.
 
 		*Note*: Walletbeat currently only considers L1 chain state verification
 		for this criterion, not L2s. This is because L2 state verification is
