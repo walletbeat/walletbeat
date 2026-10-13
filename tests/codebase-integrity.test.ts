@@ -69,6 +69,7 @@ const ALLOWED_BARE_FILENAMES = new Set([
 	'Makefile',
 	'agentsignore',
 	'checkpoint',
+	'upstream-commit',
 	'torrc',
 	'.editorconfig',
 	'.gitattributes',
@@ -181,7 +182,7 @@ describe('codebase integrity', () => {
 		const symlinks: (CodebaseEntry & { type: CodebaseEntryType.SYMLINK })[] = []
 
 		await crawlCodebase({
-			ignore: ['.git', await GitIgnoredFiles()],
+			ignore: ['.git', 'node_modules', await GitIgnoredFiles()],
 			complexTraversalFn: async (entryBase, getFullEntry) => {
 				if (entryBase.type === CodebaseEntryType.SYMLINK) {
 					const entry = await getFullEntry()
@@ -522,6 +523,7 @@ describe('codebase integrity', () => {
 			'[...slug]',
 			'[...path].[ext].ts',
 			'_about.md',
+			'APPEND_SYSTEM.md',
 		])
 
 		const componentsFailed: string[] = []
