@@ -13,8 +13,9 @@ import * as shiki from 'shiki'
  * identical output for server-side rendering and client hydration.
  *
  * The language comes from the source file's extension, which the snippet
- * naming scheme keeps right before the `.snippet` suffix
- * (e.g. `...--Wallet.L2232-L2242.ts.snippet` → `ts`).
+ * naming scheme keeps right after the line range and before the `.snippet`
+ * suffix (e.g. `...--Wallet.L2232-L2242.ts.snippet` → `ts`). Source files
+ * without an extension (e.g. `...--LICENSE.L1-L3.snippet`) are plain text.
  */
 
 /**
@@ -83,17 +84,33 @@ function escapeHtml(text) {
 }
 
 /**
- * The Shiki language for a snippet file path. Throws for any extension not
- * present in `extensionToLanguage`, since that's either a typo or a new
- * extension that needs to be classified there (as a real language, or as
- * `'text'` if it shouldn't be highlighted).
+ * The line range and optional source extension at the end of a snippet file
+ * name, as produced by `snippetFileName` in src/schema/code-snippets.ts.
+ */
+const snippetFileNameSuffix = /\.L\d+(?:-L\d+)?(?:\.(?<extension>[^.]+))?\.snippet$/
+
+/**
+ * The Shiki language for a snippet file path. Source files without an
+ * extension are plain text. Throws for any extension not present in
+ * `extensionToLanguage`, since that's either a typo or a new extension that
+ * needs to be classified there (as a real language, or as `'text'` if it
+ * shouldn't be highlighted).
  *
  * @param {string} filePath
  * @returns {string}
  */
-function snippetLanguage(filePath) {
-	const parts = path.basename(filePath).split('.')
-	const extension = parts.length < 2 ? '' : parts[parts.length - 2]
+export function snippetLanguage(filePath) {
+	const match = snippetFileNameSuffix.exec(path.basename(filePath))
+
+	if (match === null) {
+		throw new Error(`Not a code snippet file name: ${filePath}`)
+	}
+
+	const extension = match.groups?.extension
+
+	if (extension === undefined) {
+		return 'text'
+	}
 
 	if (!Object.hasOwn(extensionToLanguage, extension)) {
 		throw new Error(
