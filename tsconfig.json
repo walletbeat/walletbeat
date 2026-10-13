@@ -1,7 +1,11 @@
 {
 	"extends": "astro/tsconfigs/strict",
 	"include": [".astro/types.d.ts", "**/*"],
-	"exclude": ["dist", "resources/contracts"],
+	"exclude": [
+		"dist",
+		"resources/contracts",
+		"src/tools/wallet-data-collection/agent/backup-tree.bak"
+	],
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
