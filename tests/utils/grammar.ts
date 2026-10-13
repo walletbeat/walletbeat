@@ -12,7 +12,7 @@ import {
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
-import { isInsideMarkdownLinkUrl, isInsideUrl } from '@/utils/markdown-utils'
+import { extractProse } from '@/utils/markdown-utils'
 
 import { aiTellsLinter } from './ai-tells'
 import {
@@ -134,14 +134,6 @@ function getRegexpLinter({
 					for (const match of text.matchAll(regExp)) {
 						const matchedText = match[0]
 						const start = match.index ?? 0
-
-						if (isInsideMarkdownLinkUrl(text, start)) {
-							continue
-						}
-
-						if (isInsideUrl(text, start)) {
-							continue
-						}
 
 						const replacement = replace === null ? null : replace(matchedText)
 						const end = start + matchedText.length
@@ -322,6 +314,7 @@ export async function grammarLintMessages(
 	kind = GrammarTextKind.GENERAL,
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
+	const extractedProse = extractProse(trimmedText, lintOptions?.language)
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
@@ -333,16 +326,21 @@ export async function grammarLintMessages(
 	for (const grammarLinterFn of grammarLinters) {
 		const linter = await grammarLinterFn()
 
-		let linterLints = await linter.lint(trimmedText, lintOptions, kind)
+		let linterLints = await linter.lint(trimmedText, lintOptions, kind, extractedProse)
 
-		// Spelling exceptions and generated-label heuristics do not exempt authored AI prose.
+		// AI prose diagnostics already originate in masked prose, and vocabulary and
+		// generated-label exemptions do not exempt authored AI prose. Other diagnostics are
+		// suppressed only when they start in non-prose, preserving sentence-wide findings.
 		if (linter !== aiTellsLinter) {
-			linterLints = linterLints.filter(
-				lint =>
-					!isInsideMarkdownLinkUrl(trimmedText, lint.span().start) &&
-					!overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges) &&
-					!overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
-			)
+			linterLints = linterLints.filter(lint => {
+				const { start, end } = lint.span()
+
+				return (
+					!extractedProse.excludedRanges.some(range => start >= range.start && start < range.end) &&
+					!overlapsAnyRange(start, end, cspellRanges) &&
+					!overlapsAnyRange(start, end, githubLabelRanges)
+				)
+			})
 		}
 
 		lints = lints.concat(linterLints)

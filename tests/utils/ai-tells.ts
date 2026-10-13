@@ -4,7 +4,7 @@
  * sound generated, and untrustworthy as a consequence.
  */
 
-import { maskMarkdownNonProse, maskUrls } from '@/utils/markdown-utils'
+import { extractProse } from '@/utils/markdown-utils'
 
 import { type AbstractLinter, GrammarTextKind, type Lint } from './linter'
 
@@ -48,11 +48,8 @@ function aiProseLint(match: RegExpMatchArray, message: string): Lint {
 
 /** Apply reference punctuation rules and contextual word-frequency rules. */
 export const aiTellsLinter: AbstractLinter = {
-	lint(text, lintOptions, kind = GrammarTextKind.GENERAL): Promise<Lint[]> {
-		const prose =
-			(lintOptions?.language ?? 'markdown') === 'markdown'
-				? maskMarkdownNonProse(text)
-				: maskUrls(text)
+	lint(text, lintOptions, kind = GrammarTextKind.GENERAL, extractedProse): Promise<Lint[]> {
+		const { prose } = extractedProse ?? extractProse(text, lintOptions?.language)
 		const lints: Lint[] = []
 
 		if (

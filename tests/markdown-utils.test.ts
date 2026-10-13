@@ -3,14 +3,29 @@ import { describe, expect, it } from 'vitest'
 import { ContentType, type MarkdownContent } from '@/types/content'
 import {
 	collapseToSingleLine,
-	maskMarkdownNonProse,
-	maskUrls,
+	extractProse,
+	extractUrlRanges,
 	rewriteMarkdownURLs,
 } from '@/utils/markdown-utils'
 
 function makeContent(markdown: string): MarkdownContent<null> {
 	return { contentType: ContentType.MARKDOWN, markdown }
 }
+
+describe('standalone URL ranges', () => {
+	it.each([
+		['prose', 'https://wallet.invalid/path'],
+		['source', 'https://wallet.invalid/path),suffix'],
+	] as const)('uses %s delimiters while preserving source offsets', (context, expectedUrl) => {
+		const text = '🔒 "https://wallet.invalid/path),suffix" next'
+		const ranges = extractUrlRanges(text, context)
+
+		expect(ranges).toEqual([
+			{ start: text.indexOf('https://'), end: text.indexOf('https://') + expectedUrl.length },
+		])
+		expect(ranges.map(({ start, end }) => text.slice(start, end))).toEqual([expectedUrl])
+	})
+})
 
 describe('prose masking', () => {
 	it.each([
@@ -23,8 +38,10 @@ describe('prose masking', () => {
 		['link titles', 'before [Wallet](/gate "ship;—") after'],
 		['reference links', 'before [Wallet][gate]\n\n[gate]: /ship "gate;—"\n\nafter'],
 		['autolinks', 'before <https://example.com/gate;ship> after'],
+		['standalone URLs', 'before https://example.com/gate;ship after'],
+		['URLs inside code', 'before `https://example.com/gate`after'],
 	])('excludes %s while retaining prose and source positions', (_name, markdown) => {
-		const masked = maskMarkdownNonProse(markdown)
+		const { prose: masked, excludedRanges } = extractProse(markdown)
 
 		expect(masked.length).toBe(markdown.length)
 		expect(masked.match(/\S+/g)).toEqual(
@@ -35,11 +52,23 @@ describe('prose masking', () => {
 			expect(masked.indexOf(word)).toBe(markdown.indexOf(word))
 		}
 		expect(masked.match(/\r?\n/g)).toEqual(markdown.match(/\r?\n/g))
+
+		for (let offset = 0; offset < markdown.length; offset++) {
+			const excluded = excludedRanges.some(({ start, end }) => start <= offset && offset < end)
+
+			expect(masked[offset]).toBe(
+				excluded && !/[\r\n]/.test(markdown[offset]) ? ' ' : markdown[offset],
+			)
+		}
+
+		for (let index = 1; index < excludedRanges.length; index++) {
+			expect(excludedRanges[index].start).toBeGreaterThanOrEqual(excludedRanges[index - 1].end)
+		}
 	})
 
 	it('preserves escaped delimiters and Unicode offsets', () => {
 		const markdown = '🔒 \\`gate\\` `ship`\r\nKeep this explanation.'
-		const masked = maskMarkdownNonProse(markdown)
+		const { prose: masked } = extractProse(markdown)
 
 		expect(masked).toContain('\\`gate\\`')
 		expect(masked).not.toContain('ship')
@@ -50,12 +79,15 @@ describe('prose masking', () => {
 
 	it('excludes standalone URLs without interpreting plaintext as Markdown', () => {
 		const text = 'gate `ship` https://example.com/gate;ship next'
-		const masked = maskUrls(text)
+		const { prose: masked, excludedRanges } = extractProse(text, 'plaintext')
 
 		expect(masked).toContain('gate `ship`')
 		expect(masked).not.toContain('https://')
 		expect(masked.length).toBe(text.length)
 		expect(masked.indexOf('next')).toBe(text.indexOf('next'))
+		expect(excludedRanges).toEqual([
+			{ start: text.indexOf('https://'), end: text.indexOf(' next') },
+		])
 	})
 })
 

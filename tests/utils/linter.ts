@@ -1,5 +1,7 @@
 import * as harper from 'harper.js'
 
+import type { ExtractedProse } from '@/utils/markdown-utils'
+
 /** The purpose of the text being checked, independent of its markup format. */
 export enum GrammarTextKind {
 	GENERAL = 'GENERAL',
@@ -26,7 +28,13 @@ export interface Lint {
 }
 
 export interface AbstractLinter {
-	lint(text: string, lintOptions?: harper.LintOptions, kind?: GrammarTextKind): Promise<Lint[]>
+	/** Reuse source exclusions prepared for the same text and language when supplied. */
+	lint(
+		text: string,
+		lintOptions?: harper.LintOptions,
+		kind?: GrammarTextKind,
+		extractedProse?: ExtractedProse,
+	): Promise<Lint[]>
 }
 
 /** Format diagnostics with source locations, highlighted text, and suggestions. */

@@ -10,41 +10,26 @@ import {
 } from '../types/content'
 import type { Strings } from '../types/utils/string-templates'
 
-/** Check whether a source position belongs to a Markdown link destination. */
-export function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
-	const before = text.substring(0, start)
-	const lastLinkStart = before.lastIndexOf('](')
-
-	if (lastLinkStart === -1) {
-		return false
-	}
-
-	const urlStart = lastLinkStart + 2
-	const closeParen = text.substring(urlStart).indexOf(')')
-
-	if (closeParen === -1) {
-		return true
-	}
-
-	return start >= urlStart && start < urlStart + closeParen
+const standaloneUrlRegExps = {
+	prose: /\bhttps?:\/\/[^\s,)'"\]]+/gi,
+	source: /https?:\/\/[^\s'"`<>]+/gi,
 }
 
-const standaloneUrlRegExp = /\bhttps?:\/\/[^\s,)'"\]]+/gi
-
-/** Check whether a source position belongs to a standalone HTTP(S) URL. */
-export function isInsideUrl(text: string, start: number): boolean {
-	for (const match of text.matchAll(standaloneUrlRegExp)) {
-		if (start >= match.index && start < match.index + match[0].length) {
-			return true
-		}
-	}
-
-	return false
+/** Source scans use string delimiters; prose scans also stop at punctuation around URLs. */
+export function extractUrlRanges(
+	text: string,
+	context: 'prose' | 'source' = 'prose',
+): { start: number; end: number }[] {
+	return Array.from(text.matchAll(standaloneUrlRegExps[context]), match => ({
+		start: match.index,
+		end: match.index + match[0].length,
+	}))
 }
 
-/** Mask standalone URLs with spaces, preserving source offsets. */
-export function maskUrls(text: string): string {
-	return text.replace(standaloneUrlRegExp, match => ' '.repeat(match.length))
+/** Prose and excluded ranges share the source text's UTF-16 offsets. */
+export interface ExtractedProse {
+	prose: string
+	excludedRanges: { start: number; end: number }[]
 }
 
 const nonProseTokenTypes = new Set([
@@ -57,31 +42,57 @@ const nonProseTokenTypes = new Set([
 	'autolink',
 ])
 
-/**
- * Mask code, link destinations, and URLs while retaining visible link labels.
- * Spaces preserve UTF-16 offsets and line endings for source diagnostics.
- */
-export function maskMarkdownNonProse(markdown: string): string {
-	const events = postprocess(
-		parse()
-			.document()
-			.write(preprocess()(markdown, undefined, true)),
-	)
+function maskTextRanges(text: string, ranges: { start: number; end: number }[]): string {
 	const parts: string[] = []
 	let cursor = 0
 
-	for (const [phase, token] of events) {
-		if (phase !== 'enter' || !nonProseTokenTypes.has(token.type) || token.start.offset < cursor) {
-			continue
-		}
-
-		parts.push(markdown.slice(cursor, token.start.offset))
-		parts.push(markdown.slice(token.start.offset, token.end.offset).replace(/[^\r\n]/g, ' '))
-		cursor = token.end.offset
+	for (const { start, end } of ranges) {
+		parts.push(text.slice(cursor, start))
+		parts.push(text.slice(start, end).replace(/[^\r\n]/g, ' '))
+		cursor = end
 	}
-	parts.push(markdown.slice(cursor))
+	parts.push(text.slice(cursor))
 
-	return maskUrls(parts.join(''))
+	return parts.join('')
+}
+
+/**
+ * Extract prose and the source ranges excluded from it, retaining visible link labels.
+ * Markdown excludes code and link destinations; all formats exclude standalone URLs.
+ * Masked spaces preserve UTF-16 offsets and line endings for source diagnostics.
+ */
+export function extractProse(
+	text: string,
+	language: 'markdown' | 'plaintext' | 'typst' = 'markdown',
+): ExtractedProse {
+	const excludedRanges: { start: number; end: number }[] = []
+
+	if (language === 'markdown') {
+		const events = postprocess(
+			parse()
+				.document()
+				.write(preprocess()(text, undefined, true)),
+		)
+
+		for (const [phase, token] of events) {
+			const previousEnd = excludedRanges.at(-1)?.end ?? 0
+
+			if (
+				phase === 'enter' &&
+				nonProseTokenTypes.has(token.type) &&
+				token.start.offset >= previousEnd
+			) {
+				excludedRanges.push({ start: token.start.offset, end: token.end.offset })
+			}
+		}
+	}
+
+	const prose = maskTextRanges(text, excludedRanges)
+
+	excludedRanges.push(...extractUrlRanges(prose))
+	excludedRanges.sort((a, b) => a.start - b.start)
+
+	return { prose: maskTextRanges(text, excludedRanges), excludedRanges }
 }
 
 /**

@@ -1,8 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import * as harper from 'harper.js'
+import { describe, expect, it, vi } from 'vitest'
+
+import * as markdownUtils from '@/utils/markdown-utils'
 
 import { aiTellsLinter } from './utils/ai-tells'
 import { grammarLintMessages } from './utils/grammar'
-import { formatLintMessages, GrammarTextKind } from './utils/linter'
+import { formatLintMessages, GrammarTextKind, type Lint } from './utils/linter'
+
+function aiProseMessages(messages: string[]): string[] {
+	return messages.filter(message => message.includes(': AI prose:'))
+}
 
 describe('AI prose linter', () => {
 	it.each(Object.values(GrammarTextKind))('scopes punctuation for %s', async kind => {
@@ -92,6 +99,93 @@ describe('AI prose linter', () => {
 		expect(await aiTellsLinter.lint(text, { language: 'plaintext' })).toHaveLength(3)
 	})
 
+	it.each(Object.values(GrammarTextKind))(
+		'extracts prose once in the grammar pipeline for %s',
+		async kind => {
+			const extract = vi.spyOn(markdownUtils, 'extractProse')
+
+			try {
+				const messages = await grammarLintMessages(
+					'gate gated gating `gate gated gating`',
+					{ language: 'markdown' },
+					kind,
+				)
+
+				expect(extract).toHaveBeenCalledTimes(1)
+				expect(aiProseMessages(messages)).toHaveLength(3)
+			} finally {
+				extract.mockRestore()
+			}
+		},
+	)
+
+	it.each(['`details`', 'https://wallet.invalid/details'])(
+		'preserves diagnostics starting in prose and spanning %s',
+		async nonProse => {
+			const text = `Wallet details include ${nonProse} for users.`
+			const { excludedRanges } = markdownUtils.extractProse(text)
+			const sentenceLint: Lint = {
+				get_problem_text: () => text,
+				lint_kind_pretty: () => 'Sentence structure',
+				suggestions: () => [],
+				span: () => ({ start: 0, end: text.length }),
+				message: () => 'Sentence diagnostic.',
+			}
+			const nonProseLints = excludedRanges.map(({ start, end }): Lint => ({
+				get_problem_text: () => text.slice(start, end),
+				lint_kind_pretty: () => 'Sentence structure',
+				suggestions: () => [],
+				span: () => ({ start, end }),
+				message: () => 'Non-prose diagnostic.',
+			}))
+			const lint = vi
+				.spyOn(harper.LocalLinter.prototype, 'lint')
+				.mockResolvedValue([sentenceLint, ...nonProseLints] as unknown as harper.Lint[])
+
+			try {
+				const messages = await grammarLintMessages(text, { language: 'markdown' })
+
+				expect(messages.filter(message => message.includes(': Sentence structure:'))).toHaveLength(
+					1,
+				)
+				expect(messages.join('\n')).toContain('Sentence diagnostic.')
+			} finally {
+				lint.mockRestore()
+			}
+		},
+	)
+
+	it.each([
+		'`on-chain gate gated gating;—`',
+		'``on-chain ` gate gated gating;—``',
+		'~~~\non-chain gate gated gating;—\n~~~',
+		'Wallet details.\n\n    on-chain gate gated gating;—',
+		'[Wallet](/on-chain/gate/gated/gating;—)',
+		'[Wallet](/path_(on-chain)/gate/gated/gating;—)',
+		'[Wallet](/path "on-chain gate gated gating;—")',
+		'[Wallet][on-chain]\n\n[on-chain]: /gate/gated/gating;—',
+		'https://example.com/on-chain/gate/gated/gating;—',
+	])('shares non-prose exclusions across diagnostic categories: %s', async text => {
+		const messages = await grammarLintMessages(
+			text,
+			{ language: 'markdown' },
+			GrammarTextKind.REFERENCE_EXPLANATION,
+		)
+
+		expect(messages).toEqual([])
+	})
+
+	it('keeps visible link labels subject to grammar and AI prose rules', async () => {
+		const messages = await grammarLintMessages(
+			'[on-chain gate gated gating;—](/wallet)',
+			{ language: 'markdown' },
+			GrammarTextKind.REFERENCE_LABEL,
+		)
+
+		expect(messages.filter(message => message.includes(': Site convention:'))).toHaveLength(1)
+		expect(aiProseMessages(messages)).toHaveLength(5)
+	})
+
 	it('integrates with grammar checks without inheriting spelling exemptions', async () => {
 		const referenceMessages = await grammarLintMessages(
 			'tl;dr',
@@ -103,8 +197,8 @@ describe('AI prose linter', () => {
 			{ language: 'markdown' },
 		)
 
-		expect(referenceMessages.filter(message => message.includes(': AI prose:'))).toHaveLength(1)
-		expect(labelMessages.filter(message => message.includes(': AI prose:'))).toHaveLength(3)
+		expect(aiProseMessages(referenceMessages)).toHaveLength(1)
+		expect(aiProseMessages(labelMessages)).toHaveLength(3)
 		expect(await grammarLintMessages('tl;dr', { language: 'markdown' })).toEqual([])
 	})
 })
