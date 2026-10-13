@@ -15,10 +15,12 @@
 	let {
 		tableId,
 		title,
+		titleLevel,
 		focus,
 	}: {
 		tableId?: string
 		title?: string
+		titleLevel?: 1 | 2
 		focus?: WalletTableFocus
 	} = $props()
 
@@ -28,6 +30,7 @@
 <WalletTable
 	{tableId}
 	{title}
+	{titleLevel}
 	{focus}
 	{titleDisclaimer}
 	ladders={hardwareLadders}
