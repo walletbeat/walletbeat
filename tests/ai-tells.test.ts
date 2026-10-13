@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import * as markdownUtils from '@/utils/markdown-utils'
-
 import { aiTellsLinter } from './utils/ai-tells'
 import { grammarLintMessages, harperGrammarLinter } from './utils/grammar'
 import { formatLintMessages, GrammarTextKind, type Lint } from './utils/linter'
@@ -102,7 +100,8 @@ describe('AI prose linter', () => {
 		'preserves diagnostics starting in prose and spanning %s',
 		async nonProse => {
 			const text = `Wallet details include ${nonProse} for users.`
-			const { excludedRanges } = markdownUtils.extractProse(text)
+			const start = text.indexOf(nonProse)
+			const end = start + nonProse.length
 			const sentenceLint: Lint = {
 				get_problem_text: () => text,
 				lint_kind_pretty: () => 'Sentence structure',
@@ -110,16 +109,16 @@ describe('AI prose linter', () => {
 				span: () => ({ start: 0, end: text.length }),
 				message: () => 'Sentence diagnostic.',
 			}
-			const nonProseLints = excludedRanges.map(({ start, end }): Lint => ({
+			const nonProseLint: Lint = {
 				get_problem_text: () => text.slice(start, end),
 				lint_kind_pretty: () => 'Sentence structure',
 				suggestions: () => [],
 				span: () => ({ start, end }),
 				message: () => 'Non-prose diagnostic.',
-			}))
+			}
 			const lint = vi
 				.spyOn(harperGrammarLinter, 'lint')
-				.mockResolvedValue([sentenceLint, ...nonProseLints])
+				.mockResolvedValue([sentenceLint, nonProseLint])
 
 			try {
 				const messages = await grammarLintMessages(text, { language: 'markdown' })

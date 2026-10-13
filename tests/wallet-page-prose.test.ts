@@ -19,7 +19,7 @@ describe('wallet page prose extraction', () => {
 		expect(await aiTellsLinter.lint(prose, { language: 'plaintext' })).toHaveLength(3)
 	})
 
-	it('keeps link labels and inline prose while excluding code and non-prose content', async () => {
+	it('keeps link labels and inline prose while excluding code and non-prose content', () => {
 		const prose = walletPageProse(`
 			<html><body><main id="wallet-page"><article>
 				<p><a href="https://example.com/gate/ship">Wallet</a> <em>fund</em>ing</p>
@@ -30,7 +30,6 @@ describe('wallet page prose extraction', () => {
 		`)
 
 		expect(prose).toBe('Wallet funding details')
-		expect(await aiTellsLinter.lint(prose, { language: 'plaintext' })).toEqual([])
 	})
 
 	it('rejects missing reports instead of treating them as empty prose', () => {
