@@ -32,6 +32,7 @@ import {
 	userInfoName,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { isLooseReference, type LooseReference } from '@/schema/reference'
 import { type Variant, variantEnum } from '@/schema/variants'
 import { variantToWalletType, WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
@@ -49,7 +50,9 @@ import {
 } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
+import { isUnjustifiedImpacted } from './agent/wallet-capture-classification'
 import { type ChalkLike, getChalk as _getChalk } from './chalk-like'
+import { isOpenMutationMode, writeFileAtomically } from './read-only'
 import {
 	chunkBinaryAwareString,
 	classifyStringHeuristically,
@@ -61,6 +64,13 @@ import {
 	WalletCaptureAnnotations,
 	WalletRequestMatcher,
 } from './wallet-capture-annotations'
+import {
+	AUDIT_LOG_RELATIVE_PATH,
+	parseRequestId,
+	requestIdToString,
+	WalletCaptureClassificationAuditLogFile,
+	type WalletCaptureImpactedRequestId,
+} from './wallet-capture-classification-audit-log'
 import {
 	CaptureInfo,
 	CaptureInfoTransaction,
@@ -77,6 +87,7 @@ import {
 	WalletRequest,
 	WalletRequestReview,
 } from './wallet-capture-file'
+import { allRequestIds, enumerateCaptureFiles } from './wallet-capture-repo'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -470,6 +481,36 @@ export const globalOptions = new Options<GlobalOptions>({
 	},
 })
 
+/**
+ * Options for the `agent` subcommand. Unlike other subcommands, `id`/`variant`/`type`
+ * are optional: they scope the harness to a wallet but are not required to run it.
+ * `actor` is accepted for consistency with the other global options but is not used by
+ * the harness (which always runs as an agent).
+ */
+export interface AgentOptions {
+	id: WalletName | null
+	variant: Variant | null
+	type: WalletType | null
+	actor: DataCollectionActor | null
+}
+
+export const agentOptions = new Options<AgentOptions>({
+	id: optionalOption((x: string | null): WalletName => {
+		if (x === null || x === '') {
+			throw new Error('must specify wallet ID')
+		}
+
+		if (!isValidWalletName(x)) {
+			throw new Error(`not a valid wallet ID: ${x}`)
+		}
+
+		return x
+	}),
+	variant: optionalOption(enumOption(variantEnum)),
+	type: optionalOption(enumOption(walletTypes)),
+	actor: optionalOption(enumOption(dataCollectionActor)),
+})
+
 export function getSaveOptions(opts: GlobalOptions): SaveOptions {
 	return {
 		verifyExisting: false,
@@ -755,6 +796,42 @@ export const checkOptions = new Options<CheckOptions>(
 	globalOptions,
 )
 
+export interface JustifyOptions extends GlobalOptions {
+	/** Comma-separated `walletId:walletVariant:sessionTime` request IDs. */
+	requestId: string
+	/** The exact URL (domain + path + query) of the request(s) being justified. */
+	url: string
+	/** A non-empty string or a `LooseReference` JSON object. */
+	rationale: string
+}
+
+export const justifyOptions = new Options<JustifyOptions>(
+	{
+		requestId: (x: string | null): string => {
+			if (x === null || x === '') {
+				throw new Error('must specify --request-id')
+			}
+
+			return x
+		},
+		url: (x: string | null): string => {
+			if (x === null || x === '') {
+				throw new Error('must specify --url')
+			}
+
+			return x
+		},
+		rationale: (x: string | null): string => {
+			if (x === null || x === '') {
+				throw new Error('must specify --rationale')
+			}
+
+			return x
+		},
+	},
+	globalOptions,
+)
+
 function scriptDir(): string {
 	return __dirname
 }
@@ -766,13 +843,13 @@ function repoDir(): string {
 function capturePath(options: GlobalOptions): string {
 	const { type, id, variant } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.${variant.toLocaleLowerCase()}.capture.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.${variant.toLocaleLowerCase()}.capture.json`
 }
 
 function annotationsPath(options: GlobalOptions): string {
 	const { type, id } = options
 
-	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.annotations.json`
+	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id}/${id}.annotations.json`
 }
 
 function globalAnnotationsPath(): string {
@@ -991,6 +1068,14 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 }
 
 export async function handleCheck(opts: CheckOptions): Promise<number> {
+	if (isOpenMutationMode()) {
+		const openMutationIssues = await openMutationCheck(opts)
+
+		if (openMutationIssues !== null) {
+			return openMutationIssues
+		}
+	}
+
 	const capture = await openCaptureFile(opts)
 	const issues = await capture.check({
 		reviewType: opts.actor === DataCollectionActor.AGENT ? 'MUST_MAKE_REVIEWABLE' : 'MUST_REVIEW',
@@ -1086,6 +1171,331 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 	return issues.length
 }
 
+const maxUnjustifiedRequestsShown = 32
+const maxJustifiedRequestBatchSize = 16
+
+/**
+ * The open-mutation `check` pre-check: when an open mutation is outstanding, list the
+ * un-justified request IDs instruct the agent to justify or roll back.
+ * Returns the number of outstanding issues (so `check` short-circuits), or
+ * `null` when there is no open mutation.
+ */
+async function openMutationCheck(opts: CheckOptions): Promise<number | null> {
+	const repoRoot = repoDir()
+	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
+		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		null,
+	)
+	const open = auditLog.getOpenMutation()
+
+	if (open === null) {
+		return null
+	}
+
+	const unjustified = auditLog.getUnjustifiedImpacted()
+
+	if (unjustified.length === 0) {
+		return null
+	}
+
+	const chalk = getChalk(opts)
+
+	// Build a request lookup by request ID across every capture file, so the impacted
+	// requests can be displayed with full detail (reusing `displayRequestInfo`).
+	const requestsById = new Map<string, WalletRequest>()
+
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
+		for (const request of captureFile.getRequests()) {
+			requestsById.set(request.requestIdString(), request)
+		}
+	}
+
+	log(
+		'⛔ An open mutation is outstanding. The following request classification changes must be justified or rolled back:',
+	)
+	log('')
+
+	for (const impactedId of unjustified.slice(0, maxUnjustifiedRequestsShown)) {
+		const id = requestIdToString(impactedId)
+		const request = requestsById.get(id)
+
+		if (request === undefined) {
+			log(chalk.gray(`  - ${id} (request not found in capture data)`))
+			log('')
+
+			continue
+		}
+
+		displayRequestInfo(request, {
+			captureStrings: null,
+			isBenignString: null,
+			highlight: null,
+			headerPrefix: null,
+			chalk,
+			showRequestId: true,
+		})
+
+		log('')
+	}
+
+	if (unjustified.length > maxUnjustifiedRequestsShown) {
+		log(
+			`  ... and ${unjustified.length - maxUnjustifiedRequestsShown} more. The rest will be shown after some of the above requests have been justified.`,
+		)
+		log(
+			'Do not attempt to enumerate more requests. Start working on the above immediately instead.',
+		)
+	}
+
+	log('')
+	log(
+		`Use \`pnpm wallet-data-collection:agent justify --request-id=<ids> --url=<exact-url> --rationale=<reason>\` to justify up to ${maxJustifiedRequestBatchSize} requests with the same URL at a time, or \`pnpm wallet-data-collection:agent rollback\` to abandon the change.`,
+	)
+
+	return unjustified.length
+}
+
+/**
+ * Parse a `--rationale` argument into a non-empty string or a non-empty array of
+ * `LooseReference`.
+ */
+function parseRationale(raw: string): string | NonEmptyArray<LooseReference> {
+	const trimmed = raw.trim()
+
+	if (trimmed === '') {
+		throw new Error('rationale must be non-empty')
+	}
+
+	let parsed: unknown
+
+	try {
+		parsed = JSON.parse(trimmed) as unknown
+	} catch {
+		parsed = null
+	}
+
+	if (parsed !== null) {
+		if (typeof parsed === 'string') {
+			if (parsed.trim() === '') {
+				throw new Error('rationale must be non-empty')
+			}
+
+			return parsed
+		}
+
+		if (Array.isArray(parsed)) {
+			if (parsed.length === 0) {
+				throw new Error('rationale must be non-empty')
+			}
+
+			if (!parsed.every(item => isLooseReference(item))) {
+				throw new Error('not a valid array of LooseReference objects')
+			}
+
+			return assertNonEmptyArray(parsed)
+		}
+
+		if (!isLooseReference(parsed)) {
+			throw new Error('not a valid LooseReference object')
+		}
+
+		return assertNonEmptyArray([parsed])
+	}
+
+	return trimmed
+}
+
+export async function handleJustify(opts: JustifyOptions): Promise<void> {
+	if (!isOpenMutationMode()) {
+		throw new Error(
+			'The `justify` subcommand may only run while an open mutation is outstanding. Run `pnpm wallet-data-collection:agent check` first.',
+		)
+	}
+
+	const requestIds = opts.requestId
+		.split(',')
+		.map(id => id.trim())
+		.filter(id => id !== '')
+
+	if (requestIds.length === 0) {
+		throw new Error('must supply at least one request ID')
+	}
+
+	if (requestIds.length > maxJustifiedRequestBatchSize) {
+		throw new Error(`may not justify more than ${maxJustifiedRequestBatchSize} requests at once`)
+	}
+
+	const rationale = parseRationale(opts.rationale)
+	const repoRoot = repoDir()
+
+	const requestsById = new Map<`${string}:${string}:${string}`, WalletRequest>()
+
+	for (const captureFile of await enumerateCaptureFiles(repoRoot)) {
+		for (const request of captureFile.getRequests()) {
+			requestsById.set(request.requestIdString(), request)
+		}
+	}
+
+	const validIds = await allRequestIds(repoRoot)
+	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
+		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		validIds,
+	)
+	const open = auditLog.getOpenMutation()
+
+	if (open === null) {
+		throw new Error('no active open mutation to justify')
+	}
+
+	const alreadyJustified = auditLog.getJustifiedImpacted()
+
+	const justifiedIds: WalletCaptureImpactedRequestId[] = []
+
+	for (const rawId of requestIds) {
+		const id = parseRequestId(rawId)
+		const key = requestIdToString(id)
+
+		if (!validIds.has(key)) {
+			throw new Error(`unknown request ID: ${key}`)
+		}
+
+		if (!isUnjustifiedImpacted(open, alreadyJustified, id)) {
+			throw new Error(
+				`request ${key} is not an un-justified impacted request of the current open mutation`,
+			)
+		}
+
+		const request = requestsById.get(key)
+
+		if (request === undefined) {
+			throw new Error(`request ${key} not found in capture data`)
+		}
+
+		if (!urlMatchesRequest(opts.url, request)) {
+			throw new Error(
+				`request ${key} does not match --url '${opts.url}'. Its exact URL is: ${requestUrl(request)}. ` +
+					'If you are justifying requests to different URLs, call `justify` once per unique URL.',
+			)
+		}
+
+		justifiedIds.push(id)
+	}
+
+	auditLog.appendEntry({
+		type: 'justify',
+		justified: assertNonEmptyArray(justifiedIds),
+		rationale,
+		unixMillis: Date.now(),
+	})
+	await auditLog.save()
+
+	log(`Justified ${justifiedIds.length} request(s).`)
+}
+
+/**
+ * Serialize a request's query dict into a URL query string (percent-encoded, so the
+ * result is always a valid URL). URL matching via `urlMatchesRequest` is tolerant of
+ * encoding differences, so an agent may supply the URL with either encoded or raw values.
+ */
+function serializeQuery(query: UserDataDict): string {
+	const parts: string[] = []
+
+	for (const [key, values] of Object.entries(query)) {
+		for (const value of values) {
+			parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+		}
+	}
+
+	return parts.join('&')
+}
+
+/**
+ * The exact URL of a `WalletRequest`: `scheme://domain/path?query`.
+ */
+function requestUrl(request: WalletRequest): string {
+	const scheme = request.scheme ?? 'https'
+	const query = serializeQuery(request.query)
+
+	return `${scheme}://${request.domain}${request.path}${query ? `?${query}` : ''}`
+}
+
+/**
+ * True when `url` matches the exact URL of `request`.
+ */
+function urlMatchesRequest(url: string, request: WalletRequest): boolean {
+	let parsed: URL
+
+	try {
+		parsed = new URL(url)
+	} catch {
+		return false
+	}
+
+	if (parsed.hostname.toLowerCase() !== request.domain.toLowerCase()) {
+		return false
+	}
+
+	if (parsed.pathname !== request.path) {
+		return false
+	}
+
+	const searchParams = parsed.searchParams
+	const requestQuery = request.query
+
+	if ([...searchParams.keys()].length !== Object.keys(requestQuery).length) {
+		return false
+	}
+
+	for (const [key, values] of Object.entries(requestQuery)) {
+		const actual = searchParams.getAll(key)
+
+		if (actual.length !== values.length) {
+			return false
+		}
+
+		for (const value of values) {
+			if (!actual.includes(value)) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+export async function handleRollback(): Promise<void> {
+	if (!isOpenMutationMode()) {
+		throw new Error(
+			'The `rollback` subcommand may only run while an open mutation is outstanding. Run `pnpm wallet-data-collection:agent check` first.',
+		)
+	}
+
+	const repoRoot = repoDir()
+	const auditLog = WalletCaptureClassificationAuditLogFile.fromFile(
+		path.join(repoRoot, AUDIT_LOG_RELATIVE_PATH),
+		null,
+	)
+	const open = auditLog.getOpenMutation()
+
+	if (open === null) {
+		throw new Error('no active open mutation to roll back')
+	}
+
+	if (auditLog.getUnjustifiedImpacted().length === 0) {
+		throw new Error('all impacted requests are already justified; nothing to roll back')
+	}
+
+	auditLog.appendEntry({
+		type: 'rollback',
+		rationale:
+			'Rolled back the classification change because one or more impacted requests should not have been classified as such.',
+		unixMillis: Date.now(),
+	})
+	await auditLog.save()
+
+	log('Rolled back the open mutation.')
+}
+
 export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions): Promise<void> {
 	const capture = await openCaptureFile(opts)
 
@@ -1170,11 +1580,7 @@ async function writeDomainMappingFile(mapping: DomainToEntityIdMapping): Promise
 	assertValidDomainToEntityIdMapping(sortedDomains)
 
 	// Save file with formatting, atomically (write to a temp file, then rename).
-	const tmpPath = domainFile + '.tmp'
-
-	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
-	await fs.promises.writeFile(tmpPath, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
-	await fs.promises.rename(tmpPath, domainFile)
+	await writeFileAtomically(domainFile, JSON.stringify(sortedDomains, null, '\t') + '\n')
 
 	// Keep the module-level mapping in sync with the file it was loaded from.
 	updateDomainMapping(sortedDomains)
@@ -1551,6 +1957,7 @@ export async function handleSearch(opts: SearchOptions): Promise<void> {
 			highlight,
 			headerPrefix: null,
 			chalk,
+			showRequestId: opts.actor === DataCollectionActor.AGENT,
 		})
 
 		log('')
@@ -1579,6 +1986,7 @@ function displayRequestInfo(
 		highlight: ((s: string) => string) | null
 		headerPrefix: string | null
 		chalk: ChalkLike
+		showRequestId: boolean
 	},
 ): void {
 	const chalk = options.chalk
@@ -1662,10 +2070,6 @@ function displayRequestInfo(
 	}
 	const resolved = entitiesForDomain(request.domain)
 
-	if (resolved === null) {
-		throw new Error(`no entity associated with ${request.domain}`)
-	}
-
 	function resolvedDomainNames(r: ResolvedDomain): string {
 		return (
 			chalk.cyan(r.operator.name) +
@@ -1685,10 +2089,19 @@ function displayRequestInfo(
 		)
 	}
 
+	if (options.showRequestId === true) {
+		log(`${header('ID')}${chalk.bold(request.requestIdString())}`)
+	}
+
 	log(`${header('URL')}${fadedOut('https://')}${chalk.blue(request.domain)}${request.path}`)
-	log(
-		`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(')}${resolvedDomainNames(resolved)}${fadedOut(')')}`,
-	)
+
+	if (resolved === null) {
+		log(`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(no entity mapping)')}`)
+	} else {
+		log(
+			`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(')}${resolvedDomainNames(resolved)}${fadedOut(')')}`,
+		)
+	}
 
 	if (Object.keys(request.query).length > 0) {
 		log(`${header('Query')}${formatUserDataDict(request.query)}`)
@@ -1712,12 +2125,14 @@ function displayRequestInfo(
 		const refResolved = entitiesForDomain(requestRefererDomain)
 
 		if (refResolved === null) {
-			throw new Error(`no entity associated with referer domain ${requestRefererDomain}`)
+			log(
+				`${header('Referer')}${chalk.blue(requestRefererDomain)} ${fadedOut('(no entity mapping)')}`,
+			)
+		} else {
+			log(
+				`${header('Referer')}${chalk.blue(requestRefererDomain)} ${fadedOut('(')}${resolvedDomainNames(refResolved)}${fadedOut(')')}`,
+			)
 		}
-
-		log(
-			`${header('Referer')}${chalk.blue(requestRefererDomain)} ${fadedOut('(')}${resolvedDomainNames(refResolved)}${fadedOut(')')}`,
-		)
 	}
 
 	if (Object.keys(request.oddHeaders).length > 0) {
@@ -1822,6 +2237,7 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 			isBenignString: (s: string) => capture.isBenignString(s),
 			headerPrefix: ' '.repeat(4),
 			chalk: chalk,
+			showRequestId: false,
 		})
 
 		// Build prompt choices
@@ -2105,6 +2521,7 @@ async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<voi
 			isBenignString: (s: string) => capture.isBenignString(s),
 			headerPrefix: ' '.repeat(4),
 			chalk: getChalk(opts),
+			showRequestId: true,
 		})
 
 		log('')
@@ -2182,8 +2599,11 @@ async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<voi
 		log(
 			`After marking one or more strings, re-run the \`${cmdPrefix} review-strings\` command to see the next batch, or run \`${cmdPrefix} check\` to verify progress.`,
 		)
+		log('Do not attempt to enumerate more strings. Start working on the above immediately instead.')
 	} else {
-		log(`All strings shown. After classification, run \`${cmdPrefix} check\` to verify.`)
+		log(
+			`All strings shown. After classification of the above, run \`${cmdPrefix} check\` to verify.`,
+		)
 	}
 
 	log('='.repeat(68))
@@ -2252,6 +2672,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				highlight: null,
 				headerPrefix: null,
 				chalk: chalk,
+				showRequestId: false,
 			})
 
 			// Get matcher if any
@@ -2528,6 +2949,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				highlight: null,
 				headerPrefix: null,
 				chalk: chalk,
+				showRequestId: false,
 			})
 
 			log('\n   Purposes:')
@@ -2747,8 +3169,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 				'data',
 				typeDir,
 				'collection',
-				walletId.toLowerCase(),
-				`${walletId.toLowerCase()}.${variant.toLowerCase()}.capture.json`,
+				walletId,
+				`${walletId}.${variant.toLowerCase()}.capture.json`,
 			)
 
 			const exists = fs.existsSync(captureFilePath)
@@ -2761,8 +3183,8 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 					'data',
 					typeDir,
 					'collection',
-					walletId.toLowerCase(),
-					`${walletId.toLowerCase()}.annotations.json`,
+					walletId,
+					`${walletId}.annotations.json`,
 				)
 				const globalAnnotations = globalAnnotationsPath()
 
