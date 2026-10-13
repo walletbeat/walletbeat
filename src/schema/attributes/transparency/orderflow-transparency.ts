@@ -65,6 +65,7 @@ const exampleAuctioneerRow: WithRef<DataCollectionByEntity> = {
 	dataCollection: {
 		[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 		endpoint: RegularEndpoint,
+		multiAddress: null,
 	},
 	purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
 	role: EntityRole.OPERATOR,
@@ -76,6 +77,7 @@ const exampleNonExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
 	dataCollection: {
 		[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 		endpoint: exampleVerifiedEnclaveEndpoint,
+		multiAddress: null,
 	},
 	purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
 	role: EntityRole.OPERATOR,
@@ -87,6 +89,7 @@ const exampleExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
 	dataCollection: {
 		[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 		endpoint: RegularEndpoint,
+		multiAddress: null,
 	},
 	purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
 	role: EntityRole.OPERATOR,
