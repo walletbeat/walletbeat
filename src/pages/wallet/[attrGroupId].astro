@@ -46,7 +46,11 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<SoftwareWalletTable client:visible title='Software Wallets' />
+		<SoftwareWalletTable
+			client:visible
+			title='Software Wallets'
+			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/wallet/summary/' }}
+		/>
 	</main>
 </Layout>
 
