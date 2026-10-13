@@ -977,6 +977,8 @@ type MultiAddressHandling =
 			 *   request).
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
+
+			// TODO: Presence of reused tracking identifiers across requests.
 	  }
 ```
 
@@ -1200,7 +1202,7 @@ type Collection<T extends UserInfo> = NonEmptyRecord<T, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 ```
 
@@ -1235,7 +1237,7 @@ type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 ```
 
