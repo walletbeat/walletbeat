@@ -19,27 +19,32 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
 		<header data-scroll-item='inline-detached padding-match-start padding-match-end'>
+			<span class='hero-status' data-badge='small'>Beta</span>
+
 			<h1>Who watches the wallets?</h1>
 
 			<p>
-				This website is still in beta. It aims to provide a comprehensive list of wallets, their
-				functionality, practices, and support for certain standards.
+				Walletbeat aims to provide a comprehensive list of wallets, their functionality, practices,
+				and support for certain standards. We welcome contributions.
 			</p>
-			<p>
-				We welcome contributions via the <a
+
+			<nav class='hero-actions' aria-label='Contribute' data-row='start gap-3 wrap'>
+				<a
+					class='hero-action-primary'
 					href='https://github.com/walletbeat/walletbeat'
 					target='_blank'
-					rel='noreferrer'>GitHub Repository</a
-				>.
-			</p>
-			<p>
+					rel='noreferrer'
+				>
+					GitHub repository
+				</a>
 				<a
 					href='https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md'
 					target='_blank'
+					rel='noreferrer'
 				>
-					Learn More.
+					How to contribute →
 				</a>
-			</p>
+			</nav>
 		</header>
 
 		<SoftwareWalletTable client:visible title='Software Wallets' />
@@ -76,33 +81,45 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 
 			padding-block-end: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem);
 
-			text-shadow:
-				0 0 1em var(--hero-glowColor),
-				0 0 2em var(--hero-glowColor),
-				0 0 3em var(--hero-glowColor);
+			/* The band fades into the page instead of ending on a hard edge; content sits above it, unmasked. */
+			&::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				mask-image: linear-gradient(to bottom, black calc(100% - 6rem), transparent);
 
-			background:
-				linear-gradient(
-					to right,
-					color-mix(in oklch, var(--hero-backgroundColor) 100%, transparent) 34cqi,
-					color-mix(in oklch, var(--hero-backgroundColor) 80%, transparent) 72cqi,
-					color-mix(in oklch, var(--hero-backgroundColor) 34%, transparent)
-				),
-				radial-gradient(
-					circle at 90% 12%,
-					color-mix(in oklch, var(--hero-rimColor) 34%, transparent) 0,
-					transparent 21cqi
-				),
-				radial-gradient(
-					circle at 82% 88%,
-					color-mix(in oklch, var(--hero-highlightColor) 24%, transparent) 0,
-					transparent 26cqi
-				),
-				var(--hero-backgroundColor);
+				background:
+					linear-gradient(
+						to right,
+						color-mix(in oklch, var(--hero-backgroundColor) 100%, transparent) 34cqi,
+						color-mix(in oklch, var(--hero-backgroundColor) 80%, transparent) 72cqi,
+						color-mix(in oklch, var(--hero-backgroundColor) 34%, transparent)
+					),
+					radial-gradient(
+						circle at 90% 12%,
+						color-mix(in oklch, var(--hero-rimColor) 34%, transparent) 0,
+						transparent 21cqi
+					),
+					radial-gradient(
+						circle at 82% 88%,
+						color-mix(in oklch, var(--hero-highlightColor) 24%, transparent) 0,
+						transparent 26cqi
+					),
+					var(--hero-backgroundColor);
+			}
 
 			> * {
 				position: relative;
 				z-index: 1;
+			}
+
+			.hero-status {
+				--accent: var(--hero-highlightColor);
+
+				margin-block-end: 1rem;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--hero-textColor);
 			}
 
 			h1 {
@@ -111,20 +128,53 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 				margin: 0 0 1rem 0;
 				color: var(--hero-textColor);
 				line-height: 1.1;
+				text-shadow:
+					0 0 1em var(--hero-glowColor),
+					0 0 2em var(--hero-glowColor);
 			}
 
 			p {
-				font-size: smaller;
+				font-size: 1.125rem;
 				line-height: 1.6;
 				margin: 0;
-				text-wrap: balance;
-				max-width: 72.5%;
-				margin-bottom: 1em;
+				text-wrap: pretty;
+				max-inline-size: 36rem;
 				color: var(--hero-textSecondaryColor);
 			}
 
-			a {
-				color: currentColor;
+			.hero-actions {
+				margin-block-start: 1.75rem;
+
+				a {
+					display: inline-flex;
+					align-items: center;
+					padding: 0.7em 1.15em;
+					border: 1px solid color-mix(in oklch, var(--hero-textColor) 25%, transparent);
+					border-radius: 999em;
+					color: var(--hero-textColor);
+					font-weight: 600;
+					text-decoration: none;
+
+					transition-property: background-color, border-color, color;
+
+					&:hover {
+						border-color: var(--hero-textColor);
+					}
+				}
+
+				.hero-action-primary {
+					border-color: transparent;
+					background-color: var(--hero-textColor);
+					color: var(--hero-backgroundColor);
+
+					&:hover {
+						background-color: color-mix(
+							in oklch,
+							var(--hero-textColor) 85%,
+							var(--hero-highlightColor)
+						);
+					}
+				}
 			}
 		}
 	}
