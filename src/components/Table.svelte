@@ -190,15 +190,11 @@
 		})
 
 		rowsSorted = $derived.by(() => {
-			if (!this.sortState) return this.rows
-
-			const { direction } = this.sortState
-
 			let result = this.rowsAscending
 
 			if(!result) return result
 
-			if (direction === SortDirection.Descending) {
+			if (this.sortState?.direction === SortDirection.Descending) {
 				result = result.toReversed()
 			}
 
@@ -517,6 +513,14 @@
 					data-header-level={level}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
+					aria-sort={
+						table.sortState?.columnId !== column.id ?
+							undefined
+						: table.sortState.direction === SortDirection.Ascending ?
+							'ascending'
+						:
+							'descending'
+					}
 					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
 					data-column-align={column.align ? column.align.toLowerCase() : undefined}
 					data-expandable={isExpandable || hasHeaderExtra ? '' : undefined}
