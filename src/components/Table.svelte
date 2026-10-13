@@ -126,7 +126,9 @@
 				Math.max(
 					1,
 					...columns.map(column =>
-						!column.subcolumns?.length ? 1 : 1 + getMaxLevel(column.subcolumns),
+						column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+							? 1 + getMaxLevel(column.subcolumns)
+							: 1,
 					),
 				)
 
@@ -439,7 +441,7 @@
 	// Transitions/animations
 	import { flip } from 'svelte/animate'
 	import { expoOut } from 'svelte/easing'
-	import { fade, fly } from 'svelte/transition'
+	import { fly } from 'svelte/transition'
 </script>
 
 
@@ -635,8 +637,6 @@
 									value,
 								})
 							}
-							animate:flip={{ duration: 300, easing: expoOut }}
-							in:fade={{ duration: 300, easing: expoOut }}
 						>
 							{#if column.Cell}
 								{@render column.Cell({
@@ -726,22 +726,22 @@
 					&[data-header-level='0'] {
 						font-weight: 700;
 						font-size: 1.1em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.02));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 2%);
 					}
 					&[data-header-level='1'] {
 						font-weight: 600;
 						font-size: 0.825em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.01));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 1%);
 					}
 					&[data-header-level='2'] {
 						font-weight: 500;
 						font-size: 0.7em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.005));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 0.5%);
 					}
 					&[data-header-level='3'] {
 						font-weight: 400;
 						font-size: 0.7em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.0025));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 0.25%);
 					}
 
 					> .header-cell-content {
@@ -950,8 +950,8 @@
 						& td.sticky {
 							backdrop-filter: none;
 							transition:
-								all var(--active-transitionInDuration),
-								backdrop-filter none;
+								all var(--pressable-transitionInDuration),
+								backdrop-filter 0s;
 							opacity: 0;
 							scale: 0.9;
 						}

@@ -5,6 +5,7 @@ export const erc8213: Eip = {
 	friendlyName: 'Wallet signature & calldata digest display',
 	formalTitle: 'Wallet Signature and Calldata Digest Display',
 	appliesTo: variantEnum.set,
+	finalizedDate: null,
 	icon: 'ICON_HASH',
 	number: '8213',
 	prefix: EipPrefix.ERC,
