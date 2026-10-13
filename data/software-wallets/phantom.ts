@@ -45,8 +45,8 @@ import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
@@ -191,13 +191,7 @@ export const phantom: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: [
 				{
@@ -476,6 +470,7 @@ export const phantom: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
