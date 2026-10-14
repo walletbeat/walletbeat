@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
@@ -81,9 +82,9 @@ export const phantom: SoftwareWallet = {
 		displayName: 'Phantom',
 		tableName: 'Phantom',
 		coinspectId: 'phantom',
-		contributors: [nconsigny, mattmatt],
+		contributors: [nconsigny, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-02-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.phantom.com/'],
 			extensions: [
@@ -192,21 +193,45 @@ export const phantom: SoftwareWallet = {
 		},
 		licensing: fullyClosedSource,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Phantom raised a $150M Series C in January 2025, led by Sequoia Capital and Paradigm, at a $3B valuation.',
+					url: 'https://cointelegraph.com/news/phantom-raises-150-million-3-billion-valuation',
+				},
+				{
+					explanation:
+						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021; it skipped a seed round.",
+					url: 'https://www.theblock.co/post/111249/defi-wallet-solana-phantom-9-million-series-a-a16z',
+				},
+				{
+					explanation:
+						'Phantom charges a 0.85% fee on most swaps; users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
+					url: 'https://help.phantom.com/hc/en-us/articles/5985106844435-Swap-tokens-in-Phantom',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
+				donations: false,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				publicOffering: false,
+				selfFunded: false,
+				transparentConvenienceFees: true,
+				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Users can add more wallets and accounts, including new accounts derived from the existing Secret Recovery Phrase, in both the browser extension and the mobile app.',
+					url: 'https://help.phantom.com/articles/add-wallets-and-accounts-to-your-phantom-wallet-28355310978067',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -459,6 +484,7 @@ export const phantom: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,

@@ -40,6 +40,12 @@ export const trezorWallet: HardwareWallet = {
 				url: 'https://trezor.io/trezor-safe-5',
 			},
 			{
+				id: 'trezor-safe-7',
+				name: 'Trezor Safe 7',
+				isFlagship: false,
+				url: 'https://trezor.io/trezor-safe-7',
+			},
+			{
 				id: 'trezor-safe-3',
 				name: 'Trezor Safe 3',
 				isFlagship: false,

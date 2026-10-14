@@ -41,11 +41,38 @@
 	let searchValue = $state('')
 	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
+	// Stable between server and client, so the client can find its server-rendered markup.
+	const instanceId = $props.id()
+
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
 		currentHref === item.href
 		|| (item.children?.some(hasCurrentPage) ?? false)
 	)
+
+	/*
+	 * Copies the open state of groups (native <details>) toggled before
+	 * hydration, so the `open` bindings below keep it.
+	 */
+	const adoptPreHydrationToggles = () => {
+		const root = globalThis.document?.querySelector(`[data-navigation-instance="${instanceId}"]`)
+
+		if (!root) return
+
+		const flatten = (items: NavigationItem[]): NavigationItem[] => (
+			items.flatMap(item => [item, ...flatten(item.children ?? [])])
+		)
+		const allItems = (groups ?? [{ items }]).flatMap(group => flatten(group.items))
+
+		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
+			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)
+
+			if (item && details.open !== (defaultOpen || hasCurrentPage(item)))
+				isOpen.set(item, details.open)
+		}
+	}
+
+	adoptPreHydrationToggles()
 
 	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
 		const ranges: [number, number][] = []
@@ -105,6 +132,7 @@
 	data-column-item="flexible"
 	aria-label={ariaLabel}
 	data-sticky-container
+	data-navigation-instance={instanceId}
 >
 	{#if showSearch}
 		<search
@@ -200,6 +228,7 @@
 		{@render linkable(item, depth)}
 	{:else}
 		<details
+			data-navigation-item={item.id}
 			bind:open={
 				() => (
 					effectiveSearchValue
