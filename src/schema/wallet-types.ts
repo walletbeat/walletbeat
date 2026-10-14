@@ -60,9 +60,9 @@ export function walletTypeToUrlSlug(walletType: WalletType): string {
 		case WalletType.SOFTWARE:
 			return 'wallet'
 		case WalletType.HARDWARE:
-			return 'hww'
+			return 'hardware-wallets'
 		case WalletType.EMBEDDED:
-			return 'embedded'
+			return 'embedded-wallets'
 	}
 }
 
