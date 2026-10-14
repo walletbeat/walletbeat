@@ -19,7 +19,9 @@
 	"NATIVE_SWAP": {
 		"collected": []
 	},
-	"MAKE_TRANSACTION": null,
+	"MAKE_TRANSACTION": {
+		"collected": []
+	},
 	"APP_CONNECTION": {
 		"collected": []
 	}
