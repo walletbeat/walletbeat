@@ -304,12 +304,39 @@ export const frame: SoftwareWallet = {
 				}),
 				dependencyVulnerabilityScanning: {
 					[Variant.BROWSER]: notSupported,
-					[Variant.DESKTOP]: supported({
+					[Variant.DESKTOP]: notSupportedWithRef({
 						ref: [
 							{
 								explanation:
-									'Dependabot security update pull requests are opened for the desktop repository, but several remain unmerged, such as this Electron update from 2023.',
-								url: 'https://github.com/floating/frame/pull/1658',
+									'The CI and release workflows install, compile, test and publish without a dependency audit step, and the repository has no Dependabot configuration file.',
+								urls: [
+									{
+										label: 'CI workflow',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/compile-and-test.yml#L15-L33',
+									},
+									{
+										label: 'Release workflow',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L61-L91',
+									},
+									{
+										label: 'Repository configuration directory',
+										url: 'https://github.com/floating/frame/tree/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github',
+									},
+								],
+							},
+							{
+								explanation:
+									'The most recent Dependabot security update pull request was opened in September 2023 and is unmerged; none has been opened since.',
+								urls: [
+									{
+										label: 'Dependabot pull requests',
+										url: 'https://github.com/floating/frame/pulls?q=is%3Apr+author%3Aapp%2Fdependabot',
+									},
+									{
+										label: 'Latest Dependabot pull request',
+										url: 'https://github.com/floating/frame/pull/1658',
+									},
+								],
 							},
 						],
 					}),
