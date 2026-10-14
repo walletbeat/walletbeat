@@ -1,16 +1,14 @@
 <script lang="ts">
 	// Types/constants
-	import { type EipStatusSupportCard, EipSupportStatus } from '@/schema/eip-support'
+	import {
+		type EipStatusSupportCard,
+		EipSupportStatus,
+		eipSupportStatusColor as statusColor,
+		eipSupportStatusGroupId,
+	} from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
-
-	const statusColor: Record<EipSupportStatus, string> = {
-		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
-		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail)',
-		[EipSupportStatus.UNKNOWN]: 'var(--rating-unrated)',
-		[EipSupportStatus.NOT_APPLICABLE]: 'var(--rating-neutral)',
-	}
 
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
 	// backgrounds; solid text needs its own, legible color.
@@ -47,10 +45,13 @@
 
 	// Props
 	let {
+		id,
 		title,
 		cards,
 		codeSnippets = {},
 	}: {
+		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
+		id?: string
 		title?: string
 		cards: EipStatusSupportCard[]
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
@@ -108,6 +109,7 @@
 			<div data-column="gap-4">
 				<header data-scroll-item='inline-detached'>
 					<h3
+						id={id === undefined ? undefined : eipSupportStatusGroupId(id, status)}
 						data-support-status={status}
 						style:--accent={headingColor[status]}
 					>{label}</h3>

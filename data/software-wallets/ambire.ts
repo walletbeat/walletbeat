@@ -538,6 +538,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -728,6 +729,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [
 								DataCollectionPurpose.UPDATE_CHECKING,
@@ -1157,6 +1159,7 @@ export const ambire: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{

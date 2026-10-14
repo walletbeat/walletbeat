@@ -116,7 +116,10 @@ import {
 	OrderflowDisclosureLevel,
 	type OrderflowPracticesPageContents,
 } from '@/schema/features/transparency/orderflow'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -420,6 +423,9 @@ export const completedTemplate: SoftwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.NEVER,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
 							role: EntityRole.OPERATOR,
@@ -467,6 +473,9 @@ export const completedTemplate: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -481,6 +490,9 @@ export const completedTemplate: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [
 								DataCollectionPurpose.UPDATE_CHECKING,
@@ -886,6 +898,7 @@ export const completedTemplate: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BOTH',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({ ref: refTodo }),
 				dependencySandboxing: supported({ ref: refTodo }),
 				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
@@ -893,11 +906,11 @@ export const completedTemplate: SoftwareWallet = {
 				hermeticBuilds: supported({ ref: refTodo }),
 				repositoryChangeControls: {
 					ref: refTodo,
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: true,
-					requiredReview: true,
-					tagsImmutable: true,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				reproducibleBuilds: supported({ ref: refTodo }),
 			},
