@@ -33,7 +33,7 @@ Why should you listen to us about wallets?
 
 @polymutex & @0xmattmatt are core contributors at Walletbeat.
 
-Polymutex wants to see Ethereum fullfil its cypherpunk mission. That is why he is working on Walletbeat specifically. He has been working on defining the methogology that we use to rate software wallets.
+Polymutex wants to see Ethereum fulfill its cypherpunk mission. That is why he is working on Walletbeat specifically. He has been working on defining the methodology that we use to rate software wallets.
 
 Matt wants to see the Ethereum wallet ecosystem grow. He mainly focuses on wallet attributes and development.
 
