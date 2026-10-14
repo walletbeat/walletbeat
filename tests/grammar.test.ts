@@ -6,6 +6,18 @@ import { grammarLintMessages, warmupHarperLinter } from './utils/grammar'
 await warmupHarperLinter()
 
 describe('grammarLintMessages', () => {
+	it('flags "backup" used as a verb', async () => {
+		expect(
+			await grammarLintMessages('You should backup your wallet.', { language: 'markdown' }),
+		).not.toEqual([])
+	})
+
+	it('allows "backup" in a compound noun', async () => {
+		expect(
+			await grammarLintMessages('Backup password prompt bypassable', { language: 'markdown' }),
+		).toEqual([])
+	})
+
 	it('ignores inline code in rendered details', async () => {
 		expect(
 			await grammarLintMessages(

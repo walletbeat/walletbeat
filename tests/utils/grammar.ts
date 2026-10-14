@@ -27,9 +27,10 @@ const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
 const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
 
 /**
- * Compound nouns that Harper's phrasal-verb rule mistakes for verbs (e.g. "setup" for "set up").
+ * Compound noun phrases whose first word Harper's phrasal-verb rule reads as a verb that should
+ * be split (e.g. "Backup password prompt bypassable" in a security audit finding title).
  */
-const COMPOUND_NOUNS = new Set(['backup', 'setup'])
+const COMPOUND_NOUN_PHRASES = ['backup password']
 
 let vocabulary: string[] | null = null
 
@@ -435,12 +436,26 @@ export async function grammarLintMessages(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
 	)
 
-	// Suppress Word Choice false positives for compound nouns used as nouns.
+	// Suppress Word Choice false positives for "setup" used as a noun.
 	lints = lints.filter(
-		lint =>
-			lint.lint_kind_pretty() !== 'Word Choice' ||
-			!COMPOUND_NOUNS.has(lint.get_problem_text().toLowerCase()),
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'setup',
 	)
+
+	// Suppress Word Choice false positives for the first word of a compound noun phrase.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Word Choice') {
+			return true
+		}
+
+		const following = trimmedText.slice(lint.span().start).toLowerCase()
+
+		return !COMPOUND_NOUN_PHRASES.some(
+			phrase =>
+				phrase.startsWith(`${lint.get_problem_text().toLowerCase()} `) &&
+				following.startsWith(phrase) &&
+				!/\w/.test(following.charAt(phrase.length)),
+		)
+	})
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(
