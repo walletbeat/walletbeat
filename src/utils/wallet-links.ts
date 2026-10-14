@@ -1,18 +1,19 @@
 import type { Entity } from '@/schema/entity'
 import { entityUrl } from '@/schema/entity'
-import { getDomain, getUrlLabel, isLabeledUrl, type Url } from '@/schema/url'
+import {
+	getDomain,
+	getUrlLabel,
+	isLabeledUrl,
+	type LabeledUrl,
+	labeledUrl,
+	type Url,
+} from '@/schema/url'
 import type { RatedWallet, WalletMetadata } from '@/schema/wallet'
 
 /** One external link in the wallet page's Links menu. */
-export interface WalletLink {
-	/** What the link is ("Website", "App Store", ...). */
-	label: string
-
+export interface WalletLink extends LabeledUrl {
 	/** Where the link goes, shown as a secondary hint (domain or `org/repo`). */
 	hint: string
-
-	/** Absolute URL. */
-	url: string
 }
 
 /** A titled section of the Links menu. */
@@ -43,21 +44,16 @@ export function urlKey(url: string): string {
 	return `${parsed.hostname.replace(/^www\./, '')}${parsed.pathname.replace(/\/+$/, '')}${parsed.search}`
 }
 
-function toLink(url: Url, label: string): WalletLink | null {
-	const href = isLabeledUrl(url) ? url.url : url
+function toLink(url: Url, defaultLabel: string): WalletLink | null {
+	const { url: href, label } = labeledUrl(url, defaultLabel)
 
 	if (!URL.canParse(href) || !/^https?:$/.test(new URL(href).protocol)) {
 		return null
 	}
 
-	const linkLabel = isLabeledUrl(url) ? url.label : label
-	const hint = isLabeledUrl(url) ? getDomain(url) : getUrlLabel(href)
+	const hint = isLabeledUrl(url) ? getDomain(href) : getUrlLabel(href)
 
-	return {
-		label: linkLabel,
-		hint: hint === linkLabel ? getDomain(href) : hint,
-		url: href,
-	}
+	return { label, hint: hint === label ? getDomain(href) : hint, url: href }
 }
 
 /**
