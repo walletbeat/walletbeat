@@ -433,8 +433,22 @@ export const safe: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Organization rule sets on main, dev, and release branches require a pull request with one approving code-owner review, CodeQL code scanning and signed commits, and block deletion and force-pushes. Tag rule sets block deletion and rewrites of all tags.',
+								'Organization rule sets on main, dev, and release branches require a pull request with one approving code-owner review, CodeQL code scanning and signed commits, and block deletion and force-pushes.',
 							url: 'https://api.github.com/repos/safe-global/safe-wallet-monorepo/rules/branches/dev',
+						},
+						{
+							explanation:
+								'An active organization tag rule set targets all tags and blocks tag deletion and force-updates.',
+							urls: [
+								{
+									label: 'Tag rule set',
+									url: 'https://github.com/safe-global/safe-wallet-monorepo/rules/16698869',
+								},
+								{
+									label: 'Tag rule set definition',
+									url: 'https://api.github.com/repos/safe-global/safe-wallet-monorepo/rulesets/16698869',
+								},
+							],
 						},
 					],
 					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
