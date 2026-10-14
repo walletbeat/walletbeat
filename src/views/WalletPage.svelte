@@ -1407,10 +1407,11 @@
 			;
 		}
 		@media (max-width: 864px) {
-			---wallet-mobile-pie-size-rem: 8;
+			/* Pixels, not rem: `---pie-scale` assumes 16px per rem. */
+			---wallet-mobile-pie-size-rem: 4.5;
 			---wallet-mobile-pie-size: calc(
 				var(---wallet-mobile-pie-size-rem)
-				* 1rem
+				* 16px
 			);
 			---wallet-breadcrumb-companion-inline-end-clearance: var(---wallet-mobile-pie-size);
 			---wallet-name-sticky-icon-size: 2.4rem;
@@ -1865,14 +1866,14 @@
 				--slice-arcSize: small;
 			}
 
-			/* Firefox lacks typed length division/multiplication outside shape(). */
-			@supports not (top: calc(sibling-index() * 1px)) {
+			/* Fallback offsets for browsers without typed division (the label radius divides an angle by an angle). */
+			@supports not (top: calc(1px * (1deg / 1rad))) {
 				:global(.navigation-items summary > a) {
 					---slice-label-offset: 52.313px;
 				}
 
 				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-					---slice-label-offset: 10.99px;
+					---slice-label-offset: 24.45px;
 				}
 			}
 
@@ -2013,7 +2014,7 @@
 				border-radius: 0;
 				background: var(--accent, var(--background-tertiary));
 				color: var(--text-primary);
-				opacity: 0.62;
+				opacity: 0.9;
 				pointer-events: auto;
 				transform-origin: var(---pie-origin-x) var(---pie-origin-y);
 				transform:
@@ -2144,17 +2145,21 @@
 
 			:global(.navigation-items a > .pie-navigation-icon) {
 				--icon-size: calc(var(---slice-label-size) * 1px);
-				color: #fff;
+				/*
+				 * Dark ink on the light rating fills. In dark mode, translucent fills
+				 * (unrated) composite to a dark tone, so their effective lightness
+				 * (l × alpha) picks light ink instead.
+				 */
+				color: light-dark(
+					rgb(19 10 43 / 0.62),
+					oklch(from var(--accent, #000) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
+				);
 
 				position: absolute;
 				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
 				translate: -50% calc(-50% - var(---slice-label-offset));
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
-				filter: var(
-					---linked-icon-filter,
-					opacity(0.75)
-						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
-				);
+				filter: var(---linked-icon-filter, opacity(0.8));
 				transition-property: filter;
 			}
 
@@ -2193,7 +2198,7 @@
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
 				---pie-size-rem: var(---wallet-mobile-pie-size-rem);
 				---pie-size: var(---wallet-mobile-pie-size);
-				---pie-surface-size: 4.25rem;
+				---pie-surface-size: var(---pie-size);
 				---pie-target-angle: 0.5turn;
 
 				z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
@@ -2210,6 +2215,11 @@
 				.pie-navigation-geometry {
 					margin: 0;
 					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
+				}
+
+				/* At badge size the attribute icons are a few pixels wide; the colors carry the meaning. */
+				:global(.navigation-items menu[data-navigation-depth='1'] .pie-navigation-icon) {
+					display: none;
 				}
 			}
 		}

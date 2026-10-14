@@ -17,6 +17,7 @@
 	// Types/constants
 	import type { HTMLAttributes } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
+	import { createAttachmentKey } from 'svelte/attachments'
 
 
 	// IDs
@@ -69,6 +70,12 @@
 		onblur: () => {
 			isTriggerHovered = false
 		},
+		// The pointer may have entered before hydration, when no handler was
+		// listening, and `pointerenter` won't fire again until it leaves
+		[createAttachmentKey()]: (node: HTMLElement) => {
+			if (node.matches(':hover'))
+				isTriggerHovered = true
+		},
 	}
 
 	const supportsAnchorPositioning = (
@@ -80,8 +87,10 @@
 	const useButtonTrigger = (node: HTMLElement) => {
 		triggerElement = node
 
+		// When the wrapper handles hover, a button behind the content is made
+		// static so it doesn't paint over the content.
 		$effect(() => {
-			if(hoverTriggerPlacement === 'around')
+			if(buttonTriggerPlacement === 'behind' && hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
 			else
 				node.style.removeProperty('position')
@@ -91,7 +100,9 @@
 	// Attachments must return their cleanup synchronously (an async attachment
 	// returns a Promise, which Svelte silently ignores), and floating-ui's
 	// `autoUpdate` polls and re-measures on every scroll, so it only runs while
-	// the popover is open.
+	// the popover is open. The module is fetched up front so the first open
+	// doesn't wait on the network, and the popover stays hidden until it has
+	// a position.
 	const useFloatingUiPositioning = (popover: HTMLElement) => {
 		if (layoutMode === TooltipLayoutMode.AnchorPositioning && supportsAnchorPositioning)
 			return
@@ -100,6 +111,8 @@
 		popover.style.position = 'absolute'
 		popover.style.setProperty('position-area', 'none')
 		popover.style.setProperty('position-anchor', anchorName)
+
+		const floatingUi = import('@floating-ui/dom')
 
 		let stopAutoUpdate: (() => void) | undefined
 		let isDetached = false
@@ -116,7 +129,7 @@
 				flip,
 				shift,
 				autoUpdate,
-			} = await import('@floating-ui/dom')
+			} = await floatingUi
 
 			const reference = triggerElement
 
@@ -151,23 +164,27 @@
 						.then(({ x, y }) => {
 							popover.style.left = `${x}px`
 							popover.style.top = `${y}px`
+							popover.style.removeProperty('visibility')
 						})
 				}
 			)
 		}
 
-		const onToggle = (event: ToggleEvent) => {
-			if (event.newState === 'open')
+		// `beforetoggle` fires before the popover is first painted, unlike `toggle`
+		const onBeforeToggle = (event: ToggleEvent) => {
+			if (event.newState === 'open') {
+				popover.style.visibility = 'hidden'
 				void startPositioning()
-			else
+			} else {
 				stopPositioning()
+			}
 		}
 
-		popover.addEventListener('toggle', onToggle)
+		popover.addEventListener('beforetoggle', onBeforeToggle)
 
 		return () => {
 			isDetached = true
-			popover.removeEventListener('toggle', onToggle)
+			popover.removeEventListener('beforetoggle', onBeforeToggle)
 			stopPositioning()
 		}
 	}
