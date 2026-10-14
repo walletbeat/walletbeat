@@ -60,7 +60,7 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed by Wa
 
 Neither is affiliated with a wallet Walletbeat rates; affiliations are disclosed in the repository.
 
-Other funding: the Ethereum Foundation pays $50,000 through January 2027 for Walletbeat's software wallet work, including the top five software wallet ratings. In May 2026 Walletbeat received funds from Giveth, TheDAO and public donations in the Giveth Ethereum Security QF round: https://github.com/walletbeat/walletbeat/blob/beta/src/pages/about/about.md
+Other funding: the Ethereum Foundation funded Walletbeat with $106,100 in 2025, and pays $50,000 through January 2027 for Walletbeat's software wallet work, including the top five software wallet ratings. In May 2026 Walletbeat received funds from Giveth, TheDAO and public donations in the Giveth Ethereum Security QF round: https://github.com/walletbeat/walletbeat/blob/beta/src/pages/about/about.md
 
 ## Why a grant: what already exists
 
