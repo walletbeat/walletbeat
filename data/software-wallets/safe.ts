@@ -88,11 +88,15 @@ export const safe: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The address input resolves ENS names with the RPC provider of the ENS hub chain, using the coin type of the target chain, and fills in the EIP-3770 short-name address.',
+							"The address input resolves ENS names with the wallet's RPC provider for the ENS hub chain (the user's custom RPC if one is set), using the coin type of the target chain, and fills in the EIP-3770 short-name address.",
 						urls: [
 							{
 								label: 'Name resolver hook',
 								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/components/common/AddressInput/useNameResolver.ts#L21-L36',
+							},
+							{
+								label: 'ENS hub provider',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/hooks/useEnsHubProvider.ts#L31-L45',
 							},
 							{
 								label: 'ENS resolution',
