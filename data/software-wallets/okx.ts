@@ -36,7 +36,6 @@ import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 import { minimalsm } from '../contributors/minimalsm'
-import { slowMist } from '../entities/slowmist'
 import { okx7702DelegatorContract } from '../wallet-contracts/okx-7702-delegator'
 
 export const okx: SoftwareWallet = {
@@ -271,35 +270,8 @@ export const okx: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			// Both 2023 audits cover the Web3 wallet inside the OKX exchange app (iOS 6.15.0, Android 6.14.0), not the standalone OKX Wallet app or the extension; no Medium-or-higher findings.
-			publicSecurityAudits: [
-				{
-					ref: [
-						{
-							explanation:
-								'SlowMist audit of OKX Web3 Wallet iOS (app 6.15.0), 2023.05.16–2023.06.06: "we found 8 suggestion vulnerabilities. All the findings have been confirmed."',
-							url: 'https://github.com/slowmist/Knowledge-Base/blob/ca4ff9fe9f633c174c09fd189658902d9e3619d0/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OKX/SlowMist%20Audit%20Report%20-%20OKX%20Web3%20Wallet%20iOS_en-us.pdf',
-						},
-					],
-					auditDate: '2023-06-06',
-					auditor: slowMist,
-					unpatchedFlaws: 'NONE_FOUND',
-					variantsScope: { [Variant.MOBILE]: true },
-				},
-				{
-					ref: [
-						{
-							explanation:
-								'SlowMist audit of OKX MPC Wallet (Android, app 6.14.0), 2023.05.16–2023.06.06: "we found 9 suggestions and 1 low risk. All the findings have been confirmed."',
-							url: 'https://github.com/slowmist/Knowledge-Base/blob/ca4ff9fe9f633c174c09fd189658902d9e3619d0/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OKX/SlowMist%20Audit%20Report%20-%20OKX%20MPC%20Wallet(Android)_en-us.pdf',
-						},
-					],
-					auditDate: '2023-06-06',
-					auditor: slowMist,
-					unpatchedFlaws: 'NONE_FOUND',
-					variantsScope: { [Variant.MOBILE]: true },
-				},
-			],
+			// SlowMist's 2023 OKX audits target the OKX exchange app's built-in Web3 wallet (iOS 6.15.0, Android 6.14.0), not the standalone OKX Wallet app or the extension, so they are not listed.
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
