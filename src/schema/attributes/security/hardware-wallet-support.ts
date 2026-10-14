@@ -8,42 +8,23 @@ import {
 } from '@/schema/attributes'
 import {
 	HardwareWalletConnection,
-	hardwareWalletConnectionEnum,
 	hardwareWalletConnectionIsOnlyWalletConnect,
 	type HardwareWalletSupport,
 	HardwareWalletType,
 	hardwareWalletType,
 	type SupportedHardwareWallet,
+	supportedHardwareWalletsId,
 	supportsHardwareWalletTypesMarkdown,
 } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { nonEmptyDedup } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type HardwareWalletSupportMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
-}
-
-function supportedHardwareWalletsId(hardwareWalletSupport: HardwareWalletSupport): string {
-	const wallets = hardwareWalletType.fullRecord(hardwareWalletSupport.wallets, notSupported)
-
-	return hardwareWalletType
-		.recordKeys(wallets)
-		.flatMap(w => {
-			const support = wallets[w]
-
-			return isSupported(support)
-				? [
-						`${w}_${nonEmptyDedup(hardwareWalletConnectionEnum.reorderNonEmpty(support.connectionTypes)).join('_')}`,
-					]
-				: []
-		})
-		.join('__')
-		.toLowerCase()
 }
 
 function noHardwareWalletSupport(

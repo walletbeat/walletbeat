@@ -14,6 +14,7 @@ import {
 	hardwareWalletType,
 	hardwareWalletTypeToString,
 	type SupportedHardwareWallet,
+	supportedHardwareWalletsId,
 	supportsHardwareWalletTypesMarkdown,
 } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
@@ -69,7 +70,7 @@ function singleHardwareWalletManufacturerSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'single_hardware_wallet_support',
+			id: `single_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.FAIL,
 			displayName: 'Supports only one hardware wallet manufacturer',
 			shortExplanation: sentence(`
@@ -97,7 +98,7 @@ function insufficientHardwareWalletManufacturerSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'insufficient_hardware_wallet_interoperability',
+			id: `insufficient_hardware_wallet_interoperability__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet interoperability',
 			shortExplanation: sentence(`
@@ -121,7 +122,7 @@ function comprehensiveHardwareWalletSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'comprehensive_hardware_wallet_interoperability',
+			id: `comprehensive_hardware_wallet_interoperability__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PASS,
 			displayName: 'Interoperable hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports a wide range of hardware wallets.'),
