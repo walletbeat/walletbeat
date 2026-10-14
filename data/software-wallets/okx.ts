@@ -46,7 +46,7 @@ export const okx: SoftwareWallet = {
 		coinspectId: 'okx',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-14',
 		urls: {
 			extensions: [
 				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -212,8 +212,23 @@ export const okx: SoftwareWallet = {
 								'Trezor lists OKX Wallet among the desktop wallets that work with Trezor devices through Trezor Connect.',
 							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/trezor-connect',
 						},
+						{
+							explanation:
+								"The extension's hardware wallet connect screen lists Keystone, Ledger, OneKey and Trezor.",
+							file: 'public/references/wallets/okx/screenshots/2026-10-13-okx-extension-connect-hardware-wallet.png',
+							label:
+								"Screenshot of the OKX Wallet extension's hardware wallet connect screen, provided by a maintainer",
+						},
+						{
+							explanation:
+								"OKX's December 2022 announcement says Ledger compatibility is available on the OKX Wallet Web Extension.",
+							url: 'https://investor.wedbush.com/wedbush/article/gnwcq-2022-12-12-okx-introduces-quick-transfer-feature-and-announces-ledger-compatibility-streamlining-self-custody-for-millions-of-users',
+						},
 					],
 					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
 						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
 							connectionTypes: [HardwareWalletConnection.QR],
 						}),
