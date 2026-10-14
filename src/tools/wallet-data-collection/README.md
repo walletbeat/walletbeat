@@ -230,6 +230,23 @@ All requests must be reviewed manually at least once. This is your chance to:
 
 After a request is manually reviewed, it will never be prompted for in future executions of the `review-requests` subcommand.
 
+#### `agent` subcommand
+
+```
+pnpm wallet-data-collection <global flags> agent [<prompt>]
+```
+
+Run a Pi-based harness that drives the wallet-data-collection workflow autonomously.
+
+The `prompt` that follows `agent` is the initial instruction given to the agent, for example:
+
+```
+pnpm wallet-data-collection agent 'Classify network traffic for metamask browser extension'
+```
+
+After the initial instruction runs, the harness keeps reading further prompts from the terminal until you quit with `/quit`.
+The harness is instructed to make _some_ forward progress only, not to complete classification. Classifying an entire wallet's worth of data usually runs past the context window of even frontier models as of 2026. Encouraging models to complete this task as a whole makes them take shortcuts by doing aggressive bulk-matching of requests. Therefore, you should not push them to classify entire swaths of requests at once. Be ready instead to run many separate sessions that each make some forward progress.
+
 ## Workflow
 
 - Human:

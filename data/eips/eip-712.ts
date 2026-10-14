@@ -5,6 +5,8 @@ export const eip712: Eip = {
 	friendlyName: 'Typed structured data signing',
 	formalTitle: 'Typed structured data hashing and signing',
 	appliesTo: variantEnum.set,
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/c2e19a6ba0dda0e6fbf846b62e3711d3bc2ebbed
+	finalizedDate: '2022-08-11',
 	icon: 'ICON_SIGNATURE',
 	number: '712',
 	prefix: EipPrefix.EIP,

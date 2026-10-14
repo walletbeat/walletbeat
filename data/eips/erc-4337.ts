@@ -7,6 +7,8 @@ export const erc4337: Eip = {
 	friendlyName: 'Account Abstraction for smart contract wallets',
 	formalTitle: 'Account Abstraction Using Alt Mempool',
 	appliesTo: variantEnum.set,
+	// "Move to Final" commit: https://github.com/ethereum/ERCs/commit/c8d8c2107f63c996fe8b60af20081d4d911e1f9d
+	finalizedDate: '2026-06-02',
 	icon: 'ICON_USER_COG',
 	number: '4337',
 	prefix: EipPrefix.ERC,

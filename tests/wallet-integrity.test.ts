@@ -88,11 +88,11 @@ describe('wallets', () => {
 
 	for (const { walletMap, dataSubdir } of walletMaps) {
 		for (const walletKey of Object.keys(walletMap)) {
-			walletIdToDataSubdir.set(walletKey.toString(), dataSubdir)
+			walletIdToDataSubdir.set(String(walletKey), dataSubdir)
 		}
 	}
 
-	for (const wallet of Object.values(allWallets)) {
+	for (const [walletKey, wallet] of Object.entries(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
 			it('has a slug-style metadata.id (lowercase, hyphens only)', () => {
 				expect(wallet.metadata.id).toMatch(/^[a-z\d]+(?:-[a-z\d]+)*$/)
@@ -135,7 +135,8 @@ describe('wallets', () => {
 				})
 			}
 
-			const dataSubdir = walletIdToDataSubdir.get(wallet.metadata.id)
+			const collectionWalletId = walletKey
+			const dataSubdir = walletIdToDataSubdir.get(walletKey)
 
 			if (dataSubdir !== undefined) {
 				const manifestDir = path.resolve(
@@ -143,7 +144,7 @@ describe('wallets', () => {
 					'data',
 					dataSubdir,
 					'manifests',
-					wallet.metadata.id,
+					walletKey,
 				)
 
 				for (const extensionUrl of wallet.metadata.urls?.extensions ?? []) {
@@ -170,7 +171,7 @@ describe('wallets', () => {
 			if (
 				dataSubdir !== undefined &&
 				fs.existsSync(
-					path.resolve(getRepositoryRoot(), 'data', dataSubdir, 'collection', wallet.metadata.id),
+					path.resolve(getRepositoryRoot(), 'data', dataSubdir, 'collection', collectionWalletId),
 				)
 			) {
 				it('has valid data collection info', async () => {
@@ -179,10 +180,10 @@ describe('wallets', () => {
 						'data',
 						dataSubdir,
 						'collection',
-						wallet.metadata.id,
+						collectionWalletId,
 					)
-					const walletId = assertValidWalletName(wallet.metadata.id)
-					const annotationsPath = path.join(collectionDir, `${wallet.metadata.id}.annotations.json`)
+					const walletId = assertValidWalletName(walletKey)
+					const annotationsPath = path.join(collectionDir, `${collectionWalletId}.annotations.json`)
 					const globalAnnotationsPath = path.join(
 						getRepositoryRoot(),
 						'data',
@@ -193,7 +194,13 @@ describe('wallets', () => {
 						annotationsPath,
 						globalAnnotationsPath,
 					)
+
 					const files = fs.readdirSync(collectionDir)
+
+					for (const file of files) {
+						expect(file.startsWith(`${collectionWalletId}.`)).toBe(true)
+					}
+
 					const captureFiles = files.filter(f => f.endsWith('.capture.json'))
 
 					for (const captureFile of captureFiles) {
