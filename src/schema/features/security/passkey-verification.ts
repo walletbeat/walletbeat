@@ -28,7 +28,6 @@ export enum PasskeyVerificationLibrary {
 	/**
 	 * Base's WebAuthn.sol (https://github.com/base/webauthn-sol) — a Solidity
 	 * library for onchain WebAuthn verification.
-	 * For Solady's WebAuthn.sol, use SOLADY_WEB_AUTHN instead.
 	 */
 	WEB_AUTHN_SOL = 'WEB_AUTHN_SOL',
 
