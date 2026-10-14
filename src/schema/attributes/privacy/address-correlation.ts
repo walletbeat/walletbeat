@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	type Evaluation,
@@ -242,6 +243,9 @@ export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 		Additionally, if such a request is not proxied, then it inherently reveals
 		the user's IP address and ties it with the user's wallet address, which is
 		also personal information.
+
+		See the [data collection guide](${withBasePath('/docs/wallet-testing/data-collection/')})
+		for how Walletbeat captures and inspects a wallet's network requests.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
