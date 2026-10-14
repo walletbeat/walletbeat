@@ -107,6 +107,25 @@ export function isExplicitRating(rating: Rating): rating is ExplicitRating {
 	}
 }
 
+/**
+ * Sort rank of a rating: PASS > PARTIAL > FAIL.
+ * UNRATED and EXEMPT have no rank, so tables sort them last.
+ */
+export function ratingSortRank(rating: Rating | undefined): number | null {
+	switch (rating) {
+		case Rating.PASS:
+			return 2
+		case Rating.PARTIAL:
+			return 1
+		case Rating.FAIL:
+			return 0
+		case Rating.EXEMPT:
+		case Rating.UNRATED:
+		case undefined:
+			return null
+	}
+}
+
 /** Ratings enum. */
 export const ratingEnum = new Enum<Rating>({
 	[Rating.PASS]: true,
