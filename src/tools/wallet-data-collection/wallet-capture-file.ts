@@ -15,8 +15,10 @@ import {
 	type DataCollectionForFlowWithOnchainData,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	type EndpointCollection,
 	EntityRole,
 	leastConfigurableCollectionPolicy,
+	type MultiAddressHandling,
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
@@ -56,6 +58,12 @@ import {
 	stableJSONStringify,
 } from '@/utils/json'
 
+import {
+	type AddressBearingRequest,
+	classifyEntityMultiAddressHandling,
+	type EntityRequests,
+} from './multi-address-classification'
+import { removeFile, writeFileAtomically } from './read-only'
 import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
@@ -63,6 +71,7 @@ import {
 	type WalletCaptureAnnotations,
 	type WalletRequestMatcher,
 } from './wallet-capture-annotations'
+import { requestIdToString } from './wallet-capture-classification-audit-log'
 
 export enum RecordedOnlyFlow {
 	IDLE_PRE_INSTALL = 'IDLE_PRE_INSTALL',
@@ -2441,6 +2450,39 @@ export class WalletRequest {
 	}
 
 	/**
+	 * Returns the subset of the given wallet addresses in this request.
+	 */
+	public async walletAddressesPresent(
+		walletAddresses: ReadonlySet<Erc55Address>,
+	): Promise<Erc55Address[]> {
+		if (walletAddresses.size === 0) {
+			return []
+		}
+
+		// Build the request's strings once, then check each wallet address
+		// against them. This avoids re-parsing the request per address.
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const stringValues = reqStrings.strings().map(s => s.str.str.toLowerCase())
+
+		const present: Erc55Address[] = []
+
+		for (const walletAddr of walletAddresses) {
+			const addr = walletAddr.toLowerCase()
+
+			const found = stringValues.some(v => v.includes(addr))
+
+			if (found) {
+				present.push(walletAddr)
+			}
+		}
+
+		return present
+	}
+
+	/**
 	 * True when this request is directly identified as NOT_WALLET_INITIATED,
 	 * either by a matching request matcher or by manual review.
 	 */
@@ -2517,6 +2559,15 @@ export class WalletRequest {
 
 	public get key(): string {
 		return this._key
+	}
+
+	/** The canonical request ID: `walletId:walletVariant:sessionTime`. */
+	public requestIdString(): `${string}:${string}:${string}` {
+		return requestIdToString({
+			walletId: this._captureFile.identity.walletId,
+			walletVariant: this._captureFile.identity.walletVariant,
+			sessionTime: this.sessionTime.toNumber(),
+		})
 	}
 
 	public domains(): NonEmptyArray<string> {
@@ -2862,6 +2913,24 @@ export interface WalletCaptureFileIdentity {
 	walletId: string
 }
 
+/**
+ * The classification fingerprint of a single request, resolved across the whole
+ * repository so it can be diffed to detect classification changes. Canonical and
+ * deterministic (sorted arrays) so `JSON.stringify` equality is a valid diff.
+ */
+export interface WalletRequestClassification {
+	/** Sorted, deduped purposes from matcher + manual review. */
+	purposes: DataCollectionPurpose[]
+	/** Sorted `{ userInfo, policy }` resolved via request.userInfo + matcher policy. */
+	userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }>
+	/** Operator + intermediaries resolved from the domain mapping, as `{ entityId, role }`. */
+	receivingEntities: Array<{ entityId: string; role: EntityRole }>
+	/** True when the request is NOT_WALLET_INITIATED (directly or by proxy). */
+	notWalletInitiated: boolean
+	/** True when the request's domain has no entity mapping (unclassifiable). */
+	unclassifiable: boolean
+}
+
 export class WalletCaptureFile {
 	public readonly identity: WalletCaptureFileIdentity
 	public readonly path: string | null
@@ -3072,6 +3141,10 @@ export class WalletCaptureFile {
 			[UserFlow.APP_CONNECTION]: null,
 		}
 
+		// The set of the wallet's own addresses that appear anywhere across all
+		// flows.
+		const totalWalletAddressesSeen = await this.computeWalletAddressesSeen()
+
 		for (const recFlow of recordedFlow.items) {
 			const flow = this.getFlow(recFlow)
 
@@ -3092,7 +3165,11 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = await this.processFlowRequests(flow, options.strict ?? false)
+			const collected = await this.processFlowRequests(
+				flow,
+				options.strict ?? false,
+				totalWalletAddressesSeen,
+			)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -3114,11 +3191,35 @@ export class WalletCaptureFile {
 	}
 
 	/**
+	 * Compute the set of the wallet's own addresses that appear across all
+	 * recorded flows.
+	 */
+	private async computeWalletAddressesSeen(): Promise<Set<Erc55Address>> {
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
+		const seen = new Set<Erc55Address>()
+
+		for (const request of this.getRequests()) {
+			const carried = await request.walletAddressesPresent(walletOwnAddressesSet)
+
+			for (const addr of carried) {
+				seen.add(addr)
+			}
+		}
+
+		return seen
+	}
+
+	/**
 	 * Process flow requests to build DataCollectionByEntity array.
+	 *
+	 * @param totalWalletAddressesSeen The set of the wallet's own addresses
+	 *   seen across all flows.
 	 */
 	private async processFlowRequests(
 		flow: WalletCaptureFlow,
 		strict: boolean,
+		totalWalletAddressesSeen: ReadonlySet<Erc55Address>,
 	): Promise<WithRef<DataCollectionByEntity>[]> {
 		const maybeThrow = (error: string) => {
 			if (strict) {
@@ -3134,8 +3235,15 @@ export class WalletCaptureFile {
 				role: EntityRole
 				info: Map<UserInfo, CollectionPolicy>
 				purposes: Set<DataCollectionPurpose>
+				/** The wallet's own addresses observed by this entity. */
+				walletAddresses: Set<Erc55Address>
+				/** The address-bearing requests observed by this entity. */
+				addressRequests: AddressBearingRequest[]
 			}
 		>()
+
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
 
 		for (const request of flow.requests) {
 			const resolved = entitiesForDomain(request.domain)
@@ -3176,6 +3284,8 @@ export class WalletCaptureFile {
 				purposes.add(purpose)
 			}
 
+			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
+
 			// The data is seen by the operator and by every intermediary on the
 			// way there, so record one receipt per entity with its role.
 			const receivingEntities: Array<{ entity: Entity; role: EntityRole }> = [
@@ -3196,6 +3306,8 @@ export class WalletCaptureFile {
 						role,
 						info: new Map<UserInfo, CollectionPolicy>(),
 						purposes: new Set<DataCollectionPurpose>(),
+						walletAddresses: new Set<Erc55Address>(),
+						addressRequests: [],
 					}
 					perEntity.set(perEntityKey, entData)
 				}
@@ -3218,6 +3330,17 @@ export class WalletCaptureFile {
 				for (const purpose of purposes) {
 					entData.purposes.add(purpose)
 				}
+
+				if (carriedWalletAddresses.length > 0) {
+					for (const addr of carriedWalletAddresses) {
+						entData.walletAddresses.add(addr)
+					}
+
+					entData.addressRequests.push({
+						addresses: assertNonEmptyArray(carriedWalletAddresses),
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
+				}
 			}
 		}
 
@@ -3237,26 +3360,40 @@ export class WalletCaptureFile {
 				continue
 			}
 
+			const multiAddress = ((): MultiAddressHandling | null => {
+				if (entData.walletAddresses.size === 0) {
+					return null
+				}
+
+				const entityRequests: EntityRequests = {
+					addresses: assertNonEmptyArray(Array.from(entData.walletAddresses)),
+					requests: entData.addressRequests,
+				}
+
+				return classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests)
+			})()
+
+			const dataCollection: EndpointCollection = {
+				// TODO: Implement support for other values here once any wallet supports this, i.e. Kohaku wallet.
+				endpoint: RegularEndpoint,
+				multiAddress,
+				...nonEmptyMapToRecord(userInfos, info => {
+					const policy = entData.info.get(info)
+
+					if (policy === undefined) {
+						maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
+
+						return CollectionPolicy.ALWAYS
+					}
+
+					return policy
+				}),
+			}
+
 			const row: WithRef<DataCollectionByEntity> = {
 				byEntity: entData.entity,
 				role: entData.role,
-				dataCollection: {
-					// TODO: Implement support for other values here once any wallet supports this...
-					endpoint: RegularEndpoint,
-					// TODO: Handle multiAddress.
-					multiAddress: undefined,
-					...nonEmptyMapToRecord(userInfos, info => {
-						const policy = entData.info.get(info)
-
-						if (policy === undefined) {
-							maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
-
-							return CollectionPolicy.ALWAYS
-						}
-
-						return policy
-					}),
-				},
+				dataCollection,
 				purposes: purposes,
 				ref: refNotNecessary,
 			}
@@ -3315,11 +3452,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${this.path}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = this.path + '.tmp'
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, this.path)
+			await writeFileAtomically(this.path, content)
 			changed.push(this.path)
 		}
 
@@ -3352,7 +3485,7 @@ export class WalletCaptureFile {
 					throw new Error(`File not in sync: ${jsonPath}`)
 				}
 
-				await fs.promises.rm(jsonPath)
+				await removeFile(jsonPath)
 
 				return [jsonPath]
 			}
@@ -3378,11 +3511,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${jsonPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${jsonPath}.tmp`
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, jsonPath)
+			await writeFileAtomically(jsonPath, content)
 			changed.push(jsonPath)
 		}
 
@@ -3430,6 +3559,7 @@ export class WalletCaptureFile {
 		variants.sort((a, b) => a.localeCompare(b))
 
 		const wantLines: string[] = [
+			"import { Variant } from '@/schema/variants'",
 			"import { capturedWalletDataCollection } from '@/tools/wallet-data-collection/data-collection-for-wallet-lib.ts'",
 			'',
 		]
@@ -3443,7 +3573,7 @@ export class WalletCaptureFile {
 
 		wantLines.push('')
 		wantLines.push(
-			`const ${dataCollectionVarName} = capturedWalletDataCollection([${variants.map(variant => `${variant.toLowerCase()}Data`).join(', ')}])`,
+			`const ${dataCollectionVarName} = capturedWalletDataCollection({ ${variants.map(variant => `[Variant.${variant}]: ${variant.toLowerCase()}Data`).join(', ')} })`,
 		)
 		wantLines.push('')
 		wantLines.push(`export default ${dataCollectionVarName}`)
@@ -3472,11 +3602,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${aggregationLibPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${aggregationLibPath}.tmp`
-
-			await fs.promises.mkdir(dir, { recursive: true })
-			await fs.promises.writeFile(tmpPath, wantTypescript, 'utf8')
-			await fs.promises.rename(tmpPath, aggregationLibPath)
+			await writeFileAtomically(aggregationLibPath, wantTypescript)
 			changed.push(aggregationLibPath)
 		}
 
@@ -3499,9 +3625,45 @@ export class WalletCaptureFile {
 		return this.flows[flow] ?? null
 	}
 
+	/** Returns every request across all recorded flows (excluding `NOT_SUPPORTED` flows). */
+	public getRequests(): WalletRequest[] {
+		const requests: WalletRequest[] = []
+
+		for (const flow of recordedFlow.items) {
+			const resolved = this.getFlow(flow)
+
+			if (resolved === null || resolved === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const request of resolved.requests) {
+				requests.push(request)
+			}
+		}
+
+		return requests
+	}
+
 	/** Returns the list of capture-info entries recorded so far (possibly empty). */
 	public getCaptureInfo(): CaptureInfo[] {
 		return this.captureInfo
+	}
+
+	/**
+	 * Returns the set of the wallet's own addresses recorded in capture info.
+	 */
+	public walletOwnAddresses(): NonEmptyArray<Erc55Address> | null {
+		const addresses = new Set<Erc55Address>()
+
+		for (const info of this.captureInfo) {
+			for (const addr of info.walletAddresses) {
+				addresses.add(ethereumErc55Address(addr))
+			}
+		}
+
+		const allAddresses = Array.from(addresses)
+
+		return isNonEmptyArray(allAddresses) ? allAddresses : null
 	}
 
 	/** Replaces the full list of capture-info entries. */
@@ -3812,6 +3974,106 @@ export class WalletCaptureFile {
 
 	public findMatcherForReq(request: WalletRequest): WalletRequestMatcher | null {
 		return this.annotations.matches(request)
+	}
+
+	/**
+	 * Resolve the full classification fingerprint of a single request, mirroring the
+	 * per-request body of {@link processFlowRequests}. The result is canonical (sorted
+	 * arrays, deterministic key order) so that `JSON.stringify` equality is a valid diff.
+	 */
+	public async resolveRequestClassification(
+		request: WalletRequest,
+	): Promise<WalletRequestClassification> {
+		const resolved = entitiesForDomain(request.domain)
+		const notWalletInitiated = request.isNotWalletInitiated()
+
+		if (resolved === null) {
+			return {
+				purposes: [],
+				userData: [],
+				receivingEntities: [],
+				notWalletInitiated,
+				unclassifiable: true,
+			}
+		}
+
+		const matcher = this.findMatcherForReq(request)
+		const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
+
+		const receivingEntities: Array<{ entityId: string; role: EntityRole }> = [
+			{ entityId: resolved.operator.id, role: EntityRole.OPERATOR },
+			...resolved.intermediaries.map(entity => ({
+				entityId: entity.id,
+				role: EntityRole.INTERMEDIARY,
+			})),
+		]
+
+		const purposes = new Set<DataCollectionPurpose>()
+
+		if (!notWalletInitiated) {
+			if (
+				matcher !== null &&
+				matcher.purposes !== 'NOT_WALLET_INITIATED' &&
+				matcher.purposes !== null
+			) {
+				for (const purpose of setItems(matcher.purposes)) {
+					purposes.add(purpose)
+				}
+			}
+
+			const extraPurposes = request.review.getExtraPurposes()
+
+			if (extraPurposes !== 'NOT_WALLET_INITIATED') {
+				for (const purpose of extraPurposes) {
+					purposes.add(purpose)
+				}
+			}
+		}
+
+		const userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }> = []
+
+		if (!notWalletInitiated) {
+			for (const [userInfo, policy] of userInfos.entries()) {
+				if (policy !== null) {
+					userData.push({ userInfo, policy })
+				}
+			}
+		}
+
+		// Canonicalize so the fingerprint is deterministic and can be diffed.
+		const purposesSorted = [...purposes].sort((a, b) => a.localeCompare(b))
+
+		const userDataSorted = userData
+			.map(entry => ({ userInfo: entry.userInfo, policy: entry.policy }))
+			.sort((a, b) => {
+				const infoCmp = compareUserInfo(a.userInfo, b.userInfo)
+
+				if (infoCmp !== 0) {
+					return infoCmp
+				}
+
+				return a.policy.localeCompare(b.policy)
+			})
+
+		const receivingEntitiesSorted = receivingEntities
+			.map(entry => ({ entityId: entry.entityId, role: entry.role }))
+			.sort((a, b) => {
+				const idCmp = a.entityId.localeCompare(b.entityId)
+
+				if (idCmp !== 0) {
+					return idCmp
+				}
+
+				return a.role.localeCompare(b.role)
+			})
+
+		return {
+			purposes: purposesSorted,
+			userData: userDataSorted,
+			receivingEntities: receivingEntitiesSorted,
+			notWalletInitiated,
+			unclassifiable: false,
+		}
 	}
 
 	/**

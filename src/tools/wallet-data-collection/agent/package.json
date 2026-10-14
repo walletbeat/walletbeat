@@ -1,0 +1,17 @@
+{
+	"name": "@walletbeat/wallet-data-collection-agent",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"description": "Pi-based harness for the wallet-data-collection skill. Exposes only the bash tool and only the wallet-data-collection skill.",
+	"engines": {
+		"node": ">=22.0.0"
+	},
+	"dependencies": {
+		"@earendil-works/pi-coding-agent": "0.85.1",
+		"@sinclair/typebox": "^0.34.0",
+		"chalk": "^6.0.0",
+		"pi-ask-user": "^0.16.0",
+		"prompts": "^2.4.2"
+	}
+}
