@@ -1,12 +1,13 @@
 <script lang="ts">
-	import type { Eip } from '@/schema/eips'
+	import { lucideNavigationIcons } from '@/icons/lucide-navigation-icons'
 	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
+	import type { EipDirectoryEntry } from '@/utils/eip-directory'
 	import { getEipTrackerUrl } from '@/utils/urls'
 
 	type Props = {
-		eips: Eip[]
+		eips: EipDirectoryEntry[]
 	}
 
 	let { eips }: Props = $props()
@@ -56,6 +57,13 @@
 			>
 				<summary>
 					<div class="eip-row">
+						<span class="eip-icon" aria-hidden="true">
+							{#if eip.icon in lucideNavigationIcons}
+								{@html (lucideNavigationIcons as Record<string, string>)[eip.icon]}
+							{:else}
+								<span data-icon="wbicons-simple {eip.icon}"></span>
+							{/if}
+						</span>
 						<span class="eip-label">{eipShortLabel(eip)}</span>
 						<span class="eip-name">{eip.friendlyName}</span>
 						<span class="eip-status" data-status={eip.status}>
@@ -81,6 +89,30 @@
 							<Typography content={markdown(eip.noteMarkdown)} />
 						</section>
 					{/if}
+
+					<section class="eip-detail__section">
+						<h4>Implemented by</h4>
+						{#if eip.implementers.length > 0}
+							<ul class="eip-implementers" data-list="unstyled">
+								{#each eip.implementers as wallet (wallet.id)}
+									<li>
+										<a class="eip-implementer" href={wallet.url}>
+											<img
+												src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`}
+												alt=""
+												width="20"
+												height="20"
+												loading="lazy"
+											/>
+											{wallet.displayName}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						{:else}
+							<p>No rated wallet implements {eipShortLabel(eip)} yet.</p>
+						{/if}
+					</section>
 
 					<div class="eip-detail__links">
 						<a class="eip-detail__spec-link" href={getEipTrackerUrl(eip)}>
@@ -120,7 +152,7 @@
 		font-size: 0.82rem;
 		font-weight: 500;
 		padding: 0.35em 0.9em;
-		border: 1px solid var(--border);
+		border: 1px solid var(--border-color);
 		border-radius: 99px;
 		background: transparent;
 		color: var(--text-secondary);
@@ -146,7 +178,7 @@
 		margin-left: auto;
 		font-size: 0.8rem;
 		color: var(--text-secondary);
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 
 	/* EIP list */
@@ -197,6 +229,24 @@
 		align-items: center;
 		gap: 1.5rem;
 		width: 100%;
+
+		@media (width <= 40rem) {
+			gap: 0.875rem;
+		}
+	}
+
+	.eip-icon {
+		display: inline-grid;
+		place-items: center;
+		width: 1.25rem;
+		height: 1.25rem;
+		flex-shrink: 0;
+		color: var(--accent);
+
+		:global(svg) {
+			width: 100%;
+			height: 100%;
+		}
 	}
 
 	.eip-label {
@@ -224,7 +274,7 @@
 
 		&[data-status='FINAL'] {
 			background: color-mix(in srgb, #4ade80 15%, transparent);
-			color: #4ade80;
+			color: light-dark(oklch(from #4ade80 0.48 c h), #4ade80);
 		}
 
 		&[data-status='DRAFT'] {
@@ -234,27 +284,27 @@
 
 		&[data-status='REVIEW'] {
 			background: color-mix(in srgb, #a78bfa 15%, transparent);
-			color: #a78bfa;
+			color: light-dark(oklch(from #a78bfa 0.48 c h), #a78bfa);
 		}
 
 		&[data-status='LIVING'] {
 			background: color-mix(in srgb, #38bdf8 15%, transparent);
-			color: #38bdf8;
+			color: light-dark(oklch(from #38bdf8 0.48 c h), #38bdf8);
 		}
 
 		&[data-status='LAST_CALL'] {
 			background: color-mix(in srgb, #facc15 15%, transparent);
-			color: #facc15;
+			color: light-dark(oklch(from #facc15 0.48 c h), #facc15);
 		}
 	}
 
 	/* Expanded detail */
-	.eip-detail {
+	details[data-card] > .eip-detail {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		padding-top: 1rem;
-		border-top: 1px solid var(--border);
+		border-top: 1px solid var(--border-color);
 		margin-top: 0.875rem;
 	}
 
@@ -273,6 +323,39 @@
 			font-size: 0.9rem;
 			color: var(--text-secondary);
 			line-height: 1.65;
+		}
+	}
+
+	.eip-implementers {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 0;
+	}
+
+	.eip-implementer {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4em;
+		padding: 0.25em 0.6em 0.25em 0.3em;
+		border: 1px solid var(--border-color);
+		border-radius: 99px;
+		font-size: 0.82rem;
+		font-weight: 500;
+		color: var(--text-primary);
+		text-decoration: none;
+
+		&:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			text-decoration: none;
+		}
+
+		img {
+			width: 1.25rem;
+			height: 1.25rem;
+			border-radius: 0.3rem;
+			object-fit: contain;
 		}
 	}
 
@@ -297,7 +380,7 @@
 	.empty {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
-		opacity: 0.6;
+		opacity: 0.7;
 		padding: 2rem 0;
 		text-align: center;
 	}

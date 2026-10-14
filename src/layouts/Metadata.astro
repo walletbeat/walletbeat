@@ -21,8 +21,8 @@ type MetadataConfig = {
 	description?: string
 	keywordsBefore?: string[]
 	keywordsAfter?: string[]
-	/** Absolute or root-relative path to a 1.91:1 image used for og:image and Twitter card. */
-	image?: string
+	/** 1.91:1 image used for og:image and Twitter card, at an absolute or root-relative URL. */
+	image?: OpenGraphImage
 }
 
 const siteName = 'Walletbeat'
@@ -80,7 +80,7 @@ const generateBasicMetadata = ({
 		description: description ?? siteDescription,
 		siteName,
 		locale,
-		image: image ? { ...defaultOgImage, url: image } : defaultOgImage,
+		image: image ?? defaultOgImage,
 	},
 })
 

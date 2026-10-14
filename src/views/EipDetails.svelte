@@ -6,13 +6,19 @@
 	// Props
 	const {
 		eip,
+		headingLevel = 2,
 	}: {
 		eip: Eip
+		// Level of the EIP name heading; the formal title and sections sit one level below.
+		headingLevel?: 1 | 2
 	} = $props()
+
+	const subheading = $derived(`h${headingLevel + 1}`)
 
 
 	// Functions
-	import { eipEthereumDotOrgUrl } from '@/schema/eips'
+	import { eipEthereumDotOrgUrl, eipFinalForLabel } from '@/schema/eips'
+	import { daysSince } from '@/types/date'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 
 
@@ -36,22 +42,37 @@
 			>
 				{eip.status}
 			</div>
+
+			{#if eip.finalizedDate !== null}
+				<!-- `data-final-since` lets pages refresh the day count client-side. -->
+				<span class="final-since">
+					<strong data-final-since={eip.finalizedDate}>{eipFinalForLabel(daysSince(eip.finalizedDate))}</strong>,
+					since <time datetime={eip.finalizedDate}>{
+						new Date(eip.finalizedDate).toLocaleDateString('en-US', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC',
+						})
+					}</time>
+				</span>
+			{/if}
 		</div>
 
-		<h2>
+		<svelte:element this={`h${headingLevel}`} class="title">
 			{eip.friendlyName ? eip.friendlyName : eip.formalTitle}
-		</h2>
+		</svelte:element>
 
 		{#if eip.formalTitle && eip.formalTitle !== eip.friendlyName}
-			<h3>
+			<svelte:element this={subheading} class="formal-title">
 				{eip.formalTitle}
-			</h3>
+			</svelte:element>
 		{/if}
 	</header>
 
 	{#if eip.summaryMarkdown}
 		<section data-column>
-			<h4>Summary</h4>
+			<svelte:element this={subheading} class="section-title">Summary</svelte:element>
 
 			<Typography
 				content={{
@@ -64,7 +85,7 @@
 
 	{#if eip.whyItMattersMarkdown}
 		<section data-column>
-			<h4>Why It Matters</h4>
+			<svelte:element this={subheading} class="section-title">Why It Matters</svelte:element>
 
 			<Typography
 				content={{
@@ -97,8 +118,26 @@
 		text-align: left;
 
 		> header {
-			h3 {
+			.title {
+				font-size: 1.5em;
+			}
+
+			.formal-title {
+				font-size: 1.17em;
 				color: var(--text-secondary);
+			}
+
+			.tags {
+				flex-wrap: wrap;
+				align-items: center;
+			}
+
+			.final-since {
+				color: var(--text-secondary);
+
+				strong {
+					color: var(--text-primary);
+				}
 			}
 		}
 
@@ -111,7 +150,7 @@
 
 			color: var(--text-secondary);
 
-			h4 {
+			.section-title {
 				font-size: 0.75rem;
 				text-transform: uppercase;
 				letter-spacing: 0.05em;

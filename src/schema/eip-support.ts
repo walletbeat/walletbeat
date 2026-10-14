@@ -416,6 +416,21 @@ export const EipSupportStatus = {
 
 export type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
 
+/** Fill color (CSS) for wallets with the given EIP support status. */
+export const eipSupportStatusColor: Record<EipSupportStatus, string> = {
+	[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
+	[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail)',
+	[EipSupportStatus.UNKNOWN]: 'var(--rating-unrated)',
+	[EipSupportStatus.NOT_APPLICABLE]: 'var(--rating-neutral)',
+}
+
+/**
+ * The fragment ID of a status group within an EIP tracker list, so other
+ * parts of the page can link to it.
+ */
+export const eipSupportStatusGroupId = (listId: string, status: EipSupportStatus): string =>
+	`${listId}-${status.toLowerCase().replaceAll('_', '-')}`
+
 /** Collapse an `EipSupport` value into its display status. */
 export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 	if (typeof support === 'string') {

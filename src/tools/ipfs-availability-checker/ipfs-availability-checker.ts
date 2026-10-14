@@ -17,6 +17,16 @@ import { isRecord } from '@/types/utils/record'
 /** Public gateways that serve the site's `index.html` for a CID. */
 const GATEWAYS: Array<{ name: string; url: (cid: string) => string }> = [
 	{ name: 'filebase', url: cid => `https://ipfs.filebase.io/ipfs/${cid}/` },
+	{ name: 'orbitor', url: cid => `https://ipfs.orbitor.dev/ipfs/${cid}/` },
+]
+
+/** Delegated routing services that list the providers announcing a CID. */
+const ROUTERS: Array<{ name: string; url: (cid: string) => string }> = [
+	{ name: 'cid.contact', url: cid => `https://cid.contact/routing/v1/providers/${cid}` },
+	{
+		name: 'delegated-ipfs.dev',
+		url: cid => `https://delegated-ipfs.dev/routing/v1/providers/${cid}`,
+	},
 ]
 
 const TIME_BUDGET_MS = 600_000
@@ -114,24 +124,6 @@ function parseRetryAfter(value: string | null): number {
 	return Math.min(Math.max(0, Math.ceil((retryAt - Date.now()) / 1000)), MAX_RETRY_AFTER_SECONDS)
 }
 
-/** Include the network error code, which `fetch` hides in `cause`. */
-function describeFetchError(error: unknown): string {
-	const description =
-		error instanceof Error ? `${error.name}: ${error.message}` : getErrorMessage(error)
-	const cause = error instanceof Error ? error.cause : undefined
-
-	if (
-		typeof cause === 'object' &&
-		cause !== null &&
-		'code' in cause &&
-		typeof cause.code === 'string'
-	) {
-		return `${description} (${cause.code})`
-	}
-
-	return description
-}
-
 function describeResult({ status, error }: Omit<FetchResult, 'body'>): string {
 	const httpStatus = `HTTP ${status ?? 'none'}`
 
@@ -140,13 +132,14 @@ function describeResult({ status, error }: Omit<FetchResult, 'body'>): string {
 
 /**
  * Fetch `url`, bounded by both `timeoutMs` and the overall deadline. Error
- * responses and partial transfers never yield a body, so they cannot reach a
+ * responses and interrupted transfers never yield a body, so they cannot reach a
  * content hash.
  */
 async function fetchEndpoint(
 	url: string,
 	timeoutMs: number,
 	deadline: number,
+	headers: Record<string, string> = {},
 ): Promise<FetchResult> {
 	const remainingMs = deadline - performance.now()
 
@@ -158,10 +151,11 @@ async function fetchEndpoint(
 
 	try {
 		response = await fetch(url, {
+			headers,
 			signal: AbortSignal.timeout(Math.ceil(Math.min(timeoutMs, remainingMs))),
 		})
 	} catch (error) {
-		return { status: null, body: null, error: describeFetchError(error), retryAfterSeconds: 0 }
+		return { status: null, body: null, error: getErrorMessage(error), retryAfterSeconds: 0 }
 	}
 
 	const { status } = response
@@ -181,7 +175,7 @@ async function fetchEndpoint(
 			retryAfterSeconds,
 		}
 	} catch (error) {
-		return { status, body: null, error: describeFetchError(error), retryAfterSeconds }
+		return { status, body: null, error: getErrorMessage(error), retryAfterSeconds }
 	}
 }
 
@@ -227,18 +221,19 @@ function httpProviderAddresses(payload: unknown): string[] {
 }
 
 /**
- * Bypass public gateways by fetching the root block from providers listed on
- * the indexer. The block is checked against the CID's digest, so an untrusted
+ * Bypass public gateways by fetching the root block from providers listed by
+ * a delegated router. The block is checked against the CID's digest, so an untrusted
  * provider cannot fake availability.
  */
 async function checkProviders(
+	routerName: string,
 	lookupUrl: string,
 	cid: string,
 	rootDigest: string,
 	deadline: number,
 ): Promise<CheckResult> {
 	const lookup = await fetchEndpoint(lookupUrl, PROVIDER_TIMEOUT_MS, deadline)
-	// Report and back off according to the indexer, not the last provider tried.
+	// Report and back off according to the router, not the last provider tried.
 	const failure: CheckResult = {
 		status: lookup.status,
 		error: lookup.error,
@@ -247,7 +242,7 @@ async function checkProviders(
 	}
 
 	if (lookup.body === null) {
-		log(`Failed to look up providers for CID '${cid}' on cid.contact.`)
+		log(`Failed to look up providers for CID '${cid}' on ${routerName}.`)
 
 		return failure
 	}
@@ -257,7 +252,7 @@ async function checkProviders(
 	try {
 		payload = JSON.parse(Buffer.from(lookup.body).toString('utf8'))
 	} catch (error) {
-		log(`Invalid provider lookup response from cid.contact: ${getErrorMessage(error)}`)
+		log(`Invalid provider lookup response from ${routerName}: ${getErrorMessage(error)}`)
 
 		return failure
 	}
@@ -267,7 +262,7 @@ async function checkProviders(
 		.filter(url => url !== null)
 
 	if (providerUrls.length === 0) {
-		log(`No HTTP providers found for CID '${cid}' on cid.contact.`)
+		log(`No HTTP providers found for CID '${cid}' on ${routerName}.`)
 
 		return failure
 	}
@@ -305,7 +300,11 @@ async function checkGateway(
 	expectedSha: string,
 	deadline: number,
 ): Promise<CheckResult> {
-	const { body, ...result } = await fetchEndpoint(url, GATEWAY_TIMEOUT_MS, deadline)
+	// Request all bytes as a range to avoid Cloudflare's HTML script injection.
+	// The complete response must still match the local build's hash.
+	const { body, ...result } = await fetchEndpoint(url, GATEWAY_TIMEOUT_MS, deadline, {
+		Range: 'bytes=0-',
+	})
 
 	if (body === null) {
 		log(`Failed to fetch content from '${url}'.`)
@@ -365,13 +364,16 @@ async function checkAvailability(cid: string, deployDirectory: string): Promise<
 	const rootDigest = parseRootDigest(cid)
 	const expectedSha = sha256Hex(await readFile(join(deployDirectory, 'index.html')))
 	const deadline = performance.now() + TIME_BUDGET_MS
-	const providerLookupUrl = `https://cid.contact/routing/v1/providers/${cid}`
 	const endpoints: Endpoint[] = [
-		{
-			name: 'ipfs-providers',
-			url: providerLookupUrl,
-			check: () => checkProviders(providerLookupUrl, cid, rootDigest, deadline),
-		},
+		...ROUTERS.map(router => {
+			const url = router.url(cid)
+
+			return {
+				name: `ipfs-providers (${router.name})`,
+				url,
+				check: () => checkProviders(router.name, url, cid, rootDigest, deadline),
+			}
+		}),
 		...GATEWAYS.map(gateway => {
 			const url = gateway.url(cid)
 
