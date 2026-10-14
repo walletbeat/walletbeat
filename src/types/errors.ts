@@ -1,6 +1,17 @@
-/** Get the error message of an error. */
+/** Get the error message, including a network error code hidden in its cause. */
 export function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
+		const cause = error.cause
+
+		if (
+			typeof cause === 'object' &&
+			cause !== null &&
+			'code' in cause &&
+			typeof cause.code === 'string'
+		) {
+			return `${error.message} (${cause.code})`
+		}
+
 		return error.message
 	}
 

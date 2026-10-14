@@ -2,7 +2,7 @@
 name: wallet-update
 description: >
   Use when a contributor wants to populate or update feature data for a wallet
-  that already exists in the walletbeat project. Guides through filling in null
+  that already exists in the Walletbeat project. Guides through filling in null
   feature fields with proper values, types, and refs. To add a brand-new wallet
   first, use /wallet-create instead.
 argument-hint: '[wallet-name]'
@@ -101,6 +101,23 @@ For every `null` field:
 3. Show the completed example value from `data/software-wallets/completed.tmpl.ts` if applicable
 4. Let the contributor fill it in with a `ref`
 
+### Comments guidance
+
+Comments are generally best avoided in wallet data file. Comments are not consumed by anything, so they are not visible on the site. Comments are appropriate for things like:
+
+- Notes for future wallet data reviewers about something, e.g. an impending change to the wallet implementation that will cause a rating to flip but that can't be rated at the time the comment is written.
+- Commented-out feature fields during refactorings (transient).
+- Explanations on how to retest a specific feature quickly, e.g. keywords to search for in the codebase, etc. (if such things are not already obvious from the `ref` fields)
+- Explanations for why a wallet's feature data doesn't exactly line up with the reality of the wallet, e.g. the wallet's implementation reflects nuance that the feature fields don't capture. If present, such comments should generally be accompanied by an issue number reflecting what needs to be addressed to make the feature field capable of representing this properly.
+- Long explanations of a rating that won't reasonably fit in a `ref.explanation` field (see below). These should be extremely rare; if your explanation is so long-winded that it takes more than a sentence or two to explain, maybe the real problem is that you need to find a more obvious reference.
+
+Comments are **not appropriate** for:
+
+- Prose that repeats what the feature field essentially expresses.
+- Explanations that mirror the contents of `ref` data.
+- Temporal comments reflecting the data change being made in the present moment / PR.
+- Explanations that relate to the rating of the **attribute** that a feature field is related to. Feature fields are distinct from attributes, even though they often have a one-to-one relationship. Explanations for nuanced attribute ratings are rare, but when they are necessary, they should use the `overrides.attributes.*` fields instead, so that they may show up on the site.
+
 ### The type system — read this section carefully
 
 **`null` = unknown.** Never use `undefined` or omit the field. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing. If the answer is known to be "none / does not apply", use a named sentinel (`NO_*`) or empty array — not `undefined`. See "How `/data` fields are encoded" in `resources/docs/contribute/wallet-data/wallet-data.md`.
@@ -134,7 +151,7 @@ chainConfigurability: supported({
 
 ```typescript
 // Single URL (shorthand):
-ref: 'https://github.com/example/wallet/blob/main/src/config.ts'
+ref: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150'
 
 // Single reference object with label and explanation:
 ref: {
@@ -165,6 +182,13 @@ ref: refNotNecessary
 ```typescript
 supported<WithRef<ChainConfigurability>>({ ... })
 ```
+
+References often point to wallet code, which should ideally be formatted as GitHub links. When this is the case, the following rules apply:
+
+- The GitHub URL _must_ contain the full commit hash, not a branch name. This pins the content of the file so that the reference always points to the version of the file that was actually reviewed.
+- The GitHub URL _should_ (but is not required to) contain a line number range as anchor (e.g. `#L146-L150`). When present, this causes the code snippet referred to by the line range to be imported into the Walletbeat repository, which allows it to be displayed directly on the site. Even when a line range is inappropriate (e.g. because the entire file is relevant), a range that covers the whole file may still be fine, as long as the file is reasonably small and inline display adds value.
+
+References may also point to files inside the `public/references` subdirectory of the repository. This is achieved by simply putting the repository-root-relative path of the file as the `url` field. This is notably useful for screenshot references, which are displayed as a gallery on the site. Such references are highly preferred over code references for feature fields related to user interface features (e.g. scam prevention, clear signing, etc.), as actual wallet screenshots are much more obvious proof of implementation than UI code itself.
 
 ### Field-by-field guidance
 

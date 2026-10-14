@@ -86,6 +86,86 @@ export const overallRatingPieMaxRadius = Math.max(
 	),
 )
 
+/**
+ * Path data for a computed slice, drawn pointing up (toward negative y)
+ * around the pie origin, before its `rotate(midAngle)` and
+ * `translate(0, -offset)` transforms. Usable both as SVG path data and in
+ * CSS `clip-path: path()`.
+ */
+export const slicePathData = (
+	{
+		totalAngle,
+		outerR,
+		innerR,
+		outerCornerRadius,
+		innerCornerRadius,
+		gap,
+	}: ComputedSlice['computed'],
+	origin: { x: number; y: number } = { x: 0, y: 0 },
+): string => {
+	const point = (x: number, y: number) =>
+		`${(origin.x + x).toFixed(3)} ${(origin.y + y).toFixed(3)}`
+	const polar = (angle: number, r: number) => point(Math.sin(angle) * r, -Math.cos(angle) * r)
+
+	if (Math.abs(totalAngle) >= 359.99) {
+		return [
+			`M ${point(outerR, 0)}`,
+			`A ${outerR} ${outerR} 0 1 1 ${point(-outerR, 0)}`,
+			`A ${outerR} ${outerR} 0 1 1 ${point(outerR, 0)}`,
+			`L ${point(innerR, 0)}`,
+			`A ${innerR} ${innerR} 0 1 0 ${point(-innerR, 0)}`,
+			`A ${innerR} ${innerR} 0 1 0 ${point(innerR, 0)}`,
+			'Z',
+		].join(' ')
+	}
+
+	const halfAngle = (Math.abs(totalAngle) * Math.PI) / 360
+	const sinHalf = Math.sin(halfAngle)
+	const cosHalf = Math.cos(halfAngle)
+	const halfGap = gap / 2
+	const maxCornerR = (outerR - innerR) / 2
+	const outerCornerR = Math.max(
+		0,
+		Math.min(
+			outerCornerRadius,
+			maxCornerR,
+			Math.max(0, (sinHalf * outerR - halfGap) / (1 + sinHalf)),
+		),
+	)
+	const innerCornerR = Math.max(
+		0,
+		Math.min(
+			innerCornerRadius,
+			maxCornerR,
+			Math.max(0, (sinHalf * innerR - halfGap) / Math.max(0.000001, 1 - sinHalf)),
+		),
+	)
+	const outerCornerOffset = halfGap + outerCornerR
+	const innerCornerOffset = halfGap + innerCornerR
+	const outerCornerCenterR = outerR - outerCornerR
+	const innerCornerCenterR = innerR + innerCornerR
+	const outerAngleInset = Math.asin(outerCornerOffset / outerCornerCenterR)
+	const innerAngleInset = Math.asin(innerCornerOffset / innerCornerCenterR)
+	const outerSideR = Math.sqrt(outerCornerCenterR ** 2 - outerCornerOffset ** 2)
+	const innerSideR = Math.sqrt(innerCornerCenterR ** 2 - innerCornerOffset ** 2)
+	const largeArc = Math.abs(totalAngle) > 180 ? 1 : 0
+	const sidePoint = (sideR: number, side: 1 | -1) =>
+		point(side * (sinHalf * sideR - cosHalf * halfGap), -(cosHalf * sideR + sinHalf * halfGap))
+
+	return [
+		`M ${polar(outerAngleInset - halfAngle, outerR)}`,
+		`A ${outerR} ${outerR} 0 ${largeArc} 1 ${polar(halfAngle - outerAngleInset, outerR)}`,
+		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${sidePoint(outerSideR, 1)}`,
+		`L ${sidePoint(innerSideR, 1)}`,
+		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${polar(halfAngle - innerAngleInset, innerR)}`,
+		`A ${innerR} ${innerR} 0 ${largeArc} 0 ${polar(innerAngleInset - halfAngle, innerR)}`,
+		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${sidePoint(innerSideR, -1)}`,
+		`L ${sidePoint(outerSideR, -1)}`,
+		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${polar(outerAngleInset - halfAngle, outerR)}`,
+		'Z',
+	].join(' ')
+}
+
 export const computePieSlices = ({
 	slices,
 	radius,
