@@ -179,6 +179,78 @@ export const testTransactions: TestTransaction[] = [
 			},
 		],
 	},
+	{
+		id: 'safe-exec-1',
+		name: 'Safe execTransaction: USDC Transfer',
+		function:
+			'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)',
+		parameters: [
+			{
+				name: 'to',
+				value: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+				type: 'address',
+			},
+			{
+				name: 'value',
+				value: '0',
+				type: 'uint256',
+			},
+			{
+				name: 'data',
+				value:
+					'0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000000000000002710',
+				type: 'bytes',
+			},
+			{
+				name: 'operation',
+				value: '0',
+				type: 'uint8',
+			},
+			{
+				name: 'safeTxGas',
+				value: '0',
+				type: 'uint256',
+			},
+			{
+				name: 'baseGas',
+				value: '0',
+				type: 'uint256',
+			},
+			{
+				name: 'gasPrice',
+				value: '0',
+				type: 'uint256',
+			},
+			{
+				name: 'gasToken',
+				value: '0x0000000000000000000000000000000000000000',
+				type: 'address',
+			},
+			{
+				name: 'refundReceiver',
+				value: '0x0000000000000000000000000000000000000000',
+				type: 'address',
+			},
+			{
+				// Pre-validated signature (v = 1) for the zero address, which is never a Safe owner.
+				name: 'signatures',
+				value:
+					'0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
+				type: 'bytes',
+			},
+		],
+		calldata:
+			'0x6a761202000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000044a9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000',
+		contractAddress: '0xedb22965D0Dd7fe8fe4dae8E89F1d958D6b2F0A4', // Walletbeat test Safe (mattmatt_test2 in governance/treasury/addresses.tsv)
+		description:
+			'Transfer 0.01 USDC from a Safe through execTransaction, to test nested calldata decoding. Expected to revert: reject it at the confirmation screen.',
+		requirements: [
+			'This transaction is expected to revert, because it carries no valid Safe owner signature',
+			"Judge what the wallet's confirmation screen shows, then reject the transaction there",
+			'You do not need your own Safe or any USDC: the transaction targets the Walletbeat test Safe',
+			"Make sure you're on the correct network (Ethereum Mainnet)",
+		],
+	},
 ]
 
 /** EIP-712 types of a Safe multisig transaction (Safe v1.3.0 and later). */
