@@ -21,17 +21,32 @@ const refPunctuationTells = [
 	},
 ]
 
+interface AiWordFamily {
+	name: string
+	regExp: RegExp
+
+	/** Allow this many uses regardless of text length. */
+	maxOccurrencesBeforeDensityCheck: number
+
+	/** After the allowed count, limit uses per 1000 prose words. */
+	maxOccurrencesPer1000Words: number
+}
+
 /** Words that read as AI-generated when repeated within a body of text. */
-const aiWordFamilies = [
-	{ name: 'gate', regExp: /\bgat(?:e|es|ed|ing)\b/gi },
-	{ name: 'ship', regExp: /\bship(?:s|ped|ping)?\b/gi },
+const aiWordFamilies: AiWordFamily[] = [
+	{
+		name: 'gate',
+		regExp: /\bgat(?:e|es|ed|ing)\b/gi,
+		maxOccurrencesBeforeDensityCheck: 2,
+		maxOccurrencesPer1000Words: 1,
+	},
+	{
+		name: 'ship',
+		regExp: /\bship(?:s|ped|ping)?\b/gi,
+		maxOccurrencesBeforeDensityCheck: 2,
+		maxOccurrencesPer1000Words: 1,
+	},
 ]
-
-/** Allow this many uses of each word family regardless of text length. */
-const maxOccurrencesBeforeDensityCheck = 2
-
-/** After the allowed count, limit uses per 1000 prose words. */
-const maxOccurrencesPer1000Words = 1
 
 function aiProseLint(match: RegExpMatchArray, message: string): Lint {
 	const start = match.index ?? 0
@@ -69,13 +84,13 @@ export const aiTellsLinter: AbstractLinter = {
 			const per1000Words = (matches.length * 1000) / wordCount
 
 			if (
-				matches.length > maxOccurrencesBeforeDensityCheck &&
-				per1000Words > maxOccurrencesPer1000Words
+				matches.length > family.maxOccurrencesBeforeDensityCheck &&
+				per1000Words > family.maxOccurrencesPer1000Words
 			) {
 				const message =
 					`"${family.name}" occurs ${matches.length} times in ${wordCount} words ` +
 					`(${per1000Words.toFixed(2)} per 1000 words, above the limit of ` +
-					`${maxOccurrencesPer1000Words} once past ${maxOccurrencesBeforeDensityCheck} occurrences). ` +
+					`${family.maxOccurrencesPer1000Words} once past ${family.maxOccurrencesBeforeDensityCheck} occurrences). ` +
 					'Reword some of these occurrences.'
 
 				lints.push(...matches.map(match => aiProseLint(match, message)))
