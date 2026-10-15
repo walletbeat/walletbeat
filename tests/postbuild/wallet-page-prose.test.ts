@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { allRatedWallets } from '@/data/wallets'
 import { aiTellsLinter } from '@/tests/utils/ai-tells'
-import { formatLintMessages } from '@/tests/utils/linter'
+import { formatLintMessages, GrammarTextKind } from '@/tests/utils/linter'
 import { walletPageProse } from '@/tests/utils/wallet-page-prose'
 import { getRepositoryRoot } from '@/utils/codebase'
 import { getWalletUrl } from '@/utils/urls'
@@ -19,7 +19,7 @@ describe('rendered wallet page prose', () => {
 			const prose = walletPageProse(html)
 			const violations = formatLintMessages(
 				prose,
-				await aiTellsLinter.lint(prose, { language: 'plaintext' }),
+				await aiTellsLinter.lint(prose, { language: 'plaintext' }, GrammarTextKind.GENERAL),
 			)
 
 			expect(prose.length, 'Wallet report has no prose').toBeGreaterThan(0)

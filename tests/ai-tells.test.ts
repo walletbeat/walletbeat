@@ -32,7 +32,7 @@ describe('AI prose linter', () => {
 			...Array<string>(count).fill('ship'),
 			...Array<string>(totalWords - count).fill('wallet'),
 		].join(' ')
-		const lints = await aiTellsLinter.lint(text, { language: 'plaintext' })
+		const lints = await aiTellsLinter.lint(text, { language: 'plaintext' }, GrammarTextKind.GENERAL)
 
 		expect(lints).toHaveLength(expectedLints)
 	})
@@ -41,6 +41,7 @@ describe('AI prose linter', () => {
 		const lints = await aiTellsLinter.lint(
 			'Gate gates GATED gating ship Ships SHIPPED shipping gateway shipment',
 			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
 		)
 
 		expect(lints.map(lint => lint.get_problem_text())).toEqual([
@@ -59,7 +60,7 @@ describe('AI prose linter', () => {
 		const code = 'wallet '.repeat(3000)
 		const text = ['gate gated gating', '```', code, '```'].join('\n')
 
-		const lints = await aiTellsLinter.lint(text, { language: 'markdown' })
+		const lints = await aiTellsLinter.lint(text, { language: 'markdown' }, GrammarTextKind.GENERAL)
 
 		expect(lints.map(lint => lint.get_problem_text())).toEqual(['gate', 'gated', 'gating'])
 	})
@@ -67,8 +68,10 @@ describe('AI prose linter', () => {
 	it('uses the declared language for code exclusions', async () => {
 		const text = '`gate gated gating`'
 
-		expect(await aiTellsLinter.lint(text)).toEqual([])
-		expect(await aiTellsLinter.lint(text, { language: 'plaintext' })).toHaveLength(3)
+		expect(await aiTellsLinter.lint(text, undefined, GrammarTextKind.GENERAL)).toEqual([])
+		expect(
+			await aiTellsLinter.lint(text, { language: 'plaintext' }, GrammarTextKind.GENERAL),
+		).toHaveLength(3)
 	})
 })
 

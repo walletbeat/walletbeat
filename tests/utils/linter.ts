@@ -41,7 +41,11 @@ export interface Lint {
 }
 
 export interface AbstractLinter {
-	lint(text: string, lintOptions?: harper.LintOptions, kind?: GrammarTextKind): Promise<Lint[]>
+	lint(
+		text: string,
+		lintOptions: harper.LintOptions | undefined,
+		kind: GrammarTextKind,
+	): Promise<Lint[]>
 }
 
 /** Format diagnostics with source locations, highlighted text, and suggestions. */

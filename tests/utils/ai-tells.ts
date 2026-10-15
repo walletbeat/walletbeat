@@ -62,7 +62,7 @@ function aiProseLint(match: RegExpMatchArray, message: string): Lint {
 
 /** Check reference punctuation and word frequency in prose. */
 export const aiTellsLinter: AbstractLinter = {
-	lint(text, lintOptions, kind = GrammarTextKind.GENERAL): Promise<Lint[]> {
+	lint(text, lintOptions, kind): Promise<Lint[]> {
 		const { prose } = extractProse(text, lintOptions?.language)
 		const lints: Lint[] = []
 
