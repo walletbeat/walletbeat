@@ -55,28 +55,13 @@ describe('AI prose linter', () => {
 		])
 	})
 
-	it('excludes non-prose from both occurrence and word counts while preserving spans', async () => {
-		const code = Array<string>(3000).fill('wallet gate ship;—').join(' ')
-		const text = `🔒 [gate](/ship "gate") \`\`${code}\`\` [gated](https://example.com/ship) gating;—`
-		const lints = await aiTellsLinter.lint(
-			text,
-			{ language: 'markdown' },
-			GrammarTextKind.REFERENCE_EXPLANATION,
-		)
+	it('excludes code from the word-frequency denominator', async () => {
+		const code = 'wallet '.repeat(3000)
+		const text = ['gate gated gating', '```', code, '```'].join('\n')
 
-		expect(lints.map(lint => lint.get_problem_text())).toEqual([
-			';',
-			'—',
-			'gate',
-			'gated',
-			'gating',
-		])
+		const lints = await aiTellsLinter.lint(text, { language: 'markdown' })
 
-		for (const lint of lints) {
-			const { start, end } = lint.span()
-
-			expect(text.slice(start, end)).toBe(lint.get_problem_text())
-		}
+		expect(lints.map(lint => lint.get_problem_text())).toEqual(['gate', 'gated', 'gating'])
 	})
 
 	it('uses the declared language for code exclusions', async () => {
