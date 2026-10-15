@@ -1,7 +1,6 @@
 /*
- * Writing patterns that make prose read as AI-generated. Once such prose makes
- * up most of the site, the repeated sentence structure makes the whole site
- * sound generated, and untrustworthy as a consequence.
+ * Repeated wording across wallet reports can make the site sound AI-generated.
+ * Check reference punctuation and flag words that appear too often.
  */
 
 import { extractProse } from '@/utils/markdown-utils'
@@ -28,10 +27,10 @@ const aiWordFamilies = [
 	{ name: 'ship', regExp: /\bship(?:s|ped|ping)?\b/gi },
 ]
 
-/** A word family may occur this many times, however short the text. */
+/** Allow this many uses of each word family regardless of text length. */
 const maxOccurrencesBeforeDensityCheck = 2
 
-/** Above the floor, the limit is this many occurrences per 1000 prose words. */
+/** After the allowed count, limit uses per 1000 prose words. */
 const maxOccurrencesPer1000Words = 1
 
 function aiProseLint(match: RegExpMatchArray, message: string): Lint {
@@ -46,7 +45,7 @@ function aiProseLint(match: RegExpMatchArray, message: string): Lint {
 	}
 }
 
-/** Apply reference punctuation rules and contextual word-frequency rules. */
+/** Check reference punctuation and word frequency in prose. */
 export const aiTellsLinter: AbstractLinter = {
 	lint(text, lintOptions, kind = GrammarTextKind.GENERAL): Promise<Lint[]> {
 		const { prose } = extractProse(text, lintOptions?.language)

@@ -15,7 +15,7 @@ const standaloneUrlRegExps = {
 	source: /https?:\/\/[^\s'"`<>]+/gi,
 }
 
-/** Source scans use string delimiters; prose scans also stop at punctuation around URLs. */
+/** Find URL ranges, stopping at string delimiters in source and surrounding punctuation in prose. */
 export function extractUrlRanges(
 	text: string,
 	context: 'prose' | 'source' = 'prose',
@@ -57,9 +57,9 @@ function maskTextRanges(text: string, ranges: { start: number; end: number }[]):
 }
 
 /**
- * Extract prose and the source ranges excluded from it, retaining visible link labels.
- * Markdown excludes code and link destinations; all formats exclude standalone URLs.
- * Masked spaces preserve UTF-16 offsets and line endings for source diagnostics.
+ * Keep visible link labels, but mask Markdown code and link destinations with spaces.
+ * Standalone URLs are masked in every format. Preserve UTF-16 offsets and line endings
+ * so diagnostics still point to the original text.
  */
 export function extractProse(
 	text: string,

@@ -336,9 +336,9 @@ export async function grammarLintMessages(
 
 		let linterLints = await linter.lint(trimmedText, lintOptions, kind)
 
-		// AI prose diagnostics already originate in masked prose, and vocabulary and
-		// generated-label exemptions do not exempt authored AI prose. Other diagnostics are
-		// suppressed only when they start in non-prose, preserving sentence-wide findings.
+		// The AI linter already skips non-prose and must still check ignored vocabulary
+		// and generated labels. For other linters, keep diagnostics that start in prose
+		// even if they span code or URLs.
 		if (linter !== aiTellsLinter) {
 			linterLints = linterLints.filter(lint => {
 				const { start, end } = lint.span()

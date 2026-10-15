@@ -19,7 +19,7 @@ export interface Span {
 
 export interface Lint {
 	/**
-	 * Get the content of the source material pointed to by [`Self::span`]
+	 * Get the source text covered by span().
 	 */
 	get_problem_text(): string
 	/**
