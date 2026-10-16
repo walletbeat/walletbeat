@@ -1,6 +1,5 @@
 import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
-import { alphabet } from '@/data/entities/alphabet'
 import { flashbots } from '@/data/entities/flashbots'
 import { github } from '@/data/entities/github'
 import { trailOfBits } from '@/data/entities/trail-of-bits'
