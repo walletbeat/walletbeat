@@ -12,7 +12,7 @@ Wallets are how users use and experience Ethereum.
 
 Doesn't matter how CROPS-y the protocol layer is: no CROPS in wallets equals no CROPS for users. 
 
-Walletbeat aims to be an L2BEAT-like public good for wallets: an open framework that evaluates Ethereum wallets through CROPS values.
+Like L2BEAT, Walletbeat aims to improve the wallet ecosystem through open, transparent, and evidence-based evaluations. Pushing CROPS to wallets, we ensure Ethereum values make it all the way to users.
 
 ![Access Layer](./access_layer.png)
 
@@ -29,11 +29,9 @@ This talk walks through:
 
 Why should you listen to us about wallets?
 
-@polymutex wants to see Ethereum fulfill its cypherpunk mission. That is why he is building Walletbeat.
+@polymutex wants to see Ethereum fulfill its cypherpunk mission. That is why he revamped Walletbeat in 2025, with a more in-depth focus on Ethereum alignment and richer data about individual wallets.
 
-He has been working on specifically defining the methodology that we use to rate software wallets.
-
-![Polymutex Avatar](./polymutex_avatar)
+![Polymutex](./polymutex_devconnect_2025.png)
 
 ---
 
