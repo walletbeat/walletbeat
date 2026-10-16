@@ -2,6 +2,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { getRepositoryRoot } from '@/utils/codebase'
+import { isRecord } from '@/utils/json'
+
 import { type CoinspectCheckRow, coinspectChecks, isSkippedCoinspectCheck } from './check-mapping'
 
 const CHECKS_FILE = 'data/coinspect/config/checks.json'
@@ -21,18 +24,10 @@ export interface CoinspectClassificationReport {
 	emptySkipReasons: readonly string[]
 }
 
-function repositoryRoot(): string {
-	return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-}
-
 function readJson(filePath: string): unknown {
 	const parsed: unknown = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }))
 
 	return parsed
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 function criteriaScores(check: unknown, checkId: string): number[] {
@@ -116,7 +111,7 @@ function sorted(ids: Iterable<string>): string[] {
 
 /** Compare the mapping table with the vendored checks and reports. */
 export function coinspectClassificationReport(
-	root: string = repositoryRoot(),
+	root: string = getRepositoryRoot(),
 ): CoinspectClassificationReport {
 	const defined = checksById(path.join(root, CHECKS_FILE))
 	const used = reportCheckIds(path.join(root, REPORTS_DIR))

@@ -1,6 +1,9 @@
+import bridgeWalletAndroidCoinspect from '@/data/coinspect/current-reports/bridge-wallet-android/bridge-wallet-android.json'
+import bridgeWalletIosCoinspect from '@/data/coinspect/current-reports/bridge-wallet-ios/bridge-wallet-ios.json'
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { sigri } from '@/data/contributors/sigri'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -150,7 +153,18 @@ export const mtpelerin: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([
+						bridgeWalletAndroidCoinspect,
+						bridgeWalletIosCoinspect,
+					]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+			},
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},

@@ -13,10 +13,9 @@ if ! hash rsync; then
 	echo 'rsync not installed.' >&2
 	exit 1
 fi
-
 UPSTREAM_REPO='https://github.com/coinspect/wallet-security-ranking'
 UPSTREAM_REF='main'
-LOCAL_COMMIT_FILE='data/coinspect/upstream-commit'
+LOCAL_COMMIT_FILE='data/coinspect/upstream-commit.json'
 LOCAL_REPORTS_DIR='data/coinspect/current-reports'
 LOCAL_CHECKS_FILE='data/coinspect/config/checks.json'
 
@@ -27,7 +26,7 @@ if [[ -z "$remote_sha" ]]; then
 fi
 
 if [[ -f "$LOCAL_COMMIT_FILE" ]]; then
-	local_sha=$(cat "$LOCAL_COMMIT_FILE")
+	local_sha="$(sed -n 's/.*"commit": *"\([0-9a-f]*\)".*/\1/p' "$LOCAL_COMMIT_FILE")"
 else
 	local_sha=''
 fi
@@ -68,5 +67,5 @@ rsync -a --delete \
 	"$tmp/current-reports/" "$LOCAL_REPORTS_DIR/"
 cp "$tmp/config/checks.json" "$LOCAL_CHECKS_FILE"
 
-echo "$remote_sha" > "$LOCAL_COMMIT_FILE"
+printf '{\n\t"commit": "%s"\n}\n' "$remote_sha" > "$LOCAL_COMMIT_FILE"
 echo "Updated Coinspect snapshot to $remote_sha." >&2

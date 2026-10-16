@@ -1,4 +1,8 @@
+import okxAndroidCoinspect from '@/data/coinspect/current-reports/okx-android/okx-android.json'
+import okxBrowserCoinspect from '@/data/coinspect/current-reports/okx-browser/okx-browser.json'
+import okxIosCoinspect from '@/data/coinspect/current-reports/okx-ios/okx-ios.json'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -196,7 +200,20 @@ export const okx: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				[Variant.BROWSER]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([okxBrowserCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+				[Variant.MOBILE]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([okxAndroidCoinspect, okxIosCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

@@ -793,6 +793,7 @@
 		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" },
 		{ "name": "backdoor", "pattern": "/\\bbackdoor\\b/gi" },
 		{ "name": "C.", "pattern": "/\\bC\\./g" },
+		{ "name": "Coinspect check IDs", "pattern": "/\\bWSR-[A-Z]+-\\d+(?:~[A-Za-z]+)?\\.v\\d+\\b/g" },
 		{ "name": "N/A", "pattern": "/\\bN\\/A\\b/g" },
 		{ "name": "tl;dr", "pattern": "/\\btl;dr\\b/g" },
 		{
@@ -813,6 +814,7 @@
 		"Chrome extension IDs",
 		"Chrome extension literally",
 		"C.",
+		"Coinspect check IDs",
 		"Git commit ref pins",
 		"Git short commit hashes",
 		"GitHub line anchors",

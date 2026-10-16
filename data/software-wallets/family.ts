@@ -1,5 +1,7 @@
+import familyIosCoinspect from '@/data/coinspect/current-reports/family-ios/family-ios.json'
 import { lucemans } from '@/data/contributors/lucemans'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -113,7 +115,12 @@ export const family: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: null,
+				scamUrlWarning: coinspectScamUrlWarning([familyIosCoinspect]),
+				sendTransactionWarning: null,
+				unlimitedApprovalWarning: null,
+			},
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},

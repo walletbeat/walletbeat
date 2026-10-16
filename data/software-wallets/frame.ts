@@ -1,8 +1,10 @@
+import frameBrowserCoinspect from '@/data/coinspect/current-reports/frame-browser/frame-browser.json'
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -137,7 +139,15 @@ export const frame: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				[Variant.BROWSER]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([frameBrowserCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+				[Variant.DESKTOP]: null,
+			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

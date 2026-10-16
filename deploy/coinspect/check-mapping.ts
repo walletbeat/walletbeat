@@ -59,15 +59,20 @@ export type CoinspectCheckRow =
 	  }
 
 /** Wrap a mapped row so its score values match the target field's type. */
-export function mapCoinspectCheck<T>(row: CoinspectMappedCheck<T>): CoinspectCheckRow {
+export function mapCoinspectCheck<T>(row: CoinspectMappedCheck<T>): CoinspectMappedCheck<T> {
 	return row
 }
 
 /** Wrap a mapped row so its score values match the target property's type. */
 export function mapCoinspectProperty<F extends object, K extends keyof F>(
 	row: CoinspectMappedProperty<F, K>,
-): CoinspectCheckRow {
+): CoinspectMappedProperty<F, K> {
 	return row
+}
+
+/** True when a mapped score deliberately produces no feature value. */
+export function isCoinspectNoValue(value: unknown): value is CoinspectNoValue {
+	return value === coinspectNoValue
 }
 
 function skip(reason: string): CoinspectSkippedCheck {

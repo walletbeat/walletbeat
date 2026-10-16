@@ -3,10 +3,12 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import coinspectUpstream from '@/data/coinspect/upstream-commit.json'
 import { allWallets } from '@/data/wallets'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import { coinspectClassificationReport } from '../deploy/coinspect/check-classification'
+import { coinspectAudit } from '../deploy/coinspect/coinspect-audit'
 
 /**
  * Coinspect `walletMakerUID`s that Walletbeat does not track.
@@ -36,7 +38,7 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 ])
 
 const CURRENT_REPORTS_DIR = 'data/coinspect/current-reports'
-const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit'
+const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit.json'
 const FULL_SHA1 = /^[0-9a-f]{40}$/
 
 function walletMakerUIDFromReport(parsed: unknown, reportPath: string): string {
@@ -200,10 +202,10 @@ describe('coinspect mapping', () => {
 
 describe('coinspect upstream pin', () => {
 	it('has a well-formed upstream-commit pin', () => {
-		const pinPath = path.join(getRepositoryRoot(), UPSTREAM_COMMIT_FILE)
-		const localSha = fs.readFileSync(pinPath, { encoding: 'utf-8' }).trim()
-
-		expect(localSha, `${UPSTREAM_COMMIT_FILE} must be a full 40-character SHA-1`).toMatch(FULL_SHA1)
+		expect(
+			coinspectUpstream.commit,
+			`${UPSTREAM_COMMIT_FILE} commit must be a full 40-character SHA-1`,
+		).toMatch(FULL_SHA1)
 	})
 })
 
@@ -216,5 +218,20 @@ describe('coinspect check classification', () => {
 		expect(report.mappedWithoutDefinition).toEqual([])
 		expect(report.unhandledScores).toEqual([])
 		expect(report.emptySkipReasons).toEqual([])
+	})
+})
+
+describe('coinspect import', () => {
+	const audit = coinspectAudit()
+
+	// Coinspect has a value for a field that is still null: wire the field to
+	// its helper in `@/schema/coinspect`, passing that variant's reports.
+	it('fills every gap that Coinspect has a value for', () => {
+		expect(audit.unusedValues).toEqual([])
+	})
+
+	// A helper was passed reports from the wrong wallet or the wrong variant.
+	it('wires Coinspect helpers to the matching wallet and variant reports', () => {
+		expect(audit.wrongReports).toEqual([])
 	})
 })
