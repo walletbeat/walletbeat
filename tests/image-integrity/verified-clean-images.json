@@ -1655,9 +1655,17 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-14 - Crops Devcon Talk/cover.jpg": {
-		"hash": "aded9216dcfc897ec1c76e17834336b0cca0ea922682c0e9a30928711d55d3f4",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/cover.png": {
+		"hash": "053798d23c164651d38eeb04d508e79e558daf1035d20b6d1600bceba8223d42",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/polymuter_avatar.png": {
+		"hash": "dcc90b3335fff58d1fea50caf7d454074ec85f4bc8c155f662e6b94fc0c3460f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/walletbeat_image.png": {
+		"hash": "6d56565b6f9e15e75620045f9f1c42d8d63c2d0136ac154d0022f0db2373712b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
