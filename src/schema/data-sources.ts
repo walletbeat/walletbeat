@@ -1,4 +1,4 @@
-import { coinspectUpstreamCommit } from '@/data/coinspect/upstream-commit'
+import coinspectUpstream from '@/data/coinspect/upstream-commit.json'
 import { coinspect } from '@/data/entities/coinspect'
 import type { Entity } from '@/schema/entity'
 import type { LabeledUrl, Url } from '@/schema/url'
@@ -36,7 +36,7 @@ export function coinspectRef(args: {
 	lastRetrieved: CalendarDate
 	source: DataSource
 } {
-	const commit = coinspectUpstreamCommit
+	const { commit } = coinspectUpstream
 	const url = `https://github.com/coinspect/wallet-security-ranking/blob/${commit}/current-reports/${args.report.walletUID}/${args.report.walletUID}.json`
 
 	return {

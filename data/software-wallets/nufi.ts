@@ -1,6 +1,8 @@
+import nufiBrowserCoinspect from '@/data/coinspect/current-reports/nu-fi-browser/nu-fi-browser.json'
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -165,7 +167,12 @@ export const nufi: SoftwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: null,
+				scamUrlWarning: coinspectScamUrlWarning([nufiBrowserCoinspect]),
+				sendTransactionWarning: null,
+				unlimitedApprovalWarning: null,
+			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

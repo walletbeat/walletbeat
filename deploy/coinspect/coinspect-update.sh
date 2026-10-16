@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Refresh the vendored Coinspect current-reports/ snapshot.
+# Refresh the vendored Coinspect current-reports/ snapshot and checks.json.
 
 set -euo pipefail
 set +x
@@ -13,11 +13,11 @@ if ! hash rsync; then
 	echo 'rsync not installed.' >&2
 	exit 1
 fi
-
 UPSTREAM_REPO='https://github.com/coinspect/wallet-security-ranking'
 UPSTREAM_REF='main'
-LOCAL_COMMIT_FILE='data/coinspect/upstream-commit.ts'
+LOCAL_COMMIT_FILE='data/coinspect/upstream-commit.json'
 LOCAL_REPORTS_DIR='data/coinspect/current-reports'
+LOCAL_CHECKS_FILE='data/coinspect/config/checks.json'
 
 remote_sha="$(git ls-remote "$UPSTREAM_REPO" "$UPSTREAM_REF" | cut -f1)"
 if [[ -z "$remote_sha" ]]; then
@@ -26,7 +26,7 @@ if [[ -z "$remote_sha" ]]; then
 fi
 
 if [[ -f "$LOCAL_COMMIT_FILE" ]]; then
-	local_sha="$(grep -oE '[0-9a-f]{40}' "$LOCAL_COMMIT_FILE" | head -n 1 || true)"
+	local_sha="$(sed -n 's/.*"commit": *"\([0-9a-f]*\)".*/\1/p' "$LOCAL_COMMIT_FILE")"
 else
 	local_sha=''
 fi
@@ -45,7 +45,7 @@ trap cleanup EXIT
 
 git clone --depth 1 --filter=blob:none --sparse \
 	"$UPSTREAM_REPO" "$tmp"
-git -C "$tmp" sparse-checkout set current-reports
+git -C "$tmp" sparse-checkout set current-reports config
 git -C "$tmp" fetch --depth 1 origin "$remote_sha"
 git -C "$tmp" checkout "$remote_sha"
 
@@ -54,12 +54,20 @@ if [[ ! -d "$tmp/current-reports" ]] || [[ -z "$(ls -A "$tmp/current-reports")" 
 	exit 1
 fi
 
+if [[ ! -f "$tmp/config/checks.json" ]]; then
+	echo "Upstream config/checks.json is missing at $remote_sha; refusing to update $LOCAL_CHECKS_FILE." >&2
+	exit 1
+fi
+
 mkdir -p "$LOCAL_REPORTS_DIR"
+mkdir -p "$(dirname "$LOCAL_CHECKS_FILE")"
 rsync -a --delete \
 	--exclude='images/' \
 	--exclude='images.json' \
 	"$tmp/current-reports/" "$LOCAL_REPORTS_DIR/"
+cp "$tmp/config/checks.json" "$LOCAL_CHECKS_FILE"
 
+printf '{\n\t"commit": "%s"\n}\n' "$remote_sha" > "$LOCAL_COMMIT_FILE"
 cat > "$LOCAL_COMMIT_FILE" <<EOF
 // Written by deploy/coinspect/coinspect-update.sh; do not edit by hand.
 export const coinspectUpstreamCommit = '$remote_sha'

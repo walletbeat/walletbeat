@@ -20,7 +20,17 @@ if ! git status --porcelain data/coinspect/ | grep -q .; then
 	exit 0
 fi
 
+# COINSPECT_NOTES_FILE, when set and non-empty, is a second commit
+# paragraph of non-blocking findings: platform conflicts (Android and
+# iOS disagree, so the mobile field stays empty), reports for platforms
+# Walletbeat does not track, and researched values that disagree with
+# Coinspect.
+commit_args=(-m 'Automated Coinspect snapshot update.')
+if [[ -n "${COINSPECT_NOTES_FILE:-}" ]] && [[ -s "$COINSPECT_NOTES_FILE" ]]; then
+	commit_args+=(-m "$(cat "$COINSPECT_NOTES_FILE")")
+fi
+
 echo 'Pushing updated Coinspect snapshot.' >&2
 git add data/coinspect/
-git commit -m 'Automated Coinspect snapshot update.'
+git commit "${commit_args[@]}"
 git push "$GIT_REMOTE_URL" "$GIT_REMOTE_BRANCH"

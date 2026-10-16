@@ -1,7 +1,11 @@
+import phantomAndroidCoinspect from '@/data/coinspect/current-reports/phantom-android/phantom-android.json'
+import phantomBrowserCoinspect from '@/data/coinspect/current-reports/phantom-browser/phantom-browser.json'
+import phantomIosCoinspect from '@/data/coinspect/current-reports/phantom-ios/phantom-ios.json'
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -339,7 +343,20 @@ export const phantom: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: securityAudits,
-			scamAlerts: null,
+			scamAlerts: {
+				[Variant.BROWSER]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([phantomBrowserCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+				[Variant.MOBILE]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([phantomAndroidCoinspect, phantomIosCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+			},
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,

@@ -1,6 +1,8 @@
+import elytroBrowserCoinspect from '@/data/coinspect/current-reports/elytro-browser/elytro-browser.json'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { slowMist } from '@/data/entities/slowmist'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectScamUrlWarning } from '@/schema/coinspect'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -159,7 +161,15 @@ export const elytro: SoftwareWallet = {
 					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/d183d9b07a6cb0772ff52aa4e3e40165e99d6359/contracts/utils/cryptography/P256.sol',
 			}),
 			publicSecurityAudits: elytroAudits,
-			scamAlerts: null,
+			scamAlerts: {
+				[Variant.BROWSER]: {
+					contractTransactionWarning: null,
+					scamUrlWarning: coinspectScamUrlWarning([elytroBrowserCoinspect]),
+					sendTransactionWarning: null,
+					unlimitedApprovalWarning: null,
+				},
+				[Variant.MOBILE]: null,
+			},
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},
