@@ -16,7 +16,7 @@ export const rudderstack: CorporateEntity & OffchainDataProvider = {
 		walletDeveloper: false,
 	},
 	crunchbase: {
-		type: "NO_CRUNCHBASE_URL"
+		type: 'NO_CRUNCHBASE_URL',
 	},
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: 'NO_ICON',

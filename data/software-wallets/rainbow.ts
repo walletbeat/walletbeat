@@ -853,7 +853,7 @@ export const rainbow: SoftwareWallet = {
 			},
 			dataCollection: {
 				[UserFlow.INSTALL]: {
-					collected: []
+					collected: [],
 				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [
@@ -1125,6 +1125,118 @@ export const rainbow: SoftwareWallet = {
 							role: EntityRole.OPERATOR,
 						},
 					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.cloudinary,
+							byEntity: cloudinary,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
 			},
 			privacyPolicy: 'https://rainbow.me/privacy',
