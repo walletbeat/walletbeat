@@ -6,6 +6,17 @@ import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	walletInfo,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
@@ -69,7 +80,7 @@ import {
 	type ArtifactSigningDetails,
 	RepositoryChangeControlState,
 } from '@/schema/features/transparency/release-transparency'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -82,10 +93,97 @@ import { consensys } from '../entities/consensys'
 import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
+import { hyperFoundation } from '../entities/hyper-foundation'
+import { quicknode } from '../entities/quicknode'
+import { segment } from '../entities/segment'
+import { sentry } from '../entities/sentry'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 import metamaskAndroidParsed from './manifests/metamask/android.parsed.json'
 import metamaskIosParsed from './manifests/metamask/ios.parsed.json'
 import metamaskRawExtManifest from './manifests/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn.manifest.json'
+
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation: 'The extension is installed from the Chrome Web Store.',
+			url: 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+		},
+	],
+	hyperFoundation: [
+		{
+			explanation:
+				"While the wallet is open, the active account address is sent to Hyperliquid's API to look up perpetuals positions.",
+			url: 'https://api.hyperliquid.xyz/info',
+		},
+	],
+	infura: [
+		{
+			explanation:
+				'RPC traffic for default networks goes through Infura, operated by Consensys. Balances are refreshed with Multicall `eth_call` requests that each carry one account address, sent back to back for every account in the wallet.',
+			url: 'https://mainnet.infura.io',
+		},
+	],
+	metamaskApi: [
+		{
+			explanation:
+				'MetaMask services operated by Consensys fetch balances, transaction history, token metadata, prices, and notifications. Notification requests list all accounts in the wallet in a single request.',
+			url: [
+				'https://accounts.api.cx.metamask.io',
+				'https://notification.api.cx.metamask.io',
+				'https://trigger.api.cx.metamask.io',
+				'https://price.api.cx.metamask.io',
+				'https://token.api.cx.metamask.io',
+			],
+		},
+		{
+			explanation:
+				'When creating a wallet, the profile sync service receives the MetaMetrics ID together with the account addresses.',
+			url: 'https://authentication.api.cx.metamask.io/api/v2/profile/accounts',
+		},
+		{
+			explanation:
+				'Transactions are simulated and submitted through the Transaction Sentinel service, and addresses, transactions, and connected apps are checked by the security alerts and app scanning services.',
+			urls: [
+				{
+					label: 'Transaction Sentinel service',
+					url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io',
+				},
+				{
+					label: 'Security alerts service',
+					url: 'https://security-alerts.api.cx.metamask.io',
+				},
+				{
+					label: 'App scanning service',
+					url: 'https://dapp-scanning.api.cx.metamask.io/v2/scan',
+				},
+			],
+		},
+		{
+			explanation: 'Swap quotes are fetched from the MetaMask bridge API.',
+			url: 'https://bridge.api.cx.metamask.io/getQuoteStream',
+		},
+	],
+	quicknode: [
+		{
+			explanation:
+				'When importing a wallet, some balance lookups are sent to QuickNode endpoints on Arbitrum, Base, Optimism, and Monad.',
+			url: 'https://www.quicknode.com/',
+		},
+	],
+	segment: [
+		{
+			explanation:
+				'MetaMetrics product analytics are sent to Segment with the MetaMetrics ID as `userId`, a profile ID, and the actions taken. Transaction events include the connected app as `referrer`. MetaMask asks for consent to MetaMetrics during onboarding.',
+			url: 'https://api.segment.io/v1/batch',
+		},
+	],
+	sentry: [
+		{
+			explanation: 'Sentry receives performance traces and error reports.',
+			url: 'https://sentry.io/api/273505/envelope/',
+		},
+	],
+}
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -399,7 +497,80 @@ export const metamask: SoftwareWallet = {
 				}),
 				useAppSpecificLastConnectedAddresses: notSupported,
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+			},
 			privacyPolicy: 'https://consensys.io/privacy-notice/',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
