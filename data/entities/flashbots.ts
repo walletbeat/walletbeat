@@ -22,6 +22,6 @@ export const flashbots: CorporateEntity & TransactionBroadcastProvider = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: 'https://docs.flashbots.net/policies/privacy',
 	repoUrl: 'https://github.com/flashbots',
-	twitter: {type: 'NO_TWITTER_URL'},
+	twitter: { type: 'NO_TWITTER_URL' },
 	url: 'https://www.flashbots.net/',
 }
