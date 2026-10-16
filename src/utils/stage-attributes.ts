@@ -39,7 +39,7 @@ export const allCriteriaInStage = <_AttributeGroupId extends string>(
 /**
  * Aggregate status for a stage or criteria group based on applicable criterion ratings.
  * Rule: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
- * Throws if every criterion is EXEMPT (stage must have at least one applicable criterion).
+ * All-exempt criteria pass, with zero applicable criteria.
  */
 export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
 
@@ -52,7 +52,7 @@ export interface StageCountsAndStatus {
 /**
  * Compute passed/total counts and aggregate status for a set of stage criteria.
  * "Applicable" = not EXEMPT. Status: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
- * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
+ * All-exempt criteria pass, with zero applicable criteria.
  */
 export function computeCountsAndStatus<_AttributeGroupId extends string>(
 	criteria: WalletStageCriterion<_AttributeGroupId>[],
@@ -68,9 +68,7 @@ export function computeCountsAndStatus<_AttributeGroupId extends string>(
 		allEvaluations.length > 0 && allEvaluations.every(e => e.rating === StageCriterionRating.EXEMPT)
 
 	if (allExempt) {
-		throw new Error(
-			'Stage has no applicable criteria for this wallet (all criteria are EXEMPT). The stage definition should have at least one criterion that applies.',
-		)
+		return { passedCount, totalCount, status: 'PASS' }
 	}
 
 	const hasUnrated = applicableEvaluations.some(e => e.rating === StageCriterionRating.UNRATED)

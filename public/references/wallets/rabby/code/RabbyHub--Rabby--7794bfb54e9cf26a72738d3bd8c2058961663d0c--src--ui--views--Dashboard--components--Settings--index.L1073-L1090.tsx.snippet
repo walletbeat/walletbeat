@@ -1,0 +1,74 @@
+{
+	"highlightFirstLine": 1073,
+	"highlightLastLine": 1090,
+	"segments": [
+		{
+			"lines": [
+				"}) => {"
+			],
+			"startLine": 626
+		},
+		{
+			"lines": [
+				"  const renderData = {"
+			],
+			"startLine": 870
+		},
+		{
+			"lines": [
+				"    settings: {"
+			],
+			"startLine": 1003
+		},
+		{
+			"lines": [
+				"      items: ["
+			],
+			"startLine": 1005
+		},
+		{
+			"lines": [
+				"        {"
+			],
+			"startLine": 1060
+		},
+		{
+			"lines": [
+				"          rightIcon: (",
+				"            <Switch"
+			],
+			"startLine": 1064
+		},
+		{
+			"lines": [
+				"              disabled={dataAnalysisPending}",
+				"            />",
+				"          ),",
+				"        },",
+				"        {",
+				"          leftIcon: RcIconCustomTestnet,",
+				"          content: t('page.dashboard.settings.settings.customTestnet'),",
+				"          onClick: () => {",
+				"            history.push('/custom-testnet');",
+				"            matomoRequestEvent({",
+				"              category: 'Setting',",
+				"              action: 'clickToUse',",
+				"              label: 'Custom Testnet',",
+				"            });",
+				"",
+				"            ga4.fireEvent('More_CustomTestnet', {",
+				"              event_category: 'Click More',",
+				"            });",
+				"",
+				"            reportSettings('Custom Testnet');",
+				"          },",
+				"        },",
+				"        ...(CUSTOM_RPC_ENABLED",
+				"          ? [",
+				"              {",
+				"                leftIcon: RcIconCustomRPC,"
+			],
+			"startLine": 1069
+		}
+	]
+}

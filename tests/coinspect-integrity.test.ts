@@ -3,7 +3,11 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+<<<<<<< HEAD
 import coinspectUpstream from '@/data/coinspect/upstream-commit.json'
+=======
+import { coinspectUpstreamCommit } from '@/data/coinspect/upstream-commit'
+>>>>>>> beta
 import { allWallets } from '@/data/wallets'
 import { getRepositoryRoot } from '@/utils/codebase'
 
@@ -38,7 +42,11 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 ])
 
 const CURRENT_REPORTS_DIR = 'data/coinspect/current-reports'
+<<<<<<< HEAD
 const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit.json'
+=======
+const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit.ts'
+>>>>>>> beta
 const FULL_SHA1 = /^[0-9a-f]{40}$/
 
 function walletMakerUIDFromReport(parsed: unknown, reportPath: string): string {

@@ -1,0 +1,58 @@
+{
+	"highlightFirstLine": 27,
+	"highlightLastLine": 54,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  deploy-to-prod:"
+			],
+			"startLine": 7
+		},
+		{
+			"lines": [
+				"    steps:",
+				"      - uses: bullfrogsec/bullfrog@dcde5841b19b7ef693224207a7fdec67fce604db # v0.8.3",
+				"        with:"
+			],
+			"startLine": 10
+		},
+		{
+			"lines": [
+				"          # Default: audit",
+				"          egress-policy: audit",
+				"      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+				"",
+				"      - name: 🧷️ Get version",
+				"        uses: juliangruber/read-file-action@02bbba9876a8f870efd4ad64e3b9088d3fb94d4b",
+				"        id: version",
+				"        with:",
+				"          path: VERSION",
+				"",
+				"      - name: 🧾️ Get release notes",
+				"        uses: juliangruber/read-file-action@02bbba9876a8f870efd4ad64e3b9088d3fb94d4b",
+				"        id: release-notes",
+				"        with:",
+				"          path: RELEASE",
+				"",
+				"      - name: 🏷️ Tag",
+				"        id: github-tag-action",
+				"        uses: uniswap/github-tag-action@7bddacd4864a0f5671e836721db60174d8a9c399",
+				"        with:",
+				"          github_token: ${{ secrets.GITHUB_TOKEN }}",
+				"          custom_tag: ${{ steps.version.outputs.content }}",
+				"          tag_prefix: \"\"",
+				"",
+				"      - name: 🪽 Release",
+				"        uses: actions/create-release@c9ba6969f07ed90fae07e2e66100dd03f9b1a50e",
+				"        env:",
+				"          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}",
+				"        with:",
+				"          tag_name: ${{ steps.github-tag-action.outputs.new_tag }}",
+				"          release_name: Release ${{ steps.github-tag-action.outputs.new_tag }}",
+				"          body: ${{ steps.release-notes.outputs.content }}"
+			],
+			"startLine": 23
+		}
+	]
+}

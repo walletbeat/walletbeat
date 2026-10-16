@@ -101,9 +101,7 @@ export function isEmbeddedRatedWallet(
 	return wallet.types[WalletType.EMBEDDED] === true
 }
 
-export function attributeTreeForWallet(
-	wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets],
-) {
+export function attributeTreeForWallet(wallet: RatedWallet<string>) {
 	if (isSoftwareRatedWallet(wallet)) {
 		return softwareWalletAttributeTree
 	}

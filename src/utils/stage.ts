@@ -39,20 +39,19 @@ function canonicalizeLadderEvaluation(
 		return ladderEvaluation
 	}
 
-	if (!isStage(ladderEvaluation.stage)) {
-		return {
-			...ladderEvaluation,
-			ladder,
-		}
-	}
-
-	const evaluatedStage = ladderEvaluation.stage
-	const stage = ladder.stages.find(ladderStage => ladderStage.id === evaluatedStage.id)
+	const canonicalStage = (stage: WalletStage<string>): WalletStage<string> =>
+		ladder.stages.find(ladderStage => ladderStage.id === stage.id) ?? stage
 
 	return {
 		...ladderEvaluation,
 		ladder,
-		stage: stage ?? ladderEvaluation.stage,
+		stage: isStage(ladderEvaluation.stage)
+			? canonicalStage(ladderEvaluation.stage)
+			: ladderEvaluation.stage,
+		highestClearedStage:
+			ladderEvaluation.highestClearedStage === null
+				? null
+				: canonicalStage(ladderEvaluation.highestClearedStage),
 	}
 }
 
@@ -72,7 +71,7 @@ function getCanonicalLadderEvaluation(
 }
 
 export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
-	stage: WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+	stage: WalletLadderEvaluation<string>['stage'] | null
 	ladderEvaluation: WalletLadderEvaluation<string> | null
 	ladderType: WalletLadderType | null
 } {
@@ -127,7 +126,7 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
  * attributes, so they should not be ranked with Stage 0+ wallets.
  */
 export function walletQualifiesForStageZero(wallet: RatedWalletStageSlice): boolean {
-	const { stage } = getWalletStageAndLadder(wallet)
+	const { ladderEvaluation } = getWalletStageAndLadder(wallet)
 
-	return stage !== null && typeof stage === 'object'
+	return ladderEvaluation !== null && ladderEvaluation.highestClearedStage !== null
 }

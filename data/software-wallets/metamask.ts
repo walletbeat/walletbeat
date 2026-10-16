@@ -65,7 +65,10 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -185,8 +188,32 @@ export const metamask: SoftwareWallet = {
 				},
 			],
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
@@ -695,7 +722,31 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask shows the amount, sender, recipient, network, network fee, and nonce on an ETH transfer request.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_2.png',
+						label: 'MetaMask transfer request for an ETH transfer',
+					},
+					{
+						explanation:
+							'MetaMask simulates a transaction that reverts and warns that it is likely to fail.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_6.png',
+						label: 'MetaMask transaction request warning that the transaction is likely to fail',
+					},
+					{
+						explanation: 'MetaMask simulates an ERC-721 mint and shows the NFT the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png',
+						label: 'MetaMask transaction request for an ERC-721 mint',
+					},
+					{
+						explanation:
+							'MetaMask simulates an ERC-1155 mint and shows the token the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_9.png',
+						label: 'MetaMask transaction request for an ERC-1155 mint',
+					},
+				],
 				erc4361: supported({
 					ref: {
 						explanation: 'MetaMask formats SIWE requests for easy readability.',
@@ -748,7 +799,32 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask shows the EIP-712 primary type and message fields of a typed data signature request.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png',
+							label: 'MetaMask signature request for EIP-712 typed data',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC approval into the function name, spender, and value, with a button to copy the raw data.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_3.png',
+							label: 'MetaMask decoded calldata for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC transfer into the function name, recipient, and value.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_4.png',
+							label: 'MetaMask decoded calldata for a USDC transfer',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of an Aave supply into the function name and its parameters.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_5.png',
+							label: 'MetaMask decoded calldata for an Aave supply',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -965,6 +1041,7 @@ export const metamask: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BUILD_INFRA_IDENTITY',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -978,6 +1055,23 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: {
+					[Variant.BROWSER]: supported({
+						ref: [
+							{
+								explanation:
+									'Production `build` and `dist` scripts run webpack under LavaMoat, enforcing a per-package policy on bundled dependencies.',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#L49-L51',
+							},
+							{
+								explanation:
+									'Committed LavaMoat policies (with overrides) for each build type define what each dependency may access.',
+								url: 'https://github.com/MetaMask/metamask-extension/tree/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/lavamoat/webpack',
+							},
+						],
+					}),
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
@@ -1029,11 +1123,11 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/metamask-extension/rules/18725950',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: true,
-					requiredReview: true,
-					tagsImmutable: true,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				// MetaMask rebuilds and compares its own Firefox releases, but the harness
 				// and reviewer instructions are private so it can't be independently

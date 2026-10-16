@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 375,
+	"highlightLastLine": 381,
+	"segments": [
+		{
+			"lines": [
+				"export class Networks {"
+			],
+			"startLine": 73
+		},
+		{
+			"lines": [
+				"  isNativeAddress(address: string | null, chainId: ChainId): boolean {"
+			],
+			"startLine": 366
+		},
+		{
+			"lines": [
+				"    }",
+				"    return address === implementation.address;",
+				"  }",
+				"",
+				"  static getNetworkRpcUrlInternal(network: NetworkInfo) {",
+				"    const url = network.rpcUrlUser || network.rpcUrl || network.publicRpcUrl;",
+				"    if (!url) {",
+				"      throw new Error(`Network url missing: ${network.id}`);",
+				"    }",
+				"    return url;",
+				"  }",
+				"",
+				"  getRpcUrlInternal(chain: Chain) {",
+				"    const network = this.getByNetworkId(chain);",
+				"    if (!network) {"
+			],
+			"startLine": 371
+		}
+	]
+}

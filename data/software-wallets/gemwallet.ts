@@ -1,4 +1,5 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -17,7 +18,10 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import type { UnlimitedApprovalWarning } from '@/schema/features/security/scam-alerts'
+import {
+	type UnlimitedApprovalWarning,
+	UnlimitedApprovalWarningBenchmarkSpenders,
+} from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
@@ -32,7 +36,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, type WithRef } from '@/schema/reference'
@@ -81,9 +90,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman],
+		contributors: [h3rman, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-14',
+		lastUpdated: '2026-10-09',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -407,7 +416,15 @@ export const gemwallet: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: {
+						[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+							featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+							featureSupported,
+					},
 				}),
 			},
 			securityBestPractices: {
@@ -542,6 +559,7 @@ export const gemwallet: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported<WithRef<{}>>({
 					ref: [
 						{
@@ -564,6 +582,7 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
@@ -573,7 +592,24 @@ export const gemwallet: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
-		walletCall: null,
+		walletCall: notSupportedWithRef({
+			ref: [
+				{
+					explanation:
+						'Gem connects to apps through WalletConnect. Its EVM request handler supports signing, sending transactions and switching or adding chains, but not the EIP-5792 methods. Requests for methods outside its list are rejected as unsupported.',
+					urls: [
+						{
+							label: 'Gem features: WalletConnect',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/docs/FEATURES.md#L84-L101',
+						},
+						{
+							label: 'WalletConnect method identifiers',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/core/crates/primitives/src/wallet_connector.rs#L21-L38',
+						},
+					],
+				},
+			],
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

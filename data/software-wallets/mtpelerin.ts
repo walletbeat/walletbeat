@@ -13,8 +13,8 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const mtpelerin: SoftwareWallet = {
@@ -79,13 +79,7 @@ export const mtpelerin: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
 			revenueBreakdownIsPublic: false,
@@ -188,7 +182,9 @@ export const mtpelerin: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

@@ -13,6 +13,7 @@ import {
 	HardwareWalletType,
 	hardwareWalletType,
 	type SupportedHardwareWallet,
+	supportedHardwareWalletsId,
 	supportsHardwareWalletTypesMarkdown,
 } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
@@ -58,7 +59,7 @@ function indirectHardwareWalletSupport(
 ): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'indirect_hardware_wallet_support',
+			id: `indirect_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PARTIAL,
 			displayName: 'Indirect hardware wallet support',
 			shortExplanation: sentence(`
@@ -90,7 +91,7 @@ function directHardwareWalletSupport(
 ): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'direct_hardware_wallet_support',
+			id: `direct_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PASS,
 			displayName: 'Supports hardware wallets',
 			shortExplanation: sentence('{{WALLET_NAME}} supports hardware wallets.'),

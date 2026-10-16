@@ -1,0 +1,63 @@
+{
+	"highlightFirstLine": 36,
+	"highlightLastLine": 68,
+	"segments": [
+		{
+			"lines": [
+				"export const queryTokensCache = async (",
+				"  user_id: string,",
+				"  wallet: WalletControllerType,",
+				"  isTestnet = false",
+				") => {",
+				"  return requestOpenApiWithChainId("
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"    }",
+				"  );",
+				"};",
+				"",
+				"export const batchQueryTokens = async (",
+				"  user_id: string,",
+				"  wallet: WalletControllerType,",
+				"  chainId?: string,",
+				"  isTestnet: boolean = !chainId ? false : checkIsTestnet(chainId),",
+				"  isAll: boolean = true",
+				") => {",
+				"  if (!chainId && !isTestnet) {",
+				"    const usedChains = await wallet.openapi.usedChainList(user_id);",
+				"    const chainIdList = usedChains.map((item) => item.id);",
+				"    const res = await Promise.all(",
+				"      chainIdList.map((serverId) =>",
+				"        pQueue.add(() => {",
+				"          return requestOpenApiWithChainId(",
+				"            ({ openapi }) => openapi.listToken(user_id, serverId, isAll),",
+				"            {",
+				"              wallet,",
+				"              isTestnet,",
+				"            }",
+				"          );",
+				"        })",
+				"      )",
+				"    );",
+				"    return flatten(res);",
+				"  }",
+				"  return requestOpenApiWithChainId(",
+				"    ({ openapi }) => openapi.listToken(user_id, chainId, isAll),",
+				"    {",
+				"      wallet,",
+				"      isTestnet,",
+				"    }",
+				"  );",
+				"};",
+				"",
+				"export const batchQueryHistoryTokens = async (",
+				"  user_id: string,",
+				"  time_at: number,"
+			],
+			"startLine": 32
+		}
+	]
+}

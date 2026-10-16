@@ -65,8 +65,6 @@ export const safe: SoftwareWallet = {
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
-				supportsAddingOrRemovingSigners: true,
-				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
@@ -328,7 +326,9 @@ export const safe: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

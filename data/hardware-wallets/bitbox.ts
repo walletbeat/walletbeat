@@ -132,6 +132,7 @@ export const bitboxWallet: HardwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
 								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
 							role: EntityRole.OPERATOR,
@@ -150,6 +151,7 @@ export const bitboxWallet: HardwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
 								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
@@ -250,6 +252,7 @@ export const bitboxWallet: HardwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

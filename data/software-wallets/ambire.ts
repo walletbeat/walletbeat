@@ -306,16 +306,38 @@ export const ambire: SoftwareWallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
-				supportsAddingOrRemovingSigners: false,
-				supportsKeyRotationWithoutModules: false,
 				tokenTransferTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 			}),
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation: 'Ambire supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/AmbireTech/extension/blob/3f6c7af91fde4c056da96ff9ede5c39f53ed7083/src/common/hooks/useAddressInput/useAddressInput.tsx#L149',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/services/nameResolvers/resolvers/EnsCompatibleResolver.ts#L84-L104',
+					},
+				],
+			},
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: {
+						explanation: "Ambire doesn't support ERC-7828 names.",
+						file: 'public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7828-rejected.png',
+						label: 'Browser extension fails to resolve an ERC-7828 name',
+					},
+				}),
+				erc7831: notSupportedWithRef({
+					ref: {
+						explanation: "Ambire doesn't support ERC-7831 names.",
+						file: 'public/references/wallets/ambire/screenshots/2026-10-04-ambire-browser-erc7831-rejected.png',
+						label: 'Browser extension fails to resolve an ERC-7831 name',
+					},
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
@@ -526,6 +548,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -716,6 +739,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [
 								DataCollectionPurpose.UPDATE_CHECKING,
@@ -1145,6 +1169,7 @@ export const ambire: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -1158,6 +1183,7 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',

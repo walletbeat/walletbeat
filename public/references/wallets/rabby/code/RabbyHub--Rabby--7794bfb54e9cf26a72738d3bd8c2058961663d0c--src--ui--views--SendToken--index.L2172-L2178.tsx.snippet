@@ -1,0 +1,45 @@
+{
+	"highlightFirstLine": 2172,
+	"highlightLastLine": 2178,
+	"segments": [
+		{
+			"lines": [
+				"const SendToken = () => {"
+			],
+			"startLine": 337
+		},
+		{
+			"lines": [
+				"  const loadCurrentToken = useCallback(",
+				"    async (id: string, chainId: string, currentAddress: string) => {"
+			],
+			"startLine": 2152
+		},
+		{
+			"lines": [
+				"      if (chain?.isTestnet) {"
+			],
+			"startLine": 2163
+		},
+		{
+			"lines": [
+				"        });",
+				"        if (res) {",
+				"          result = customTestnetTokenToTokenItem(res);",
+				"        }",
+				"      } else {",
+				"        result = await wallet.openapi.getToken(",
+				"          currentAddress,",
+				"          chainId,",
+				"          tokenId",
+				"        );",
+				"      }",
+				"      if (result) {",
+				"        estimateGasOnChain({",
+				"          chainItem: chain,",
+				"          tokenItem: result,"
+			],
+			"startLine": 2168
+		}
+	]
+}

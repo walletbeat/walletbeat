@@ -44,7 +44,7 @@ export const keycardShell: HardwareWallet = {
 				id: 'keycard-shell',
 				name: 'Keycard Shell',
 				isFlagship: true,
-				url: 'https://get.keycard.tech/pages/keycard-shell',
+				url: 'https://keycard.tech/products/keycard-shell',
 			},
 		],
 		iconExtension: 'svg',
@@ -304,6 +304,7 @@ export const keycardShell: HardwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

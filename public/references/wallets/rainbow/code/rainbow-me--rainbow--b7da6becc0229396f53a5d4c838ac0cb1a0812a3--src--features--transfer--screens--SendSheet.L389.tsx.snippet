@@ -1,0 +1,26 @@
+{
+	"highlightFirstLine": 389,
+	"highlightLastLine": 389,
+	"segments": [
+		{
+			"lines": [
+				"export function SendSheet() {"
+			],
+			"startLine": 138
+		},
+		{
+			"lines": [
+				"  useEffect(() => {",
+				"    const resolveAddressIfNeeded = async () => {",
+				"      const isValid = checkIsValidAddressOrDomainFormat(debouncedRecipient);",
+				"      if (isValid) {",
+				"        const resolvedAddress = await resolveNameOrAddress(debouncedRecipient);",
+				"        if (resolvedAddress && typeof resolvedAddress === 'string') {",
+				"          setToAddress(resolvedAddress);",
+				"        } else {",
+				"          setIsValidAddress(false);"
+			],
+			"startLine": 385
+		}
+	]
+}

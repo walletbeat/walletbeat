@@ -68,4 +68,8 @@ rsync -a --delete \
 cp "$tmp/config/checks.json" "$LOCAL_CHECKS_FILE"
 
 printf '{\n\t"commit": "%s"\n}\n' "$remote_sha" > "$LOCAL_COMMIT_FILE"
+cat > "$LOCAL_COMMIT_FILE" <<EOF
+// Written by deploy/coinspect/coinspect-update.sh; do not edit by hand.
+export const coinspectUpstreamCommit = '$remote_sha'
+EOF
 echo "Updated Coinspect snapshot to $remote_sha." >&2
