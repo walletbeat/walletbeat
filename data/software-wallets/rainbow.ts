@@ -111,7 +111,7 @@ const dataLeakReferences: Record<string, References> = {
 		},
 		{
 			explanation:
-				"Rainbow's platform API fetches assets, balances and transaction history for the active address.",
+				"Rainbow's platform API fetches assets, balances, and transaction history for the active address.",
 			url: 'https://platform.p.rainbow.me',
 		},
 		{
@@ -133,14 +133,14 @@ const dataLeakReferences: Record<string, References> = {
 	rudderstack: [
 		{
 			explanation:
-				'Product analytics events are sent to RudderStack with a persistent `userId`, a `walletAddressHash` for the active wallet, the screens and actions taken (including send and swap amounts), and the domain of connected apps.',
+				'Product analytics events are sent to RudderStack with a persistent `userId`, a `walletAddressHash` for the active wallet, the screens viewed, the actions taken (including send and swap amounts), and the domain of connected apps. This can be turned off in the Privacy Settings.',
 			url: 'https://rainbowjiumask.dataplane.rudderstack.com/v1/batch',
 		},
 	],
 	sentry: [
 		{
 			explanation:
-				'Sentry receives session reports with a persistent session ID. Performance traces include the URLs of API calls, which contain account addresses.',
+				'Sentry receives session reports with a persistent session ID. Performance traces include the URLs of API calls, which contain account addresses. Sentry reporting continues even when analytics is turned off in the Privacy Settings.',
 			url: 'https://o331974.ingest.sentry.io',
 		},
 	],
