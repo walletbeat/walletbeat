@@ -6,12 +6,15 @@ import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
 import { cloudinary } from '@/data/entities/cloudinary'
 import { deBank } from '@/data/entities/debank'
+import { flashbots } from '@/data/entities/flashbots'
+import { github } from '@/data/entities/github'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
 import { monad } from '@/data/entities/monad'
 import { rainbow } from '@/data/entities/rainbow'
 import { rudderstack } from '@/data/entities/rudderstack'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
+import { uniswapLabs } from '@/data/entities/uniswap-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
 import type { Entity } from '@/schema/entity'
 
@@ -28,12 +31,15 @@ export const allEntities = {
 	cloudflare,
 	cloudinary,
 	debank: deBank,
+	flashbots,
+	github,
 	hyperFoundation,
 	monad,
 	rainbow,
 	rudderstack,
 	sentry,
 	sonicLabs,
+	uniswapLabs,
 	walletbeat,
 }
 
