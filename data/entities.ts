@@ -4,9 +4,12 @@ import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
 import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
+import { cloudinary } from '@/data/entities/cloudinary'
 import { deBank } from '@/data/entities/debank'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
 import { monad } from '@/data/entities/monad'
+import { rainbow } from '@/data/entities/rainbow'
+import { rudderstack } from '@/data/entities/rudderstack'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
@@ -23,9 +26,12 @@ export const allEntities = {
 	apple,
 	citrea,
 	cloudflare,
+	cloudinary,
 	debank: deBank,
 	hyperFoundation,
 	monad,
+	rainbow,
+	rudderstack,
 	sentry,
 	sonicLabs,
 	walletbeat,
