@@ -1,0 +1,49 @@
+{
+	"highlightFirstLine": 54,
+	"highlightLastLine": 69,
+	"segments": [
+		{
+			"lines": [
+				"const AccountsHeader = ({ isSidebar, onLinkClick }: { isSidebar: boolean; onLinkClick?: () => void }) => {"
+			],
+			"startLine": 38
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <div",
+				"      className={cn("
+			],
+			"startLine": 46
+		},
+		{
+			"lines": [
+				"        isDarkMode && 'dark',",
+				"        isSidebar && 'border-border border-b px-4',",
+				"      )}",
+				"    >",
+				"      {isSidebar || !isSpacesFeatureEnabled ? (",
+				"        <Typography variant={isSidebar ? 'h3' : 'h1'}>Accounts</Typography>",
+				"      ) : (",
+				"        <AccountsNavigation />",
+				"      )}",
+				"",
+				"      <div className=\"flex flex-row gap-2 max-[599px]:[&>span]:flex-1\">",
+				"        <AddSafeButton trackingLabel={trackingLabel} onLinkClick={onLinkClick} />",
+				"",
+				"        {wallet ? (",
+				"          <Track {...OVERVIEW_EVENTS.CREATE_NEW_SAFE} label={trackingLabel}>",
+				"            <CreateButton isPrimary />",
+				"          </Track>",
+				"        ) : (",
+				"          <ConnectWalletButton size=\"action\" />",
+				"        )}",
+				"      </div>",
+				"    </div>",
+				"  )",
+				"}"
+			],
+			"startLine": 50
+		}
+	]
+}

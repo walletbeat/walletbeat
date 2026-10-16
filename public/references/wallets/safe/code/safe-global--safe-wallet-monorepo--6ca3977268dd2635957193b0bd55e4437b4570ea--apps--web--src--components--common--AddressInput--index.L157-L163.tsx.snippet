@@ -1,0 +1,33 @@
+{
+	"highlightFirstLine": 157,
+	"highlightLastLine": 163,
+	"segments": [
+		{
+			"lines": [
+				"}: AddressInputProps): ReactElement => {"
+			],
+			"startLine": 81
+		},
+		{
+			"lines": [
+				"  const setAddressValue = useCallback(",
+				"    (value: string) => setValue(name, value, { shouldValidate: true }),",
+				"    [setValue, name],",
+				"  )",
+				"",
+				"  // On ENS resolution, update the input value and remember the name it resolved from",
+				"  useEffect(() => {",
+				"    if (address) {",
+				"      if (resolvedName) setResolvedFrom({ name: resolvedName, address })",
+				"      setAddressValue(`${currentShortName}:${address}`)",
+				"    }",
+				"  }, [address, resolvedName, currentShortName, setAddressValue])",
+				"",
+				"  // Label the field with the source ENS name while it still holds that resolved address",
+				"  const resolvedFromLabel =",
+				"    resolvedFrom && sameAddress(watchedValue, resolvedFrom.address)"
+			],
+			"startLine": 152
+		}
+	]
+}

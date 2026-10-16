@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 67,
+	"highlightLastLine": 82,
+	"segments": [
+		{
+			"lines": [
+				"export const getEnsHubChainId = (isTestnet: boolean): string => {",
+				"  return isTestnet ? ENS_HUB_SEPOLIA : ENS_HUB_MAINNET",
+				"}",
+				"",
+				"/**",
+				" * Forward-resolve an ENS name for a target chain via a hub provider (Mainnet/Sepolia).",
+				" * Looks up only that chain's coin type — no fallback to the ETH (60) record.",
+				" */",
+				"export const resolveNameForChain = async (",
+				"  hubProvider: Pick<JsonRpcProvider, 'resolveName'>,",
+				"  name: string,",
+				"  targetChainId: number,",
+				"): Promise<string | null> => {",
+				"  const coinType = convertChainIdToCoinType(targetChainId)",
+				"  if (coinType === undefined) {",
+				"    return null",
+				"  }",
+				"",
+				"  return hubProvider.resolveName(name, coinType)",
+				"}"
+			],
+			"startLine": 63
+		}
+	]
+}
