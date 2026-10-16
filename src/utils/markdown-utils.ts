@@ -1,3 +1,5 @@
+import { parse, postprocess, preprocess } from 'micromark'
+
 import { stringHasPrefix } from '@/types/utils/text'
 
 import {
@@ -120,6 +122,21 @@ export function extractMarkdownLinks(content: string): ExtractedLink[] {
 	}
 
 	return links
+}
+
+const MARKDOWN_CODE_TOKEN_TYPES = new Set(['codeFenced', 'codeIndented', 'codeText'])
+
+/**
+ * Return the character ranges of code spans and code blocks (fenced and indented) in a
+ * Markdown document, as parsed by micromark.
+ */
+export function markdownCodeRanges(markdown: string): { start: number; end: number }[] {
+	const chunks = preprocess()(markdown, undefined, true)
+	const events = postprocess(parse().document().write(chunks))
+
+	return events
+		.filter(([kind, token]) => kind === 'enter' && MARKDOWN_CODE_TOKEN_TYPES.has(token.type))
+		.map(([, token]) => ({ start: token.start.offset, end: token.end.offset }))
 }
 
 /**

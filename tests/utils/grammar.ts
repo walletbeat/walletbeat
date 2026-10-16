@@ -12,6 +12,7 @@ import {
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+import { markdownCodeRanges } from '@/utils/markdown-utils'
 
 /**
  * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
@@ -27,10 +28,10 @@ const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
 const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
 
 /**
- * Compound noun phrases whose first word Harper's phrasal-verb rule reads as a verb that should
- * be split (e.g. "Backup password prompt bypassable" in a security audit finding title).
+ * External titles that the site quotes verbatim, such as security audit finding titles.
+ * Lints inside them are ignored, as their wording is not the site's to change.
  */
-const COMPOUND_NOUN_PHRASES = ['backup password']
+const VERBATIM_TITLES = ['Backup password prompt bypassable']
 
 let vocabulary: string[] | null = null
 
@@ -205,12 +206,20 @@ function getRegexpLinter({
 
 		if (linter === undefined) {
 			linter = {
-				lint(text: string, _lintOptions?: harper.LintOptions): Promise<Lint[]> {
+				lint(text: string, lintOptions?: harper.LintOptions): Promise<Lint[]> {
 					const lints: Lint[] = []
+					// Harper treats text as Markdown unless told otherwise.
+					const codeRanges =
+						(lintOptions?.language ?? 'markdown') === 'markdown' ? markdownCodeRanges(text) : []
 
 					for (const match of text.matchAll(regExp)) {
 						const matchedText = match[0]
 						const start = match.index ?? 0
+						const end = start + matchedText.length
+
+						if (overlapsAnyRange(start, end, codeRanges)) {
+							continue
+						}
 
 						if (isInsideMarkdownLinkUrl(text, start)) {
 							continue
@@ -221,7 +230,6 @@ function getRegexpLinter({
 						}
 
 						const replacement = replace === null ? null : replace(matchedText)
-						const end = start + matchedText.length
 						const suggestion: Suggestion | null =
 							replacement === null
 								? null
@@ -372,6 +380,19 @@ function collectCspellPatternRanges(text: string): { start: number; end: number 
 	return ranges
 }
 
+/** Return all character ranges in `text` that hold one of the `VERBATIM_TITLES`. */
+function collectVerbatimTitleRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+
+	for (const title of VERBATIM_TITLES) {
+		for (let start = text.indexOf(title); start !== -1; start = text.indexOf(title, start + 1)) {
+			ranges.push({ start, end: start + title.length })
+		}
+	}
+
+	return ranges
+}
+
 /** Return true if `[spanStart, spanEnd)` overlaps any entry in `ranges`. */
 function overlapsAnyRange(
 	spanStart: number,
@@ -416,8 +437,9 @@ export async function grammarLintMessages(
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
-	// Same for GitHub labels
+	// Same for GitHub labels and verbatim titles
 	const githubLabelRanges = collectGitHubLabelRanges(trimmedText)
+	const verbatimTitleRanges = collectVerbatimTitleRanges(trimmedText)
 
 	let lints: Lint[] = []
 
@@ -435,27 +457,14 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
 	)
+	lints = lints.filter(
+		lint => !overlapsAnyRange(lint.span().start, lint.span().end, verbatimTitleRanges),
+	)
 
 	// Suppress Word Choice false positives for "setup" used as a noun.
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'setup',
 	)
-
-	// Suppress Word Choice false positives for the first word of a compound noun phrase.
-	lints = lints.filter(lint => {
-		if (lint.lint_kind_pretty() !== 'Word Choice') {
-			return true
-		}
-
-		const following = trimmedText.slice(lint.span().start).toLowerCase()
-
-		return !COMPOUND_NOUN_PHRASES.some(
-			phrase =>
-				phrase.startsWith(`${lint.get_problem_text().toLowerCase()} `) &&
-				following.startsWith(phrase) &&
-				!/\w/.test(following.charAt(phrase.length)),
-		)
-	})
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(

@@ -6,15 +6,33 @@ import { grammarLintMessages, warmupHarperLinter } from './utils/grammar'
 await warmupHarperLinter()
 
 describe('grammarLintMessages', () => {
-	it('flags "backup" used as a verb', async () => {
+	it.each(['You should backup your wallet.', 'You should backup password files.'])(
+		'flags "backup" used as a verb in %j',
+		async text => {
+			expect(await grammarLintMessages(text, { language: 'markdown' })).not.toEqual([])
+		},
+	)
+
+	it('ignores verbatim audit finding titles', async () => {
 		expect(
-			await grammarLintMessages('You should backup your wallet.', { language: 'markdown' }),
-		).not.toEqual([])
+			await grammarLintMessages('Medium: RBY-01-014 WP1-WP2: Backup password prompt bypassable', {
+				language: 'markdown',
+			}),
+		).toEqual([])
 	})
 
-	it('allows "backup" in a compound noun', async () => {
+	it.each([
+		'Use the value:String parameter.',
+		'It depends on The user who holds the key.',
+		'Open the dapp settings.',
+		'The on-chain registry is public.',
+	])('applies site-convention rules to %j outside Markdown code only', async text => {
+		expect(await grammarLintMessages(text, { language: 'markdown' })).not.toEqual([])
+		expect(await grammarLintMessages(`Run \`${text}\` once.`, { language: 'markdown' })).toEqual([])
 		expect(
-			await grammarLintMessages('Backup password prompt bypassable', { language: 'markdown' }),
+			await grammarLintMessages(`Run this once:\n\n\`\`\`\n${text}\n\`\`\`\n`, {
+				language: 'markdown',
+			}),
 		).toEqual([])
 	})
 
