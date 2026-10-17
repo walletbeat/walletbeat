@@ -870,6 +870,7 @@ export const uniswapWallet: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: notSupported,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: {
