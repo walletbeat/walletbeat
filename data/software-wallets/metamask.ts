@@ -113,7 +113,7 @@ const dataLeakReferences: Record<string, References> = {
 	github: [
 		{
 			explanation:
-				"After installation, MetaMask loads its phishing warning page from GitHub Pages. Token icons are loaded from the Trust Wallet asset repository on GitHub.",
+				'After installation, MetaMask loads its phishing warning page from GitHub Pages. Token icons are loaded from the Trust Wallet asset repository on GitHub.',
 			url: [
 				'https://metamask.github.io/phishing-warning/',
 				'https://raw.githubusercontent.com/trustwallet/assets',
@@ -512,6 +512,77 @@ export const metamask: SoftwareWallet = {
 				[UserFlow.INSTALL]: {
 					collected: [],
 				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SWAP_QUOTE,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
 				[UserFlow.ONBOARDING_IMPORT]: {
 					collected: [
 						{
@@ -611,7 +682,7 @@ export const metamask: SoftwareWallet = {
 								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
 								multiAddress: {
-									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
