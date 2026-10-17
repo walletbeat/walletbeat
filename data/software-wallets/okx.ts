@@ -219,11 +219,6 @@ export const okx: SoftwareWallet = {
 							label:
 								"Screenshot of the OKX Wallet extension's hardware wallet connect screen, provided by a maintainer",
 						},
-						{
-							explanation:
-								"OKX's December 2022 announcement says Ledger compatibility is available on the OKX Wallet Web Extension.",
-							url: 'https://investor.wedbush.com/wedbush/article/gnwcq-2022-12-12-okx-introduces-quick-transfer-feature-and-announces-ledger-compatibility-streamlining-self-custody-for-millions-of-users',
-						},
 					],
 					wallets: {
 						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
@@ -264,6 +259,7 @@ export const okx: SoftwareWallet = {
 						{
 							explanation:
 								'OKX announced in February 2023 that the iOS and Android apps connect to Ledger hardware wallets over Bluetooth.',
+							label: "Third-party copy of OKX's announcement",
 							url: 'https://www.coincarp.com/exchange/announcement/okex-13317066449933-connecting-ledger-hardware-wallet-to-okx-wallet-is-now-available-in-app/',
 						},
 					],
@@ -408,13 +404,12 @@ export const okx: SoftwareWallet = {
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: notSupported,
+				hasPublicChangelog: null,
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
-						explanation:
-							'Only the signing SDKs are open source; the apps are not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						explanation: 'The OKX Wallet apps are closed source.',
 						url: 'https://walletscrutiny.com/android/com.okx.wallet/',
 					},
 				}),
