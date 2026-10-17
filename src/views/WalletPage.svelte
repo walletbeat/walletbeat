@@ -225,6 +225,33 @@
 			[]
 	))
 
+	const attributeGroupRatings = $derived(
+		Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) return []
+
+			const attributes = attrGroup.attributes.flatMap(({ attribute }) => {
+				const evalAttr = evalGroup[attribute.id]
+
+				if (!evalAttr || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) return []
+
+				return [{
+					attribute,
+					rating: evalAttr.evaluation.outcome.rating,
+				}]
+			})
+
+			if (attributes.length === 0) return []
+
+			return [{
+				attrGroup,
+				score: calculateAttributeGroupScore(attrGroup, evalGroup),
+				attributes,
+			}]
+		})
+	)
+
 	const pieNavigationItems = $derived.by(() => {
 		const referenceSlices = tocNavigationItems.map<Slice>(group => {
 			const sourceGroup = Object.values(attributeTree).find(
@@ -369,6 +396,7 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
+	import RatingTally from '@/views/RatingTally.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
@@ -616,6 +644,50 @@
 						{/if}
 					{/if}
 				</div>
+
+				<ul
+					class="attribute-group-ratings"
+					data-list="unstyled"
+					aria-label="Ratings by group"
+				>
+					{#each attributeGroupRatings as { attrGroup, score, attributes } (attrGroup.id)}
+						{@const failingAttributes = attributes.filter(({ rating }) => rating === Rating.FAIL)}
+
+						<li
+							class="attribute-group-rating"
+							data-column="gap-2"
+						>
+							<div data-row="gap-2">
+								<a
+									data-link="camouflaged"
+									data-row="gap-2 start"
+									href={`#${slugifyCamelCase(attrGroup.id)}`}
+								>
+									<span data-icon="wbicons-simple {attrGroup.icon}" aria-hidden="true"></span>
+									<strong>{attrGroup.displayName}</strong>
+								</a>
+
+								{#if showScores}
+									<ScoreBadge {score} size="small" />
+								{/if}
+							</div>
+
+							<RatingTally
+								attributes={attributes.map(({ attribute, rating }) => ({ id: attribute.id, rating }))}
+								showCounts
+							/>
+
+							{#if failingAttributes.length > 0}
+								<p class="failing-attributes">
+									Fails:
+									{#each failingAttributes as { attribute }, index (attribute.id)}
+										{index > 0 ? ', ' : ''}<a href={`#${slugifyCamelCase(attribute.id)}`}>{attribute.displayName}</a>
+									{/each}
+								</p>
+							{/if}
+						</li>
+					{/each}
+				</ul>
 			</section>
 		</header>
 
@@ -2908,6 +2980,31 @@
 
 	.wallet-overview {
 		font-size: 0.9rem;
+	}
+
+	.attribute-group-ratings {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+		gap: 1.25rem 1.5rem;
+		margin: 0;
+	}
+
+	.attribute-group-rating {
+		--ratingTally-blockSize: 0.625rem;
+
+		> [data-row] {
+			justify-content: space-between;
+		}
+
+		.failing-attributes {
+			font-size: 0.8rem;
+			line-height: 1.4;
+			color: var(--rating-fail-text);
+
+			a {
+				color: inherit;
+			}
+		}
 	}
 
 	.platforms-label {
