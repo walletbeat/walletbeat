@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 118,
+	"highlightLastLine": 127,
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"  eas-deploy:"
+			],
+			"startLine": 104
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 108
+		},
+		{
+			"lines": [
+				"",
+				"      - name: Install dependencies",
+				"        run: npm ci",
+				"",
+				"      - name: Setup Expo and EAS",
+				"        uses: expo/expo-github-action@v8",
+				"        with:",
+				"          packager: npm",
+				"          eas-version: latest",
+				"          token: ${{ secrets.EXPO_TOKEN }}",
+				"",
+				"      - name: Build and publish update",
+				"        run: npm run build:prod",
+				"        working-directory: ./apps/daimo-mobile",
+				"",
+				"  # Only publish APK on tag (e.g. v1.0.0)",
+				"  publish-apk:",
+				"    if: startsWith(github.ref, 'refs/tags/v')"
+			],
+			"startLine": 114
+		}
+	]
+}

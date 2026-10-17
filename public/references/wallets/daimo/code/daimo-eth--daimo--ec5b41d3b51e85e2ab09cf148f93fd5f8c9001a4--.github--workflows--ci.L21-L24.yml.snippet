@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 21,
+	"highlightLastLine": 24,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  test:"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"      - uses: actions/setup-node@v3",
+				"        with:",
+				"          node-version: \"22.x\"",
+				"",
+				"      - run: |",
+				"          cp apps/daimo-web/.env.example apps/daimo-web/.env",
+				"          cp packages/daimo-api/.env.example packages/daimo-api/.env",
+				"          npm ci",
+				"          NODE_OPTIONS='--max-old-space-size=4096' npm test",
+				"",
+				"  test-contract:",
+				"    runs-on: ubuntu-latest"
+			],
+			"startLine": 17
+		}
+	]
+}

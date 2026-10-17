@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 4,
+	"highlightLastLine": 23,
+	"segments": [
+		{
+			"lines": [
+				"import { assert } from \"./assert\";",
+				"import { KeyData } from \"./model\";",
+				"",
+				"export enum SlotType {",
+				"  Phone = \"Phone\",",
+				"  Computer = \"Computer\",",
+				"  PasskeyBackup = \"Passkey Backup\",",
+				"  SecurityKeyBackup = \"Security Key Backup\",",
+				"  SeedPhraseBackup = \"Seed Phrase Backup\",",
+				"}",
+				"",
+				"// slots 0 - 63 are for mobile devices",
+				"// slots 64 - 127 are for computer devices",
+				"// slots 128 - 160 are for passkey backups",
+				"// slots 160 - 192 are for security key backups",
+				"// slots 192 - 256 are for seed phrase backups",
+				"const slotTypeToFirstSlot = {",
+				"  [SlotType.Phone]: 0,",
+				"  [SlotType.Computer]: 0x40,",
+				"  [SlotType.PasskeyBackup]: 0x80,",
+				"  [SlotType.SecurityKeyBackup]: 0xa0,",
+				"  [SlotType.SeedPhraseBackup]: 0xc0,",
+				"};",
+				"",
+				"// Top three bits of slot denote the type.",
+				"export function getSlotType(slot: number): SlotType | undefined {",
+				"  if (slot > 255) return undefined;"
+			],
+			"startLine": 1
+		}
+	]
+}
