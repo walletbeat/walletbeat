@@ -984,6 +984,7 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({

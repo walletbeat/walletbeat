@@ -1033,6 +1033,7 @@ export const zerion: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			orderflowPractices: null,

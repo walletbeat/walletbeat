@@ -1272,6 +1272,7 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
