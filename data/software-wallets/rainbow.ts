@@ -120,7 +120,7 @@ export const rainbow: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Both clients execute EIP-7702 (type-4) delegation as part of swap/send-calls flows via the @rainbow-me/delegation SDK; `willExecuteDelegation` decides per (address, chainId) whether the next operation delegates.',
+							'Both clients execute EIP-7702 (type-4) delegation as part of swap/send-calls flows via the @rainbow-me/delegation SDK. The `willExecuteDelegation` function decides per (address, chainId) whether the next operation delegates.',
 						url: 'https://github.com/rainbow-me/rainbow/blob/a6caacc07ddad0d40554d647dc4414945c9ebb81/src/features/delegation/willDelegate.ts',
 					},
 				],
@@ -567,7 +567,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`; it does not stop Sentry crash reporting.',
+								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`. It does not stop Sentry crash reporting.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
 						},
 						{
@@ -591,7 +591,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app collects product usage analytics via RudderStack; analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
+								'The mobile app collects product usage analytics via RudderStack. Analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
 						},
 						{
@@ -628,7 +628,7 @@ export const rainbow: SoftwareWallet = {
 					createInAppConnectionFlow: notSupportedWithRef({
 						ref: {
 							explanation:
-								'The Rainbow browser extension connection dialog only offers a "Switch Wallets" picker over existing accounts; it provides no option to create a new address as part of connecting to an app.',
+								'The Rainbow browser extension connection dialog only offers a "Switch Wallets" picker over existing accounts. It provides no option to create a new address as part of connecting to an app.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-wallet-picker.png',
 							label:
 								'Rainbow browser extension connect dialog showing only an existing-wallet picker, no create option',
@@ -657,7 +657,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow browser extension connection dialog: the "Wallet" field is a single-select "Switch Wallets" picker that defaults to the currently active account. Connecting exposes only that one account; tested against the Walletbeat test page, eth_accounts returned exactly the single selected account.',
+									'Rainbow browser extension connection dialog: the "Wallet" field is a single-select "Switch Wallets" picker that defaults to the currently active account. Connecting exposes only that one account. When tested against the Walletbeat test page, eth_accounts returned exactly the single selected account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-eth-accounts-single.png',
 								label:
 									'Walletbeat test page showing Rainbow eth_accounts returning a single account',
@@ -708,7 +708,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
+									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow. The connection can only be completed by selecting an existing account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg',
 								label:
 									'Rainbow mobile connection sheet account picker expanded, showing the "+ Add" option among existing accounts',
@@ -1212,7 +1212,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"When creating a new browser-extension wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `@scure/bip39`, at the library's default 128-bit entropy (12 words). `@scure/bip39` draws that entropy from `@noble/hashes`, whose `randomBytes` calls the browser-provided `crypto.getRandomValues` and throws rather than returning bytes if no secure provider is available. The extension pins `@scure/bip39` 1.6.0, which requires `@noble/hashes` `~1.8.0`; its lockfile resolves that to 1.8.0.",
+								"When creating a new browser-extension wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `@scure/bip39`, at the library's default 128-bit entropy (12 words). `@scure/bip39` draws that entropy from `@noble/hashes`, whose `randomBytes` calls the browser-provided `crypto.getRandomValues` and throws rather than returning bytes if no secure provider is available. The extension pins `@scure/bip39` 1.6.0, which requires `@noble/hashes` `~1.8.0`, resolved to 1.8.0 by its lockfile.",
 							lastRetrieved: '2026-08-02',
 							url: [
 								{
@@ -1248,7 +1248,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, which the React Native bundler resolves to its browser build under the default `react-native, browser, main` field precedence; that build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup; it returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
+								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, which the React Native bundler resolves to its browser build under the default `react-native, browser, main` field precedence. That build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup. The provider returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
 							lastRetrieved: '2026-08-02',
 							url: [
 								{
@@ -1301,31 +1301,31 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rainbow does not decode a USDC approval; it only shows the simulated approval amount, without the spender.',
+								'Rainbow does not decode a USDC approval. It only shows the simulated approval amount, without the spender.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-usdc-approval.png',
 							label: 'Rainbow transaction request for a USDC approval',
 						},
 						{
 							explanation:
-								'Rainbow does not decode an Aave supply; it only shows the simulated amount sent.',
+								'Rainbow does not decode an Aave supply. It only shows the simulated amount sent.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-aave-supply.png',
 							label: 'Rainbow transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction; the simulation shows no changes detected.',
+								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction. The simulation shows no changes detected.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-aave-supply.png',
 							label: 'Rainbow transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; the simulation shows no changes detected.',
+								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. The simulation shows no changes detected.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-batch-approve-supply.png',
 							label: 'Rainbow transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA; it only shows the simulated amounts sent and approved.',
+								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA. It only shows the simulated amounts sent and approved.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-batch-approve-supply.png',
 							label: 'Rainbow batch request for a batched approve and supply',
 						},
@@ -1480,7 +1480,7 @@ export const rainbow: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: {
 						explanation:
-							"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 						url: [
 							{
 								label: "Browser extension sends transactions through the network's RPC",
@@ -1609,7 +1609,7 @@ export const rainbow: SoftwareWallet = {
 								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default, alongside the simulated result. The Uniswap protocol fee is reflected in the simulated receive amount, not itemized separately.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png',
 							label:
-								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded; the fee is the single aggregate "Estimated fee"',
+								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded. The fee is the single aggregate "Estimated fee".',
 							lastRetrieved: '2026-07-03',
 						},
 						{

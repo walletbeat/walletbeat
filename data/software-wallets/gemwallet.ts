@@ -283,10 +283,10 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								"On iOS, unlocking the wallet's keystore password stored in the Keychain is gated behind Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store is gated behind `BiometricPrompt`.",
+								"On iOS, unlocking the wallet's keystore password stored in the Keychain requires Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store requires `BiometricPrompt` authentication.",
 							urls: [
 								{
-									label: 'iOS keystore password gated by biometrics/device passcode',
+									label: 'iOS keystore password protected by biometrics/device passcode',
 									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L104',
 								},
 								{
@@ -564,7 +564,7 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Gradle dependency locking is enabled for the Android build (committed `settings-gradle.lockfile`); the Rust core commits a `Cargo.lock`. Each Swift Package commits a `Package.resolved`, resolved by CI via `just spm-resolve` before building.',
+								'Gradle dependency locking is enabled for the Android build (committed `settings-gradle.lockfile`). The Rust core commits a `Cargo.lock`. Each Swift Package commits a `Package.resolved`, resolved by CI via `just spm-resolve` before building.',
 							urls: [
 								{
 									label: 'Android Gradle settings lockfile',

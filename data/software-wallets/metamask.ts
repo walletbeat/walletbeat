@@ -764,7 +764,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'MetaMask does not decode an Aave supply; it only shows the simulated balance change and the contract being interacted with.',
+								'MetaMask does not decode an Aave supply. It only shows the simulated balance change and the contract being interacted with.',
 							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
 							label: 'MetaMask transaction request for an Aave supply',
 						},
@@ -972,7 +972,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							url: [
 								{
 									label: "Transactions are sent to the network's RPC",
@@ -990,7 +990,7 @@ export const metamask: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon; the network fee is shown by default but the wallet fee is not.',
+								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon. The network fee is shown by default, but the wallet fee is not.',
 							file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
 							label:
 								'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',

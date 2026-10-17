@@ -183,6 +183,8 @@ ref: refNotNecessary
 supported<WithRef<ChainConfigurability>>({ ... })
 ```
 
+Reference `label` and `explanation` fields must not contain semicolons or em dashes. Write separate sentences instead. Avoid AI-ish words such as "gate" and "ship".
+
 References often point to wallet code, which should ideally be formatted as GitHub links. When this is the case, the following rules apply:
 
 - The GitHub URL _must_ contain the full commit hash, not a branch name. This pins the content of the file so that the reference always points to the version of the file that was actually reviewed.

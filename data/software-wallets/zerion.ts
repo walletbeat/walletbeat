@@ -692,7 +692,7 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps—with an extra hop.',
+							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps, with an extra hop.',
 						url: ['https://www.ledger.com/zerion'],
 					},
 				],
@@ -841,13 +841,13 @@ export const zerion: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows an execute call to the Safe address.',
+								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows an execute call to the Safe address.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-aave-supply.png',
 							label: 'Zerion execute confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows an execute call to the Safe address.',
+								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows an execute call to the Safe address.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-batch-approve-supply.png',
 							label: 'Zerion execute confirmation for a Safe{Wallet} batched approve and supply',
 						},
@@ -994,7 +994,7 @@ export const zerion: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								url: [
 									{
 										label:
@@ -1022,7 +1022,7 @@ export const zerion: SoftwareWallet = {
 					l2: {
 						ref: {
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png',
 							label: 'Zerion iOS Networks page listing Base, Optimism and Arbitrum',
 							lastRetrieved: '2026-10-01',

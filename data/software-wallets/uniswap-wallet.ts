@@ -607,7 +607,7 @@ export const uniswapWallet: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
+							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer. The simulated result is empty.',
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
 						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
 					},
@@ -638,7 +638,7 @@ export const uniswapWallet: SoftwareWallet = {
 				erc4361: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
+							'Uniswap Wallet does not format SIWE requests for easy readability. It shows the raw message text in a generic signature request.',
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
 						label: 'Uniswap Wallet signature request for an ERC-4361 message',
 					},
@@ -652,26 +652,26 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode an Aave supply; it only shows the amount sent.',
+								'Uniswap Wallet does not decode an Aave supply. It only shows the amount sent.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the `execTransaction` function.',
+								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the `execTransaction` function.',
+								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA; it only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
+								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA. It only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
 							label: 'Uniswap Wallet transaction request for a batched approve and supply',
 						},

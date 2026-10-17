@@ -147,7 +147,7 @@ export const imtoken: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'imToken publishes its core code under the Apache 2.0 open-source license; the app itself is proprietary.',
+							'imToken publishes its core code under the Apache 2.0 open-source license, but the app itself is proprietary.',
 						url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE',
 					},
 				],
@@ -303,7 +303,7 @@ export const imtoken: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'"imToken uses the system-provided secure random source on iOS and Android to generate private keys locally"; private keys "are never transmitted over any network."',
+							'"imToken uses the system-provided secure random source on iOS and Android to generate private keys locally." Private keys "are never transmitted over any network."',
 						url: 'https://support.token.im/hc/en-us/articles/51636016918553',
 					},
 					{
@@ -416,7 +416,7 @@ export const imtoken: SoftwareWallet = {
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Only the TokenCore library is open source; the app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+							'Only the TokenCore library is open source. The app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
 						url: 'https://walletscrutiny.com/mobile/im.token.app/',
 					},
 				}),

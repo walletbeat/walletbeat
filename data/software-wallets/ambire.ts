@@ -1121,7 +1121,7 @@ export const ambire: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							url: [
 								{
 									label: "Browser extension sends the signed transaction through the network's RPC",

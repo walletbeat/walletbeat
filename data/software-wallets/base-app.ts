@@ -368,7 +368,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39; the seed phrase is shown only to the user and stored locally.',
+							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39. The seed phrase is shown only to the user and stored locally.',
 						url: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 					},
 				],
@@ -585,7 +585,7 @@ export const baseApp: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"). Apps check support via `wallet_getCapabilities` (`atomicBatch`).',
 						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
 					},
 					{
@@ -595,7 +595,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call. One failure therefore reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
 						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
 					},
 					{

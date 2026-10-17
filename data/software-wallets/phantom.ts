@@ -201,12 +201,12 @@ export const phantom: SoftwareWallet = {
 				},
 				{
 					explanation:
-						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021; it skipped a seed round.",
+						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021. It skipped a seed round.",
 					url: 'https://www.theblock.co/post/111249/defi-wallet-solana-phantom-9-million-series-a-a16z',
 				},
 				{
 					explanation:
-						'Phantom charges a 0.85% fee on most swaps; users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
+						'Phantom charges a 0.85% fee on most swaps. Users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
 					url: 'https://help.phantom.com/hc/en-us/articles/5985106844435-Swap-tokens-in-Phantom',
 				},
 			],
@@ -363,7 +363,7 @@ export const phantom: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Phantom does not decode an Aave supply; it only shows the simulated balance change.',
+								'Phantom does not decode an Aave supply. It only shows the simulated balance change.',
 							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-aave-supply.png',
 							label: 'Phantom transaction confirmation for an Aave supply',
 						},

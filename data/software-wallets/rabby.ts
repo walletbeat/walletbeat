@@ -921,7 +921,7 @@ export const rabby: SoftwareWallet = {
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app. The patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -1021,13 +1021,13 @@ export const rabby: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
 							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
@@ -1213,7 +1213,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								url: [
 									{
 										label:
@@ -1262,7 +1262,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								label:
 									"Mobile app sends transactions on Rabby's built-in networks to Rabby's servers",
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
