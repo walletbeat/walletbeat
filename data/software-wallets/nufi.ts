@@ -142,8 +142,7 @@ export const nufi: SoftwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: notSupportedWithRef({
 				ref: {
-					explanation:
-						"No bug bounty or disclosure policy: NuFi's `/.well-known/security.txt` returns 404, no bug bounty platform lists a NuFi program, and the terms have no disclosure clause.",
+					explanation: 'NuFi does not run a bug bounty program.',
 					label: 'NuFi terms and conditions',
 					url: 'https://nu.fi/terms-and-conditions',
 				},
@@ -177,8 +176,6 @@ export const nufi: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
-			// No public independent audit of NuFi's wallet code found (nu.fi, support.nu.fi, changelog, GitHub, web search).
-			// Source: https://nu.fi/features/security
 			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
@@ -226,8 +223,7 @@ export const nufi: SoftwareWallet = {
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: supported({
 					ref: {
-						explanation:
-							'The public changelog lags the shipped version: its latest entry is 31.0.0 from December 2025, while the extension ships 35.2.0.',
+						explanation: 'NuFi publishes a public changelog.',
 						label: 'NuFi changelog',
 						url: 'https://support.nu.fi/support/solutions/articles/80001016927-changelog',
 					},
