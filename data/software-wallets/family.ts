@@ -1,10 +1,13 @@
 import { lucemans } from '@/data/contributors/lucemans'
+import { minimalsm } from '@/data/contributors/minimalsm'
+import { zellic } from '@/data/entities/zellic'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -14,9 +17,9 @@ export const family: SoftwareWallet = {
 		displayName: 'Family',
 		tableName: 'Family',
 		coinspectId: 'family',
-		contributors: [lucemans],
+		contributors: [lucemans, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2025-04-22',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://family.co/docs'],
 			socials: {
@@ -65,19 +68,42 @@ export const family: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation:
+							'The terms grant only a limited, nonexclusive, non-transferable license "with no right to sublicense"; the audited wallet repositories named in the 2024 audit are private.',
+						url: 'https://family.co/terms',
+					},
+				],
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
+		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'"Family does not charge any additional fees for using the wallet. However, standard network fees still apply."',
+					url: 'https://family.co/faqs',
+				},
+				{
+					explanation:
+						'"There are no additional fees for using the bridge, just the standard network fee for the transaction."',
+					url: 'https://family.co/support/bridging',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				hiddenConvenienceFees: false,
 				publicOffering: null,
 				selfFunded: null,
-				transparentConvenienceFees: null,
+				transparentConvenienceFees: false,
 				ventureCapital: null,
 			},
 		},
@@ -101,7 +127,13 @@ export const family: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						'No bug bounty or disclosure policy: the `/security`, `/bug-bounty` and `/.well-known/security.txt` paths on family.co return 404, and no bug bounty platform lists a program for Family.',
+					url: 'https://family.co/terms',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -112,7 +144,25 @@ export const family: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation:
+								'Zellic assessment of the Family Wallet iOS application (January 29 to February 23, 2024): three High and two Medium findings, all acknowledged with fixes implemented.',
+							url: 'https://family.co/media/family-wallet-audit-report-2024.pdf',
+						},
+					],
+					auditDate: '2024-02-28',
+					auditor: zellic,
+					codeSnapshot: {
+						commit: 'abe1d78615984662c3a9f1f80a443ec51b889f2a',
+						date: '2024-01-29',
+					},
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+			],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: null,
