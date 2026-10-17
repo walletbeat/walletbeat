@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 62,
+	"highlightLastLine": 83,
+	"segments": [
+		{
+			"lines": [
+				"class KeyringService {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"  private set _encryptData(data: TPasswordEncryptedData | undefined) {",
+				"    this._store.state.data = data;",
+				"  }",
+				"",
+				"  public async createNewOwner(password?: string) {",
+				"    await this._verifyPassword(password);",
+				"",
+				"    try {",
+				"      const key = generatePrivateKey();",
+				"      const ownerAccount = privateKeyToAccount(key);",
+				"      const ownerData: TOwnerData = {",
+				"        id: ownerAccount.address,",
+				"        key,",
+				"      };",
+				"",
+				"      this._signingKey = new SigningKey(key);",
+				"      this._currentOwner = ownerAccount;",
+				"      this._owners = [...(this._owners || []), ownerData];",
+				"",
+				"      this._encryptData = await encrypt<TVaultData>(",
+				"        {",
+				"          owners: this._owners,",
+				"          currentOwnerId: ownerData.id,",
+				"        },",
+				"        password",
+				"      );",
+				"",
+				"      console.log('Elytro: createNewOwner', this._currentOwner?.address);",
+				"      this._locked = false;",
+				"    } catch (error) {"
+			],
+			"startLine": 58
+		}
+	]
+}
