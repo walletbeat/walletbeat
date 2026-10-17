@@ -543,6 +543,50 @@
 		"hash": "e73bf46b7bbc9d2964e33a619dc57ddbfabe3cfc1fa43a30c61648dacb821105",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-aave-supply.png": {
+		"hash": "f8212bdf61fd6d0a7d1fb1b73eab2c65aaa2af3f70e5feb7e020c6358d27c6cb",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-batch-approve-supply.png": {
+		"hash": "391553f815f8f7515eb97b36db051f684ff7f485745adda93107a49400fa9831",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eip712.png": {
+		"hash": "f4da84eb4d73112c255383a2725a1612543e1751fa583c97067589de40be0f69",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-general-gas-settings.png": {
+		"hash": "51ecddfe5984a098131ccff6d337746042997eb8074a05f2ac3b7b567017e04b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-raw.png": {
+		"hash": "ac72b9097f74f7766f833e270cb29d871a9cdeef71b35026693d84d836127713",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer.png": {
+		"hash": "da4d6db1a41cf374411a88c5468ccb5ee7ea0297cdf32fa1f370269a6ef3b416",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-aave-supply.png": {
+		"hash": "ab9c78a7e6c81aa774dc7b3aac78b5f8aed8059992d1b883d6a8d842e055ba11",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-batch-approve-supply.png": {
+		"hash": "35922e10210c87d83c747d1e3b0955bdb052a5225b9df2ca18dccca09de2f48c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-siwe.png": {
+		"hash": "442df28b6e36d552090ce1dc1bf009e46c82e47a0591f1cb033cd674b593ce03",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval-raw-hex.png": {
+		"hash": "fc650b8ef658f13b932ab95801a79cf880f1ef984f6d0f5811557fe6fe212e88",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval.png": {
+		"hash": "eaa31b0b24e59dd828ff63e0c0cf9026fbdb28baaf7707478e0d34fb8ab0e915",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
 		"hash": "6760318e1b81adef5fc78cd7c901c109f3dd58145009d4dd7855c349afae40c1",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
