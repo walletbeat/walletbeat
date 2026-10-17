@@ -93,6 +93,7 @@ import { consensys } from '../entities/consensys'
 import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
+import { github } from '../entities/github'
 import { hyperFoundation } from '../entities/hyper-foundation'
 import { quicknode } from '../entities/quicknode'
 import { segment } from '../entities/segment'
@@ -107,6 +108,16 @@ const dataLeakReferences: Record<string, References> = {
 		{
 			explanation: 'The extension is installed from the Chrome Web Store.',
 			url: 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+		},
+	],
+	github: [
+		{
+			explanation:
+				"After installation, MetaMask loads its phishing warning page from GitHub Pages. Token icons are loaded from the Trust Wallet asset repository on GitHub.",
+			url: [
+				'https://metamask.github.io/phishing-warning/',
+				'https://raw.githubusercontent.com/trustwallet/assets',
+			],
 		},
 	],
 	hyperFoundation: [
@@ -500,6 +511,86 @@ export const metamask: SoftwareWallet = {
 			dataCollection: {
 				[UserFlow.INSTALL]: {
 					collected: [],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.github,
+							byEntity: github,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [
