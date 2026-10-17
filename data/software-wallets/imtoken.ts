@@ -378,6 +378,7 @@ export const imtoken: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {

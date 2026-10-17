@@ -157,6 +157,7 @@ export const frame: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {

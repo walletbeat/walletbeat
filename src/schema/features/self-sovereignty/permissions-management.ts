@@ -75,6 +75,55 @@ export interface PermissionsManagement {
 
 export type PermissionsManagementSupport = WithRef<PermissionsManagement>
 
+/** Which EIP-7702 delegations the user can remove from within the wallet. */
+export enum DelegationRevocationScope {
+	/** The wallet offers no way to remove the account's delegation. */
+	CANNOT_REVOKE,
+	/**
+	 * The wallet can only remove a delegation to its own delegate contract.
+	 */
+	OWN_DELEGATE_CONTRACT_ONLY,
+	/**
+	 * The wallet can remove a delegation to any contract, including one set
+	 * by another wallet or app.
+	 */
+	ANY_DELEGATE_CONTRACT,
+}
+
+/**
+ * How the wallet lets users inspect and remove the EIP-7702 delegation of
+ * their account, e.g. to take back control after delegating it to a
+ * malicious contract. Removing a delegation means signing an EIP-7702
+ * authorization that delegates the account to the zero address.
+ *
+ * To test:
+ * - `showsCurrentDelegate`: From another wallet or a script, delegate the
+ *   test account to a contract that is not the wallet's own delegate
+ *   contract. Check whether the wallet shows the account as delegated and
+ *   names or links that contract.
+ * - `revocation`: Look in the account settings for a "Revoke delegation",
+ *   "Switch back to a standard account" or similar option. Try it with the
+ *   account delegated to the wallet's own delegate contract, then to a
+ *   contract set by another wallet, and check on a block explorer that the
+ *   account no longer has delegated code.
+ */
+export interface DelegationRevocation {
+	/**
+	 * Does the wallet show which contract the account is currently delegated
+	 * to, including a contract set by another wallet or app?
+	 */
+	showsCurrentDelegate: boolean
+
+	/** Which delegations can the user remove from within the wallet? */
+	revocation: DelegationRevocationScope
+}
+
+/**
+ * EIP-7702 delegation revocation support, or `EIP_7702_NOT_SUPPORTED` for
+ * wallets that cannot sign EIP-7702 authorizations at all.
+ */
+export type DelegationRevocationSupport = 'EIP_7702_NOT_SUPPORTED' | WithRef<DelegationRevocation>
+
 /** Whether the wallet has a built-in swap/bridge feature to rate approval behavior for. */
 export function hasBuiltInSwap(
 	builtInSwapApprovals: PermissionsManagement['builtInSwapApprovals'],

@@ -98,6 +98,7 @@ import {
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	BuiltInSwapDefaultApprovalBehavior,
+	DelegationRevocationScope,
 	SpendingApprovalsControl,
 } from '@/schema/features/self-sovereignty/permissions-management'
 import {
@@ -823,6 +824,11 @@ export const completedTemplate: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: {
+				ref: refTodo,
+				revocation: DelegationRevocationScope.ANY_DELEGATE_CONTRACT,
+				showsCurrentDelegate: true,
+			},
 			permissionsManagement: {
 				ref: refTodo,
 				approvalsManagement: supported({

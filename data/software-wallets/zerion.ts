@@ -934,6 +934,7 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: {
 				ref: [
 					{
