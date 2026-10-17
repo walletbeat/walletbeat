@@ -1655,6 +1655,10 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-15 - Devcon Booth Announcement/origami_flower.jpg": {
+		"hash": "a8f9f755728455926db06d374d8cf68cbad53eb8e917eeb1cca1b30d9af58434",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/social-media/threads/2026-10-15 - Devcon Booth Announcement/walletbeat_booth.jpg": {
 		"hash": "c0c329c11ead04e2d257228253b09aae263b6fbd190ca5829d50cef2695cef5b",
 		"passedTests": ["blockiness", "file-format"]
