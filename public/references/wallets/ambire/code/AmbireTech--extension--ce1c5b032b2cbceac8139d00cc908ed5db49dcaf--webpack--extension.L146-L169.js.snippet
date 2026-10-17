@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 146,
+	"highlightLastLine": 169,
+	"segments": [
+		{
+			"lines": [
+				"// The LavaMoat plugin set, enabled only for production webkit builds: the",
+				"// LavaMoatPlugin itself, a verifier for ignored modules, and a plugin that",
+				"// always emits the SES lockdown source as a standalone asset. See the inline",
+				"// comments and README.MD for the policy-generation workflow.",
+				"function createLavaMoatPlugins() {",
+				"  return [",
+				"    new LavaMoatPlugin({",
+				"      generatePolicy: process.env.LAVAMOAT_GENERATE_POLICY === 'true',",
+				"      // Where policy.json and policy-override.json live",
+				"      policyLocation: path.resolve(ROOT_DIR, 'lavamoat/webpack'),",
+				"      // Inline the SES lockdown shim directly into the background and main UI chunks.",
+				"      // This is critical for MV3 service workers where we can't control",
+				"      // script load order via <script> tags and ensures that popup/tab UIs",
+				"      // run under SES lockdown.",
+				"      // Note: Chunk files (e.g. 738.js in build/webpack-prod) do NOT need inline SES:",
+				"      // they are always loaded by the webpack runtime inside background.js or",
+				"      // main.js (including background-*.js / main-*.js variants) and execute",
+				"      // in the same realm, which is already locked down.",
+				"      inlineLockdown: /^(background)(-.*)?\\.js$/,",
+				"      lockdown: {",
+				"        errorTaming: 'unsafe-debug',",
+				"        stackFiltering: 'verbose',",
+				"        consoleTaming: 'unsafe',",
+				"        errorTrapping: 'none',",
+				"        unhandledRejectionTrapping: 'none',",
+				"        overrideTaming: 'moderate',",
+				"        localeTaming: 'unsafe'",
+				"      },",
+				"      // Keep resource IDs readable for easier debugging and policy maintenance.",
+				"      // Set to true during policy generation for easier debugging, false in production",
+				"      // to reduce bundle size. Same policy works for both gecko and webkit builds.",
+				"      readableResourceIds: process.env.LAVAMOAT_GENERATE_POLICY === 'true',"
+			],
+			"startLine": 142
+		}
+	]
+}
