@@ -291,6 +291,10 @@
 		"hash": "c8c7d819cee5310530a0e67f1213801960f5a05632b63e4b840a1e4aca16f89b",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/wallets/walletchan.png": {
+		"hash": "7aacf2dd85083b8f2172f71cad3dd35bbd66a2e464469d6d91cca15340774c72",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/images/wallets/zerion.svg": {
 		"hash": "8117a299080eb4b793d51bb4bd7c5788978d9a812cc788e4186fcb54245c7d62",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
