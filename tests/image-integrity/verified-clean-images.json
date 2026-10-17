@@ -95,6 +95,10 @@
 		"hash": "f5250ba9776653c69c7ebb7d423d795eeca60729abf012fd1c6c0973a1b73f25",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/infinex.svg": {
+		"hash": "5a311c305646dfa835f6fea89b488b8952e358f82bd4eb4c852f850a6d9724a9",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/jiffylabs.png": {
 		"hash": "5435cb63c2e7086b83c2313e2f6c8ebb4d3aaf19ddb55b6778cb2f0dccb5c50c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -225,6 +229,10 @@
 	},
 	"public/images/wallets/imtoken.svg": {
 		"hash": "99873319aa6259b1f2f47261cd1b04b6047d535186dd3edaae4492a48086ffa4",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/infinex.svg": {
+		"hash": "5a311c305646dfa835f6fea89b488b8952e358f82bd4eb4c852f850a6d9724a9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/keycard-shell.svg": {
