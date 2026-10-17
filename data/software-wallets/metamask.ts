@@ -293,6 +293,7 @@ export const metamask: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: {
 				duringEOACreation: 'NO',
 				duringEOAImport: 'NO',
