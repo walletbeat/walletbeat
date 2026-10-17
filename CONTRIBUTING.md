@@ -16,6 +16,10 @@ Please read [`/resources/docs/contribute/wallet-data/wallet-data.md`](/resources
 
 Please read [`/resources/docs/contribute/ui/ui.md`](/resources/docs/contribute/ui/ui.md).
 
+### I want to understand how the site is hosted and deployed
+
+Please read [`/deploy/README.md`](/deploy/README.md).
+
 ### I want to learn more about Walletbeat
 
 Please read the top-level [`README.md`](/README.md).
