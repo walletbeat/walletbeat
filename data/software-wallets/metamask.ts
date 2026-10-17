@@ -14,7 +14,6 @@ import {
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
-	walletInfo,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -192,6 +191,28 @@ const dataLeakReferences: Record<string, References> = {
 		{
 			explanation: 'Sentry receives performance traces and error reports.',
 			url: 'https://sentry.io/api/273505/envelope/',
+		},
+	],
+	smartTransactions: [
+		{
+			explanation:
+				'MetaMask documents Smart Transactions as routing eligible transactions privately and auctioning them to a network of block builders. The capture shows the transaction submitted to this infrastructure, not whether that particular transaction was auctioned.',
+			url: 'https://metamask.io/news/introducing-smart-transactions',
+		},
+		{
+			explanation:
+				'The signed swap transaction is submitted to the Smart Transactions service, which returns an ID used for status polling.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/v1/networks/1/submitTransactions',
+		},
+		{
+			explanation:
+				'The status of the submitted transaction is then polled until it is mined or canceled.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/v1/networks/1/batchStatus',
+		},
+		{
+			explanation:
+				'Network capabilities and configuration, including Smart Transactions support, are fetched from the same service.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/networks',
 		},
 	],
 }
@@ -538,7 +559,6 @@ export const metamask: SoftwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
 								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -548,9 +568,26 @@ export const metamask: SoftwareWallet = {
 							purposes: [
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.SWAP_QUOTE,
-								DataCollectionPurpose.TRANSACTION_BROADCAST,
 								DataCollectionPurpose.GAS_QUOTE,
 								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.smartTransactions,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.ORDERFLOW_AUCTION,
 							],
 							role: EntityRole.OPERATOR,
 						},
