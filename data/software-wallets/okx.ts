@@ -259,7 +259,7 @@ export const okx: SoftwareWallet = {
 						{
 							explanation:
 								'OKX announced in February 2023 that the iOS and Android apps connect to Ledger hardware wallets over Bluetooth.',
-							label: "Third-party copy of OKX's announcement",
+							label: "Independent copy of OKX's announcement",
 							url: 'https://www.coincarp.com/exchange/announcement/okex-13317066449933-connecting-ledger-hardware-wallet-to-okx-wallet-is-now-available-in-app/',
 						},
 					],
