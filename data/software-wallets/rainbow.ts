@@ -793,6 +793,7 @@ export const rainbow: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				// Rainbow prompts about backups, but never on a schedule, so none of these
 				// prompts is a drill. The three surfaces that look like one:
 				// the seed quiz runs only from onboarding or when the user opens it in

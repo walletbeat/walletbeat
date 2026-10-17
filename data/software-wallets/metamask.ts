@@ -412,6 +412,7 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: notSupportedWithRef({
 					ref: [
 						{
