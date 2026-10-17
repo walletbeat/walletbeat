@@ -17,9 +17,7 @@ export const keystone: CorporateEntity & WalletDeveloper = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/kesytone',
 	farcaster: 'https://warpcast.com/keystonewallet',
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Hong Kong',
 	linkedin: 'https://www.linkedin.com/company/keystonehardwarewallet/',
 	privacyPolicy: 'https://keyst.one/privacy-policy',
