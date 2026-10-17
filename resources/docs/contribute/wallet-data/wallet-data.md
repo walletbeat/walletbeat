@@ -585,6 +585,33 @@ After you have populated this data, you should see attributes that rely on this 
 
 ![](../images/privacy-rating.png)
 
+#### How to find out how to test a field
+
+- Some type definitions include a "To test:" note with concrete steps. For example, the `features.privacy.addressResolution` fields list the exact strings to type into the send address field.
+- The [feature types reference](/resources/docs/features/features.md) collects the documentation for every feature type on a single page.
+- Some fields need more setup than fits in a type comment. These have their own testing guides:
+  - [Data collection](/resources/docs/wallet-testing/data-collection/data-collection.md) (`features.privacy.dataCollection`), covered in example C above.
+  - [Chain verification](/resources/docs/wallet-testing/chain-verification/chain-verification.md) (`features.security.lightClient`).
+  - [L1 provider independence](/resources/docs/wallet-testing/l1-provider-independence/l1-provider-independence.md).
+- Look at how other wallets fill in the same field, and at the `ref`s they cite.
+
+#### What counts as a source
+
+Every value you enter should be verifiable by someone else. Which kind of source is good enough depends on the feature:
+
+- For features that anyone can observe by using the wallet, such as native swaps, multi-chain support or ENS resolution, the wallet's own documentation is an acceptable `ref`.
+- For claims that a user cannot check from the wallet itself, such as having security audits, using a common cryptographic library, or running a light client, the wallet's own statement is not enough. Link to the evidence: the audit report, the source code, or the dependency declaration.
+
+#### Rating categories do not mirror the `features` layout
+
+The categories on the site (security, privacy, self-sovereignty, transparency, and so on) group **attributes**, while the `features` object groups **data**. An attribute can read data from anywhere in `features`. For example, the **Account unruggability** attribute appears under self-sovereignty, but it reads `features.security.keysHandling` and `features.security.accountRecovery`.
+
+To find which data an attribute needs, open its file under `/src/schema/attributes/` and look at which `features.*` fields it reads. For Account unruggability, that file is `/src/schema/attributes/self-sovereignty/account-unruggability.ts`.
+
+#### Closed-source wallets
+
+If none of the wallet's code is public, set `licensing: fullyClosedSource` (from `/src/schema/features/transparency/license.ts`). Wallets with an open-source core library and a proprietary app use `LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE` instead, with a `ref` for each license.
+
 ### **Step 4**: Send a PR to Walletbeat and get it merged
 
 Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. See the corresponding section on the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide for instructions on this.
