@@ -30,6 +30,11 @@
 		PieLayout,
 		type Slice,
 	} from '@/components/pie-geometry'
+	import {
+		attributeGroupFlowerGradient,
+		pieSliceFill,
+		pieSliceLabelBackground,
+	} from '@/components/pie-gradient'
 
 
 	// Functions
@@ -234,6 +239,7 @@
 			return {
 				id: group.id,
 				color: group.accentColor ?? 'transparent',
+				gradient: attributeGroupFlowerGradient,
 				weight: 1,
 				arcLabel: '',
 				ariaLabel: group.title,
@@ -261,7 +267,12 @@
 
 			return {
 				...group,
-				sliceStyle: computedGroup?.computed,
+				sliceStyle: computedGroup && {
+					...computedGroup.computed,
+					// Same rating gradient as the homepage flowers, centered on the pie origin.
+					fill: pieSliceFill(computedGroup, 'var(---pie-origin-x) var(---pie-origin-y)'),
+					labelBackground: pieSliceLabelBackground(computedGroup),
+				},
 				children: group.children?.map((attribute, attributeIndex) => ({
 					...attribute,
 					sliceStyle: computedGroup?.children?.[attributeIndex]?.computed,
@@ -2012,7 +2023,7 @@
 				block-size: 100%;
 				padding: 0;
 				border-radius: 0;
-				background: var(--accent, var(--background-tertiary));
+				background: var(--slice-fill, var(--accent, var(--background-tertiary)));
 				color: var(--text-primary);
 				opacity: 0.9;
 				pointer-events: auto;
@@ -2152,7 +2163,7 @@
 				 */
 				color: light-dark(
 					rgb(19 10 43 / 0.62),
-					oklch(from var(--accent, #000) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
+					oklch(from var(--slice-labelBackground, var(--accent, #000)) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
 				);
 
 				position: absolute;
