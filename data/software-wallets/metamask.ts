@@ -512,6 +512,93 @@ export const metamask: SoftwareWallet = {
 				[UserFlow.INSTALL]: {
 					collected: [],
 				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.quicknode,
+							byEntity: quicknode,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
 				[UserFlow.ONBOARDING_NEW]: {
 					collected: [
 						{
@@ -572,6 +659,7 @@ export const metamask: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
 								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
 								endpoint: RegularEndpoint,
 								multiAddress: null,
 							},
@@ -813,6 +901,7 @@ export const metamask: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
 								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
 								endpoint: RegularEndpoint,
 								multiAddress: null,
 							},
@@ -890,6 +979,7 @@ export const metamask: SoftwareWallet = {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
 								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
 								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
 								endpoint: RegularEndpoint,
 								multiAddress: null,
 							},
