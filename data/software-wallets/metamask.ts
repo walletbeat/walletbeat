@@ -730,6 +730,83 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
 			},
 			privacyPolicy: 'https://consensys.io/privacy-notice/',
 			transactionPrivacy: {
