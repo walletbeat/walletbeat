@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 155,
+	"highlightLastLine": 164,
+	"segments": [
+		{
+			"lines": [
+				"aliases:"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"  - &android_latest_yarn",
+				"    run:",
+				"      name: Install latest yarn version",
+				"      command: |",
+				"        sudo npm install -g yarn",
+				"  - &yarn_install",
+				"    run:",
+				"      name: Install node dependencies",
+				"      command: |",
+				"        yarn install --prefer-offline --cache-folder /home/circleci/.cache/yarn",
+				"  - &yarn_install_ios",
+				"    run:",
+				"      name: Install node dependencies",
+				"      command: |",
+				"        yarn install --prefer-offline",
+				"  - &yarn_restore_cache",
+				"    restore_cache:",
+				"      name: Restore Yarn Package Cache",
+				"      keys:"
+			],
+			"startLine": 150
+		}
+	]
+}
