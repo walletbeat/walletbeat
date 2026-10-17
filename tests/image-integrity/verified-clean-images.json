@@ -131,6 +131,10 @@
 		"hash": "6d9ba8b0abf96cc67c267f0a38cfe26035baae6ae37f3a60082832d5ad5c5341",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/images/entities/privy.svg": {
+		"hash": "af47d9dc3551181a850b7d3eb2d7ad2c575e969546223e78c780b53bc3f4c4e8",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/rainbow.png": {
 		"hash": "0a7a84dbd45b5ca049612cceae644271d22fcded25064e845760f7a87a1727ba",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -269,6 +273,10 @@
 	},
 	"public/images/wallets/pillarx.svg": {
 		"hash": "2009bbf3972a28beccefcf1efaa1299d26487a51dbeb1d717bd2de17e341103e",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/privy.svg": {
+		"hash": "af47d9dc3551181a850b7d3eb2d7ad2c575e969546223e78c780b53bc3f4c4e8",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/rabby.svg": {
