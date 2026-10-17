@@ -167,6 +167,7 @@ export const nufi: SoftwareWallet = {
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				// transactionDetailsDisplay: {

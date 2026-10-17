@@ -139,6 +139,7 @@ export const frame: SoftwareWallet = {
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,

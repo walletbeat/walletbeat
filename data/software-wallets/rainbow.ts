@@ -1287,6 +1287,7 @@ export const rainbow: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: notSupportedWithRef({

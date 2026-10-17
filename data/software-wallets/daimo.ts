@@ -441,6 +441,7 @@ export const daimo: SoftwareWallet = {
 				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

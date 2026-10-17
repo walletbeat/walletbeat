@@ -467,6 +467,7 @@ export const gemwallet: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 			},
+			securityLibraries: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
