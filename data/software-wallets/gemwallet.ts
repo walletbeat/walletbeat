@@ -427,6 +427,7 @@ export const gemwallet: SoftwareWallet = {
 					},
 				}),
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: 'NOT_A_BROWSER_EXTENSION',
 				desktop: 'NOT_A_DESKTOP_APP',

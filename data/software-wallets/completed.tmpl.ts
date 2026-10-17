@@ -723,6 +723,11 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 			},
+			secretKeyBackup: supported({
+				ref: refTodo,
+				screenCaptureBlocking: featureSupported,
+				sensitivityWarning: featureSupported,
+			}),
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,

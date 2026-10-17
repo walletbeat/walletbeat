@@ -874,6 +874,7 @@ export const rabby: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: [

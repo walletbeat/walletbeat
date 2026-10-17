@@ -706,6 +706,7 @@ export const metamask: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
