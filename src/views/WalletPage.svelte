@@ -714,6 +714,7 @@
 			data-column
 			data-column-item="flexible"
 			data-sticky-container
+			aria-label="Table of contents"
 		>
 			<NavigationItems
 				items={pieNavigationItems}
@@ -784,7 +785,7 @@
 		<section
 			class="attribute-group"
 			id={slugifyCamelCase(attrGroup.id)}
-			aria-label={attrGroup.displayName}
+			aria-label={`${attrGroup.displayName} attributes`}
 			data-sticky-breadcrumb="scope"
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
