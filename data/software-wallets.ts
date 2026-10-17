@@ -48,8 +48,7 @@ export const softwareWalletAttributeTree = attributeTreeForIds(
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
-	features: WalletSoftwareFeatures
+export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId, WalletSoftwareFeatures> & {
 	variants:
 		| {
 				[Variant.BROWSER]: true

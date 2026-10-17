@@ -39,8 +39,7 @@ export const hardwareWalletAttributeTree = attributeTreeForIds(
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export type HardwareWallet = BaseWallet<HardwareAttributeGroupId> & {
-	features: WalletHardwareFeatures
+export type HardwareWallet = BaseWallet<HardwareAttributeGroupId, WalletHardwareFeatures> & {
 	variants: {
 		[Variant.HARDWARE]: true
 	}
