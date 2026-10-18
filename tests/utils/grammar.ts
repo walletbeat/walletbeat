@@ -12,7 +12,17 @@ import {
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
-import { markdownCodeRanges } from '@/utils/markdown-utils'
+import { extractProse } from '@/utils/markdown-utils'
+
+import { aiTellsLinter } from './ai-tells'
+import {
+	type AbstractLinter,
+	formatLintMessages,
+	GrammarTextKind,
+	type Lint,
+	type Span,
+	type Suggestion,
+} from './linter'
 
 /**
  * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
@@ -108,83 +118,7 @@ export async function warmupHarperLinter() {
 	await getHarperLinter()
 }
 
-interface Suggestion {
-	get_replacement_text(): string
-	kind(): harper.SuggestionKind
-}
-
-interface Span {
-	start: number
-	end: number
-}
-
-interface Lint {
-	/**
-	 * Get the content of the source material pointed to by [`Self::span`]
-	 */
-	get_problem_text(): string
-	/**
-	 * Get a string representing the general category of the lint.
-	 */
-	lint_kind_pretty(): string
-	/**
-	 * Get an array of any suggestions that may resolve the issue.
-	 */
-	suggestions(): Suggestion[]
-	/**
-	 * Get the location of the problematic text.
-	 */
-	span(): Span
-	/**
-	 * Get a description of the error.
-	 */
-	message(): string
-}
-
-interface AbstractLinter {
-	lint(text: string, lintOptions?: harper.LintOptions): Promise<Lint[]>
-}
-
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
-
-function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
-	const before = text.substring(0, start)
-	const lastLinkStart = before.lastIndexOf('](')
-
-	if (lastLinkStart === -1) {
-		return false
-	}
-
-	const urlStart = lastLinkStart + 2
-	const afterLinkStart = text.substring(urlStart)
-	const closeParen = afterLinkStart.indexOf(')')
-
-	if (closeParen === -1) {
-		return true
-	}
-
-	const urlEnd = urlStart + closeParen
-
-	return start >= urlStart && start < urlEnd
-}
-
-/**
- * Check if a given position falls inside a standalone URL (e.g. `https://example.com/path`).
- */
-function isInsideUrl(text: string, start: number): boolean {
-	const urlRegex = /\bhttps?:\/\/[^\s,)'"\]]+/gi
-
-	for (const match of text.matchAll(urlRegex)) {
-		const urlStart = match.index ?? 0
-		const urlEnd = urlStart + match[0].length
-
-		if (start >= urlStart && start < urlEnd) {
-			return true
-		}
-	}
-
-	return false
-}
 
 function deprecatedTermMessage(matchedText: string, replacement: string | null): string {
 	return `The term "${matchedText}" is deprecated across the site. Use "${replacement}" instead.`
@@ -206,30 +140,15 @@ function getRegexpLinter({
 
 		if (linter === undefined) {
 			linter = {
-				lint(text: string, lintOptions?: harper.LintOptions): Promise<Lint[]> {
+				lint(text: string, _lintOptions?: harper.LintOptions): Promise<Lint[]> {
 					const lints: Lint[] = []
-					// Harper treats text as Markdown unless told otherwise.
-					const codeRanges =
-						(lintOptions?.language ?? 'markdown') === 'markdown' ? markdownCodeRanges(text) : []
 
 					for (const match of text.matchAll(regExp)) {
 						const matchedText = match[0]
 						const start = match.index ?? 0
-						const end = start + matchedText.length
-
-						if (overlapsAnyRange(start, end, codeRanges)) {
-							continue
-						}
-
-						if (isInsideMarkdownLinkUrl(text, start)) {
-							continue
-						}
-
-						if (isInsideUrl(text, start)) {
-							continue
-						}
 
 						const replacement = replace === null ? null : replace(matchedText)
+						const end = start + matchedText.length
 						const suggestion: Suggestion | null =
 							replacement === null
 								? null
@@ -272,8 +191,17 @@ function getRegexpLinter({
 	}
 }
 
+export const harperGrammarLinter: AbstractLinter = {
+	async lint(text, lintOptions): Promise<Lint[]> {
+		const linter = await getHarperLinter()
+
+		return linter.lint(text, lintOptions)
+	},
+}
+
 const grammarLinters: (() => Promise<AbstractLinter>)[] = [
-	getHarperLinter,
+	() => Promise.resolve(harperGrammarLinter),
+	() => Promise.resolve(aiTellsLinter),
 	getRegexpLinter({
 		name: 'dApp', // Replace dApp and dApps
 		regExp: /\bdapps?\b/gi,
@@ -432,8 +360,10 @@ function isInCspellWords(word: string): boolean {
 export async function grammarLintMessages(
 	text: string,
 	lintOptions?: harper.LintOptions,
+	kind = GrammarTextKind.GENERAL,
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
+	const extractedProse = extractProse(trimmedText, lintOptions?.language)
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
@@ -446,17 +376,27 @@ export async function grammarLintMessages(
 	for (const grammarLinterFn of grammarLinters) {
 		const linter = await grammarLinterFn()
 
-		lints = lints.concat(await linter.lint(trimmedText, lintOptions))
+		let linterLints = await linter.lint(trimmedText, lintOptions, kind)
+
+		// The AI linter already skips non-prose and must still check ignored vocabulary
+		// and generated labels. For other linters, keep diagnostics that start in prose
+		// even if they span code or URLs.
+		if (linter !== aiTellsLinter) {
+			linterLints = linterLints.filter(lint => {
+				const { start, end } = lint.span()
+
+				return (
+					!extractedProse.excludedRanges.some(range => start >= range.start && start < range.end) &&
+					!overlapsAnyRange(start, end, cspellRanges) &&
+					!overlapsAnyRange(start, end, githubLabelRanges)
+				)
+			})
+		}
+
+		lints = lints.concat(linterLints)
 	}
 
-	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
-	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
-
-	// Ignore lints that fall inside text that is part of an ignored text range.
-	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
-	lints = lints.filter(
-		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
-	)
+	// Verbatim titles are external text, so no linter applies to them.
 	lints = lints.filter(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, verbatimTitleRanges),
 	)
@@ -746,50 +686,16 @@ export async function grammarLintMessages(
 		return charAfterEtc.toUpperCase() !== charAfterEtc
 	})
 
-	const message: string[] = []
-
-	for (const lint of lints) {
-		const before = trimmedText.substring(Math.max(0, lint.span().start - 16), lint.span().start)
-		const after = trimmedText.substring(
-			lint.span().end,
-			Math.min(trimmedText.length, lint.span().end + 16),
-		)
-		const badText = trimmedText.substring(lint.span().start, lint.span().end)
-		const span = `…${before}𜱭${badText}𜱫${after}…`
-
-		message.push(
-			`- ${lint.span().start}:${lint.span().end} (${JSON.stringify(span)}): ${lint.lint_kind_pretty()}: ${lint.message()}`,
-		)
-
-		if (lint.suggestions().length !== 0) {
-			message.push('  Consider:')
-
-			for (const sug of lint.suggestions()) {
-				switch (sug.kind()) {
-					case harper.SuggestionKind.Remove:
-						message.push(`   - Remove: "${lint.get_problem_text()}"`)
-						break
-					case harper.SuggestionKind.InsertAfter:
-						message.push(
-							`   - After "${lint.get_problem_text()}", insert "${sug.get_replacement_text()}"`,
-						)
-						break
-					case harper.SuggestionKind.Replace:
-						message.push(
-							`   - Replace: "${lint.get_problem_text()}" with "${sug.get_replacement_text()}"`,
-						)
-						break
-				}
-			}
-		}
-	}
-
-	return message
+	return formatLintMessages(trimmedText, lints)
 }
 
 /** Lint a string for grammar errors. */
-export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
-	const message = await grammarLintMessages(text, lintOptions)
+export async function grammarLint(
+	text: string,
+	lintOptions?: harper.LintOptions,
+	kind = GrammarTextKind.GENERAL,
+) {
+	const message = await grammarLintMessages(text, lintOptions, kind)
 
 	if (message.length > 0) {
 		// This assertion will never match and makes no sense on its own.
