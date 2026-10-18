@@ -410,7 +410,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
  * app-private permission that AndroidX Core declares in every app that uses it
  * to protect its own dynamically registered broadcast receivers.
  */
-const androidxDynamicReceiverPermission =
+const dynamicReceiverPermission =
 	/^[A-Za-z]\w*(?:\.[A-Za-z]\w*)+\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$/
 
 /**
@@ -418,7 +418,7 @@ const androidxDynamicReceiverPermission =
  * These names differ per app and are not security-relevant.
  */
 export function isIgnoredAndroidPermission(name: string): boolean {
-	return androidxDynamicReceiverPermission.test(name)
+	return dynamicReceiverPermission.test(name)
 }
 
 /**
