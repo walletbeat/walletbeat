@@ -1,3 +1,5 @@
+import { parse, postprocess, preprocess } from 'micromark'
+
 import { stringHasPrefix } from '@/types/utils/text'
 
 import {
@@ -7,6 +9,91 @@ import {
 	type MarkdownContentWithFrontmatter,
 } from '../types/content'
 import type { Strings } from '../types/utils/string-templates'
+
+const standaloneUrlRegExps = {
+	prose: /\bhttps?:\/\/[^\s,)'"\]]+/gi,
+	source: /https?:\/\/[^\s'"`<>]+/gi,
+}
+
+/** Find URL ranges, stopping at string delimiters in source and surrounding punctuation in prose. */
+export function extractUrlRanges(
+	text: string,
+	context: 'prose' | 'source' = 'prose',
+): { start: number; end: number }[] {
+	return Array.from(text.matchAll(standaloneUrlRegExps[context]), match => ({
+		start: match.index,
+		end: match.index + match[0].length,
+	}))
+}
+
+/** Prose and excluded ranges share the source text's UTF-16 offsets. */
+export interface ExtractedProse {
+	prose: string
+	excludedRanges: { start: number; end: number }[]
+}
+
+const nonProseTokenTypes = new Set([
+	'codeText',
+	'codeFenced',
+	'codeIndented',
+	'resource',
+	'reference',
+	'definition',
+	'autolink',
+])
+
+function maskTextRanges(text: string, ranges: { start: number; end: number }[]): string {
+	const parts: string[] = []
+	let cursor = 0
+
+	for (const { start, end } of ranges) {
+		parts.push(text.slice(cursor, start))
+		parts.push(text.slice(start, end).replace(/[^\r\n]/g, ' '))
+		cursor = end
+	}
+	parts.push(text.slice(cursor))
+
+	return parts.join('')
+}
+
+/**
+ * Keep visible link labels, but mask Markdown code and link destinations with spaces.
+ * Standalone URLs are masked in every format. Preserve UTF-16 offsets and line endings
+ * so diagnostics still point to the original text.
+ */
+export function extractProse(
+	text: string,
+	language: 'markdown' | 'plaintext' | 'typst' = 'markdown',
+): ExtractedProse {
+	const excludedRanges: { start: number; end: number }[] = []
+
+	if (language === 'markdown') {
+		const events = postprocess(
+			parse()
+				.document()
+				.write(preprocess()(text, undefined, true)),
+		)
+
+		for (const [phase, token] of events) {
+			const previousEnd = excludedRanges.at(-1)?.end ?? 0
+
+			if (
+				phase === 'enter' &&
+				nonProseTokenTypes.has(token.type) &&
+				token.start.offset >= previousEnd
+			) {
+				excludedRanges.push({ start: token.start.offset, end: token.end.offset })
+			}
+		}
+	}
+
+	const prose = maskTextRanges(text, excludedRanges)
+
+	excludedRanges.push(...extractUrlRanges(prose))
+	excludedRanges.sort((a, b) => a.start - b.start)
+
+	return { prose: maskTextRanges(text, excludedRanges), excludedRanges }
+}
 
 /**
  * Extract all markdown-style links from a document.
