@@ -249,6 +249,7 @@ export const imtoken: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: null,
 				guardianRecovery: notSupportedWithRef({
 					ref: {
