@@ -46,7 +46,7 @@ export const okx: SoftwareWallet = {
 		coinspectId: 'okx',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-14',
+		lastUpdated: '2026-10-18',
 		urls: {
 			extensions: [
 				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -199,89 +199,53 @@ export const okx: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension connects to Keystone by scanning its QR code with the camera.',
-							url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
-						},
-						{
-							explanation:
-								'OneKey documents that the OKX Wallet extension only adds OneKey hardware wallets over a USB cable.',
-							url: 'https://help.onekey.so/en/articles/11461103-how-to-use-okx-web3-wallet-with-onekey-hardware-wallets',
-						},
-						{
-							explanation:
-								'Trezor lists OKX Wallet among the desktop wallets that work with Trezor devices through Trezor Connect.',
-							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/trezor-connect',
-						},
-						{
-							explanation:
 								"The extension's hardware wallet connect screen lists Keystone, Ledger, OneKey and Trezor.",
 							file: 'public/references/wallets/okx/screenshots/2026-10-13-okx-extension-connect-hardware-wallet.png',
 							label:
 								"Screenshot of the OKX Wallet extension's hardware wallet connect screen, provided by a maintainer",
 						},
-					],
-					wallets: {
-						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.USB],
-						}),
-						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.QR],
-						}),
-						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.USB],
-						}),
-						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.USB],
-						}),
-					},
-				},
-				[Variant.MOBILE]: {
-					ref: [
 						{
 							explanation:
-								'The app connects to Keystone by scanning its QR code, and to other hardware wallets over Bluetooth.',
-							urls: [
-								{
-									label: 'Connect Keystone to OKX Wallet',
-									url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
-								},
-								{
-									label: 'Manage your wallet in the app',
-									url: 'https://web3.okx.com/help/how-do-i-manage-my-wallet-app',
-								},
-							],
+								'The browser extension connects to Keystone by scanning its QR code with the camera.',
+							label: 'OKX guide to connecting a Keystone hardware wallet',
+							url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
 						},
 						{
 							explanation:
-								'OneKey documents that the OKX mobile app only adds OneKey hardware wallets over Bluetooth.',
+								'OneKey documents that the OKX Wallet extension only adds OneKey hardware wallets over a USB cable.',
+							label: 'OneKey guide to using OneKey with OKX Wallet',
 							url: 'https://help.onekey.so/en/articles/11461103-how-to-use-okx-web3-wallet-with-onekey-hardware-wallets',
 						},
 						{
 							explanation:
-								'OKX announced in February 2023 that the iOS and Android apps connect to Ledger hardware wallets over Bluetooth.',
-							label: "Independent copy of OKX's announcement",
-							url: 'https://www.coincarp.com/exchange/announcement/okex-13317066449933-connecting-ledger-hardware-wallet-to-okx-wallet-is-now-available-in-app/',
+								'Trezor lists OKX Wallet among the desktop wallets that work with Trezor devices.',
+							label: 'Trezor list of compatible wallets',
+							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/trezor-connect',
 						},
 					],
 					wallets: {
 						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.bluetooth],
+							connectionTypes: [HardwareWalletConnection.webHID],
 						}),
 						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
 							connectionTypes: [HardwareWalletConnection.QR],
 						}),
 						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.bluetooth],
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
 						}),
 					},
 				},
+				[Variant.MOBILE]: null,
 			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			// SlowMist's 2023 OKX audits target the OKX exchange app's built-in Web3 wallet (iOS 6.15.0, Android 6.14.0), not the standalone OKX Wallet app or the extension, so they are not listed.
+			// SlowMist's 2023 OKX audits cover the OKX exchange app, not the OKX Wallet app or extension, so they are not listed.
 			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
@@ -410,6 +374,7 @@ export const okx: SoftwareWallet = {
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
 						explanation: 'The OKX Wallet apps are closed source.',
+						label: 'WalletScrutiny review of the OKX Wallet app',
 						url: 'https://walletscrutiny.com/android/com.okx.wallet/',
 					},
 				}),
