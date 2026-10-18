@@ -29,20 +29,23 @@ import { certik } from '../entities/certik'
 import { cure53 } from '../entities/cure53'
 import trustWalletRawExtManifest from './manifests/trustWallet/egjidjbpglichdcondbcbdnbeeppgdph.manifest.json'
 
-// Only audits of the wallet app code are listed. Trust Wallet's security page also
-// lists audits of its smart contracts, a review of an external cryptography library
-// and a penetration test of its token assets service. None of these covers the
-// browser extension or mobile app code.
+// Trust Wallet's smart contract and library audits don't cover the app or extension code.
 const securityAudits: SecurityAudit[] = [
 	{
-		ref: 'https://assets-cdn.trustwallet.com/audits/Certik-browser-extension_Feb24.pdf',
+		ref: {
+			label: 'CertiK audit of the Trust Wallet browser extension',
+			url: 'https://assets-cdn.trustwallet.com/audits/Certik-browser-extension_Feb24.pdf',
+		},
 		auditDate: '2023-02-24',
 		auditor: certik,
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://trustwallet.com/assets/files/cure53_tw_browser_extension_04.2023.pdf',
+		ref: {
+			label: 'Cure53 audit of the Trust Wallet browser extension',
+			url: 'https://trustwallet.com/assets/files/cure53_tw_browser_extension_04.2023.pdf',
+		},
 		auditDate: '2023-04-20',
 		auditor: cure53,
 		unpatchedFlaws: 'ALL_FIXED',
@@ -58,7 +61,7 @@ export const trustWallet: SoftwareWallet = {
 		coinspectId: 'trust-wallet',
 		contributors: [minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],
 			extensions: [
@@ -106,21 +109,31 @@ export const trustWallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Trust Wallet Core is published under the Apache License 2.0.',
-						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/LICENSE',
+						label: 'Trust Wallet Core license',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/LICENSE#L1-L3',
 					},
 					{
 						explanation:
-							'The README describes Trust Wallet Core as a library "implementing low-level cryptographic wallet functionality" and says "It is a core part of the popular Trust Wallet".',
+							'Trust Wallet Core is an open-source library that forms a core part of Trust Wallet.',
+						label: 'Trust Wallet Core README',
 						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/README.md#L3-L5',
 					},
 				],
 				license: FOSSLicense.APACHE_2_0,
 			},
 			walletAppLicense: {
-				ref: {
-					explanation: 'No source repository exists for the mobile app or the browser extension.',
-					url: 'https://walletscrutiny.com/android/com.wallet.crypto.trustapp/',
-				},
+				ref: [
+					{
+						explanation:
+							'The source code of the Trust Wallet Android and iPhone apps is not public.',
+						label: 'WalletScrutiny review of the Trust Wallet Android app',
+						url: 'https://walletscrutiny.com/android/com.wallet.crypto.trustapp/',
+					},
+					{
+						label: 'WalletScrutiny review of the Trust Wallet iPhone app',
+						url: 'https://walletscrutiny.com/iphone/com.sixdays.trust/',
+					},
+				],
 				license: SourceNotAvailableLicense.PROPRIETARY,
 			},
 		},
@@ -129,6 +142,7 @@ export const trustWallet: SoftwareWallet = {
 				{
 					explanation:
 						"Binance acquired Trust Wallet in July 2018, paying with a mix of cash, Binance stock and Binance's own token.",
+					label: 'TechCrunch report on the Binance acquisition',
 					url: 'https://techcrunch.com/2018/07/31/crypto-exchange-binance-buys-trust-wallet-in-first-acquisition-deal',
 				},
 			],
@@ -163,12 +177,14 @@ export const trustWallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Trust Wallet is part of the Binance bug bounty program on Bugcrowd. The Trust Wallet Android and iOS apps, the Chrome extension and wallet-core are in scope; the Trust Wallet websites are out of scope. Rewards for Trust Wallet targets range from $200 to $10,000 depending on severity, paid in Binance's own token.",
+							"Trust Wallet's apps, browser extension and wallet-core are covered by Binance's bug bounty on Bugcrowd.",
+						label: 'Binance bug bounty program on Bugcrowd',
 						url: 'https://bugcrowd.com/engagements/binance',
 					},
 					{
 						explanation:
-							'The Trust Wallet iOS app, Android app and wallet-core were added to the Binance program on 2020-07-01.',
+							'The Trust Wallet apps and wallet-core joined the Binance program on 2020-07-01.',
+						label: 'Binance bug bounty announcements on Bugcrowd',
 						url: 'https://bugcrowd.com/engagements/binance/announcements',
 					},
 				],
@@ -181,7 +197,8 @@ export const trustWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Bugcrowd rates the Binance program "Partial safe harbor": "This engagement provides a limited goodwill statement about not pursuing legal action related to security research."',
+								'Bugcrowd marks the Binance program as "Partial safe harbor", a limited promise not to take legal action over security research.',
+							label: 'Binance bug bounty program on Bugcrowd',
 							url: 'https://bugcrowd.com/engagements/binance',
 						},
 					],
@@ -208,7 +225,8 @@ export const trustWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Manifest collected from the Chrome Web Store listing. The extension source is not public, so key storage and RNG cannot be verified.',
+								'The extension source code is not public, so how it stores keys and generates random numbers cannot be checked.',
+							label: 'Trust Wallet on the Chrome Web Store',
 							url: 'https://chromewebstore.google.com/detail/trust-wallet/egjidjbpglichdcondbcbdnbeeppgdph',
 						},
 					],
@@ -252,8 +270,13 @@ export const trustWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'WalletScrutiny: "Build cannot be done because the source code is not publicly available." The browser extension has no public source repository either.',
+								'WalletScrutiny cannot rebuild the Trust Wallet mobile apps because their source code is not public.',
+							label: 'WalletScrutiny review of the Trust Wallet Android app',
 							url: 'https://walletscrutiny.com/android/com.wallet.crypto.trustapp/',
+						},
+						{
+							label: 'WalletScrutiny review of the Trust Wallet iPhone app',
+							url: 'https://walletscrutiny.com/iphone/com.sixdays.trust/',
 						},
 					],
 				}),
