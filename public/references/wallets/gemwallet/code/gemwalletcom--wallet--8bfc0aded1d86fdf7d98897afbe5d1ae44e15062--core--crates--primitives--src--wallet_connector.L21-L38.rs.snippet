@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 21,
+	"highlightLastLine": 38,
+	"segments": [
+		{
+			"lines": [
+				"pub enum WalletConnectionState {"
+			],
+			"startLine": 15
+		},
+		{
+			"lines": [
+				"    Active,",
+				"    Expired,",
+				"}",
+				"",
+				"#[derive(Debug, Serialize, Deserialize)]",
+				"pub enum WalletConnectionMethods {",
+				"    #[serde(rename = \"eth_chainId\")]",
+				"    EthChainId,",
+				"    #[serde(rename = \"personal_sign\")]",
+				"    PersonalSign,",
+				"    #[serde(rename = \"eth_signTypedData\")]",
+				"    EthSignTypedData,",
+				"    #[serde(rename = \"eth_signTypedData_v4\")]",
+				"    EthSignTypedDataV4,",
+				"    #[serde(rename = \"eth_signTransaction\")]",
+				"    EthSignTransaction,",
+				"    #[serde(rename = \"eth_sendTransaction\")]",
+				"    EthSendTransaction,",
+				"    #[serde(rename = \"wallet_switchEthereumChain\")]",
+				"    WalletSwitchEthereumChain,",
+				"    #[serde(rename = \"wallet_addEthereumChain\")]",
+				"    WalletAddEthereumChain,",
+				"    #[serde(rename = \"solana_signMessage\")]",
+				"    SolanaSignMessage,",
+				"    #[serde(rename = \"solana_signTransaction\")]",
+				"    SolanaSignTransaction,"
+			],
+			"startLine": 17
+		}
+	]
+}

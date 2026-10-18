@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 84,
+	"highlightLastLine": 101,
+	"segments": [
+		{
+			"lines": [
+				"<sub>Reviewed 2026-09-24. Sources: [chain list](../core/crates/primitives/src/chain.rs), [feature configuration](../core/crates/primitives/src/chain_config.rs), [Squid chain coverage](../core/crates/swapper/src/squid/mod.rs), [address-history contract](../core/crates/chain_traits/src/lib.rs), [simulation implementations](../core/crates/gem_evm/src/provider/simulation.rs), [Solana](../core/crates/gem_solana/src/provider/simulation.rs), [Sui](../core/crates/gem_sui/src/provider/simulation.rs), [TON](../core/crates/gem_ton/src/provider/simulation.rs), [Tron](../core/crates/gem_tron/src/provider/simulation.rs), [WalletConnect chain configuration](../core/gemstone/src/config/wallet_connect.rs), and [WalletConnect request handlers](../core/crates/gem_wallet_connect/src/request_handler/mod.rs).</sub>",
+				"",
+				"The Cetus package-version guard is not a stub: it turns one on-chain failure into a message the swap screen can show, and it clears itself when the built-in version catches up.",
+				"",
+				"## WalletConnect",
+				"",
+				"The status is based on both the chains returned by Core configuration and the methods accepted by the Core request dispatcher. Method-set links open the chain-specific handler.",
+				"",
+				"In this section, `➖` means WalletConnect does not publish an ecosystem method-set reference for that Gem chain; it is not an implementation TODO. Bitcoin is `🏗️` because WalletConnect does publish a `bip122` method set and Core does not implement it.",
+				"",
+				"### Supported method sets",
+				"",
+				"| Method set | Namespace | Core-supported methods | Published methods missing in Core | WalletConnect reference |",
+				"| --- | --- | --- | --- | --- |",
+				"| Bitcoin (TODO) | `bip122` | None | `getAccountAddresses`<br>`signMessage`<br>`signPsbt`<br>`sendTransfer` | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/bitcoin)</sub> |",
+				"| [EVM](../core/crates/gem_wallet_connect/src/request_handler/ethereum.rs) | `eip155` | `eth_chainId`<br>`personal_sign`<br>`eth_signTypedData`<br>`eth_signTypedData_v4`<br>`eth_signTransaction`<br>`eth_sendTransaction`<br>`wallet_addEthereumChain`<br>`wallet_switchEthereumChain` | `eth_sign`<br>`eth_sendRawTransaction` | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/evm)</sub> |",
+				"| [Solana](../core/crates/gem_wallet_connect/src/request_handler/solana.rs) | `solana` | `solana_signMessage`<br>`solana_signTransaction`<br>`solana_signAndSendTransaction`<br>`solana_signAllTransactions` | `solana_getAccounts`<br>`solana_requestAccounts` | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/solana)</sub> |",
+				"| [Sui](../core/crates/gem_wallet_connect/src/request_handler/sui.rs) | `sui` | `sui_getAccounts`<br>`sui_signPersonalMessage`<br>`sui_signTransaction`<br>`sui_signAndExecuteTransaction` | ➖ | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/sui)</sub> |",
+				"| [TON](../core/crates/gem_wallet_connect/src/request_handler/ton.rs) | `ton` | `ton_sendMessage`<br>`ton_signData` | ➖ | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/ton)</sub> |",
+				"| [Tron](../core/crates/gem_wallet_connect/src/request_handler/tron.rs) | `tron` | `tron_signMessage`<br>`tron_signTransaction`<br>`tron_sendTransaction` | `tron_getBalance` (optional) | <sub>[spec](https://docs.walletconnect.network/wallet-sdk/chain-support/tron)</sub> |",
+				"",
+				"Core's session-wide method list, consumed by both platform approval paths and by the one-click-auth namespace, advertises only the methods the request handler accepts. A method the handler cannot serve is absent from the method enum, so an incoming request for it reads as unsupported. `solana_signAllTransactions` is advertised and served for a single transaction; a batch is answered with an unsupported error rather than dropped from the session.",
+				"",
+				"### Chain coverage",
+				"",
+				"| Chain | Status | Namespace | Supported methods |"
+			],
+			"startLine": 80
+		}
+	]
+}
