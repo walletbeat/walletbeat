@@ -196,6 +196,11 @@ describe('codebase integrity', () => {
 			},
 		})
 
+		it('has a vacuous test', () => {
+			// Present to make Vitest happy if the codebase has no symlink.
+			expect(true).toBeTruthy()
+		})
+
 		for (const symlink of symlinks) {
 			describe(`symlink ${symlink.path}`, () => {
 				it('points to valid target', async () => {
