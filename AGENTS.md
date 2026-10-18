@@ -64,19 +64,28 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 
 ### Code quality
 
-- Don't run checks after every edit; they are slow. Run `pnpm lint` then `pnpm check:quick` once before each commit
-- Run `pnpm check:all` before considering tasks complete or opening a PR
-- Fix prettier issues with `pnpm lint` rather than formatting by hand
-- Never use `eslint-disable` or `as any` workarounds
-- Add spelling exceptions to `.cspell.json` only for valid terms
+- Don't run checks after every edit; they are slow. Run `pnpm fix` then `pnpm check:quick` once before each commit. Fix prettier issues with `pnpm fix` rather than formatting by hand.
+- Never use `eslint-disable` or `as any` workarounds. Use the typesystem to your advantage, not as your enemy. Where unavoidable, express type narrowings as type-assertion or type-checking functions (i.e. return signatures of `func isSomeType(x: ...): x is SomeType` or `func assertSomeType(x: ...): asserts x is SomeType`) that do runtime type-checking, and no other work. Look for helpers that may already exist for existing types, e.g. string prefix/suffix narrowing functions, `NonEmptyArray`/`NonEmptyRecord` assertions, and `Enum` helper classes with assertion functions all already exist.
+- Add spelling exceptions to `.cspell.json` only for valid terms. You may also update grammar rules at `tests/utils/grammar.ts` as necessary. If doing so breaks other content on the site as a result of your update, fix it in the same pass rather than adding exclusions.
 - Reuse helpers and common libraries. Chances are the problem you are trying to solve (argument parsing, codebase traversal, or grammar checking) was already faced by some other part of the codebase. Do not reinvent the wheel.
+- Legacy is debt. Do not write code that assumes fallbacks to previous behavior is needed; doing so incurs debt accumulation, with interest. Fixing it all in the moment is cheaper.
+
+### Testing
+
+Run `pnpm check:all` before considering tasks complete or opening a PR. PR checks will fail unless `pnpm check:all` passes.
+
+Note that `pnpm check:all` has side-effects in some cases, such as updating the image cache, which is necessary to pass when running in CI. As such, relying on CI to tell you if tests pass is insufficient; you _MUST_ run it locally prior to sending a PR. If it fails due to reasons your changes introduce, fix them. If it fails due to unrelated reasons, you should investigate and either file an issue, or send another PR to fix this first.
+
+Some changes require certain command-line tools to be installed. Example includes `inkscape` in the case of SVGs, or `bwrap` on Linux for testing build reproducibility. If these are not installed, ask your operator what to do as appropriate.
 
 ### Comments
 
 Code comments must not be temporal. This means they must stand the test of time. They must assist any and all _future_ readers of the codebase, not a reviewer of the change being done in the present. Comments describing why something works a certain way are good when that would otherwise be non-obvious, but comments describing the specific problem that some particular line was added fix are completely irrelevant. If a problem is likely to reoccur in the future, the correct fix is not a comment describing the problem, but a test verifying that the problem never happens again.
 
-Bad comment: "Check for URLs with line numbers first, because the deep search below used to take minutes without it.": Who cares how long it used to take? What does "URLs with line numbers" even mean?
-Good comment: "Cheap pre-filter to remove most entries prior to the more expensive deep search later.": Good, explains the structure of the code and why a pre-filter pass exists.
+- Bad comment: "Check for URLs with line numbers first, because the deep search below used to take minutes without it.": Who cares how long it used to take? What does "URLs with line numbers" even mean?
+- Good comment: "Cheap pre-filter to remove most entries prior to the more expensive deep search later.": Good, explains the structure of the code and why a pre-filter pass exists.
+
+Comments in wallet `/data` files are almost never appropriate. Use the `wallet-update` skill when updating wallet data files.
 
 ### Test scope
 
@@ -97,7 +106,11 @@ Read `src/styles/css-attributes.css` to understand how to work with the site's C
 
 ## Adding New Wallets
 
-Load the `wallet-create` and/or `wallet-update` skills as needed.
+When a wallet is being added to the site, load the `wallet-create` skill.
+
+## Updating wallet data
+
+When wallet data under `/data` is updated, load the `wallet-update` skill.
 
 ## Repository layout
 
@@ -111,4 +124,11 @@ Load the `wallet-create` and/or `wallet-update` skills as needed.
 - `public/`: Static files. `public/foo/bar.png` is served by the web server at `/foo/bar.png`.
 - `tests/`: Unit tests with Vitest. Already runs as part of `pnpm check:all`, but can be run explicitly with `pnpm check:vitest`.
 - `resources/`: Miscellaneous files.
-- `governance/`: Project governance history. You do not need to touch this directory.
+- `governance/`: Project governance history. You generally do not need to touch this directory unless told otherwise.
+
+## Commit and PR hygiene
+
+Commit descriptions should have a topline under 72 characters describing the change. If this isn't sufficient to fully understand the change, it should be followed by two newline characters, and a longer description. Write for humans, using ASD-STE100 language (or 80% of the way there).
+
+PR descriptions should follow similar constraints. The PR title is usually the topline of the commit, or a similar aggregate summary when sending multiple commits. When part of a stack, only the top-level commit is relevant to the PR's part in the stack. PR description can be similar ASD-STE100 language (or 80% of the way there), but PR descriptions also enable richer content such as images or videos. When sending PRs that update the site, screenshots, and videos speak more than prose, so prefer that.
+For architectural changes or rating pipeline changes, describe the change via prose or a Mermaid diagram, whichever is clearer to humans.
