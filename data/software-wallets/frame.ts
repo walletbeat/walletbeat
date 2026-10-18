@@ -24,7 +24,7 @@ import {
 	type ArtifactSigningDetails,
 	RepositoryChangeControlState,
 } from '@/schema/features/transparency/release-transparency'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 export const frame: SoftwareWallet = {
 	metadata: {
@@ -290,7 +290,7 @@ export const frame: SoftwareWallet = {
 							url: 'https://github.com/frame-labs/frame-extension/blob/09d7848b6b4612314f13e107e3b5c56fb9fadfe0/README.md#L16-L19',
 						},
 					}),
-					[Variant.DESKTOP]: supported({
+					[Variant.DESKTOP]: supported<WithRef<{}>>({
 						ref: [
 							{
 								explanation:
