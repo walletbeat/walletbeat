@@ -54,7 +54,7 @@ export const daimo: SoftwareWallet = {
 					explanation:
 						'The Daimo repository README says "The old Daimo app is shutting down" and asks users to withdraw their funds. The repository is archived, and the Daimo app is no longer listed on the App Store or Google Play.',
 					label: 'Daimo README: The old Daimo app is shutting down',
-					url: 'https://github.com/daimo-eth/daimo/blob/c2874304e24ebce1736c63a1af662725944d2fa3/README.md',
+					url: 'https://github.com/daimo-eth/daimo/blob/c2874304e24ebce1736c63a1af662725944d2fa3/README.md#L1-L3',
 				},
 			],
 			date: '2025-11-29',
