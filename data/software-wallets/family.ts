@@ -6,7 +6,7 @@ import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -99,7 +99,20 @@ export const family: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation: 'One recovery phrase can hold a group of several wallet addresses.',
+					label: 'Family support: Wallet Groups',
+					url: 'https://family.co/support/wallet-groups',
+				},
+				{
+					explanation: 'Users can switch between their wallets from the main screen.',
+					label: 'Family support: Switch wallets',
+					url: 'https://family.co/support/switch-wallets',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -107,7 +120,7 @@ export const family: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://family.co/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -149,7 +162,11 @@ export const family: SoftwareWallet = {
 				},
 			],
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
@@ -171,15 +188,22 @@ export const family: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The changelog on the Family website covers only its developer library, not the wallet app.',
+						label: 'Family changelog',
+						url: 'https://family.co/changelog',
+					},
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
