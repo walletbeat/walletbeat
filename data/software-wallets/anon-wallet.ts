@@ -27,7 +27,7 @@ export const anonWallet: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://docs.anon.inc'],
 			extensions: [
@@ -58,20 +58,15 @@ export const anonWallet: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: [
-					{
-						explanation: 'Anon Wallet injects a standard EIP-1193 provider into web pages.',
-						url: 'https://docs.anon.inc/developer/dapp-integration',
-					},
-					{
-						explanation:
-							'The published extension package announces itself to web apps as Anon Wallet through EIP-6963 provider discovery events.',
-						url: 'https://chromewebstore.google.com/detail/anon-wallet-private-evm-w/gnkbgepgknkbhnnbaihklcfkjhbclajk',
-					},
-				],
+				ref: {
+					explanation:
+						'Anon Wallet connects to web apps through the standard EIP-1193 interface, so most apps that work with MetaMask also work with Anon.',
+					label: 'Anon Wallet app integration guide',
+					url: 'https://docs.anon.inc/developer/dapp-integration',
+				},
 				'1193': featureSupported,
 				'2700': null,
-				'6963': featureSupported,
+				'6963': null,
 			},
 		},
 		licensing: {
@@ -80,12 +75,14 @@ export const anonWallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The wallet source code is not published yet. Anon states that it plans to publish its repositories progressively.',
+							'The wallet source code is not public. Anon plans to publish its code over time.',
+						label: 'Anon security overview',
 						url: 'https://docs.anon.inc/security/overview',
 					},
 					{
 						explanation:
-							'The Terms of Service grant a limited, personal, revocable, nonexclusive, nontransferable license to use the software.',
+							'The Terms of Service give users only a limited, personal license to use the software.',
+						label: 'Anon Terms of Service',
 						url: 'https://anon.inc/tos',
 					},
 				],
@@ -96,12 +93,13 @@ export const anonWallet: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Shielding costs the 0.25% Railgun protocol fee plus a 0.13% fee charged by Anon, both listed in the docs.',
+						'Anon charges a 0.13% fee when funds move into or out of the private balance, on top of the Railgun protocol fee.',
+					label: 'Anon shielding guide',
 					url: 'https://docs.anon.inc/guides/shielding',
 				},
 				{
-					explanation:
-						'Private swaps carry a documented 0.30% Anon swap fee, in addition to the fees for moving funds out of and back into the private balance.',
+					explanation: 'Anon charges a 0.30% fee on private swaps.',
+					label: 'Anon swapping guide',
 					url: 'https://docs.anon.inc/guides/swapping',
 				},
 			],
@@ -143,12 +141,13 @@ export const anonWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The 12-word mnemonic is created in the extension and stored in the browser, encrypted with AES-256-GCM.',
-							url: 'https://docs.anon.inc/concepts/key-management',
+								'When you create an account, Anon creates the recovery phrase and encrypts it on your device.',
+							label: 'Anon installation guide',
+							url: 'https://docs.anon.inc/installation',
 						},
 						{
-							explanation:
-								'The docs state that no key material, mnemonic, or note contents are sent to the wallet servers.',
+							explanation: 'Anon does not send keys or the recovery phrase to its servers.',
+							label: 'Anon security overview',
 							url: 'https://docs.anon.inc/security/overview',
 						},
 					],
@@ -168,7 +167,8 @@ export const anonWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The extension is published on the Chrome Web Store, so its manifest is public. The extension source code is not published, so key storage and RNG cannot be verified.',
+								'The extension source code is not public, so how it stores keys and generates random numbers cannot be checked.',
+							label: 'Anon Wallet on the Chrome Web Store',
 							url: 'https://chromewebstore.google.com/detail/anon-wallet-private-evm-w/gnkbgepgknkbhnnbaihklcfkjhbclajk',
 						},
 					],
@@ -181,7 +181,8 @@ export const anonWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Permissions come from the manifest of the published Android app, version 1.3.6 (build 10306). The download hash matches the one listed on the releases page, and the package is signed by Ahloop. The app source code is not published, so key storage and RNG cannot be verified.',
+								'The permission list comes from the Android app downloaded from this page. The app source code is not public, so how it stores keys and generates random numbers cannot be checked.',
+							label: 'Anon releases page',
 							url: 'https://anon.inc/releases',
 						},
 					],
@@ -235,7 +236,9 @@ export const anonWallet: SoftwareWallet = {
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: supported({
 					ref: {
-						explanation: 'Dated release notes for each extension and Android version.',
+						explanation:
+							'Anon publishes dated release notes for the extension and the Android app.',
+						label: 'Anon releases page',
 						url: 'https://anon.inc/releases',
 					},
 				}),
