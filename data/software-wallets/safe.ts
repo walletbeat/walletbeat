@@ -88,7 +88,7 @@ export const safe: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"The address input resolves ENS names with the wallet's RPC provider for the ENS hub chain (the user's custom RPC if one is set), using the coin type of the target chain, and fills in the EIP-3770 short-name address.",
+							"The address field looks up ENS names on Ethereum through the app's own node connection, or through the user's custom node if one is set.",
 						urls: [
 							{
 								label: 'Name resolver hook',
@@ -102,15 +102,11 @@ export const safe: SoftwareWallet = {
 								label: 'ENS resolution',
 								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/ens.ts#L67-L82',
 							},
-							{
-								label: 'Short-name address',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/components/common/AddressInput/index.tsx#L157-L163',
-							},
 						],
 					},
 					{
 						explanation:
-							'Prefixed addresses are parsed as EIP-3770 short names, and a prefix that does not match the current chain is rejected.',
+							'An address with a network prefix is accepted only when the prefix matches the current network. Other chain-specific address formats are not recognized.',
 						urls: [
 							{
 								label: 'Prefix parsing',
@@ -135,7 +131,7 @@ export const safe: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The send recipient and address book fields only accept hexadecimal addresses.',
+							'The send and address book fields accept only plain addresses, not ENS names.',
 						urls: [
 							{
 								label: 'Recipient validation',
