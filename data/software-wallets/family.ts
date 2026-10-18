@@ -19,7 +19,7 @@ export const family: SoftwareWallet = {
 		coinspectId: 'family',
 		contributors: [lucemans, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://family.co/docs'],
 			socials: {
@@ -71,29 +71,21 @@ export const family: SoftwareWallet = {
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
-				ref: [
-					{
-						explanation:
-							'The terms grant only a limited, nonexclusive, non-transferable license "with no right to sublicense"; the audited wallet repositories named in the 2024 audit are private.',
-						url: 'https://family.co/terms',
-					},
-				],
+				ref: {
+					explanation:
+						'Family licenses the app for personal use only and does not allow copying, modifying, or decompiling it. Its source code is not public.',
+					label: 'Family terms of service',
+					url: 'https://family.co/terms',
+				},
 				license: SourceNotAvailableLicense.PROPRIETARY,
 			},
 		},
 		monetization: {
-			ref: [
-				{
-					explanation:
-						'"Family does not charge any additional fees for using the wallet. However, standard network fees still apply."',
-					url: 'https://family.co/faqs',
-				},
-				{
-					explanation:
-						'"There are no additional fees for using the bridge, just the standard network fee for the transaction."',
-					url: 'https://family.co/support/bridging',
-				},
-			],
+			ref: {
+				explanation: 'Family says it charges no fees of its own. Users pay only network fees.',
+				label: 'Family FAQ',
+				url: 'https://family.co/faqs',
+			},
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -139,13 +131,7 @@ export const family: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: notSupportedWithRef({
-				ref: {
-					explanation:
-						'No bug bounty or disclosure policy: the `/security`, `/bug-bounty` and `/.well-known/security.txt` paths on family.co return 404, and no bug bounty platform lists a program for Family.',
-					url: 'https://family.co/terms',
-				},
-			}),
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -158,13 +144,12 @@ export const family: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
-					ref: [
-						{
-							explanation:
-								'Zellic assessment of the Family Wallet iOS application (January 29 to February 23, 2024): three High and two Medium findings, all acknowledged with fixes implemented.',
-							url: 'https://family.co/media/family-wallet-audit-report-2024.pdf',
-						},
-					],
+					ref: {
+						explanation:
+							'Zellic reviewed the Family iOS app and found three high and two medium severity issues. The report lists a fix for each of them.',
+						label: 'Zellic security assessment of Family Wallet for iOS',
+						url: 'https://family.co/media/family-wallet-audit-report-2024.pdf',
+					},
 					auditDate: '2024-02-28',
 					auditor: zellic,
 					codeSnapshot: {
