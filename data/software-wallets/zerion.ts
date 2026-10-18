@@ -375,7 +375,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -386,11 +386,11 @@ export const zerion: SoftwareWallet = {
 						url: [
 							{
 								label: 'Zerion Wallet Core for iOS',
-								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE#not-line-specific',
 							},
 							{
 								label: 'Zerion Wallet Core for Android',
-								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE#not-line-specific',
 							},
 						],
 					},
@@ -403,7 +403,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -1052,7 +1052,7 @@ export const zerion: SoftwareWallet = {
 						{
 							explanation:
 								'A committed `package-lock.json` pins every dependency to an exact resolved version with an integrity hash.',
-							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json#not-line-specific',
 						},
 					],
 				}),
@@ -1062,7 +1062,7 @@ export const zerion: SoftwareWallet = {
 							{
 								explanation:
 									'The extension has no LavaMoat or SES dependency in its build, and the shipped v1.45.2 extension contains no LavaMoat or SES runtime.',
-								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/dc9be458cd0e08be170058ba256bd4144e362f0a/package.json',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/dc9be458cd0e08be170058ba256bd4144e362f0a/package.json#not-line-specific',
 							},
 						],
 					}),

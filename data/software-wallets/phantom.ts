@@ -57,14 +57,14 @@ import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhp
 
 const securityAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf#binary-file',
 		auditDate: '2021-05-07',
 		auditor: kudelskiSecurity,
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf#binary-file',
 		auditDate: '2024-06-07',
 		auditor: leastAuthority,
 		codeSnapshot: {

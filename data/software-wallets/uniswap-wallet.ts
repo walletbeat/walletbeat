@@ -64,7 +64,7 @@ import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngpl
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf#binary-file',
 		auditDate: '2023-11-02',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -87,7 +87,7 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		variantsScope: { [Variant.MOBILE]: true },
 	},
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf#binary-file',
 		auditDate: '2024-04-30',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -277,7 +277,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The Uniswap Wallet mobile app is explicitly licensed under GPL 3.0 or later. The browser extension directory in the same monorepo does not contain a `LICENSE` file. Development happens in a private repository and only production-ready code is published.',
-					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE',
+					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE#not-line-specific',
 				},
 				license: FOSSLicense.GPL_3_0,
 			},
@@ -817,12 +817,12 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'The committed `bun.lock` pins exact versions for the `@uniswap/extension` workspace (`apps/extension`) and its transitive JavaScript dependencies.',
-							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#not-line-specific',
 						},
 						{
 							explanation:
 								'iOS: the committed `Podfile.lock` pins every CocoaPods dependency version and records the Podfile checksum used to resolve them.',
-							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock#not-line-specific',
 						},
 						{
 							explanation:
@@ -837,7 +837,7 @@ export const uniswapWallet: SoftwareWallet = {
 							{
 								explanation:
 									'The extension package has no LavaMoat or SES dependency, and the shipped v1.84.0.2 extension contains no LavaMoat or SES runtime.',
-								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json#not-line-specific',
 							},
 						],
 					}),
@@ -846,7 +846,7 @@ export const uniswapWallet: SoftwareWallet = {
 							{
 								explanation:
 									'The mobile app package has no LavaMoat, SES or other dependency isolation.',
-								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json#not-line-specific',
 							},
 						],
 					}),

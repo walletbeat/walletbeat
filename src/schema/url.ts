@@ -53,6 +53,19 @@ export const fullCommitHashRegExp = /^[0-9a-f]{40}$/
  */
 export const lineFragmentRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
 
+/**
+ * Synthetic GitHub URL fragments used by Walletbeat's internal integrity
+ * checks to mark a commit-pinned blob URL as either a binary file
+ * (`#binary-file`) or a text file intentionally without a line range
+ * (`#not-line-specific`).
+ */
+export const syntheticAnchorRegExp = /#(?:not-line-specific|binary-file)$/
+
+/** Strip a Walletbeat synthetic GitHub anchor from a URL, if present. */
+export function stripSyntheticAnchor(url: string): string {
+	return url.replace(syntheticAnchorRegExp, '')
+}
+
 /** Format a GitHub line-anchor fragment as `L123` / `L123-456`, or null if not one. */
 function gitHubLineRange(fragment: string): string | null {
 	const match = lineFragmentRegExp.exec(fragment)
@@ -254,10 +267,16 @@ export function getUrlLabel(url: Url): string {
  */
 export function labeledUrl(url: Url, defaultLabel?: string): LabeledUrl {
 	if (typeof url === 'string') {
-		return { label: defaultLabel ?? getUrlLabel(url), url }
+		return {
+			label: defaultLabel ?? getUrlLabel(url),
+			url: stripSyntheticAnchor(url),
+		}
 	}
 
-	return url
+	return {
+		label: url.label,
+		url: stripSyntheticAnchor(url.url),
+	}
 }
 
 /** Type predicate for `LabeledUrl`. */

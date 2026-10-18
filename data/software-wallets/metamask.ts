@@ -335,14 +335,14 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The MetaMask browser extension uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
 				[Variant.MOBILE]: {
 					ref: {
 						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
@@ -631,7 +631,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf#binary-file',
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -641,7 +641,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf#binary-file',
 					auditDate: '2025-04-01',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -1047,7 +1047,7 @@ export const metamask: SoftwareWallet = {
 						{
 							explanation:
 								'The repo pins a `yarn.lock` lockfile committed alongside `package.json`.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#not-line-specific',
 						},
 						{
 							explanation: 'CI lints the lockfile and checks yarn resolutions on every run.',
@@ -1081,7 +1081,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation: 'A dedicated static security code scanner runs on push and PR.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml#not-line-specific',
 						},
 					],
 				}),
@@ -1089,7 +1089,7 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The repo maintains a publicly accessible `CHANGELOG.md`, validated by CI on every run.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md#not-line-specific',
 					},
 				}),
 				hermeticBuilds: notSupported,
