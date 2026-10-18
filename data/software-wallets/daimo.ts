@@ -80,7 +80,7 @@ export const daimo: SoftwareWallet = {
 				ref: {
 					explanation:
 						'Key rotation changes are supported in the UI and result in onchain transactions with a well-known structure',
-					url: 'https://github.com/daimo-eth/daimo/blob/01e18724ff6c1ac77727a14e64ec0f72749f54d5/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
+					url: 'https://github.com/daimo-eth/daimo/blob/01e18724ff6c1ac77727a14e64ec0f72749f54d5/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx#not-line-specific',
 				},
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -155,7 +155,7 @@ export const daimo: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Daimo is licensed under the GPL-3.0 license.',
-						url: 'https://github.com/daimo-eth/daimo/blob/226ed1a1f5087a39ce87e6be17a66c1ce1189e9d/LICENSE',
+						url: 'https://github.com/daimo-eth/daimo/blob/226ed1a1f5087a39ce87e6be17a66c1ce1189e9d/LICENSE#not-line-specific',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -242,6 +242,7 @@ export const daimo: SoftwareWallet = {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
 								[PersonalInfo.FARCASTER_ACCOUNT]: CollectionPolicy.OPT_IN,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
 							role: EntityRole.OPERATOR,
@@ -260,6 +261,7 @@ export const daimo: SoftwareWallet = {
 								[PersonalInfo.FARCASTER_ACCOUNT]: CollectionPolicy.OPT_IN,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
 							role: EntityRole.OPERATOR,
@@ -272,6 +274,7 @@ export const daimo: SoftwareWallet = {
 								"Creating a Daimo wallet creates a transaction publicly registering your name and address in Daimo's nameRegistry contract on Ethereum.",
 							url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/contract/nameRegistry.ts#L183-L197',
 						},
+						multiAddress: null,
 						purposes: [DataCollectionPurpose.ACCOUNT_SIGNUP],
 					},
 				},
@@ -353,7 +356,7 @@ export const daimo: SoftwareWallet = {
 									explanation:
 										'The wallet refreshes fiat currency exchange rates periodically. Such requests do not carry wallet identifying information.',
 									url: [
-										'https://github.com/daimo-eth/daimo/blob/072e57d700ba8d2e932165a12c2741c31938f1c2/packages/daimo-api/src/api/getExchangeRates.ts',
+										'https://github.com/daimo-eth/daimo/blob/072e57d700ba8d2e932165a12c2741c31938f1c2/packages/daimo-api/src/api/getExchangeRates.ts#not-line-specific',
 										'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/.env.example#L6',
 									],
 								},
@@ -362,6 +365,7 @@ export const daimo: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -409,7 +413,7 @@ export const daimo: SoftwareWallet = {
 					{
 						explanation:
 							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
-						url: 'https://github.com/daimo-eth/p256-verifier/blob/402e7b4ec4b91f941529f43f9270a8727f647c98/src/P256Verifier.sol',
+						url: 'https://github.com/daimo-eth/p256-verifier/blob/402e7b4ec4b91f941529f43f9270a8727f647c98/src/P256Verifier.sol#not-line-specific',
 					},
 				],
 				details:
@@ -420,7 +424,7 @@ export const daimo: SoftwareWallet = {
 			}),
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/daimo-eth/daimo/blob/0a31a01bf47dcf339db57df4891db23ba914f1ba/audits/2023-10-veridise-daimo.pdf',
+					ref: 'https://github.com/daimo-eth/daimo/blob/0a31a01bf47dcf339db57df4891db23ba914f1ba/audits/2023-10-veridise-daimo.pdf#binary-file',
 					auditDate: '2023-10-06',
 					auditor: veridise,
 					codeSnapshot: {

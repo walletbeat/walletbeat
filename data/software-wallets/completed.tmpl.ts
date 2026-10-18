@@ -427,6 +427,9 @@ export const completedTemplate: SoftwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.NEVER,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
 							role: EntityRole.OPERATOR,
@@ -474,6 +477,9 @@ export const completedTemplate: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -488,6 +494,9 @@ export const completedTemplate: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
 							},
 							purposes: [
 								DataCollectionPurpose.UPDATE_CHECKING,
