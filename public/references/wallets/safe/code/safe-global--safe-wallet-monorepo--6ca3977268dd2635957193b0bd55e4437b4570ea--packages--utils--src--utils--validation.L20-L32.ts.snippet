@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 20,
+	"highlightLastLine": 32,
+	"segments": [
+		{
+			"lines": [
+				"}",
+				"",
+				"export const isValidAddress = (address: string): boolean => validateAddress(address) === undefined",
+				"",
+				"export const validatePrefixedAddress =",
+				"  (chainShortName?: string) =>",
+				"  (value: string): string | undefined => {",
+				"    const { prefix, address } = parsePrefixedAddress(value)",
+				"",
+				"    if (prefix) {",
+				"      if (prefix !== chainShortName) {",
+				"        return `\"${prefix}\" doesn't match the current chain`",
+				"      }",
+				"    }",
+				"",
+				"    return validateAddress(address)",
+				"  }",
+				"",
+				"export const uniqueAddress =",
+				"  (addresses: string[] = [], message?: string) =>",
+				"  (address: string): string | undefined => {"
+			],
+			"startLine": 16
+		}
+	]
+}

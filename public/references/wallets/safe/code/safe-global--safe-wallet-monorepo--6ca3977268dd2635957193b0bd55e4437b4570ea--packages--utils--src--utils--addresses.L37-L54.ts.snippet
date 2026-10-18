@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 37,
+	"highlightLastLine": 54,
+	"segments": [
+		{
+			"lines": [
+				"export type PrefixedAddress = {",
+				"  prefix?: string",
+				"  address: string",
+				"}",
+				"",
+				"/**",
+				" * Parses a string that may/may not contain an address and returns the `prefix` and checksummed `address`",
+				" * @param value (prefixed) address",
+				" * @returns `prefix` and checksummed `address`",
+				" */",
+				"export const parsePrefixedAddress = (value: string): PrefixedAddress => {",
+				"  let [prefix, address] = value.split(':')",
+				"",
+				"  if (!address) {",
+				"    address = value",
+				"    prefix = ''",
+				"  }",
+				"",
+				"  return {",
+				"    prefix: prefix || undefined,",
+				"    address: checksumAddress(address),",
+				"  }",
+				"}",
+				"",
+				"export const formatPrefixedAddress = (address: string, prefix?: string): string => {",
+				"  return prefix ? `${prefix}:${address}` : address",
+				"}"
+			],
+			"startLine": 32
+		}
+	]
+}

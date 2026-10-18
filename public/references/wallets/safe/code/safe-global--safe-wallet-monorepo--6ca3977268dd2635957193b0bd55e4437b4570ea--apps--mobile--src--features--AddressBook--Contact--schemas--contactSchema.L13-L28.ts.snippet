@@ -1,0 +1,41 @@
+{
+	"highlightFirstLine": 13,
+	"highlightLastLine": 28,
+	"segments": [
+		{
+			"lines": [
+				"export const contactSchema = z.object({",
+				"  name: z"
+			],
+			"startLine": 5
+		},
+		{
+			"lines": [
+				"    .max(50, 'Name is too long')",
+				"    .refine((value) => value.trim().length > 0, {",
+				"      message: 'Name cannot be empty or only whitespace',",
+				"    }),",
+				"  address: z",
+				"    .string()",
+				"    .min(1, 'Address is required')",
+				"    .refine(",
+				"      (value) => {",
+				"        try {",
+				"          const { address } = parsePrefixedAddress(value)",
+				"          return isValidAddress(address)",
+				"        } catch {",
+				"          return false",
+				"        }",
+				"      },",
+				"      {",
+				"        message: 'Invalid Ethereum address format',",
+				"      },",
+				"    ),",
+				"})",
+				"",
+				"export type ContactFormData = z.infer<typeof contactSchema>"
+			],
+			"startLine": 9
+		}
+	]
+}

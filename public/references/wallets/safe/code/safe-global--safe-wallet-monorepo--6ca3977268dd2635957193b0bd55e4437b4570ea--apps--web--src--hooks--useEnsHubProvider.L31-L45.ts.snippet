@@ -1,0 +1,35 @@
+{
+	"highlightFirstLine": 31,
+	"highlightLastLine": 45,
+	"segments": [
+		{
+			"lines": [
+				"export const _clearEnsHubProviders = (): void => {",
+				"  Object.keys(hubProviders).forEach((key) => delete hubProviders[key])",
+				"}",
+				"",
+				"// Fails closed when the hub chain is missing from config: ENS must never fall back to another RPC.",
+				"export const useEnsHubProvider = (",
+				"  targetChain?: Chain,",
+				"): { hubChain: Chain | undefined; provider: JsonRpcProvider | undefined; isDomainLookupEnabled: boolean } => {",
+				"  const globalProvider = useWeb3ReadOnly()",
+				"  const currentChain = useCurrentChain()",
+				"  const customRpc = useAppSelector(selectRpc)",
+				"",
+				"  const hubChainId = targetChain ? getEnsHubChainId(!!targetChain.isTestnet) : undefined",
+				"  const hubChain = useChain(hubChainId || '')",
+				"",
+				"  const provider = useMemo(() => {",
+				"    if (!hubChain) return undefined",
+				"    if (hubChain.chainId === currentChain?.chainId) return globalProvider",
+				"    return getSharedHubProvider(hubChain, customRpc?.[hubChain.chainId])",
+				"  }, [hubChain, currentChain?.chainId, globalProvider, customRpc])",
+				"",
+				"  const isDomainLookupEnabled = hasHubDomainLookup(hubChain)",
+				"",
+				"  return useMemo(() => ({ hubChain, provider, isDomainLookupEnabled }), [hubChain, provider, isDomainLookupEnabled])"
+			],
+			"startLine": 26
+		}
+	]
+}

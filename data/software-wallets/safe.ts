@@ -4,6 +4,7 @@ import { ackee } from '@/data/entities/ackee'
 import { certora } from '@/data/entities/certora'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -83,12 +84,72 @@ export const safe: SoftwareWallet = {
 			}),
 		},
 		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+			[Variant.BROWSER]: {
+				ref: [
+					{
+						explanation:
+							"The address field looks up ENS names on Ethereum through the app's own node connection, or through the user's custom node if one is set.",
+						urls: [
+							{
+								label: 'Name resolver hook',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/components/common/AddressInput/useNameResolver.ts#L21-L36',
+							},
+							{
+								label: 'ENS hub provider',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/hooks/useEnsHubProvider.ts#L31-L45',
+							},
+							{
+								label: 'ENS resolution',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/ens.ts#L67-L82',
+							},
+						],
+					},
+					{
+						explanation:
+							'An address with a network prefix is accepted only when the prefix matches the current network. Other chain-specific address formats are not recognized.',
+						urls: [
+							{
+								label: 'Prefix parsing',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/addresses.ts#L37-L54',
+							},
+							{
+								label: 'Prefix validation',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/validation.ts#L20-L32',
+							},
+						],
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'CHAIN_CLIENT',
+				}),
 			},
-			nonChainSpecificEnsResolution: null,
+			[Variant.MOBILE]: {
+				ref: [
+					{
+						explanation:
+							'The send and address book fields accept only plain addresses, not ENS names.',
+						urls: [
+							{
+								label: 'Recipient validation',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/Send/hooks/useRecipientValidation.ts#L51-L62',
+							},
+							{
+								label: 'Contact schema',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/AddressBook/Contact/schemas/contactSchema.ts#L13-L28',
+							},
+						],
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: notSupported,
+			},
 		},
 		chainAbstraction: null,
 		chainConfigurability: supported({
@@ -174,7 +235,24 @@ export const safe: SoftwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Both apps keep a list of Safe accounts, and users can create or add existing accounts.',
+					urls: [
+						{
+							label: 'Web: accounts list',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/features/myAccounts/components/AccountsHeader/index.tsx#L54-L69',
+						},
+						{
+							label: 'Mobile: add existing account',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/AccountsSheet/MyAccounts/MyAccountsFooter.tsx#L29-L37',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
