@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	EvaluationContext,
@@ -204,7 +205,7 @@ type QualifiedDataCollectionWithMultiAddress = QualifiedDataCollection & {
 function isQualifiedDataCollectionWithMultiAddress(
 	dataCollection: QualifiedDataCollection,
 ): dataCollection is QualifiedDataCollectionWithMultiAddress {
-	return dataCollection.multiAddress !== undefined
+	return dataCollection.multiAddress != null
 }
 
 function rateHandling(
@@ -300,6 +301,10 @@ export const multiAddressCorrelation: Attribute = {
 		  the receiving endpoint to learn that all of these addresses belong to
 		  the same user. Similar correlations are also possible by IP and/or
 			time-based correlation of requests that each contain one wallet address.
+
+		Walletbeat determines this by inspecting the network requests made by the
+		wallet. See the [data collection guide](${withBasePath('/docs/wallet-testing/data-collection/')})
+		for how these requests are captured.
 
 		In order to prevent this information from being revealed, wallets can
 		use a variety of strategies:

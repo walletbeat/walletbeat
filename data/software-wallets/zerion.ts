@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
@@ -67,6 +68,7 @@ import {
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -80,9 +82,9 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		coinspectId: 'zerion',
-		contributors: [lucemans, mattmatt, ren2140],
+		contributors: [lucemans, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-31',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -373,7 +375,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -384,11 +386,11 @@ export const zerion: SoftwareWallet = {
 						url: [
 							{
 								label: 'Zerion Wallet Core for iOS',
-								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE#not-line-specific',
 							},
 							{
 								label: 'Zerion Wallet Core for Android',
-								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE#not-line-specific',
 							},
 						],
 					},
@@ -401,7 +403,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -485,7 +487,15 @@ export const zerion: SoftwareWallet = {
 				ventureCapital: true, // $22.5M across seed, Series A and Series B
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Both the browser extension and the mobile app can add wallets: new addresses from the current recovery phrase (the same wallet group) or a new one, imported wallets, Ledger devices and watch-only addresses.',
+					url: 'https://help.zerion.io/en/articles/8653430-add-an-additional-wallet-to-zerion',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -691,7 +701,7 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps—with an extra hop.',
+							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps, with an extra hop.',
 						url: ['https://www.ledger.com/zerion'],
 					},
 				],
@@ -840,13 +850,13 @@ export const zerion: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows an execute call to the Safe address.',
+								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows an execute call to the Safe address.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-aave-supply.png',
 							label: 'Zerion execute confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows an execute call to the Safe address.',
+								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows an execute call to the Safe address.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-batch-approve-supply.png',
 							label: 'Zerion execute confirmation for a Safe{Wallet} batched approve and supply',
 						},
@@ -993,7 +1003,7 @@ export const zerion: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								url: [
 									{
 										label:
@@ -1021,7 +1031,7 @@ export const zerion: SoftwareWallet = {
 					l2: {
 						ref: {
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png',
 							label: 'Zerion iOS Networks page listing Base, Optimism and Arbitrum',
 							lastRetrieved: '2026-10-01',
@@ -1037,16 +1047,29 @@ export const zerion: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'A committed `package-lock.json` pins every dependency to an exact resolved version with an integrity hash.',
-							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json#not-line-specific',
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension has no LavaMoat or SES dependency in its build, and the shipped v1.45.2 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/dc9be458cd0e08be170058ba256bd4144e362f0a/package.json#not-line-specific',
+							},
+						],
+					}),
+					// The mobile app source is not public.
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
@@ -1072,11 +1095,11 @@ export const zerion: SoftwareWallet = {
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: false,
-					requiredReview: false,
-					tagsImmutable: false,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 				},
 				reproducibleBuilds: null,
 			},

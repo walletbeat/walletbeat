@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
@@ -89,9 +90,9 @@ export const rabby: SoftwareWallet = {
 		displayName: 'Rabby',
 		tableName: 'Rabby',
 		coinspectId: 'rabby-wallet',
-		contributors: [polymutex, nconsigny, mattmatt, ren2140],
+		contributors: [polymutex, nconsigny, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-31',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/android/app/src/main/AndroidManifest.xml',
@@ -355,7 +356,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							'Rabby implements the EIP-1193 Provider interface and injects it into web pages. EIP-2700 and EIP-6963 are also supported.',
-						url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts',
+						url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts#not-line-specific',
 					},
 				],
 				'1193': featureSupported,
@@ -374,7 +375,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							"Other than its rabby-api package, Rabby's core code is licensed under the MIT license.",
-						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE#not-line-specific',
 					},
 				],
 				license: SourceAvailableNonFOSSLicense.UNLICENSED_VISIBLE,
@@ -384,7 +385,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's browser extension is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+							url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE#not-line-specific',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -402,7 +403,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's desktop app is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE',
+							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE#not-line-specific',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -664,7 +665,7 @@ export const rabby: SoftwareWallet = {
 				{
 					ref: {
 						label: '[20210623] Rabby Chrome Extension Penetration Testing Report.pdf',
-						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf#binary-file',
 					},
 					auditDate: '2021-06-18',
 					auditor: slowMist,
@@ -675,7 +676,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf#binary-file',
 					auditDate: '2022-03-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -687,7 +688,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf#binary-file',
 					auditDate: '2023-07-20',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -699,7 +700,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf#binary-file',
 					auditDate: '2023-09-26',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -714,7 +715,7 @@ export const rabby: SoftwareWallet = {
 					// The upstream repository really names this file
 					// "Least Authority - Debank Rabby Walle Audit Report.pdf";
 					// the missing "t" is Rabby's, not ours. Do not "fix" the URL.
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -741,7 +742,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-10-22',
 					auditor: cure53,
 					codeSnapshot: {
@@ -778,7 +779,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf#binary-file',
 					auditDate: '2024-10-23',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -789,7 +790,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-12-12',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -800,7 +801,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-12-17',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -920,7 +921,7 @@ export const rabby: SoftwareWallet = {
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app. The patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -933,7 +934,7 @@ export const rabby: SoftwareWallet = {
 								},
 								{
 									label: 'The patch, which leaves `generateMnemonic` untouched',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch#not-line-specific',
 								},
 								{
 									label: 'The patch was made "to keep same level performance as past"',
@@ -949,7 +950,7 @@ export const rabby: SoftwareWallet = {
 								},
 								{
 									label: 'Crypto provider installed at app startup',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts#not-line-specific',
 								},
 							],
 						},
@@ -1020,13 +1021,13 @@ export const rabby: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
 							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
@@ -1212,7 +1213,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								url: [
 									{
 										label:
@@ -1261,7 +1262,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								label:
 									"Mobile app sends transactions on Rabby's built-in networks to Rabby's servers",
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
@@ -1305,16 +1306,36 @@ export const rabby: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'The CI runs `yarn install --immutable`, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
-							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml#not-line-specific',
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension has no LavaMoat or SES dependency in its build, and the shipped v0.94.11 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/package.json#not-line-specific',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app has no LavaMoat, SES or other dependency isolation configured.',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/package.json#not-line-specific',
+							},
+						],
+					}),
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/RabbyHub/Rabby/releases',
