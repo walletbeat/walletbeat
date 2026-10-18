@@ -1188,21 +1188,24 @@ export const ambire: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Production Chromium and Safari builds use @lavamoat/webpack with a committed policy, running dependencies in SES compartments under lockdown; the shipped v6.21.10 extension includes the LavaMoat runtime in background.js and main.js.',
+								'The production extension runs each code library in a LavaMoat sandbox. A library can only reach what its policy allows.',
+							label: 'LavaMoat setup in the extension build',
 							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L146-L169',
 						},
 						{
-							explanation: 'Committed LavaMoat policy for the webpack build.',
+							explanation: 'The policy lists what each library is allowed to use.',
+							label: 'LavaMoat policy',
 							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/lavamoat/webpack/policy.json#L1-L36',
 						},
 						{
 							explanation:
-								'LavaMoat is enabled only for production builds where `WEB_ENGINE` is `webkit` (Chromium and Safari); Firefox builds run without it.',
+								'LavaMoat is on for production builds for Chrome and Safari. The Firefox build runs without it.',
+							label: 'Builds that use LavaMoat',
 							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/shared.js#L70',
 						},
 						{
-							explanation:
-								'The in-page and content-script entries run without the LavaMoat runtime.',
+							explanation: 'The scripts that the extension adds to web pages run without LavaMoat.',
+							label: 'Scripts that run without LavaMoat',
 							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L19-L35',
 						},
 					],
