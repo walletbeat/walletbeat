@@ -1656,12 +1656,14 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Production Chrome and Edge releases are built with `yarn build:webpack`; the shipped v1.6.13 extension contains no LavaMoat or SES runtime.',
+									'The production release builds the extension with the standard build, which does not sandbox code libraries.',
+								label: 'Chrome release build step',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/.github/workflows/publish-prod-chrome.yml#L31-L32',
 							},
 							{
 								explanation:
-									'`build:webpack` runs the webpack build tooling under LavaMoat, which protects the build process but not the shipped bundle. The LavaMoat browserify step that would sandbox the shipped bundle at runtime (`build:lavamoat`) is not part of the release build.',
+									'The standard build uses LavaMoat only while the extension is being built, which protects the build machine but not users. The separate step that would sandbox libraries inside the extension is not part of the release.',
+								label: 'Extension build scripts',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/package.json#L17-L22',
 							},
 						],
@@ -1670,7 +1672,8 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'The mobile app uses @lavamoat/allow-scripts to gate install scripts, but has no runtime dependency isolation.',
+									'The mobile app uses LavaMoat only to control which libraries may run scripts when they are installed. It does not sandbox libraries while the app runs.',
+								label: 'LavaMoat install script settings',
 								url: 'https://github.com/rainbow-me/rainbow/blob/1753c733bf204c0046b9f16b6e43b594e78f2c81/package.json#L469-L490',
 							},
 						],
