@@ -323,7 +323,7 @@ export const bitget: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+								'Bitget Wallet does not decode an Aave supply. It shows a generic signature confirmation.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
 							label: 'Bitget Wallet signature confirmation for an Aave supply',
 						},
