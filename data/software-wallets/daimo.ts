@@ -389,7 +389,8 @@ export const daimo: SoftwareWallet = {
 				guardianRecovery: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Recovery is by adding backup keys held by the user (passkey, security key or seed phrase) to the onchain account; there is no guardian or vendor-assisted recovery.',
+							'Users recover their account with backup keys they hold themselves, such as a passkey, a security key or a seed phrase. There is no guardian or company-assisted recovery.',
+						label: 'Account key types',
 						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts#L4-L23',
 					},
 				}),
@@ -480,43 +481,39 @@ export const daimo: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupportedWithRef({
-					ref: [
-						{
-							explanation:
-								'The `publish-apk` job builds the Android app on Expo EAS and uploads the resulting `.apk` file to GitHub Releases when a `v*` tag is pushed. It uploads no separate signature or attestation.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L130-L166',
-						},
-						{
-							explanation:
-								'The repository has no releases, so the `publish-apk` job has never published a build.',
-							url: 'https://github.com/daimo-eth/daimo/releases',
-						},
-					],
+					ref: {
+						explanation:
+							'The release workflow uploads the Android app file without a signature or attestation that users can check.',
+						label: 'Android release job',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L130-L166',
+					},
 				}),
 				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
-							explanation: 'package-lock.json is committed and CI installs with `npm ci`.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/ci.yml#L21-L24',
+							explanation:
+								'The release workflow installs the exact library versions recorded in the repository.',
+							label: 'Release workflow install step',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L115-L116',
 						},
 						{
-							explanation: 'The release workflow also installs with `npm ci`.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L115-L116',
+							explanation: 'The test workflow installs the same recorded versions.',
+							label: 'Test workflow install step',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/ci.yml#L21-L24',
 						},
 					],
 				}),
 				dependencySandboxing: notSupported,
 				dependencyVulnerabilityScanning: notSupported,
-				hasPublicChangelog: notSupported,
+				hasPublicChangelog: null,
 				hermeticBuilds: notSupportedWithRef({
-					ref: [
-						{
-							explanation:
-								'Production builds run on the Expo EAS cloud service with `eas-version: latest`, fetching tools and dependencies during the build.',
-							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
-						},
-					],
+					ref: {
+						explanation:
+							'Production builds use whatever build tool version is latest and run on an external cloud service that downloads libraries during the build.',
+						label: 'Production build job',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
+					},
 				}),
 				repositoryChangeControls: null,
 				reproducibleBuilds: notSupported,
