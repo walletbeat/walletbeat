@@ -11,12 +11,7 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import {
-	featureSupported,
-	notSupported,
-	notSupportedWithRef,
-	supported,
-} from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -140,13 +135,7 @@ export const nufi: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: notSupportedWithRef({
-				ref: {
-					explanation: 'NuFi does not run a bug bounty program.',
-					label: 'NuFi terms and conditions',
-					url: 'https://nu.fi/terms-and-conditions',
-				},
-			}),
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
