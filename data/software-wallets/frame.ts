@@ -34,7 +34,7 @@ export const frame: SoftwareWallet = {
 		coinspectId: 'frame',
 		contributors: [polymutex, nconsigny, lucemans, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://docs.frame.sh/'],
 			repositories: ['https://github.com/floating/frame'],
@@ -90,8 +90,17 @@ export const frame: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Frame desktop is GPL-3.0 ("Copyright (C) 2021 Frame Labs, Inc."); the companion browser extension (frame-labs/frame-extension) is also GPL-3.0.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE',
+							'The Frame desktop app and its browser extension are both licensed under GPL-3.0.',
+						urls: [
+							{
+								label: 'Frame desktop license',
+								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/LICENSE#L1-L4',
+							},
+							{
+								label: 'Frame extension license',
+								url: 'https://github.com/frame-labs/frame-extension/blob/09d7848b6b4612314f13e107e3b5c56fb9fadfe0/LICENSE#L1-L2',
+							},
+						],
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -100,10 +109,9 @@ export const frame: SoftwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation:
-						'Frame interacts with apps as an injected wallet; the swap guide uses an external decentralized exchange and mentions no Frame fee.',
-					label: 'Frame documentation',
-					url: 'https://docs.frame.sh/',
+					explanation: 'Frame has no built-in swap feature.',
+					label: 'Frame guide to token swaps',
+					url: 'https://docs.frame.sh/docs/Guides/Performing%20DEX%20Swaps',
 				},
 			],
 			revenueBreakdownIsPublic: false,
@@ -143,18 +151,13 @@ export const frame: SoftwareWallet = {
 				guardianRecovery: notSupportedWithRef({
 					ref: {
 						explanation:
-							"Recovery is only by re-importing the user's own seed phrase, private key or keystore, or using a hardware wallet; no social, cloud, or vendor-assisted recovery exists in the code.",
+							'Users can only restore an account by importing their own seed phrase, private key or keystore file, or by connecting a hardware wallet.',
+						label: 'Add account options',
 						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/app/dash/Accounts/index.js#L81-L117',
 					},
 				}),
 			},
-			bugBountyProgram: notSupportedWithRef({
-				ref: {
-					explanation:
-						'No bug bounty, SECURITY.md, or disclosure policy in either repository or on the Frame website and documentation.',
-					url: 'https://github.com/floating/frame',
-				},
-			}),
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -180,7 +183,7 @@ export const frame: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Hot signer secrets (an imported seed or private key) are encrypted locally with AES-256 using a scrypt-derived key and stored in the app data folder; hardware signers keep keys on the device.',
+							"Imported seed phrases and private keys are encrypted and stored on the user's computer. Hardware wallets keep their keys on the device.",
 						urls: [
 							{
 								label: 'Encryption',
@@ -205,7 +208,8 @@ export const frame: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Cure53 white-box penetration test and code audit of the Frame Electron app (August-September 2018): two Low and four Informational findings, all fixed in v0.0.7.',
+								'Cure53 tested and reviewed the code of the Frame desktop app in 2018. It found two low-severity and four informational issues.',
+							label: 'Cure53 audit report',
 							url: 'https://cure53.de/pentest-report_frame.pdf',
 						},
 					],
@@ -259,7 +263,7 @@ export const frame: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Release builds are code-signed in CI with Frame Labs Apple Developer (notarized) and Windows certificates and published as GitHub release assets; Linux builds are unsigned and no detached signatures are published.',
+									'Frame Labs signs the macOS and Windows release builds with its own developer certificates and publishes them on GitHub. Linux builds are not signed.',
 								urls: [
 									{
 										label: 'Signing certificates',
@@ -281,37 +285,41 @@ export const frame: SoftwareWallet = {
 					[Variant.BROWSER]: notSupportedWithRef({
 						ref: {
 							explanation:
-								'The extension commits package-lock.json but has no CI, and the README builds with `npm install`.',
-							url: 'https://github.com/frame-labs/frame-extension',
+								"The extension's build instructions don't enforce locked dependency versions.",
+							label: 'Extension build instructions',
+							url: 'https://github.com/frame-labs/frame-extension/blob/09d7848b6b4612314f13e107e3b5c56fb9fadfe0/README.md#L16-L19',
 						},
 					}),
 					[Variant.DESKTOP]: supported({
 						ref: [
 							{
 								explanation:
-									'package-lock.json is committed and CI installs with `npm ci` (the `setup:ci` script).',
-								url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json#L10',
+									"The desktop app's release build installs the exact dependency versions recorded in the repository.",
+								urls: [
+									{
+										label: 'Install script',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json#L10',
+									},
+									{
+										label: 'Release build steps',
+										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L67-L78',
+									},
+								],
 							},
 						],
 					}),
 				},
-				dependencySandboxing: notSupportedWithRef({
-					ref: {
-						explanation:
-							'Desktop gates install scripts with @lavamoat/allow-scripts but has no runtime LavaMoat policy; the extension has neither.',
-						url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/package.json#L10-L12',
-					},
-				}),
+				dependencySandboxing: notSupported,
 				dependencyVulnerabilityScanning: {
 					[Variant.BROWSER]: notSupported,
 					[Variant.DESKTOP]: notSupportedWithRef({
 						ref: [
 							{
 								explanation:
-									'The CI and release workflows install, compile, test and publish without a dependency audit step, and the repository has no Dependabot configuration file.',
+									"The desktop app's automated build and release steps don't check dependencies for known vulnerabilities.",
 								urls: [
 									{
-										label: 'CI workflow',
+										label: 'Automated test workflow',
 										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/compile-and-test.yml#L15-L33',
 									},
 									{
@@ -319,21 +327,21 @@ export const frame: SoftwareWallet = {
 										url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L61-L91',
 									},
 									{
-										label: 'Repository configuration directory',
+										label: 'Repository settings folder',
 										url: 'https://github.com/floating/frame/tree/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github',
 									},
 								],
 							},
 							{
 								explanation:
-									'The most recent Dependabot security update pull request was opened in September 2023 and is unmerged; none has been opened since.',
+									'Automatic security update requests stopped in September 2023, and the last one was never merged.',
 								urls: [
 									{
-										label: 'Dependabot pull requests',
+										label: 'Automatic update requests',
 										url: 'https://github.com/floating/frame/pulls?q=is%3Apr+author%3Aapp%2Fdependabot',
 									},
 									{
-										label: 'Latest Dependabot pull request',
+										label: 'Last automatic security update request',
 										url: 'https://github.com/floating/frame/pull/1658',
 									},
 								],
@@ -342,21 +350,21 @@ export const frame: SoftwareWallet = {
 					}),
 				},
 				hasPublicChangelog: {
-					[Variant.BROWSER]: notSupportedWithRef({
-						ref: {
-							explanation: 'The extension repository has no release notes or changelog.',
-							url: 'https://github.com/frame-labs/frame-extension',
-						},
-					}),
+					[Variant.BROWSER]: notSupported,
 					[Variant.DESKTOP]: supported({
-						ref: 'https://github.com/floating/frame/releases',
+						ref: {
+							explanation: 'Each desktop release on GitHub lists its changes.',
+							label: 'Frame desktop releases',
+							url: 'https://github.com/floating/frame/releases',
+						},
 					}),
 				},
 				hermeticBuilds: notSupportedWithRef({
 					ref: [
 						{
 							explanation:
-								'The desktop release workflow runs `apt update`, `pip install` and `npm ci` on GitHub-hosted runners during the build; the extension has no build workflow.',
+								'The desktop release build downloads system tools and packages from the internet while it runs. The extension has no automated build.',
+							label: 'Release build steps',
 							url: 'https://github.com/floating/frame/blob/dac4378979fe1f490f4d0bf141dc19c201d2cb58/.github/workflows/build.yml#L67-L78',
 						},
 					],
@@ -365,7 +373,8 @@ export const frame: SoftwareWallet = {
 					[Variant.BROWSER]: {
 						ref: [
 							{
-								explanation: 'GitHub reports the frame-extension master branch as not protected.',
+								explanation: "GitHub reports the extension's default branch as not protected.",
+								label: 'Extension branch settings',
 								url: 'https://api.github.com/repos/frame-labs/frame-extension/branches/master',
 							},
 						],
@@ -375,15 +384,9 @@ export const frame: SoftwareWallet = {
 						requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 						tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 					},
-					// Desktop branches are protected, but whether reviews are required is not visible to non-admins.
 					[Variant.DESKTOP]: null,
 				},
-				reproducibleBuilds: notSupportedWithRef({
-					ref: {
-						explanation: 'No reproducible build process is documented for either variant.',
-						url: 'https://github.com/floating/frame',
-					},
-				}),
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
