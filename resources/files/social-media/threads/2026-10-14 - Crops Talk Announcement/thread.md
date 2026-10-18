@@ -29,7 +29,7 @@ This talk walks through:
 
 Why should you listen to us about wallets?
 
-@polymutex wants to see Ethereum fulfill its cypherpunk mission. Hence the Walletbeat revamp in 2025, with a more in-depth focus on Ethereum alignment and richer data about individual wallets.
+@polymutex wants to see Ethereum fulfill its cypherpunk mission. Hence, the Walletbeat revamp in 2025, with a more in-depth focus on Ethereum alignment and richer data about individual wallets.
 
 ![Polymutex](./polymutex_devconnect_2025.png)
 
