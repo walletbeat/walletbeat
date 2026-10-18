@@ -6,3 +6,4 @@ data/*-wallets/collection/*
 data/coinspect/current-reports/
 pnpm-lock.yaml
 resources/files/
+src/tools/wallet-data-collection/agent/backup-tree.bak/**
