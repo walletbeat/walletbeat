@@ -1,28 +1,1533 @@
 {
 	"INSTALL": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT"
+				},
+				"purposes": [
+					"SCAM_DETECTION",
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA",
+					"SWAP_QUOTE",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "socket",
+					"name": "Socket",
+					"legalName": {
+						"name": "Socket Technology",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": "https://www.linkedin.com/company/socketdottech/",
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": "https://github.com/SocketDotTech",
+					"twitter": "https://x.com/SocketDotTech",
+					"url": "https://www.socket.tech/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"SWAP_QUOTE"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "cloudflare",
+					"name": "Cloudflare",
+					"legalName": {
+						"name": "Cloudflare, Inc.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": true,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/cloudflare",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "San Francisco, California, United States",
+					"linkedin": "https://www.linkedin.com/company/cloudflare/",
+					"privacyPolicy": "https://www.cloudflare.com/privacypolicy/",
+					"repoUrl": "https://github.com/cloudflare",
+					"twitter": "https://x.com/Cloudflare",
+					"url": "https://www.cloudflare.com/"
+				},
+				"role": "INTERMEDIARY",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"SWAP_QUOTE"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	},
 	"ONBOARDING_NEW": {
-		"collected": [],
+		"collected": [
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		],
 		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
 	},
 	"ONBOARDING_IMPORT": {
-		"collected": [],
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"ANALYTICS",
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		],
 		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
 	},
 	"SEND_ETHER": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"USER_ACTIONS": "ALWAYS",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"MEMPOOL_TRANSACTIONS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA",
+					"TRANSACTION_BROADCAST",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "pimlico",
+					"name": "Pimlico",
+					"legalName": {
+						"name": "Austerlitz Labs Ltd",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/pimlico",
+					"farcaster": "https://warpcast.com/pimlico",
+					"icon": {
+						"extension": "png",
+						"height": 200,
+						"width": 200
+					},
+					"jurisdiction": "London, England, United Kingdom",
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": "https://www.pimlico.io/privacy",
+					"repoUrl": "https://github.com/pimlicolabs",
+					"twitter": "https://x.com/pimlicoHQ",
+					"url": "https://www.pimlico.io/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "cloudflare",
+					"name": "Cloudflare",
+					"legalName": {
+						"name": "Cloudflare, Inc.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": true,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/cloudflare",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "San Francisco, California, United States",
+					"linkedin": "https://www.linkedin.com/company/cloudflare/",
+					"privacyPolicy": "https://www.cloudflare.com/privacypolicy/",
+					"repoUrl": "https://github.com/cloudflare",
+					"twitter": "https://x.com/Cloudflare",
+					"url": "https://www.cloudflare.com/"
+				},
+				"role": "INTERMEDIARY",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	},
 	"SEND_USDC": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "pimlico",
+					"name": "Pimlico",
+					"legalName": {
+						"name": "Austerlitz Labs Ltd",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/pimlico",
+					"farcaster": "https://warpcast.com/pimlico",
+					"icon": {
+						"extension": "png",
+						"height": 200,
+						"width": 200
+					},
+					"jurisdiction": "London, England, United Kingdom",
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": "https://www.pimlico.io/privacy",
+					"repoUrl": "https://github.com/pimlicolabs",
+					"twitter": "https://x.com/pimlicoHQ",
+					"url": "https://www.pimlico.io/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "cloudflare",
+					"name": "Cloudflare",
+					"legalName": {
+						"name": "Cloudflare, Inc.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": true,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/cloudflare",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "San Francisco, California, United States",
+					"linkedin": "https://www.linkedin.com/company/cloudflare/",
+					"privacyPolicy": "https://www.cloudflare.com/privacypolicy/",
+					"repoUrl": "https://github.com/cloudflare",
+					"twitter": "https://x.com/Cloudflare",
+					"url": "https://www.cloudflare.com/"
+				},
+				"role": "INTERMEDIARY",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"USER_ACTIONS": "ALWAYS",
+					"ASSETS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"MEMPOOL_TRANSACTIONS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_BROADCAST",
+					"ASSET_METADATA",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	},
 	"NATIVE_SWAP": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"USER_ACTIONS": "BY_DEFAULT",
+					"MEMPOOL_TRANSACTIONS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA",
+					"TRANSACTION_BROADCAST",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "coingecko",
+					"name": "CoinGecko",
+					"legalName": {
+						"name": "Gecko Labs Pte. Ltd.",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/coingecko",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "Singapore",
+					"linkedin": "https://www.linkedin.com/company/coingecko/",
+					"privacyPolicy": "https://www.coingecko.com/en/privacy",
+					"repoUrl": "https://github.com/coingecko",
+					"twitter": "https://x.com/coingecko",
+					"url": "https://www.coingecko.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS"
+				},
+				"purposes": [
+					"STATIC_ASSETS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "cloudflare",
+					"name": "Cloudflare",
+					"legalName": {
+						"name": "Cloudflare, Inc.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": true,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/cloudflare",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "San Francisco, California, United States",
+					"linkedin": "https://www.linkedin.com/company/cloudflare/",
+					"privacyPolicy": "https://www.cloudflare.com/privacypolicy/",
+					"repoUrl": "https://github.com/cloudflare",
+					"twitter": "https://x.com/Cloudflare",
+					"url": "https://www.cloudflare.com/"
+				},
+				"role": "INTERMEDIARY",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"TRACKING_IDENTIFIER": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"ASSETS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"STATIC_ASSETS",
+					"SWAP_QUOTE",
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "lifi",
+					"name": "LiFi",
+					"legalName": {
+						"name": "LI.FI Service GmbH",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/li-finance-fbae",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "UNKNOWN",
+					"linkedin": "https://www.linkedin.com/company/lifiprotocol/",
+					"privacyPolicy": "https://li.fi/legal/privacy-policy/",
+					"repoUrl": "https://github.com/lifinance",
+					"twitter": "https://x.com/lifiprotocol",
+					"url": "https://li.fi/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"TRACKING_IDENTIFIER": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"ASSETS": "ALWAYS"
+				},
+				"purposes": [
+					"SWAP_QUOTE"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "socket",
+					"name": "Socket",
+					"legalName": {
+						"name": "Socket Technology",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": "https://www.linkedin.com/company/socketdottech/",
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": "https://github.com/SocketDotTech",
+					"twitter": "https://x.com/SocketDotTech",
+					"url": "https://www.socket.tech/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"SWAP_QUOTE",
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "uniswapLabs",
+					"name": "Uniswap Labs",
+					"legalName": {
+						"name": "Universal Navigation Inc.",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/uniswap-labs",
+					"farcaster": "https://farcaster.xyz/uniswap",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "United States",
+					"linkedin": "https://www.linkedin.com/company/uniswaporg/",
+					"privacyPolicy": "https://uniswap.org/privacy-policy",
+					"repoUrl": "https://github.com/Uniswap",
+					"twitter": "https://x.com/Uniswap",
+					"url": "https://uniswap.org/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"TRACKING_IDENTIFIER": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"ASSETS": "ALWAYS"
+				},
+				"purposes": [
+					"SWAP_QUOTE"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "pimlico",
+					"name": "Pimlico",
+					"legalName": {
+						"name": "Austerlitz Labs Ltd",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/pimlico",
+					"farcaster": "https://warpcast.com/pimlico",
+					"icon": {
+						"extension": "png",
+						"height": 200,
+						"width": 200
+					},
+					"jurisdiction": "London, England, United Kingdom",
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": "https://www.pimlico.io/privacy",
+					"repoUrl": "https://github.com/pimlicolabs",
+					"twitter": "https://x.com/pimlicoHQ",
+					"url": "https://www.pimlico.io/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	},
 	"MAKE_TRANSACTION": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"ASSETS": "BY_DEFAULT",
+					"USER_ACTIONS": "ALWAYS",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT",
+					"MEMPOOL_TRANSACTIONS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"ASSET_METADATA",
+					"ANALYTICS",
+					"TRANSACTION_BROADCAST"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "pimlico",
+					"name": "Pimlico",
+					"legalName": {
+						"name": "Austerlitz Labs Ltd",
+						"soundsDifferent": true
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/pimlico",
+					"farcaster": "https://warpcast.com/pimlico",
+					"icon": {
+						"extension": "png",
+						"height": 200,
+						"width": 200
+					},
+					"jurisdiction": "London, England, United Kingdom",
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": "https://www.pimlico.io/privacy",
+					"repoUrl": "https://github.com/pimlicolabs",
+					"twitter": "https://x.com/pimlicoHQ",
+					"url": "https://www.pimlico.io/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "cloudflare",
+					"name": "Cloudflare",
+					"legalName": {
+						"name": "Cloudflare, Inc.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": false,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": true,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": false,
+						"walletDeveloper": false
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/cloudflare",
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": "San Francisco, California, United States",
+					"linkedin": "https://www.linkedin.com/company/cloudflare/",
+					"privacyPolicy": "https://www.cloudflare.com/privacypolicy/",
+					"repoUrl": "https://github.com/cloudflare",
+					"twitter": "https://x.com/Cloudflare",
+					"url": "https://www.cloudflare.com/"
+				},
+				"role": "INTERMEDIARY",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS",
+					"USER_ACTIONS": "ALWAYS",
+					"ACCOUNT_ADDRESS": "ALWAYS"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"TRANSACTION_SIMULATION"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	},
 	"APP_CONNECTION": {
-		"collected": []
+		"collected": [
+			{
+				"byEntity": {
+					"id": "ambire",
+					"name": "Ambire Wallet",
+					"legalName": {
+						"name": "Ambire Tech Ltd.",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": true,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/adex-03c2",
+					"farcaster": "https://warpcast.com/ambirewallet",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Bulgaria",
+					"linkedin": "https://www.linkedin.com/company/ambiretech",
+					"privacyPolicy": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+					"repoUrl": "https://github.com/AmbireTech",
+					"twitter": "https://x.com/ambireWallet",
+					"url": "https://ambire.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT",
+					"TRACKING_IDENTIFIER": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			},
+			{
+				"byEntity": {
+					"id": "monad",
+					"name": "Monad",
+					"legalName": {
+						"name": "Monad Labs",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": false
+					},
+					"crunchbase": {
+						"type": "NO_CRUNCHBASE_URL"
+					},
+					"farcaster": {
+						"type": "NO_FARCASTER_PROFILE"
+					},
+					"icon": "NO_ICON",
+					"jurisdiction": {
+						"type": "UNKNOWN"
+					},
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": {
+						"type": "NO_PRIVACY_POLICY"
+					},
+					"repoUrl": {
+						"type": "NO_REPO"
+					},
+					"twitter": "https://x.com/monad_xyz",
+					"url": "https://www.monad.xyz/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "BY_DEFAULT",
+					"ACCOUNT_ADDRESS": "BY_DEFAULT"
+				},
+				"purposes": [
+					"CHAIN_DATA_LOOKUP"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
 	}
 }
