@@ -205,19 +205,19 @@ export const okx: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'OKX Wallet does not decode an Aave supply properly; it labels it as a deposit and shows the token amount, but the contract is shown as a raw address and the collateral recipient is not shown.',
+								'OKX Wallet does not decode an Aave supply properly. It labels it as a deposit and shows the token amount, but the contract is shown as a raw address and the collateral recipient is not shown.',
 							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png',
 							label: 'OKX Wallet deposit confirmation for an Aave supply',
 						},
 						{
 							explanation:
-								'OKX Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it is shown as "Modify configuration".',
+								'OKX Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction. It is shown as "Modify configuration".',
 							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-aave-supply.png',
 							label: 'OKX Wallet confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'OKX Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it is shown as "Modify configuration".',
+								'OKX Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It is shown as "Modify configuration".',
 							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-batch-approve-supply.png',
 							label: 'OKX Wallet confirmation for a Safe{Wallet} batched approve and supply',
 						},
