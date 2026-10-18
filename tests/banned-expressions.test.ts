@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { commonExclusions, getCodebaseIndex, type IndexedFile } from '@/utils/codebase'
+import { extractUrlRanges } from '@/utils/markdown-utils'
 
 interface BannedExpression {
 	name: string
@@ -37,18 +38,7 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 		indexFn: (_, fileContents: string): FileBannedExpressionNames => {
 			const matched = new Set<string>()
 
-			const urlRegex = /https?:\/\/[^\s'"`<>]+/gi
-
-			const urls: { start: number; end: number }[] = []
-			let matchUrl
-
-			while ((matchUrl = urlRegex.exec(fileContents)) !== null) {
-				urls.push({ start: matchUrl.index, end: matchUrl.index + matchUrl[0].length })
-			}
-
-			function isInsideUrl(pos: number): boolean {
-				return urls.some(url => pos >= url.start && pos < url.end)
-			}
+			const urls = extractUrlRanges(fileContents, 'source')
 
 			for (const bannedExpr of bannedExpressions) {
 				const flags = bannedExpr.regexp.flags.includes('g')
@@ -58,7 +48,9 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 				let match
 
 				while ((match = regexp.exec(fileContents)) !== null) {
-					if (isInsideUrl(match.index)) {
+					const start = match.index
+
+					if (urls.some(url => start >= url.start && start < url.end)) {
 						continue
 					}
 
