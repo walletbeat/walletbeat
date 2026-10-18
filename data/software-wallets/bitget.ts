@@ -48,7 +48,7 @@ export const bitget: SoftwareWallet = {
 		coinspectId: 'bitget',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://web3.bitget.com/en/docs'],
 			extensions: [
@@ -210,11 +210,11 @@ export const bitget: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Users set a 6-digit passcode when creating a wallet and use it to sign transactions. The "Unlock required" option can be turned off, so neither the passcode nor biometrics is needed to open the app.',
+									'The app asks for a 6-digit PIN to open the wallet and sign transactions, and face or fingerprint unlock is optional. The "Unlock required" option can be turned off, so the app then opens without the PIN or biometrics.',
 								urls: [
 									{
-										label: 'Passcode',
-										url: 'https://web3.bitget.com/helpCenter/484',
+										label: 'Bitget Wallet guide to PIN codes',
+										url: 'https://web3.bitget.com/en/academy/pincode',
 									},
 									{
 										label: 'Privacy policy, section 10',
@@ -242,7 +242,7 @@ export const bitget: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension supports Ledger hardware wallets connected over USB, for EVM networks among others.',
+								'The browser extension supports Ledger hardware wallets connected by USB cable.',
 							urls: [
 								{
 									label: 'Getting started with Ledger',
@@ -257,14 +257,14 @@ export const bitget: SoftwareWallet = {
 					],
 					wallets: {
 						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.USB],
+							connectionTypes: [HardwareWalletConnection.webHID],
 						}),
 					},
 				},
 				[Variant.MOBILE]: {
 					ref: [
 						{
-							explanation: 'The app imports a Keystone 3 Pro by scanning its QR code.',
+							explanation: 'The app adds a Keystone hardware wallet by scanning its QR code.',
 							urls: [
 								{
 									label: 'Keystone: Bitget Wallet (Mobile)',
