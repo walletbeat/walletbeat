@@ -2,7 +2,7 @@ import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported } from '@/schema/features/support'
+import { supported } from '@/schema/features/support'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -19,7 +19,7 @@ export const cloaked: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://clkd.xyz/docs'],
 			repositories: [
@@ -65,8 +65,9 @@ export const cloaked: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Cloaked's stealth address SDK, which derives the spending and viewing keys and generates stealth addresses, is MIT-licensed.",
-						url: 'https://github.com/cloakedxyz/clkd-stealth/blob/9eb359efdd4ea31f5504bf81e57dcfe6f966dc14/LICENSE',
+							"Cloaked's address library, which creates the user's keys and one-time addresses, uses the MIT license.",
+						label: 'Cloaked stealth library license file',
+						url: 'https://github.com/cloakedxyz/clkd-stealth/blob/9eb359efdd4ea31f5504bf81e57dcfe6f966dc14/LICENSE#L1-L21',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -74,8 +75,8 @@ export const cloaked: SoftwareWallet = {
 			walletAppLicense: {
 				ref: [
 					{
-						explanation:
-							'L2BEAT reports that the production Cloaked web wallet is closed source, has no published reproducible build, and cannot be self-hosted. Only the derivation SDK, API schema and recovery client are published.',
+						explanation: 'L2BEAT reports that the Cloaked web app is closed source.',
+						label: 'L2BEAT privacy review of Cloaked',
 						url: 'https://l2beat.com/privacy/projects/cloaked',
 					},
 				],
@@ -97,7 +98,14 @@ export const cloaked: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: featureSupported,
+		multiAddress: supported({
+			ref: {
+				explanation:
+					'Each payment the user receives lands at a new address that only the user controls. The app shows all of them in one balance.',
+				label: 'Cloaked docs: Receiving funds',
+				url: 'https://clkd.xyz/docs/how-it-works#receiving-funds',
+			},
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
