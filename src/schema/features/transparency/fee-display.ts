@@ -38,130 +38,138 @@ export enum FeeDisplayLevel {
 }
 
 /**
- * A unit that a wallet service fee (platform fee on built-in swap or bridge
- * flows) line item may be displayed in, within a comprehensive fee breakdown.
- * A single fee line item may show more than one of these at once (e.g. a
- * percentage next to its fiat-equivalent amount).
+ * A unit that a fee amount may be displayed in. A single fee figure may show
+ * more than one of these at once (e.g. a percentage next to its
+ * fiat-equivalent amount).
  */
 export enum WalletServiceFeeDisplayUnit {
-	/** Wallet service fee line item shows a percentage (e.g. "0.3%"). */
+	/** The fee is shown as a percentage (e.g. "0.3%"). */
 	PERCENTAGE = 'PERCENTAGE',
 
-	/** Wallet service fee line item shows basis points (e.g. "30 bps"). */
+	/** The fee is shown in basis points (e.g. "30 bps"). */
 	BASIS_POINTS = 'BASIS_POINTS',
 
-	/** Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24"). */
+	/** The fee is shown as a flat fiat-currency amount (e.g. "$1.24"). */
 	FIAT = 'FIAT',
 
 	/**
-	 * Wallet service fee line item shows a fixed amount of an onchain asset,
-	 * native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+	 * The fee is shown as a fixed amount of an onchain asset, native or ERC-20
+	 * (e.g. "0.001 ETH", "0.5 USDC").
 	 */
 	TOKEN_AMOUNT = 'TOKEN_AMOUNT',
 }
 
-/** How much fee information is displayed by default and after an action. */
+/** How fees are presented to the user at a given depth of the interface. */
+export interface FeeDisplayAtDepth {
+	/** Level of fee information shown at this depth. */
+	comprehensiveness: FeeDisplayLevel
+
+	/**
+	 * Every distinct unit that the fee figures shown at this depth use,
+	 * whichever type of fee they represent and whether they are itemized or
+	 * aggregated (e.g. a wallet showing a fee as both a percentage and its
+	 * fiat equivalent uses both units here).
+	 * `null` if not yet researched, or if `comprehensiveness` is `NONE`.
+	 */
+	units: NonEmptySet<WalletServiceFeeDisplayUnit> | null
+}
+
+/** Fees that may be charged during a transaction or operation. */
+export enum FeeType {
+	/** Blockchain fees for transaction inclusion/processing. */
+	NETWORK_FEE = 'NETWORK_FEE',
+
+	/** Fees charged by the onchain app, e.g. liquidity provider fees during swap. */
+	ONCHAIN_APP_FEE = 'ONCHAIN_APP_FEE',
+
+	/** Fees charged by the wallet or wallet provider. */
+	WALLET_FEE = 'WALLET_FEE',
+}
+
+/** What fees are involved in an operation and how they are displayed. */
 export interface FeeDisplay {
+	/** Which fees are involved in this operation? At least one must be true. */
+	feesInvolved: Exclude<Record<FeeType, boolean>, Record<FeeType, false>>
+
 	/**
-	 * Level of fee information shown with default wallet settings and zero
-	 * fee-specific interactions on the transaction approval screen.
+	 * How are fees presented to the user by default?
 	 * To test: initiate the transaction on a freshly installed wallet with no
-	 * settings changed. Record the fee display level visible on the approval
-	 * screen before clicking anything fee-related.
+	 * settings changed. Record what the transaction approval screen shows
+	 * before any fee-related interaction.
 	 */
-	byDefault: FeeDisplayLevel
+	shownByDefault: FeeDisplayAtDepth
 
 	/**
-	 * Level of fee information shown after at most one additional
-	 * click/tap on the transaction approval screen (e.g. tapping a fee row,
-	 * an info icon, or a "show details" chevron), with no settings changed.
-	 * To test: from the same default approval screen, make exactly one
-	 * fee-related interaction and record the highest level of detail then shown.
-	 * If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
-	 */
-	afterSingleAction: FeeDisplayLevel
-
-	/**
-	 * Whether the wallet fully sponsors these fees on behalf of the user,
-	 * so the user pays nothing.
-	 * To test: complete the transaction and verify that no gas or protocol fee
-	 * is deducted from the user's balance. Check the wallet's documentation
-	 * or source code to confirm sponsorship is intentional and not a test-net
-	 * artifact.
+	 * How are fees presented after one action?
+	 * Things that count as "actions":
 	 *
-	 * This field describes payment (whether the user pays nothing), while
-	 * `byDefault` and `afterSingleAction` describe UI visibility. Orderflow
-	 * prominence comparison uses the recorded display levels as-is; if no
-	 * fee-related copy appears on the approval screen, set both levels to
-	 * `NONE` even when the wallet fully sponsors fees.
-	 */
-	fullySponsored: boolean
-
-	/**
-	 * Which unit(s) the wallet service fee line item(s) are shown in, when a
-	 * comprehensive breakdown is available. Meaningful when the flow includes
-	 * a wallet-charged platform fee line item in the breakdown (e.g. built-in
-	 * swap or cross-chain bridging).
+	 * - Any tap or click, e.g. modal dialog, "Show more", etc.
+	 * - Any amount of scrolling or other interface manipulation that
+	 *   confirming the transaction doesn't itself already require.
+	 * - Changing wallet configuration from the default settings, even if
+	 *   this only needs to be done once in the wallet settings.
 	 *
-	 * - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
-	 *   shown on the wallet service fee line item(s) (e.g. a wallet showing
-	 *   both a percentage and its fiat equivalent would use both units here).
-	 * - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
-	 *   flow. Use for L1 transfers, external app transactions, relayer fees,
-	 *   and other flows where only network or external protocol fees apply.
-	 * - `null` — not yet researched (required on in-scope swap/bridge flows).
+	 * `NO_ACTION_POSSIBLE` if no action reveals any more fee information.
 	 */
-	walletServiceFeeDisplayUnits: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null
+	shownAfterSingleAction: FeeDisplayAtDepth | 'NO_ACTION_POSSIBLE'
+}
+
+/**
+ * How fees are presented after at most one action: the default
+ * presentation if no action is possible.
+ */
+export function feeDisplayAfterSingleAction(feeDisplay: FeeDisplay): FeeDisplayAtDepth {
+	return feeDisplay.shownAfterSingleAction === 'NO_ACTION_POSSIBLE'
+		? feeDisplay.shownByDefault
+		: feeDisplay.shownAfterSingleAction
+}
+
+function feeDisplayLevelRank(level: FeeDisplayLevel): number {
+	switch (level) {
+		case FeeDisplayLevel.NONE:
+			return 0
+		case FeeDisplayLevel.AGGREGATED:
+			return 1
+		case FeeDisplayLevel.COMPREHENSIVE:
+			return 2
+	}
 }
 
 /**
  * Validates that `FeeDisplay` fields are consistent.
  *
- * @throws When fee display level pairs violate the by-default / after-action rules,
- *   or when `walletServiceFeeDisplayUnits` is set without a comprehensive breakdown.
+ * @throws When no fee type is involved, when one action shows less fee
+ *   information than the default presentation, or when units are set at a
+ *   depth that shows no fee information.
  */
 export function validateFeeDisplay(feeDisplay: FeeDisplay): void {
+	if (!Object.values(feeDisplay.feesInvolved).includes(true)) {
+		throw new Error('Invalid fee display: at least one fee type must be involved')
+	}
+
+	const afterSingleAction = feeDisplayAfterSingleAction(feeDisplay)
+
 	if (
-		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
-			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
-		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
+		feeDisplayLevelRank(afterSingleAction.comprehensiveness) <
+		feeDisplayLevelRank(feeDisplay.shownByDefault.comprehensiveness)
 	) {
 		throw new Error(
-			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
+			'Invalid fee display: shownAfterSingleAction cannot be less comprehensive than shownByDefault',
 		)
 	}
 
-	if (
-		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
-		)
-	}
-
-	if (
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
-		feeDisplay.walletServiceFeeDisplayUnits !== null
-	) {
-		throw new Error(
-			'Invalid fee display: when afterSingleAction is not COMPREHENSIVE, walletServiceFeeDisplayUnits must be NOT_APPLICABLE or null',
-		)
+	for (const atDepth of [feeDisplay.shownByDefault, afterSingleAction]) {
+		if (atDepth.comprehensiveness === FeeDisplayLevel.NONE && atDepth.units !== null) {
+			throw new Error('Invalid fee display: units must be null when comprehensiveness is NONE')
+		}
 	}
 }
 
-/**
- * Shorthand for fully sponsored fees with no user-visible fee line items.
- * `NOT_APPLICABLE` because there is no wallet service fee to denominate.
- */
-export const fullySponsoredFees: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.NONE,
-	afterSingleAction: FeeDisplayLevel.NONE,
-	fullySponsored: true,
-	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
-	ref: [],
-}
+/** How fees are displayed for a basic operation. */
+export type OperationFeeDisplay = WithRef<{
+	/** How are fees displayed when performing this operation? */
+	fees: FeeDisplay | 'NO_FEES_CHARGED'
+}>
 
 /**
  * Details about how the wallet displays fees for basic operations.
@@ -172,14 +180,14 @@ export interface BasicOperationFees {
 	 * To test: initiate a send of any ETH amount to a different address on
 	 * Ethereum mainnet and evaluate the fee display on the approval screen.
 	 */
-	ethL1Transfer: Support<WithRef<FeeDisplay>>
+	ethL1Transfer: Support<OperationFeeDisplay>
 
 	/**
 	 * How does the wallet display fees for a simple ERC-20 transfer on L1?
 	 * To test: initiate a send of any ERC-20 token (e.g. USDC) to a different
 	 * address on Ethereum mainnet and evaluate the fee display on the approval screen.
 	 */
-	erc20L1Transfer: Support<WithRef<FeeDisplay>>
+	erc20L1Transfer: Support<OperationFeeDisplay>
 
 	/**
 	 * If the wallet has a built-in ERC-20 swap feature, how are fees displayed?
@@ -188,7 +196,7 @@ export interface BasicOperationFees {
 	 * display on the approval screen. Set to not supported if the wallet has
 	 * no built-in swap feature.
 	 */
-	builtInErc20Swap: Support<WithRef<FeeDisplay>>
+	builtInErc20Swap: Support<OperationFeeDisplay>
 
 	/**
 	 * For a Uniswap transaction exchanging USDC for Ether, initiated through
@@ -198,7 +206,7 @@ export interface BasicOperationFees {
 	 * swap, and evaluate the fee display shown in the wallet's approval popup
 	 * — not the Uniswap UI itself.
 	 */
-	uniswapUSDCToEtherSwap: Support<WithRef<FeeDisplay>>
+	uniswapUSDCToEtherSwap: Support<OperationFeeDisplay>
 
 	// Private token transfer transactions are already encoded in their
 	// respective types, so no need to redeclare them here.
@@ -206,9 +214,9 @@ export interface BasicOperationFees {
 }
 
 /**
- * Whether the given set of wallet service fee display units includes at
- * least one unit that expresses a rate (as opposed to a flat amount),
- * making it possible to compare the effective cost across order sizes.
+ * Whether the given set of fee display units includes at least one unit
+ * that expresses a rate (as opposed to a flat amount), making it possible
+ * to compare the effective cost across order sizes.
  */
 export function hasRelativeWalletServiceFeeUnit(
 	units: NonEmptySet<WalletServiceFeeDisplayUnit>,
@@ -220,32 +228,25 @@ export function hasRelativeWalletServiceFeeUnit(
 }
 
 /**
- * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
- * Returns 1 if units1 is better, 0 if equal, -1 if units2 is better.
- * Ranking: NOT_APPLICABLE and any set containing a relative unit (tied) >
- * a set with only absolute units > null.
+ * Tiebreaker for `compareFees` when display levels match.
+ * Ranking: no wallet fee involved, or units after at most one action that
+ * include a relative unit (tied) > units with only absolute units > `null`.
  */
-function compareWalletServiceFeeDisplayUnits(
-	units1: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-	units2: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-): -1 | 0 | 1 {
-	const rank = (
-		units: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-	): number => {
-		if (units === null) {
-			return 1
-		}
-
-		if (units === 'NOT_APPLICABLE' || hasRelativeWalletServiceFeeUnit(units)) {
-			return 3
-		}
-
-		return 2
+function walletFeeUnitsRank(feeDisplay: FeeDisplay): number {
+	if (!feeDisplay.feesInvolved[FeeType.WALLET_FEE]) {
+		return 3
 	}
 
-	const rank1 = rank(units1)
-	const rank2 = rank(units2)
+	const units = feeDisplayAfterSingleAction(feeDisplay).units
 
+	if (units === null) {
+		return 1
+	}
+
+	return hasRelativeWalletServiceFeeUnit(units) ? 3 : 2
+}
+
+function compareRanks(rank1: number, rank2: number): -1 | 0 | 1 {
 	if (rank1 > rank2) {
 		return 1
 	}
@@ -259,70 +260,51 @@ function compareWalletServiceFeeDisplayUnits(
 
 /**
  * Returns;
- *   * 1 if feeDisplay1 is better
- *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
- *   * -1 if feeDisplay2 is better
+ *   * 1 if fees1 is better
+ *   * 0 if fees1 and fees2 are equally good
+ *   * -1 if fees2 is better
+ *
+ * `NO_FEES_CHARGED` is better than any fee display.
  */
-export function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1 | 0 | 1 {
-	validateFeeDisplay(feeDisplay1)
-	validateFeeDisplay(feeDisplay2)
-
-	if (
-		feeDisplay1.byDefault === feeDisplay2.byDefault &&
-		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
-		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
-	) {
-		return compareWalletServiceFeeDisplayUnits(
-			feeDisplay1.walletServiceFeeDisplayUnits,
-			feeDisplay2.walletServiceFeeDisplayUnits,
-		)
+export function compareFees(
+	fees1: FeeDisplay | 'NO_FEES_CHARGED',
+	fees2: FeeDisplay | 'NO_FEES_CHARGED',
+): -1 | 0 | 1 {
+	if (fees1 === 'NO_FEES_CHARGED' || fees2 === 'NO_FEES_CHARGED') {
+		return compareRanks(fees1 === 'NO_FEES_CHARGED' ? 1 : 0, fees2 === 'NO_FEES_CHARGED' ? 1 : 0)
 	}
 
-	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
-		return feeDisplay1.fullySponsored ? 1 : -1
+	validateFeeDisplay(fees1)
+	validateFeeDisplay(fees2)
+
+	const byDefaultCompare = compareRanks(
+		feeDisplayLevelRank(fees1.shownByDefault.comprehensiveness),
+		feeDisplayLevelRank(fees2.shownByDefault.comprehensiveness),
+	)
+
+	if (byDefaultCompare !== 0) {
+		return byDefaultCompare
 	}
 
-	const compareFeeDisplayLevel = (
-		displayLevel1: FeeDisplayLevel,
-		displayLevel2: FeeDisplayLevel,
-	): -1 | 0 | 1 => {
-		if (displayLevel1 === FeeDisplayLevel.COMPREHENSIVE) {
-			return 1
-		}
+	const afterSingleActionCompare = compareRanks(
+		feeDisplayLevelRank(feeDisplayAfterSingleAction(fees1).comprehensiveness),
+		feeDisplayLevelRank(feeDisplayAfterSingleAction(fees2).comprehensiveness),
+	)
 
-		if (displayLevel2 === FeeDisplayLevel.COMPREHENSIVE) {
-			return -1
-		}
-
-		if (displayLevel1 === FeeDisplayLevel.AGGREGATED) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.AGGREGATED) {
-			return -1
-		}
-
-		throw new Error('Unreachable')
+	if (afterSingleActionCompare !== 0) {
+		return afterSingleActionCompare
 	}
 
-	if (feeDisplay1.byDefault !== feeDisplay2.byDefault) {
-		return compareFeeDisplayLevel(feeDisplay1.byDefault, feeDisplay2.byDefault)
-	}
-
-	if (feeDisplay1.afterSingleAction !== feeDisplay2.afterSingleAction) {
-		return compareFeeDisplayLevel(feeDisplay1.afterSingleAction, feeDisplay2.afterSingleAction)
-	}
-
-	throw new Error('Unreachable')
+	return compareRanks(walletFeeUnitsRank(fees1), walletFeeUnitsRank(fees2))
 }
 
-/** Worst basic-operation fee display with contributing research refs. */
+/** Worst basic-operation fees with contributing research refs. */
 export type WorstOperationFees = {
-	feeDisplay: FeeDisplay
+	fees: FeeDisplay | 'NO_FEES_CHARGED'
 	references: FullyQualifiedReference[]
 }
 
-/** Worst-case fee display among basic operation fees, with contributing refs. */
+/** Worst-case fees among basic operation fees, with contributing refs. */
 export function computeWorstOperationFees(
 	operationFees: BasicOperationFees,
 ): WorstOperationFees | null {
@@ -338,24 +320,24 @@ export function computeWorstOperationFees(
 	}
 
 	let worstOperationFees: WorstOperationFees = {
-		feeDisplay: supportedOperationFees[0],
+		fees: supportedOperationFees[0].fees,
 		references: refs(supportedOperationFees[0]),
 	}
 
-	for (const feeDisplay of supportedOperationFees.slice(1)) {
-		switch (compareFeeDisplay(worstOperationFees.feeDisplay, feeDisplay)) {
+	for (const operationFeeDisplay of supportedOperationFees.slice(1)) {
+		switch (compareFees(worstOperationFees.fees, operationFeeDisplay.fees)) {
 			case -1:
 				break
 			case 0:
 				worstOperationFees = {
-					feeDisplay: worstOperationFees.feeDisplay,
-					references: mergeRefs(worstOperationFees.references, refs(feeDisplay)),
+					fees: worstOperationFees.fees,
+					references: mergeRefs(worstOperationFees.references, refs(operationFeeDisplay)),
 				}
 				break
 			case 1:
 				worstOperationFees = {
-					feeDisplay,
-					references: refs(feeDisplay),
+					fees: operationFeeDisplay.fees,
+					references: refs(operationFeeDisplay),
 				}
 		}
 	}

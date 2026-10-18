@@ -544,7 +544,7 @@ Chain abstraction features.
 
 - `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: CrossChainBalanceDisplay usdc: CrossChainBalanceDisplay }>`): What types of balances can the wallet display?
 - `bridging` (object): Chain bridging features.
-  - `builtInBridging` (`Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay }> >`): Does the wallet have a built-in bridging feature? (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
+  - `builtInBridging` (`Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay | 'NO_FEES_CHARGED' }> >`): Does the wallet have a built-in bridging feature? (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
   - `suggestedBridging` (`Support<WithRef<{}>>`): When the user is attempting to spend tokens on a chain where their balance is insufficient, but where they have sufficient balance on another chain, does the wallet automatically propose the user to bridge? (e.g. The user tries to send USDC on Arbitrum but only has USDC on Ethereum, the wallet prompts them to bridge first.)
 
 ---
@@ -1545,7 +1545,7 @@ type StealthAddressSupport = WithRef<{
 	>
 
 	/** When sending transactions, how are fees displayed? */
-	fees: FeeDisplay
+	fees: FeeDisplay | 'NO_FEES_CHARGED' | null
 }>
 ```
 
@@ -1588,7 +1588,7 @@ type TornadoCashNovaSupport = WithRef<
 		/**
 		 * Is the fee taken by the relayer displayed in the UI?
 		 */
-		relayerFee: FeeDisplay
+		relayerFee: FeeDisplay | 'NO_FEES_CHARGED'
 	} & (
 		| {
 				/**
@@ -3717,34 +3717,62 @@ What level of information is shown about fees.
 
 ### Enum: `WalletServiceFeeDisplayUnit`
 
-A unit that a wallet service fee (platform fee on built-in swap or bridge flows) line item may be displayed in, within a comprehensive fee breakdown. A single fee line item may show more than one of these at once (e.g. a percentage next to its fiat-equivalent amount).
+A unit that a fee amount may be displayed in. A single fee figure may show more than one of these at once (e.g. a percentage next to its fiat-equivalent amount).
 
-- `PERCENTAGE` = `'PERCENTAGE'`: Wallet service fee line item shows a percentage (e.g. "0.3%").
-- `BASIS_POINTS` = `'BASIS_POINTS'`: Wallet service fee line item shows basis points (e.g. "30 bps").
-- `FIAT` = `'FIAT'`: Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24").
-- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+- `PERCENTAGE` = `'PERCENTAGE'`: The fee is shown as a percentage (e.g. "0.3%").
+- `BASIS_POINTS` = `'BASIS_POINTS'`: The fee is shown in basis points (e.g. "30 bps").
+- `FIAT` = `'FIAT'`: The fee is shown as a flat fiat-currency amount (e.g. "$1.24").
+- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: The fee is shown as a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+
+---
+
+### Interface: `FeeDisplayAtDepth`
+
+How fees are presented to the user at a given depth of the interface.
+
+- `comprehensiveness` (`FeeDisplayLevel`): Level of fee information shown at this depth.
+- `units` (`NonEmptySet<WalletServiceFeeDisplayUnit> | null`): Every distinct unit that the fee figures shown at this depth use, whichever type of fee they represent and whether they are itemized or aggregated (e.g. a wallet showing a fee as both a percentage and its fiat equivalent uses both units here). `null` if not yet researched, or if `comprehensiveness` is `NONE`.
+
+---
+
+### Enum: `FeeType`
+
+Fees that may be charged during a transaction or operation.
+
+- `NETWORK_FEE` = `'NETWORK_FEE'`: Blockchain fees for transaction inclusion/processing.
+- `ONCHAIN_APP_FEE` = `'ONCHAIN_APP_FEE'`: Fees charged by the onchain app, e.g. liquidity provider fees during swap.
+- `WALLET_FEE` = `'WALLET_FEE'`: Fees charged by the wallet or wallet provider.
 
 ---
 
 ### Interface: `FeeDisplay`
 
-How much fee information is displayed by default and after an action.
+What fees are involved in an operation and how they are displayed.
 
-- `byDefault` (`FeeDisplayLevel`): Level of fee information shown with default wallet settings and zero fee-specific interactions on the transaction approval screen. To test: initiate the transaction on a freshly installed wallet with no settings changed. Record the fee display level visible on the approval screen before clicking anything fee-related.
-- `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
-- `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
+- `feesInvolved` (`Exclude<Record<FeeType, boolean>, Record<FeeType, false>>`): Which fees are involved in this operation? At least one must be true.
+- `shownByDefault` (`FeeDisplayAtDepth`): How are fees presented to the user by default? To test: initiate the transaction on a freshly installed wallet with no settings changed. Record what the transaction approval screen shows before any fee-related interaction.
+- `shownAfterSingleAction` (`FeeDisplayAtDepth | 'NO_ACTION_POSSIBLE'`): How are fees presented after one action? Things that count as "actions":
 
-  This field describes payment (whether the user pays nothing), while `byDefault` and `afterSingleAction` describe UI visibility. Orderflow prominence comparison uses the recorded display levels as-is; if no fee-related copy appears on the approval screen, set both levels to `NONE` even when the wallet fully sponsors fees.
+  - Any tap or click, e.g. modal dialog, "Show more", etc.
+  - Any amount of scrolling or other interface manipulation that
+    confirming the transaction doesn't itself already require.
+  - Changing wallet configuration from the default settings, even if
+    this only needs to be done once in the wallet settings.
 
-- `walletServiceFeeDisplayUnits` (`NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null`): Which unit(s) the wallet service fee line item(s) are shown in, when a comprehensive breakdown is available. Meaningful when the flow includes a wallet-charged platform fee line item in the breakdown (e.g. built-in swap or cross-chain bridging).
+  `NO_ACTION_POSSIBLE` if no action reveals any more fee information.
 
-  - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
-    shown on the wallet service fee line item(s) (e.g. a wallet showing
-    both a percentage and its fiat equivalent would use both units here).
-  - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
-    flow. Use for L1 transfers, external app transactions, relayer fees,
-    and other flows where only network or external protocol fees apply.
-  - `null` — not yet researched (required on in-scope swap/bridge flows).
+---
+
+### Type: `OperationFeeDisplay`
+
+How fees are displayed for a basic operation.
+
+```typescript
+type OperationFeeDisplay = WithRef<{
+	/** How are fees displayed when performing this operation? */
+	fees: FeeDisplay | 'NO_FEES_CHARGED'
+}>
+```
 
 ---
 
@@ -3752,18 +3780,18 @@ How much fee information is displayed by default and after an action.
 
 Details about how the wallet displays fees for basic operations.
 
-- `ethL1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ETH transfer on L1? To test: initiate a send of any ETH amount to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
-- `erc20L1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
-- `builtInErc20Swap` (`Support<WithRef<FeeDisplay>>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
-- `uniswapUSDCToEtherSwap` (`Support<WithRef<FeeDisplay>>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
+- `ethL1Transfer` (`Support<OperationFeeDisplay>`): How does the wallet display fees for a simple ETH transfer on L1? To test: initiate a send of any ETH amount to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
+- `erc20L1Transfer` (`Support<OperationFeeDisplay>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
+- `builtInErc20Swap` (`Support<OperationFeeDisplay>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
+- `uniswapUSDCToEtherSwap` (`Support<OperationFeeDisplay>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
 
 ---
 
 ### Type: `WorstOperationFees`
 
-Worst basic-operation fee display with contributing research refs.
+Worst basic-operation fees with contributing research refs.
 
-- `feeDisplay` (`FeeDisplay`)
+- `fees` (`FeeDisplay | 'NO_FEES_CHARGED'`)
 - `references` (`FullyQualifiedReference[]`)
 
 ---
