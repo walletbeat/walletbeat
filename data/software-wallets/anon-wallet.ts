@@ -188,19 +188,20 @@ export const anonWallet: SoftwareWallet = {
 					],
 					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
 					mobileAppHardening: {
-						// The APK also declares FOREGROUND_SERVICE, FOREGROUND_SERVICE_DATA_SYNC, WAKE_LOCK,
-						// RECEIVE_BOOT_COMPLETED and the AndroidX DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION,
-						// which AndroidPermission cannot represent yet (#1602).
 						android: {
 							usesPermissions: [
 								AndroidPermission.ACCESS_NETWORK_STATE,
 								AndroidPermission.CAMERA,
 								AndroidPermission.DETECT_SCREEN_CAPTURE,
+								AndroidPermission.FOREGROUND_SERVICE,
+								AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC,
 								AndroidPermission.INTERNET,
 								AndroidPermission.POST_NOTIFICATIONS,
+								AndroidPermission.RECEIVE_BOOT_COMPLETED,
 								AndroidPermission.USE_BIOMETRIC,
 								AndroidPermission.USE_FINGERPRINT,
 								AndroidPermission.VIBRATE,
+								AndroidPermission.WAKE_LOCK,
 							],
 						},
 						ios: 'NOT_AN_IOS_APP',
