@@ -88,6 +88,7 @@ export const pillarx: SoftwareWallet = {
 			ref: [
 				{
 					explanation: 'Pillar raised 113,674 ETH (about $21M) in a July 2017 token sale.',
+					label: 'Finance Magnates report on the Pillar token sale',
 					url: 'https://www.financemagnates.com/cryptocurrency/news/pillar-ico-raises-21-million-little-help-bitcoin-whales/',
 				},
 			],
@@ -124,14 +125,7 @@ export const pillarx: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: notSupportedWithRef({
-				ref: {
-					explanation:
-						'No active bug bounty covers PillarX: the former bug bounty page for Pillar returns 404, no HackerOne team exists, there is no SECURITY.md or security.txt, and GitHub private vulnerability reporting is disabled.',
-					label: 'PillarX repository',
-					url: 'https://github.com/pillarwallet/x',
-				},
-			}),
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -168,63 +162,65 @@ export const pillarx: SoftwareWallet = {
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyAgeGate: null,
-				dependencyLocking: notSupportedWithRef({
-					ref: [
-						{
+				dependencyLocking: {
+					[Variant.BROWSER]: null,
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: {
 							explanation:
-								'The web CI workflows install with `npm i` rather than `npm ci`, and the mobile CircleCI build runs `yarn install` without `--frozen-lockfile`, so committed lockfiles are not enforced.',
-							urls: [
-								{
-									label: 'Web CI install',
-									url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows/unit-tests.yml#L11',
-								},
-								{
-									label: 'Mobile CircleCI install',
-									url: 'https://github.com/pillarwallet/pillarwallet/blob/ff3047e05ee01024f2b230aad846af50849042a9/.circleci/config.yml#L155-L164',
-								},
-							],
+								'The mobile app release build installs its dependencies without checking them against the locked versions in the repository.',
+							label: 'Pillar Wallet mobile build configuration',
+							url: 'https://github.com/pillarwallet/pillarwallet/blob/ff3047e05ee01024f2b230aad846af50849042a9/.circleci/config.yml#L155-L164',
 						},
-					],
-				}),
-				dependencySandboxing: notSupportedWithRef({
-					ref: {
-						explanation:
-							'No LavaMoat or install-script allow list; `.npmrc` sets `ignore-scripts=false`.',
-						url: 'https://github.com/pillarwallet/x/blob/00c986f4df58c4399341d2d241e55e98bac77e99/.npmrc',
-					},
-				}),
-				dependencyVulnerabilityScanning: notSupportedWithRef({
-					ref: {
-						explanation:
-							'Neither repository configures automated dependency vulnerability scanning.',
-						url: 'https://github.com/pillarwallet/x/tree/00c986f4df58c4399341d2d241e55e98bac77e99/.github/workflows',
-					},
-				}),
+					}),
+				},
+				dependencySandboxing: notSupported,
+				dependencyVulnerabilityScanning: {
+					[Variant.BROWSER]: notSupported,
+					[Variant.MOBILE]: null,
+				},
 				hasPublicChangelog: notSupportedWithRef({
 					ref: {
 						explanation:
-							'The web repo has no releases or changelog; mobile GitHub releases stop at v3.29.9 (June 2024) and App Store notes are generic.',
-						label: 'Pillar Wallet releases',
-						url: 'https://github.com/pillarwallet/pillarwallet/releases',
+							'The PillarX web app publishes no release notes. The mobile app release notes on GitHub stopped in 2024, and its app store notes do not say what changed.',
+						urls: [
+							{
+								label: 'PillarX web app releases on GitHub',
+								url: 'https://github.com/pillarwallet/x/releases',
+							},
+							{
+								label: 'Pillar Wallet mobile app releases on GitHub',
+								url: 'https://github.com/pillarwallet/pillarwallet/releases',
+							},
+						],
 					},
 				}),
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: {
 					[Variant.BROWSER]: {
-						ref: [
-							{
-								explanation:
-									'Rule sets on main block deletion and force-pushes and require a pull request with one approving review; no required status checks or tag protection.',
-								url: 'https://api.github.com/repos/pillarwallet/x/rules/branches/main',
-							},
-						],
+						ref: {
+							explanation:
+								'The main branch cannot be deleted or overwritten, and every change needs one approving review. Automated checks do not need to pass, and release tags are not protected.',
+							urls: [
+								{
+									label: 'GitHub rules for the PillarX main branch',
+									url: 'https://api.github.com/repos/pillarwallet/x/rules/branches/main',
+								},
+								{
+									label: 'GitHub rule sets for the PillarX repository',
+									url: 'https://api.github.com/repos/pillarwallet/x/rulesets',
+								},
+								{
+									label: 'GitHub branch protection for the PillarX main branch',
+									url: 'https://api.github.com/repos/pillarwallet/x/branches/main',
+								},
+							],
+						},
 						branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 						forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 						requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 						requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 						tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 					},
-					// Mobile repo branches are protected, but details are not visible to non-admins.
 					[Variant.MOBILE]: null,
 				},
 				reproducibleBuilds: notSupported,
