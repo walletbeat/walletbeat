@@ -102,12 +102,13 @@ export const family: SoftwareWallet = {
 		multiAddress: supported({
 			ref: [
 				{
-					explanation:
-						'A Wallet Group is a collection of individual wallet addresses generated from a single Secret Recovery Phrase.',
+					explanation: 'One recovery phrase can hold a group of several wallet addresses.',
+					label: 'Family support: Wallet Groups',
 					url: 'https://family.co/support/wallet-groups',
 				},
 				{
-					explanation: 'Users switch between wallets from the Mission Control screen.',
+					explanation: 'Users can switch between their wallets from the main screen.',
+					label: 'Family support: Switch wallets',
 					url: 'https://family.co/support/switch-wallets',
 				},
 			],
@@ -195,19 +196,14 @@ export const family: SoftwareWallet = {
 				hasPublicChangelog: notSupportedWithRef({
 					ref: {
 						explanation:
-							'The changelog on family.co lists releases of the Family wallet-connection library only; app release notes appear only in the App Store listing.',
+							'The changelog on the Family website covers only its developer library, not the wallet app.',
+						label: 'Family changelog',
 						url: 'https://family.co/changelog',
 					},
 				}),
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: notSupportedWithRef({
-					ref: {
-						explanation:
-							'The app repositories named in the Zellic audit are not public, and the Family GitHub organization hosts only a wallet-connection library and a forked library.',
-						url: 'https://github.com/family',
-					},
-				}),
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,
