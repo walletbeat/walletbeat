@@ -79,6 +79,7 @@ interface CleanImageEntry {
  * re-encoding.
  */
 const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
+	'resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/access_layer.png',
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',

@@ -1655,12 +1655,16 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/access_layer.png": {
+		"hash": "ef6df0e7a4a01b4a47ec2d9a9e29d0962069c1f0fb4e1e6fd86b1d35bb36315a",
+		"passedTests": ["file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/cover.png": {
 		"hash": "053798d23c164651d38eeb04d508e79e558daf1035d20b6d1600bceba8223d42",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/polymuter_avatar.png": {
-		"hash": "dcc90b3335fff58d1fea50caf7d454074ec85f4bc8c155f662e6b94fc0c3460f",
+	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/polymutex_devconnect_2025.png": {
+		"hash": "7a1fee829c29c8ade67d42314babe22e0afeab43767c8f472e77a26981ec2c44",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-10-14 - Crops Talk Announcement/walletbeat_image.png": {
