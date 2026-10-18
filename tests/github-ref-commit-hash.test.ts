@@ -1,102 +1,189 @@
 import { describe, expect, it } from 'vitest'
 
-import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/utils/codebase'
-
-const REPO_ROOT = getRepositoryRoot()
-const DATA_DIR = `${REPO_ROOT}data/`
+import { allWallets } from '@/data/wallets'
+import { collectAllRawRefs, type RawCollectedRef } from '@/schema/reference'
 
 const GITHUB_BLOB_URL_RE =
 	/https:\/\/github\.com\/[^/"'\s]+\/[^/"'\s]+\/blob\/([^/"'\s]+)\/[^"'\s]*/
 
 const COMMIT_HASH_RE = /^[0-9a-f]{40}$/
 
+/**
+ * A GitHub line-anchor URL fragment. Matches a single line (`L123`), a line
+ * range (`L123-L456`), the column-qualified form (`L123C4-L456C7`), and
+ * comma-separated multiple ranges (`L53,L340-L353`), all of which GitHub
+ * supports as valid line anchors.
+ * TODO: After issue #1646 is solved, this should reuse the same regex as the
+ * code snippet tooling does.
+ */
+const LINE_ANCHOR_RE = /^L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?(?:,L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?)*$/
+
+/** Synthetic anchor marking a commit-pinned blob URL as pointing to a binary file. */
+const BINARY_FILE_ANCHOR = 'binary-file'
+
+/** Synthetic anchor marking a commit-pinned blob URL to a text file with no line range. */
+const NOT_LINE_SPECIFIC_ANCHOR = 'not-line-specific'
+
 interface OffendingLink {
 	url: string
 	ref: string
-	line: number
+	fieldPath: string
 }
 
-function findOffendingLinks(source: string): OffendingLink[] {
-	const offending: OffendingLink[] = []
-
-	source.split('\n').forEach((lineText, lineIndex) => {
-		const lineRe = new RegExp(GITHUB_BLOB_URL_RE.source, 'g')
-		let match: RegExpExecArray | null
-
-		while ((match = lineRe.exec(lineText)) !== null) {
-			const fullUrl = match[0]
-			const refSegment = match[1]
-
-			if (!COMMIT_HASH_RE.test(refSegment)) {
-				offending.push({
-					url: fullUrl,
-					ref: refSegment,
-					line: lineIndex + 1,
-				})
-			}
-		}
-	})
-
-	return offending
+interface AnchorOffense {
+	url: string
+	ref: string
+	fieldPath: string
 }
 
-describe('GitHub ref URLs in wallet data must use 40-char commit hashes', async () => {
-	const fileMap = new Map<string, OffendingLink[]>()
+/** Extract every GitHub blob URL (with its ref segment) from a raw `ref` value. */
+function blobUrlsInRef(rawRef: RawCollectedRef['rawRef']): { url: string; ref: string }[] {
+	const found: { url: string; ref: string }[] = []
 
-	await crawlCodebase({
-		root: DATA_DIR,
-		ignore: [],
-		fullTraversalFn: entry => {
-			if (entry.type === CodebaseEntryType.FILE && entry.path.endsWith('.ts')) {
-				const offending = findOffendingLinks(entry.contents)
+	const visit = (value: unknown): void => {
+		if (typeof value === 'string') {
+			for (const match of value.matchAll(new RegExp(GITHUB_BLOB_URL_RE.source, 'g'))) {
+				const refSegment = match[1]
 
-				if (offending.length > 0) {
-					fileMap.set(entry.path, offending)
+				if (refSegment !== undefined) {
+					found.push({ url: match[0], ref: refSegment })
 				}
 			}
-		},
-	})
 
-	it('data/ directory exists', () => {
-		expect(
-			true,
-			`Expected to find a data/ directory at ${DATA_DIR}. ` +
-				'Make sure this test is located at tests/github-ref-commit-hash.test.ts ' +
-				'inside the repository root.',
-		).toBe(true)
-	})
+			return
+		}
 
-	if (fileMap.size === 0) {
-		it.todo('no TypeScript files found in data/ — nothing to check')
+		if (Array.isArray(value)) {
+			value.forEach(visit)
+
+			return
+		}
+
+		if (value === null || typeof value !== 'object') {
+			return
+		}
+
+		Object.values(value).forEach(visit)
 	}
 
-	for (const [relPath, offending] of fileMap) {
-		describe(relPath, () => {
-			for (const { url, ref, line } of offending) {
-				it(`line ${line}: ref must be a commit hash, not branch "${ref}"`, () => {
+	visit(rawRef)
+
+	return found
+}
+
+/** Push an entry into a map keyed by wallet name, appending to any existing list. */
+function pushByWallet<K extends string, V>(map: Map<string, V[]>, key: K, value: V): void {
+	const existing = map.get(key)
+
+	if (existing === undefined) {
+		map.set(key, [value])
+	} else {
+		existing.push(value)
+	}
+}
+
+const hashOffenses = new Map<string, OffendingLink[]>()
+const anchorOffenses = new Map<string, AnchorOffense[]>()
+
+for (const raw of collectAllRawRefs(allWallets)) {
+	for (const { url, ref } of blobUrlsInRef(raw.rawRef)) {
+		if (!COMMIT_HASH_RE.test(ref)) {
+			pushByWallet(hashOffenses, raw.walletName, { url, ref, fieldPath: raw.fieldPath })
+		}
+
+		let fragment: string
+
+		try {
+			fragment = new URL(url).hash.replace(/^#/, '')
+		} catch {
+			// Malformed URLs are surfaced by other checks; skip here.
+			continue
+		}
+
+		if (
+			COMMIT_HASH_RE.test(ref) &&
+			fragment !== BINARY_FILE_ANCHOR &&
+			fragment !== NOT_LINE_SPECIFIC_ANCHOR &&
+			!LINE_ANCHOR_RE.test(fragment)
+		) {
+			pushByWallet(anchorOffenses, raw.walletName, { url, ref, fieldPath: raw.fieldPath })
+		}
+	}
+}
+
+describe('GitHub ref URLs in wallet data must use 40-char commit hashes', () => {
+	it('finds at least one reference in wallet data', () => {
+		expect(collectAllRawRefs(allWallets).length).toBeGreaterThan(0)
+	})
+
+	if (hashOffenses.size === 0) {
+		it.todo('no GitHub blob URL uses a branch name — nothing to check')
+	}
+
+	for (const [walletName, offenses] of hashOffenses) {
+		describe(walletName, () => {
+			for (const { url, ref, fieldPath } of offenses) {
+				it(`ref must be a commit hash, not branch "${ref}"`, () => {
 					expect.fail(
 						[
 							'',
 							'Found a GitHub blob URL that uses a branch name instead of a commit hash.',
 							'',
-							`  File : ${relPath}`,
-							`  Line : ${line}`,
-							`  URL  : ${url}`,
-							`  Ref  : "${ref}" — this is a branch name, not a 40-char commit hash.`,
+							`  Wallet    : ${walletName}`,
+							`  Ref field : ${fieldPath}`,
+							`  URL       : '${url}'`,
+							`  Ref       : "${ref}" (this is a branch name, not a 40-char commit hash)`,
 							'',
 							'Branch-based links are fragile: the target file can be renamed, deleted,',
 							'or have its line numbers shift without any warning. A commit hash permanently',
 							'anchors the link to the exact version of the file that was reviewed.',
 							'',
 							'How to get the correct commit hash:',
-							'  Option 1 – GitHub UI : Open the file on GitHub, press "y" to get the',
-							'             permanent permalink, then copy the 40-char hash from the URL.',
-							"  Option 2 – CLI       : git log --format='%H' -n 1 -- <path/to/file>",
-							'  Option 3 – CLI       : git rev-parse HEAD   (hash of the current commit)',
+							'  Option 1: GitHub UI : Open the file on GitHub, press "y" to get the',
+							'            permanent permalink, then copy the 40-char hash from the URL.',
+							"  Option 2: CLI       : git log --format='%H' -n 1 -- <path/to/file>",
+							'  Option 3: CLI       : git rev-parse HEAD   (hash of the current commit)',
 							'',
 							'Replace the branch name in the URL with that hash:',
 							'  Before: https://github.com/<owner>/<repo>/blob/main/<path>',
 							'  After : https://github.com/<owner>/<repo>/blob/<40-char-hash>/<path>',
+							'',
+						].join('\n'),
+					)
+				})
+			}
+		})
+	}
+})
+
+describe('GitHub ref URLs in wallet data must carry a line anchor or a synthetic anchor', () => {
+	it('finds at least one reference in wallet data', () => {
+		expect(collectAllRawRefs(allWallets).length).toBeGreaterThan(0)
+	})
+
+	if (anchorOffenses.size === 0) {
+		it.todo('no commit-pinned GitHub blob URL is missing an anchor — nothing to check')
+	}
+
+	for (const [walletName, offenses] of anchorOffenses) {
+		describe(walletName, () => {
+			for (const { url, ref, fieldPath } of offenses) {
+				it(`missing allowed anchor on "${url}"`, () => {
+					expect.fail(
+						[
+							'',
+							'Found a commit-pinned GitHub blob URL that is not properly anchored.',
+							'',
+							`  Wallet    : ${walletName}`,
+							`  Ref field : ${fieldPath}`,
+							`  URL       : '${url}'`,
+							`  Ref       : ${ref}`,
+							'',
+							'Every commit-pinned GitHub blob URL must carry exactly one of these suffixes:',
+							'  - a #L<first>[-L<last>] line range anchor (preferred),',
+							`  - the ${BINARY_FILE_ANCHOR} anchor when the file is binary, or`,
+							`  - the ${NOT_LINE_SPECIFIC_ANCHOR} anchor when the file is text but no line`,
+							'    range is appropriate.',
 							'',
 						].join('\n'),
 					)
