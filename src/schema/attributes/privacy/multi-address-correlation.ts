@@ -205,7 +205,7 @@ type QualifiedDataCollectionWithMultiAddress = QualifiedDataCollection & {
 function isQualifiedDataCollectionWithMultiAddress(
 	dataCollection: QualifiedDataCollection,
 ): dataCollection is QualifiedDataCollectionWithMultiAddress {
-	return dataCollection.multiAddress !== undefined
+	return dataCollection.multiAddress != null
 }
 
 function rateHandling(

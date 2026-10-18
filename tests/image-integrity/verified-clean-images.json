@@ -16,11 +16,11 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"governance/treasury/treasury-expenses-breakdown.svg": {
-		"hash": "c0f349719f67d2179b8771221e62b86e92acef1fb599f729e908da41e94520ea",
+		"hash": "3c59515698606342d3c0b0f6ced7f0750f834039f0933c5bfd3b54ff49e7dd06",
 		"passedTests": ["file-format"]
 	},
 	"governance/treasury/treasury-expenses-over-time.svg": {
-		"hash": "620073e9cc12c7d23f74449b5ed9d928e2961365ad24023db15f566614662ac6",
+		"hash": "994f269148cbe1960a07ade81d52e531eabbe935ad0a72dc9c38c1aaf8fcbb33",
 		"passedTests": ["file-format"]
 	},
 	"public/banner--small.png": {
@@ -1629,6 +1629,38 @@
 	},
 	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/september_cover.png": {
 		"hash": "3a40fba76842fa7634354267b3825ad1082bab663fc16668b2b07ffa506c7e82",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/account_portability.png": {
+		"hash": "5d4583474aa239ec68973c7236b8cdf3626fb7201ca095ea8dcba1466dbf2e74",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/account_unruggability.png": {
+		"hash": "6abf0c4b532101838bd47478e01aac477152a8872371864d5a801ad6c58e1948",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/chain_verification.png": {
+		"hash": "e3ae5b19066ea73752e8ffbc52ebbf114a5a87e51c6231ddf23d50b79c624ba0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/l1_provider_independence.png": {
+		"hash": "3ac9e526c787861df91fc196c7456ba594e4fc5522662ad5d44298e817530abc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/permissions_management.png": {
+		"hash": "9be5295aecb4d787bf42640feb1e6706f78baa0f6acbd3fc7fffd21aa34d11e4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/self_sovereignty.png": {
+		"hash": "190cd7528c40002a77b7d364b259c4fa08d40aca28ef22559a8d2c62588537be",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/setting_the_bar.png": {
+		"hash": "6d56565b6f9e15e75620045f9f1c42d8d63c2d0136ac154d0022f0db2373712b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/transaction_inclusion.png": {
+		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
