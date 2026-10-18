@@ -32,7 +32,7 @@ export const mtpelerin: SoftwareWallet = {
 		coinspectId: 'bridge-wallet',
 		contributors: [sigri, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-18',
 		urls: {
 			repositories: ['https://github.com/mtpelerin'],
 			socials: {
@@ -91,16 +91,20 @@ export const mtpelerin: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Mt Pelerin "was bootstrapped by our community the next year through an equity crowdfunding that raised more than $2 million, the first one to offer a tokenized share".',
+						'Mt Pelerin raised its early funding through a public equity crowdfunding that sold tokenized shares.',
+					label: 'About Mt Pelerin',
 					url: 'https://developers.mtpelerin.com/additional-information/about-mt-pelerin',
 				},
 				{
 					explanation:
-						'Swap and bridge commission is published: free up to 499, then 0.3%; on- and off-ramp tiers are also published, and Mt Pelerin says it takes no spread.',
-					url: 'https://developers.mtpelerin.com/service-information/pricing-and-limits/swap-pricing',
+						'Mt Pelerin publishes the commission it charges on purchases, sales, and swaps, and says this is the only way it earns money from users.',
+					label: 'Mt Pelerin pricing',
+					url: 'https://www.mtpelerin.com/pricing',
 				},
 				{
-					explanation: 'Integrators receive a 25% share of the fees charged to users they refer.',
+					explanation:
+						'Apps that integrate the Mt Pelerin exchange service receive a share of the fees paid by the users they bring.',
+					label: 'Mt Pelerin revenue sharing',
 					url: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
 				},
 			],
@@ -141,7 +145,8 @@ export const mtpelerin: SoftwareWallet = {
 				guardianRecovery: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Recovery is only from the user\'s secret phrase: "we have no way to help you recover it if you lose your secret phrase."',
+							'The wallet can only be restored from its secret phrase. Mt Pelerin cannot help recover a wallet if the phrase is lost.',
+						label: 'Bridge Wallet FAQ',
 						url: 'https://www.mtpelerin.com/faq',
 					},
 				}),
@@ -173,13 +178,12 @@ export const mtpelerin: SoftwareWallet = {
 				wallets: {},
 			},
 			keysHandling: {
-				ref: [
-					{
-						explanation:
-							'"The purpose of Bridge Wallet\'s password is to encrypt and secure your secret phrase on your device, but none of them are stored elsewhere."',
-						url: 'https://www.mtpelerin.com/faq',
-					},
-				],
+				ref: {
+					explanation:
+						'Mt Pelerin says only the user knows the secret phrase, and that it is kept encrypted on the device and not stored anywhere else.',
+					label: 'Bridge Wallet FAQ',
+					url: 'https://www.mtpelerin.com/faq',
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -187,8 +191,6 @@ export const mtpelerin: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			// No audit of the Bridge Wallet app found. The only listed audit is ChainSecurity's 2019 review of the Bridge Protocol v2.0 smart contracts.
-			// Source: https://developers.mtpelerin.com/bridge-protocol/security-and-audits
 			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
@@ -224,7 +226,8 @@ export const mtpelerin: SoftwareWallet = {
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
 						explanation:
-							'The app is closed source. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+							'WalletScrutiny could not rebuild the app because its source code is not public.',
+						label: 'WalletScrutiny review of Bridge Wallet for Android',
 						url: 'https://walletscrutiny.com/android/com.mtpelerin.bridge/',
 					},
 				}),
