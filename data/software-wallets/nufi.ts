@@ -186,34 +186,28 @@ export const nufi: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'NuFi shows the chain, the ETH amount sent, and the network fee of an ETH transfer by default. The sender and recipient addresses are under "General" and the gas settings under "Gas settings". Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+							'NuFi shows the network, the amount of ETH sent, and the fee by default. The sender and recipient are under "General", and the gas settings are under "Gas settings".',
 						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer.png',
 						label: 'NuFi transaction request for an ETH transfer',
 					},
 					{
 						explanation:
-							'Opening "General" shows the sender and recipient addresses, and opening "Gas settings" shows the max fee per gas and the gas limit. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+							'Opening "General" shows the sender and recipient addresses. Opening "Gas settings" shows the maximum fee per unit of gas and the gas limit.',
 						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-general-gas-settings.png',
 						label: 'NuFi ETH transfer request with General and Gas settings opened',
 					},
 					{
 						explanation:
-							'The RAW view of the request shows the transaction as JSON, including the nonce. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+							'The "RAW" view shows the full transaction as raw data, including its sequence number (nonce).',
 						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-raw.png',
-						label: 'NuFi RAW view of an ETH transfer request',
-					},
-					{
-						explanation:
-							'NuFi shows a USDC approval as a token access approval for 0.01 USDC. The spender is not shown. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
-						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval.png',
-						label: 'NuFi transaction request for a USDC approval',
+						label: 'NuFi raw data view of an ETH transfer request',
 					},
 				],
 				erc4361: notSupportedWithRef({
 					ref: [
 						{
 							explanation:
-								'NuFi shows a Sign-In with Ethereum request as plain text, like any other message. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'NuFi shows a Sign-In with Ethereum request as plain text, the same as any other message.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-siwe.png',
 							label: 'NuFi signature request for an ERC-4361 sign-in message',
 						},
@@ -223,33 +217,33 @@ export const nufi: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'NuFi does not decode a USDC approval. It shows the token and the approved amount, but neither the function nor the spender. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'NuFi shows the token and the amount of a USDC approval. It does not name the action or say who may spend the tokens.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval.png',
 							label: 'NuFi transaction request for a USDC approval',
 						},
 						{
 							explanation:
-								'NuFi does not decode an Aave supply. It only shows the ETH amounts, the fee, the addresses, and the gas settings. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'For an Aave supply, NuFi only shows the ETH amounts, the fee, the addresses, and the gas settings. It does not say what the transaction does.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-aave-supply.png',
 							label: 'NuFi transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'NuFi does not decode the Aave supply nested within a Safe{Wallet} transaction. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'For an Aave supply sent through a Safe{Wallet} account, NuFi does not say what the transaction does.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-aave-supply.png',
 							label: 'NuFi transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'NuFi does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'For a Safe{Wallet} transaction that bundles a USDC approval and an Aave supply, NuFi does not show the bundled actions.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-batch-approve-supply.png',
-							label: 'NuFi transaction request for a Safe{Wallet} batched approve and supply',
+							label: 'NuFi transaction request for a Safe{Wallet} bundled approval and supply',
 						},
 						{
 							explanation:
-								"After the user accepts NuFi's prompt to use an EIP-7702 smart account, NuFi shows a batched USDC approval and Aave supply from an EOA as one transaction to the user's own address, without decoding the inner calls. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.",
+								"NuFi shows a bundled USDC approval and Aave supply as one transaction to the user's own address, without the bundled actions. This happens after the user accepts NuFi's offer to switch to a smart account.",
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-batch-approve-supply.png',
-							label: 'NuFi batch request for a batched approve and supply',
+							label: 'NuFi request for a bundled USDC approval and Aave supply',
 						},
 					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
@@ -273,15 +267,15 @@ export const nufi: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'NuFi shows the EIP-712 message fields with truncated values by default, and the message as JSON after opening "View raw message". The domain and type definitions are not shown, and no domain hash, message hash or EIP-712 digest is shown. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'NuFi shows the message fields in shortened form, and the full message after "View raw message". It does not show the domain, the type definitions, or any message hash.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-eip712.png',
 							label: 'NuFi signature request for an EIP-712 message',
 						},
 						{
 							explanation:
-								'The HEX tab of the RAW view shows the raw calldata, and its copy button copies it. NuFi does not decode the calldata or show a calldata digest. Captured on NuFi 35.2.0 using the Walletbeat tester, with the request rejected before signing.',
+								'The "HEX" tab of the "RAW" view shows the raw transaction data, and its copy button copies it. NuFi does not turn this data into readable form or show a hash of it.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval-raw-hex.png',
-							label: 'NuFi RAW view of a USDC approval calldata',
+							label: 'NuFi raw data view of a USDC approval',
 						},
 					],
 					calldataDisplay: {
@@ -309,9 +303,7 @@ export const nufi: SoftwareWallet = {
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						transactionOutcome: TransactionOutcome.EXPLAINED,
-					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: null,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: null,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: null,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
