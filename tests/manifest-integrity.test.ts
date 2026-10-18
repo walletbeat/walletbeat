@@ -44,7 +44,7 @@ describe('parseAndroidManifest', () => {
 		)
 	})
 
-	it.each(['com.ahloop.anon', 'org.toshi', 'io.example.wallet_app'])(
+	it.each(['com.example.wallet', 'org.example.app', 'io.example.wallet_app'])(
 		'ignores the AndroidX app-private receiver permission of %s',
 		applicationId => {
 			expect(
