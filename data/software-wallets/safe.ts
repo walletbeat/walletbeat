@@ -137,7 +137,7 @@ export const safe: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'SafeDAO has received ecosystem grants; example Optimism grant proposal in the Optimism governance forum.',
+						'SafeDAO has received ecosystem grants. This Optimism governance forum post is an example grant proposal.',
 					url: 'https://gov.optimism.io/t/draft-gf-phase-1-proposal-old-template-safe/3400',
 				},
 				{
@@ -147,7 +147,7 @@ export const safe: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Community‑Aligned Fees: revenue (e.g., Native Swaps) pledged to SafeDAO; fee approach is explained publicly.',
+						'Community‑Aligned Fees: revenue (e.g., Native Swaps) pledged to SafeDAO. The fee approach is explained publicly.',
 					url: 'https://safefoundation.org/blog/safedao-community-aligned-fees-introduction',
 				},
 				{
@@ -157,7 +157,7 @@ export const safe: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'SAFE tokenomics and governance scope; currently primarily used for SafeDAO treasury resource allocation (e.g., grants).',
+						'SAFE tokenomics and governance scope. The token is currently used primarily for SafeDAO treasury resource allocation (e.g., grants).',
 					url: 'https://safefoundation.org/blog/safe-tokenomics',
 				},
 			],
@@ -224,7 +224,7 @@ export const safe: SoftwareWallet = {
 					},
 					{
 						explanation: 'Safe uses FCL P256 verifier for passkey verification.',
-						url: 'https://github.com/safe-fndn/safe-modules/blob/1e57772571fc72471b7bc3203fde9b1799fb87d4/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+						url: 'https://github.com/safe-fndn/safe-modules/blob/1e57772571fc72471b7bc3203fde9b1799fb87d4/modules/passkey/contracts/verifiers/FCLP256Verifier.sol#not-line-specific',
 					},
 				],
 				details: 'Safe uses FreshCryptoLib for passkey verification in their 4337 modules.',
@@ -234,14 +234,14 @@ export const safe: SoftwareWallet = {
 			}),
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Certora.pdf#binary-file',
 					auditDate: '2025-01-14',
 					auditor: certora,
 					unpatchedFlaws: 'NONE_FOUND',
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Ackee.pdf#binary-file',
 					auditDate: '2025-05-28',
 					auditor: ackee,
 					unpatchedFlaws: 'NONE_FOUND',
