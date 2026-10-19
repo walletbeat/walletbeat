@@ -622,7 +622,6 @@ export const uniswapWallet: SoftwareWallet = {
 							purposes: [
 								DataCollectionPurpose.TRANSACTION_BROADCAST,
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
-								DataCollectionPurpose.UPDATE_CHECKING,
 							],
 							role: EntityRole.OPERATOR,
 						},
