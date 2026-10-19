@@ -6,6 +6,7 @@ import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
+import { anonWallet } from './software-wallets/anon-wallet'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
 import { daimo } from './software-wallets/daimo'
@@ -65,6 +66,7 @@ export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
+	anonWallet,
 	baseApp,
 	bitget,
 	daimo,

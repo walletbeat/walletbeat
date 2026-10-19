@@ -2862,7 +2862,7 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 
 Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
 
-All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
+All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values that `isIgnoredAndroidPermission` does not match.
 
 - `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
 - `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
@@ -2884,6 +2884,10 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `USE_BIOMETRIC` = `'android.permission.USE_BIOMETRIC'`: Authenticate with biometric hardware (fingerprint, face, etc.).
 - `USE_FINGERPRINT` = `'android.permission.USE_FINGERPRINT'`: Legacy fingerprint authentication (superseded by USE_BIOMETRIC).
 - `READ_MEDIA_IMAGES` = `'android.permission.READ_MEDIA_IMAGES'`: Read images from shared media storage (scoped storage, Android 13+).
+- `FOREGROUND_SERVICE` = `'android.permission.FOREGROUND_SERVICE'`: Run a foreground service, shown to the user as a persistent notification.
+- `FOREGROUND_SERVICE_DATA_SYNC` = `'android.permission.FOREGROUND_SERVICE_DATA_SYNC'`: Run a foreground service of the data sync type (Android 14+).
+- `WAKE_LOCK` = `'android.permission.WAKE_LOCK'`: Keep the processor awake while background work finishes.
+- `RECEIVE_BOOT_COMPLETED` = `'android.permission.RECEIVE_BOOT_COMPLETED'`: Receive the broadcast sent when the device finishes booting.
 - `AD_ID` = `'com.google.android.gms.permission.AD_ID'`: Access the Google advertising ID — used for ad attribution/tracking.
 
 ---
