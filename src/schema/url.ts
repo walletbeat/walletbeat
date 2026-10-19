@@ -228,6 +228,23 @@ function getDefaultUrlLabel(url: string): string {
  */
 export const gitCommitRefPinRegExp = /@(?:[0-9a-f]{40}|[0-9a-f]{7})\b/g
 
+/**
+ * Whether a link URL found in a document resolves to a path in the
+ * repository, as opposed to a URL with a scheme, a protocol-relative URL, or
+ * an anchor within the same page.
+ */
+export function isRepoRelativeLink(url: string): boolean {
+	return !(
+		url.startsWith('data:') ||
+		url.startsWith('https:') ||
+		url.startsWith('http:') ||
+		url.startsWith('mailto:') ||
+		url.startsWith('tel:') ||
+		url.startsWith('#') ||
+		url.startsWith('//')
+	)
+}
+
 /** File extensions of URLs that browsers render as images. */
 const imageFileExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif', '.svg']
 
