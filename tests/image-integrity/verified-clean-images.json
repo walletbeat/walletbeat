@@ -575,6 +575,10 @@
 		"hash": "1562c9fc8d893ea88f20ed1580b84942035fc9ff38180b9359a33489adaa33c9",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/okx/screenshots/2026-10-13-okx-extension-connect-hardware-wallet.png": {
+		"hash": "366ab9fb093bf3f23cde2c4f2f15d93d479e5ad57e0e5d42b27ba01308bee792",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png": {
 		"hash": "74d81d3dbe0f208f96ef74ff8289fe4ba7b0f2087f5f3d6d81f5cebb57800b0e",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
