@@ -330,7 +330,6 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 		ref: refNotNecessary,
 		risksExplained: 'VISIBLE_BY_DEFAULT',
 		feesLargerThan1bps: {
-			ref: [],
 			afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 			byDefault: FeeDisplayLevel.COMPREHENSIVE,
 			fullySponsored: false,
@@ -494,7 +493,6 @@ export const chainAbstraction: Attribute = {
 							builtInBridging: supported({
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
-									ref: [],
 									afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 									byDefault: FeeDisplayLevel.COMPREHENSIVE,
 									fullySponsored: false,

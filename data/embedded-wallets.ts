@@ -28,8 +28,7 @@ export const embeddedWalletAttributeTree = attributeTreeForIds(
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export type EmbeddedWallet = BaseWallet<EmbeddedAttributeGroupId> & {
-	features: WalletEmbeddedFeatures
+export type EmbeddedWallet = BaseWallet<EmbeddedAttributeGroupId, WalletEmbeddedFeatures> & {
 	variants: {
 		[Variant.EMBEDDED]: true
 	}

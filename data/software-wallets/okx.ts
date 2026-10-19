@@ -71,7 +71,6 @@ export const okx: SoftwareWallet = {
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: true,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
@@ -98,18 +97,16 @@ export const okx: SoftwareWallet = {
 			},
 			crossChainBalances: {
 				ref: refTodo,
-				ether: supported({
-					ref: refTodo,
+				ether: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 				globalAccountValue: featureSupported,
 				perChainAccountValue: featureSupported,
-				usdc: supported({
-					ref: refTodo,
+				usdc: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: notSupported,

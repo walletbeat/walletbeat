@@ -222,7 +222,10 @@ export interface WalletOverrides<_AttributeGroupId extends string> {
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export interface BaseWallet<_AttributeGroupId extends string> {
+export interface BaseWallet<
+	_AttributeGroupId extends string,
+	_Features extends WalletBaseFeatures = WalletBaseFeatures,
+> {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -230,7 +233,7 @@ export interface BaseWallet<_AttributeGroupId extends string> {
 	variants: AtLeastOneTrueVariant
 
 	/** All wallet features. */
-	features: WalletBaseFeatures
+	features: _Features
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides<_AttributeGroupId>
