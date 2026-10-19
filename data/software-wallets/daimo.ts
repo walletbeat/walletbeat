@@ -1,3 +1,4 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { SoftwareWallet } from '@/data/software-wallets'
@@ -26,7 +27,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
@@ -47,9 +53,9 @@ export const daimo: SoftwareWallet = {
 		displayName: 'Daimo',
 		tableName: 'Daimo',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-08',
 		pseudonymType: {
 			plural: 'Daimo usernames',
 			singular: 'Daimo username',
@@ -378,7 +384,17 @@ export const daimo: SoftwareWallet = {
 		},
 		profile: WalletProfile.PAYMENTS,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: null,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Users recover their account with backup keys they hold themselves, such as a passkey, a security key or a seed phrase. There is no guardian or company-assisted recovery.',
+						label: 'Account key types',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/packages/daimo-common/src/keySlot.ts#L4-L23',
+					},
+				}),
+			},
 			bugBountyProgram: null,
 			duressResistance: null,
 			hardwareWalletSupport: {
@@ -464,15 +480,43 @@ export const daimo: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The release workflow uploads the Android app file without a signature or attestation that users can check.',
+						label: 'Android release job',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L130-L166',
+					},
+				}),
 				dependencyAgeGate: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The release workflow installs the exact library versions recorded in the repository.',
+							label: 'Release workflow install step',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L115-L116',
+						},
+						{
+							explanation: 'The test workflow installs the same recorded versions.',
+							label: 'Test workflow install step',
+							url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/ci.yml#L21-L24',
+						},
+					],
+				}),
+				dependencySandboxing: notSupported,
+				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hermeticBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Production builds use whatever build tool version is latest and run on an external cloud service that downloads libraries during the build.',
+						label: 'Production build job',
+						url: 'https://github.com/daimo-eth/daimo/blob/ec5b41d3b51e85e2ab09cf148f93fd5f8c9001a4/.github/workflows/cd.yml#L118-L127',
+					},
+				}),
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: notSupported,
