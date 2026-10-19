@@ -1,0 +1,45 @@
+{
+	"highlightFirstLine": 206,
+	"highlightLastLine": 213,
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"  release-deploy:"
+			],
+			"startLine": 98
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 107
+		},
+		{
+			"lines": [
+				"      - name: Add SRI to scripts",
+				"        run: node ./scripts/integrity-hashes.cjs",
+				"        working-directory: apps/web",
+				"",
+				"      - name: Create archive",
+				"        run: tar -czf \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}\".tar.gz out",
+				"        working-directory: apps/web",
+				"",
+				"      - name: Generate artifact attestation",
+				"        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2",
+				"        with:",
+				"          subject-path: apps/web/${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}.tar.gz",
+				"",
+				"      - name: Create checksum",
+				"        run: sha256sum \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}\".tar.gz > \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}-sha256-checksum.txt\"",
+				"        working-directory: apps/web"
+			],
+			"startLine": 202
+		}
+	]
+}
