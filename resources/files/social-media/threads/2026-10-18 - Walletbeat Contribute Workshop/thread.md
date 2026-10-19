@@ -11,13 +11,13 @@ Walletbeat aims to make CROPS legible for wallets, and this workshop grows the n
 
 ---
 
-@0xmattmatt will share how to gather evidence using the proper references (e.g. screenshots, direct links, etc.), verify the evidence is correct, and contribute the data to our repo using an agentic workflow with a human in the loop.
+@0xmattmatt will share how to gather evidence using the proper references (e.g. screenshots, direct links, etc.), verify the evidence is correct, and contribute to the Ethereum community by inputting wallet data to Walletbeat.
 
 ![Matt Picture](./matt_picture.jpg)
 
 ---
 
-We'll discuss best practices for capturing evidence, write the entry and open the PR. No coding skills required.
+We'll discuss best practices for capturing evidence, writing entries and opening PRs. No coding skills required.
 
 You will leave this workshop with the confidence to begin contributing data to Walletbeat and open your first PR.
 
