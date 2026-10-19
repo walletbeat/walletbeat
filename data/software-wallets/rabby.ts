@@ -152,7 +152,7 @@ const dataLeakReferences: Record<string, References> = {
 	hyperFoundation: [
 		{
 			explanation:
-				"Perpetuals positions for every address in the wallet are looked up on Hyperliquid's API, one request per address, sent within a few milliseconds of each other.",
+				"Rabby Perps is built on Hyperliquid's API. Perpetuals positions for every address in the wallet are looked up on it, one request per address, sent within a few milliseconds of each other.",
 			url: 'https://api.hyperliquid.xyz/info',
 		},
 	],
