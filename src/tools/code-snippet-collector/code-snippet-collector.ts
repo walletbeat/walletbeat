@@ -7,6 +7,7 @@ import {
 	type CodeSnippetSource,
 	describeNotASnippetUrl,
 	isSnippetSource,
+	lineRangesEqual,
 	parseGitHubBlobUrl,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
@@ -51,8 +52,9 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 			const parsed = parseStoredSnippetContent(contents)
 
 			if (
-				parsed.highlightFirstLine === source.firstLine &&
-				parsed.highlightLastLine === source.lastLine
+				lineRangesEqual(parsed.highlightRanges, [
+					{ first: source.firstLine, last: source.lastLine },
+				])
 			) {
 				return
 			}

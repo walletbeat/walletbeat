@@ -4,11 +4,15 @@ import * as path from 'node:path'
 import { allWallets } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
+	formatLineRanges,
+	type LineRange,
+	lineRangesEqual,
 	rawGitHubContentUrl,
 	type StoredSnippetContent,
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { getErrorMessage } from '@/types/errors'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 
@@ -193,12 +197,22 @@ export function buildSnippetContent(fileText: string, source: CodeSnippetSource)
 	).sort((a, b) => a - b)
 
 	const content: StoredSnippetContent = {
-		highlightFirstLine: source.firstLine,
-		highlightLastLine: source.lastLine,
+		highlightRanges: [{ first: source.firstLine, last: source.lastLine }],
 		segments: groupIntoSegments(lines, includedLineNumbers),
 	}
 
 	return JSON.stringify(content, null, '\t') + '\n'
+}
+
+/** Type predicate for a single line range's raw JSON shape. */
+function isLineRange(range: unknown): range is LineRange {
+	if (typeof range !== 'object' || range === null) {
+		return false
+	}
+
+	const { first, last } = range as Partial<LineRange>
+
+	return typeof first === 'number' && typeof last === 'number'
 }
 
 /** Type predicate for a single segment's raw JSON shape. */
@@ -228,19 +242,19 @@ export function parseStoredSnippetContent(contents: string): StoredSnippetConten
 		throw new Error('Stored snippet JSON is not an object.')
 	}
 
-	const { highlightFirstLine, highlightLastLine, segments } =
-		parsed as Partial<StoredSnippetContent>
+	const { highlightRanges, segments } = parsed as Partial<StoredSnippetContent>
 
 	if (
-		typeof highlightFirstLine !== 'number' ||
-		typeof highlightLastLine !== 'number' ||
+		!Array.isArray(highlightRanges) ||
+		!isNonEmptyArray(highlightRanges) ||
+		!highlightRanges.every(isLineRange) ||
 		!Array.isArray(segments) ||
 		!segments.every(isStoredSnippetSegment)
 	) {
 		throw new Error('Stored snippet JSON does not match the expected shape.')
 	}
 
-	return { highlightFirstLine, highlightLastLine, segments }
+	return { highlightRanges, segments }
 }
 
 /** Fetch the full source file for a snippet from raw.githubusercontent.com. */
@@ -328,14 +342,15 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 			continue
 		}
 
-		if (
-			parsed.highlightFirstLine !== occurrence.source.firstLine ||
-			parsed.highlightLastLine !== occurrence.source.lastLine
-		) {
+		const expectedRanges = [
+			{ first: occurrence.source.firstLine, last: occurrence.source.lastLine },
+		]
+
+		if (!lineRangesEqual(parsed.highlightRanges, expectedRanges)) {
 			problems.push({
 				issue:
-					`Snippet highlights lines ${parsed.highlightFirstLine}-${parsed.highlightLastLine} ` +
-					`but its filename declares ${occurrence.source.firstLine}-${occurrence.source.lastLine}.`,
+					`Snippet highlights lines ${formatLineRanges(parsed.highlightRanges)} ` +
+					`but its filename declares ${formatLineRanges(expectedRanges)}.`,
 				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})

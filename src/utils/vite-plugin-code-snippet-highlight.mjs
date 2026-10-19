@@ -183,8 +183,9 @@ export function codeSnippetHighlight() {
 						.join('')
 
 					rows.push({
-						highlighted:
-							lineNumber >= content.highlightFirstLine && lineNumber <= content.highlightLastLine,
+						highlighted: content.highlightRanges.some(
+							range => lineNumber >= range.first && lineNumber <= range.last,
+						),
 						html,
 						number: lineNumber,
 						type: 'line',

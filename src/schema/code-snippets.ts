@@ -1,3 +1,5 @@
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
 import { fullCommitHashRegExp, lineFragmentRegExp } from './url'
 
 /**
@@ -23,6 +25,20 @@ export interface CodeSnippetSource {
 	lastLine: number
 }
 
+/** An inclusive 1-based range of source lines. */
+export interface LineRange {
+	first: number
+	last: number
+}
+
+/** Whether two lists of line ranges are identical. */
+export function lineRangesEqual(a: LineRange[], b: LineRange[]): boolean {
+	return (
+		a.length === b.length &&
+		a.every((range, i) => range.first === b[i].first && range.last === b[i].last)
+	)
+}
+
 /** A contiguous run of source lines stored in a `.snippet` file. */
 export interface StoredSnippetSegment {
 	/** 1-based source line number of `lines[0]`. */
@@ -31,16 +47,15 @@ export interface StoredSnippetSegment {
 }
 
 /**
- * The JSON content of a `.snippet` file: the referenced range
- * (`highlightFirstLine`-`highlightLastLine`, matching a `CodeSnippetSource`'s
- * `firstLine`/`lastLine`) plus the surrounding-context and scope-header
- * segments built around it. Segments are ordered by `startLine` and are never
- * adjacent or overlapping (adjacent runs are merged into one segment), so a
- * gap between two segments always means source lines were omitted there.
+ * The JSON content of a `.snippet` file: the referenced ranges
+ * (`highlightRanges`, matching the `CodeSnippetSource` line ranges) plus the
+ * surrounding-context and scope-header segments built around them. Segments
+ * are ordered by `startLine` and are never adjacent or overlapping (adjacent
+ * runs are merged into one segment), so a gap between two segments always
+ * means source lines were omitted there.
  */
 export interface StoredSnippetContent {
-	highlightFirstLine: number
-	highlightLastLine: number
+	highlightRanges: NonEmptyArray<LineRange>
 	segments: StoredSnippetSegment[]
 }
 
@@ -73,13 +88,16 @@ export function isSnippetRow(row: unknown): row is SnippetRow {
 	)
 }
 
+/** Format line ranges as a GitHub line-anchor fragment, e.g. `L53,L340-L353`. */
+export function formatLineRanges(ranges: LineRange[]): string {
+	return ranges
+		.map(({ first, last }) => (first === last ? `L${first}` : `L${first}-L${last}`))
+		.join(',')
+}
+
 /** The `L123` / `L123-L456` filename and URL-fragment suffix for a snippet. */
 function snippetLineSuffix(source: CodeSnippetSource): string {
-	if (source.firstLine === source.lastLine) {
-		return `L${source.firstLine}`
-	}
-
-	return `L${source.firstLine}-L${source.lastLine}`
+	return formatLineRanges([{ first: source.firstLine, last: source.lastLine }])
 }
 
 export type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
