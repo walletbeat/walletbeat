@@ -82,6 +82,30 @@ const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)[
 		),
 	})
 
+const trackingIdentifierCorrelation: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
+			id: 'tracking_identifier_correlation',
+			rating: Rating.FAIL,
+			displayName: 'Multiple addresses are correlatable by a tracking identifier',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} makes requests about different addresses that share a tracking identifier, allowing an external provider to correlate them.',
+			),
+		},
+		details: paragraph(`
+When configured with multiple addresses, {{WALLET_NAME}} makes requests about each address
+separately, but these requests carry a tracking identifier that is shared across them (either
+directly or through a chain of requests). This lets an external provider link the requests
+back to the same user and therefore correlate the user's addresses.
+`),
+		impact: paragraph(
+			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should strip all tracking identifiers from the requests it makes.',
+		),
+	})
+
 const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
@@ -218,14 +242,14 @@ function rateHandling(
 		return 0
 	}
 
-	if (collectedByDefault(dataCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-		return 0
-	}
-
 	switch (dataCollection.multiAddress.type) {
 		case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-			return 1000
+			return collectedByDefault(dataCollection[PersonalInfo.TRACKING_IDENTIFIER]) ? 0 : 1000
 		case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
+			if (dataCollection.multiAddress.trackingIdentifierCorrelation === 'CORRELATABLE') {
+				return 0
+			}
+
 			const destinationScore =
 				{ SAME_FOR_ALL: 0, ISOLATED: 1 }[dataCollection.multiAddress.destination] * 1000
 			const enclaveScore =
@@ -301,6 +325,11 @@ export const multiAddressCorrelation: Attribute = {
 		  the receiving endpoint to learn that all of these addresses belong to
 		  the same user. Similar correlations are also possible by IP and/or
 			time-based correlation of requests that each contain one wallet address.
+		- Requests about different wallet addresses carrying a common tracking
+		  identifier (e.g. cookies, unique HTTP headers, UUIDs), either directly
+			or transitively through a chain of requests that each share a tracking
+			identifier. This lets the receiving endpoint link requests back to the
+			same user and therefore correlate the user's addresses.
 
 		Walletbeat determines this by inspecting the network requests made by the
 		wallet. See the [data collection guide](${withBasePath('/docs/wallet-testing/data-collection/')})
@@ -344,6 +373,12 @@ export const multiAddressCorrelation: Attribute = {
 				activeAddressOnlyWithTrackingIdentifier(
 					EvaluationContext.forTest(() => multiAddressCorrelation),
 				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet refreshes each wallet address in a separate request, but the requests carry a tracking identifier shared across them, allowing an external provider to correlate the addresses.',
+				),
+				trackingIdentifierCorrelation(EvaluationContext.forTest(() => multiAddressCorrelation)),
 			),
 			exampleRating(
 				paragraph(
@@ -461,8 +496,10 @@ export const multiAddressCorrelation: Attribute = {
 				// they are clearly correlatable.
 				return bulkRequests(ctx)
 			case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS:
-				if (collectedByDefault(worstCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-					return activeAddressOnlyWithTrackingIdentifier(ctx)
+				if (handling.trackingIdentifierCorrelation === 'CORRELATABLE') {
+					// The wallet's addresses are correlated through a chain of shared
+					// tracking identifiers, regardless of destination, proxy, or timing.
+					return trackingIdentifierCorrelation(ctx)
 				}
 
 				if (handling.destination === 'ISOLATED') {

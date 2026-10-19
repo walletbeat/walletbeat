@@ -21,9 +21,34 @@ export interface AddressBearingRequest {
 	addresses: NonEmptyArray<Erc55Address>
 
 	/**
+	 * The tracking identifier string values carried by this request. Two
+	 * requests that carry the same tracking identifier can be correlated by
+	 * the receiving entity, so tracking identifiers are what allow addresses
+	 * sent in separate requests to be linked together.
+	 */
+	trackingIdentifiers: ReadonlySet<string>
+
+	/**
 	 * The session-relative time of the request, in milliseconds since the
 	 * start of its capture session. Used to classify whether requests for
 	 * different addresses are simultaneous or staggered.
+	 */
+	sessionMilliseconds: number
+}
+
+/**
+ * A request that carries tracking identifiers but no wallet address. Such
+ * requests still matter for correlation, because a chain of requests linked
+ * by shared tracking identifiers can transitively correlate two addresses
+ * even when no single request carries both.
+ */
+export interface TrackingOnlyRequest {
+	/** The tracking identifier string values carried by this request. */
+	trackingIdentifiers: ReadonlySet<string>
+
+	/**
+	 * The session-relative time of the request, in milliseconds since the
+	 * start of its capture session.
 	 */
 	sessionMilliseconds: number
 }
@@ -34,6 +59,12 @@ export interface EntityRequests {
 	addresses: NonEmptyArray<Erc55Address>
 	/** The requests, each carrying one or more wallet addresses. */
 	requests: AddressBearingRequest[]
+	/**
+	 * The requests that carry tracking identifiers but no wallet address.
+	 * These participate in tracking-identifier correlation chains but are not
+	 * address-bearing, so they are kept separate from `requests`.
+	 */
+	trackingOnlyRequests: TrackingOnlyRequest[]
 }
 
 /**
@@ -56,6 +87,10 @@ export const SIMULTANEOUS_WINDOW_MS = 300_000
  * - Otherwise the wallet only ever makes requests about a single address
  *   (`ACTIVE_ADDRESS_ONLY`).
  *
+ * For `SEPARATE_REQUEST_PER_ADDRESS`, the classification also determines
+ * whether the wallet's addresses are correlatable through a chain of shared
+ * tracking identifiers (see {@link addressesCorrelatableByTrackingIdentifier}).
+ *
  * @param totalWalletAddressCount The number of distinct wallet addresses the
  *   wallet manages across the entire capture. This distinguishes
  *   `ACTIVE_ADDRESS_ONLY` (single address) from `SEPARATE_REQUEST_PER_ADDRESS`
@@ -70,7 +105,7 @@ export function classifyEntityMultiAddressHandling(
 	totalWalletAddressCount: number,
 	entityRequests: EntityRequests,
 ): MultiAddressHandling | null {
-	const { addresses, requests } = entityRequests
+	const { addresses, requests, trackingOnlyRequests } = entityRequests
 
 	if (requests.length === 0) {
 		return null
@@ -102,7 +137,130 @@ export function classifyEntityMultiAddressHandling(
 		destination,
 		proxy: 'NONE',
 		timing: classifyTiming(requests),
+		trackingIdentifierCorrelation: addressesCorrelatableByTrackingIdentifier(
+			requests,
+			trackingOnlyRequests,
+		)
+			? 'CORRELATABLE'
+			: 'NOT_CORRELATABLE',
 	}
+}
+
+/**
+ * Determine whether two or more distinct wallet addresses are correlatable
+ * through a chain of requests that share tracking identifiers.
+ *
+ * Two addresses are correlated when requests about each of them carry the
+ * same tracking identifier, either directly (a request about address A1 and a
+ * request about address A2 both carry identifier X) or transitively (a
+ * sequence of requests R1..Rn links A1 to A2, where each consecutive pair of
+ * requests shares a tracking identifier, and only the endpoints carry the
+ * addresses). This is computed with a union-find over a graph whose nodes are
+ * wallet addresses and tracking identifier values; each request connects all
+ * of its addresses and all of its tracking identifiers.
+ */
+function addressesCorrelatableByTrackingIdentifier(
+	requests: AddressBearingRequest[],
+	trackingOnlyRequests: TrackingOnlyRequest[],
+): boolean {
+	// Union-find over node keys. Addresses and identifiers are prefixed so that
+	// a value that happens to be both an address and an identifier never
+	// collides.
+	const parent = new Map<string, string>()
+
+	const find = (node: string): string => {
+		let root = node
+
+		// Every node is registered in `parent` via `add` before it is ever
+		// queried, so a missing entry means the node is its own root.
+		while (true) {
+			const p = parent.get(root)
+
+			if (p === undefined || p === root) {
+				break
+			}
+
+			root = p
+		}
+
+		// Path compression.
+		let current = node
+
+		while (current !== root) {
+			const next = parent.get(current)
+
+			if (next === undefined) {
+				break
+			}
+
+			parent.set(current, root)
+			current = next
+		}
+
+		return root
+	}
+
+	const add = (node: string): void => {
+		if (!parent.has(node)) {
+			parent.set(node, node)
+		}
+	}
+
+	const union = (a: string, b: string): void => {
+		const rootA = find(a)
+		const rootB = find(b)
+
+		if (rootA !== rootB) {
+			parent.set(rootB, rootA)
+		}
+	}
+
+	const connect = (nodes: string[]): void => {
+		for (const node of nodes) {
+			add(node)
+		}
+
+		for (let i = 1; i < nodes.length; i++) {
+			union(nodes[0], nodes[i])
+		}
+	}
+
+	for (const req of requests) {
+		connect([
+			...req.addresses.map(addr => `address:${addr}`),
+			...[...req.trackingIdentifiers].map(id => `identifier:${id}`),
+		])
+	}
+
+	for (const req of trackingOnlyRequests) {
+		connect([...[...req.trackingIdentifiers].map(id => `identifier:${id}`)])
+	}
+
+	// Group the wallet addresses seen by this entity by their union-find root.
+	// If any group contains two or more distinct addresses, those addresses are
+	// correlatable through a chain of shared tracking identifiers.
+	const addressesByRoot = new Map<string, Set<string>>()
+
+	for (const req of requests) {
+		for (const addr of req.addresses) {
+			const root = find(`address:${addr}`)
+			const group = addressesByRoot.get(root)
+
+			if (group === undefined) {
+				addressesByRoot.set(root, new Set([addr]))
+			} else {
+				group.add(addr)
+			}
+		}
+	}
+
+	for (const group of addressesByRoot.values()) {
+		if (group.size >= 2) {
+			return true
+		}
+	}
+
+	return false
 }
 
 /**

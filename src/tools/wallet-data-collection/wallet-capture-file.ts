@@ -62,6 +62,7 @@ import {
 	type AddressBearingRequest,
 	classifyEntityMultiAddressHandling,
 	type EntityRequests,
+	type TrackingOnlyRequest,
 } from './multi-address-classification'
 import { removeFile, writeFileAtomically } from './read-only'
 import { looksBinary } from './string-classification-heuristics'
@@ -2483,6 +2484,27 @@ export class WalletRequest {
 	}
 
 	/**
+	 * The set of tracking identifier string values carried by this request.
+	 * These are the actual string values (e.g. cookie values) that have been
+	 * classified as {@link PersonalInfo.TRACKING_IDENTIFIER}.
+	 */
+	public async trackingIdentifiers(): Promise<ReadonlySet<string>> {
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const result = new Set<string>()
+
+		for (const s of reqStrings.strings()) {
+			if (s.str.pieces.has(PersonalInfo.TRACKING_IDENTIFIER)) {
+				result.add(s.str.str)
+			}
+		}
+
+		return result
+	}
+
+	/**
 	 * True when this request is directly identified as NOT_WALLET_INITIATED,
 	 * either by a matching request matcher or by manual review.
 	 */
@@ -3239,6 +3261,8 @@ export class WalletCaptureFile {
 				walletAddresses: Set<Erc55Address>
 				/** The address-bearing requests observed by this entity. */
 				addressRequests: AddressBearingRequest[]
+				/** The tracking-identifier-only requests observed by this entity. */
+				trackingOnlyRequests: TrackingOnlyRequest[]
 			}
 		>()
 
@@ -3285,6 +3309,7 @@ export class WalletCaptureFile {
 			}
 
 			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
+			const trackingIdentifiers = await request.trackingIdentifiers()
 
 			// The data is seen by the operator and by every intermediary on the
 			// way there, so record one receipt per entity with its role.
@@ -3308,6 +3333,7 @@ export class WalletCaptureFile {
 						purposes: new Set<DataCollectionPurpose>(),
 						walletAddresses: new Set<Erc55Address>(),
 						addressRequests: [],
+						trackingOnlyRequests: [],
 					}
 					perEntity.set(perEntityKey, entData)
 				}
@@ -3338,6 +3364,15 @@ export class WalletCaptureFile {
 
 					entData.addressRequests.push({
 						addresses: assertNonEmptyArray(carriedWalletAddresses),
+						trackingIdentifiers,
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
+				} else if (trackingIdentifiers.size > 0) {
+					// A request that carries tracking identifiers but no wallet
+					// address can still participate in a tracking-identifier
+					// correlation chain, so record it separately.
+					entData.trackingOnlyRequests.push({
+						trackingIdentifiers,
 						sessionMilliseconds: request.sessionTime.toNumber(),
 					})
 				}
@@ -3368,6 +3403,7 @@ export class WalletCaptureFile {
 				const entityRequests: EntityRequests = {
 					addresses: assertNonEmptyArray(Array.from(entData.walletAddresses)),
 					requests: entData.addressRequests,
+					trackingOnlyRequests: entData.trackingOnlyRequests,
 				}
 
 				return classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests)

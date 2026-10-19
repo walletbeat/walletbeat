@@ -209,7 +209,24 @@ export type MultiAddressHandling =
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
 
-			// TODO: Presence of reused tracking identifiers across requests.
+			/**
+			 * Whether two or more of the wallet's distinct addresses are
+			 * correlatable by the receiving entity through a chain of requests
+			 * that share a common tracking identifier.
+			 *
+			 * Two addresses are correlated when requests about each of them
+			 * carry the same tracking identifier (e.g. a cookie), either directly
+			 * or transitively: request R1 about address A1 and request Rn about
+			 * address A2 are correlated when there is a sequence of requests
+			 * R1..Rn such that each consecutive pair shares a tracking identifier.
+			 *
+			 * - NOT_CORRELATABLE: no chain of shared tracking identifiers links
+			 *   two or more distinct wallet addresses.
+			 * - CORRELATABLE: a chain of shared tracking identifiers links two or
+			 *   more distinct wallet addresses, allowing the receiving entity to
+			 *   correlate them.
+			 */
+			trackingIdentifierCorrelation: 'NOT_CORRELATABLE' | 'CORRELATABLE'
 	  }
 
 /**
