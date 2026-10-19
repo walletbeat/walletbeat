@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	MultiAddressPolicy,
+	PersonalInfo,
+	type UserInfo,
+} from '@/schema/features/privacy/data-collection'
 import {
 	type AddressBearingRequest,
 	classifyEntityMultiAddressHandling,
+	type CorrelatableOnlyRequest,
 	type EntityRequests,
-	type TrackingOnlyRequest,
 } from '@/tools/wallet-data-collection/multi-address-classification'
 import type { Erc55Address } from '@/types/utils/ethereum-address'
 import { assertNonEmptyArray } from '@/types/utils/non-empty'
@@ -14,24 +18,29 @@ const A1 = '0x1111111111111111111111111111111111111111'
 const A2 = '0x2222222222222222222222222222222222222222'
 const A3 = '0x3333333333333333333333333333333333333333'
 
+/** Build a `correlatableUserInfo` map from `[UserInfo, values]` entries. */
+function userInfoMap(entries: Array<[UserInfo, string[]]>): Map<UserInfo, Set<string>> {
+	return new Map(entries.map(([info, values]) => [info, new Set(values)]))
+}
+
 function addressRequest(
 	addresses: Erc55Address[],
-	trackingIdentifiers: string[] = [],
+	correlatableUserInfo: Array<[UserInfo, string[]]> = [],
 	sessionMilliseconds = 0,
 ): AddressBearingRequest {
 	return {
 		addresses: assertNonEmptyArray(addresses),
-		trackingIdentifiers: new Set(trackingIdentifiers),
+		correlatableUserInfo: userInfoMap(correlatableUserInfo),
 		sessionMilliseconds,
 	}
 }
 
-function trackingRequest(
-	trackingIdentifiers: string[],
+function correlatableOnlyRequest(
+	correlatableUserInfo: Array<[UserInfo, string[]]>,
 	sessionMilliseconds = 0,
-): TrackingOnlyRequest {
+): CorrelatableOnlyRequest {
 	return {
-		trackingIdentifiers: new Set(trackingIdentifiers),
+		correlatableUserInfo: userInfoMap(correlatableUserInfo),
 		sessionMilliseconds,
 	}
 }
@@ -39,12 +48,12 @@ function trackingRequest(
 function entityRequests(
 	addresses: Erc55Address[],
 	requests: AddressBearingRequest[],
-	trackingOnlyRequests: TrackingOnlyRequest[] = [],
+	correlatableOnlyRequests: CorrelatableOnlyRequest[] = [],
 ): EntityRequests {
 	return {
 		addresses: assertNonEmptyArray(addresses),
 		requests,
-		trackingOnlyRequests,
+		correlatableOnlyRequests,
 	}
 }
 
@@ -79,14 +88,14 @@ describe('classifyEntityMultiAddressHandling', () => {
 		})
 	})
 
-	it('does not flag correlation when requests carry no tracking identifiers', () => {
+	it('does not flag correlation when requests carry no correlatable user info', () => {
 		const result = classifyEntityMultiAddressHandling(
 			2,
 			entityRequests([A1, A2], [addressRequest([A1], [], 0), addressRequest([A2], [], 0)]),
 		)
 
 		expect(result).toMatchObject({
-			trackingIdentifierCorrelation: 'NOT_CORRELATABLE',
+			correlatableUserInfoCorrelation: 'NOT_CORRELATABLE',
 		})
 	})
 
@@ -96,31 +105,55 @@ describe('classifyEntityMultiAddressHandling', () => {
 			entityRequests(
 				[A1, A2],
 				[
-					addressRequest([A1], ['shared-cookie'], 0),
-					addressRequest([A2], ['shared-cookie'], 1_000),
+					addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['shared-cookie']]], 0),
+					addressRequest([A2], [[PersonalInfo.TRACKING_IDENTIFIER, ['shared-cookie']]], 1_000),
 				],
 			),
 		)
 
 		expect(result).toMatchObject({
 			type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
-			trackingIdentifierCorrelation: 'CORRELATABLE',
+			correlatableUserInfoCorrelation: 'CORRELATABLE',
 		})
 	})
 
-	it('flags two addresses as correlatable through a transitive chain of tracking identifiers', () => {
+	it('flags two addresses as correlatable when their requests share an email', () => {
+		const result = classifyEntityMultiAddressHandling(
+			2,
+			entityRequests(
+				[A1, A2],
+				[
+					addressRequest([A1], [[PersonalInfo.EMAIL, ['user@example.com']]], 0),
+					addressRequest([A2], [[PersonalInfo.EMAIL, ['user@example.com']]], 1_000),
+				],
+			),
+		)
+
+		expect(result).toMatchObject({
+			type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+			correlatableUserInfoCorrelation: 'CORRELATABLE',
+		})
+	})
+
+	it('flags two addresses as correlatable through a transitive chain of correlatable user info', () => {
 		// R1: A1 + idA,idB; R2: idB,idC; R3: idC,idD; R4: idD + A2.
 		const result = classifyEntityMultiAddressHandling(
 			2,
 			entityRequests(
 				[A1, A2],
-				[addressRequest([A1], ['idA', 'idB'], 0), addressRequest([A2], ['idD'], 4_000)],
-				[trackingRequest(['idB', 'idC'], 1_000), trackingRequest(['idC', 'idD'], 2_000)],
+				[
+					addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['idA', 'idB']]], 0),
+					addressRequest([A2], [[PersonalInfo.TRACKING_IDENTIFIER, ['idD']]], 4_000),
+				],
+				[
+					correlatableOnlyRequest([[PersonalInfo.TRACKING_IDENTIFIER, ['idB', 'idC']]], 1_000),
+					correlatableOnlyRequest([[PersonalInfo.TRACKING_IDENTIFIER, ['idC', 'idD']]], 2_000),
+				],
 			),
 		)
 
 		expect(result).toMatchObject({
-			trackingIdentifierCorrelation: 'CORRELATABLE',
+			correlatableUserInfoCorrelation: 'CORRELATABLE',
 		})
 	})
 
@@ -132,53 +165,65 @@ describe('classifyEntityMultiAddressHandling', () => {
 			entityRequests(
 				[A1, A2, A3],
 				[
-					addressRequest([A1], ['idA'], 0),
-					addressRequest([A2], ['idA'], 1_000),
-					addressRequest([A3], ['idZ'], 2_000),
+					addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['idA']]], 0),
+					addressRequest([A2], [[PersonalInfo.TRACKING_IDENTIFIER, ['idA']]], 1_000),
+					addressRequest([A3], [[PersonalInfo.TRACKING_IDENTIFIER, ['idZ']]], 2_000),
 				],
 			),
 		)
 
 		expect(result).toMatchObject({
-			trackingIdentifierCorrelation: 'CORRELATABLE',
+			correlatableUserInfoCorrelation: 'CORRELATABLE',
 		})
 	})
 
-	it('does not flag correlation for a single address even when it carries tracking identifiers', () => {
+	it('does not flag correlation for a single address even when it carries correlatable user info', () => {
 		const result = classifyEntityMultiAddressHandling(
 			1,
-			entityRequests([A1], [addressRequest([A1], ['idA'], 0)]),
+			entityRequests(
+				[A1],
+				[addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['idA']]], 0)],
+			),
 		)
 
 		expect(result).toEqual({ type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY })
 	})
 
-	it('flags correlation when a tracking-only request bridges two address requests', () => {
+	it('flags correlation when a correlatable-only request bridges two address requests', () => {
 		const result = classifyEntityMultiAddressHandling(
 			2,
 			entityRequests(
 				[A1, A2],
-				[addressRequest([A1], ['idA'], 0), addressRequest([A2], ['idC'], 2_000)],
-				[trackingRequest(['idA', 'idB'], 1_000), trackingRequest(['idB', 'idC'], 1_500)],
+				[
+					addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['idA']]], 0),
+					addressRequest([A2], [[PersonalInfo.TRACKING_IDENTIFIER, ['idC']]], 2_000),
+				],
+				[
+					correlatableOnlyRequest([[PersonalInfo.TRACKING_IDENTIFIER, ['idA', 'idB']]], 1_000),
+					correlatableOnlyRequest([[PersonalInfo.TRACKING_IDENTIFIER, ['idB', 'idC']]], 1_500),
+				],
 			),
 		)
 
 		expect(result).toMatchObject({
-			trackingIdentifierCorrelation: 'CORRELATABLE',
+			correlatableUserInfoCorrelation: 'CORRELATABLE',
 		})
 	})
 
-	it('does not flag correlation when tracking identifiers are disjoint between addresses', () => {
+	it('does not flag correlation when correlatable user info is disjoint between addresses', () => {
 		const result = classifyEntityMultiAddressHandling(
 			2,
 			entityRequests(
 				[A1, A2],
-				[addressRequest([A1], ['cookie-1'], 0), addressRequest([A2], ['cookie-2'], 1_000)],
+				[
+					addressRequest([A1], [[PersonalInfo.TRACKING_IDENTIFIER, ['cookie-1']]], 0),
+					addressRequest([A2], [[PersonalInfo.TRACKING_IDENTIFIER, ['cookie-2']]], 1_000),
+				],
 			),
 		)
 
 		expect(result).toMatchObject({
-			trackingIdentifierCorrelation: 'NOT_CORRELATABLE',
+			correlatableUserInfoCorrelation: 'NOT_CORRELATABLE',
 		})
 	})
 })

@@ -13,9 +13,10 @@ import {
 	type Endpoint,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
-	PersonalInfo,
 	type QualifiedDataCollection,
 	qualifiedDataCollectionWithEndpoint,
+	userInfoCorrelatableAcrossEntities,
+	userInfoEnums,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { isSupported } from '@/schema/features/support'
@@ -59,42 +60,44 @@ const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 		),
 	})
 
-const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
-	ctx.build({
-		outcome: {
-			id: 'active_address_only_with_tracking_identifier',
-			rating: Rating.FAIL,
-			displayName: 'Multiple addresses are correlatable by a tracking cookie',
-			shortExplanation: sentence(
-				'{{WALLET_NAME}} only makes requests about one active address at a time, but uses a tracking cookie across requests allowing addresses to be correlated over time.',
-			),
-		},
-		details: paragraph(`
+const activeAddressOnlyWithCorrelatableUserInfo: (typeof multiAddressCorrelation)['evaluate'] =
+	ctx =>
+		ctx.build({
+			outcome: {
+				id: 'active_address_only_with_correlatable_user_info',
+				rating: Rating.FAIL,
+				displayName: 'Multiple addresses are correlatable by a shared identifier',
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} only makes requests about one active address at a time, but sends a user identifier across requests allowing addresses to be correlated over time.',
+				),
+			},
+			details: paragraph(`
 			{{WALLET_NAME}} only has one active address at a time, and all outgoing RPC requests are only about that address.
-			However, requests contain a tracking identifier or cookie, which lets the external provider correlate requests
-			that belong to the same user. This allows the external provider to correlate the user's addresses.
+			However, requests contain a shared user identifier (e.g. a tracking cookie), which lets the external provider
+			correlate requests that belong to the same user. This allows the external provider to correlate the user's
+			addresses.
 		`),
-		impact: paragraph(
-			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
-		),
-		howToImprove: paragraph(
-			'{{WALLET_NAME}} should strip all tracking identifiers from the RPCs it makes.',
-		),
-	})
+			impact: paragraph(
+				'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
+			),
+			howToImprove: paragraph(
+				'{{WALLET_NAME}} should stop sending correlatable user identifiers from the requests it makes.',
+			),
+		})
 
-const trackingIdentifierCorrelation: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+const correlatableUserInfoCorrelation: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
-			id: 'tracking_identifier_correlation',
+			id: 'correlatable_user_info_correlation',
 			rating: Rating.FAIL,
-			displayName: 'Multiple addresses are correlatable by a tracking identifier',
+			displayName: 'Multiple addresses are correlatable by a shared user identifier',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} makes requests about different addresses that share a tracking identifier, allowing an external provider to correlate them.',
+				'{{WALLET_NAME}} makes requests about different addresses that share a user identifier, allowing an external provider to correlate them.',
 			),
 		},
 		details: paragraph(`
 When configured with multiple addresses, {{WALLET_NAME}} makes requests about each address
-separately, but these requests carry a tracking identifier that is shared across them (either
+separately, but these requests carry a user identifier that is shared across them (either
 directly or through a chain of requests). This lets an external provider link the requests
 back to the same user and therefore correlate the user's addresses.
 `),
@@ -102,7 +105,7 @@ back to the same user and therefore correlate the user's addresses.
 			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should strip all tracking identifiers from the requests it makes.',
+			'{{WALLET_NAME}} should strip all correlatable user identifiers from the requests it makes.',
 		),
 	})
 
@@ -232,6 +235,30 @@ function isQualifiedDataCollectionWithMultiAddress(
 	return dataCollection.multiAddress != null
 }
 
+/**
+ * Whether the given data collection sends any correlatable `UserInfo` value
+ * by default. A correlatable `UserInfo` is one whose identical string value
+ * across two requests forms a correlation edge (see
+ * {@link userInfoCorrelatableAcrossEntities}).
+ *
+ * The account address and mempool transactions are excluded: their values vary
+ * per address, so they are the correlation target rather than a correlation
+ * signal.
+ */
+function anyCorrelatableUserInfoCollectedByDefault(
+	dataCollection: QualifiedDataCollection,
+): boolean {
+	return userInfoEnums.items.some(userInfo => {
+		if (userInfo === WalletInfo.ACCOUNT_ADDRESS || userInfo === WalletInfo.MEMPOOL_TRANSACTIONS) {
+			return false
+		}
+
+		return (
+			userInfoCorrelatableAcrossEntities(userInfo) && collectedByDefault(dataCollection[userInfo])
+		)
+	})
+}
+
 function rateHandling(
 	dataCollection: QualifiedDataCollectionWithMultiAddress,
 	endpoint: Endpoint,
@@ -244,9 +271,9 @@ function rateHandling(
 
 	switch (dataCollection.multiAddress.type) {
 		case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-			return collectedByDefault(dataCollection[PersonalInfo.TRACKING_IDENTIFIER]) ? 0 : 1000
+			return anyCorrelatableUserInfoCollectedByDefault(dataCollection) ? 0 : 1000
 		case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
-			if (dataCollection.multiAddress.trackingIdentifierCorrelation === 'CORRELATABLE') {
+			if (dataCollection.multiAddress.correlatableUserInfoCorrelation === 'CORRELATABLE') {
 				return 0
 			}
 
@@ -325,11 +352,11 @@ export const multiAddressCorrelation: Attribute = {
 		  the receiving endpoint to learn that all of these addresses belong to
 		  the same user. Similar correlations are also possible by IP and/or
 			time-based correlation of requests that each contain one wallet address.
-		- Requests about different wallet addresses carrying a common tracking
-		  identifier (e.g. cookies, unique HTTP headers, UUIDs), either directly
-			or transitively through a chain of requests that each share a tracking
-			identifier. This lets the receiving endpoint link requests back to the
-			same user and therefore correlate the user's addresses.
+		- Requests about different wallet addresses carrying a common
+		  correlatable user identifier (e.g. cookies, unique HTTP headers, UUIDs),
+			either directly or transitively through a chain of requests that each
+			share such an identifier. This lets the receiving endpoint link requests
+			back to the same user and therefore correlate the user's addresses.
 
 		Walletbeat determines this by inspecting the network requests made by the
 		wallet. See the [data collection guide](${withBasePath('/docs/wallet-testing/data-collection/')})
@@ -370,7 +397,7 @@ export const multiAddressCorrelation: Attribute = {
 				paragraph(
 					'The wallet only refreshes the currently-active wallet address balances, but such requests carry an identifier or cookie which can identify the same user across requests for different wallet addresses.',
 				),
-				activeAddressOnlyWithTrackingIdentifier(
+				activeAddressOnlyWithCorrelatableUserInfo(
 					EvaluationContext.forTest(() => multiAddressCorrelation),
 				),
 			),
@@ -378,7 +405,7 @@ export const multiAddressCorrelation: Attribute = {
 				paragraph(
 					'The wallet refreshes each wallet address in a separate request, but the requests carry a tracking identifier shared across them, allowing an external provider to correlate the addresses.',
 				),
-				trackingIdentifierCorrelation(EvaluationContext.forTest(() => multiAddressCorrelation)),
+				correlatableUserInfoCorrelation(EvaluationContext.forTest(() => multiAddressCorrelation)),
 			),
 			exampleRating(
 				paragraph(
@@ -483,8 +510,8 @@ export const multiAddressCorrelation: Attribute = {
 
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-				if (collectedByDefault(worstCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-					return activeAddressOnlyWithTrackingIdentifier(ctx)
+				if (anyCorrelatableUserInfoCollectedByDefault(worstCollection)) {
+					return activeAddressOnlyWithCorrelatableUserInfo(ctx)
 				}
 
 				// If the wallet has a concept of a singular "active address" and only
@@ -496,10 +523,11 @@ export const multiAddressCorrelation: Attribute = {
 				// they are clearly correlatable.
 				return bulkRequests(ctx)
 			case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS:
-				if (handling.trackingIdentifierCorrelation === 'CORRELATABLE') {
+				if (handling.correlatableUserInfoCorrelation === 'CORRELATABLE') {
 					// The wallet's addresses are correlated through a chain of shared
-					// tracking identifiers, regardless of destination, proxy, or timing.
-					return trackingIdentifierCorrelation(ctx)
+					// correlatable user identifiers, regardless of destination,
+					// proxy, or timing.
+					return correlatableUserInfoCorrelation(ctx)
 				}
 
 				if (handling.destination === 'ISOLATED') {

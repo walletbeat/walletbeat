@@ -978,7 +978,27 @@ type MultiAddressHandling =
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
 
-			// TODO: Presence of reused tracking identifiers across requests.
+			/**
+			 * Whether two or more of the wallet's distinct addresses are
+			 * correlatable by the receiving entity through a chain of requests
+			 * that share a common correlatable `UserInfo` value.
+			 *
+			 * Two addresses are correlated when requests about each of them
+			 * carry the same correlatable `UserInfo` value (e.g. a tracking
+			 * cookie, an email address, a phone number, etc), either
+			 * directly or transitively:
+			 * request R1 about address A1 and request Rn about
+			 * address A2 are correlated when there is a sequence of requests
+			 * R1..Rn such that each consecutive pair shares a correlatable
+			 * `UserInfo` value. See {@link userInfoCorrelatableAcrossEntities}.
+			 *
+			 * - NOT_CORRELATABLE: no chain of shared correlatable `UserInfo`
+			 *   values links two or more distinct wallet addresses.
+			 * - CORRELATABLE: a chain of shared correlatable `UserInfo` values
+			 *   links two or more distinct wallet addresses, allowing the
+			 *   receiving entity to correlate them.
+			 */
+			correlatableUserInfoCorrelation: 'NOT_CORRELATABLE' | 'CORRELATABLE'
 	  }
 ```
 

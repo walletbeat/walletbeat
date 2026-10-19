@@ -1,6 +1,8 @@
 import {
 	type MultiAddressHandling,
 	MultiAddressPolicy,
+	type UserInfo,
+	userInfoCorrelatableAcrossEntities,
 } from '@/schema/features/privacy/data-collection'
 import type { Erc55Address } from '@/types/utils/ethereum-address'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -21,12 +23,16 @@ export interface AddressBearingRequest {
 	addresses: NonEmptyArray<Erc55Address>
 
 	/**
-	 * The tracking identifier string values carried by this request. Two
-	 * requests that carry the same tracking identifier can be correlated by
-	 * the receiving entity, so tracking identifiers are what allow addresses
-	 * sent in separate requests to be linked together.
+	 * The correlatable `UserInfo` string values carried by this request,
+	 * keyed by `UserInfo` type. Two requests that carry the same value for the
+	 * same correlatable `UserInfo` type (e.g. the same tracking cookie, email
+	 * address, or phone number) can be correlated by the receiving entity, so
+	 * these values are what allow addresses sent in separate requests to be
+	 * linked together.
+	 *
+	 * See {@link userInfoCorrelatableAcrossEntities}.
 	 */
-	trackingIdentifiers: ReadonlySet<string>
+	correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>
 
 	/**
 	 * The session-relative time of the request, in milliseconds since the
@@ -37,14 +43,14 @@ export interface AddressBearingRequest {
 }
 
 /**
- * A request that carries tracking identifiers but no wallet address. Such
- * requests still matter for correlation, because a chain of requests linked
- * by shared tracking identifiers can transitively correlate two addresses
- * even when no single request carries both.
+ * A request that carries correlatable `UserInfo` values but no wallet address.
+ * Such requests still matter for correlation, because a chain of requests
+ * linked by shared correlatable `UserInfo` values can transitively correlate
+ * two addresses even when no single request carries both.
  */
-export interface TrackingOnlyRequest {
-	/** The tracking identifier string values carried by this request. */
-	trackingIdentifiers: ReadonlySet<string>
+export interface CorrelatableOnlyRequest {
+	/** The correlatable `UserInfo` string values carried by this request. */
+	correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>
 
 	/**
 	 * The session-relative time of the request, in milliseconds since the
@@ -60,11 +66,11 @@ export interface EntityRequests {
 	/** The requests, each carrying one or more wallet addresses. */
 	requests: AddressBearingRequest[]
 	/**
-	 * The requests that carry tracking identifiers but no wallet address.
-	 * These participate in tracking-identifier correlation chains but are not
+	 * The requests that carry correlatable `UserInfo` values but no wallet
+	 * address. These participate in correlation chains but are not
 	 * address-bearing, so they are kept separate from `requests`.
 	 */
-	trackingOnlyRequests: TrackingOnlyRequest[]
+	correlatableOnlyRequests: CorrelatableOnlyRequest[]
 }
 
 /**
@@ -89,7 +95,8 @@ export const SIMULTANEOUS_WINDOW_MS = 300_000
  *
  * For `SEPARATE_REQUEST_PER_ADDRESS`, the classification also determines
  * whether the wallet's addresses are correlatable through a chain of shared
- * tracking identifiers (see {@link addressesCorrelatableByTrackingIdentifier}).
+ * correlatable `UserInfo` values (see
+ * {@link addressesCorrelatableByCorrelatableUserInfo}).
  *
  * @param totalWalletAddressCount The number of distinct wallet addresses the
  *   wallet manages across the entire capture. This distinguishes
@@ -105,7 +112,7 @@ export function classifyEntityMultiAddressHandling(
 	totalWalletAddressCount: number,
 	entityRequests: EntityRequests,
 ): MultiAddressHandling | null {
-	const { addresses, requests, trackingOnlyRequests } = entityRequests
+	const { addresses, requests, correlatableOnlyRequests } = entityRequests
 
 	if (requests.length === 0) {
 		return null
@@ -137,9 +144,9 @@ export function classifyEntityMultiAddressHandling(
 		destination,
 		proxy: 'NONE',
 		timing: classifyTiming(requests),
-		trackingIdentifierCorrelation: addressesCorrelatableByTrackingIdentifier(
+		correlatableUserInfoCorrelation: addressesCorrelatableByCorrelatableUserInfo(
 			requests,
-			trackingOnlyRequests,
+			correlatableOnlyRequests,
 		)
 			? 'CORRELATABLE'
 			: 'NOT_CORRELATABLE',
@@ -148,24 +155,29 @@ export function classifyEntityMultiAddressHandling(
 
 /**
  * Determine whether two or more distinct wallet addresses are correlatable
- * through a chain of requests that share tracking identifiers.
+ * through a chain of requests that share correlatable `UserInfo` values.
  *
  * Two addresses are correlated when requests about each of them carry the
- * same tracking identifier, either directly (a request about address A1 and a
- * request about address A2 both carry identifier X) or transitively (a
- * sequence of requests R1..Rn links A1 to A2, where each consecutive pair of
- * requests shares a tracking identifier, and only the endpoints carry the
- * addresses). This is computed with a union-find over a graph whose nodes are
- * wallet addresses and tracking identifier values; each request connects all
- * of its addresses and all of its tracking identifiers.
+ * same correlatable `UserInfo` value, either directly (a request about
+ * address A1 and a request about address A2 both carry identifier X) or
+ * transitively (a sequence of requests R1..Rn links A1 to A2, where each
+ * consecutive pair of requests shares a correlatable `UserInfo` value, and
+ * only the endpoints carry the addresses). This is computed with a union-find
+ * over a graph whose nodes are wallet addresses and correlatable `UserInfo`
+ * values; each request connects all of its addresses and all of its
+ * correlatable `UserInfo` values.
+ *
+ * @param requests The requests, each carrying one or more wallet addresses.
+ * @param correlatableOnlyRequests The requests carrying correlatable
+ *   `UserInfo` values but no wallet address.
  */
-function addressesCorrelatableByTrackingIdentifier(
+function addressesCorrelatableByCorrelatableUserInfo(
 	requests: AddressBearingRequest[],
-	trackingOnlyRequests: TrackingOnlyRequest[],
+	correlatableOnlyRequests: CorrelatableOnlyRequest[],
 ): boolean {
-	// Union-find over node keys. Addresses and identifiers are prefixed so that
-	// a value that happens to be both an address and an identifier never
-	// collides.
+	// Union-find over node keys. Addresses and correlatable UserInfo values are
+	// prefixed (by kind and, for UserInfo values, by type) so that values that
+	// happen to collide never share a node.
 	const parent = new Map<string, string>()
 
 	const find = (node: string): string => {
@@ -225,20 +237,36 @@ function addressesCorrelatableByTrackingIdentifier(
 		}
 	}
 
+	// The nodes a request connects: its wallet addresses plus every
+	// correlatable `UserInfo` value it carries, each keyed by `UserInfo` type.
+	const nodesForCorrelatableUserInfo = (
+		correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>,
+	): string[] => {
+		const nodes: string[] = []
+
+		for (const [userInfo, values] of correlatableUserInfo) {
+			for (const value of values) {
+				nodes.push(`userinfo:${userInfo}:${value}`)
+			}
+		}
+
+		return nodes
+	}
+
 	for (const req of requests) {
 		connect([
 			...req.addresses.map(addr => `address:${addr}`),
-			...[...req.trackingIdentifiers].map(id => `identifier:${id}`),
+			...nodesForCorrelatableUserInfo(req.correlatableUserInfo),
 		])
 	}
 
-	for (const req of trackingOnlyRequests) {
-		connect([...[...req.trackingIdentifiers].map(id => `identifier:${id}`)])
+	for (const req of correlatableOnlyRequests) {
+		connect(nodesForCorrelatableUserInfo(req.correlatableUserInfo))
 	}
 
 	// Group the wallet addresses seen by this entity by their union-find root.
 	// If any group contains two or more distinct addresses, those addresses are
-	// correlatable through a chain of shared tracking identifiers.
+	// correlatable through a chain of shared correlatable `UserInfo` values.
 	const addressesByRoot = new Map<string, Set<string>>()
 
 	for (const req of requests) {

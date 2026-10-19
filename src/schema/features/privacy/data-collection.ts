@@ -212,21 +212,23 @@ export type MultiAddressHandling =
 			/**
 			 * Whether two or more of the wallet's distinct addresses are
 			 * correlatable by the receiving entity through a chain of requests
-			 * that share a common tracking identifier.
+			 * that share a common correlatable `UserInfo` value.
 			 *
 			 * Two addresses are correlated when requests about each of them
-			 * carry the same tracking identifier (e.g. a cookie), either directly
+			 * carry the same correlatable `UserInfo` value (e.g. a tracking
+			 * cookie, an email address, etc.), either directly
 			 * or transitively: request R1 about address A1 and request Rn about
 			 * address A2 are correlated when there is a sequence of requests
-			 * R1..Rn such that each consecutive pair shares a tracking identifier.
+			 * R1..Rn such that each consecutive pair shares a correlatable
+			 * `UserInfo` value. See {@link userInfoCorrelatableAcrossEntities}.
 			 *
-			 * - NOT_CORRELATABLE: no chain of shared tracking identifiers links
-			 *   two or more distinct wallet addresses.
-			 * - CORRELATABLE: a chain of shared tracking identifiers links two or
-			 *   more distinct wallet addresses, allowing the receiving entity to
-			 *   correlate them.
+			 * - NOT_CORRELATABLE: no chain of shared correlatable `UserInfo`
+			 *   values links two or more distinct wallet addresses.
+			 * - CORRELATABLE: a chain of shared correlatable `UserInfo` values
+			 *   links two or more distinct wallet addresses, allowing the
+			 *   receiving entity to correlate them.
 			 */
-			trackingIdentifierCorrelation: 'NOT_CORRELATABLE' | 'CORRELATABLE'
+			correlatableUserInfoCorrelation: 'NOT_CORRELATABLE' | 'CORRELATABLE'
 	  }
 
 /**
@@ -589,6 +591,66 @@ function userInfoScore(userInfo: UserInfo): number {
 			return 16
 		case PersonalInfo.GOVERNMENT_ID:
 			return 17
+	}
+}
+
+/**
+ * Whether a given `UserInfo` value, when the *same string* appears in two
+ * requests, forms a correlation edge that can transitively link two requests
+ * bearing *distinct* wallet addresses.
+ *
+ * Two requests carrying an identical string value of a correlatable
+ * `UserInfo` (e.g. the same tracking cookie, email address, phone number,
+ * etc) can be linked together by the receiving entity. A chain of such
+ * links lets that entity correlate requests about different wallet addresses,
+ * revealing that the addresses belong to the same user. This is what the
+ * multi-address correlation attribute relies on.
+ *
+ * `UserInfo`s whose string value varies per address (e.g. the account address
+ * itself) are not correlation *signals*: they are the correlation target.
+ */
+export function userInfoCorrelatableAcrossEntities(userInfo: UserInfo): boolean {
+	switch (userInfo) {
+		case PersonalInfo.IP_ADDRESS:
+			return false
+		case WalletInfo.USER_ACTIONS:
+			return false
+		case PersonalInfo.TRACKING_IDENTIFIER:
+			return true
+		case WalletInfo.ASSETS:
+			return false
+		case WalletInfo.BALANCE:
+			return false
+		case WalletInfo.ACCOUNT_ADDRESS:
+			return true
+		case WalletInfo.MEMPOOL_TRANSACTIONS:
+			return true
+		case WalletInfo.WALLET_CONNECTED_DOMAINS:
+			return false
+		case PersonalInfo.PSEUDONYM:
+			return true
+		case PersonalInfo.FARCASTER_ACCOUNT:
+			return true
+		case PersonalInfo.X_DOT_COM_ACCOUNT:
+			return true
+		case PersonalInfo.EMAIL:
+			return true
+		case PersonalInfo.BROWSING_HISTORY_URLS:
+			return false
+		case PersonalInfo.LEGAL_NAME:
+			return true
+		case PersonalInfo.PHONE:
+			return true
+		case PersonalInfo.CONTACTS:
+			return true
+		case PersonalInfo.PHYSICAL_ADDRESS:
+			return true
+		case PersonalInfo.CEX_ACCOUNT:
+			return true
+		case PersonalInfo.FACE:
+			return true
+		case PersonalInfo.GOVERNMENT_ID:
+			return true
 	}
 }
 
