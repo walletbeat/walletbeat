@@ -76,10 +76,15 @@ import {
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
 import {
+	OnchainVerificationDocumentation,
+	OrderflowDisclosureLevel,
+	type OrderflowPracticesPageContents,
+} from '@/schema/features/transparency/orderflow'
+import {
 	type ArtifactSigningDetails,
 	RepositoryChangeControlState,
 } from '@/schema/features/transparency/release-transparency'
-import { type References, refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -1720,7 +1725,39 @@ export const metamask: SoftwareWallet = {
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
-			orderflowPractices: null,
+			orderflowPractices: {
+				disclosure: {
+					ref: {
+						explanation:
+							'The swap review screen shows the rate, network fee, slippage, price impact, minimum received, and MetaMask fee, but does not mention that the transaction is routed through Smart Transactions or auctioned to block builders.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask swap review screen',
+					},
+					afterSingleAction: OrderflowDisclosureLevel.NONE,
+					byDefault: OrderflowDisclosureLevel.NONE,
+				},
+				practicesPage: supported({
+					ref: {
+						explanation:
+							'The Smart Transactions support article explains that Smart Transactions is on by default and works by auctioning transactions to a network of trusted block builders, who may profit from some transactions without changing the trade price. It documents how to turn the feature off, but does not name the builders. It only notes that transactions appear on block explorers once confirmed.',
+						url: 'https://support.metamask.io/manage-crypto/transactions/smart-transactions/',
+					},
+					contents: {
+						documentsHowToChangeDefaults: true,
+						explainsDefaultOrderflowAuctioning: true,
+						listsEntitiesAndWhatTheyDo: false,
+						onchainVerification: OnchainVerificationDocumentation.NO_METHOD_DOCUMENTED,
+						pageLastUpdated: '2026-09-30',
+					},
+				} satisfies MustRef<{ contents: OrderflowPracticesPageContents }>),
+				userCanRemoveAuctioning: supported({
+					ref: {
+						explanation:
+							'Smart Transactions can be turned off in Settings > Transactions on the extension and Settings > Advanced on mobile. Setting a custom RPC for a supported network also overrides it.',
+						url: 'https://support.metamask.io/manage-crypto/transactions/smart-transactions/',
+					},
+				}),
+			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({
 					ref: [
