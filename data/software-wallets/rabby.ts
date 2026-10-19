@@ -8,7 +8,16 @@ import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
-import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -71,7 +80,7 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -84,6 +93,77 @@ import { slowMist } from '../entities/slowmist'
 import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
 import rabbyAndroidParsed from './manifests/rabby/android.parsed.json'
 import rabbyIosParsed from './manifests/rabby/ios.parsed.json'
+import { alphabet } from '../entities/alphabet'
+import { hyperFoundation } from '../entities/hyper-foundation'
+import { sentry } from '../entities/sentry'
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation:
+				'The extension is installed from the Chrome Web Store. Once installed, it sends page views to Google Analytics through the Measurement Protocol with a persistent `client_id`. Page URLs such as the seed phrase backup screen include the account address.',
+			url: [
+				'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
+				'https://www.google-analytics.com/mp/collect',
+			],
+		},
+	],
+	debank: [
+		{
+			explanation:
+				"Rabby fetches the list of available RPC endpoints and its remote configuration from DeBank's servers on every launch.",
+			url: ['https://api.rabby.io/v1/chainrpc', 'https://static.debank.com/rabby/config.json'],
+		},
+		{
+			explanation: 'Gas prices are fetched from the Rabby API.',
+			url: 'https://api.rabby.io/v2/wallet/gas_market',
+		},
+		{
+			explanation:
+				"The active address's total balance, balance history, and DeFi positions are fetched from the Rabby API, one address per request. When importing a wallet, the addresses being imported are looked up in separate requests sent within about two seconds of each other.",
+			url: [
+				'https://api.rabby.io/v1/user/total_balance',
+				'https://api.rabby.io/v1/user/total_net_curve',
+				'https://api.rabby.io/v1/user/complex_app_list',
+			],
+		},
+		{
+			explanation:
+				'After a transaction is sent, its receipt is polled through the Rabby RPC proxy to check whether it has been included.',
+			url: 'https://api.rabby.io/v1/wallet/eth_rpc',
+		},
+		{
+			explanation:
+				'When swapping, the Rabby API builds the complete unsigned transaction (sender, router, calldata, nonce, gas, and value) before the user signs it, routed through a DEX aggregator with a 0.25% fee. The Gas Account endpoint is queried for multiple addresses at the same time.',
+			url: ['https://api.rabby.io/v1/wallet/swap_trade', 'https://api.rabby.io/v2/gas_account'],
+		},
+	],
+	debankAnalytics: [
+		{
+			explanation:
+				"Page views and events are sent to DeBank's Matomo instance with a persistent visitor ID (`_id`). Page URLs such as the seed phrase backup screen include the account address.",
+			url: 'https://matomo.debank.com/matomo.php',
+		},
+		{
+			explanation:
+				'Events for each transaction step (created, signed, submitted, and completed) are sent to DeBank with the account type, chain, and source screen.',
+			url: 'https://festats.debank.com/rabby/createTransaction',
+		},
+	],
+	hyperFoundation: [
+		{
+			explanation:
+				"Perpetuals positions for every address in the wallet are looked up on Hyperliquid's API, one request per address, sent within a few milliseconds of each other.",
+			url: 'https://api.hyperliquid.xyz/info',
+		},
+	],
+	sentry: [
+		{
+			explanation: 'Sentry receives session reports with a session ID, and error reports.',
+			url: 'https://o4507018303438848.ingest.us.sentry.io',
+		},
+	],
+}
+
 export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
@@ -486,7 +566,91 @@ export const rabby: SoftwareWallet = {
 				},
 				[Variant.DESKTOP]: null,
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: []
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.STATIC_ASSETS,
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+			},
 			privacyPolicy: 'https://rabby.io/docs/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
