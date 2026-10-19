@@ -60,7 +60,7 @@ A wallet does well on this aspect if it has been audited at least once within th
 
 MetaMask should undergo a new security audit. 
 
-![Security Audits](./security_audits.png)
+![Security Audits](./security_audits.jpg)
 
 ---
 
