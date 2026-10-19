@@ -1,8 +1,8 @@
-Ethereum values only matter if users actually experience them.
+How does @MetaMask stack up against Ethereum’s values?
 
-So, how does MetaMask stack up against Ethereum’s values?
+Ethereum values only matter if users actually experience them. Where MetaMask is making progress, where it’s stuck, and what could be better?
 
-Where MetaMask is making progress, and what CROPS alignment actually looks like in practice 👇
+A Walletbeat thread 🧵
 
 ---
 
@@ -12,22 +12,14 @@ We'll be evaluating this wallet across five dimensions: security, self-sovereign
 
 ---
 
-First, some context on how Walletbeat grades.
-
-Wallets climb a ladder: Stage 0 (verifiable), Stage 0.5 (foundational), Stage 1 (Ethereum standard), Stage 2 (trust-minimized).
-
-MetaMask sits at Stage 0. Its source code is public, and it meets 2 of 4 Stage 0.5 criteria.
-
-Here’s why 🧵
-
----
-
 🔒 1/5 Security
 
-What’s good about MetaMask’s security?
+What’s good about @MetaMask’s security?
 
 🗝️ Hardware wallet support
 🐛 Bug bounty program
+
+![Security Attributes](./security_attributes.png)
 
 ---
 
@@ -41,13 +33,15 @@ Software wallets supporting hardware wallets means they offer the best of both w
 
 🐛 Bug bounty program
 
-✅ MetaMask runs an active program on HackerOne covering all aspects of the wallet.
+✅ @MetaMask runs an active program on HackerOne covering all aspects of the wallet.
 
 Rewards range from $250 to $1,000,000, with Safe Harbor protections for good faith researchers.
 
+![Bug Bounty Program](./metamask_audits_bounties.jpg)
+
 ---
 
-What could be better about MetaMask’s security?
+What could be better about @MetaMask’s security?
 
 📜 Security audits
 🚨 Scam prevention
@@ -60,15 +54,19 @@ Let’s break it down 👇
 
 📜 Security audits
 
-⚠️ The latest is from April 1, 2025, over a year ago. Walletbeat’s bar is an audit within the last 365 days.
+⚠️ @MetaMask was last audited on March 31, 2025, which was over a year ago. 
 
-A new audit would bring this to Pass.
+A wallet does well on this aspect if it has been audited at least once within the last 365 days. This matter in order to ensure the wallet's source code is secure, and remains that way over time.
+
+MetaMask should undergo a new security audit. 
+
+![Security Audits](./security_audits.png)
 
 ---
 
 🚨 Scam prevention
 
-MetaMask warns the user about:
+@MetaMask warns the user about:
 
 Unknown recipients
 Address poisoning
@@ -80,27 +78,29 @@ Two gaps 👇
 
 ---
 
-⚠️ MetaMask does not warn you when granting unlimited token approvals.
+⚠️ @MetaMask does not warn you when granting unlimited token approvals.
 
 ⚠️ Address and contract checks leak the user’s IP, their Ethereum address, and the contract address to an external provider that can correlate them.
 
-MetaMask says this data isn’t shared beyond Consensys. Walletbeat still counts it as a correlation risk.
+MetaMask says this data isn’t shared beyond Consensys. Walletbeat still counts it as a correlation risk, because the wallet doesn't implement these scam warning features in a privacy-preserving manner.
 
 ---
 
 🔏 Transaction legibility
 
-⚠️ MetaMask supports some transaction legibility features, but not all. 
+⚠️ @MetaMask supports some transaction legibility features, but not all. 
 
 The wallet displays basic transaction details but may be missing calldata display formats, clear transaction outcome explanations for complex interactions, or simulation capabilities. 
 
 Showing full transaction details is crucial for security.
 
+![Transaction legibility screenshot](./metamask-erc7730-usdc-approval.png)  
+
 ---
 
 🥷 Duress resistance
  
-⚠️ MetaMask protects access behind a lock screen (password and biometric (Face ID / fingerprint)). This slows down an opportunistic attacker, but doesn’t help against someone forcing you to unlock. 
+⚠️ @MetaMask protects access behind a lock screen (password and biometric (Face ID / fingerprint)). This slows down an opportunistic attacker, but doesn’t help against someone forcing you to unlock. 
 
 It should implement a duress mode triggered by a separate duress PIN or passphrase. 
 
@@ -118,15 +118,17 @@ Let’s take a closer look 👇
 
 ⚓ Chain verification
 
-❌ MetaMask doesn't verify the integrity of the Ethereum L1 blockchain when retrieving chain state or simulating transactions.
+❌ @MetaMask doesn't verify the integrity of the Ethereum L1 blockchain when retrieving chain state or simulating transactions.
 
-Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.
+This attribute refers to the ability for participants to verify that the chain data is valid when they interact with it. Without such verification, users rely on trusted external providers to tell them what the state of the blockchain is, similar to the web2 trust model. 
+
+To avoid this, Ethereum was designed to be verifiable on a light client. MetaMask should integrate light client functionality to verify the integrity of Ethereum chain data.
 
 ---
 
 🔐 Security best practices
 
-❌ MetaMask's mobile app declares high-risk OS permissions not required for wallet functionality, increasing the attack surface.
+❌ @MetaMask's mobile app declares high-risk OS permissions not required for wallet functionality, increasing the attack surface.
 
 The browser extension injects content scripts into all origins including file:// and other non-web schemes, dramatically increasing the extension attack surface.
 
@@ -134,26 +136,29 @@ The browser extension injects content scripts into all origins including file://
 
 🛟 Account recovery
 
-❌ MetaMask implements a Guardian-based account recovery feature which does not pass any of the tested scenarios. 
+❌ @MetaMask implements a Guardian-based account recovery feature which does not pass any of the tested scenarios. 
 
 Key shares are split across Google and/or Apple, and combined with a password-derived key to encrypt a seed phrase backup stored in Consensys’s data store.
 
 Recovery depends on the wallet password and that data store.
 
 ---
-❌ MetaMask reminds users to back up their recovery phrase but only if they haven't had their recovery phrase backed up in the first place. Once the user confirms the backup, the reminder is permanently dismissed.
+❌ @MetaMask reminds users to back up their recovery phrase but only if they haven't had their recovery phrase backed up in the first place. Once the user confirms the backup, the reminder is permanently dismissed.
 
 It also does not run the following recommended account recovery drills periodic check-ups: private key check-ups, seed phrase check-ups, guardian account check-ups. 
+
+![Recovery Phrase Reminder](./recovery_phrase_reminder.jpg)
 
 ---
 
 🏰 2/5 Self-sovereignty
 
-What’s good about MetaMask’s self-sovereignty?
+What’s good about @MetaMask’s self-sovereignty?
 
 🧳 Account portability
 🪚 Account unruggability
 
+![Self-sovereignty Attributes](./self_sovereignty_attributes.png)
 ---
 
 🧳 Account portability
@@ -176,7 +181,7 @@ What could be better about MetaMask’s self-sovereignty?
 
 🔗 L1 provider independence
 
-⚠️ MetaMask lets users set custom RPC endpoints for any network, including mainnet. Before that, it contacts default endpoints (mainnet.infura.io and some L2s) for nonsensitive RPCs.
+⚠️ While @MetaMask allows users to configure custom RPC endpoints, it may still send some requests to its default endpoints before the custom RPC is used.
 
 MetaMask should modify the wallet setup flow to allow the user to configure the RPC endpoint for L1 before making any requests, or should avoid making any such requests until the user can access the RPC endpoint configuration options.
 
@@ -216,13 +221,17 @@ MetaMask is:
 💰 Transparent about its funding
 💸 Transparent about transaction fees
 
+![Transparency Attributes](./transparency_attributes.png)
+
 ---
 
-💰 Public funding
+💰 Funding transparency
 
-✅ MetaMask is funded by transparent fees, venture capital.
+✅ MetaMask is funded by transparent fees and venture capital.
 
 Consensys, which develops MetaMask, raised a $450M Series D led by ParaFi in March 2022. Revenue is published by product line and chain on DeFiLlama.
+
+Wallets must be maintained, regularly audited, and follow the continuous improvements in the ecosystem. This requires a reliable, transparent source of funding.
 
 --- 
 
@@ -237,7 +246,6 @@ It charges 0.875% on built-in swaps, and the same engine powers its bridge.
 What could be better about MetaMask’s transparency?
 
 📦 Release process (reproducibility)
-🌊 Orderflow transparency
 
 Let’s dig in 👇
 
@@ -248,14 +256,6 @@ Let’s dig in 👇
 ⚠️ MetaMask supports public changelog, artifact signing, and dependency locking, but is missing reproducible or hermetic builds.
 
 To fully pass, MetaMask should add reproducible or hermetic builds. Adding these would allow independent parties to verify that released software corresponds to the published source.
-
----
-
-🌊 Orderflow transparency
-
-❔ Walletbeat's database does not have the necessary information on MetaMask to assess this question.
-
-If you know how it works, contributions are open on GitHub: https://github.com/walletbeat/walletbeat/tree/beta/data/software-wallets/metamask.ts
 
 ---
 
@@ -282,6 +282,8 @@ What’s good about MetaMask’s ecosystem alignment?
 
 MetaMask is well aligned with several emerging Ethereum wallet standards.
 
+![Ecosystem Attributes](./ecosystem_attributes.png)
+
 ---
 
 What could be better about MetaMask’s ecosystem alignment?
@@ -299,6 +301,9 @@ Here’s what we found 👇
 
 MetaMask may want to add support for sending funds to chain-specific human-readable addresses. Supporting them would make cross-chain payments easier and less ambiguous.
 
+![ERC-7828 Name](./metamask-browser-erc7828-unresolved.png)
+![ERC-7831 Name](./metamask-browser-erc7831-unresolved.png)
+
 ---
 
 🌉 Chain abstraction
@@ -315,7 +320,9 @@ This matters for the Ethereum L2 roadmap, which aims to make L2s seamless for us
 
 Privacy is where MetaMask has the most to cover.
 
-Two attributes fail. Three are unrated: wallet address privacy, multi-address privacy and privacy hygiene.
+Two attributes fail.
+
+![Privacy Attributes](./ecosystem_attributes.png)
 
 ---
 
@@ -348,13 +355,13 @@ MetaMask should locally store each app’s address set locally and reuse it by d
 
 ---
 
-So, where does MetaMask stand?
+So, where does @MetaMask stand?
 
 Across Walletbeat's five dimensions, it has a mix of strengths and areas for improvement.
 
-Solid areas: account portability, unruggability, hardware wallet support, the bug bounty, public funding, and signed release artifacts.
+Solid areas: account portability, unruggability, hardware wallet support, bug bounty program, transparent funding, and signed release artifacts.
 
-Biggest gaps: the source license, chain verification, account recovery, approval management and private transfers.
+Biggest gaps: the source code license, chain verification, account recovery, approval management and private transfers.
 
 ---
 
@@ -369,10 +376,19 @@ Removing unneeded mobile permissions
 None of them needs an architectural rewrite.
 
 ---
+Overall
+
+@MetaMask has the fundamentals of ecosystem alignment covered.
+
+The attribute that can still improve is security.
+
+Privacy is the area that needs more improvement.
 
 Let’s keep pushing CROPS in wallets 🌸
 
-See MetaMask’s full breakdown on Walletbeat:
+---
+
+See @MetaMask’s full breakdown on Walletbeat:
 
 https://beta.walletbeat.eth.limo/metamask
 
