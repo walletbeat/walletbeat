@@ -2519,6 +2519,23 @@ export class WalletRequest {
 	}
 
 	/**
+	 * The proxy circuit this request was routed through, or `null` if it was
+	 * not proxied. Two requests routed through the same circuit appear to the
+	 * receiving entity as coming from the same IP address.
+	 */
+	public proxy(): string | null {
+		return null
+	}
+
+	/**
+	 * Details about the secure enclave the request's endpoint runs in, or
+	 * `null` if the endpoint is not an IP-hiding secure enclave
+	 */
+	public secureEnclaveDetails(): null {
+		return null // Secure enclaves not yet supported.
+	}
+
+	/**
 	 * True when this request is directly identified as NOT_WALLET_INITIATED,
 	 * either by a matching request matcher or by manual review.
 	 */
@@ -3379,6 +3396,8 @@ export class WalletCaptureFile {
 					entData.addressRequests.push({
 						addresses: assertNonEmptyArray(carriedWalletAddresses),
 						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
 						sessionMilliseconds: request.sessionTime.toNumber(),
 					})
 				} else if (correlatableUserInfo.size > 0) {
@@ -3387,6 +3406,8 @@ export class WalletCaptureFile {
 					// so record it separately.
 					entData.correlatableOnlyRequests.push({
 						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
 						sessionMilliseconds: request.sessionTime.toNumber(),
 					})
 				}

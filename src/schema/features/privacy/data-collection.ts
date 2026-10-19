@@ -210,25 +210,17 @@ export type MultiAddressHandling =
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
 
 			/**
-			 * Whether two or more of the wallet's distinct addresses are
-			 * correlatable by the receiving entity through a chain of requests
-			 * that share a common correlatable `UserInfo` value.
+			 * The best request-correlation chain the classifier could find between
+			 * two requests bearing distinct wallet addresses, or `null` if no
+			 * chain links any two distinct addresses.
 			 *
-			 * Two addresses are correlated when requests about each of them
-			 * carry the same correlatable `UserInfo` value (e.g. a tracking
-			 * cookie, an email address, etc.), either directly
-			 * or transitively: request R1 about address A1 and request Rn about
-			 * address A2 are correlated when there is a sequence of requests
-			 * R1..Rn such that each consecutive pair shares a correlatable
-			 * `UserInfo` value. See {@link userInfoCorrelatableAcrossEntities}.
-			 *
-			 * - NOT_CORRELATABLE: no chain of shared correlatable `UserInfo`
-			 *   values links two or more distinct wallet addresses.
-			 * - CORRELATABLE: a chain of shared correlatable `UserInfo` values
-			 *   links two or more distinct wallet addresses, allowing the
-			 *   receiving entity to correlate them.
+			 * The chain may be built from shared correlatable `UserInfo` values
+			 * and/or IP-time-based links (same entity, within
+			 * {@link IP_TIME_CORRELATION_WINDOW_MS}, from the same IP). The
+			 * receiving entity can use any such chain to correlate the user's
+			 * addresses. See {@link CorrelationChain}.
 			 */
-			correlatableUserInfoCorrelation: 'NOT_CORRELATABLE' | 'CORRELATABLE'
+			bestChain: CorrelationChain | null
 	  }
 
 /**
@@ -543,10 +535,53 @@ export const userInfoEnums: Enum<UserInfo> = mergeEnums<PersonalInfo, WalletInfo
 )
 
 /**
+ * Two requests sent within this many milliseconds are considered simultaneous.
+ */
+export const SIMULTANEOUS_WINDOW_MS = 300_000
+
+/**
+ * Two requests to the same entity from the same IP within this many
+ * milliseconds are considered IP-time correlatable.
+ */
+export const IP_TIME_CORRELATION_WINDOW_MS = 30 * 60 * 1000
+
+/**
+ * A single link in a request-correlation chain.
+ *
+ * Two requests are linked by a UserInfo edge when they carry an identical
+ * correlatable `UserInfo` value, and by an IP-time edge when they go to the
+ * same entity within {@link IP_TIME_CORRELATION_WINDOW_MS} from the same IP
+ * (and that entity learns the user's IP address).
+ *
+ * `strength` is a comparable measure of how strongly the link correlates the
+ * two requests: any UserInfo edge is stronger than any IP-time edge; among
+ * UserInfo edges a higher {@link userInfoScore} is stronger; among IP-time
+ * edges a shorter time gap is stronger.
+ */
+export type CorrelationEdge =
+	| { kind: 'userInfo'; userInfo: UserInfo; strength: number }
+	| { kind: 'ipTime'; gapMs: number; strength: number }
+
+/**
+ * The best request-correlation chain found between two requests bearing
+ * distinct wallet addresses.
+ *
+ * A chain's strength is its *weakest* edge (bottleneck): a chain is only as
+ * trustworthy as its weakest correlation link. The best chain is the shortest
+ * one, breaking ties by highest weakest-edge strength.
+ */
+export interface CorrelationChain {
+	/** The number of edges in the chain. */
+	length: number
+	/** The weakest (least trustworthy) edge in the chain. */
+	weakestEdge: CorrelationEdge
+}
+
+/**
  * Rough ordering score for comparing UserInfo.
  * Higher score means the data is more sensitive.
  */
-function userInfoScore(userInfo: UserInfo): number {
+export function userInfoScore(userInfo: UserInfo): number {
 	switch (userInfo) {
 		case PersonalInfo.IP_ADDRESS:
 			return 0

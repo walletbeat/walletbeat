@@ -1,11 +1,19 @@
 import {
+	type CorrelationChain,
+	type CorrelationEdge,
+	IP_TIME_CORRELATION_WINDOW_MS,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
+	SIMULTANEOUS_WINDOW_MS,
 	type UserInfo,
 	userInfoCorrelatableAcrossEntities,
+	userInfoScore,
 } from '@/schema/features/privacy/data-collection'
 import type { Erc55Address } from '@/types/utils/ethereum-address'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
+
+export type { CorrelationChain, CorrelationEdge } from '@/schema/features/privacy/data-collection'
+export { IP_TIME_CORRELATION_WINDOW_MS, SIMULTANEOUS_WINDOW_MS }
 
 /**
  * A single request, reduced to the fields that matter for classifying how a
@@ -35,6 +43,21 @@ export interface AddressBearingRequest {
 	correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>
 
 	/**
+	 * The proxy circuit this request was routed through, or `null` if it was
+	 * not proxied. Two requests routed through the same circuit appear to the
+	 * receiving entity as coming from the same IP address, so a matching proxy
+	 * (including two `null`s) is what allows IP-time correlation.
+	 */
+	proxy: string | null
+
+	/**
+	 * Details about the secure enclave the request's endpoint runs in, or
+	 * `null` if the endpoint is not an IP-hiding secure enclave (in which case
+	 * the entity learns the user's IP address).
+	 */
+	secureEnclaveDetails: null // Secure enclaves not representable yet.
+
+	/**
 	 * The session-relative time of the request, in milliseconds since the
 	 * start of its capture session. Used to classify whether requests for
 	 * different addresses are simultaneous or staggered.
@@ -45,12 +68,19 @@ export interface AddressBearingRequest {
 /**
  * A request that carries correlatable `UserInfo` values but no wallet address.
  * Such requests still matter for correlation, because a chain of requests
- * linked by shared correlatable `UserInfo` values can transitively correlate
- * two addresses even when no single request carries both.
+ * linked by shared correlatable `UserInfo` values or IP-time links can
+ * transitively correlate two addresses even when no single request carries
+ * both.
  */
 export interface CorrelatableOnlyRequest {
 	/** The correlatable `UserInfo` string values carried by this request. */
 	correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>
+
+	/** The proxy circuit this request was routed through, or `null`. */
+	proxy: string | null
+
+	/** Secure-enclave details, or `null` if the endpoint is not an IP-hiding enclave. */
+	secureEnclaveDetails: null // Secure enclaves not representable yet.
 
 	/**
 	 * The session-relative time of the request, in milliseconds since the
@@ -73,10 +103,19 @@ export interface EntityRequests {
 	correlatableOnlyRequests: CorrelatableOnlyRequest[]
 }
 
-/**
- * Two requests sent within this many milliseconds are considered simultaneous.
- */
-export const SIMULTANEOUS_WINDOW_MS = 300_000
+// UserInfo edge strengths are offset well above any IP-time edge strength so
+// that a shared-UserInfo link is always stronger than an IP-time link.
+const USERINFO_STRENGTH_OFFSET = 10_000_000
+
+/** The strength of a shared-`UserInfo` correlation link. */
+function userInfoEdgeStrength(userInfo: UserInfo): number {
+	return USERINFO_STRENGTH_OFFSET + userInfoScore(userInfo)
+}
+
+/** The strength of an IP-time correlation link: a shorter gap is stronger. */
+function ipTimeEdgeStrength(gapMs: number): number {
+	return IP_TIME_CORRELATION_WINDOW_MS - gapMs
+}
 
 /**
  * Classify how a wallet handles fetching data for multiple wallet addresses,
@@ -93,10 +132,9 @@ export const SIMULTANEOUS_WINDOW_MS = 300_000
  * - Otherwise the wallet only ever makes requests about a single address
  *   (`ACTIVE_ADDRESS_ONLY`).
  *
- * For `SEPARATE_REQUEST_PER_ADDRESS`, the classification also determines
- * whether the wallet's addresses are correlatable through a chain of shared
- * correlatable `UserInfo` values (see
- * {@link addressesCorrelatableByCorrelatableUserInfo}).
+ * For `SEPARATE_REQUEST_PER_ADDRESS`, the classification also finds the best
+ * request-correlation chain between any two requests bearing distinct
+ * addresses (see {@link findBestCorrelationChain}).
  *
  * @param totalWalletAddressCount The number of distinct wallet addresses the
  *   wallet manages across the entire capture. This distinguishes
@@ -144,151 +182,280 @@ export function classifyEntityMultiAddressHandling(
 		destination,
 		proxy: 'NONE',
 		timing: classifyTiming(requests),
-		correlatableUserInfoCorrelation: addressesCorrelatableByCorrelatableUserInfo(
-			requests,
-			correlatableOnlyRequests,
-		)
-			? 'CORRELATABLE'
-			: 'NOT_CORRELATABLE',
+		bestChain: findBestCorrelationChain(requests, correlatableOnlyRequests),
 	}
 }
 
 /**
- * Determine whether two or more distinct wallet addresses are correlatable
- * through a chain of requests that share correlatable `UserInfo` values.
+ * A node in the request-correlation graph: one captured request.
+ */
+interface CorrelationNode {
+	/** The wallet addresses this request carries (empty for correlatable-only requests). */
+	addresses: Erc55Address[]
+	correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>
+	proxy: string | null
+	secureEnclaveDetails: null
+	sessionMilliseconds: number
+}
+
+/**
+ * Find the best request-correlation chain between any two requests bearing
+ * distinct wallet addresses, or `null` if no chain links any two distinct
+ * addresses.
  *
- * Two addresses are correlated when requests about each of them carry the
- * same correlatable `UserInfo` value, either directly (a request about
- * address A1 and a request about address A2 both carry identifier X) or
- * transitively (a sequence of requests R1..Rn links A1 to A2, where each
- * consecutive pair of requests shares a correlatable `UserInfo` value, and
- * only the endpoints carry the addresses). This is computed with a union-find
- * over a graph whose nodes are wallet addresses and correlatable `UserInfo`
- * values; each request connects all of its addresses and all of its
- * correlatable `UserInfo` values.
+ * The graph's nodes are requests. Two requests are linked by:
+ * - a UserInfo edge, when they carry an identical correlatable `UserInfo`
+ *   value (strength by {@link userInfoScore});
+ * - an IP-time edge, when both endpoints are not IP-hiding secure enclaves,
+ *   both requests share the same proxy circuit, and they were sent within
+ *   {@link IP_TIME_CORRELATION_WINDOW_MS} of each other (strength by inverse
+ *   time gap).
  *
- * @param requests The requests, each carrying one or more wallet addresses.
+ * A chain's strength is its weakest edge (bottleneck). The best chain between
+ * two requests is the shortest one, breaking ties by highest weakest-edge
+ * strength. This is a lexicographic shortest-path (Dijkstra) over the graph:
+ * extending a chain always adds an edge (never improves it), so the cost
+ * tuple `(hops, -weakestEdgeStrength)` is monotonic and Dijkstra applies.
+ *
+ * @param requests The address-bearing requests.
  * @param correlatableOnlyRequests The requests carrying correlatable
  *   `UserInfo` values but no wallet address.
  */
-function addressesCorrelatableByCorrelatableUserInfo(
+function findBestCorrelationChain(
 	requests: AddressBearingRequest[],
 	correlatableOnlyRequests: CorrelatableOnlyRequest[],
-): boolean {
-	// Union-find over node keys. Addresses and correlatable UserInfo values are
-	// prefixed (by kind and, for UserInfo values, by type) so that values that
-	// happen to collide never share a node.
-	const parent = new Map<string, string>()
-
-	const find = (node: string): string => {
-		let root = node
-
-		// Every node is registered in `parent` via `add` before it is ever
-		// queried, so a missing entry means the node is its own root.
-		while (true) {
-			const p = parent.get(root)
-
-			if (p === undefined || p === root) {
-				break
-			}
-
-			root = p
-		}
-
-		// Path compression.
-		let current = node
-
-		while (current !== root) {
-			const next = parent.get(current)
-
-			if (next === undefined) {
-				break
-			}
-
-			parent.set(current, root)
-			current = next
-		}
-
-		return root
-	}
-
-	const add = (node: string): void => {
-		if (!parent.has(node)) {
-			parent.set(node, node)
-		}
-	}
-
-	const union = (a: string, b: string): void => {
-		const rootA = find(a)
-		const rootB = find(b)
-
-		if (rootA !== rootB) {
-			parent.set(rootB, rootA)
-		}
-	}
-
-	const connect = (nodes: string[]): void => {
-		for (const node of nodes) {
-			add(node)
-		}
-
-		for (let i = 1; i < nodes.length; i++) {
-			union(nodes[0], nodes[i])
-		}
-	}
-
-	// The nodes a request connects: its wallet addresses plus every
-	// correlatable `UserInfo` value it carries, each keyed by `UserInfo` type.
-	const nodesForCorrelatableUserInfo = (
-		correlatableUserInfo: ReadonlyMap<UserInfo, ReadonlySet<string>>,
-	): string[] => {
-		const nodes: string[] = []
-
-		for (const [userInfo, values] of correlatableUserInfo) {
-			for (const value of values) {
-				nodes.push(`userinfo:${userInfo}:${value}`)
-			}
-		}
-
-		return nodes
-	}
+): CorrelationChain | null {
+	const nodes: CorrelationNode[] = []
 
 	for (const req of requests) {
-		connect([
-			...req.addresses.map(addr => `address:${addr}`),
-			...nodesForCorrelatableUserInfo(req.correlatableUserInfo),
-		])
+		nodes.push({
+			addresses: [...req.addresses],
+			correlatableUserInfo: req.correlatableUserInfo,
+			proxy: req.proxy,
+			secureEnclaveDetails: req.secureEnclaveDetails,
+			sessionMilliseconds: req.sessionMilliseconds,
+		})
 	}
 
 	for (const req of correlatableOnlyRequests) {
-		connect(nodesForCorrelatableUserInfo(req.correlatableUserInfo))
+		nodes.push({
+			addresses: [],
+			correlatableUserInfo: req.correlatableUserInfo,
+			proxy: req.proxy,
+			secureEnclaveDetails: req.secureEnclaveDetails,
+			sessionMilliseconds: req.sessionMilliseconds,
+		})
 	}
 
-	// Group the wallet addresses seen by this entity by their union-find root.
-	// If any group contains two or more distinct addresses, those addresses are
-	// correlatable through a chain of shared correlatable `UserInfo` values.
-	const addressesByRoot = new Map<string, Set<string>>()
+	// Build edges, keeping only the strongest edge between any pair.
+	const pairEdges = new Map<string, CorrelationEdge>()
+	const keyFor = (a: number, b: number): string => `${Math.min(a, b)}:${Math.max(a, b)}`
+	const upsertEdge = (a: number, b: number, edge: CorrelationEdge): void => {
+		const key = keyFor(a, b)
+		const existing = pairEdges.get(key)
 
-	for (const req of requests) {
-		for (const addr of req.addresses) {
-			const root = find(`address:${addr}`)
-			const group = addressesByRoot.get(root)
+		if (existing === undefined || edge.strength > existing.strength) {
+			pairEdges.set(key, edge)
+		}
+	}
 
-			if (group === undefined) {
-				addressesByRoot.set(root, new Set([addr]))
-			} else {
-				group.add(addr)
+	// UserInfo edges: group requests by correlatable `UserInfo` value.
+	const valuesByUserInfo = new Map<UserInfo, Map<string, number[]>>()
+
+	for (let i = 0; i < nodes.length; i++) {
+		for (const [userInfo, values] of nodes[i].correlatableUserInfo) {
+			let byValue = valuesByUserInfo.get(userInfo)
+
+			if (byValue === undefined) {
+				byValue = new Map()
+				valuesByUserInfo.set(userInfo, byValue)
+			}
+
+			for (const value of values) {
+				const indices = byValue.get(value)
+
+				if (indices === undefined) {
+					byValue.set(value, [i])
+				} else {
+					indices.push(i)
+				}
 			}
 		}
 	}
 
-	for (const group of addressesByRoot.values()) {
-		if (group.size >= 2) {
-			return true
+	for (const [userInfo, byValue] of valuesByUserInfo) {
+		for (const indices of byValue.values()) {
+			if (indices.length < 2) {
+				continue
+			}
+
+			const edge: CorrelationEdge = {
+				kind: 'userInfo',
+				userInfo,
+				strength: userInfoEdgeStrength(userInfo),
+			}
+
+			for (let i = 0; i < indices.length; i++) {
+				for (let j = i + 1; j < indices.length; j++) {
+					upsertEdge(indices[i], indices[j], edge)
+				}
+			}
 		}
 	}
 
-	return false
+	// IP-time edges: same proxy, non-enclave endpoints, within the window.
+	for (let i = 0; i < nodes.length; i++) {
+		for (let j = i + 1; j < nodes.length; j++) {
+			const a = nodes[i]
+			const b = nodes[j]
+
+			if (a.secureEnclaveDetails !== null || b.secureEnclaveDetails !== null) {
+				continue
+			}
+
+			if (a.proxy !== b.proxy) {
+				continue
+			}
+
+			const gapMs = Math.abs(a.sessionMilliseconds - b.sessionMilliseconds)
+
+			if (gapMs >= IP_TIME_CORRELATION_WINDOW_MS) {
+				continue
+			}
+
+			upsertEdge(i, j, {
+				kind: 'ipTime',
+				gapMs,
+				strength: ipTimeEdgeStrength(gapMs),
+			})
+		}
+	}
+
+	const adjacency = new Map<number, Array<{ to: number; edge: CorrelationEdge }>>()
+
+	for (const [key, edge] of pairEdges) {
+		const [a, b] = key.split(':').map(Number)
+
+		let list = adjacency.get(a)
+
+		if (list === undefined) {
+			list = []
+			adjacency.set(a, list)
+		}
+
+		list.push({ to: b, edge })
+
+		let listB = adjacency.get(b)
+
+		if (listB === undefined) {
+			listB = []
+			adjacency.set(b, listB)
+		}
+
+		listB.push({ to: a, edge })
+	}
+
+	let best: CorrelationChain | null = null
+
+	for (let src = 0; src < nodes.length; src++) {
+		if (nodes[src].addresses.length === 0) {
+			continue
+		}
+
+		// cost = (hops, weakestStrength); a lower cost (fewer hops, then
+		// higher weakest strength) is better. weakestEdge is the bottleneck.
+		const cost = new Map<
+			number,
+			{ hops: number; weakest: number; weakestEdge: CorrelationEdge | null }
+		>()
+		const settled = new Set<number>()
+
+		cost.set(src, { hops: 0, weakest: Infinity, weakestEdge: null })
+		const isBetter = (
+			a: { hops: number; weakest: number },
+			b: { hops: number; weakest: number },
+		): boolean => a.hops < b.hops || (a.hops === b.hops && a.weakest > b.weakest)
+
+		while (true) {
+			let bestIdx = -1
+			let bestCost: { hops: number; weakest: number } | null = null
+
+			for (const [idx, c] of cost) {
+				if (settled.has(idx)) {
+					continue
+				}
+
+				if (bestCost === null || isBetter(c, bestCost)) {
+					bestCost = c
+					bestIdx = idx
+				}
+			}
+
+			if (bestIdx === -1) {
+				break
+			}
+
+			settled.add(bestIdx)
+
+			for (const { to, edge } of adjacency.get(bestIdx) ?? []) {
+				const c = cost.get(bestIdx)!
+				const newHops = c.hops + 1
+				const newWeakest = Math.min(c.weakest, edge.strength)
+				const newWeakestEdge = edge.strength < c.weakest ? edge : c.weakestEdge
+				const existing = cost.get(to)
+
+				if (
+					existing === undefined ||
+					newHops < existing.hops ||
+					(newHops === existing.hops && newWeakest > existing.weakest)
+				) {
+					cost.set(to, { hops: newHops, weakest: newWeakest, weakestEdge: newWeakestEdge })
+				}
+			}
+		}
+
+		// Collect chains to every other address-bearing request with a distinct
+		// address.
+		for (let tgt = 0; tgt < nodes.length; tgt++) {
+			if (tgt === src) {
+				continue
+			}
+
+			const target = nodes[tgt]
+
+			if (target.addresses.length === 0) {
+				continue
+			}
+
+			// Each address-bearing request carries exactly one address in the
+			// SEPARATE_REQUEST_PER_ADDRESS case, so distinct addresses means
+			// the single addresses differ.
+			if (target.addresses[0] === nodes[src].addresses[0]) {
+				continue
+			}
+
+			const c = cost.get(tgt)
+
+			if (c === undefined || c.hops === 0 || c.weakestEdge === null) {
+				continue
+			}
+
+			const chain: CorrelationChain = {
+				length: c.hops,
+				weakestEdge: c.weakestEdge,
+			}
+
+			if (
+				best === null ||
+				chain.length < best.length ||
+				(chain.length === best.length && chain.weakestEdge.strength > best.weakestEdge.strength)
+			) {
+				best = chain
+			}
+		}
+	}
+
+	return best
 }
 
 /**
