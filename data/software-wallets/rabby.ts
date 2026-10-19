@@ -86,16 +86,16 @@ import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browse
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
+import { alphabet } from '../entities/alphabet'
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
+import { hyperFoundation } from '../entities/hyper-foundation'
 import { leastAuthority } from '../entities/least-authority'
+import { sentry } from '../entities/sentry'
 import { slowMist } from '../entities/slowmist'
 import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
 import rabbyAndroidParsed from './manifests/rabby/android.parsed.json'
 import rabbyIosParsed from './manifests/rabby/ios.parsed.json'
-import { alphabet } from '../entities/alphabet'
-import { hyperFoundation } from '../entities/hyper-foundation'
-import { sentry } from '../entities/sentry'
 const dataLeakReferences: Record<string, References> = {
 	alphabet: [
 		{
@@ -133,7 +133,7 @@ const dataLeakReferences: Record<string, References> = {
 		},
 		{
 			explanation:
-				'When swapping, the Rabby API builds the complete unsigned transaction (sender, router, calldata, nonce, gas, and value) before the user signs it, routed through a DEX aggregator with a 0.25% fee. The Gas Account endpoint is queried for multiple addresses at the same time.',
+				'When swapping, the Rabby API builds the complete unsigned transaction (sender, router, calldata, nonce, gas, and value) before the user signs it, routed through a decentralized exchange aggregator with a 0.25% fee. The Gas Account endpoint is queried for multiple addresses at the same time.',
 			url: ['https://api.rabby.io/v1/wallet/swap_trade', 'https://api.rabby.io/v2/gas_account'],
 		},
 	],
@@ -568,7 +568,7 @@ export const rabby: SoftwareWallet = {
 			},
 			dataCollection: {
 				[UserFlow.INSTALL]: {
-					collected: []
+					collected: [],
 				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [
@@ -941,7 +941,7 @@ export const rabby: SoftwareWallet = {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
-									timing: 'SIMULTANEOUS'
+									timing: 'SIMULTANEOUS',
 								},
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
