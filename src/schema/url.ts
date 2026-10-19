@@ -1,4 +1,11 @@
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import {
+	assertNonEmptyArray,
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyMap,
+} from '@/types/utils/non-empty'
+
+import type { LineRange } from './code-snippets'
 
 /** A URL and a label. */
 export interface LabeledUrl {
@@ -47,11 +54,36 @@ const wellKnownDomainsToLabels: Record<string, string> = {
 /** A full 40-character git commit hash. */
 export const fullCommitHashRegExp = /^[0-9a-f]{40}$/
 
+/** One GitHub line range: `L123`, `L123-L456`, or the column-qualified form `L123C4-L456C7`. */
+const lineRangeRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
+
+/** A GitHub line-anchor URL fragment: one or more comma-separated line ranges, e.g. `L53,L340-L353`. */
+export const lineFragmentRegExp =
+	/^L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?(?:,L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?)*$/
+
 /**
- * A GitHub line-anchor URL fragment: `L123`, `L123-L456`,
- * or the column-qualified form `L123C4-L456C7`.
+ * Parse a GitHub line-anchor URL fragment into its line ranges, in fragment
+ * order, or null if it isn't one. Column qualifiers are dropped. The ranges
+ * are not validated against each other (ordering, overlap) nor for sanity
+ * (e.g. `L0`, `L9-L3`).
  */
-export const lineFragmentRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
+export function parseLineFragment(fragment: string): NonEmptyArray<LineRange> | null {
+	if (!lineFragmentRegExp.test(fragment)) {
+		return null
+	}
+
+	return nonEmptyMap(assertNonEmptyArray(fragment.split(',')), part => {
+		const groups = lineRangeRegExp.exec(part)?.groups
+
+		if (groups === undefined) {
+			throw new Error(`Line range "${part}" does not match its own fragment pattern.`)
+		}
+
+		const first = parseInt(groups.first, 10)
+
+		return { first, last: groups.last === undefined ? first : parseInt(groups.last, 10) }
+	})
+}
 
 /**
  * Synthetic GitHub URL fragments used by Walletbeat's internal integrity
@@ -66,21 +98,17 @@ export function stripSyntheticAnchor(url: string): string {
 	return url.replace(syntheticAnchorRegExp, '')
 }
 
-/** Format a GitHub line-anchor fragment as `L123` / `L123-456`, or null if not one. */
+/** Format a GitHub line-anchor fragment as `L123` / `L123-456` / `L53, L340-353`, or null if not one. */
 function gitHubLineRange(fragment: string): string | null {
-	const match = lineFragmentRegExp.exec(fragment)
+	const ranges = parseLineFragment(fragment)
 
-	if (match?.groups === undefined) {
+	if (ranges === null) {
 		return null
 	}
 
-	const { first, last } = match.groups
-
-	if (last === undefined || last === first) {
-		return `L${first}`
-	}
-
-	return `L${first}-${last}`
+	return ranges
+		.map(({ first, last }) => (first === last ? `L${first}` : `L${first}-${last}`))
+		.join(', ')
 }
 
 /**

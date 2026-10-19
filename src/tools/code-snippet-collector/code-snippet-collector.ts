@@ -51,11 +51,7 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 		try {
 			const parsed = parseStoredSnippetContent(contents)
 
-			if (
-				lineRangesEqual(parsed.highlightRanges, [
-					{ first: source.firstLine, last: source.lastLine },
-				])
-			) {
+			if (lineRangesEqual(parsed.highlightRanges, source.ranges)) {
 				return
 			}
 		} catch (error) {
@@ -76,10 +72,11 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 /**
  * CLI for fetching and pruning the local copies of code snippets that wallet
  * data files reference via commit-pinned, line-anchored GitHub blob URLs
- * (https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>-L<last>).
+ * (https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>-L<last>,
+ * optionally followed by more comma-separated ranges).
  *
  * Data is saved to flat files named after the source location:
- *   public/references/wallets/<wallet-id>/code/<org>--<repo>--<commit>--<path with '/' as '--'>.L<first>[-L<last>].<ext>.snippet
+ *   public/references/wallets/<wallet-id>/code/<org>--<repo>--<commit>--<path with '/' as '--'>.<line ranges>.<ext>.snippet
  */
 const cli = cac('collect-snippets')
 
@@ -177,7 +174,7 @@ cli
 			if (!isSnippetSource(parsed)) {
 				process.stderr.write(`Error: ${describeNotASnippetUrl(parsed)}: ${blobUrl}\n`)
 				process.stderr.write(
-					'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>]\n',
+					'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>][,L<first>[-L<last>]...]\n',
 				)
 				process.exit(1)
 			}

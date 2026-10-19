@@ -87,7 +87,8 @@ function escapeHtml(text) {
  * The line range and optional source extension at the end of a snippet file
  * name, as produced by `snippetFileName` in src/schema/code-snippets.ts.
  */
-const snippetFileNameSuffix = /\.L\d+(?:-L\d+)?(?:\.(?<extension>[^.]+))?\.snippet$/
+const snippetFileNameSuffix =
+	/\.L\d+(?:-L\d+)?(?:,L\d+(?:-L\d+)?)*(?:\.(?<extension>[^.]+))?\.snippet$/
 
 /**
  * The Shiki language for a snippet file path. Source files without an
