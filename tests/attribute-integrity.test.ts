@@ -55,6 +55,15 @@ describe('attribute', () => {
 					it('has well-formed lowerCamelCase ID', () => {
 						expect(attribute.id).toMatch(/^[a-z]+([A-Z][a-z]*)*/)
 					})
+					it('uses sentence case for its display name', () => {
+						const [firstWord, ...otherWords] = attribute.displayName.split(' ')
+
+						expect(firstWord).toMatch(/^[A-Z0-9]/)
+						expect(
+							otherWords.filter(word => /^[A-Z][a-z]/.test(word)),
+							'words after the first must be lowercase unless they are acronyms',
+						).toEqual([])
+					})
 					it('appears once in the group attribute list', () => {
 						expect(
 							attributeGroup.attributes.filter(row => row.attribute.id === attribute.id).length,

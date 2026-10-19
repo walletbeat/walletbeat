@@ -16,7 +16,7 @@ export type SupplyChainDIYMetadata = {
 export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	id: 'supplyChainDIY',
 	icon: 'security_best_practices',
-	displayName: 'Supply Chain DIY',
+	displayName: 'Supply chain DIY',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a DIY wallet's supply chain evaluated?",
@@ -106,7 +106,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 			outcome: {
 				id: 'supply_chain_diy',
 				rating,
-				displayName: 'Supply Chain DIY',
+				displayName: 'Supply chain DIY',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} DIY supply chain.`),
 				metadata: {
 					diyNoNda: diyFeature.diyNoNda,
