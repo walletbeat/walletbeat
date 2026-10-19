@@ -84,8 +84,10 @@ function escapeHtml(text) {
 }
 
 /**
- * The line range and optional source extension at the end of a snippet file
- * name, as produced by `snippetFileName` in src/schema/code-snippets.ts.
+ * The line ranges and optional source extension at the end of a snippet file
+ * name, as produced by `snippetFileName` in src/schema/code-snippets.ts. The
+ * line ranges are the canonical (column-free) form of `lineFragmentRegExp` in
+ * src/schema/url.ts.
  */
 const snippetFileNameSuffix =
 	/\.L\d+(?:-L\d+)?(?:,L\d+(?:-L\d+)?)*(?:\.(?<extension>[^.]+))?\.snippet$/

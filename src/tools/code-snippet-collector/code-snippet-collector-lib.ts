@@ -4,13 +4,12 @@ import * as path from 'node:path'
 import { allWallets } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
-	formatLineRanges,
-	type LineRange,
 	lineRangesEqual,
 	rawGitHubContentUrl,
 	type StoredSnippetContent,
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
+import { formatLineRanges, type LineRange } from '@/schema/url'
 import { getErrorMessage } from '@/types/errors'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 import { commonWhitespacePrefix } from '@/types/utils/text'

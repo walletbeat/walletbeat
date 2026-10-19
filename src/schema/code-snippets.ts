@@ -1,6 +1,12 @@
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-import { fullCommitHashRegExp, parseLineFragment } from './url'
+import {
+	formatLineRanges,
+	fullCommitHashRegExp,
+	type LineRange,
+	lineRangesProblem,
+	parseLineFragment,
+} from './url'
 
 /**
  * The source location of a locally stored code snippet: a file in a GitHub
@@ -20,17 +26,8 @@ export interface CodeSnippetSource {
 	commit: string
 	/** Repository-relative file path, using forward slashes, percent-decoded. */
 	path: string
-	/**
-	 * Referenced line ranges, sorted, each valid, and neither overlapping nor
-	 * adjacent (so every list of lines has exactly one representation).
-	 */
+	/** Referenced line ranges, valid per `lineRangesProblem`. */
 	ranges: NonEmptyArray<LineRange>
-}
-
-/** An inclusive 1-based range of source lines. */
-export interface LineRange {
-	first: number
-	last: number
 }
 
 /** Whether two lists of line ranges are identical. */
@@ -88,13 +85,6 @@ export function isSnippetRow(row: unknown): row is SnippetRow {
 		'highlighted' in row &&
 		typeof row.highlighted === 'boolean'
 	)
-}
-
-/** Format line ranges as a GitHub line-anchor fragment, e.g. `L53,L340-L353`. */
-export function formatLineRanges(ranges: LineRange[]): string {
-	return ranges
-		.map(({ first, last }) => (first === last ? `L${first}` : `L${first}-L${last}`))
-		.join(',')
 }
 
 export type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
@@ -159,22 +149,11 @@ export function parseGitHubBlobUrl(url: string): CodeSnippetSource | NotASnippet
 		return 'NO_LINE_ANCHOR'
 	}
 
-	ranges.forEach((range, i) => {
-		if (range.first < 1 || range.last < range.first) {
-			throw new Error(
-				`GitHub blob URL has an invalid line range (L${range.first}-L${range.last}): ${url}`,
-			)
-		}
+	const problem = lineRangesProblem(ranges)
 
-		const previous = i === 0 ? undefined : ranges[i - 1]
-
-		if (previous !== undefined && range.first <= previous.last + 1) {
-			throw new Error(
-				'GitHub blob URL has line ranges that are out of order, overlapping, or adjacent ' +
-					`(${formatLineRanges([previous, range])}); sort and merge them: ${url}`,
-			)
-		}
-	})
+	if (problem !== null) {
+		throw new Error(`GitHub blob URL has ${problem}: ${url}`)
+	}
 
 	return {
 		commit: ref,
