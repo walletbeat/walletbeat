@@ -578,8 +578,8 @@ export const rabby: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
 								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -635,8 +635,8 @@ export const rabby: SoftwareWallet = {
 							ref: dataLeakReferences.hyperFoundation,
 							byEntity: hyperFoundation,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
@@ -784,8 +784,8 @@ export const rabby: SoftwareWallet = {
 							ref: dataLeakReferences.hyperFoundation,
 							byEntity: hyperFoundation,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
@@ -807,8 +807,8 @@ export const rabby: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -872,8 +872,8 @@ export const rabby: SoftwareWallet = {
 							ref: dataLeakReferences.hyperFoundation,
 							byEntity: hyperFoundation,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
@@ -895,8 +895,8 @@ export const rabby: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -963,8 +963,8 @@ export const rabby: SoftwareWallet = {
 							ref: dataLeakReferences.hyperFoundation,
 							byEntity: hyperFoundation,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
@@ -977,6 +977,178 @@ export const rabby: SoftwareWallet = {
 							role: EntityRole.OPERATOR,
 						},
 					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
 			},
 			privacyPolicy: 'https://rabby.io/docs/privacy',
