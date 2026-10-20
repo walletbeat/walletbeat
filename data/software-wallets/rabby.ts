@@ -650,6 +650,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 2, kind: 'ipTime', strength: 1799998 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -738,6 +742,14 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -799,6 +811,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -887,6 +903,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 3, kind: 'ipTime', strength: 1799997 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -949,6 +969,7 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: null,
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -978,6 +999,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -1001,6 +1026,14 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -1066,6 +1099,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 3, kind: 'ipTime', strength: 1799997 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -1090,6 +1127,14 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
@@ -1149,6 +1194,10 @@ export const rabby: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
