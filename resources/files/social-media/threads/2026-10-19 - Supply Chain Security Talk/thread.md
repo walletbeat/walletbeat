@@ -8,9 +8,9 @@ Catch this lightning talk on the Open and Verifiable Stack 👇
 
 ---
 
-Wallets are one of the highest-stakes pieces of software in crypto. Yet your wallet probably depends on a few dozen random NPM packages, recursively depending on thousands of others. 
-
 In the face of NPM package compromises, such as the Axios hack earlier this year, how should wallets protect against software supply chain attacks and make their build processes more robust?
+
+https://socket.dev/blog/axios-npm-package-compromised
 
 ---
 
@@ -22,4 +22,4 @@ Walletbeat is a rating system for Ethereum wallets. A place where users know wha
 
 See you in Mumbai 🇮🇳
 
-
+https://x.com/walletbeat/status/2112203994399469805
