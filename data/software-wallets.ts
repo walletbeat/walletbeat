@@ -26,6 +26,7 @@ import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
 import { uniswapWallet } from './software-wallets/uniswap-wallet'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
+import { walletchan } from './software-wallets/walletchan'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
 
@@ -85,6 +86,7 @@ export const softwareWallets = {
 	rainbow,
 	safe,
 	uniswapWallet,
+	walletchan,
 	zerion,
 	zeus,
 } as const satisfies Record<string, SoftwareWallet>
