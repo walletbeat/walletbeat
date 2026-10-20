@@ -10,7 +10,9 @@ What happened?
 
 On October 9, Ledger announced that it was investigating reports of users in Southeast Asia losing funds after purchasing hardware wallets from CryptoBilis, an authorized Ledger reseller for Malaysia, Indonesia, and Philippines. Findings suggested that an unauthorized hardware implant could capture recovery phrases displayed on the device's screen and potentially transmit them through cellular connectivity. Even if a hardware wallet has strong cryptography, a secure element, and legitimate firmware, it can still be vulnerable if an attacker can physically modify the device to observe sensitive information.
 
-What makes this incident especially concerning is that the affected devices were distributed through an authorized reseller. Users followed a commonly recommended security practice: purchasing from recognized sellers rather than unknown third parties. Yet this was still not sufficient to protect them.
+What makes this incident especially concerning is that the affected devices were distributed through an authorized reseller. Users followed a commonly recommended security practice: purchasing from recognized sellers rather than unknown third parties. It did not protect them.
+
+Similar implants were then reported in sealed Ledger devices sold at retail in Europe, and MediaMarkt pulled Ledger devices from its stores and website. Buying from a major retailer and checking the seal did not help either.
 
 This raises important questions about supply-chain security, physical tamper resistance, and the extent to which users can independently verify the integrity of their devices.
 
@@ -26,7 +28,7 @@ Why we remain optimistic
 
 Despite what happened, we remain optimistic about the future of wallet security.
 
-While there may have been better ways to protect users affected by this incident, we should also recognize that security is not a solved problem. There will always be new attack vectors, new vulnerabilities, and new challenges as wallets and technology continue to evolve.
+There were better ways to protect the users affected by this incident. We should also recognize that security is not a solved problem. There will always be new attack vectors, new vulnerabilities, and new challenges as wallets and technology continue to evolve.
 The work of independent security researchers, affected users sharing their experiences, and the broader community investigating these incidents is incredibly important. It allows previously overlooked threats to become better understood and gives the ecosystem an opportunity to develop better protections. What matters is how the ecosystem responds to these incidents. Rather than treating incidents like these as reasons to lose confidence in self-custody, we believe they should motivate the ecosystem to improve the tools and protections that make self-custody possible.
 
 Moving forward
@@ -36,5 +38,11 @@ In @VitalikButerin's September 2025 article, The Importance of Full-Stack Openne
 
 We should strive toward a future where users don't have to rely solely on trusting manufacturers, authorized resellers, or third-party certifications to know whether their devices are secure. Instead, we should work toward minimizing trust assumptions through greater openness and verifiability, allowing users to independently verify the security properties of their devices.
 
+In practice, this means end-user-verifiable hardware, which requires open specs: schematics, board layouts, and a bill of materials that anyone can compare against the device in their hands. The alternative is a wallet built from off-the-shelf parts with a self-assembly manual, so no reseller ever handles it. Firefly (https://firefly.city/) takes this approach.
+
+Either path would fulfill a future "Hardware integrity assurance" attribute that we plan to add to Walletbeat for hardware wallets.
+
 The goal should not simply be to convince users that their wallets are secure, but to make it increasingly possible for them to independently verify that they are.
 While there is still a long way to go, we believe this is a future worth working toward.
+
+We are tracking this incident in Wallet Security News: https://beta.walletbeat.eth.limo/news/
