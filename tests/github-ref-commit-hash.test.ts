@@ -2,21 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
 import { collectAllRawRefs, type RawCollectedRef } from '@/schema/reference'
+import { lineFragmentRegExp } from '@/schema/url'
 
 const GITHUB_BLOB_URL_RE =
 	/https:\/\/github\.com\/[^/"'\s]+\/[^/"'\s]+\/blob\/([^/"'\s]+)\/[^"'\s]*/
 
 const COMMIT_HASH_RE = /^[0-9a-f]{40}$/
-
-/**
- * A GitHub line-anchor URL fragment. Matches a single line (`L123`), a line
- * range (`L123-L456`), the column-qualified form (`L123C4-L456C7`), and
- * comma-separated multiple ranges (`L53,L340-L353`), all of which GitHub
- * supports as valid line anchors.
- * TODO: After issue #1646 is solved, this should reuse the same regex as the
- * code snippet tooling does.
- */
-const LINE_ANCHOR_RE = /^L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?(?:,L\d+(?:C\d+)?(?:-L\d+(?:C\d+)?)?)*$/
 
 /** Synthetic anchor marking a commit-pinned blob URL as pointing to a binary file. */
 const BINARY_FILE_ANCHOR = 'binary-file'
@@ -104,7 +95,7 @@ for (const raw of collectAllRawRefs(allWallets)) {
 			COMMIT_HASH_RE.test(ref) &&
 			fragment !== BINARY_FILE_ANCHOR &&
 			fragment !== NOT_LINE_SPECIFIC_ANCHOR &&
-			!LINE_ANCHOR_RE.test(fragment)
+			!lineFragmentRegExp.test(fragment)
 		) {
 			pushByWallet(anchorOffenses, raw.walletName, { url, ref, fieldPath: raw.fieldPath })
 		}
@@ -180,7 +171,7 @@ describe('GitHub ref URLs in wallet data must carry a line anchor or a synthetic
 							`  Ref       : ${ref}`,
 							'',
 							'Every commit-pinned GitHub blob URL must carry exactly one of these suffixes:',
-							'  - a #L<first>[-L<last>] line range anchor (preferred),',
+							'  - a #L<first>[-L<last>][,...] line range anchor (preferred),',
 							`  - the ${BINARY_FILE_ANCHOR} anchor when the file is binary, or`,
 							`  - the ${NOT_LINE_SPECIFIC_ANCHOR} anchor when the file is text but no line`,
 							'    range is appropriate.',

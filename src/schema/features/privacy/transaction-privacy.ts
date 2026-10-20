@@ -205,7 +205,7 @@ export type StealthAddressSupport = WithRef<{
 	>
 
 	/** When sending transactions, how are fees displayed? */
-	fees: FeeDisplay
+	fees: FeeDisplay | 'NO_FEES_CHARGED' | null
 }>
 
 /**
@@ -248,7 +248,7 @@ export type TornadoCashNovaSupport = WithRef<
 		/**
 		 * Is the fee taken by the relayer displayed in the UI?
 		 */
-		relayerFee: FeeDisplay
+		relayerFee: FeeDisplay | 'NO_FEES_CHARGED'
 	} & (
 		| {
 				/**
@@ -431,7 +431,7 @@ type BroadcasterBasedTransactionSubmissionData = {
 	/**
 	 * Is the fee taken by broadcasters displayed in the UI?
 	 */
-	broadcasterFee: FeeDisplay
+	broadcasterFee: FeeDisplay | 'NO_FEES_CHARGED'
 }
 
 type RailgunTransactionSubmissionMethods =
