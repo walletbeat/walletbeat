@@ -978,7 +978,18 @@ type MultiAddressHandling =
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
 
-			// TODO: Presence of reused tracking identifiers across requests.
+			/**
+			 * The best request-correlation chain the classifier could find between
+			 * two requests bearing distinct wallet addresses, or `null` if no
+			 * chain links any two distinct addresses.
+			 *
+			 * The chain may be built from shared correlatable `UserInfo` values
+			 * and/or IP-time-based links (same entity, within
+			 * {@link IP_TIME_CORRELATION_WINDOW_MS}, from the same IP). The
+			 * receiving entity can use any such chain to correlate the user's
+			 * addresses. See {@link CorrelationChain}.
+			 */
+			bestChain: CorrelationChain | null
 	  }
 ```
 
@@ -1143,6 +1154,33 @@ Wallet-related information types.
 ```typescript
 type UserInfo = PersonalInfo | WalletInfo
 ```
+
+---
+
+### Type: `CorrelationEdge`
+
+A single link in a request-correlation chain.
+
+Two requests are linked by a UserInfo edge when they carry an identical correlatable `UserInfo` value, and by an IP-time edge when they go to the same entity within {@link IP_TIME_CORRELATION_WINDOW_MS} from the same IP (and that entity learns the user's IP address).
+
+`strength` is a comparable measure of how strongly the link correlates the two requests: any UserInfo edge is stronger than any IP-time edge; among UserInfo edges a higher {@link userInfoScore} is stronger; among IP-time edges a shorter time gap is stronger.
+
+```typescript
+type CorrelationEdge =
+	| { kind: 'userInfo'; userInfo: UserInfo; strength: number }
+	| { kind: 'ipTime'; gapMs: number; strength: number }
+```
+
+---
+
+### Interface: `CorrelationChain`
+
+The best request-correlation chain found between two requests bearing distinct wallet addresses.
+
+A chain's strength is its _weakest_ edge (bottleneck): a chain is only as trustworthy as its weakest correlation link. The best chain is the shortest one, breaking ties by highest weakest-edge strength.
+
+- `length` (`number`): The number of edges in the chain.
+- `weakestEdge` (`CorrelationEdge`): The weakest (least trustworthy) edge in the chain.
 
 ---
 
