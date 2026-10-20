@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 15,
+	"highlightLastLine": 26,
+	"segments": [
+		{
+			"lines": [
+				"import MiddleTruncatedAddress from \"@/components/MiddleTruncatedAddress\";",
+				"import { useAccountIdentityLabels } from \"@/hooks/useAccountIdentityLabels\";",
+				"import type { ResolvedChain } from \"@/lib/chains\";",
+				"",
+				"interface AccountSwitcherProps {",
+				"  accounts: Account[];",
+				"  activeAccount: Account | null;",
+				"  explorerChains: ResolvedChain[];",
+				"  onAccountSelect: (account: Account) => void;",
+				"  onAddAccount: () => void;",
+				"  onAccountSettings: (account: Account) => void;",
+				"  onShowQr?: () => void;",
+				"  isPickerOpen?: boolean;",
+				"  onPickerOpenChange?: (isOpen: boolean) => void;",
+				"  onAccountsReordered?: (accounts: Account[]) => void;",
+				"}",
+				"",
+				"const QrCodeIcon = () => (",
+				"  <Icon viewBox=\"0 0 24 24\" boxSize=\"14px\" aria-hidden=\"true\">",
+				"    <path"
+			],
+			"startLine": 11
+		}
+	]
+}

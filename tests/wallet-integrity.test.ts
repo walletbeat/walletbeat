@@ -6,9 +6,12 @@ import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
 import { AttributeGroupId } from '@/schema/attribute-tree'
+import { extractFeeTransparency } from '@/schema/attributes/transparency/fee-transparency'
 import { walletEipSupport } from '@/schema/eip-support'
 import { getExtensionId } from '@/schema/extension-url'
 import { resolveFeatures } from '@/schema/features'
+import { isSupported } from '@/schema/features/support'
+import { validateFeeDisplay } from '@/schema/features/transparency/fee-display'
 import { Variant } from '@/schema/variants'
 import type { BaseWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
@@ -116,6 +119,34 @@ describe('wallets', () => {
 					expect(() =>
 						walletEipSupport(resolveFeatures(wallet.features, wallet.variants, variant)),
 					).not.toThrow()
+				}
+			})
+
+			it('has consistent fee displays for each variant', () => {
+				for (const variant of Object.values(Variant)) {
+					if (wallet.variants[variant] !== true) {
+						continue
+					}
+
+					const feeTransparency = extractFeeTransparency(
+						resolveFeatures(wallet.features, wallet.variants, variant),
+					)
+
+					for (const operationFeeDisplay of Object.values(feeTransparency)) {
+						if (operationFeeDisplay === null || !isSupported(operationFeeDisplay)) {
+							continue
+						}
+
+						const { fees } = operationFeeDisplay
+
+						if (fees === 'NO_FEES_CHARGED') {
+							continue
+						}
+
+						expect(() => {
+							validateFeeDisplay(fees)
+						}).not.toThrow()
+					}
 				}
 			})
 

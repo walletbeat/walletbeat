@@ -60,8 +60,9 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	type FeeDisplay,
 	FeeDisplayLevel,
+	FeeType,
+	type OperationFeeDisplay,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -273,13 +274,22 @@ export const rainbow: SoftwareWallet = {
 							},
 						],
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(
-								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-								WalletServiceFeeDisplayUnit.PERCENTAGE,
-							),
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -359,13 +369,22 @@ export const rainbow: SoftwareWallet = {
 							},
 						],
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(
-								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-								WalletServiceFeeDisplayUnit.PERCENTAGE,
-							),
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -1499,13 +1518,13 @@ export const rainbow: SoftwareWallet = {
 			operationFees: {
 				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// Corrects an earlier questionnaire-sourced NONE: the default swap
-				// screen already shows a network fee (so byDefault is AGGREGATED, not
+				// screen already shows a network fee (so shownByDefault is AGGREGATED, not
 				// NONE), and tapping "Review" (one action) reveals a comprehensive
 				// breakdown including an itemized "Included Rainbow Fee" line, shown as
 				// a token amount (ETH); tapping that fee line (mobile) or its info icon
 				// (browser) reveals the rate as a percentage (0.85%), so the unit set
 				// is {TOKEN_AMOUNT, PERCENTAGE}.
-				builtInErc20Swap: supported<WithRef<FeeDisplay>>({
+				builtInErc20Swap: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1540,21 +1559,32 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-04',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(
-						WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-						WalletServiceFeeDisplayUnit.PERCENTAGE,
-					),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// For all three flows below, the transaction screen shows a single
 				// aggregate "Estimated fee" figure by default, and one tap on the gas
 				// control opens a sheet itemizing base fee / miner tip / max
 				// transaction fee. None of these flows carry a Rainbow platform fee,
-				// so walletServiceFeeDisplayUnits is NOT_APPLICABLE.
-				erc20L1Transfer: supported<WithRef<FeeDisplay>>({
+				// so WALLET_FEE is false.
+				erc20L1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1573,12 +1603,23 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
-				ethL1Transfer: supported<WithRef<FeeDisplay>>({
+				ethL1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1597,12 +1638,23 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
-				uniswapUSDCToEtherSwap: supported<WithRef<FeeDisplay>>({
+				uniswapUSDCToEtherSwap: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1621,10 +1673,21 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,

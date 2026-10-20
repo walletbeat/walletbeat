@@ -25,6 +25,7 @@ import {
 	userFlow,
 	userFlowMayBeMarkedUnsupported,
 	type UserInfo,
+	userInfoCorrelatableAcrossEntities,
 	userInfoEnums,
 	validateDataCollectionByEntityRow,
 	WalletInfo,
@@ -61,6 +62,7 @@ import {
 import {
 	type AddressBearingRequest,
 	classifyEntityMultiAddressHandling,
+	type CorrelatableOnlyRequest,
 	type EntityRequests,
 } from './multi-address-classification'
 import { removeFile, writeFileAtomically } from './read-only'
@@ -2483,6 +2485,57 @@ export class WalletRequest {
 	}
 
 	/**
+	 * The correlatable `UserInfo` string values carried by this request, keyed
+	 * by `UserInfo` type. These are the actual string values (e.g. cookie
+	 * values, email addresses, phone numbers) that have been classified as a
+	 * {@link UserInfo} that passes
+	 * {@link userInfoCorrelatableAcrossEntities}.
+	 */
+	public async correlatableUserInfo(): Promise<ReadonlyMap<UserInfo, ReadonlySet<string>>> {
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const result = new Map<UserInfo, Set<string>>()
+
+		for (const s of reqStrings.strings()) {
+			for (const info of s.str.pieces) {
+				if (!userInfoCorrelatableAcrossEntities(info)) {
+					continue
+				}
+
+				let values = result.get(info)
+
+				if (values === undefined) {
+					values = new Set()
+					result.set(info, values)
+				}
+
+				values.add(s.str.str)
+			}
+		}
+
+		return result
+	}
+
+	/**
+	 * The proxy circuit this request was routed through, or `null` if it was
+	 * not proxied. Two requests routed through the same circuit appear to the
+	 * receiving entity as coming from the same IP address.
+	 */
+	public proxy(): string | null {
+		return null
+	}
+
+	/**
+	 * Details about the secure enclave the request's endpoint runs in, or
+	 * `null` if the endpoint is not an IP-hiding secure enclave
+	 */
+	public secureEnclaveDetails(): null {
+		return null // Secure enclaves not yet supported.
+	}
+
+	/**
 	 * True when this request is directly identified as NOT_WALLET_INITIATED,
 	 * either by a matching request matcher or by manual review.
 	 */
@@ -3239,6 +3292,8 @@ export class WalletCaptureFile {
 				walletAddresses: Set<Erc55Address>
 				/** The address-bearing requests observed by this entity. */
 				addressRequests: AddressBearingRequest[]
+				/** The correlatable-UserInfo-only requests observed by this entity. */
+				correlatableOnlyRequests: CorrelatableOnlyRequest[]
 			}
 		>()
 
@@ -3285,6 +3340,7 @@ export class WalletCaptureFile {
 			}
 
 			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
+			const correlatableUserInfo = await request.correlatableUserInfo()
 
 			// The data is seen by the operator and by every intermediary on the
 			// way there, so record one receipt per entity with its role.
@@ -3308,6 +3364,7 @@ export class WalletCaptureFile {
 						purposes: new Set<DataCollectionPurpose>(),
 						walletAddresses: new Set<Erc55Address>(),
 						addressRequests: [],
+						correlatableOnlyRequests: [],
 					}
 					perEntity.set(perEntityKey, entData)
 				}
@@ -3338,6 +3395,19 @@ export class WalletCaptureFile {
 
 					entData.addressRequests.push({
 						addresses: assertNonEmptyArray(carriedWalletAddresses),
+						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
+				} else if (correlatableUserInfo.size > 0) {
+					// A request that carries correlatable `UserInfo` values but no
+					// wallet address can still participate in a correlation chain,
+					// so record it separately.
+					entData.correlatableOnlyRequests.push({
+						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
 						sessionMilliseconds: request.sessionTime.toNumber(),
 					})
 				}
@@ -3368,6 +3438,7 @@ export class WalletCaptureFile {
 				const entityRequests: EntityRequests = {
 					addresses: assertNonEmptyArray(Array.from(entData.walletAddresses)),
 					requests: entData.addressRequests,
+					correlatableOnlyRequests: entData.correlatableOnlyRequests,
 				}
 
 				return classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests)

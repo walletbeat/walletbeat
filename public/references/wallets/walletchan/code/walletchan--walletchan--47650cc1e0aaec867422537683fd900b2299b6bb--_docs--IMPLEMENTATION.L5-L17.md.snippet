@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 5,
+	"highlightLastLine": 17,
+	"segments": [
+		{
+			"lines": [
+				"# WalletChan Transaction Handling Implementation",
+				"",
+				"## Overview",
+				"",
+				"WalletChan is a multi-account Ethereum/EVM browser wallet that supports six",
+				"account models:",
+				"",
+				"1. **Private Key Accounts** - Standard wallets with local key storage for transaction signing",
+				"2. **Seed Phrase Accounts** - BIP39/BIP44 groups whose derived keys sign locally",
+				"3. **Ledger Accounts** - Hardware-backed accounts that sign on a connected Ledger in Chromium",
+				"4. **Impersonator Accounts** - View-only addresses that cannot sign; a",
+				"   per-RPC developer opt-in may submit their reviewed transactions to a fork",
+				"   node with `eth_sendTransaction`",
+				"5. **Safe Accounts** - Existing Safe multisig contract accounts whose proposals",
+				"   are approved or executed by linked eligible owner accounts",
+				"6. **Bankr API Accounts** - Optional remote-signing accounts that execute",
+				"   supported transactions through the Bankr API",
+				"",
+				"This document describes the core architecture and transaction handling implementation.",
+				"",
+				"This workspace contains the extension, website, docs, domain reputation service,"
+			],
+			"startLine": 1
+		}
+	]
+}

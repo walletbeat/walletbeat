@@ -607,6 +607,16 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
 	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
 	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
+	// Foreground services show a persistent notification while they run, e.g. while a wallet syncs
+	// or submits a transaction in the background. No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE]: Rating.PASS,
+	// Foreground service type for data transfers such as wallet sync (Android 14+). No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC]: Rating.PASS,
+	// Keeps the processor awake until background work finishes. No access to user data.
+	[AndroidPermission.WAKE_LOCK]: Rating.PASS,
+	// Lets the app start when the device boots, e.g. to reschedule background work after a reboot.
+	// No access to user data, and no UI over other apps.
+	[AndroidPermission.RECEIVE_BOOT_COMPLETED]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
