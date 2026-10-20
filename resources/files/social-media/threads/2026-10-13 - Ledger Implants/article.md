@@ -1,4 +1,4 @@
-Over the past few days, Ledger has confirmed incidents involving compromised hardware wallets purchased through an authorized reseller, resulting in users losing funds.
+Over the past few days, @Ledger has confirmed incidents involving compromised hardware wallets purchased through an authorized reseller, resulting in users losing funds.
 
 Calling these events unfortunate and disappointing would be an understatement. People lost their funds after doing everything they were told to do.
 
@@ -38,7 +38,7 @@ In @VitalikButerin's September 2025 article, The Importance of Full-Stack Openne
 
 Users should not have to rely on trusting manufacturers, authorized resellers, or third-party certifications to know whether their devices are secure. This incident shows where that trust leads. Instead, we should work toward minimizing trust assumptions through greater openness and verifiability, allowing users to independently verify the security properties of their devices.
 
-In practice, this means end-user-verifiable hardware, which requires open specs: schematics, board layouts, and a bill of materials that anyone can compare against the device in their hands. The alternative is a wallet built from off-the-shelf parts with a self-assembly manual, so no reseller ever handles it. Firefly (https://firefly.city/) takes this approach.
+In practice, this means end-user-verifiable hardware, which requires open specs: schematics, board layouts, and a bill of materials that anyone can compare against the device in their hands. The alternative is a wallet built from off-the-shelf parts with a self-assembly manual, so no reseller ever handles it. @FireflyPocket (https://firefly.city/) takes this approach.
 
 Either path would fulfill a future "Hardware integrity assurance" attribute that we plan to add to Walletbeat for hardware wallets.
 
