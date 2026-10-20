@@ -37,6 +37,14 @@ describe('getUrlLabel for GitHub URLs', () => {
 			).toBe('file.ts L10-20 @e1ddce7')
 		})
 
+		it('formats comma-separated line ranges', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/file.yml#L53,L340-L353',
+				),
+			).toBe('file.yml L53, L340-353 @e1ddce7')
+		})
+
 		it('formats a file without a line anchor', () => {
 			expect(
 				getUrlLabel(

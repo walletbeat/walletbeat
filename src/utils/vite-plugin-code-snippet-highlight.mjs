@@ -84,10 +84,13 @@ function escapeHtml(text) {
 }
 
 /**
- * The line range and optional source extension at the end of a snippet file
- * name, as produced by `snippetFileName` in src/schema/code-snippets.ts.
+ * The line ranges and optional source extension at the end of a snippet file
+ * name, as produced by `snippetFileName` in src/schema/code-snippets.ts. The
+ * line ranges are the canonical (column-free) form of `lineFragmentRegExp` in
+ * src/schema/url.ts.
  */
-const snippetFileNameSuffix = /\.L\d+(?:-L\d+)?(?:\.(?<extension>[^.]+))?\.snippet$/
+const snippetFileNameSuffix =
+	/\.L\d+(?:-L\d+)?(?:,L\d+(?:-L\d+)?)*(?:\.(?<extension>[^.]+))?\.snippet$/
 
 /**
  * The Shiki language for a snippet file path. Source files without an
@@ -183,8 +186,9 @@ export function codeSnippetHighlight() {
 						.join('')
 
 					rows.push({
-						highlighted:
-							lineNumber >= content.highlightFirstLine && lineNumber <= content.highlightLastLine,
+						highlighted: content.highlightRanges.some(
+							range => lineNumber >= range.first && lineNumber <= range.last,
+						),
 						html,
 						number: lineNumber,
 						type: 'line',
