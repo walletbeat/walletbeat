@@ -23,7 +23,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -296,31 +296,75 @@ export const safe: SoftwareWallet = {
 			operationFees: {
 				builtInErc20Swap: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: null,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,
