@@ -23,7 +23,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -82,14 +82,23 @@ export const zeus: SoftwareWallet = {
 						{
 							explanation:
 								'Zeus has a built-in interface which uses the Across protocol to bridge ETH between chains.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs',
+							url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs#not-line-specific',
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -153,7 +162,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Zeus is licensed under the MIT license.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT',
+						url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT#not-line-specific',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -272,7 +281,7 @@ export const zeus: SoftwareWallet = {
 					{
 						explanation:
 							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like ERC-20 transfers, swaps, approvals etc.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
+						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs#not-line-specific',
 					},
 				],
 				erc4361: null,
@@ -342,10 +351,21 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: null,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: [
@@ -355,10 +375,21 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [
@@ -368,10 +399,21 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [
@@ -381,10 +423,21 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,

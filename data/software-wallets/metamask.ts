@@ -58,6 +58,7 @@ import {
 } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
@@ -237,10 +238,19 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -335,14 +345,14 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The MetaMask browser extension uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
 				[Variant.MOBILE]: {
 					ref: {
 						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
@@ -631,7 +641,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf#binary-file',
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -641,7 +651,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf#binary-file',
 					auditDate: '2025-04-01',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -764,7 +774,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'MetaMask does not decode an Aave supply; it only shows the simulated balance change and the contract being interacted with.',
+								'MetaMask does not decode an Aave supply. It only shows the simulated balance change and the contract being interacted with.',
 							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
 							label: 'MetaMask transaction request for an Aave supply',
 						},
@@ -972,7 +982,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							url: [
 								{
 									label: "Transactions are sent to the network's RPC",
@@ -990,37 +1000,81 @@ export const metamask: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon; the network fee is shown by default but the wallet fee is not.',
+								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon. The network fee is shown by default, but the wallet fee is not.',
 							file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
 							label:
 								'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,
@@ -1047,7 +1101,7 @@ export const metamask: SoftwareWallet = {
 						{
 							explanation:
 								'The repo pins a `yarn.lock` lockfile committed alongside `package.json`.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#not-line-specific',
 						},
 						{
 							explanation: 'CI lints the lockfile and checks yarn resolutions on every run.',
@@ -1081,7 +1135,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation: 'A dedicated static security code scanner runs on push and PR.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml#not-line-specific',
 						},
 					],
 				}),
@@ -1089,7 +1143,7 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The repo maintains a publicly accessible `CHANGELOG.md`, validated by CI on every run.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md#not-line-specific',
 					},
 				}),
 				hermeticBuilds: notSupported,

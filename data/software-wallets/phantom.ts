@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
@@ -42,6 +43,7 @@ import {
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
@@ -56,14 +58,14 @@ import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhp
 
 const securityAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf#binary-file',
 		auditDate: '2021-05-07',
 		auditor: kudelskiSecurity,
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf#binary-file',
 		auditDate: '2024-06-07',
 		auditor: leastAuthority,
 		codeSnapshot: {
@@ -81,9 +83,9 @@ export const phantom: SoftwareWallet = {
 		displayName: 'Phantom',
 		tableName: 'Phantom',
 		coinspectId: 'phantom',
-		contributors: [nconsigny, mattmatt],
+		contributors: [nconsigny, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-02-08',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.phantom.com/'],
 			extensions: [
@@ -148,10 +150,19 @@ export const phantom: SoftwareWallet = {
 								label: 'Phantom swap fee hover breakdown',
 							},
 						],
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -192,21 +203,45 @@ export const phantom: SoftwareWallet = {
 		},
 		licensing: fullyClosedSource,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Phantom raised a $150M Series C in January 2025, led by Sequoia Capital and Paradigm, at a $3B valuation.',
+					url: 'https://cointelegraph.com/news/phantom-raises-150-million-3-billion-valuation',
+				},
+				{
+					explanation:
+						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021. It skipped a seed round.",
+					url: 'https://www.theblock.co/post/111249/defi-wallet-solana-phantom-9-million-series-a-a16z',
+				},
+				{
+					explanation:
+						'Phantom charges a 0.85% fee on most swaps. Users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
+					url: 'https://help.phantom.com/hc/en-us/articles/5985106844435-Swap-tokens-in-Phantom',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
+				donations: false,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				publicOffering: false,
+				selfFunded: false,
+				transparentConvenienceFees: true,
+				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Users can add more wallets and accounts, including new accounts derived from the existing Secret Recovery Phrase, in both the browser extension and the mobile app.',
+					url: 'https://help.phantom.com/articles/add-wallets-and-accounts-to-your-phantom-wallet-28355310978067',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -338,7 +373,7 @@ export const phantom: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Phantom does not decode an Aave supply; it only shows the simulated balance change.',
+								'Phantom does not decode an Aave supply. It only shows the simulated balance change.',
 							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-aave-supply.png',
 							label: 'Phantom transaction confirmation for an Aave supply',
 						},

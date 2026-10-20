@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 11,
+	"highlightLastLine": 17,
+	"segments": [
+		{
+			"lines": [
+				"/**"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				" *     authorize, and whether an authorization tuple needs to be bundled in.",
+				" *   - Account Settings \"Smart Account\" section UI: shows current onchain",
+				" *     delegation + custom override + what would be used on the next batch.",
+				" *",
+				" * Resolution order (per account × per chain):",
+				" *   1. Probe onchain: eth_getCode(EOA) → parse 0xef0100 prefix → current delegate",
+				" *   2. If active delegate exists AND supports ERC-7821 batch mode → use silently",
+				" *   3. Else if the chain has WalletChan's default delegate deployed",
+				" *      (built-in Pectra chain or KNOWN_CHAINS entry) → use WalletChan default",
+				" *      with a bundled authorization in the first batch tx.",
+				" *   4. Else → null (caller falls back to existing auto-sequential PK/SP path)",
+				" *",
+				" * \"Silently\" in (2) means we DON'T need to include an authorization tuple in",
+				" * the tx — the EOA is already delegated onchain to that contract. This is the",
+				" * common case after the first batch on a given chain."
+			],
+			"startLine": 7
+		}
+	]
+}

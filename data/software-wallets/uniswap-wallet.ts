@@ -49,7 +49,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type MustRef, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -64,7 +64,7 @@ import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngpl
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf#binary-file',
 		auditDate: '2023-11-02',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -87,7 +87,7 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		variantsScope: { [Variant.MOBILE]: true },
 	},
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf#binary-file',
 		auditDate: '2024-04-30',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -204,10 +204,19 @@ export const uniswapWallet: SoftwareWallet = {
 									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
 							},
 						],
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -277,7 +286,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The Uniswap Wallet mobile app is explicitly licensed under GPL 3.0 or later. The browser extension directory in the same monorepo does not contain a `LICENSE` file. Development happens in a private repository and only production-ready code is published.',
-					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE',
+					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE#not-line-specific',
 				},
 				license: FOSSLicense.GPL_3_0,
 			},
@@ -607,7 +616,7 @@ export const uniswapWallet: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
+							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer. The simulated result is empty.',
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
 						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
 					},
@@ -638,7 +647,7 @@ export const uniswapWallet: SoftwareWallet = {
 				erc4361: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
+							'Uniswap Wallet does not format SIWE requests for easy readability. It shows the raw message text in a generic signature request.',
 						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
 						label: 'Uniswap Wallet signature request for an ERC-4361 message',
 					},
@@ -652,26 +661,26 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode an Aave supply; it only shows the amount sent.',
+								'Uniswap Wallet does not decode an Aave supply. It only shows the amount sent.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the `execTransaction` function.',
+								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the `execTransaction` function.',
+								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA; it only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
+								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA. It only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
 							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
 							label: 'Uniswap Wallet transaction request for a batched approve and supply',
 						},
@@ -817,12 +826,12 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'The committed `bun.lock` pins exact versions for the `@uniswap/extension` workspace (`apps/extension`) and its transitive JavaScript dependencies.',
-							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#not-line-specific',
 						},
 						{
 							explanation:
 								'iOS: the committed `Podfile.lock` pins every CocoaPods dependency version and records the Podfile checksum used to resolve them.',
-							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock#not-line-specific',
 						},
 						{
 							explanation:
@@ -837,7 +846,7 @@ export const uniswapWallet: SoftwareWallet = {
 							{
 								explanation:
 									'The extension package has no LavaMoat or SES dependency, and the shipped v1.84.0.2 extension contains no LavaMoat or SES runtime.',
-								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json#not-line-specific',
 							},
 						],
 					}),
@@ -846,7 +855,7 @@ export const uniswapWallet: SoftwareWallet = {
 							{
 								explanation:
 									'The mobile app package has no LavaMoat, SES or other dependency isolation.',
-								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json#not-line-specific',
 							},
 						],
 					}),

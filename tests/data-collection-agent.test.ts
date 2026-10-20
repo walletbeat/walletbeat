@@ -7,10 +7,12 @@ import {
 	redactCdPath,
 	referencesRestrictedEnvVar,
 } from '@/tools/wallet-data-collection/agent/command-classification'
-import { getRepositoryRoot } from '@/utils/codebase'
+import { getRepositoryRoot, normalizePath } from '@/utils/codebase'
+
+const bashRepoRoot = normalizePath(getRepositoryRoot())
 
 /** `cd <repo-root>` — the only `cd` a plain agent invocation allows. */
-const cdRepo = `cd ${getRepositoryRoot()}`
+const cdRepo = `cd ${bashRepoRoot}`
 
 describe('isDomainClassificationCommand', () => {
 	const domainMappingFile = '/data/entities/domains/entity-domains.json'
@@ -529,7 +531,7 @@ describe('isPlainAgentInvocation', () => {
 
 		it('accepts a quoted cd to the repository root', () => {
 			expect(
-				isPlainAgentInvocation(`cd '${getRepositoryRoot()}' && pnpm wallet-data-collection:agent`),
+				isPlainAgentInvocation(`cd '${bashRepoRoot}' && pnpm wallet-data-collection:agent`),
 			).toBe(true)
 		})
 
@@ -540,9 +542,7 @@ describe('isPlainAgentInvocation', () => {
 
 		it('rejects cd to a subdirectory of the repo root', () => {
 			expect(
-				isPlainAgentInvocation(
-					`cd ${getRepositoryRoot()}/sub && pnpm wallet-data-collection:agent`,
-				),
+				isPlainAgentInvocation(`cd ${bashRepoRoot}/sub && pnpm wallet-data-collection:agent`),
 			).toBe(false)
 		})
 
@@ -552,9 +552,7 @@ describe('isPlainAgentInvocation', () => {
 
 		it('rejects cd with a flag', () => {
 			expect(
-				isPlainAgentInvocation(
-					`cd --flag ${getRepositoryRoot()} && pnpm wallet-data-collection:agent`,
-				),
+				isPlainAgentInvocation(`cd --flag ${bashRepoRoot} && pnpm wallet-data-collection:agent`),
 			).toBe(false)
 		})
 
