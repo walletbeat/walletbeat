@@ -130,6 +130,23 @@ export enum RepositoryChangeControlState {
 }
 
 /**
+ * Whether a repository change control counts as in place.
+ * Controls that are neither publicly checkable nor claimed by the developer
+ * do not count.
+ */
+export function isRepositoryChangeControlPresent(state: RepositoryChangeControlState): boolean {
+	switch (state) {
+		case RepositoryChangeControlState.VERIFIABLY_PRESENT:
+		case RepositoryChangeControlState.CLAIMED_PRESENT:
+			return true
+		case RepositoryChangeControlState.VERIFIABLY_ABSENT:
+		case RepositoryChangeControlState.CLAIMED_ABSENT:
+		case RepositoryChangeControlState.UNVERIFIABLE:
+			return false
+	}
+}
+
+/**
  * Observable repository-level change controls for the wallet's source
  * repository.
  */
@@ -145,3 +162,6 @@ export type RepositoryChangeControls = WithRef<{
 	/** Whether release tags are protected / immutable. */
 	tagsImmutable: RepositoryChangeControlState
 }>
+
+/** The name of an individual control in `RepositoryChangeControls`. */
+export type RepositoryChangeControl = Exclude<keyof RepositoryChangeControls, 'ref'>
