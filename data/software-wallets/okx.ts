@@ -379,6 +379,7 @@ export const okx: SoftwareWallet = {
 					},
 				}),
 			},
+			softwareUpdates: null,
 		},
 		walletCall: supported({
 			ref: refTodo,

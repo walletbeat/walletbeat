@@ -635,6 +635,7 @@ export const gemwallet: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: notSupported,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupportedWithRef({
 			ref: [

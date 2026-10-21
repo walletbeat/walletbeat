@@ -1112,6 +1112,7 @@ export const zerion: SoftwareWallet = {
 				},
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupported,
 	},
