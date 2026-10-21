@@ -27,21 +27,21 @@ import { defaultNavigationItems } from '@/constants/navigation'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-4'>
+		<header data-scroll-item='inline-detached padding-match-start' data-column='gap-4'>
+			{
+				parentUrl && (
+					<nav aria-label='Breadcrumb'>
+						<a href={parentUrl}>← Back</a>
+					</nav>
+				)
+			}
+
+			<hgroup data-column='gap-3'>
 				<h1>{metadata.title}</h1>
 
 				{metadata.description && <p>{metadata.description}</p>}
 			</hgroup>
 		</header>
-
-		{
-			parentUrl && (
-				<nav data-scroll-item='inline-detached padding-match-start'>
-					<a href={parentUrl}>← Back</a>
-				</nav>
-			)
-		}
 
 		{
 			entries.length > 0 ? (
@@ -73,25 +73,28 @@ import { defaultNavigationItems } from '@/constants/navigation'
 
 <style>
 	main {
+		/* Same column and header as MarkdownPage, so moving between index and article keeps the left edge. */
 		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 72rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxSize: 52rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
 		}
 
 		line-height: 1.4;
 
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
+		hgroup {
+			h1 {
+				font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+				line-height: 1.15;
+			}
 
-		h1,
-		h2,
-		h3 {
-			font-family: var(--fontFamily-spMonorium);
+			p {
+				max-inline-size: 60ch;
+				font-size: 1.125rem;
+				line-height: 1.5;
+				color: var(--text-secondary);
+				text-wrap: pretty;
+			}
 		}
 
 		nav a {
@@ -107,8 +110,8 @@ import { defaultNavigationItems } from '@/constants/navigation'
 
 	.index-grid {
 		display: grid;
-		gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+		gap: 0.75rem;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
 	}
 
 	.index-card {
@@ -117,17 +120,19 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 1.25rem 1.5rem;
-		border: 1px solid var(--border);
-		border-radius: 0.5rem;
+		border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+		border-radius: 0.75rem;
+		background-color: var(--background-secondary);
 		text-decoration: none;
 		color: var(--text-primary);
 		transition:
 			border-color 0.15s ease,
-			background-color 0.15s ease;
+			box-shadow 0.15s ease;
 
 		&:hover {
-			border-color: var(--accent);
-			background-color: var(--bg-secondary);
+			border-color: color-mix(in srgb, var(--accent) 50%, var(--border-color));
+			box-shadow: 0 8px 24px -12px rgb(19 10 43 / 0.2);
+			text-decoration: none;
 		}
 	}
 
@@ -144,6 +149,8 @@ import { defaultNavigationItems } from '@/constants/navigation'
 	.index-card-content p {
 		margin: 0;
 		font-size: 0.875rem;
+		line-height: 1.5;
+		font-weight: 400;
 		color: var(--text-secondary);
 	}
 
