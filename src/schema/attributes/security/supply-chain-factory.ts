@@ -46,7 +46,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 	id: 'supplyChainFactory',
 	icon: 'security_best_practices',
-	displayName: 'Supply Chain Factory',
+	displayName: 'Supply chain factory',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
@@ -158,7 +158,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 			outcome: {
 				id: 'Supply Chain Factory',
 				rating,
-				displayName: 'Supply Chain Factory',
+				displayName: 'Supply chain factory',
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
 				),
