@@ -754,6 +754,7 @@ export const uniswapWallet: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: null,
 				drills: notSupported,
 				guardianRecovery: notSupported,
 			},
