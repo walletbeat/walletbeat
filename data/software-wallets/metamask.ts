@@ -1441,6 +1441,7 @@ export const metamask: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: [
 					{

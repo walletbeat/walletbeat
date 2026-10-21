@@ -276,6 +276,7 @@ export const zeus: SoftwareWallet = {
 				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: supported({
 				ref: [
 					{
