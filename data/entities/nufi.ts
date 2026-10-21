@@ -3,7 +3,7 @@ import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
 export const nufi: CorporateEntity & WalletDeveloper = {
 	id: 'nufi',
 	name: 'NuFi',
-	legalName: { name: 'NuFi AG', soundsDifferent: false },
+	legalName: { name: 'NUFI AG', soundsDifferent: false },
 	type: {
 		chainDataProvider: false,
 		corporate: true,

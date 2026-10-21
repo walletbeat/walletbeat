@@ -1,7 +1,9 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
+import { refi93 } from '@/data/contributors/refi93'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -23,9 +25,9 @@ export const nufi: SoftwareWallet = {
 		displayName: 'NuFi',
 		tableName: 'NuFi',
 		coinspectId: 'nu-fi',
-		contributors: [gabrielkerekes, mattmatt],
+		contributors: [gabrielkerekes, mattmatt, refi93],
 		iconExtension: 'svg',
-		lastUpdated: '2025-08-11',
+		lastUpdated: '2026-10-21',
 		urls: {
 			docs: ['https://nufi.gitbook.io/'],
 			extensions: [
@@ -46,8 +48,8 @@ export const nufi: SoftwareWallet = {
 			eip7702: supported({
 				ref: {
 					explanation:
-						'The NuFi FAQ mentions the use the MetaMask Delegator contract as smart account implementation.',
-					label: 'NuFi support site',
+						'NuFi uses the MetaMask Delegator contract for EIP-7702 smart accounts, and can include the delegation in the same transaction as a batch.',
+					label: 'NuFi EVM smart accounts',
 					url: 'https://support.nu.fi/support/solutions/articles/80001178239',
 				},
 				contract: metamask7702DelegatorContract,
@@ -67,12 +69,19 @@ export const nufi: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation:
+					'The Ethereum send form resolves a plain ENS name through the chain RPC. It does not resolve ERC-7828 or ERC-7831 names.',
+				label: 'NuFi web wallet',
+				url: 'https://wallet.nu.fi',
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: notSupported,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
@@ -92,7 +101,12 @@ export const nufi: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'The Ethereum connector implements the MetaMask provider API, including provider events, and announces the wallet with EIP-6963.',
+					label: 'NuFi Ethereum connector',
+					url: 'https://nufi.gitbook.io/developer-docs/nufi-wallet/dapp-connector',
+				},
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
@@ -100,11 +114,22 @@ export const nufi: SoftwareWallet = {
 		},
 		licensing: fullyClosedSource,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'NuFi lists three completed Project Catalyst projects on its about page, so ecosystem grants fund part of its development.',
+					label: 'NuFi about page',
+					url: 'https://nu.fi/about',
+				},
+				{
+					label: 'Project Catalyst: Ethereum and Cardano web3 wallet',
+					url: 'https://projectcatalyst.io/funds/9/the-great-migration-from-ethereum/ethereum-and-cardano-web3-wallet',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: false,
-				ecosystemGrants: false,
+				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: false,
@@ -137,25 +162,59 @@ export const nufi: SoftwareWallet = {
 			bugBountyProgram: null,
 			duressResistance: null,
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'NuFi pairs a Ledger by cable or Bluetooth. The cable path uses the browser WebHID API.',
+						label: 'Pair a Ledger',
+						url: 'https://support.nu.fi/support/solutions/articles/80001171374-manage-ledger-nano-s-s-x-flex-stax-using-nufi-wallet',
+					},
+					{
+						explanation:
+							'NuFi pairs a Trezor by cable through the Trezor Suite desktop app, or through the browser WebUSB API.',
+						label: 'Pair a Trezor',
+						url: 'https://support.nu.fi/support/solutions/articles/80001171361-manage-trezor-t-safe3-safe5-and-safe7-using-nufi-wallet',
+					},
+					{
+						explanation: 'NuFi pairs a Keystone 3 Pro by cable over WebUSB.',
+						label: 'Pair a Keystone 3 Pro',
+						url: 'https://support.nu.fi/support/solutions/articles/80001172601-manage-keystone-3-pro-using-nufi-wallet',
+					},
+					{
+						explanation:
+							'NuFi pairs a GridPlus Lattice1 through the Lattice Connector. The device stays online, and NuFi does not open a USB session.',
+						label: 'Pair a GridPlus Lattice1',
+						url: 'https://support.nu.fi/support/solutions/articles/80001171377-manage-gridplus-lattice1-using-nufi-wallet',
+					},
+					{
+						explanation: 'NuFi pairs a OneKey by USB cable through the browser WebUSB API.',
+						label: 'Pair a OneKey',
+						url: 'https://support.nu.fi/support/solutions/articles/80001175825-manage-onekey-device-using-nufi-wallet',
+					},
+					{
+						explanation: 'NuFi pairs a BitBox02 by cable. The browser connection uses WebHID.',
+						label: 'Pair a BitBox02',
+						url: 'https://support.nu.fi/support/solutions/articles/80001172583-manage-bitbox02-using-nufi-wallet',
+					},
+				],
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB, HardwareWalletConnection.bluetooth],
+						connectionTypes: [HardwareWalletConnection.webHID, HardwareWalletConnection.bluetooth],
 					}),
 					[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
+						connectionTypes: [HardwareWalletConnection.USB, HardwareWalletConnection.webUSB],
 					}),
 					[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.QR],
+						connectionTypes: [HardwareWalletConnection.webUSB],
 					}),
 					[HardwareWalletType.GRIDPLUS]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
+						connectionTypes: [HardwareWalletConnection.vendorCloud],
 					}),
 					[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
 					}),
 					[HardwareWalletType.BITBOX]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
+						connectionTypes: [HardwareWalletConnection.webHID],
 					}),
 				},
 			},
