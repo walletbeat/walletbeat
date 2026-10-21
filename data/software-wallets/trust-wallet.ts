@@ -206,7 +206,7 @@ export const trustWallet: SoftwareWallet = {
 				platform: BugBountyPlatform.BUG_CROWD,
 				rewards: supported({
 					currency: 'USD',
-					maximum: 10000,
+					maximum: 100000,
 					minimum: 200,
 				}),
 				upgradePathAvailable: true,
