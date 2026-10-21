@@ -58,7 +58,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - [ ] Smooth Crypto Lib
   - [ ] Daimo P256 Verifier
   - [ ] OpenZeppelin P256 Verifier
-  - [ ] WebAuthn.sol
+  - [ ] Base WebAuthn.sol
   - [ ] Other:
 
 ### Security Audits
