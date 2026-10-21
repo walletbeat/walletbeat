@@ -2,12 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { hardwareWalletAttributeTree, hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWalletAttributeTree, softwareWallets } from '@/data/software-wallets'
-import { type AttributeTree, mapAttributesGetter } from '@/schema/attribute-groups'
+import {
+	type AttributeTree,
+	evaluateAttributes,
+	mapAttributesGetter,
+} from '@/schema/attribute-groups'
 import { Rating } from '@/schema/attributes'
+import { resolveFeatures } from '@/schema/features'
 import { hardwareLadders, type Ladders, softwareLadders } from '@/schema/ladders'
 import type { Variant } from '@/schema/variants'
 import { type BaseWallet, rateWallet, type ResolvedWallet } from '@/schema/wallet'
-import { nonEmptyEntries } from '@/types/utils/non-empty'
+import { nonEmptyEntries, nonEmptyValues } from '@/types/utils/non-empty'
 
 type WalletMapTestCase = {
 	attributeTree: AttributeTree<string>
@@ -37,8 +42,16 @@ describe('wallets', () => {
 			for (const walletName in walletMap) {
 				const wallet = walletMap[walletName]
 
-				it(`can rate ${walletName}`, () => {
-					rateWallet(attributeTree, ladders, wallet)
+				it(`can rate ${walletName} without modifying its per-variant evaluations`, () => {
+					const rated = rateWallet(attributeTree, ladders, wallet)
+
+					for (const resolved of nonEmptyValues<Variant, ResolvedWallet<string>>(rated.variants)) {
+						const features = resolveFeatures(wallet.features, wallet.variants, resolved.variant)
+
+						expect(resolved.attributes, `variant ${resolved.variant}`).toEqual(
+							evaluateAttributes(attributeTree, features, wallet.metadata),
+						)
+					}
 				})
 
 				it(`${walletName} variants sharing an outcome ID have the same evaluation`, () => {
