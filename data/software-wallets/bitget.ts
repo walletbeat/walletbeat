@@ -17,13 +17,19 @@ import {
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import { minimalsm } from '../contributors/minimalsm'
 
 export const bitget: SoftwareWallet = {
 	metadata: {
@@ -31,9 +37,9 @@ export const bitget: SoftwareWallet = {
 		displayName: 'Bitget Wallet',
 		tableName: 'Bitget',
 		coinspectId: 'bitget',
-		contributors: [mattmatt],
+		contributors: [mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-01-17',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://web3.bitget.com/en/docs'],
 			extensions: [
@@ -78,10 +84,19 @@ export const bitget: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -113,15 +128,25 @@ export const bitget: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'BitKeep (now Bitget Wallet) raised a $15M Series A round in May 2022 with Dragonfly Capital as lead investor.',
+					url: 'https://web3.bitget.com/en/blog/articles/6644',
+				},
+				{
+					explanation:
+						'Bitget invested a further $30M at a $300M valuation in March 2023, taking a controlling stake.',
+					url: 'https://cointelegraph.com/news/multi-chain-wallet-bitkeep-raises-30m-at-300m-valuation',
+				},
+				{
+					explanation:
+						'BWB token tokenomics: 1.1% of the supply was allocated to a public offering and 10% to a private round.',
+					url: 'https://web3.bitget.com/resource/BWB-tokenomics.html',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -129,10 +154,10 @@ export const bitget: SoftwareWallet = {
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
+				publicOffering: true,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: featureSupported,
@@ -196,7 +221,9 @@ export const bitget: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			// No public audit of the wallet app or extension code found; Bitget cites CertiK and SlowMist audits of its swap contracts only.
+			// Source: https://web3.bitget.com/en/about/security-technology
+			publicSecurityAudits: [],
 			scamAlerts: {
 				contractTransactionWarning: notSupported,
 				scamUrlWarning: notSupported,
@@ -217,7 +244,7 @@ export const bitget: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+								'Bitget Wallet does not decode an Aave supply. It shows a generic signature confirmation.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
 							label: 'Bitget Wallet signature confirmation for an Aave supply',
 						},
@@ -304,14 +331,25 @@ export const bitget: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					// No LavaMoat or SES markers in the shipped v2.21.8 extension bundle.
+					[Variant.BROWSER]: notSupported,
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The app is closed source. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+						url: 'https://walletscrutiny.com/android/com.bitkeep.wallet/',
+					},
+				}),
 			},
 		},
 		walletCall: notSupported,

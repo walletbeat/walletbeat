@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	type Evaluation,
@@ -61,7 +62,7 @@ function noChainVerification(
 
 	return ctx.build({
 		outcome: {
-			id: 'no_chain_verification',
+			id: canConfigureL1 ? 'no_chain_verification_l1_rpc_configurable' : 'no_chain_verification',
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey
 			displayName: 'No L1 chain state verification',
@@ -108,6 +109,9 @@ export const chainVerification: Attribute = {
 	methodology: markdown(`
 		Wallets are evaluated based on whether or not they integrate a light
 		client for verification of Ethereum L1 state.
+
+		See the [chain verification testing guide](${withBasePath('/docs/wallet-testing/chain-verification/')})
+		for how Walletbeat tests whether a wallet verifies the chain data it receives.
 
 		*Note*: Walletbeat currently only considers L1 chain state verification
 		for this criterion, not L2s. This is because L2 state verification is

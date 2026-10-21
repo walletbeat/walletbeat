@@ -3,6 +3,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { coinspectUpstreamCommit } from '@/data/coinspect/upstream-commit'
 import { allWallets } from '@/data/wallets'
 import { getRepositoryRoot } from '@/utils/codebase'
 
@@ -34,7 +35,7 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 ])
 
 const CURRENT_REPORTS_DIR = 'data/coinspect/current-reports'
-const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit'
+const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit.ts'
 const FULL_SHA1 = /^[0-9a-f]{40}$/
 
 function walletMakerUIDFromReport(parsed: unknown, reportPath: string): string {
@@ -198,9 +199,9 @@ describe('coinspect mapping', () => {
 
 describe('coinspect upstream pin', () => {
 	it('has a well-formed upstream-commit pin', () => {
-		const pinPath = path.join(getRepositoryRoot(), UPSTREAM_COMMIT_FILE)
-		const localSha = fs.readFileSync(pinPath, { encoding: 'utf-8' }).trim()
-
-		expect(localSha, `${UPSTREAM_COMMIT_FILE} must be a full 40-character SHA-1`).toMatch(FULL_SHA1)
+		expect(
+			coinspectUpstreamCommit,
+			`${UPSTREAM_COMMIT_FILE} must export a full 40-character SHA-1`,
+		).toMatch(FULL_SHA1)
 	})
 })

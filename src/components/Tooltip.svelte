@@ -1,12 +1,5 @@
 <script module lang="ts">
 	declare global {
-		interface HTMLButtonElement {
-			popoverTargetElement?: HTMLElement & {
-				showPopover(): void
-				hidePopover(): void
-			}
-		}
-
 		interface HTMLElement {
 			showPopover(): void
 			hidePopover(): void
@@ -24,6 +17,7 @@
 	// Types/constants
 	import type { HTMLAttributes } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
+	import { createAttachmentKey } from 'svelte/attachments'
 
 
 	// IDs
@@ -76,71 +70,123 @@
 		onblur: () => {
 			isTriggerHovered = false
 		},
+		// The pointer may have entered before hydration, when no handler was
+		// listening, and `pointerenter` won't fire again until it leaves
+		[createAttachmentKey()]: (node: HTMLElement) => {
+			if (node.matches(':hover'))
+				isTriggerHovered = true
+		},
 	}
 
 	const supportsAnchorPositioning = (
 		globalThis.CSS?.supports('anchor-name: --test')
 	)
 
-	const useButtonTrigger = async (node: HTMLElement & { popoverTargetElement: HTMLElement }) => {
+	let triggerElement: HTMLElement | undefined
+
+	const useButtonTrigger = (node: HTMLElement) => {
+		triggerElement = node
+
+		// When the wrapper handles hover, a button behind the content is made
+		// static so it doesn't paint over the content.
 		$effect(() => {
-			if(hoverTriggerPlacement === 'around')
+			if(buttonTriggerPlacement === 'behind' && hoverTriggerPlacement === 'around')
 				node.style.setProperty('position', 'static')
 			else
 				node.style.removeProperty('position')
 		})
+	}
 
+	// Attachments must return their cleanup synchronously (an async attachment
+	// returns a Promise, which Svelte silently ignores), and floating-ui's
+	// `autoUpdate` polls and re-measures on every scroll, so it only runs while
+	// the popover is open. The module is fetched up front so the first open
+	// doesn't wait on the network, and the popover stays hidden until it has
+	// a position.
+	const useFloatingUiPositioning = (popover: HTMLElement) => {
 		if (layoutMode === TooltipLayoutMode.AnchorPositioning && supportsAnchorPositioning)
 			return
 
-		const {
-			computePosition,
-			offset: offsetMiddleware,
-			flip,
-			shift,
-			autoUpdate,
-		} = await import('@floating-ui/dom')
-
 		// Disable native anchor positioning
-		node.popoverTargetElement.style.position = 'absolute'
-		node.popoverTargetElement.style.setProperty('position-area', 'none')
-		node.popoverTargetElement.style.setProperty('position-anchor', anchorName)
+		popover.style.position = 'absolute'
+		popover.style.setProperty('position-area', 'none')
+		popover.style.setProperty('position-anchor', anchorName)
 
-		const updatePosition = () => {
-			void computePosition(
-				node,
-				node.popoverTargetElement,
-				{
-					placement: ({
-						'block-start': 'top',
-						'block-end': 'bottom',
-						'inline-start': 'left',
-						'inline-end': 'right',
-					} as const)[placement],
-					middleware: [
-						offsetMiddleware(offset),
-						flip(),
-						shift({
-							padding: offset * 2,
-							crossAxis: true,
-							mainAxis: true,
-						}),
-					],
-				}
-			)
-				.then(({ x, y }) => {
-					node.popoverTargetElement.style.left = `${x}px`
-					node.popoverTargetElement.style.top = `${y}px`
-				})
+		const floatingUi = import('@floating-ui/dom')
+
+		let stopAutoUpdate: (() => void) | undefined
+		let isDetached = false
+
+		const stopPositioning = () => {
+			stopAutoUpdate?.()
+			stopAutoUpdate = undefined
 		}
 
-		updatePosition()
+		const startPositioning = async () => {
+			const {
+				computePosition,
+				offset: offsetMiddleware,
+				flip,
+				shift,
+				autoUpdate,
+			} = await floatingUi
 
-		return autoUpdate(
-			node,
-			node.popoverTargetElement,
-			updatePosition
-		)
+			const reference = triggerElement
+
+			if (isDetached || stopAutoUpdate || !reference || !popover.matches(':popover-open'))
+				return
+
+			stopAutoUpdate = autoUpdate(
+				reference,
+				popover,
+				() => {
+					void computePosition(
+						reference,
+						popover,
+						{
+							placement: ({
+								'block-start': 'top',
+								'block-end': 'bottom',
+								'inline-start': 'left',
+								'inline-end': 'right',
+							} as const)[placement],
+							middleware: [
+								offsetMiddleware(offset),
+								flip(),
+								shift({
+									padding: offset * 2,
+									crossAxis: true,
+									mainAxis: true,
+								}),
+							],
+						}
+					)
+						.then(({ x, y }) => {
+							popover.style.left = `${x}px`
+							popover.style.top = `${y}px`
+							popover.style.removeProperty('visibility')
+						})
+				}
+			)
+		}
+
+		// `beforetoggle` fires before the popover is first painted, unlike `toggle`
+		const onBeforeToggle = (event: ToggleEvent) => {
+			if (event.newState === 'open') {
+				popover.style.visibility = 'hidden'
+				void startPositioning()
+			} else {
+				stopPositioning()
+			}
+		}
+
+		popover.addEventListener('beforetoggle', onBeforeToggle)
+
+		return () => {
+			isDetached = true
+			popover.removeEventListener('beforetoggle', onBeforeToggle)
+			stopPositioning()
+		}
 	}
 </script>
 
@@ -170,6 +216,7 @@
 					}
 				}
 			}}
+			{@attach useFloatingUiPositioning}
 
 			style:position-area={placement}
 			style:position-anchor={anchorName}
