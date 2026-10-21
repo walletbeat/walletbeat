@@ -524,6 +524,7 @@ describe('codebase integrity', () => {
 			'eternalsafe.Containerfile',
 			'[attrGroupId].astro',
 			'[eip].astro',
+			'[eip]',
 			'[walletName]',
 			'[...slug]',
 			'[...path].[ext].ts',
