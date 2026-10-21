@@ -17,11 +17,7 @@ export const ackee: CorporateEntity & SecurityAuditor = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/ackee-blockchain',
 	farcaster: 'https://farcaster.xyz/ackee',
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Prague, Czech Republic',
 	linkedin: 'https://linkedin.com/company/ackee-blockchain',
 	privacyPolicy: 'https://ackee.xyz/privacy-policy',

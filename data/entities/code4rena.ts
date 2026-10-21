@@ -17,11 +17,7 @@ export const code4rena: CorporateEntity & SecurityAuditor = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/code4rena',
 	farcaster: 'https://warpcast.com/code4rena',
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'United States',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
