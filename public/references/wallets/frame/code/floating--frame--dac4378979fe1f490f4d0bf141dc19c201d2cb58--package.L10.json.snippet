@@ -1,0 +1,26 @@
+{
+	"highlightFirstLine": 10,
+	"highlightLastLine": 10,
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				"  \"scripts\": {",
+				"    \"clean\": \"npx rimraf dist bundle compiled .parcel-cache node_modules\",",
+				"    \"setup:full\": \"npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && npm run setup:scripts && npm audit fix\",",
+				"    \"setup:clean\": \"npm run clean && npm run setup:deps\",",
+				"    \"setup:ci\": \"npm ci --ignore-scripts && npm run setup:scripts\",",
+				"    \"setup:deps\": \"npm install --ignore-scripts && npm run setup:scripts\",",
+				"    \"setup:scripts\": \"allow-scripts\",",
+				"    \"setup\": \"npm run setup:deps && husky install\",",
+				"    \"start\": \"npm run launch\","
+			],
+			"startLine": 6
+		}
+	]
+}
