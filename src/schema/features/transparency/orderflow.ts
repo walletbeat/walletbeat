@@ -12,7 +12,12 @@ import {
 	WalletInfo,
 } from '../privacy/data-collection'
 import { type Support } from '../support'
-import { type FeeDisplay, FeeDisplayLevel, validateFeeDisplay } from './fee-display'
+import {
+	type FeeDisplay,
+	feeDisplayAfterSingleAction,
+	FeeDisplayLevel,
+	validateFeeDisplay,
+} from './fee-display'
 
 /**
  * What level of orderflow / MEV auctioning information is shown by default and
@@ -131,6 +136,26 @@ function compareProminenceLevels(
 }
 
 /**
+ * Fee display levels shown by default and after at most one action, for
+ * prominence comparison. `NO_FEES_CHARGED` shows no fee information.
+ */
+export function feeProminenceLevels(fees: FeeDisplay | 'NO_FEES_CHARGED'): {
+	byDefault: FeeDisplayLevel
+	afterSingleAction: FeeDisplayLevel
+} {
+	if (fees === 'NO_FEES_CHARGED') {
+		return { byDefault: FeeDisplayLevel.NONE, afterSingleAction: FeeDisplayLevel.NONE }
+	}
+
+	validateFeeDisplay(fees)
+
+	return {
+		byDefault: fees.shownByDefault.comprehensiveness,
+		afterSingleAction: feeDisplayAfterSingleAction(fees).comprehensiveness,
+	}
+}
+
+/**
  * Compares orderflow UI disclosure prominence to fee display.
  *
  * Returns:
@@ -138,22 +163,22 @@ function compareProminenceLevels(
  *   * `0` if prominence is equal at both by-default and after-single-action levels
  *   * `-1` if orderflow disclosure is less prominent than fees
  *
- * Compares `feeDisplay.byDefault` and `feeDisplay.afterSingleAction` to the
+ * Compares the fee display levels from `feeProminenceLevels` to the
  * corresponding orderflow disclosure levels using the same prominence ordering.
  */
 export function compareOrderflowDisclosureToFeeDisplay(
 	disclosure: OrderflowDisclosure,
-	feeDisplay: FeeDisplay,
+	fees: FeeDisplay | 'NO_FEES_CHARGED',
 ): -1 | 0 | 1 {
-	validateFeeDisplay(feeDisplay)
+	const feeLevels = feeProminenceLevels(fees)
 
-	const byDefaultCompare = compareProminenceLevels(disclosure.byDefault, feeDisplay.byDefault)
+	const byDefaultCompare = compareProminenceLevels(disclosure.byDefault, feeLevels.byDefault)
 
 	if (byDefaultCompare !== 0) {
 		return byDefaultCompare
 	}
 
-	return compareProminenceLevels(disclosure.afterSingleAction, feeDisplay.afterSingleAction)
+	return compareProminenceLevels(disclosure.afterSingleAction, feeLevels.afterSingleAction)
 }
 
 /** Transaction flows used for orderflow transparency helpers derived from data collection. */

@@ -6,6 +6,7 @@ import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
+import { anonWallet } from './software-wallets/anon-wallet'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
 import { daimo } from './software-wallets/daimo'
@@ -26,6 +27,7 @@ import { safe } from './software-wallets/safe'
 import { trustWallet } from './software-wallets/trust-wallet'
 import { uniswapWallet } from './software-wallets/uniswap-wallet'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
+import { walletchan } from './software-wallets/walletchan'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
 
@@ -66,6 +68,7 @@ export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
+	anonWallet,
 	baseApp,
 	bitget,
 	daimo,
@@ -85,6 +88,7 @@ export const softwareWallets = {
 	safe,
 	trustWallet,
 	uniswapWallet,
+	walletchan,
 	zerion,
 	zeus,
 } as const satisfies Record<string, SoftwareWallet>

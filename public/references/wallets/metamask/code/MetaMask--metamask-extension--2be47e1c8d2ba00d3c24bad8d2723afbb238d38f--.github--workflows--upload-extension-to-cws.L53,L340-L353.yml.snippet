@@ -1,0 +1,74 @@
+{
+	"highlightRanges": [
+		{
+			"first": 53,
+			"last": 53
+		},
+		{
+			"first": 340,
+			"last": 353
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"",
+				"permissions:",
+				"  contents: read",
+				"  id-token: write",
+				"  attestations: read # Required for gh attestation verify (INFRA-3661)",
+				"",
+				"jobs:",
+				"  upload:",
+				"    name: Upload to CWS (${{ inputs.target }})"
+			],
+			"startLine": 49
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 67
+		},
+		{
+			"lines": [
+				"      - name: Download release asset"
+			],
+			"startLine": 328
+		},
+		{
+			"lines": [
+				"        run: |"
+			],
+			"startLine": 332
+		},
+		{
+			"lines": [
+				"          gh release download \"${RELEASE_TAG}\" \\",
+				"            --repo \"${{ github.repository }}\" \\",
+				"            --pattern \"${ZIP_NAME}\"",
+				"          ls -lh \"${ZIP_NAME}\"",
+				"",
+				"      - name: Verify artifact attestation",
+				"        if: ${{ !inputs.dry-run && steps.cws-precheck.outputs.skip_upload != 'true' }}",
+				"        id: verify-attestation",
+				"        env:",
+				"          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}",
+				"          ZIP_NAME: ${{ env.ZIP_NAME }}",
+				"        run: |",
+				"          set -euo pipefail",
+				"          echo \"=== Verifying build provenance attestation ===\"",
+				"          gh attestation verify \"${ZIP_NAME}\" \\",
+				"            --repo \"${{ github.repository }}\" \\",
+				"            --signer-workflow \"${{ github.repository }}/.github/workflows/publish-release-from-release-head.yml\" \\",
+				"            --source-ref \"refs/heads/release/${VERSION}\"",
+				"          echo \"Attestation verified for ${ZIP_NAME}\"",
+				"",
+				"      - name: Verify SHA256SUMS",
+				"        if: ${{ !inputs.dry-run && steps.cws-precheck.outputs.skip_upload != 'true' }}",
+				"        id: verify-sha256sums"
+			],
+			"startLine": 335
+		}
+	]
+}
