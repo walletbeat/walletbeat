@@ -101,6 +101,7 @@ export const zerion: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupported,
