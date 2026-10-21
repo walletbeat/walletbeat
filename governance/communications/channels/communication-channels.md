@@ -60,7 +60,7 @@ _Keep list sorted by chronological "Established" date._
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
 - **Walletbeat ↔ Devcon**:
-  - **Walletbeat contributors**: 0xMattmatt, polymutex, darrylyeo, lucila
+  - **Walletbeat contributors**: 0xMattmatt, polymutex, darrylyeo, Lucila
   - **Established**: 2026-06
   - **Fibonacci-approximate number of participants**: 9
   - **Medium**: Telegram
@@ -70,7 +70,7 @@ _Keep list sorted by chronological "Established" date._
   - **Established**: 2026-08
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
-- **Walletbeat ↔ L2Beat**:
+- **Walletbeat ↔ L2BEAT**:
   - **Walletbeat contributors**: 0xMattmatt, polymutex, ren2140
   - **Established**: 2026-09
   - **Fibonacci-approximate number of participants**: 4
