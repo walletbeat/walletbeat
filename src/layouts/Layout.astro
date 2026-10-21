@@ -30,10 +30,11 @@ const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
 import Footer from '@/views/Footer.astro'
+import { defaultLanguage } from '@/i18n/ui'
 ---
 
 <!doctype html>
-<html lang='en'>
+<html lang={defaultLanguage}>
 	<head>
 		<meta charset='UTF-8' />
 		<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
