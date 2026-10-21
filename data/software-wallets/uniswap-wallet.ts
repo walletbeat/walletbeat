@@ -1228,6 +1228,7 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			orderflowPractices: null,

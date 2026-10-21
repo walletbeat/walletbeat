@@ -1145,6 +1145,7 @@ export const ambire: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
