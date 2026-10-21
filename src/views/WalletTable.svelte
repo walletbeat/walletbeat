@@ -432,7 +432,7 @@
 >
 	<header
 		data-scroll-item="inline-detached padding-match-start"
-		data-row="wrap"
+		data-column="gap-4"
 	>
 		{#if title}
 			<div class="title-group" data-column="gap-1">
@@ -682,7 +682,7 @@
 						filterGroups={[
 							{
 								id: 'stage',
-								label: 'Attributes',
+								label: 'Attributes for',
 								displayType: 'group',
 								exclusive: false,
 								operation: 'union',
@@ -1164,6 +1164,7 @@
 								filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
 							) : null}
 							<Pie
+								class="wallet-overall-rating-pie"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
@@ -1327,13 +1328,18 @@
 										summaryType={WalletAttributeGroupSummaryType.None}
 										{isInTooltip}
 									/>
-								{:else}
+								{:else if isInTooltip}
 									<WalletOverallSummary
 										{wallet}
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
 										{isInTooltip}
 									/>
+								{:else}
+									<!-- The row already shows the name and stage; explain the flower instead. -->
+									<p class="flower-hint">
+										Hover or select a petal to see how {wallet.metadata.displayName} rates on it.
+									</p>
 								{/if}
 							{/snippet}
 						</TooltipOrAccordion>
@@ -1678,7 +1684,7 @@
 					</div>
 				</div>
 
-				<!-- Full-size overall Pie -->
+				<!-- Overall Pie, scaled down beside the header -->
 				<div class="mobile-card-pie">
 					<Pie
 						layout={PieLayout.FullTop}
@@ -1759,6 +1765,24 @@
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 		}
+	}
+
+	/*
+	 * At rest the table spans the same column as the title and filters above it
+	 * (both gutters are equal here), and still grows and scrolls when rating
+	 * columns are expanded.
+	 */
+	.desktop-table-container {
+		grid-template-columns: minmax(
+			calc(
+				var(--sticky-sizeInline)
+				- 2 * max(
+					var(--scrollItem-inlineDetached-paddingStart),
+					(var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2
+				)
+			),
+			max-content
+		);
 	}
 
 	:global {
@@ -1891,6 +1915,11 @@
 				font-size: smaller;
 				opacity: 0.6;
 			}
+
+			/* Tags render at 0.66em; this keeps them legible at about 10px. */
+			.tags {
+				font-size: 1.15em;
+			}
 		}
 
 		.variants {
@@ -1958,8 +1987,61 @@
 		margin-inline: -1em;
 	}
 
+	/* In a row the flower is an at-a-glance summary; hovering a petal or expanding the row shows details. */
+	:global(.wallet-overall-rating-pie) {
+		zoom: 0.48;
+	}
+
+	/*
+	 * At row and card size the attribute-level icons are a few pixels wide; the
+	 * colors carry the meaning. Attribute slice IDs are built in this file
+	 * (`…__attr_…` in rows, `…_a_…` in mobile cards).
+	 */
+	:global(.pie-container.wallet-overall-rating-pie .pie .slice[data-slice-id*='__attr_'] > .slice-shape > .label),
+	.mobile-card-pie :global(.pie-container .pie .slice[data-slice-id*='_a_'] > .slice-shape > .label) {
+		display: none;
+	}
+
+	/* One toolbar: groups flow from the start edge, each a wrapping row of chips. */
+	.filters {
+		> [data-scroll-item][data-row] {
+			inline-size: auto;
+			flex-wrap: wrap;
+			justify-content: start;
+			align-items: start;
+			column-gap: 2rem;
+		}
+
+		:global(form.menu) {
+			--card-backgroundColor: transparent;
+			--card-padding: 0;
+
+			column-gap: 2rem;
+			row-gap: 1rem;
+		}
+
+		:global(form.menu:not(:has(> [data-filter-group]))) {
+			display: none;
+		}
+
+		:global([data-filter-group] > .group) {
+			flex-flow: row wrap;
+			gap: 0.375rem;
+		}
+	}
+
 	.eip-tooltip-content {
 		width: 34rem;
+	}
+
+	.flower-hint {
+		max-inline-size: 14rem;
+		margin-inline: auto;
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+		line-height: 1.45;
+		text-align: center;
+		text-wrap: balance;
 	}
 
 	.pie-center-dot {
@@ -2031,16 +2113,16 @@
 		flex-direction: column;
 		gap: 0.75rem;
 
+		/* Matches the desktop filter legends. */
 		legend {
 			font-size: 0.75em;
-			font-family: var(--font-mono, monospace);
+			text-transform: uppercase;
 			letter-spacing: 0.05em;
 			color: var(--text-secondary);
 			padding: 0;
 		}
 
 		&.mobile-filter-group-centered {
-			align-items: center;
 			width: 100%;
 		}
 	}
@@ -2090,7 +2172,6 @@
 	.filter-circle-number {
 		font-size: 1rem;
 		font-weight: 600;
-		font-family: var(--font-mono, monospace);
 		line-height: 1;
 	}
 
@@ -2103,12 +2184,14 @@
 
 	/* ── Mobile wallet cards ────────────────────── */
 
+	/* Header on the start side, a scaled-down flower on the end side. */
 	.mobile-wallet-card {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		padding-block: 1.75rem;
-		border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 0.75rem;
+		padding-block: 1rem;
+		border-block-end: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
 
 		&:last-child {
 			border-block-end: none;
@@ -2122,10 +2205,10 @@
 	}
 
 	.mobile-card-rank {
-		font-size: 1.25rem;
+		font-size: 1rem;
 		font-weight: 600;
 		color: var(--text-secondary);
-		min-width: 2rem;
+		min-width: 1.5rem;
 		flex-shrink: 0;
 	}
 
@@ -2148,13 +2231,15 @@
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: 0.5rem;
+		gap: 0.25rem 0.5rem;
 		flex: 1;
 		min-width: 0;
 	}
 
+	/* Name on its own line, so stage and platforms always line up underneath. */
 	.mobile-card-name {
-		font-size: 1.25rem;
+		flex-basis: 100%;
+		font-size: 1.125rem;
 		font-weight: 700;
 		min-width: 0;
 		white-space: nowrap;
@@ -2202,6 +2287,7 @@
 	.mobile-card-pie {
 		display: flex;
 		justify-content: center;
+		zoom: 0.42;
 		content-visibility: auto;
 		/* Reserve the pie's rendered height while it is skipped, so cards below don't shift when it renders:
 		   2 * padding + 2 * (radius + outer level offset) = 2 * 8 + 2 * (100 + 0.45 * 100) */
