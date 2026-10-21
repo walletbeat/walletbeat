@@ -53,14 +53,6 @@ This enables more collaboration, transparency, and security research.
 
 ---
 
-@daimopay
-
-✅ Uses Free & Open Source license (Under GPL-3.0)
-
-![Daimo license](./daimo-license.png)
-
----
-
 @gemwallet
 
 ✅ Uses Free & Open Source license (Under GPL-3.0)
