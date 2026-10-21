@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
@@ -214,9 +215,9 @@ export const ambire: SoftwareWallet = {
 		displayName: 'Ambire',
 		tableName: 'Ambire',
 		coinspectId: 'ambire',
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-22',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -1237,7 +1238,32 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: supported({
+					ref: [
+						{
+							explanation:
+								'The production extension runs each code library in a LavaMoat sandbox. A library can only reach what its policy allows.',
+							label: 'LavaMoat setup in the extension build',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L146-L169',
+						},
+						{
+							explanation: 'The policy lists what each library is allowed to use.',
+							label: 'LavaMoat policy',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/lavamoat/webpack/policy.json#L1-L36',
+						},
+						{
+							explanation:
+								'LavaMoat is on for production builds for Chrome and Safari. The Firefox build runs without it.',
+							label: 'Builds that use LavaMoat',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/shared.js#L70',
+						},
+						{
+							explanation: 'The scripts that the extension adds to web pages run without LavaMoat.',
+							label: 'Scripts that run without LavaMoat',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L19-L35',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',
