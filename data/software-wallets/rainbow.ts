@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { alphabet } from '@/data/entities/alphabet'
@@ -153,9 +154,9 @@ export const rainbow: SoftwareWallet = {
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
 		coinspectId: 'rainbow',
-		contributors: [polymutex, mattmatt, ren2140],
+		contributors: [polymutex, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-09-03',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -2175,7 +2176,34 @@ export const rainbow: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The production release builds the extension with the standard build, which does not sandbox code libraries.',
+								label: 'Chrome release build step',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/.github/workflows/publish-prod-chrome.yml#L31-L32',
+							},
+							{
+								explanation:
+									'The standard build uses LavaMoat only while the extension is being built, which protects the build machine but not users. The separate step that would sandbox libraries inside the extension is not part of the release.',
+								label: 'Extension build scripts',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/package.json#L17-L22',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app uses LavaMoat only to control which libraries may run scripts when they are installed. It does not sandbox libraries while the app runs.',
+								label: 'LavaMoat install script settings',
+								url: 'https://github.com/rainbow-me/rainbow/blob/1753c733bf204c0046b9f16b6e43b594e78f2c81/package.json#L469-L490',
+							},
+						],
+					}),
+				},
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
