@@ -888,6 +888,10 @@ export const rainbow: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 0, kind: 'ipTime', strength: 1800000 },
+									},
 									destination: 'SAME_FOR_ALL',
 									proxy: 'NONE',
 									timing: 'SIMULTANEOUS',
