@@ -1,6 +1,12 @@
 import type { WalletSecurityNews } from '@/types/content/news'
 
+import krakenTrezorVoltageGlitchSeedExtraction from './2020-01-31-kraken-trezor-voltage-glitch-seed-extraction'
+import ledgerECommerceDatabaseBreach from './2020-07-29-ledger-e-commerce-database-breach'
+import demonicMetamaskSeedPhraseOnDisk from './2022-06-15-demonic-metamask-seed-phrase-on-disk'
 import slopeWalletSentrySeedPhraseLeak from './2022-08-11-slope-wallet-sentry-seed-phrase-leak'
+import ledgerConnectKitSupplyChainAttack from './2023-12-14-ledger-connect-kit-supply-chain-attack'
+import trezorSupportPortalBreach from './2024-01-17-trezor-support-portal-breach'
+import safeWalletBybitHack from './2025-02-21-safe-wallet-bybit-hack'
 import browserExtensionV268Incident from './2025-12-25-browser-extension-v268-incident'
 import globalEBreach from './2026-01-06-global-e-breach'
 import bankrbotHack from './2026-05-20-bankrbot-hack'
@@ -21,7 +27,13 @@ import metamaskInfrastructureSecurityIncident from './2026-09-30-metamask-infras
  * Compiled from individual news files
  */
 export const allWalletSecurityNews: WalletSecurityNews[] = [
+	krakenTrezorVoltageGlitchSeedExtraction,
+	ledgerECommerceDatabaseBreach,
+	demonicMetamaskSeedPhraseOnDisk,
 	slopeWalletSentrySeedPhraseLeak,
+	ledgerConnectKitSupplyChainAttack,
+	trezorSupportPortalBreach,
+	safeWalletBybitHack,
 	browserExtensionV268Incident,
 	globalEBreach,
 	bankrbotHack,
