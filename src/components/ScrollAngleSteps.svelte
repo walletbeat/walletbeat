@@ -52,7 +52,7 @@
 			animation-duration: 1ms;
 			animation-fill-mode: both;
 			animation-composition: accumulate;
-			animation-range: cover 78% cover 85%;
+			animation-range: exit-crossing -3rem exit-crossing -1rem;
 		}
 
 		@keyframes -global-WalletPieRotationStep {
