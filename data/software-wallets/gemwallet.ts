@@ -184,6 +184,7 @@ export const gemwallet: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
 		integration: {

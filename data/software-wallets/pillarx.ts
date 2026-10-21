@@ -60,6 +60,7 @@ export const pillarx: SoftwareWallet = {
 		chainAbstraction: null,
 		chainConfigurability: null,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {
