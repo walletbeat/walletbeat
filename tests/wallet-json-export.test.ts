@@ -44,6 +44,10 @@ describe('ratedWalletJsonExport', () => {
 				expect(() => validator.assert(JSON.stringify(payload))).not.toThrow()
 			})
 
+			it('has no EIP magic URLs', () => {
+				expect(JSON.stringify(payload)).not.toContain('#wb-format=')
+			})
+
 			it('export top-level fields match source wallet', () => {
 				const { stage } = getWalletStageAndLadder(wallet)
 
