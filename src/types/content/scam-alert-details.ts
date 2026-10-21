@@ -30,7 +30,9 @@ export function isScamPreventionMetadata(value: unknown): value is ScamPreventio
 		isRecord(value.scamUrlWarning) &&
 		isRecord(value.sendTransactionWarning) &&
 		isRecord(value.contractTransactionWarning) &&
-		isRecord(value.unlimitedApprovalWarning)
+		isRecord(value.unlimitedApprovalWarning) &&
+		(value.secretSensitivityWarning === null || isRecord(value.secretSensitivityWarning)) &&
+		(value.secretScreenCaptureBlocking === null || isRecord(value.secretScreenCaptureBlocking))
 	)
 }
 

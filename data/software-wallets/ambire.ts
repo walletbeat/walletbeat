@@ -927,6 +927,7 @@ export const ambire: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
