@@ -42,6 +42,8 @@ Their latest audit was published on February 20, 2025, over a year ago.
 
 Since then, Ambire has shipped clear signing (ERC-7730), Safe account support, and unlimited approval warnings. A new audit covering these would help.
 
+![Security audits & bug bounties](./security-audits-bug-bounties.png)
+
 ---
 
 Scam prevention 🚨
@@ -56,6 +58,8 @@ However:
 
 More comprehensive protection and privacy-preserving scam checks could improve this further.
 
+![Scam prevention](./scam-prevention.png)
+
 ---
 
 Transaction legibility 🔏
@@ -68,6 +72,9 @@ What's missing is the verification side (ERC-8213):
 ✗ No EIP-712 digest, domain hash or message hash
 
 Digests let users verify what they're signing against an independent source, like a hardware wallet screen.
+
+![Transaction legibility](./transaction-legibility-1.png)
+![Transaction legibility](./transaction-legibility-2.png)
 
 ---
 
@@ -87,6 +94,8 @@ Ambire does not independently verify the integrity of Ethereum L1 when retrievin
 
 This means users rely on external providers for blockchain state, introducing a trust assumption that could potentially result in users signing transactions with unintended effects.
 
+![Chain verification](./chain-verification.png)
+
 ---
 
 Security best practices 🔐
@@ -99,6 +108,8 @@ Ambire currently allows any installed extension to connect through `externally_c
 
 This means a malicious extension could potentially send wallet requests directly to Ambire.
 
+![Security best practices](./security-best-practices.png)
+
 ---
 
 Account recovery 🛟
@@ -108,6 +119,8 @@ Ambire does not currently support guardian-based recovery.
 It also does not provide recovery checks such as periodic private-key or seed-phrase verification.
 
 These mechanisms can help users verify that their recovery credentials are still accessible before they actually need them.
+
+![Account recovery](./account-recovery.png)
 
 ---
 
