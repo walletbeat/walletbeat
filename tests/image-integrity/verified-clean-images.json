@@ -1623,6 +1623,10 @@
 		"hash": "384b134ba6d416d6dd13cce1f645ce5d0b6f2e4ea08bb314d8d248b8a25283eb",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/l1-provider-independence.png": {
+		"hash": "45d7f34536a3d48ba6fddfda129d8d0f8fd276da3eb12f8438827235d6f7f98f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/multi-address-privacy.png": {
 		"hash": "b30e5d5200e03d3f80d5e3853ce79db1b4855a441986604f219bbaa0280dd70f",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
