@@ -1,0 +1,179 @@
+{
+	"entries": [
+		{
+			"unixMillis": 1792699401714,
+			"tip": "99f3fd323039b50c071f8511db45b57474ee0a3194da11708d1d5bca80f1edd1",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=www.google-analytics.com --path=/g/collect --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005407
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005487
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005945
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005946
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000006023
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005070
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005154
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017665
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017666
+				}
+			]
+		},
+		{
+			"unixMillis": 1792699442166,
+			"tip": "b13f7d0505bc63103ee3e04af696835d980af03e7631ca43a031b2fe17614eaa",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005407
+				}
+			],
+			"rationale": "Store user_engagement analytics from chromewebstore.google.com for its extension listing; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699453739,
+			"tip": "b69df0aa123f84d3ccd39071beb997bf99c0c132e15161d4752d10b2443c41e4",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005487
+				}
+			],
+			"rationale": "Store page_view analytics with Chrome Web Store referer and listing URL; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699470189,
+			"tip": "e7f039ef7fbf34a2268189da8ec458233a9454b09ce58c209e6a7bb8149767e7",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005945
+				}
+			],
+			"rationale": "Store user_engagement analytics with Chrome Web Store referer and listing URL, including browser properties; not wallet-initiated traffic."
+		},
+		{
+			"unixMillis": 1792699484757,
+			"tip": "57646c361bcd53acf9a96db40b1b123cdabbb59614d7c13c9575f4356669c866",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005946
+				}
+			],
+			"rationale": "Chrome Web Store view_item analytics for the extension listing, with store referer; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699498266,
+			"tip": "2ba0b03b6233a99ad98dd0b31dbf5d2bacbacf1025920d577cef15ca1dccc303",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000006023
+				}
+			],
+			"rationale": "Chrome Web Store detail_page_view analytics for the extension listing with store referer; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699513738,
+			"tip": "fd1753b929bda3a0fd95b62e577429fe19fb725ff82f91b893d3789d2f510f40",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005070
+				}
+			],
+			"rationale": "Chrome Web Store install_attempt analytics for its Uniswap listing; store Referer and event_url establish this is not wallet-initiated."
+		},
+		{
+			"unixMillis": 1792699528934,
+			"tip": "b106b6204e09730fe9f4377e194be7d6dbfc03d53d729383b58e1fecda302827",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005154
+				}
+			],
+			"rationale": "Chrome Web Store install_attempt analytics for its Uniswap listing; store Referer and event_url establish this is not wallet-initiated."
+		},
+		{
+			"unixMillis": 1792699542409,
+			"tip": "d08788db93d5ff30b1857b2167d93037b9417f9aa42c6bfbf0fce132faface5f",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017665
+				}
+			],
+			"rationale": "Chrome Web Store install_success event for its listing, confirmed by store Referer and event_url. Store analytics, not wallet code."
+		},
+		{
+			"unixMillis": 1792699555427,
+			"tip": "c3b3c258624e822b90aaba07277b1e0fc1a58f58e1b4db3192fdd27d28cc34f6",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017666
+				}
+			],
+			"rationale": "Chrome Web Store install_success event for its listing, confirmed by store Referer and event_url. Store analytics, not wallet code."
+		},
+		{
+			"type": "close-mutation",
+			"unixMillis": 1792699555618,
+			"tip": "86aad15eae4e12a74957dd9e24dfea93d6932f62371102ae2815ef38f06b692b"
+		}
+	]
+}
