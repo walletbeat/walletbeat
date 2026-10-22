@@ -157,6 +157,8 @@ Walletbeat recommends supporting force-withdrawal transactions that can be creat
 
 This would reduce reliance on intermediaries when exiting an L2.
 
+![Transaction inclusion](./transaction-inclusion.png)
+
 ---
 
 Permissions management 🔑
@@ -164,6 +166,8 @@ Permissions management 🔑
 Ambire's built-in swaps only request the exact amount needed, and batching lets apps bundle a tight approval with the action that uses it.
 
 But older approvals, or ones granted to other apps, stay live until revoked. Ambire users can't inspect or revoke existing ERC-20, ERC-721 or ERC-1155 approvals from the wallet.
+
+![Permissions management](./permissions-management.png)
 
 ---
 
@@ -203,6 +207,8 @@ However, it doesn't currently use:
 
 Adding these would make it easier for users and independent parties to verify that released software corresponds to the published source.
 
+![Release process](./release-process.png)
+
 ---
 
 Orderflow transparency 🌊
@@ -210,6 +216,8 @@ Orderflow transparency 🌊
 Ambire doesn't auction orderflow by default, but pre-inclusion transaction data is sent to Ambire's infrastructure, Pimlico and Biconomy through endpoints that aren't documented or independently verifiable as non-extractive.
 
 Documenting these endpoints and having them independently verified, or keeping this data local by default, would improve transparency.
+
+![Orderflow transparency](./orderflow-transparency.png)
 
 ---
 
@@ -245,6 +253,8 @@ For example, users can't see their total USDC balance across multiple chains in 
 
 Aggregating token balances across chains would make multi-chain management simpler.
 
+![Chain abstraction](./chain-abstraction.png)
+
 ---
 
 Address resolution 📇
@@ -257,6 +267,8 @@ However, it doesn't support chain-specific address formats such as:
 `user.eth:l2chain`
 
 Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
+
+![Address resolution](./address-resolution.png)
 
 ---
 
@@ -281,6 +293,8 @@ Ambire relies on external providers for RPC, token discovery, and account inform
 
 Some requests can expose the user's wallet address and IP address to these providers, creating potential correlation between a user and their onchain activity.
 
+![Wallet address privacy](./wallet-address-privacy.png)
+
 ---
 
 Privacy hygiene 🧼
@@ -288,6 +302,8 @@ Privacy hygiene 🧼
 Ambire doesn't consistently minimize the information shared with external providers.
 
 Privacy-preserving proxies could reduce these risks.
+
+![Privacy hygiene](./privacy-hygiene.png)
 
 ---
 
@@ -305,17 +321,23 @@ Multi-address privacy 🖇️
 
 Multiple wallet addresses can be exposed to the same provider, allowing them to be correlated.
 
+![Multi-address privacy](./multi-address-privacy.png)
+
 ---
 
 Private token transfers 📨
 
 Ambire doesn't support private token transfers. To pass, private transfers need to be the default, not just an option.
 
+![Private token transfers](./private-token-transfers.png)
+
 ---
 
 App isolation 🏝️
 
 Ambire doesn't provide app-specific accounts during the connection flow, making cross-app activity correlation possible.
+
+![App isolation](./app-isolation.png)
 
 ---
 
