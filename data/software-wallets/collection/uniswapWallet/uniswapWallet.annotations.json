@@ -5,6 +5,18 @@
 			"purposes": "NOT_WALLET_INITIATED",
 			"path": "/g/collect",
 			"refererDomain": "chromewebstore.google.com"
+		},
+		{
+			"domain": "accounts.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/RotateCookiesPage",
+			"refererDomain": "chromewebstore.google.com"
+		},
+		{
+			"domain": "ogs.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/u/0/widget/app",
+			"refererDomain": "chromewebstore.google.com"
 		}
 	],
 	"benignStrings": []
