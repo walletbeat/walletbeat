@@ -20,6 +20,8 @@ Hardware wallet support 🗝️
 
 Software wallets supporting hardware wallets means they offer the best of both worlds: a user-friendly interface with enhanced security. Ambire directly supports Ledger, Trezor, GridPlus, Keystone, and Keycard.
 
+![Security](./security.jpg)
+
 ---
 
 What could be better about Ambire's security?
@@ -121,6 +123,8 @@ Account unruggability 🪚
 
 These reduce dependence on Ambire and help prevent account lock-in.
 
+![Self-sovereignty](./self-sovereignty.jpg)
+
 ---
 
 What could be better about Ambire's self-sovereignty?
@@ -161,6 +165,8 @@ Transparent about its funding 💰
 Transparent about transaction fees 💸
 
 It also publicly discloses how transaction data is handled before inclusion onchain.
+
+![Transparency](./transparency.jpg)
 
 ---
 
@@ -204,6 +210,8 @@ Atomic transaction batching 🧺
 Hardware wallet interoperability 🧩
 
 Ambire is well aligned with several emerging Ethereum wallet standards.
+
+![Ecosystem alignment](./ecosystem-alignment.jpg)
 
 ---
 
@@ -249,6 +257,8 @@ Two areas are partially there:
 
 Wallet address privacy 🔗
 Privacy hygiene 🧼
+
+![Privacy](./privacy.jpg)
 
 ---
 
