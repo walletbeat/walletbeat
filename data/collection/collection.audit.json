@@ -171,9 +171,71 @@
 			"rationale": "Chrome Web Store install_success event for its listing, confirmed by store Referer and event_url. Store analytics, not wallet code."
 		},
 		{
-			"type": "close-mutation",
 			"unixMillis": 1792699555618,
-			"tip": "86aad15eae4e12a74957dd9e24dfea93d6932f62371102ae2815ef38f06b692b"
+			"tip": "86aad15eae4e12a74957dd9e24dfea93d6932f62371102ae2815ef38f06b692b",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792705901721,
+			"tip": "d77e601c3c595475ca589210e3ba987b10c880fac8c72594c1b50e0d92add174",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=accounts.google.com --path=/RotateCookiesPage --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005462
+				}
+			]
+		},
+		{
+			"unixMillis": 1792705914876,
+			"tip": "227e571ff35928298b47d5359662e90b583f3e79f440b72f55a18784f2051363",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005462
+				}
+			],
+			"rationale": "Google account cookie rotation embedded by Chrome Web Store: both origin query parameter and Referer identify chromewebstore.google.com. Captured before wallet installation in IDLE_PRE_INSTALL, so this is browser/store activity, not wallet-initiated traffic. The wallet-local path-and-referer matcher affects only this request."
+		},
+		{
+			"unixMillis": 1792705915058,
+			"tip": "9b60d067661ca782810470729ac59487e51f1e2c63f538f2a4f2c49a88ba0a6a",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792705952183,
+			"tip": "17701f9979ffba266efbdca2f548aade60cd3ba4d6c9f08aa7131934ac21dcff",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=ogs.google.com --path=/u/0/widget/app --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000009530
+				}
+			]
+		},
+		{
+			"unixMillis": 1792705964019,
+			"tip": "da99b08bed1675ae4b23c3a1dc261f876b55663ff16fdc2dc2644556b2b15679",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000009530
+				}
+			],
+			"rationale": "OneGoogle app widget embedded by Chrome Web Store: origin query parameter and Referer both identify chromewebstore.google.com. This IDLE_PRE_INSTALL request predates wallet installation and is store-page activity, not wallet-initiated traffic. Verified that the wallet-local path-and-referer matcher changes only this request."
+		},
+		{
+			"type": "close-mutation",
+			"unixMillis": 1792705964211,
+			"tip": "771c94bce57173ee21ea606f347f9c495676ebb0bd25479aad534d6fcfede27e"
 		}
 	]
 }
