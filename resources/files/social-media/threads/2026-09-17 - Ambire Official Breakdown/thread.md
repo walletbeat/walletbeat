@@ -12,7 +12,7 @@ We'll be evaluating Ambire across five dimensions: security, self-sovereignty, t
 
 ---
 
-1/5 Security 🔒
+1. Security 🔒
 
 What's good about Ambire's security?
 
@@ -124,7 +124,7 @@ These mechanisms can help users verify that their recovery credentials are still
 
 ---
 
-2/5 Self-sovereignty 🏰
+2. Self-sovereignty 🏰
 
 What's good about Ambire's self-sovereignty?
 
@@ -171,7 +171,7 @@ But older approvals, or ones granted to other apps, stay live until revoked. Amb
 
 ---
 
-3/5 Transparency 🕵️
+3. Transparency 🕵️
 
 What's good about Ambire's transparency?
 
@@ -221,7 +221,7 @@ Documenting these endpoints and having them independently verified, or keeping t
 
 ---
 
-4/5 Ecosystem alignment 🌳
+4. Ecosystem alignment 🌳
 
 What's good about Ambire's ecosystem alignment?
 
@@ -239,7 +239,6 @@ Ambire is well aligned with several emerging Ethereum wallet standards.
 What could be better about Ambire's ecosystem alignment?
 
 Chain abstraction 🌉
-Address resolution 📇
 
 Here's what we found 👇
 
@@ -257,22 +256,7 @@ Aggregating token balances across chains would make multi-chain management simpl
 
 ---
 
-Address resolution 📇
-
-Ambire supports human-readable ENS addresses such as `username.eth`.
-
-However, it doesn't support chain-specific address formats such as:
-
-`user@l2chain.eth`
-`user.eth:l2chain`
-
-Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
-
-![Address resolution](./address-resolution.png)
-
----
-
-5/5 Privacy 😎
+5. Privacy 😎
 
 Privacy is where Ambire has the most room for improvement.
 
@@ -319,7 +303,7 @@ One by one 👇
 
 Multi-address privacy 🖇️
 
-Multiple wallet addresses can be exposed to the same provider, allowing them to be correlated.
+Multiple wallet addresses can be exposed to the same provider, allowing them to be correlated with one another. These providers can learn that these different addresses belong to the same person.
 
 ![Multi-address privacy](./multi-address-privacy.png)
 
@@ -358,6 +342,8 @@ Ambire gives users strong control over their accounts, particularly through L1 p
 Users can choose and use their own RPC provider before any requests are made.
 
 This is an important step toward reducing trust in the wallet provider itself.
+
+![L1 provider independence](./l1-provider-independence.png)
 
 ---
 
