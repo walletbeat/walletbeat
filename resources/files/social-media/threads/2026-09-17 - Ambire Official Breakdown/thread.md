@@ -12,11 +12,11 @@ We'll be evaluating Ambire across five dimensions: security, self-sovereignty, t
 
 ---
 
-🔒 1/5 Security
+1/5 Security 🔒
 
 What's good about Ambire's security?
 
-🗝️ Hardware wallet support
+Hardware wallet support 🗝️
 
 Software wallets supporting hardware wallets means they offer the best of both worlds: a user-friendly interface with enhanced security. Ambire directly supports Ledger, Trezor, GridPlus, Keystone, and Keycard.
 
@@ -24,15 +24,15 @@ Software wallets supporting hardware wallets means they offer the best of both w
 
 What could be better about Ambire's security?
 
-📜 Security audits & bug bounties
-🚨 Scam prevention
-🔏 Transaction legibility
+Security audits & bug bounties 📜
+Scam prevention 🚨
+Transaction legibility 🔏
 
 Let's break it down 👇
 
 ---
 
-📜 Security audits & bug bounties
+Security audits & bug bounties 📜
 
 Ambire has undergone security audits and has an established bug bounty program.
 
@@ -42,7 +42,7 @@ Since then, Ambire has shipped clear signing (ERC-7730), Safe account support, a
 
 ---
 
-🚨 Scam prevention
+Scam prevention 🚨
 
 Ambire warns users when interacting with unknown addresses and known scams.
 
@@ -56,7 +56,7 @@ More comprehensive protection and privacy-preserving scam checks could improve t
 
 ---
 
-🔏 Transaction legibility
+Transaction legibility 🔏
 
 Ambire is one of the first wallets to ship clear signing (ERC-7730). It decodes approvals, Aave supplies, batched calls, and even calls nested inside Safe transactions.
 
@@ -71,15 +71,15 @@ Digests let users verify what they're signing against an independent source, lik
 
 What are the gaps in Ambire's security?
 
-⚓ Chain verification
-🔐 Security best practices
-🛟 Account recovery
+Chain verification ⚓
+Security best practices 🔐
+Account recovery 🛟
 
 Let's take a closer look 👇
 
 ---
 
-⚓ Chain verification
+Chain verification ⚓
 
 Ambire does not independently verify the integrity of Ethereum L1 when retrieving chain state or simulating transactions.
 
@@ -87,7 +87,7 @@ This means users rely on external providers for blockchain state, introducing a 
 
 ---
 
-🔐 Security best practices
+Security best practices 🔐
 
 Ambire uses standardized key-storage mechanisms and OS CSPRNG.
 
@@ -99,7 +99,7 @@ This means a malicious extension could potentially send wallet requests directly
 
 ---
 
-🛟 Account recovery
+Account recovery 🛟
 
 Ambire does not currently support guardian-based recovery.
 
@@ -109,15 +109,15 @@ These mechanisms can help users verify that their recovery credentials are still
 
 ---
 
-🏰 2/5 Self-sovereignty
+2/5 Self-sovereignty 🏰
 
 What's good about Ambire's self-sovereignty?
 
 Ambire gives users strong control over their accounts.
 
-🏠 L1 provider independence
-🧳 Account portability
-🪚 Account unruggability
+L1 provider independence 🏠
+Account portability 🧳
+Account unruggability 🪚
 
 These reduce dependence on Ambire and help prevent account lock-in.
 
@@ -125,14 +125,14 @@ These reduce dependence on Ambire and help prevent account lock-in.
 
 What could be better about Ambire's self-sovereignty?
 
-📡 Transaction inclusion
-🔑 Permissions management
+Transaction inclusion 📡
+Permissions management 🔑
 
 Here's the breakdown 👇
 
 ---
 
-📡 Transaction inclusion
+Transaction inclusion 📡
 
 Ambire requires users to trust intermediaries when withdrawing funds from L2s.
 
@@ -142,7 +142,7 @@ This would reduce reliance on intermediaries when exiting an L2.
 
 ---
 
-🔑 Permissions management
+Permissions management 🔑
 
 Ambire's built-in swaps only request the exact amount needed, and batching lets apps bundle a tight approval with the action that uses it.
 
@@ -150,15 +150,15 @@ But older approvals, or ones granted to other apps, stay live until revoked. Amb
 
 ---
 
-🕵️ 3/5 Transparency
+3/5 Transparency 🕵️
 
 What's good about Ambire's transparency?
 
 Ambire is:
 
-❤️ Open source under GPL-3.0
-💰 Transparent about its funding
-💸 Transparent about transaction fees
+Open source under GPL-3.0 ❤️
+Transparent about its funding 💰
+Transparent about transaction fees 💸
 
 It also publicly discloses how transaction data is handled before inclusion onchain.
 
@@ -166,14 +166,14 @@ It also publicly discloses how transaction data is handled before inclusion onch
 
 What could be better about Ambire's transparency?
 
-📦 Release process
-🌊 Orderflow transparency
+Release process 📦
+Orderflow transparency 🌊
 
 Let's dig in 👇
 
 ---
 
-📦 Release process
+Release process 📦
 
 Ambire has a public changelog and uses dependency locking.
 
@@ -186,7 +186,7 @@ Adding these would make it easier for users and independent parties to verify th
 
 ---
 
-🌊 Orderflow transparency
+Orderflow transparency 🌊
 
 Ambire doesn't auction orderflow by default, but pre-inclusion transaction data is sent to Ambire's infrastructure, Pimlico and Biconomy through endpoints that aren't documented or independently verifiable as non-extractive.
 
@@ -194,14 +194,14 @@ Documenting these endpoints and having them independently verified, or keeping t
 
 ---
 
-🌳 4/5 Ecosystem alignment
+4/5 Ecosystem alignment 🌳
 
 What's good about Ambire's ecosystem alignment?
 
-💼 Account abstraction via ERC-4337 & EIP-7702
-🌐 Browser integration standards
-🧺 Atomic transaction batching
-🧩 Hardware wallet interoperability
+Account abstraction via ERC-4337 & EIP-7702 💼
+Browser integration standards 🌐
+Atomic transaction batching 🧺
+Hardware wallet interoperability 🧩
 
 Ambire is well aligned with several emerging Ethereum wallet standards.
 
@@ -209,14 +209,14 @@ Ambire is well aligned with several emerging Ethereum wallet standards.
 
 What could be better about Ambire's ecosystem alignment?
 
-🌉 Chain abstraction
-📇 Address resolution
+Chain abstraction 🌉
+Address resolution 📇
 
 Here's what we found 👇
 
 ---
 
-🌉 Chain abstraction
+Chain abstraction 🌉
 
 Ambire shows total portfolio value across chains, but doesn't aggregate balances for individual tokens.
 
@@ -226,7 +226,7 @@ Aggregating token balances across chains would make multi-chain management simpl
 
 ---
 
-📇 Address resolution
+Address resolution 📇
 
 Ambire supports human-readable ENS addresses such as `username.eth`.
 
@@ -239,7 +239,7 @@ Adding support for chain-specific addresses could make cross-chain payments easi
 
 ---
 
-😎 5/5 Privacy
+5/5 Privacy 😎
 
 Privacy is where Ambire has the most room for improvement.
 
@@ -247,12 +247,12 @@ Most of its privacy attributes are rated Partial or Fail.
 
 Two areas are partially there:
 
-🔗 Wallet address privacy
-🧼 Privacy hygiene
+Wallet address privacy 🔗
+Privacy hygiene 🧼
 
 ---
 
-🔗 Wallet address privacy
+Wallet address privacy 🔗
 
 Ambire relies on external providers for RPC, token discovery, and account information.
 
@@ -260,7 +260,7 @@ Some requests can expose the user's wallet address and IP address to these provi
 
 ---
 
-🧼 Privacy hygiene
+Privacy hygiene 🧼
 
 Ambire doesn't consistently minimize the information shared with external providers.
 
@@ -270,27 +270,27 @@ Privacy-preserving proxies could reduce these risks.
 
 And three areas where the gaps are bigger:
 
-- 🖇️ Multi-address privacy
-- 📨 Private token transfers
-- 🏝️ App isolation
+- Multi-address privacy 🖇️
+- Private token transfers 📨
+- App isolation 🏝️
 
 One by one 👇
 
 ---
 
-🖇️ Multi-address privacy
+Multi-address privacy 🖇️
 
 Multiple wallet addresses can be exposed to the same provider, allowing them to be correlated.
 
 ---
 
-📨 Private token transfers
+Private token transfers 📨
 
 Ambire doesn't support private token transfers. To pass, private transfers need to be the default, not just an option.
 
 ---
 
-🏝️ App isolation
+App isolation 🏝️
 
 Ambire doesn't provide app-specific accounts during the connection flow, making cross-app activity correlation possible.
 
