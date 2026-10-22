@@ -196,6 +196,8 @@ describe('walletPageMarkdown', () => {
 					expect(md).toContain('Stage: Not applicable')
 				} else if (stage === 'QUALIFIED_FOR_NO_STAGES') {
 					expect(md).toContain('Stage: Qualified for no stages')
+				} else if (stage === 'UNRATED') {
+					expect(md).toContain('Stage: Unrated')
 				} else {
 					expect(md).toContain(`Stage: ${stage.label}`)
 				}

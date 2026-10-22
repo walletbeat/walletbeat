@@ -1,67 +1,33 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-import { allWallets, assertValidWalletName } from '@/data/wallets'
+import { allWallets } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
-	isSnippetSource,
-	parseGitHubBlobUrl,
+	lineRangesEqual,
 	rawGitHubContentUrl,
-	snippetRelativePath,
 	type StoredSnippetContent,
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
-import { collectAllRefs } from '@/schema/reference'
+import { formatLineRanges, type LineRange } from '@/schema/url'
 import { getErrorMessage } from '@/types/errors'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 
+import { findWalletSnippetOccurrences, type SnippetOccurrence } from './snippet-occurrences'
+
 /** Lines of context stored immediately before/after the referenced range. */
 const CONTEXT_LINE_COUNT = 4
-
-/** One line-anchored, commit-pinned GitHub blob URL found in a wallet's ref data. */
-export interface SnippetOccurrence {
-	walletId: string
-	source: CodeSnippetSource
-	/** The URL as written in the reference. */
-	url: string
-	/** Period-delimited field path (from the wallet root) the URL was found under. */
-	fieldPath: string
-	/** Repository-relative path of the snippet file this URL maps to. */
-	snippetPath: string
-}
 
 /**
  * Find every line-anchored, commit-pinned GitHub blob URL among wallet data
  * refs, paired with the wallet ID it was found under.
  */
 export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
-	const occurrences: SnippetOccurrence[] = []
-
-	for (const collected of collectAllRefs(allWallets)) {
-		const walletName = assertValidWalletName(collected.walletName)
-		const walletId = allWallets[walletName].metadata.id
-
-		for (const fq of collected.fullyQualifiedRefs) {
-			for (const urlEntry of fq.urls) {
-				const source = parseGitHubBlobUrl(urlEntry.url)
-
-				if (!isSnippetSource(source)) {
-					continue
-				}
-
-				occurrences.push({
-					fieldPath: collected.fieldPath,
-					snippetPath: snippetRelativePath(walletId, source),
-					source,
-					url: urlEntry.url,
-					walletId,
-				})
-			}
-		}
-	}
-
-	return occurrences
+	return Object.entries(allWallets).flatMap(([walletName, wallet]) =>
+		findWalletSnippetOccurrences(walletName, wallet),
+	)
 }
 
 /** A line's leading whitespace, used as its indentation. */
@@ -196,46 +162,62 @@ function groupIntoSegments(lines: string[], includedLineNumbers: number[]): Stor
 }
 
 /**
- * Build the JSON content stored for a snippet: the referenced lines, a
- * `CONTEXT_LINE_COUNT`-line window of surrounding context (clamped to file
- * bounds), and the enclosing scope-header lines above that window (see
- * `findScopeHeaderLines`). CRLF line endings are normalized to LF.
+ * Build the JSON content stored for a snippet: for each referenced range, its
+ * lines, a `CONTEXT_LINE_COUNT`-line window of surrounding context (clamped to
+ * file bounds), and the enclosing scope-header lines above that window (see
+ * `findScopeHeaderLines`). Ranges close enough for their context windows to
+ * touch end up in one segment; others are separated by a gap. CRLF line
+ * endings are normalized to LF.
  */
 export function buildSnippetContent(fileText: string, source: CodeSnippetSource): string {
 	const lines = fileText.replaceAll('\r\n', '\n').split('\n')
 	const lineCount = lines[lines.length - 1] === '' ? lines.length - 1 : lines.length
 
-	if (source.lastLine > lineCount) {
+	const lastLine = source.ranges[source.ranges.length - 1].last
+
+	if (lastLine > lineCount) {
 		throw new Error(
-			`Line range ${source.firstLine}-${source.lastLine} is out of bounds: ` +
+			`Line range ${formatLineRanges(source.ranges)} is out of bounds: ` +
 				`${source.path} @${source.commit.substring(0, 7)} has only ${lineCount} lines.`,
 		)
 	}
 
-	const contextStart = Math.max(1, source.firstLine - CONTEXT_LINE_COUNT)
-	const contextEnd = Math.min(lineCount, source.lastLine + CONTEXT_LINE_COUNT)
-
-	const firstNonBlankLine = lines
-		.slice(contextStart - 1, contextEnd)
-		.find(line => line.trim() !== '')
-	const startIndent = firstNonBlankLine === undefined ? '' : indentationOf(firstNonBlankLine)
-
-	const headerLines = findScopeHeaderLines(lines, contextStart, startIndent)
-
 	const includedLineNumbers = Array.from(
-		new Set([
-			...headerLines,
-			...Array.from({ length: contextEnd - contextStart + 1 }, (_, i) => contextStart + i),
-		]),
+		new Set(
+			source.ranges.flatMap(range => {
+				const contextStart = Math.max(1, range.first - CONTEXT_LINE_COUNT)
+				const contextEnd = Math.min(lineCount, range.last + CONTEXT_LINE_COUNT)
+
+				const firstNonBlankLine = lines
+					.slice(contextStart - 1, contextEnd)
+					.find(line => line.trim() !== '')
+				const startIndent = firstNonBlankLine === undefined ? '' : indentationOf(firstNonBlankLine)
+
+				return [
+					...findScopeHeaderLines(lines, contextStart, startIndent),
+					...Array.from({ length: contextEnd - contextStart + 1 }, (_, i) => contextStart + i),
+				]
+			}),
+		),
 	).sort((a, b) => a - b)
 
 	const content: StoredSnippetContent = {
-		highlightFirstLine: source.firstLine,
-		highlightLastLine: source.lastLine,
+		highlightRanges: source.ranges,
 		segments: groupIntoSegments(lines, includedLineNumbers),
 	}
 
 	return JSON.stringify(content, null, '\t') + '\n'
+}
+
+/** Type predicate for a single line range's raw JSON shape. */
+function isLineRange(range: unknown): range is LineRange {
+	if (typeof range !== 'object' || range === null) {
+		return false
+	}
+
+	const { first, last } = range as Partial<LineRange>
+
+	return typeof first === 'number' && typeof last === 'number'
 }
 
 /** Type predicate for a single segment's raw JSON shape. */
@@ -265,19 +247,19 @@ export function parseStoredSnippetContent(contents: string): StoredSnippetConten
 		throw new Error('Stored snippet JSON is not an object.')
 	}
 
-	const { highlightFirstLine, highlightLastLine, segments } =
-		parsed as Partial<StoredSnippetContent>
+	const { highlightRanges, segments } = parsed as Partial<StoredSnippetContent>
 
 	if (
-		typeof highlightFirstLine !== 'number' ||
-		typeof highlightLastLine !== 'number' ||
+		!Array.isArray(highlightRanges) ||
+		!isNonEmptyArray(highlightRanges) ||
+		!highlightRanges.every(isLineRange) ||
 		!Array.isArray(segments) ||
 		!segments.every(isStoredSnippetSegment)
 	) {
 		throw new Error('Stored snippet JSON does not match the expected shape.')
 	}
 
-	return { highlightFirstLine, highlightLastLine, segments }
+	return { highlightRanges, segments }
 }
 
 /** Fetch the full source file for a snippet from raw.githubusercontent.com. */
@@ -304,7 +286,7 @@ export enum SnippetProblemKind {
 	/**
 	 * A stored snippet whose content doesn't match what it should be: it isn't
 	 * valid `StoredSnippetContent` JSON (including the old flat-text format),
-	 * or its highlighted range doesn't match the range in its filename.
+	 * or its highlighted ranges don't match the ranges in its filename.
 	 */
 	SNIPPET_CONTENT_MISMATCH = 'SNIPPET_CONTENT_MISMATCH',
 }
@@ -365,14 +347,11 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 			continue
 		}
 
-		if (
-			parsed.highlightFirstLine !== occurrence.source.firstLine ||
-			parsed.highlightLastLine !== occurrence.source.lastLine
-		) {
+		if (!lineRangesEqual(parsed.highlightRanges, occurrence.source.ranges)) {
 			problems.push({
 				issue:
-					`Snippet highlights lines ${parsed.highlightFirstLine}-${parsed.highlightLastLine} ` +
-					`but its filename declares ${occurrence.source.firstLine}-${occurrence.source.lastLine}.`,
+					`Snippet highlights lines ${formatLineRanges(parsed.highlightRanges)} ` +
+					`but its filename declares ${formatLineRanges(occurrence.source.ranges)}.`,
 				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})

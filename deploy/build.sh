@@ -73,7 +73,7 @@ if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 fi
 
 if [[ -n "${WALLETBEAT_BUILD_DO_NOT_RECURSE:-}" ]]; then
-	exec pnpm astro build
+	exec pnpm astro build --frozen-lockfile --offline "$@"
 fi
 
 # Ensure dependencies are installed before building.
@@ -102,9 +102,9 @@ has_tty() {
 do_build() {
 	if has_tty && hash script &>/dev/null; then
 		# Using `script` preserves terminal colors.
-		WALLETBEAT_BUILD_DO_NOT_RECURSE=true script -q -e -f -c 'pnpm astro build' /dev/null 2>&1 | tee /dev/tty | sed -r "s/\x1B\[[0-9;]*[A-Za-z]//g"
+		WALLETBEAT_BUILD_DO_NOT_RECURSE=true script -q -e -f -c 'pnpm astro build --frozen-lockfile --offline' /dev/null 2>&1 | tee /dev/tty | sed -r "s/\x1B\[[0-9;]*[A-Za-z]//g"
 	elif has_tty; then
-		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/tty
+		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build --frozen-lockfile --offline 2>&1 | tee /dev/tty
 	else
 		local status_file
 		status_file="$(mktemp)"
@@ -113,7 +113,7 @@ do_build() {
 			echo "$line" >&2
 		done < <({
 			set +e
-			WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1
+			WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build --frozen-lockfile --offline 2>&1
 			echo "$?" >"$status_file" 2>/dev/null
 		})
 		local build_status

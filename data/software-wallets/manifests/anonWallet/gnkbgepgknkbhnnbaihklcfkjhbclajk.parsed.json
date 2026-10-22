@@ -1,0 +1,15 @@
+{
+	"contentScripts": "UNRESTRICTED",
+	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"hostPermissions": "UNRESTRICTED",
+	"permissions": [
+		"activeTab",
+		"storage",
+		"unlimitedStorage",
+		"notifications",
+		"tabs",
+		"alarms",
+		"sidePanel"
+	],
+	"webAccessibleResources": "UNRESTRICTED"
+}

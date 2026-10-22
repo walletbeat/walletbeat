@@ -56,7 +56,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			dataCollection: null,
 			hardwarePrivacy: null,
-			privacyPolicy: '',
+			privacyPolicy: null,
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
@@ -95,6 +95,7 @@ export const fireflyWallet: HardwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

@@ -11,13 +11,16 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import {
 	type BasicOperationFees,
-	compareFeeDisplay,
+	compareFees,
 	type FeeDisplay,
+	feeDisplayAfterSingleAction,
 	FeeDisplayLevel,
+	FeeType,
 	hasRelativeWalletServiceFeeUnit,
+	type OperationFeeDisplay,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
-import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
+import { type FullyQualifiedReference, mergeRefs, refs } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, nonEmptySet } from '@/types/utils/non-empty'
 import { markdownListFormat } from '@/types/utils/text'
@@ -25,9 +28,9 @@ import { markdownListFormat } from '@/types/utils/text'
 import { pickWorstRating, unrated } from '../common'
 
 /**
- * All possible fee types that a wallet may charge.
+ * All transaction types whose fees are evaluated.
  */
-export enum FeeType {
+export enum FeeTransactionType {
 	ETH_L1_TRANSFER = 'ETH_L1_TRANSFER',
 	ERC20_L1_TRANSFER = 'ERC20_L1_TRANSFER',
 	BUILT_IN_ERC20_SWAP = 'BUILT_IN_ERC20_SWAP',
@@ -37,40 +40,40 @@ export enum FeeType {
 	STEALTH_ADDRESS_SENDING = 'STEALTH_ADDRESS_SENDING',
 }
 
-/** Set of all fee types. */
-export const allFeeTypes: FeeType[] = [
-	FeeType.ETH_L1_TRANSFER,
-	FeeType.ERC20_L1_TRANSFER,
-	FeeType.BUILT_IN_ERC20_SWAP,
-	FeeType.UNISWAP_USDC_TO_ETHER_SWAP,
-	FeeType.CROSS_CHAIN_BRIDGING,
-	FeeType.TORNADO_CASH_NOVA_RELAYER,
-	FeeType.STEALTH_ADDRESS_SENDING,
+/** Set of all transaction types whose fees are evaluated. */
+export const allFeeTransactionTypes: FeeTransactionType[] = [
+	FeeTransactionType.ETH_L1_TRANSFER,
+	FeeTransactionType.ERC20_L1_TRANSFER,
+	FeeTransactionType.BUILT_IN_ERC20_SWAP,
+	FeeTransactionType.UNISWAP_USDC_TO_ETHER_SWAP,
+	FeeTransactionType.CROSS_CHAIN_BRIDGING,
+	FeeTransactionType.TORNADO_CASH_NOVA_RELAYER,
+	FeeTransactionType.STEALTH_ADDRESS_SENDING,
 ]
 
 /**
  * Record of fee type to its support status and info within a wallet.
  */
-export type FeeTransparency = Record<FeeType, Support<WithRef<FeeDisplay>> | null>
+export type FeeTransparency = Record<FeeTransactionType, Support<OperationFeeDisplay> | null>
 
 /**
  * Human-readable description for a given fee type.
  */
-function feeTypeDescription(feeType: FeeType): string {
+function feeTypeDescription(feeType: FeeTransactionType): string {
 	switch (feeType) {
-		case FeeType.ETH_L1_TRANSFER:
+		case FeeTransactionType.ETH_L1_TRANSFER:
 			return 'Ether transfers on L1'
-		case FeeType.ERC20_L1_TRANSFER:
+		case FeeTransactionType.ERC20_L1_TRANSFER:
 			return 'ERC-20 transfers on L1'
-		case FeeType.BUILT_IN_ERC20_SWAP:
+		case FeeTransactionType.BUILT_IN_ERC20_SWAP:
 			return 'built-in ERC-20 swaps'
-		case FeeType.UNISWAP_USDC_TO_ETHER_SWAP:
+		case FeeTransactionType.UNISWAP_USDC_TO_ETHER_SWAP:
 			return 'USDC to Ether swap on Uniswap'
-		case FeeType.CROSS_CHAIN_BRIDGING:
+		case FeeTransactionType.CROSS_CHAIN_BRIDGING:
 			return 'cross-chain bridging transactions'
-		case FeeType.TORNADO_CASH_NOVA_RELAYER:
+		case FeeTransactionType.TORNADO_CASH_NOVA_RELAYER:
 			return 'Tornado Cash Nova transactions'
-		case FeeType.STEALTH_ADDRESS_SENDING:
+		case FeeTransactionType.STEALTH_ADDRESS_SENDING:
 			return 'sending funds to stealth addresses'
 	}
 }
@@ -80,34 +83,34 @@ function feeTypeDescription(feeType: FeeType): string {
  */
 function feeDisplayLevelForType(
 	features: ResolvedFeatures,
-	feeType: FeeType,
-): Support<WithRef<FeeDisplay>> | null {
+	feeType: FeeTransactionType,
+): Support<OperationFeeDisplay> | null {
 	switch (feeType) {
-		case FeeType.ETH_L1_TRANSFER:
+		case FeeTransactionType.ETH_L1_TRANSFER:
 			if (features.transparency.operationFees === null) {
 				return null
 			}
 
 			return features.transparency.operationFees.ethL1Transfer
-		case FeeType.ERC20_L1_TRANSFER:
+		case FeeTransactionType.ERC20_L1_TRANSFER:
 			if (features.transparency.operationFees === null) {
 				return null
 			}
 
 			return features.transparency.operationFees.erc20L1Transfer
-		case FeeType.BUILT_IN_ERC20_SWAP:
+		case FeeTransactionType.BUILT_IN_ERC20_SWAP:
 			if (features.transparency.operationFees === null) {
 				return null
 			}
 
 			return features.transparency.operationFees.builtInErc20Swap
-		case FeeType.UNISWAP_USDC_TO_ETHER_SWAP:
+		case FeeTransactionType.UNISWAP_USDC_TO_ETHER_SWAP:
 			if (features.transparency.operationFees === null) {
 				return null
 			}
 
 			return features.transparency.operationFees.uniswapUSDCToEtherSwap
-		case FeeType.CROSS_CHAIN_BRIDGING:
+		case FeeTransactionType.CROSS_CHAIN_BRIDGING:
 			if (features.chainAbstraction === null) {
 				return null
 			}
@@ -117,10 +120,10 @@ function feeDisplayLevelForType(
 			}
 
 			return supported({
-				...features.chainAbstraction.bridging.builtInBridging.feesLargerThan1bps,
+				fees: features.chainAbstraction.bridging.builtInBridging.feesLargerThan1bps,
 				ref: features.chainAbstraction.bridging.builtInBridging.ref,
 			})
-		case FeeType.STEALTH_ADDRESS_SENDING:
+		case FeeTransactionType.STEALTH_ADDRESS_SENDING:
 			return (() => {
 				if (features.privacy.transactionPrivacy === null) {
 					return null
@@ -133,9 +136,13 @@ function feeDisplayLevelForType(
 					return notSupported
 				}
 
-				return supported({ ...stealthAddr.fees, ref: stealthAddr.ref })
+				if (stealthAddr.fees === null) {
+					return null
+				}
+
+				return supported({ fees: stealthAddr.fees, ref: stealthAddr.ref })
 			})()
-		case FeeType.TORNADO_CASH_NOVA_RELAYER:
+		case FeeTransactionType.TORNADO_CASH_NOVA_RELAYER:
 			return (() => {
 				if (features.privacy.transactionPrivacy === null) {
 					return null
@@ -148,14 +155,15 @@ function feeDisplayLevelForType(
 					return notSupported
 				}
 
-				return supported({ ...tornadoCashNova.relayerFee, ref: tornadoCashNova.ref })
+				return supported({ fees: tornadoCashNova.relayerFee, ref: tornadoCashNova.ref })
 			})()
 	}
 }
 
-function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
+/** Fees of every evaluated transaction type. */
+export function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
 	return Object.fromEntries(
-		allFeeTypes.map(feeType => [feeType, feeDisplayLevelForType(features, feeType)]),
+		allFeeTransactionTypes.map(feeType => [feeType, feeDisplayLevelForType(features, feeType)]),
 	)
 }
 
@@ -163,11 +171,11 @@ function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
  * How a wallet handles the worst type of fees it does handle.
  */
 export type WorstFeeDisplay = {
-	/** The way the wallet displays fees. */
-	feeDisplay: FeeDisplay
+	/** The way the wallet displays fees, or `NO_FEES_CHARGED`. */
+	fees: FeeDisplay | 'NO_FEES_CHARGED'
 
 	/** The fee types for which the wallet uses this method of displaying fees. */
-	feeTypes: NonEmptyArray<FeeType>
+	feeTypes: NonEmptyArray<FeeTransactionType>
 
 	/** Whether the wallet uses this fee display method for all fee types it supports. */
 	isUniform: boolean
@@ -185,37 +193,37 @@ export type WorstFeeDisplay = {
 function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | null {
 	let worstFeeTypes: WorstFeeDisplay | null = null
 
-	for (const feeType of allFeeTypes) {
-		const feeDisplay = feeTransparency[feeType]
+	for (const feeType of allFeeTransactionTypes) {
+		const operationFeeDisplay = feeTransparency[feeType]
 
-		if (feeDisplay === null || !isSupported(feeDisplay)) {
+		if (operationFeeDisplay === null || !isSupported(operationFeeDisplay)) {
 			continue
 		}
 
 		if (worstFeeTypes === null) {
 			worstFeeTypes = {
 				feeTypes: [feeType],
-				feeDisplay,
+				fees: operationFeeDisplay.fees,
 				isUniform: true,
-				references: refs(feeDisplay),
+				references: refs(operationFeeDisplay),
 			}
 			continue
 		}
 
-		switch (compareFeeDisplay(worstFeeTypes.feeDisplay, feeDisplay)) {
+		switch (compareFees(worstFeeTypes.fees, operationFeeDisplay.fees)) {
 			case -1:
 				worstFeeTypes.isUniform = false
 				break
 			case 0:
 				worstFeeTypes.feeTypes.push(feeType)
-				worstFeeTypes.references = mergeRefs(worstFeeTypes.references, refs(feeDisplay))
+				worstFeeTypes.references = mergeRefs(worstFeeTypes.references, refs(operationFeeDisplay))
 				break
 			case 1:
 				worstFeeTypes = {
 					feeTypes: [feeType],
-					feeDisplay,
+					fees: operationFeeDisplay.fees,
 					isUniform: false,
-					references: refs(feeDisplay),
+					references: refs(operationFeeDisplay),
 				}
 		}
 	}
@@ -223,18 +231,20 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	return worstFeeTypes
 }
 
-/** Worst-case fee display among basic operation fees only. */
-export function worstOperationFeeDisplay(operationFees: BasicOperationFees): FeeDisplay | null {
+/** Worst-case fees among basic operation fees only. */
+export function worstOperationFeeDisplay(
+	operationFees: BasicOperationFees,
+): FeeDisplay | 'NO_FEES_CHARGED' | null {
 	return (
 		computeWorstFees({
-			[FeeType.ETH_L1_TRANSFER]: operationFees.ethL1Transfer,
-			[FeeType.ERC20_L1_TRANSFER]: operationFees.erc20L1Transfer,
-			[FeeType.BUILT_IN_ERC20_SWAP]: operationFees.builtInErc20Swap,
-			[FeeType.UNISWAP_USDC_TO_ETHER_SWAP]: operationFees.uniswapUSDCToEtherSwap,
-			[FeeType.CROSS_CHAIN_BRIDGING]: null,
-			[FeeType.TORNADO_CASH_NOVA_RELAYER]: null,
-			[FeeType.STEALTH_ADDRESS_SENDING]: null,
-		})?.feeDisplay ?? null
+			[FeeTransactionType.ETH_L1_TRANSFER]: operationFees.ethL1Transfer,
+			[FeeTransactionType.ERC20_L1_TRANSFER]: operationFees.erc20L1Transfer,
+			[FeeTransactionType.BUILT_IN_ERC20_SWAP]: operationFees.builtInErc20Swap,
+			[FeeTransactionType.UNISWAP_USDC_TO_ETHER_SWAP]: operationFees.uniswapUSDCToEtherSwap,
+			[FeeTransactionType.CROSS_CHAIN_BRIDGING]: null,
+			[FeeTransactionType.TORNADO_CASH_NOVA_RELAYER]: null,
+			[FeeTransactionType.STEALTH_ADDRESS_SENDING]: null,
+		})?.fees ?? null
 	)
 }
 
@@ -257,7 +267,9 @@ function evaluateWorstFeeDisplay(
 			ifEmpty: { behavior: 'THROW_ERROR' },
 		})
 
-	if (worstFeeDisplay.feeDisplay.fullySponsored) {
+	const worstFees = worstFeeDisplay.fees
+
+	if (worstFees === 'NO_FEES_CHARGED') {
 		if (!worstFeeDisplay.isUniform) {
 			throw new Error('Logic error: all fees should be uniformly handled if fully sponsored')
 		}
@@ -279,7 +291,7 @@ function evaluateWorstFeeDisplay(
 		})
 	}
 
-	if (worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.NONE) {
+	if (worstFees.shownByDefault.comprehensiveness === FeeDisplayLevel.NONE) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
 				outcome: {
@@ -330,7 +342,9 @@ function evaluateWorstFeeDisplay(
 		})
 	}
 
-	if (worstFeeDisplay.feeDisplay.afterSingleAction === FeeDisplayLevel.AGGREGATED) {
+	const worstFeesAfterSingleAction = feeDisplayAfterSingleAction(worstFees)
+
+	if (worstFeesAfterSingleAction.comprehensiveness === FeeDisplayLevel.AGGREGATED) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
 				outcome: {
@@ -383,20 +397,21 @@ function evaluateWorstFeeDisplay(
 		})
 	}
 
-	if (worstFeeDisplay.feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE) {
+	if (worstFeesAfterSingleAction.comprehensiveness !== FeeDisplayLevel.COMPREHENSIVE) {
 		throw new Error('Logic error')
 	}
 
-	// Reached only when the worst case is COMPREHENSIVE and the wallet
-	// service fee display units are still unresearched. FAIL/PARTIAL paths
-	// above already fired if applicable.
-	if (worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits === null) {
+	// Reached only when the worst case is COMPREHENSIVE and the units of its
+	// wallet fee are still unresearched. FAIL/PARTIAL paths above already
+	// fired if applicable.
+	if (worstFees.feesInvolved[FeeType.WALLET_FEE] && worstFeesAfterSingleAction.units === null) {
 		return unrated(ctx, { worstFeeDisplay })
 	}
 
 	if (
-		worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
-		!hasRelativeWalletServiceFeeUnit(worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits)
+		worstFees.feesInvolved[FeeType.WALLET_FEE] &&
+		worstFeesAfterSingleAction.units !== null &&
+		!hasRelativeWalletServiceFeeUnit(worstFeesAfterSingleAction.units)
 	) {
 		return ctx.build({
 			outcome: {
@@ -439,7 +454,7 @@ function evaluateWorstFeeDisplay(
 		},
 		details: markdown(`
 			{{WALLET_NAME}} shows a complete breakdown of all transaction
-			fees${worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE ? ' by default' : ''}.
+			fees${worstFees.shownByDefault.comprehensiveness === FeeDisplayLevel.COMPREHENSIVE ? ' by default' : ''}.
 		`),
 	})
 }
@@ -501,13 +516,22 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 			evaluateWorstFeeDisplay(
 				EvaluationContext.forTest(() => feeTransparency),
 				{
-					feeDisplay: {
-						byDefault: FeeDisplayLevel.NONE,
-						afterSingleAction: FeeDisplayLevel.NONE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
 					},
-					feeTypes: [FeeType.ETH_L1_TRANSFER],
+					feeTypes: [FeeTransactionType.ETH_L1_TRANSFER],
 					isUniform: true,
 					references: [],
 				},
@@ -521,13 +545,22 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
 					{
-						feeDisplay: {
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							afterSingleAction: FeeDisplayLevel.AGGREGATED,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
-						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						feeTypes: [FeeTransactionType.ETH_L1_TRANSFER],
 						isUniform: true,
 						references: [],
 					},
@@ -540,13 +573,22 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
 					{
-						feeDisplay: {
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+							},
 						},
-						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
+						feeTypes: [FeeTransactionType.BUILT_IN_ERC20_SWAP],
 						isUniform: true,
 						references: [],
 					},
@@ -561,13 +603,22 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
 					{
-						feeDisplay: {
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
 						},
-						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						feeTypes: [FeeTransactionType.ETH_L1_TRANSFER],
 						isUniform: true,
 						references: [],
 					},
@@ -580,13 +631,22 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
 					{
-						feeDisplay: {
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
-						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						feeTypes: [FeeTransactionType.ETH_L1_TRANSFER],
 						isUniform: true,
 						references: [],
 					},
@@ -599,16 +659,28 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
 					{
-						feeDisplay: {
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(
-								WalletServiceFeeDisplayUnit.PERCENTAGE,
-								WalletServiceFeeDisplayUnit.FIAT,
-							),
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+									WalletServiceFeeDisplayUnit.FIAT,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+									WalletServiceFeeDisplayUnit.FIAT,
+								),
+							},
 						},
-						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
+						feeTypes: [FeeTransactionType.BUILT_IN_ERC20_SWAP],
 						isUniform: true,
 						references: [],
 					},

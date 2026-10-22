@@ -1,0 +1,38 @@
+{
+	"highlightRanges": [
+		{
+			"first": 48,
+			"last": 50
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}) => {"
+			],
+			"startLine": 30
+		},
+		{
+			"lines": [
+				"  const getChainId = () => {"
+			],
+			"startLine": 38
+		},
+		{
+			"lines": [
+				"    return ChainId.mainnet;",
+				"  };",
+				"  const chainId = getChainId();",
+				"",
+				"  const { ensAddress: toAddress, ensName: toEnsName } = useEns({",
+				"    addressOrName: toAddressOrName ?? '',",
+				"  });",
+				"",
+				"  const sendingNativeAsset = useMemo(",
+				"    () => !!asset && isNativeAsset(asset?.address, chainId),",
+				"    [asset, chainId],"
+			],
+			"startLine": 44
+		}
+	]
+}

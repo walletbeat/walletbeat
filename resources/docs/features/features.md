@@ -100,7 +100,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
-  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
+  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
   - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
@@ -112,6 +112,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `releaseTransparency` (object): Release transparency features.
     - `artifactSigning` (`VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>`)
     - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
+    - `dependencySandboxing` (`VariantFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
@@ -179,6 +180,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 
 	/**
@@ -246,6 +252,11 @@ type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 }
 ```
@@ -296,7 +307,9 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
     - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
+    - `dependencyAgeGate` (`ResolvedFeature<DependencyAgeGate>`)
     - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
+    - `dependencySandboxing` (`ResolvedFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`ResolvedFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`ResolvedFeature<HermeticBuilds>`)
@@ -499,20 +512,14 @@ To test:
 
 - `canDeployNew`: Go through the wallet's UI and check whether it offers
   a flow to deploy a new Safe contract.
-- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
-  or remove an owner using only the wallet's native UI (no extra modules).
-  Check whether the wallet generates the `addOwnerWithThreshold` /
-  `removeOwner` transaction directly.
-- `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  replace an owner key using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `swapOwner` transaction
-  directly.
-- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+- `keyRotationTransactionGeneration`: In an existing Safe, attempt to
+  replace an owner key. Check whether the `swapOwner` transaction can be
+  generated using an open-source standalone app, only a proprietary
+  standalone app, only an external API, or not at all.
+- `supportedOwners`: Try connecting the wallet to Safes with 1,
   2, and many owners and note the limits.
 
 - `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
-- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
-- `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
 - `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
 
   - SINGLE_SIGNER: only single-owner Safes are supported.
@@ -537,7 +544,7 @@ Chain abstraction features.
 
 - `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: CrossChainBalanceDisplay usdc: CrossChainBalanceDisplay }>`): What types of balances can the wallet display?
 - `bridging` (object): Chain bridging features.
-  - `builtInBridging` (`Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay }> >`): Does the wallet have a built-in bridging feature? (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
+  - `builtInBridging` (`Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay | 'NO_FEES_CHARGED' }> >`): Does the wallet have a built-in bridging feature? (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
   - `suggestedBridging` (`Support<WithRef<{}>>`): When the user is attempting to spend tokens on a chain where their balance is insufficient, but where they have sufficient balance on another chain, does the wallet automatically propose the user to bridge? (e.g. The user tries to send USDC on Arbitrum but only has USDC on Ethereum, the wallet prompts them to bridge first.)
 
 ---
@@ -788,10 +795,10 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 
 Which methods of address resolution a wallet supports.
 
-- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
+- `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `wallet.ensdao.eth` in the send address field. If it resolves, it is supported.
 - `chainSpecificAddressing` (object): Chain-specific address lookups.
-  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves.
-  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves.
+  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `wallet.ensdao.eth@ethereum` in the send address field and check if it resolves.
+  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `wallet.ensdao.eth:ethereum` in the send address field and check if it resolves.
 
 ---
 
@@ -970,6 +977,19 @@ type MultiAddressHandling =
 			 *   request).
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
+
+			/**
+			 * The best request-correlation chain the classifier could find between
+			 * two requests bearing distinct wallet addresses, or `null` if no
+			 * chain links any two distinct addresses.
+			 *
+			 * The chain may be built from shared correlatable `UserInfo` values
+			 * and/or IP-time-based links (same entity, within
+			 * {@link IP_TIME_CORRELATION_WINDOW_MS}, from the same IP). The
+			 * receiving entity can use any such chain to correlate the user's
+			 * addresses. See {@link CorrelationChain}.
+			 */
+			bestChain: CorrelationChain | null
 	  }
 ```
 
@@ -1137,6 +1157,33 @@ type UserInfo = PersonalInfo | WalletInfo
 
 ---
 
+### Type: `CorrelationEdge`
+
+A single link in a request-correlation chain.
+
+Two requests are linked by a UserInfo edge when they carry an identical correlatable `UserInfo` value, and by an IP-time edge when they go to the same entity within {@link IP_TIME_CORRELATION_WINDOW_MS} from the same IP (and that entity learns the user's IP address).
+
+`strength` is a comparable measure of how strongly the link correlates the two requests: any UserInfo edge is stronger than any IP-time edge; among UserInfo edges a higher {@link userInfoScore} is stronger; among IP-time edges a shorter time gap is stronger.
+
+```typescript
+type CorrelationEdge =
+	| { kind: 'userInfo'; userInfo: UserInfo; strength: number }
+	| { kind: 'ipTime'; gapMs: number; strength: number }
+```
+
+---
+
+### Interface: `CorrelationChain`
+
+The best request-correlation chain found between two requests bearing distinct wallet addresses.
+
+A chain's strength is its _weakest_ edge (bottleneck): a chain is only as trustworthy as its weakest correlation link. The best chain is the shortest one, breaking ties by highest weakest-edge strength.
+
+- `length` (`number`): The number of edges in the chain.
+- `weakestEdge` (`CorrelationEdge`): The weakest (least trustworthy) edge in the chain.
+
+---
+
 ### Enum: `UserInfoType`
 
 The type of information that a UserInfo is about.
@@ -1193,7 +1240,7 @@ type Collection<T extends UserInfo> = NonEmptyRecord<T, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 ```
 
@@ -1228,7 +1275,7 @@ type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 ```
 
@@ -1294,7 +1341,7 @@ type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FL
 
 ### Interface: `DataCollection`
 
-A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
+A collection of data that a wallet collects. See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
@@ -1536,7 +1583,7 @@ type StealthAddressSupport = WithRef<{
 	>
 
 	/** When sending transactions, how are fees displayed? */
-	fees: FeeDisplay
+	fees: FeeDisplay | 'NO_FEES_CHARGED' | null
 }>
 ```
 
@@ -1579,7 +1626,7 @@ type TornadoCashNovaSupport = WithRef<
 		/**
 		 * Is the fee taken by the relayer displayed in the UI?
 		 */
-		relayerFee: FeeDisplay
+		relayerFee: FeeDisplay | 'NO_FEES_CHARGED'
 	} & (
 		| {
 				/**
@@ -2544,16 +2591,45 @@ type SendTransactionWarning = WithRef<
 
 ---
 
+### Enum: `UnlimitedApprovalWarningBenchmarkSpenders`
+
+Benchmark spenders for unlimited ERC-20 token approvals.
+
+Each entry is a concrete, pinned on-chain address. Instead of describing a category of spender, we grant unlimited approval to this specific address and evaluate whether the wallet warns.
+
+- `PUBLIC_EOA` = `'PUBLIC_EOA'`: A publicly attributable Ethereum EOA belonging to an individual, rather than a protocol, application, or contract
+- `UNISWAP_V3_ROUTER` = `'UNISWAP_V3_ROUTER'`: Uniswap V3 SwapRouter, 0xE592427A0AEce92De3Edee1F18E0157C05861564: A verified, widely-used, reputable contract.
+- `PINK_PHISHING_ADDRESS` = `'PINK_PHISHING_ADDRESS'`: 0x9fA7bB759641FCd37fe4aE41f725e0f653f2C726, labeled "PinkDrainer: Wallet 2" on Etherscan. Pink Drainer was a scam-as-a-service operation that stole over $85M from more than 21,000 victims across 2023–2024 before its operators shut it down in May 2024. Stays valid as a benchmark as long as this address remains publicly flagged.
+- `CONTRACT_NOT_INTERACTED_BEFORE` = `'CONTRACT_NOT_INTERACTED_BEFORE'`: A contract the test wallet has never interacted with before. Any real contract works, as long as the tester's wallet has no prior history with it. Walletbeat's own testing contracts is a convenient default, since it's guaranteed untouched until deliberately used for this benchmark.
+- `RECENTLY_DEPLOYED_CONTRACT` = `'RECENTLY_DEPLOYED_CONTRACT'`: A contract that was only recently deployed onchain. Any real contract works, as long as it was deployed shortly before testing. Walletbeat's own testing contracts is a convenient default, since it can be redeployed on demand.
+
+---
+
+### Type: `UnlimitedApprovalWarningBenchmarks`
+
+Per-benchmark data on whether the wallet warns for that specific unlimited-approval spender.
+
+`null` means the benchmark has not been tested yet for the wallet.
+
+```typescript
+type UnlimitedApprovalWarningBenchmarks = Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	Support | null
+>
+```
+
+---
+
 ### Type: `UnlimitedApprovalWarning`
 
 ```typescript
 type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Which unlimited-approval benchmark spenders the wallet is known to
+		 * warn on.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address
@@ -2758,6 +2834,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
 - `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `FAVICON` = `'favicon'`: Load website favicons from the browser's favicon cache via `_favicon/` URLs.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
@@ -2823,7 +2900,7 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 
 Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
 
-All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
+All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values that `isIgnoredAndroidPermission` does not match.
 
 - `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
 - `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
@@ -2845,6 +2922,10 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `USE_BIOMETRIC` = `'android.permission.USE_BIOMETRIC'`: Authenticate with biometric hardware (fingerprint, face, etc.).
 - `USE_FINGERPRINT` = `'android.permission.USE_FINGERPRINT'`: Legacy fingerprint authentication (superseded by USE_BIOMETRIC).
 - `READ_MEDIA_IMAGES` = `'android.permission.READ_MEDIA_IMAGES'`: Read images from shared media storage (scoped storage, Android 13+).
+- `FOREGROUND_SERVICE` = `'android.permission.FOREGROUND_SERVICE'`: Run a foreground service, shown to the user as a persistent notification.
+- `FOREGROUND_SERVICE_DATA_SYNC` = `'android.permission.FOREGROUND_SERVICE_DATA_SYNC'`: Run a foreground service of the data sync type (Android 14+).
+- `WAKE_LOCK` = `'android.permission.WAKE_LOCK'`: Keep the processor awake while background work finishes.
+- `RECEIVE_BOOT_COMPLETED` = `'android.permission.RECEIVE_BOOT_COMPLETED'`: Receive the broadcast sent when the device finishes booting.
 - `AD_ID` = `'com.google.android.gms.permission.AD_ID'`: Access the Google advertising ID — used for ad attribution/tracking.
 
 ---
@@ -3678,34 +3759,62 @@ What level of information is shown about fees.
 
 ### Enum: `WalletServiceFeeDisplayUnit`
 
-A unit that a wallet service fee (platform fee on built-in swap or bridge flows) line item may be displayed in, within a comprehensive fee breakdown. A single fee line item may show more than one of these at once (e.g. a percentage next to its fiat-equivalent amount).
+A unit that a fee amount may be displayed in. A single fee figure may show more than one of these at once (e.g. a percentage next to its fiat-equivalent amount).
 
-- `PERCENTAGE` = `'PERCENTAGE'`: Wallet service fee line item shows a percentage (e.g. "0.3%").
-- `BASIS_POINTS` = `'BASIS_POINTS'`: Wallet service fee line item shows basis points (e.g. "30 bps").
-- `FIAT` = `'FIAT'`: Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24").
-- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+- `PERCENTAGE` = `'PERCENTAGE'`: The fee is shown as a percentage (e.g. "0.3%").
+- `BASIS_POINTS` = `'BASIS_POINTS'`: The fee is shown in basis points (e.g. "30 bps").
+- `FIAT` = `'FIAT'`: The fee is shown as a flat fiat-currency amount (e.g. "$1.24").
+- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: The fee is shown as a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+
+---
+
+### Interface: `FeeDisplayAtDepth`
+
+How fees are presented to the user at a given depth of the interface.
+
+- `comprehensiveness` (`FeeDisplayLevel`): Level of fee information shown at this depth.
+- `units` (`NonEmptySet<WalletServiceFeeDisplayUnit> | null`): Every distinct unit that the fee figures shown at this depth use, whichever type of fee they represent and whether they are itemized or aggregated (e.g. a wallet showing a fee as both a percentage and its fiat equivalent uses both units here). `null` if not yet researched, or if `comprehensiveness` is `NONE`.
+
+---
+
+### Enum: `FeeType`
+
+Fees that may be charged during a transaction or operation.
+
+- `NETWORK_FEE` = `'NETWORK_FEE'`: Blockchain fees for transaction inclusion/processing.
+- `ONCHAIN_APP_FEE` = `'ONCHAIN_APP_FEE'`: Fees charged by the onchain app, e.g. liquidity provider fees during swap.
+- `WALLET_FEE` = `'WALLET_FEE'`: Fees charged by the wallet or wallet provider.
 
 ---
 
 ### Interface: `FeeDisplay`
 
-How much fee information is displayed by default and after an action.
+What fees are involved in an operation and how they are displayed.
 
-- `byDefault` (`FeeDisplayLevel`): Level of fee information shown with default wallet settings and zero fee-specific interactions on the transaction approval screen. To test: initiate the transaction on a freshly installed wallet with no settings changed. Record the fee display level visible on the approval screen before clicking anything fee-related.
-- `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
-- `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
+- `feesInvolved` (`Exclude<Record<FeeType, boolean>, Record<FeeType, false>>`): Which fees are involved in this operation? At least one must be true.
+- `shownByDefault` (`FeeDisplayAtDepth`): How are fees presented to the user by default? To test: initiate the transaction on a freshly installed wallet with no settings changed. Record what the transaction approval screen shows before any fee-related interaction.
+- `shownAfterSingleAction` (`FeeDisplayAtDepth | 'NO_ACTION_POSSIBLE'`): How are fees presented after one action? Things that count as "actions":
 
-  This field describes payment (whether the user pays nothing), while `byDefault` and `afterSingleAction` describe UI visibility. Orderflow prominence comparison uses the recorded display levels as-is; if no fee-related copy appears on the approval screen, set both levels to `NONE` even when the wallet fully sponsors fees.
+  - Any tap or click, e.g. modal dialog, "Show more", etc.
+  - Any amount of scrolling or other interface manipulation that
+    confirming the transaction doesn't itself already require.
+  - Changing wallet configuration from the default settings, even if
+    this only needs to be done once in the wallet settings.
 
-- `walletServiceFeeDisplayUnits` (`NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null`): Which unit(s) the wallet service fee line item(s) are shown in, when a comprehensive breakdown is available. Meaningful when the flow includes a wallet-charged platform fee line item in the breakdown (e.g. built-in swap or cross-chain bridging).
+  `NO_ACTION_POSSIBLE` if no action reveals any more fee information.
 
-  - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
-    shown on the wallet service fee line item(s) (e.g. a wallet showing
-    both a percentage and its fiat equivalent would use both units here).
-  - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
-    flow. Use for L1 transfers, external app transactions, relayer fees,
-    and other flows where only network or external protocol fees apply.
-  - `null` — not yet researched (required on in-scope swap/bridge flows).
+---
+
+### Type: `OperationFeeDisplay`
+
+How fees are displayed for a basic operation.
+
+```typescript
+type OperationFeeDisplay = WithRef<{
+	/** How are fees displayed when performing this operation? */
+	fees: FeeDisplay | 'NO_FEES_CHARGED'
+}>
+```
 
 ---
 
@@ -3713,18 +3822,18 @@ How much fee information is displayed by default and after an action.
 
 Details about how the wallet displays fees for basic operations.
 
-- `ethL1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ETH transfer on L1? To test: initiate a send of any ETH amount to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
-- `erc20L1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
-- `builtInErc20Swap` (`Support<WithRef<FeeDisplay>>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
-- `uniswapUSDCToEtherSwap` (`Support<WithRef<FeeDisplay>>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
+- `ethL1Transfer` (`Support<OperationFeeDisplay>`): How does the wallet display fees for a simple ETH transfer on L1? To test: initiate a send of any ETH amount to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
+- `erc20L1Transfer` (`Support<OperationFeeDisplay>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
+- `builtInErc20Swap` (`Support<OperationFeeDisplay>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
+- `uniswapUSDCToEtherSwap` (`Support<OperationFeeDisplay>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
 
 ---
 
 ### Type: `WorstOperationFees`
 
-Worst basic-operation fee display with contributing research refs.
+Worst basic-operation fees with contributing research refs.
 
-- `feeDisplay` (`FeeDisplay`)
+- `fees` (`FeeDisplay | 'NO_FEES_CHARGED'`)
 - `references` (`FullyQualifiedReference[]`)
 
 ---
@@ -4104,6 +4213,23 @@ type ArtifactSigning = Support<ArtifactSigningDetails>
 
 ---
 
+### Type: `DependencyAgeGate`
+
+Whether routine dependency updates only pick up dependency releases that are at least a minimum age, so that a compromised release has time to be detected and pulled before the wallet adopts it. One-off updates for security fixes may bypass the minimum age.
+
+To test: look in the wallet's source repository for a minimum release age setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in `.github/dependabot.yml`. Set to `notSupported` if routine updates have no minimum age.
+
+```typescript
+type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
+```
+
+---
+
 ### Type: `DependencyLocking`
 
 Whether the wallet's release builds enforce a lockfile (or equivalent) for locked dependency resolution.
@@ -4124,6 +4250,28 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 ---
 
+### Type: `DependencySandboxing`
+
+Whether the wallet's release builds isolate external dependencies from each other and from the wallet's own code at runtime (e.g. via LavaMoat policies enforced with SES compartments), so that a compromised dependency cannot reach code or globals beyond what its policy grants.
+
+```typescript
+type DependencySandboxing = Support<WithRef<{}>>
+```
+
+---
+
+### Enum: `RepositoryChangeControlState`
+
+Whether a repository change control is in place, and whether that can be checked publicly. A `null` value means the control has not been looked into yet.
+
+- `VERIFIABLY_PRESENT` = `'VERIFIABLY_PRESENT'`: The control is in place, and anyone can check this. (e.g. A GitHub ruleset that is visible on the repository's public rules page or rulesets API.)
+- `VERIFIABLY_ABSENT` = `'VERIFIABLY_ABSENT'`: The control is not in place, and anyone can check this. (e.g. The public rulesets do not include it, and the public branch API shows no classic branch protection providing it.)
+- `CLAIMED_PRESENT` = `'CLAIMED_PRESENT'`: The wallet developer states that the control is in place, but this cannot be checked publicly. (e.g. A classic branch protection rule, which only repository admins can see.)
+- `CLAIMED_ABSENT` = `'CLAIMED_ABSENT'`: The wallet developer states that the control is not in place. This cannot be checked publicly, but a developer has no incentive to claim not to have a control, so it is as strong as `VERIFIABLY_ABSENT`.
+- `UNVERIFIABLE` = `'UNVERIFIABLE'`: The wallet developer makes no statement either way, and whether the control is in place cannot be checked publicly.
+
+---
+
 ### Type: `RepositoryChangeControls`
 
 Observable repository-level change controls for the wallet's source repository.
@@ -4131,15 +4279,15 @@ Observable repository-level change controls for the wallet's source repository.
 ```typescript
 type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
+	requiredReview: RepositoryChangeControlState
 	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
+	requiredChecks: RepositoryChangeControlState
 	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
+	forcePushBlocked: RepositoryChangeControlState
 	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
+	branchDeletionBlocked: RepositoryChangeControlState
 	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
+	tagsImmutable: RepositoryChangeControlState
 }>
 ```
 
