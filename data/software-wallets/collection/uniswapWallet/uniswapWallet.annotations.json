@@ -1,4 +1,11 @@
 {
-	"matchers": [],
+	"matchers": [
+		{
+			"domain": "www.google-analytics.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/g/collect",
+			"refererDomain": "chromewebstore.google.com"
+		}
+	],
 	"benignStrings": []
 }
