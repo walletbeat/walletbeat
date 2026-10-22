@@ -17,6 +17,35 @@
 			"purposes": "NOT_WALLET_INITIATED",
 			"path": "/u/0/widget/app",
 			"refererDomain": "chromewebstore.google.com"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"SCAM_DETECTION"
+			],
+			"path": "/infra/blockaid/v0/site/scan"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"ASSET_METADATA"
+			],
+			"path": "/swappable_tokens"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/rpc/1",
+			"method": "eth_getBalance"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/data.v1.DataApiService/ListTransactions"
 		}
 	],
 	"benignStrings": []
