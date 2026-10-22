@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 1,
+	"highlightLastLine": 26,
+	"segments": [
+		{
+			"lines": [
+				"// ERC-8213 is still an open pull request against ethereum/ERCs, so the PR is",
+				"// the only page that renders the spec.",
+				"export const ERC8213_URL = 'https://github.com/ethereum/ERCs/pull/1639';",
+				"export const ERC8213_LINK_LABEL = 'What is ERC-8213?';",
+				"export const ERC8213_QR_TITLE = 'ERC-8213';",
+				"",
+				"// The calldata digest covers the calldata and nothing else: ERC-8213 leaves",
+				"// the recipient, the value and the chain out of it on purpose.",
+				"export const CALLDATA_DIGEST_EXPLAINER =",
+				"  'A digest is a short fingerprint of what you are about to sign. This one ' +",
+				"  'covers the calldata only, not the recipient, the amount or the chain. ' +",
+				"  'Compare it with the digest shown by the app that created the request: if ' +",
+				"  'they match, the calldata is unchanged.';",
+				"",
+				"export const ERC191_DIGEST_EXPLAINER =",
+				"  'A digest is a short fingerprint of what you are about to sign. This one ' +",
+				"  'is the 32-byte value your Keycard signs: the message hashed behind the ' +",
+				"  '\"Ethereum Signed Message\" prefix, which stops the signature from passing ' +",
+				"  'as a transaction. Compare it with the digest shown by the app that ' +",
+				"  'created the request: if they match, you are signing what it asked for.';",
+				"",
+				"export const EIP712_DIGEST_EXPLAINER =",
+				"  'A digest is a short fingerprint of what you are about to sign. This one ' +",
+				"  'is the 32-byte value your Keycard signs. Compare it with the digest shown ' +",
+				"  'by the app that created the request: if they match, you are signing what ' +",
+				"  'it asked for.';"
+			],
+			"startLine": 1
+		}
+	]
+}

@@ -1,0 +1,56 @@
+{
+	"highlightFirstLine": 46,
+	"highlightLastLine": 75,
+	"segments": [
+		{
+			"lines": [
+				"}) {",
+				"  return ("
+			],
+			"startLine": 35
+		},
+		{
+			"lines": [
+				"    >",
+				"      <Text variant=\"titleMedium\" style={styles.sectionTitle}>",
+				"        Select address",
+				"      </Text>",
+				"      <FlatList",
+				"        data={rows}",
+				"        keyExtractor={item => item.path}",
+				"        style={styles.list}",
+				"        renderItem={({ item, index }) => (",
+				"          <Pressable style={styles.addrRow} onPress={() => onSelect(item)}>",
+				"            <RadioButton.Android",
+				"              value={item.address}",
+				"              status={selectedRow?.path === item.path ? 'checked' : 'unchecked'}",
+				"              onPress={() => onSelect(item)}",
+				"              color={theme.colors.primary}",
+				"            />",
+				"            <Text style={styles.addrIndex}>{index}</Text>",
+				"            <AddressText address={item.address} style={styles.addrText} />",
+				"          </Pressable>",
+				"        )}",
+				"        onEndReached={onLoadMore}",
+				"        onEndReachedThreshold={0.3}",
+				"        ListFooterComponent={",
+				"          loading ? (",
+				"            <ActivityIndicator",
+				"              size=\"small\"",
+				"              color={theme.colors.primary}",
+				"              style={styles.listFooter}",
+				"            />",
+				"          ) : undefined",
+				"        }",
+				"      />",
+				"      <View style={styles.proposalActions}>",
+				"        <Button",
+				"          mode=\"outlined\"",
+				"          onPress={onCancel}",
+				"          textColor={theme.colors.error}",
+				"        >"
+			],
+			"startLine": 42
+		}
+	]
+}

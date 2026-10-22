@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 20,
+	"highlightLastLine": 31,
+	"segments": [
+		{
+			"lines": [
+				"export function useLoadKey() {"
+			],
+			"startLine": 7
+		},
+		{
+			"lines": [
+				"  const {"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    cancel: cancelOp,",
+				"    reset: resetOp,",
+				"    ...rest",
+				"  } = useKeycardOp<void>(",
+				"    useCallback(async cmdSet => {",
+				"      const appInfo = cmdSet.applicationInfo;",
+				"      if (appInfo?.hasMasterKey()) {",
+				"        throw new Error('Card already has a key. Factory reset required.');",
+				"      }",
+				"      try {",
+				"        const response = await cmdSet.loadBIP32KeyPair(keyPairRef.current!);",
+				"        response.checkOK();",
+				"      } finally {",
+				"        keyPairRef.current = null;",
+				"      }",
+				"    }, []),",
+				"    {",
+				"      requiresPin: true,",
+				"      requiresMasterKey: false,",
+				"      // Mirrors ConfirmKeyScreen's done toast."
+			],
+			"startLine": 16
+		}
+	]
+}
