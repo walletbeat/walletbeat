@@ -363,7 +363,7 @@ This is an important step toward reducing trust in the wallet provider itself.
 
 Overall
 
-Ambire has strong foundations in self-sovereignty and ecosystem alignment, and keeps shipping, with several areas where security and transparency can still improve.
+Ambire has strong foundations in self-sovereignty and ecosystem alignment, and keeps adding features, with several areas where security and transparency can still improve.
 
 Privacy is the biggest area for improvement.
 
