@@ -1679,6 +1679,50 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/ecosystem_attributes.png": {
+		"hash": "726e9ff4e96b8f954d89fadb71c5bf41f3faf91778798fbfb34787a977e135f9",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/metamask-browser-erc7828-unresolved.png": {
+		"hash": "79098f1332d5bcc6736d059d53f3c80ddf818530adf7120e89a6251a96fc5b13",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/metamask-browser-erc7831-unresolved.png": {
+		"hash": "ba9712de3eb97d6ac573d595624e9190024f166bdd3eb5cb1a7220d41d4f5d70",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/metamask-erc7730-usdc-approval.png": {
+		"hash": "660fa5f2757cf953383f35b9f1c254fb35d143cc246eb2cc6996c62bcf43ba6d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/metamask_audits_bounties.jpg": {
+		"hash": "52711bfd84219b082b4e0330c0e2ebda67f6161bdbc98707d77767b247ea80de",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/privacy_attributes.png": {
+		"hash": "d488e9667e676ba67e84d3ba16553cc5bd546789946aa3a33fb99e7f9c06c62e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/recovery_phrase_reminder.jpg": {
+		"hash": "aa7af55209a30ad8d9f548ee8f9b0a16d2fc8ab1acdd9966a86da1a6b4901553",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/security_attributes.png": {
+		"hash": "c6e73a2990abcd07e4dd46c8f2776e894c02cfa2310783644e1853f9351b74e1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/security_audits.jpg": {
+		"hash": "65dec90cbaa5e67d0ee18ee6c458d0a306816e9f63abce7c3ac09a9ab0b07763",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/self_sovereignty_attributes.png": {
+		"hash": "9412d6c1d6f1f7c120e3e2d67b877398cae027ccb53b60c26b9b5a004c1e8c01",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-12 - Breakdown Thread Metamask/transparency_attributes.png": {
+		"hash": "e5970a52476f46942476c3e1b25cb3a914844b5c3507b82a7dc6dcf38016fb29",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
