@@ -1,0 +1,645 @@
+{
+	"entries": [
+		{
+			"unixMillis": 1792699401714,
+			"tip": "99f3fd323039b50c071f8511db45b57474ee0a3194da11708d1d5bca80f1edd1",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=www.google-analytics.com --path=/g/collect --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005407
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005487
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005945
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005946
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000006023
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005070
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005154
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017665
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017666
+				}
+			]
+		},
+		{
+			"unixMillis": 1792699442166,
+			"tip": "b13f7d0505bc63103ee3e04af696835d980af03e7631ca43a031b2fe17614eaa",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005407
+				}
+			],
+			"rationale": "Store user_engagement analytics from chromewebstore.google.com for its extension listing; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699453739,
+			"tip": "b69df0aa123f84d3ccd39071beb997bf99c0c132e15161d4752d10b2443c41e4",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005487
+				}
+			],
+			"rationale": "Store page_view analytics with Chrome Web Store referer and listing URL; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699470189,
+			"tip": "e7f039ef7fbf34a2268189da8ec458233a9454b09ce58c209e6a7bb8149767e7",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005945
+				}
+			],
+			"rationale": "Store user_engagement analytics with Chrome Web Store referer and listing URL, including browser properties; not wallet-initiated traffic."
+		},
+		{
+			"unixMillis": 1792699484757,
+			"tip": "57646c361bcd53acf9a96db40b1b123cdabbb59614d7c13c9575f4356669c866",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005946
+				}
+			],
+			"rationale": "Chrome Web Store view_item analytics for the extension listing, with store referer; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699498266,
+			"tip": "2ba0b03b6233a99ad98dd0b31dbf5d2bacbacf1025920d577cef15ca1dccc303",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000006023
+				}
+			],
+			"rationale": "Chrome Web Store detail_page_view analytics for the extension listing with store referer; not initiated by wallet code."
+		},
+		{
+			"unixMillis": 1792699513738,
+			"tip": "fd1753b929bda3a0fd95b62e577429fe19fb725ff82f91b893d3789d2f510f40",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005070
+				}
+			],
+			"rationale": "Chrome Web Store install_attempt analytics for its Uniswap listing; store Referer and event_url establish this is not wallet-initiated."
+		},
+		{
+			"unixMillis": 1792699528934,
+			"tip": "b106b6204e09730fe9f4377e194be7d6dbfc03d53d729383b58e1fecda302827",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000005154
+				}
+			],
+			"rationale": "Chrome Web Store install_attempt analytics for its Uniswap listing; store Referer and event_url establish this is not wallet-initiated."
+		},
+		{
+			"unixMillis": 1792699542409,
+			"tip": "d08788db93d5ff30b1857b2167d93037b9417f9aa42c6bfbf0fce132faface5f",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017665
+				}
+			],
+			"rationale": "Chrome Web Store install_success event for its listing, confirmed by store Referer and event_url. Store analytics, not wallet code."
+		},
+		{
+			"unixMillis": 1792699555427,
+			"tip": "c3b3c258624e822b90aaba07277b1e0fc1a58f58e1b4db3192fdd27d28cc34f6",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 2000017666
+				}
+			],
+			"rationale": "Chrome Web Store install_success event for its listing, confirmed by store Referer and event_url. Store analytics, not wallet code."
+		},
+		{
+			"unixMillis": 1792699555618,
+			"tip": "86aad15eae4e12a74957dd9e24dfea93d6932f62371102ae2815ef38f06b692b",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792705901721,
+			"tip": "d77e601c3c595475ca589210e3ba987b10c880fac8c72594c1b50e0d92add174",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=accounts.google.com --path=/RotateCookiesPage --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005462
+				}
+			]
+		},
+		{
+			"unixMillis": 1792705914876,
+			"tip": "227e571ff35928298b47d5359662e90b583f3e79f440b72f55a18784f2051363",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000005462
+				}
+			],
+			"rationale": "Google account cookie rotation embedded by Chrome Web Store: both origin query parameter and Referer identify chromewebstore.google.com. Captured before wallet installation in IDLE_PRE_INSTALL, so this is browser/store activity, not wallet-initiated traffic. The wallet-local path-and-referer matcher affects only this request."
+		},
+		{
+			"unixMillis": 1792705915058,
+			"tip": "9b60d067661ca782810470729ac59487e51f1e2c63f538f2a4f2c49a88ba0a6a",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792705952183,
+			"tip": "17701f9979ffba266efbdca2f548aade60cd3ba4d6c9f08aa7131934ac21dcff",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=ogs.google.com --path=/u/0/widget/app --referer-domain=chromewebstore.google.com --purposes=NOT_WALLET_INITIATED",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000009530
+				}
+			]
+		},
+		{
+			"unixMillis": 1792705964019,
+			"tip": "da99b08bed1675ae4b23c3a1dc261f876b55663ff16fdc2dc2644556b2b15679",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 1000009530
+				}
+			],
+			"rationale": "OneGoogle app widget embedded by Chrome Web Store: origin query parameter and Referer both identify chromewebstore.google.com. This IDLE_PRE_INSTALL request predates wallet installation and is store-page activity, not wallet-initiated traffic. Verified that the wallet-local path-and-referer matcher changes only this request."
+		},
+		{
+			"unixMillis": 1792705964211,
+			"tip": "771c94bce57173ee21ea606f347f9c495676ebb0bd25479aad534d6fcfede27e",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792708038897,
+			"tip": "13abf5f294209105bf435d211598dc090427d00c89796290beaa426e72b778c1",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=entry-gateway.backend-prod.api.uniswap.org --path=/infra/blockaid/v0/site/scan --purposes=SCAM_DETECTION",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002668
+				}
+			]
+		},
+		{
+			"unixMillis": 1792708051919,
+			"tip": "dd2cb20e3f00edb6ea87772342f477de62d6fbccbad8de833d4b5328f1c55601",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002668
+				}
+			],
+			"rationale": "Reviewed the single APP_CONNECTION request: it submits the connected Walletbeat app URL to the Blockaid site scan and receives malicious-score and attack-type results. SCAM_DETECTION is appropriate; the exact-path matcher excludes transaction scans and other APIs. Collection policy intentionally deferred to human review."
+		},
+		{
+			"unixMillis": 1792708052129,
+			"tip": "460908919f50347a8a14e14f7fa6cf32f91d0ca9a3ff05ac63287445abf8550a",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792708103349,
+			"tip": "3e0249365bc81bfe5ea51613423766b406ba47580fe91c2cd17d19217c847e84",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=entry-gateway.backend-prod.api.uniswap.org --path=/swappable_tokens --purposes=ASSET_METADATA",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000020064
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002669
+				}
+			]
+		},
+		{
+			"unixMillis": 1792708117981,
+			"tip": "9836f0d0dc2ac83feced1543dfd3db61d4b689e7a478205032c83c38fd8ebb0e",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000020064
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002669
+				}
+			],
+			"rationale": "Reviewed both affected requests, in onboarding-import and app-connection: both request supported token metadata for native ETH on Ethereum. Returned token names, symbols, decimals and logos support ASSET_METADATA, not a priced swap quote. Exact-path matcher excludes /quote and /swap; policy deferred."
+		},
+		{
+			"unixMillis": 1792708118181,
+			"tip": "954c459022c943d8c36004f602708bc316270b9ebab340167979b60cb0999248",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792708146456,
+			"tip": "e432f6bf978f1da77c221b57bff42742622348d65cbc0331729224ce37d81422",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=entry-gateway.backend-prod.api.uniswap.org --path=/rpc/1 --method=eth_getBalance --purposes=CHAIN_DATA_LOOKUP",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000022450
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000044681
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000049275
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000005222
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000020864
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000034897
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000003219
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000010928
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000011434
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000021612
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002977
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000004214
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000015714
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000019530
+				}
+			]
+		},
+		{
+			"unixMillis": 1792708163281,
+			"tip": "c0e6942fa965b1c8672fe3846b7d9dabe6cc0c2af8b658d89ff97f7f33699705",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000022450
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000044681
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000049275
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000005222
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000020864
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000034897
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000003219
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000010928
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000011434
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 7000021612
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000002977
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000004214
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000015714
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000019530
+				}
+			],
+			"rationale": "Reviewed all 14 affected payloads across sessions 5-9: each calls eth_getBalance for the same wallet address at latest, differing only in RPC id. This reads native ETH balance and does not simulate or broadcast a transaction, so CHAIN_DATA_LOOKUP applies to every match. Exact /rpc/1 plus eth_getBalance selectors exclude other RPC methods. Policy intentionally unset."
+		},
+		{
+			"unixMillis": 1792708163475,
+			"tip": "96737621c94b55e09ca8e9d7a730754fde4733be158aea1d01f75cac2c3ec30c",
+			"type": "close-mutation"
+		},
+		{
+			"unixMillis": 1792708183087,
+			"tip": "16e970af4ad8aa0d554b7679f3780ad26d2052eb5ee35359657b7a6811288a0a",
+			"type": "open-mutation",
+			"command": "pnpm wallet-data-collection:agent --id=uniswapWallet --variant=BROWSER explain-request --domain=entry-gateway.backend-prod.api.uniswap.org --path=/data.v1.DataApiService/ListTransactions --purposes=CHAIN_DATA_LOOKUP",
+			"impacted": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 3000019212
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 3000019530
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 4000087923
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 4000088288
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000002306
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000003944
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000003946
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000012279
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000003749
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000004971
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000021894
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000021895
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000009280
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000010127
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000011971
+				}
+			]
+		},
+		{
+			"unixMillis": 1792708200256,
+			"tip": "93df2befd55ace989870461c059776a3a91b2ee95985b30eedfedf0274777a1b",
+			"type": "justify",
+			"justified": [
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 3000019212
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 3000019530
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 4000087923
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 4000088288
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000002306
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000003944
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000003946
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 5000012279
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000003749
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000004971
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000021894
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 6000021895
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000009280
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 8000010127
+				},
+				{
+					"walletId": "uniswapWallet",
+					"walletVariant": "BROWSER",
+					"sessionTime": 9000011971
+				}
+			],
+			"rationale": "Reviewed all 15 affected requests individually: each queries transaction history by walletAccount address and chainIds, with page-size/includePlans variations. Requests 5000012279,6000021894,6000021895 additionally carry signed fiat-on-ramp history authentication, not transaction submission or account linking. All remain history lookups, supporting CHAIN_DATA_LOOKUP. Exact service/method path excludes other API operations; collection policy remains unset."
+		},
+		{
+			"type": "close-mutation",
+			"unixMillis": 1792708200456,
+			"tip": "520f7ec3ad4dc140837920e8024abfcf2470ca349f9f59eee770d35cf3d50f2f"
+		}
+	]
+}
