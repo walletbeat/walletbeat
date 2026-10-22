@@ -283,9 +283,11 @@ Some requests can expose the user's wallet address and IP address to these provi
 
 Privacy hygiene 🧼
 
-Ambire doesn't consistently minimize the information shared with external providers.
+Ambire doesn't collect product usage analytics, but it sends crash and error reports to Sentry by default, without asking for consent first.
 
-Privacy-preserving proxies could reduce these risks.
+Users can turn this off in settings, but it stays on until they find the toggle.
+
+Crash reports can reveal how and when someone uses their wallet. This data should only leave the device after the user opts in.
 
 ![Privacy hygiene](./privacy-hygiene.png)
 
