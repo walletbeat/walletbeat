@@ -8,47 +8,49 @@ A Walletbeat thread 🧵
 
 ---
 
-Account abstraction
+Account abstraction 👤
 
 Is the wallet Account Abstraction ready?
 
-Wallets are rated based on whether they make use of EIP-7702: Account Abstraction via smart contract authority delegation transactions (for EOA or MPC wallets), or if they support ERC-4337: Account Abstraction for smart contract wallets transactions (for smart contract wallets).
+User experience on Ethereum has historically suffered from the limitations of EOAs, which is the type of account most Ethereum users use today. By contrast, smart wallet accounts offer many UX and security improvements. 
+
+Wallets are rated based on whether they support:
+- EIP-7702: Account Abstraction via smart contract authority delegation for Externally-Owned Accounts (EOAs) wallets. 
+- ERC-4337: Account Abstraction for smart contract wallets. 
 
 ![Account Abstraction](./account_abstraction.png)
 
 ---
 Why does this matter?
 
-smart wallet accounts offer many UX and security improvements, such as the ability to: batch multiple transactions, pay gas fees in other tokens than Ether, enable the use of Passkeys for signing transactions, update the set of keys used to control the wallet, define account recovery rules, etc. 
+EIP-7702 creates a clean path for existing EOAs to obtain all the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. 
+
+This represents a large User Experience upgrade for all Ethereum EOA users.
 
 ---
 
-Address resolution
+Address resolution 📇
 
 Can the wallet send funds to human-readable Ethereum addresses?
 
 Ethereum addresses are unreadable to humans. Address naming registries like ENS partially solve this problem.
 
-Some address format standards improve upon this further by including the destination chain information as part of the address itself. Such standards include:
-- ERC-7828 Chain-specific addresses using ENS: user@l2chain.eth
-- ERC-7831 Multi-chain addresses: user.eth:l2chain
+Some address format standards improve upon this further by including the destination chain information as part of the address itself.
 
 ![Address Resolution](./address_resolution.png)
 
 ---
 Why does this matter?
 
-Ethereum addresses are hexadecimal strings (0x...) which are unreadable to humans. Phishing scams and exploits have used this to trick users into sending funds to invalid addresses.
+Ethereum addresses are hexadecimal strings (0x...) which are unreadable to humans.
 
-Additionally, Ethereum's transition to layer 2 chains has changed user needs when sending funds:
-
-The user needs to ensure that they are sending funds to the correct hexadecimal address on the correct chain, increasing the potential for mistakenly sending funds to the wrong place or the wrong chain.
+Additionally, the users need to ensure that they are sending funds on the correct chain, increasing the potential for mistakenly sending funds to the wrong place or the wrong chain.
 
 ---
 
-Browser integration
+Browser integration 🌐
 
-Does the wallet comply with web browser integration standards?
+Does the wallet support all the prominent standards for web browser integration?
 
 ![Browser Integration](./browser_integration.png)
 
@@ -62,7 +64,7 @@ By ensuring that wallets implement this standard interface, applications automat
 
 ---
 
-Chain abstraction
+Chain abstraction 🌉
 
 Does the wallet smooth out the complexities of dealing with multiple chains?
 
@@ -78,7 +80,7 @@ To address the UX impact of this complexity, wallets should provide features to 
 
 ---
 
-Transaction batching
+Transaction batching 🧺
 
 Does the wallet support bundling multiple operations as a single transaction?
 
@@ -93,11 +95,11 @@ Transaction batching is one of the longstanding features without which Ethereum 
 ---
 
 
-Hardware wallet interoperability
+Hardware wallet interoperability 🧱
 
 Does the wallet support directly connecting to hardware wallets from a plurality of manufacturers?
 
-this check is only about hardware wallet interoperability. Wallets are evaluated based on whether they directly integrate with hardware wallets from a plurality of major hardware wallet manufacturers.
+This check is only about hardware wallet interoperability. Wallets are evaluated based on whether they directly integrate with hardware wallets from a plurality of major hardware wallet manufacturers.
 
 A wallet receives a passing rating if it supports hardware wallets from at least 3 major hardware wallet manufacturers:Ledger, Trezor, Keystone, GridPlus, imKey.
 
