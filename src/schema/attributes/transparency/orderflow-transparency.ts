@@ -24,11 +24,13 @@ import { isSupported, notSupported, type Support, supported } from '@/schema/fea
 import {
 	computeWorstOperationFees,
 	FeeDisplayLevel,
+	FeeType,
 	type WorstOperationFees,
 } from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
 	deriveOrderflowFacts,
+	feeProminenceLevels,
 	OnchainVerificationDocumentation,
 	OrderflowDisclosureLevel,
 	type OrderflowPractices,
@@ -175,21 +177,39 @@ const exampleFailNoPracticesPagePractices: OrderflowPractices = {
 }
 
 const exampleComprehensiveWorstFees: WorstOperationFees = {
-	feeDisplay: {
-		byDefault: FeeDisplayLevel.COMPREHENSIVE,
-		afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-		fullySponsored: false,
-		walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+	fees: {
+		feesInvolved: {
+			[FeeType.NETWORK_FEE]: true,
+			[FeeType.ONCHAIN_APP_FEE]: false,
+			[FeeType.WALLET_FEE]: false,
+		},
+		shownAfterSingleAction: {
+			comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+			units: null,
+		},
+		shownByDefault: {
+			comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+			units: null,
+		},
 	},
 	references: [],
 }
 
 const exampleProminenceGapWorstFees: WorstOperationFees = {
-	feeDisplay: {
-		byDefault: FeeDisplayLevel.COMPREHENSIVE,
-		afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-		fullySponsored: false,
-		walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+	fees: {
+		feesInvolved: {
+			[FeeType.NETWORK_FEE]: true,
+			[FeeType.ONCHAIN_APP_FEE]: false,
+			[FeeType.WALLET_FEE]: false,
+		},
+		shownAfterSingleAction: {
+			comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+			units: null,
+		},
+		shownByDefault: {
+			comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+			units: null,
+		},
 	},
 	references: [],
 }
@@ -353,7 +373,6 @@ function evaluateAuctioningOrderflow(
 	worstFees: WorstOperationFees,
 	auctioneers: WithRef<DataCollectionByEntity>[],
 ): Evaluation {
-	const worstFeeDisplay = worstFees.feeDisplay
 	const { disclosure, practicesPage, userCanRemoveAuctioning } = orderflowPractices
 	const auctioneerEntities = uniqueEntities(auctioneers.map(row => row.byEntity))
 	const auctioneerNames = entityNames(auctioneerEntities)
@@ -385,11 +404,12 @@ function evaluateAuctioningOrderflow(
 		})
 	}
 
-	const prominenceCompare = compareOrderflowDisclosureToFeeDisplay(disclosure, worstFeeDisplay)
+	const prominenceCompare = compareOrderflowDisclosureToFeeDisplay(disclosure, worstFees.fees)
 
 	if (prominenceCompare < 0) {
 		ctx.addRef(disclosure)
 		ctx.addRef(worstFees.references)
+		const worstFeeLevels = feeProminenceLevels(worstFees.fees)
 
 		return ctx.build({
 			outcome: {
@@ -401,7 +421,7 @@ function evaluateAuctioningOrderflow(
 				),
 			},
 			details: mdSentence(
-				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. On the transaction approval screen, orderflow disclosure is less prominent than fee display. By default, users see ${orderflowDisclosureUserDescription(disclosure.byDefault)} while fees show ${feeDisplayUserDescription(worstFeeDisplay.byDefault)}. After one interaction, orderflow shows ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} while fees show ${feeDisplayUserDescription(worstFeeDisplay.afterSingleAction)}.`,
+				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. On the transaction approval screen, orderflow disclosure is less prominent than fee display. By default, users see ${orderflowDisclosureUserDescription(disclosure.byDefault)} while fees show ${feeDisplayUserDescription(worstFeeLevels.byDefault)}. After one interaction, orderflow shows ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} while fees show ${feeDisplayUserDescription(worstFeeLevels.afterSingleAction)}.`,
 			),
 			howToImprove: mdSentence(
 				'{{WALLET_NAME}} should make orderflow auctioning disclosure at least as prominent as its fee display on the transaction approval screen.',

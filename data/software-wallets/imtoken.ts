@@ -35,7 +35,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -111,10 +111,19 @@ export const imtoken: SoftwareWallet = {
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -147,8 +156,8 @@ export const imtoken: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'imToken publishes its core code under the Apache 2.0 open-source license; the app itself is proprietary.',
-						url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE',
+							'imToken publishes its core code under the Apache 2.0 open-source license, but the app itself is proprietary.',
+						url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE#not-line-specific',
 					},
 				],
 				license: FOSSLicense.APACHE_2_0,
@@ -303,7 +312,7 @@ export const imtoken: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'"imToken uses the system-provided secure random source on iOS and Android to generate private keys locally"; private keys "are never transmitted over any network."',
+							'"imToken uses the system-provided secure random source on iOS and Android to generate private keys locally." Private keys "are never transmitted over any network."',
 						url: 'https://support.token.im/hc/en-us/articles/51636016918553',
 					},
 					{
@@ -416,7 +425,7 @@ export const imtoken: SoftwareWallet = {
 				reproducibleBuilds: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Only the TokenCore library is open source; the app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
+							'Only the TokenCore library is open source. The app is not. WalletScrutiny: "Build cannot be done because the source code is not publicly available."',
 						url: 'https://walletscrutiny.com/mobile/im.token.app/',
 					},
 				}),

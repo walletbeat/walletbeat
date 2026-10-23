@@ -49,6 +49,25 @@ const intentionalPropagationDifferences = new Set([
 		outcomeId: 'standard_eoa_exportable',
 		path: 'accountSupport.eip7702.ref',
 	}),
+	// Multi-address correlation cites only data collection rows that collect the account
+	// address by default. Ambire's native swap row (LI.FI) collects only the IP address.
+	propagationDifferenceKey({
+		attributeId: 'multiAddressCorrelation',
+		outcomeId: 'bulkRequests',
+		path: 'privacy.dataCollection.NATIVE_SWAP.collected[].ref',
+	}),
+	// Orderflow transparency cites only pre-inclusion recipients, i.e. rows that collect
+	// mempool transactions. Ambire's native swap and USDC send rows do not.
+	propagationDifferenceKey({
+		attributeId: 'orderflowTransparency',
+		outcomeId: 'non_auctioning_extractive',
+		path: 'privacy.dataCollection.NATIVE_SWAP.collected[].ref',
+	}),
+	propagationDifferenceKey({
+		attributeId: 'orderflowTransparency',
+		outcomeId: 'non_auctioning_extractive',
+		path: 'privacy.dataCollection.SEND_USDC.collected[].ref',
+	}),
 ])
 
 function markFeatureReferences(features: ResolvedFeatures): MarkedFeatures {

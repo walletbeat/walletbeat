@@ -23,7 +23,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -84,10 +84,19 @@ export const bitget: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -235,7 +244,7 @@ export const bitget: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+								'Bitget Wallet does not decode an Aave supply. It shows a generic signature confirmation.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
 							label: 'Bitget Wallet signature confirmation for an Aave supply',
 						},

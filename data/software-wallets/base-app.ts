@@ -44,7 +44,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -148,10 +148,19 @@ export const baseApp: SoftwareWallet = {
 					builtInBridging: supported({
 						ref: refTodo,
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: null,
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -368,7 +377,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39; the seed phrase is shown only to the user and stored locally.',
+							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39. The seed phrase is shown only to the user and stored locally.',
 						url: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 					},
 				],
@@ -382,7 +391,7 @@ export const baseApp: SoftwareWallet = {
 				ref: {
 					explanation:
 						'Coinbase Smart Wallet verifies passkey signatures onchain via `webauthn-sol`, which uses the RIP-7212 precompile when available and falls back to `FreshCryptoLib`.',
-					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
+					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol#not-line-specific',
 				},
 				details:
 					'Uses base-org/webauthn-sol (built on Daimo WebAuthn.sol). Tries RIP-7212 P-256 precompile first, falls back to FreshCryptoLib.',
@@ -393,7 +402,7 @@ export const baseApp: SoftwareWallet = {
 			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf#binary-file',
 					auditDate: '2024-01-07',
 					auditor: cantina,
 					codeSnapshot: {
@@ -404,7 +413,7 @@ export const baseApp: SoftwareWallet = {
 					variantsScope: { [Variant.MOBILE]: true },
 				},
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf#binary-file',
 					auditDate: '2024-02-29',
 					auditor: certora,
 					codeSnapshot: {
@@ -425,7 +434,7 @@ export const baseApp: SoftwareWallet = {
 					variantsScope: { [Variant.MOBILE]: true },
 				},
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf#binary-file',
 					auditDate: '2024-04-23',
 					auditor: cantina,
 					codeSnapshot: {
@@ -533,7 +542,7 @@ export const baseApp: SoftwareWallet = {
 						ref: {
 							explanation:
 								"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
-							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts#not-line-specific',
 						},
 						selfBroadcastViaDirectGossip: notSupported,
 						selfBroadcastViaSelfHostedNode: notSupported,
@@ -546,7 +555,7 @@ export const baseApp: SoftwareWallet = {
 						ref: {
 							explanation:
 								'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
-							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts#not-line-specific',
 						},
 					},
 				},
@@ -585,18 +594,18 @@ export const baseApp: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"). Apps check support via `wallet_getCapabilities` (`atomicBatch`).',
 						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
 					},
 					{
 						explanation:
 							'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
-						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts#not-line-specific',
 					},
 					{
 						explanation:
-							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
-						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call. One failure therefore reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
+						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol#not-line-specific',
 					},
 					{
 						explanation:

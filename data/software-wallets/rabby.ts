@@ -8,7 +8,16 @@ import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
-import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -64,6 +73,7 @@ import {
 } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
@@ -71,19 +81,90 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
+import { alphabet } from '../entities/alphabet'
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
+import { hyperFoundation } from '../entities/hyper-foundation'
 import { leastAuthority } from '../entities/least-authority'
+import { sentry } from '../entities/sentry'
 import { slowMist } from '../entities/slowmist'
 import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
 import rabbyAndroidParsed from './manifests/rabby/android.parsed.json'
 import rabbyIosParsed from './manifests/rabby/ios.parsed.json'
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation:
+				'The extension is installed from the Chrome Web Store. Once installed, it sends page views to Google Analytics through the Measurement Protocol with a persistent `client_id`. Page URLs such as the seed phrase backup screen include the account address.',
+			url: [
+				'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
+				'https://www.google-analytics.com/mp/collect',
+			],
+		},
+	],
+	debank: [
+		{
+			explanation:
+				"Rabby fetches the list of available RPC endpoints and its remote configuration from DeBank's servers on every launch.",
+			url: ['https://api.rabby.io/v1/chainrpc', 'https://static.debank.com/rabby/config.json'],
+		},
+		{
+			explanation: 'Gas prices are fetched from the Rabby API.',
+			url: 'https://api.rabby.io/v2/wallet/gas_market',
+		},
+		{
+			explanation:
+				"The active address's total balance, balance history, and DeFi positions are fetched from the Rabby API, one address per request. When importing a wallet, the addresses being imported are looked up in separate requests sent within about two seconds of each other.",
+			url: [
+				'https://api.rabby.io/v1/user/total_balance',
+				'https://api.rabby.io/v1/user/total_net_curve',
+				'https://api.rabby.io/v1/user/complex_app_list',
+			],
+		},
+		{
+			explanation:
+				'After a transaction is sent, its receipt is polled through the Rabby RPC proxy to check whether it has been included.',
+			url: 'https://api.rabby.io/v1/wallet/eth_rpc',
+		},
+		{
+			explanation:
+				'When swapping, the Rabby API builds the complete unsigned transaction (sender, router, calldata, nonce, gas, and value) before the user signs it, routed through a decentralized exchange aggregator with a 0.25% fee. The Gas Account endpoint is queried for multiple addresses at the same time.',
+			url: ['https://api.rabby.io/v1/wallet/swap_trade', 'https://api.rabby.io/v2/gas_account'],
+		},
+	],
+	debankAnalytics: [
+		{
+			explanation:
+				"Page views and events are sent to DeBank's Matomo instance with a persistent visitor ID (`_id`). Page URLs such as the seed phrase backup screen include the account address.",
+			url: 'https://matomo.debank.com/matomo.php',
+		},
+		{
+			explanation:
+				'Events for each transaction step (created, signed, submitted, and completed) are sent to DeBank with the account type, chain, and source screen.',
+			url: 'https://festats.debank.com/rabby/createTransaction',
+		},
+	],
+	hyperFoundation: [
+		{
+			explanation:
+				"Rabby Perps is built on Hyperliquid's API. Perpetuals positions for every address in the wallet are looked up on it, one request per address, sent within a few milliseconds of each other.",
+			url: 'https://api.hyperliquid.xyz/info',
+		},
+	],
+	sentry: [
+		{
+			explanation: 'Sentry receives session reports with a session ID, and error reports.',
+			url: 'https://o4507018303438848.ingest.us.sentry.io',
+		},
+	],
+}
+
 export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
@@ -252,10 +333,19 @@ export const rabby: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.NONE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -357,7 +447,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							'Rabby implements the EIP-1193 Provider interface and injects it into web pages. EIP-2700 and EIP-6963 are also supported.',
-						url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts',
+						url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts#not-line-specific',
 					},
 				],
 				'1193': featureSupported,
@@ -376,7 +466,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							"Other than its rabby-api package, Rabby's core code is licensed under the MIT license.",
-						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE#not-line-specific',
 					},
 				],
 				license: SourceAvailableNonFOSSLicense.UNLICENSED_VISIBLE,
@@ -386,7 +476,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's browser extension is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+							url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE#not-line-specific',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -404,7 +494,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's desktop app is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE',
+							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE#not-line-specific',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -486,7 +576,640 @@ export const rabby: SoftwareWallet = {
 				},
 				[Variant.DESKTOP]: null,
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.STATIC_ASSETS,
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 2, kind: 'ipTime', strength: 1799998 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SWAP_QUOTE,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 3, kind: 'ipTime', strength: 1799997 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: null,
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 3, kind: 'ipTime', strength: 1799997 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.debank,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: {
+											kind: 'userInfo',
+											strength: 10_000_002,
+											userInfo: PersonalInfo.TRACKING_IDENTIFIER,
+										},
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.debankAnalytics,
+							byEntity: deBank,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.alphabet,
+							byEntity: alphabet,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+			},
 			privacyPolicy: 'https://rabby.io/docs/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -665,7 +1388,7 @@ export const rabby: SoftwareWallet = {
 				{
 					ref: {
 						label: '[20210623] Rabby Chrome Extension Penetration Testing Report.pdf',
-						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf#binary-file',
 					},
 					auditDate: '2021-06-18',
 					auditor: slowMist,
@@ -676,7 +1399,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf#binary-file',
 					auditDate: '2022-03-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -688,7 +1411,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf#binary-file',
 					auditDate: '2023-07-20',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -700,7 +1423,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf#binary-file',
 					auditDate: '2023-09-26',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -715,7 +1438,7 @@ export const rabby: SoftwareWallet = {
 					// The upstream repository really names this file
 					// "Least Authority - Debank Rabby Walle Audit Report.pdf";
 					// the missing "t" is Rabby's, not ours. Do not "fix" the URL.
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -742,7 +1465,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-10-22',
 					auditor: cure53,
 					codeSnapshot: {
@@ -779,7 +1502,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf#binary-file',
 					auditDate: '2024-10-23',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -790,7 +1513,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-12-12',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -801,7 +1524,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf#binary-file',
 					auditDate: '2024-12-17',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -921,7 +1644,7 @@ export const rabby: SoftwareWallet = {
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app. The patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -934,7 +1657,7 @@ export const rabby: SoftwareWallet = {
 								},
 								{
 									label: 'The patch, which leaves `generateMnemonic` untouched',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch#not-line-specific',
 								},
 								{
 									label: 'The patch was made "to keep same level performance as past"',
@@ -950,7 +1673,7 @@ export const rabby: SoftwareWallet = {
 								},
 								{
 									label: 'Crypto provider installed at app startup',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts#not-line-specific',
 								},
 							],
 						},
@@ -1021,13 +1744,13 @@ export const rabby: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
 							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows it as a multisig transaction submission.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
@@ -1213,7 +1936,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								url: [
 									{
 										label:
@@ -1262,7 +1985,7 @@ export const rabby: SoftwareWallet = {
 							},
 							{
 								explanation:
-									"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 								label:
 									"Mobile app sends transactions on Rabby's built-in networks to Rabby's servers",
 								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/apps/mobile/src/core/controllers/provider.ts#L1395-L1466',
@@ -1276,31 +1999,75 @@ export const rabby: SoftwareWallet = {
 			operationFees: {
 				builtInErc20Swap: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.NONE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.NONE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.NONE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.NONE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,
@@ -1312,7 +2079,7 @@ export const rabby: SoftwareWallet = {
 						{
 							explanation:
 								'The CI runs `yarn install --immutable`, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
-							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml#not-line-specific',
 						},
 					],
 				}),
@@ -1322,7 +2089,7 @@ export const rabby: SoftwareWallet = {
 							{
 								explanation:
 									'The extension has no LavaMoat or SES dependency in its build, and the shipped v0.94.11 extension contains no LavaMoat or SES runtime.',
-								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/package.json',
+								url: 'https://github.com/RabbyHub/Rabby/blob/7794bfb54e9cf26a72738d3bd8c2058961663d0c/package.json#not-line-specific',
 							},
 						],
 					}),
@@ -1331,7 +2098,7 @@ export const rabby: SoftwareWallet = {
 							{
 								explanation:
 									'The mobile app has no LavaMoat, SES or other dependency isolation configured.',
-								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/package.json',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/784783cc9ddce0edf90b8a65e5c18bc02b57af00/package.json#not-line-specific',
 							},
 						],
 					}),
