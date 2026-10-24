@@ -1255,6 +1255,90 @@
 		"hash": "bfef3a1a48a1b122cc53489639df2c275fcca6ec56c245d149f63b8b5bb89ba9",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-aave-supply-clearsigning.png": {
+		"hash": "55baef427207d8fa26bcf08185815197f505a37f04658886e9a9b91adaae0f35",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-approvals-screen.png": {
+		"hash": "2b00d3e5e6df8a005d75b7455172558e7cb827d6e50608227f1351074258b60a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-bridge-across-notice.png": {
+		"hash": "2d4cb67fe9cfb5c506fa7f1e1d623e0ac393c85a4a0e1b3b0f71148bcd1e1124",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-bridge-ui.png": {
+		"hash": "9294c084d8c974a625dbc9726facd7fba5f0c88ec996b17beec828c242092e7d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-eip712-typed-data.png": {
+		"hash": "de294cbfad63225d08d84d93965988af7f4e0b1c5c9ed985aff9b247c4284ddc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-erc20-transfer-confirmation.png": {
+		"hash": "12b0891e13b2f42f69213fc181a62babb96de575f43056c3528ae85e4871bee0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-eth-transfer-confirmation.png": {
+		"hash": "7755b49b4e6d06ff9a74327f3f896df3876b2f10621abcf116193941a04fc191",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-external-data-onboarding.png": {
+		"hash": "04ab72faa5c97865af55e175c9bd9ae1f046ebe6ff75b886387a79cfe730dde4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-network-settings.png": {
+		"hash": "15dc261f7c87af1955db7be0f3dd22e4e64f21eb5e151030287c15177c232ebf",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-railgun-onboarding.png": {
+		"hash": "4f18bc64e4c6ade5ff9e4046245cc6a998f70936f57e10797b7a984701a76bee",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-raw-calldata-modal.png": {
+		"hash": "70bc22a71f6aeeb5c191f66ff27bcfc7b2c052b410808cc936879cb93d107d51",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-revoke-approval-confirmation.png": {
+		"hash": "5b94d0a8bc87f74c41a9b1353bfe54532e3bfe3a335a1194392c6a9cb79d48be",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-send-unknown-recipient.png": {
+		"hash": "ece879a6d5d87df2462f3b6662510c303eb513fb331ec49834af143c0d1414a0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-swap-eth-to-usdc-confirmation.png": {
+		"hash": "c6e786e0a2ca95cec6caa70958f21f4e7819b7fbc718344a4feb27d1024a28bc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-swap-settings.png": {
+		"hash": "cb25584c6644890dc23a35e2bb3a1e37ebbd8bffbd2179c8f9aa4b538ab07b68",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-swap-ui.png": {
+		"hash": "dc557cb92b9d0747294e1a66e53ebbd4f9329b925b213ae8ea41417b96b7693c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-swap-usdc-to-eth-confirmation.png": {
+		"hash": "c4145393407e51c9d67a1d2f0abd429400ad030bd29d5e0a4b60345b82df014d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-unlimited-approval-warning.png": {
+		"hash": "25c1c9eeffa17e5e2893925185c77aa7aca8efcb9efa1b324662d0cad11126f4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-wallet-delegation-confirmation.png": {
+		"hash": "80f5294ea92e09f03781e8b1aeaa83fe352738a31b7cf70ab3995a869ea09b4b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-26-zeus-wallet-recovery.png": {
+		"hash": "1688da9bae0b099d68157724fc857c0d2b8123a35197bc03d3d4f90c3843f489",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/zeus/screenshots/2026-09-30-zeus-siwe-personal-sign.png": {
+		"hash": "ba44069d508411636ca574bc7466203228151ca86f79c5b7ff0e60a5a7994d80",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/robot.png": {
 		"hash": "e79045fb9ca786cffb763c8bedccabc94161f2534418f7826c31f2a3e4210ce7",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

@@ -1,0 +1,65 @@
+{
+	"highlightRanges": [
+		{
+			"first": 70,
+			"last": 71
+		},
+		{
+			"first": 87,
+			"last": 89
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl Permit2Info {",
+				"   pub async fn new(",
+				"      ctx: ZeusCtx,",
+				"      chain: u64,",
+				"      token: &ERC20Token,",
+				"      amount: U256,",
+				"      owner: Address,",
+				"      spender: Address,",
+				"   ) -> Result<Self, anyhow::Error> {"
+			],
+			"startLine": 43
+		},
+		{
+			"lines": [
+				"      let contract_need_approval = allowance < amount;",
+				"",
+				"      let current_time = TimeStamp::now_as_secs()?.timestamp();",
+				"",
+				"      let expired = u64::try_from(data.expiration)? < current_time;",
+				"      let needs_new_signature = U256::from(data.amount) < amount || expired;",
+				"",
+				"      #[cfg(feature = \"dev\")]",
+				"      {",
+				"         tracing::info!(\"AllowanceReturn {:?}\", data);"
+			],
+			"startLine": 66
+		},
+		{
+			"lines": [
+				"         tracing::info!("
+			],
+			"startLine": 81
+		},
+		{
+			"lines": [
+				"            needs_new_signature",
+				"         );",
+				"      }",
+				"",
+				"      let ten_minutes = 10 * 60;",
+				"      let expiration = U256::from(current_time + ten_minutes);",
+				"      let sig_deadline = U256::from(current_time + ten_minutes);",
+				"",
+				"      let value = if needs_new_signature {",
+				"         let v = generate_permit2_json_value(",
+				"            chain,"
+			],
+			"startLine": 83
+		}
+	]
+}

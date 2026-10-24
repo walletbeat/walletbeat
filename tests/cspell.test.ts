@@ -185,6 +185,7 @@ describe('cSpell', async () => {
 			'Mk3',
 			'Mk4',
 			'Mk5',
+			'Permit2', // Product name; word extractor does not capture CamelCase+digits as single token
 			'everland',
 		]
 
