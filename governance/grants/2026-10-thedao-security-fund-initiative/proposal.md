@@ -57,7 +57,7 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed passe
 
 - **polymutex**, Walletbeat lead and core contributor: https://x.com/polymutex
 - **0xMattmatt**, Walletbeat core contributor: https://x.com/0xmattmatt
-- **REN2140**, Walletbeat contributor: https://github.com/ren2140eth
+- **REN2140**, Walletbeat contributor: https://x.com/REN2140_eth
 
 None of us is affiliated with a wallet Walletbeat rates.
 
