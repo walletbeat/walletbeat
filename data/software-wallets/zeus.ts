@@ -115,7 +115,7 @@ export const zeus: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
-		lastUpdated: '2026-09-30',
+		lastUpdated: '2026-10-24',
 		urls: {
 			docs: ['https://github.com/greekfetacheese/zeus'],
 			repositories: ['https://github.com/greekfetacheese/zeus'],
@@ -947,10 +947,10 @@ export const zeus: SoftwareWallet = {
 					},
 					{
 						explanation:
-							"Zeus's built-in Uniswap swap approves the canonical `Permit2` contract with an unlimited token allowance (the maximum `U256` value), one time per token. The `Permit2` allowance it grants the swap router is for exactly the swap input amount and expires 30 days after signing. An existing allowance that is still sufficient and not expired is reused instead of signing again. The unlimited token approval is rendered before signing with its amount displayed as `Unlimited` and cannot be edited.",
+							"Zeus's built-in Uniswap swap approves the canonical `Permit2` contract with an unlimited token allowance (the maximum `U256` value), one time per token. The `Permit2` allowance it grants the swap router is for exactly the swap input amount and expires 10 minutes after signing. An existing allowance that is still sufficient and not expired is reused instead of signing again. The unlimited token approval is rendered before signing with its amount displayed as `Unlimited` and cannot be edited.",
 						url: [
 							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/uniswap/swap.rs#L1649-L1665',
-							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/signature/mod.rs#L66-L87',
+							'https://github.com/greekfetacheese/zeus/blob/530eb4dd21e934de1209c81c686937ea238e6f3c/src/core/signature/mod.rs#L70-L71,L87-L89',
 						] as NonEmptyArray<string>,
 					},
 					{

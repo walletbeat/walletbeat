@@ -1,8 +1,12 @@
 {
 	"highlightRanges": [
 		{
-			"first": 66,
-			"last": 87
+			"first": 70,
+			"last": 71
+		},
+		{
+			"first": 87,
+			"last": 89
 		}
 	],
 	"segments": [
@@ -22,10 +26,6 @@
 		},
 		{
 			"lines": [
-				"      });",
-				"",
-				"      let (data, allowance) = tokio::try_join!(data_fut, allowance_fut)?;",
-				"",
 				"      let contract_need_approval = allowance < amount;",
 				"",
 				"      let current_time = TimeStamp::now_as_secs()?.timestamp();",
@@ -35,25 +35,31 @@
 				"",
 				"      #[cfg(feature = \"dev\")]",
 				"      {",
-				"         tracing::info!(\"AllowanceReturn {:?}\", data);",
-				"         tracing::info!(\"Permit2 Expired: {}\", expired);",
-				"         tracing::info!(",
-				"            \"Permit2 Contract Needs Approval: {}\",",
-				"            contract_need_approval",
-				"         );",
-				"         tracing::info!(",
-				"            \"Permit2 Needs New Signature: {}\",",
+				"         tracing::info!(\"AllowanceReturn {:?}\", data);"
+			],
+			"startLine": 66
+		},
+		{
+			"lines": [
+				"         tracing::info!("
+			],
+			"startLine": 81
+		},
+		{
+			"lines": [
 				"            needs_new_signature",
 				"         );",
 				"      }",
 				"",
-				"      let expiration = U256::from(current_time + 30 * 24 * 60 * 60); // 30 days",
-				"      let sig_deadline = U256::from(current_time + 30 * 60); // 30 minutes",
+				"      let ten_minutes = 10 * 60;",
+				"      let expiration = U256::from(current_time + ten_minutes);",
+				"      let sig_deadline = U256::from(current_time + ten_minutes);",
 				"",
 				"      let value = if needs_new_signature {",
-				"         let v = generate_permit2_json_value("
+				"         let v = generate_permit2_json_value(",
+				"            chain,"
 			],
-			"startLine": 62
+			"startLine": 83
 		}
 	]
 }
