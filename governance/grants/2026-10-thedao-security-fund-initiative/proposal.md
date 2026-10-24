@@ -72,7 +72,7 @@ Other funding: https://beta.walletbeat.eth.limo/about
 
 ## In scope
 
-- Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213). Hardware ratings use only the device screen.
+- Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213).
 - One device per rated hardware wallet, bought at retail (about $2,500).
 - Retests of new releases, with results in the public impact log.
 
