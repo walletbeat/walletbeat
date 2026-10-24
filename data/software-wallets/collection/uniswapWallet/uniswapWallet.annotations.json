@@ -46,6 +46,13 @@
 				"CHAIN_DATA_LOOKUP"
 			],
 			"path": "/data.v1.DataApiService/ListTransactions"
+		},
+		{
+			"domain": "metrics.extension.gateway.uniswap.org",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"path": "/v1/amplitude-proxy"
 		}
 	],
 	"benignStrings": []
