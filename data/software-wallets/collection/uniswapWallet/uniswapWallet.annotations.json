@@ -53,6 +53,30 @@
 				"ANALYTICS"
 			],
 			"path": "/v1/amplitude-proxy"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/rpc/1",
+			"method": "eth_blockNumber"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/rpc/1",
+			"method": "net_version"
+		},
+		{
+			"domain": "entry-gateway.backend-prod.api.uniswap.org",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/rpc/1",
+			"method": "eth_chainId"
 		}
 	],
 	"benignStrings": []
