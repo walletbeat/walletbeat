@@ -14,7 +14,7 @@ export const ethInfinitismSimple7702Contract: SmartWalletContract = {
 			{
 				explanation:
 					'Zeus delegates to this implementation instead of shipping its own smart account contract. It is a minimal account intended for EIP-7702 batching and ERC-4337 gas sponsoring, and it implements ERC-1271 signature validation and ERC-4337 user operation validation.',
-				url: 'https://github.com/eth-infinitism/account-abstraction/blob/f54584edd4c627e084d04c315dcabda48a6b9ea9/contracts/accounts/Simple7702Account.sol',
+				url: 'https://github.com/eth-infinitism/account-abstraction/blob/f54584edd4c627e084d04c315dcabda48a6b9ea9/contracts/accounts/Simple7702Account.sol#not-line-specific',
 			},
 		],
 		available: true,

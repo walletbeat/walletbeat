@@ -110,3 +110,15 @@ Date	From	To	Amount	Purpose	ID
 2026-09-14	treasury	treasury	0	Approve 5 WETH for Uniswap	0x85c18428e7afbc362c622605d55cf4e319d7ad52a1b8797ce63fc454ae0c9384
 2026-09-14	treasury	treasury	0	CoW Swap order creation	0x0ffb30e0842ebe733e1d67c2fa805c8d589b6bfb31a3af15f5debdc44cab9112
 2026-09-14	treasury	treasury	1.789428977176087475 WETH → 4550 USDC	CoW swap from WETH to USDC	0x6161798ea884340238b31019fd8f02cb205aa1a7c3ca2777053fe7714de76d59
+2026-10-06	treasury	treasury	0	CoW Swap order creation	0x48ba96f2c676b72b218e728d6e8602e90b6ba3a241eea172c194c9a2054e3513
+2026-10-06	treasury	treasury	2.0236 WETH → 5500 USDC	CoW Swap order creation	0x57c656d8ba5edc252b05f0b6d172d59f840ac49f0976f3cb233967e852786cf1
+2026-10-06	treasury	mattmatt_sablier	5,571.43 USDC [labor:dev]	Top-up of Sablier stream	0x8e3d4f5247616a449e02f40f3507c86c4b6d8aad92a8391dffa2b7df0ce9af7e
+2026-10-06	treasury	ren2140	1536 USDC [labor:data_entry]	Compensation for wallet data entry	0x5bcf6315f595cab5e90f39fd701fdb2d37474e09d36aead5c841ce5fb0b755a8
+2026-10-06	treasury	thegeekygrower	500 USDC [labor:dev]	Payment for implementation of Coinspect data import pipeline	0x89140a8a83423a5d4e542fac435f2b478435bf79d82133934f17ffb26eee01c2
+2026-10-14	treasury	treasury	0	Rotate 0xMattmatt signing key	0xa033cee329e3aa2d37c4f21813304a882bd1728a364139006e6764d5578e9285
+2026-10-14	treasury	mattpereira	800 USDC [labor:dev]	Payment for development work	0x2bcc86bddffe835357bc952cd1d780d3d107a4951ca7ff3e7def7241fda0ff4d
+2026-10-14	treasury	teresa5	807.06 USDC [labor:branding]	Payment for Walletbeat branding services	0x917981a3c3c0250081c82a0ba3fd0d4107ad7a3bda600e2158b4d0e1e5e91544
+2026-10-14	treasury	treasury	0.25 ETH → 0.25 WETH	Wrapping ETH to WETH	0x18b1ed61af96683b43d3fc3675746a1dc22e9f73781e02f994beca5007808bb1
+2026-10-14	treasury	treasury	0.769923444195461423 WETH → 1926.475685 USDC	CoW Swap from WETH to USDC	0xf023b9b61c02eed72ab269d3e9d9bb964dcde769024b3cdd3b91fcf4e9628924
+2026-10-14	treasury	lucilajuliana.shefi.eth	1550 USDC [labor:comms] + 2557 USDC [expense:travel]	Payment for September work and travel reimbursement	0x8ea2a4cd673dbd3d0cdc7fc93d6d8d170f235ff4c3bd5f7a0e7ea439e7c2654c
+2026-10-14	treasury	lucilajuliana.shefi.eth	200 USDC [labor:comms]	Payment for extra September work	0xd3b3781261444a1ee6a676ec8ed73d6582e69e29c91bb5d243e5aaa628644d59

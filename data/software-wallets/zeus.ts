@@ -25,6 +25,7 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import { UnlimitedApprovalWarningBenchmarkSpenders } from '@/schema/features/security/scam-alerts'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
@@ -56,7 +57,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { OrderflowDisclosureLevel } from '@/schema/features/transparency/orderflow'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
@@ -199,10 +200,19 @@ export const zeus: SoftwareWallet = {
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
 					},
 					risksExplained: 'VISIBLE_BY_DEFAULT',
 				}),
@@ -228,7 +238,7 @@ export const zeus: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Zeus ships with a list of default public RPC endpoints, but they are disabled by default so no RPC requests are made until the user enables a default endpoint or adds their own. Users can enable, disable, or remove defaults and use custom RPCs. The UI warns when a chain has no enabled or working RPC and links to Network Settings.',
+						'Zeus includes a list of default public RPC endpoints, but they are disabled by default so no RPC requests are made until the user enables a default endpoint or adds their own. Users can enable, disable, or remove defaults and use custom RPCs. The UI warns when a chain has no enabled or working RPC and links to Network Settings.',
 					url: [
 						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
 						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/panels/top_panel.rs#L57-L78',
@@ -292,7 +302,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Zeus is licensed under the MIT license.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/LICENSE-MIT',
+						url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/LICENSE-MIT#not-line-specific',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -492,7 +502,7 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Zeus ships its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updated ETH & ERC20 balances in batches, that means one single request will contain if not all most of the user wallet addresses and this can make these addresses correlatable to each other.',
+										'Zeus keeps its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updated ETH & ERC20 balances in batches, that means one single request will contain if not all most of the user wallet addresses and this can make these addresses correlatable to each other.',
 									url: [
 										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
 										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L258-L283',
@@ -503,7 +513,7 @@ export const zeus: SoftwareWallet = {
 							],
 							byEntity: userEnabledRpcEndpoints,
 							dataCollection: {
-								// Endpoints ship disabled, so every field below is collected only
+								// Endpoints start disabled, so every field below is collected only
 								// after the user enables an endpoint in Network Settings.
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
@@ -546,6 +556,7 @@ export const zeus: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.UPDATE_CHECKING],
 							role: EntityRole.OPERATOR,
@@ -573,6 +584,7 @@ export const zeus: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.STATIC_ASSETS],
 							role: EntityRole.OPERATOR,
@@ -591,9 +603,9 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zeus has a fully native Railgun integration: local proving, local note decryption/merkle handling, and UTXO sync over the user-enabled RPC (RpcSyncer). A Subsquid syncer exists in the codebase but is not used by default and cannot be enabled from the UI. Users can shield ERC-20s, unshield ERC-20s, send private transfers to 0zk addresses, and merge notes. Unshield defaults to a privacy paymaster / bundler path (public Pimlico URL by default, user-customizable); optional self-broadcast is available for emergency withdrawals and is labeled as breaking anonymity. Private transfers and note merges are submitted from the user wallet.',
+								'Zeus has a fully native Railgun integration: local proving, local note decryption/merkle handling, and UTXO sync over the user-enabled RPC (RpcSyncer). A Subsquid syncer exists in the codebase but is not used by default and cannot be enabled from the UI. Users can shield ERC-20s, unshield ERC-20s, send private transfers to 0zk addresses, and merge notes. Unshield defaults to a privacy paymaster / bundler path (public Pimlico URL by default, user-customizable). Optional self-broadcast is available for emergency withdrawals and is labeled as breaking anonymity. Private transfers and note merges are submitted from the user wallet.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md#not-line-specific',
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/shield.rs#L1054-L1063',
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/unshield.rs#L70-L74',
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/transfer.rs#L36-L43',
@@ -603,11 +615,20 @@ export const zeus: SoftwareWallet = {
 					],
 					broadcasterBasedTransactionSubmission: supported({
 						broadcasterFee: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: false,
+							},
 							// Confirmation UI shows separate Protocol fee and Broadcaster fee line items (token + USD).
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
 						},
 						// Default bundler is HTTPS public.pimlico.io
 						broadcasterLearnsUserIpAddress: true,
@@ -722,7 +743,15 @@ export const zeus: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: {
+						[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+							featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+							featureSupported,
+					},
 				}),
 			},
 			securityBestPractices: {
@@ -734,7 +763,7 @@ export const zeus: SoftwareWallet = {
 								'Zeus derives the master HD wallet from the username and password using Argon2Id with a fixed high-cost parameter set, and persists it in a vault encrypted with those same credentials. The stored key material is protected by a standardized key derivation function rather than an ad-hoc scheme. Zeus does not generate the master key from a random number generator: its entropy comes from the user credentials. The keys Zeus does generate itself, such as the Railgun database key and the wallet state key, use the operating system CSPRNG.',
 							url: [
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/vault.rs#L369-L387',
-								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md#how-the-wallet-recovery-works',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md#not-line-specific',
 							] as NonEmptyArray<string>,
 						},
 					],
@@ -790,7 +819,7 @@ export const zeus: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'The pinned registry ships an Aave `V3` Pool calldata descriptor, which is what resolves the Aave supply benchmark. It ships no descriptor for a plain ERC-20 `approve` on USDC, and Zeus has no handling of Safe `execTransaction` or `multiSend` inner calldata.',
+								'The pinned registry contains an Aave `V3` Pool calldata descriptor, which is what resolves the Aave supply benchmark. It has no descriptor for a plain ERC-20 `approve` on USDC, and Zeus has no handling of Safe `execTransaction` or `multiSend` inner calldata.',
 							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/clear_signing/registry_pins.rs#L181-L184',
 						},
 						{
@@ -918,7 +947,7 @@ export const zeus: SoftwareWallet = {
 					},
 					{
 						explanation:
-							"Zeus's built-in Uniswap swap approves the canonical `Permit2` contract with an unlimited token allowance (the maximum `U256` value), one time per token. The `Permit2` allowance it grants the swap router is for exactly the swap input amount and expires 30 days after signing; an existing allowance that is still sufficient and not expired is reused instead of signing again. The unlimited token approval is rendered before signing with its amount displayed as `Unlimited` and cannot be edited.",
+							"Zeus's built-in Uniswap swap approves the canonical `Permit2` contract with an unlimited token allowance (the maximum `U256` value), one time per token. The `Permit2` allowance it grants the swap router is for exactly the swap input amount and expires 30 days after signing. An existing allowance that is still sufficient and not expired is reused instead of signing again. The unlimited token approval is rendered before signing with its amount displayed as `Unlimited` and cannot be edited.",
 						url: [
 							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/uniswap/swap.rs#L1649-L1665',
 							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/signature/mod.rs#L66-L87',
@@ -1002,10 +1031,21 @@ export const zeus: SoftwareWallet = {
 								'Zeus Swap confirmation window for an ETH to USDC swap, showing the amounts paid and received, the minimum received, and the estimated cost',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: [
@@ -1022,10 +1062,21 @@ export const zeus: SoftwareWallet = {
 								'Zeus ERC-20 Transfer confirmation window showing the token amount, the recipient, and the actual amount sent',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [
@@ -1042,10 +1093,21 @@ export const zeus: SoftwareWallet = {
 								'Zeus Transfer confirmation window for an ETH send, showing the amount, the recipient, and the estimated cost',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [
@@ -1062,10 +1124,21 @@ export const zeus: SoftwareWallet = {
 								'Zeus Swap confirmation window for a USDC to ETH swap, showing the amounts paid and received, the minimum received, and the estimated cost',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: {
@@ -1115,7 +1188,7 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zeus signs every release archive with `minisign`. The signature ships inside the archive as `signature.minisig` and covers the `zeus-gui` binary, and the built-in updater verifies it against a `minisign` public key embedded in the application before replacing the running binary, refusing the update if verification fails.',
+								'Zeus signs every release archive with `minisign`. The signature is included inside the archive as `signature.minisig` and covers the `zeus-gui` binary, and the built-in updater verifies it against a `minisign` public key embedded in the application before replacing the running binary, refusing the update if verification fails.',
 							url: [
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/utils/self_update.rs#L205-L217',
 								'https://github.com/greekfetacheese/zeus/releases',
@@ -1125,15 +1198,17 @@ export const zeus: SoftwareWallet = {
 					publication: 'GITHUB_RELEASE',
 					signer: 'DEVELOPER_KEY',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'Zeus commits its `Cargo.lock`, so release builds resolve every Rust dependency to the exact locked version.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/Cargo.lock',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/Cargo.lock#not-line-specific',
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: {

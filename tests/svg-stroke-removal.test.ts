@@ -7,6 +7,11 @@ import * as zlib from 'node:zlib'
 
 import { describe, expect, it } from 'vitest'
 
+import {
+	parsePngChunks,
+	pngChunkData,
+	readPngHeader,
+} from '@/tools/image-integrity/png-optimizer-lib'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import { removeCSSOutline } from '../src/tools/icon-font-generator/svg-stroke-removal'
@@ -290,31 +295,15 @@ interface DecodedImage {
 
 /** Minimal decoder for Inkscape's PNG output (8-bit, non-interlaced). */
 function decodePNG(filePath: string): DecodedImage {
-	const buffer = fs.readFileSync(filePath)
-	let position = 8
-	let width = 0
-	let height = 0
-	let channels = 0
-	const compressed: Buffer[] = []
+	const chunks = parsePngChunks(fs.readFileSync(filePath))
+	const { width, height, bitDepth, colorType, interlaceMethod } = readPngHeader(chunks)
 
-	while (position < buffer.length) {
-		const length = buffer.readUInt32BE(position)
-		const type = buffer.toString('ascii', position + 4, position + 8)
-		const data = buffer.subarray(position + 8, position + 8 + length)
+	expect(bitDepth, 'bit depth').toBe(8)
+	expect(interlaceMethod, 'interlacing').toBe(0)
+	const channels = { 0: 1, 2: 3, 4: 2, 6: 4 }[colorType] ?? 0
 
-		if (type === 'IHDR') {
-			width = data.readUInt32BE(0)
-			height = data.readUInt32BE(4)
-			expect(data[8], 'bit depth').toBe(8)
-			expect(data[12], 'interlacing').toBe(0)
-			channels = { 0: 1, 2: 3, 4: 2, 6: 4 }[data[9]] ?? 0
-			expect(channels, 'color type').toBeGreaterThan(0)
-		} else if (type === 'IDAT') {
-			compressed.push(data)
-		}
-
-		position += 12 + length
-	}
+	expect(channels, 'color type').toBeGreaterThan(0)
+	const compressed = chunks.filter(chunk => chunk.type === 'IDAT').map(pngChunkData)
 	const raw = zlib.inflateSync(Buffer.concat(compressed))
 	const stride = width * channels
 	const data = Buffer.alloc(height * stride)

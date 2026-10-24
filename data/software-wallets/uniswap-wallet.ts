@@ -1,9 +1,23 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
+import { flashbots } from '@/data/entities/flashbots'
+import { github } from '@/data/entities/github'
 import { trailOfBits } from '@/data/entities/trail-of-bits'
+import { uniswapLabs } from '@/data/entities/uniswap-labs'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -28,10 +42,13 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	BasicBenchmarkTransactions,
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
@@ -39,10 +56,15 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -55,7 +77,7 @@ import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngpl
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf#binary-file',
 		auditDate: '2023-11-02',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -78,7 +100,7 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		variantsScope: { [Variant.MOBILE]: true },
 	},
 	{
-		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf',
+		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf#binary-file',
 		auditDate: '2024-04-30',
 		auditor: trailOfBits,
 		codeSnapshot: {
@@ -101,15 +123,78 @@ const trailOfBitsAudits: SecurityAudit[] = [
 	},
 ]
 
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation: 'The extension is installed from the Chrome Web Store.',
+			url: 'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
+		},
+	],
+	flashbots: [
+		{
+			explanation:
+				'Swaps on Ethereum mainnet are broadcast through Flashbots Protect, which receives the signed transaction and the account address, and is then polled for the transaction status.',
+			url: ['https://rpc.flashbots.net/fast', 'https://protect.flashbots.net'],
+		},
+	],
+	github: [
+		{
+			explanation:
+				'Token icons are loaded from the Uniswap and Trust Wallet asset repositories on GitHub.',
+			url: [
+				'https://raw.githubusercontent.com/Uniswap/assets',
+				'https://raw.githubusercontent.com/trustwallet/assets',
+			],
+		},
+	],
+	uniswapAnalytics: [
+		{
+			explanation:
+				"Product analytics events are sent to Uniswap's Amplitude proxy with a persistent `device_id` and `session_id`, the screens and actions taken, and the domain of connected apps. When importing a wallet, the `Onboarding Completed` event lists every imported address.",
+			url: 'https://metrics.extension.gateway.uniswap.org/v1/amplitude-proxy',
+		},
+		{
+			explanation:
+				"Feature flag and experiment events are sent to Uniswap's Statsig proxy with a persistent stable ID and the active account address.",
+			url: 'https://gating.extension.gateway.uniswap.org/v1/statsig-proxy',
+		},
+	],
+	uniswapLabs: [
+		{
+			explanation:
+				"Portfolio, balance, transaction history, token price, and NFT lookups go through Uniswap's API gateway. Balance lookups for all the wallet's addresses are batched into a single request.",
+			url: 'https://entry-gateway.backend-prod.api.uniswap.org/data.v1.DataApiService/GetWalletsBalances',
+		},
+		{
+			explanation:
+				"RPC calls, including `eth_sendRawTransaction` for sends and app transactions, go through Uniswap's RPC proxy.",
+			url: 'https://entry-gateway.backend-prod.api.uniswap.org/rpc/1',
+		},
+		{
+			explanation:
+				'Swap quotes, swap transactions, and address compliance screening are requested from Uniswap services.',
+			url: [
+				'https://entry-gateway.backend-prod.api.uniswap.org/quote',
+				'https://entry-gateway.backend-prod.api.uniswap.org/swap',
+			],
+		},
+		{
+			explanation:
+				'When connecting to an app, the app URL is scanned for scams through a Blockaid proxy on the Uniswap API gateway.',
+			url: 'https://entry-gateway.backend-prod.api.uniswap.org/infra/blockaid/v0/site/scan',
+		},
+	],
+}
+
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
 		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
 		coinspectId: 'uniswap',
-		contributors: [ren2140],
+		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-04-04',
+		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
@@ -159,7 +244,7 @@ export const uniswapWallet: SoftwareWallet = {
 				{
 					explanation:
 						'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
-					file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/non-chain-specific-ens-resolution.png',
 					label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
 				},
 				{
@@ -185,20 +270,29 @@ export const uniswapWallet: SoftwareWallet = {
 					feesLargerThan1bps: {
 						ref: [
 							{
-								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png',
+								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-default.png',
 								label:
 									'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
 							},
 							{
-								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png',
+								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-comprehensive.png',
 								label:
 									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
 							},
 						],
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -206,12 +300,12 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			crossChainBalances: {
 				ref: {
-					file: 'public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-tokens-aggregated.png',
 					label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
 				},
 				ether: supported({
 					ref: {
-						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-eth-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain ETH balances',
 					},
 					crossChainSumView: featureSupported,
@@ -221,7 +315,7 @@ export const uniswapWallet: SoftwareWallet = {
 				perChainAccountValue: notSupported,
 				usdc: supported({
 					ref: {
-						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-usdc-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain USDC balances',
 					},
 					crossChainSumView: notSupported,
@@ -233,7 +327,7 @@ export const uniswapWallet: SoftwareWallet = {
 			ref: {
 				explanation:
 					'The Settings screen has no network-management section, confirming the wallet does not let users add or configure chains or RPC endpoints.',
-				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png',
+				file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-network-settings.png',
 				label: 'Uniswap Wallet Settings screen, with no network management option',
 			},
 			customChainRpcEndpoint: notSupported,
@@ -268,7 +362,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The Uniswap Wallet mobile app is explicitly licensed under GPL 3.0 or later. The browser extension directory in the same monorepo does not contain a `LICENSE` file. Development happens in a private repository and only production-ready code is published.',
-					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE',
+					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE#not-line-specific',
 				},
 				license: FOSSLicense.GPL_3_0,
 			},
@@ -294,7 +388,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -309,7 +403,344 @@ export const uniswapWallet: SoftwareWallet = {
 				}),
 				useAppSpecificLastConnectedAddresses: notSupported,
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SWAP_QUOTE,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.flashbots,
+							byEntity: flashbots,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.github,
+							byEntity: github,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.uniswapLabs,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.uniswapAnalytics,
+							byEntity: uniswapLabs,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.github,
+							byEntity: github,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+			},
 			privacyPolicy:
 				'https://support.uniswap.org/hc/en-us/articles/30934457771405-Uniswap-Labs-Privacy-Policy',
 			transactionPrivacy: {
@@ -393,7 +824,12 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'Uniswap Wallet only offers creating a new wallet or importing a recovery phrase, and can only store one recovery phrase at a time. It has no option to connect a hardware wallet.',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-hw-import.png',
+					label: 'Uniswap Wallet import flow without a hardware wallet option',
+				},
 				wallets: {},
 			},
 			keysHandling: {
@@ -458,7 +894,7 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'An app approve request to a contract the user has never interacted with only shows a generic "Contract interaction" label, with no warning about the contract being new or recently deployed.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
 							label: 'Uniswap Wallet transaction request with no recent-contract warning',
 						},
 					],
@@ -520,7 +956,7 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'Sending to an address the user has not transacted with before shows a "New address" warning asking them to confirm the address before continuing.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
 							label: 'Uniswap Wallet "New address" warning in the Send flow',
 						},
 					],
@@ -561,38 +997,104 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
-				erc4361: null,
+				ref: [
+					{
+						explanation:
+							'The send confirmation shows the amount sent (in USD and ETH), the recipient address and label, the sending wallet and the network cost. The nonce and an explicit chain/network row are not shown.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-transaction-details-send.png',
+						label: 'Uniswap Wallet send confirmation',
+					},
+					{
+						explanation:
+							'For a contract call that sends no value, Uniswap Wallet shows the function name and raw data, but not the contract being called.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-no-value.png',
+						label: 'Uniswap Wallet transaction request for a mint without value',
+					},
+					{
+						explanation:
+							'For a contract call that sends ETH, Uniswap Wallet shows the contract being called under the expanded details.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-with-value.png',
+						label: 'Uniswap Wallet transaction request for a mint that sends ETH',
+					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates an ERC-721 transfer and shows the NFT received.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-721 transfer',
+					},
+					{
+						explanation:
+							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer. The simulated result is empty.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
+						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates a USDC approval and shows the approved amount.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
+						label: 'Uniswap Wallet simulation of a USDC approval',
+					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an Aave supply and shows the amount of USDC sent.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
+						label: 'Uniswap Wallet simulation of an Aave supply',
+					},
+					{
+						explanation:
+							'Uniswap Wallet detects a transaction that will fail and shows a "cannot estimate" error, disabling confirmation.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
+						label: 'Uniswap Wallet simulation of a failing transaction',
+					},
+					{
+						explanation:
+							'For a transaction with a nondeterministic outcome, Uniswap Wallet shows a single static simulated outcome, without warning that the outcome may differ.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
+						label: 'Uniswap Wallet simulation of a nondeterministic transaction',
+					},
+				],
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Uniswap Wallet does not format SIWE requests for easy readability. It shows the raw message text in a generic signature request.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
+						label: 'Uniswap Wallet signature request for an ERC-4361 message',
+					},
+				}),
 				erc7730: supported({
 					ref: [
 						{
 							explanation: 'Uniswap Wallet decodes a USDC approval, showing the approved amount.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png',
 							label: 'Uniswap Wallet transaction request for a USDC approval',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode an Aave supply; it only shows the amount sent.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
+								'Uniswap Wallet does not decode an Aave supply. It only shows the amount sent.',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the `execTransaction` function.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
+								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows a contract interaction with the `execTransaction` function.',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the `execTransaction` function.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
+								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows a contract interaction with the `execTransaction` function.',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA; it only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
+								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA. It only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
 							label: 'Uniswap Wallet transaction request for a batched approve and supply',
 						},
 					],
@@ -618,13 +1120,13 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'Uniswap Wallet only lists the EIP-712 domain and message values as flattened key/value pairs, the EIP-712 struct itself is not shown. No domain hash, message hash or EIP-712 digest is shown.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png',
 							label: 'Uniswap Wallet signature request for an EIP-712 message',
 						},
 						{
 							explanation:
 								'Expanding the transaction details shows the function name and a truncated raw calldata hex `0x617b…0000` with a copy button. The full raw hex, formatted calldata and calldata digest are not shown.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-calldata.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-calldata.png',
 							label: 'Uniswap Wallet transaction details with truncated raw calldata',
 						},
 					],
@@ -641,8 +1143,53 @@ export const uniswapWallet: SoftwareWallet = {
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				transactionDetailsDisplay: null,
-				transactionSimulations: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.NOT_IN_UI,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_OPTIONALLY,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED, // Only receiving explained, transfer out nothing.
+					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -651,14 +1198,14 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'Uniswap Wallet swap review screen for a 1 USDC to ETH swap, before confirming with "Swap". No approve step or approval amount is shown to the user here.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-swap-review.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-16-swap-review.png',
 						label: 'Uniswap Wallet swap review screen for a 1 USDC to ETH swap',
 						lastRetrieved: '2026-09-16',
 					},
 					{
 						explanation:
 							'The onchain Approval event emitted for that swap shows an unlimited approval to the `Permit2` contract, not the 1 USDC swap amount, and not disclosed anywhere in the swap review UI.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-approve-unlimited-event.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-16-approve-unlimited-event.png',
 						label: 'Decoded Approval event log showing an unlimited (max) approval value',
 						lastRetrieved: '2026-09-16',
 					},
@@ -685,20 +1232,72 @@ export const uniswapWallet: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				artifactSigning: notSupported,
+				dependencyAgeGate: null,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The committed `bun.lock` pins exact versions for the `@uniswap/extension` workspace (`apps/extension`) and its transitive JavaScript dependencies.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#not-line-specific',
+						},
+						{
+							explanation:
+								'iOS: the committed `Podfile.lock` pins every CocoaPods dependency version and records the Podfile checksum used to resolve them.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock#not-line-specific',
+						},
+						{
+							explanation:
+								'Android (and iOS JS layer): the committed `bun.lock` pins exact versions for the `apps/mobile` workspace, locking the React Native JavaScript dependencies bundled into the Android app. Native Gradle dependencies have no lockfile.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#L305-L502',
+						},
+					],
+				}),
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension package has no LavaMoat or SES dependency, and the shipped v1.84.0.2 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/extension/package.json#not-line-specific',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The mobile app package has no LavaMoat, SES or other dependency isolation.',
+								url: 'https://github.com/Uniswap/interface/blob/7cb227b6abbb9398dd0dc4bf26eb006b3bb05ada/apps/mobile/package.json#not-line-specific',
+							},
+						],
+					}),
+				},
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported<MustRef<{}>>({
+					ref: [
+						{
+							explanation:
+								'Uniswap publishes GitHub releases with per-version notes for each platform, tagged `extension/<version>` and `mobile/<version>` alongside `web/<version>`.',
+							url: 'https://github.com/Uniswap/interface/releases',
+						},
+						{
+							explanation:
+								'On each push to main, the workflow reads the `VERSION` and `RELEASE` files, tags the commit, and creates a GitHub release whose body is the `RELEASE` notes.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/.github/workflows/tag_and_release.yml#L27-L54',
+						},
+					],
+				}),
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
 			ref: {
 				explanation:
 					'An EIP-5792 wallet capability test shows `wallet_sendCalls` is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
-				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png',
+				file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png',
 				label: 'EIP-5792 wallet capability test results for Uniswap Wallet',
 			},
 			atomicMultiTransactions: notSupported,
@@ -715,6 +1314,15 @@ export const uniswapWallet: SoftwareWallet = {
 						(for Uniswap handles, a separate feature from ENS resolution). The
 						resolved address is picked with the raw address first, the ENS
 						result second, and the Unitag result last.
+					`),
+				},
+			},
+			security: {
+				transactionLegibility: {
+					note: mdParagraph(`
+						Uniswap Wallet only shows the contract being called when the
+						transaction sends value. Contract calls that send no value show
+						the function name and raw data, but not the contract address.
 					`),
 				},
 			},
