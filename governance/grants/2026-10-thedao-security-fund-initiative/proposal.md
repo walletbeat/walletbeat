@@ -21,7 +21,7 @@ Clear signing ratings and fixes for hardware and software wallets
 
 ## Short summary
 
-Walletbeat will rate hardware and software wallets on clear signing: can users read what they sign in the wallet's own interface? We publish the fix for every check a wallet fails and retest new releases. $10,000 is paid only after wallet teams release fixes that our retests confirm.
+Walletbeat will rate hardware and software wallets on clear signing: can users read what they sign in the wallet's own interface? We publish the fix for every check a wallet fails and retest new releases. $10,000 pays only for fixes our retests confirm.
 
 ## Categories
 
@@ -49,7 +49,7 @@ https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.
 
 ## Why this matters
 
-Multisig thefts at [Bybit](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report) (February 2025, about $1.5 billion) and [Radiant Capital](https://decrypt.co/286728/radiant-capital-exploited-50-million) (October 2024, about $50 million) show the stakes of transaction signing: a compromised interface can show a routine transfer while the wallet signs a different transaction. Clear signing lets signers check it on the wallet itself: readable details, and hashes to compare against an independent source.
+Multisig thefts at [Bybit](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report) (February 2025, about $1.5 billion) and [Radiant Capital](https://decrypt.co/286728/radiant-capital-exploited-50-million) (October 2024, about $50 million) show that a compromised interface can display a routine transfer while the wallet signs a different transaction. Clear signing lets signers check it on the wallet itself: readable details, and hashes to compare against an independent source.
 
 As of October 8, 2026, none of the 32 hardware and software wallets listed passes Walletbeat's transaction legibility test, and all 11 hardware wallets are unrated.
 
@@ -59,20 +59,20 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed passe
 - **0xMattmatt**, Walletbeat core contributor: https://x.com/0xmattmatt
 - **REN2140**, Walletbeat contributor: https://x.com/REN2140_eth
 
-None of us is affiliated with a wallet Walletbeat rates.
+No team member is affiliated with a rated wallet.
 
-Other funding: the Ethereum Foundation gave $106,100 in 2025 and is funding $50,000 through January 2027 for software wallet work. Giveth, TheDAO and donors gave through the May 2026 Giveth QF round: https://beta.walletbeat.eth.limo/about
+Other funding: the Ethereum Foundation gave $106,100 in 2025 and is funding $50,000 through January 2027 for software wallet work. Giveth, TheDAO and donors gave in the May 2026 Giveth QF round: https://beta.walletbeat.eth.limo/about
 
 ## Why a grant: what already exists
 
 - A live transaction legibility rating, with a written methodology and benchmark transactions covering transactions of varying complexity (from simple token approvals to complex nested Safe multisend batch transactions).
-- A public test page that sends the benchmarks to any wallet: https://beta.walletbeat.eth.limo/test
-- Six software wallets tested.
-- A public impact log linking wallet teams' fixes to their own announcements.
+- A public test page sending the benchmarks to any wallet: https://beta.walletbeat.eth.limo/test
+- Six software wallets tested. Existing tooling keeps costs below a new build.
+- A public impact log linking wallet fixes to the teams' announcements.
 
 ## In scope
 
-- Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213). Hardware ratings use only what the device screen shows.
+- Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213). Hardware ratings use only the device screen.
 - One device per rated hardware wallet, bought at retail (about $2,500).
 - Retests of new releases, with results in the public impact log.
 
@@ -80,20 +80,21 @@ Most of the time goes into working with wallet teams on their failed checks.
 
 ## Out of scope
 
-- ERC-7730 descriptor files, and new clear signing technology such as standards or on-device verifiers.
+- ERC-7730 descriptor files, or new clear signing technology such as on-device verifiers.
 - Transaction simulation, scam warnings and other legibility checks.
 
 ## Commitments
 
 - Code and data under the MIT license. Methodology and data public in the repository.
-- Ratings kept current for 12 months after the last milestone at no further cost. No money taken from wallet teams.
+- Walletbeat maintains the ratings for 12 months after the last milestone at no further cost, funded by grants and donations.
+- Pinned target: every listed hardware wallet rated on clear signing.
 - No wallet team pays for, reviews in advance, or changes its rating except by fixing its transaction legibility.
 
 ## Milestones
 
 ### Clear signing ratings published - $20,000
 
-- [ ] At least 11 hardware and 16 software wallets rated on the clear signing checks of Walletbeat's transaction legibility rating, with a reference for every tested field, verified by the independent reviewer in the repository
+- [ ] At least 11 hardware and 16 software wallets rated on the clear signing checks of Walletbeat's transaction legibility rating, with a reference for every tested field, verified by the independent reviewer
 
 ### Software wallets release clear signing fixes - $4,000 (adoption)
 
