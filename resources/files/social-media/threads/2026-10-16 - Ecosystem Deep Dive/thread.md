@@ -1,6 +1,6 @@
-What ecosystem alignment actually looks like for modern wallets?
+Wallets should play well within the ecosystem. What ecosystem alignment actually looks like in practice? 
 
-Wallets should play well within the ecosystem. Here's how Walletbeat evaluate this attribute.
+Here's how Walletbeat evaluate this attribute.
 
 A Walletbeat thread 🧵
 
@@ -52,15 +52,21 @@ Browser integration 🌐
 
 Does the wallet support all the prominent standards for web browser integration?
 
+Wallets are rated based on whether they implement the following Ethereum standards for web browser integration:
+- EIP-1193 JavaScript Provider API
+- EIP-2700 JavaScript Provider Events
+- EIP-6963 Multiple JavaScript Providers
+
 ![Browser Integration](./browser_integration.png)
 
 ---
 
 Why does this matter?
+The Ethereum community has defined web browser integration standards, which dictate how wallets and web pages can interact with each other.
 
-Web applications that want to integrate with Ethereum should not have to write code specific to the wallet that the user has installed. For this reason, the Ethereum community has defined web browser integration standards, which dictate how wallets and web pages can interact with each other.
+By ensuring that wallets implement this standard interface, applications automatically support all wallets that implement it. 
 
-By ensuring that wallets implement this standard interface, applications automatically support all wallets that implement the interface. This ensures compatibility across wallets, and ensures that the Ethereum wallet ecosystem remains competitive thanks to wallet interoperability.
+This ensures compatibility across wallets, and that the Ethereum wallet ecosystem remains competitive thanks to wallet interoperability.
 
 ---
 
@@ -68,13 +74,19 @@ Chain abstraction 🌉
 
 Does the wallet smooth out the complexities of dealing with multiple chains?
 
+Ethereum activity is not limited to the main L1 chain; a lot of activity has moved onto rollups and Layer 2 chains. This has allowed Ethereum to scale beyond what its L1 chain can handle, but has also introduced complexity and fragmentation for users and wallets to deal with.
+
+Wallets are rated based on how much of the complexity involved in dealing with multiple chains is abstracted away from users, while keeping risks and fees transparent.
+
+To get a passing rating, wallets must be cross-chain aware in how they display account value and individual token balances.
+
 ![Chain Abstraction](./chain_abstraction.png)
 
 ---
 
 Why does this matter?
 
-Ethereum activity is not limited to the main L1 chain; a lot of activity has moved onto rollups and Layer 2 chains. This has allowed Ethereum to scale beyond what its L1 chain can handle, but has also introduced complexity and fragmentation for users and wallets to deal with. They must now deal with token balances fragmented across multiple chains.
+Wallets must now deal with token balances fragmented across multiple chains.
 
 To address the UX impact of this complexity, wallets should provide features to abstract away these issues, while remaining transparent to the user when cross-chain bridging risks or fees are involved.
 
@@ -84,16 +96,19 @@ Transaction batching 🧺
 
 Does the wallet support bundling multiple operations as a single transaction?
 
+Transaction batching is one of the longstanding features without which Ethereum user experience (UX) has suffered. One of the most common pain points for DeFi, for example, has been the need to perform separate "token approval" transactions, followed by a separate transaction to actually execute the user's original intent.
+
 ![Transaction Batching](./transaction_batching.png)
 
 ---
 
 Why does this matter?
 
-Transaction batching is one of the longstanding features without which Ethereum user experience (UX) has suffered. One of the most common pain points for DeFi, for example, has been the need to perform separate "token approval" transactions, followed by a separate transaction to actually execute the user's original intent.
+Smart account types such as ERC-4337 and EIP-7702 unlock the ability to perform multiple operations as a single transaction. This is exposed to applications through EIP-5792 Wallet Call API.
+
+To qualify for a passing rating, the wallet must support at least one type of smart account, implement EIP-5792 Wallet Call API and support atomic transaction bundles.
 
 ---
-
 
 Hardware wallet interoperability 🧱
 
@@ -102,6 +117,8 @@ Does the wallet support directly connecting to hardware wallets from a plurality
 This check is only about hardware wallet interoperability. Wallets are evaluated based on whether they directly integrate with hardware wallets from a plurality of major hardware wallet manufacturers.
 
 A wallet receives a passing rating if it supports hardware wallets from at least 3 major hardware wallet manufacturers:Ledger, Trezor, Keystone, GridPlus, imKey.
+
+![Hardware Wallet Interoperability](./hardware_wallet_interoperability.png)
 
 ---
 
