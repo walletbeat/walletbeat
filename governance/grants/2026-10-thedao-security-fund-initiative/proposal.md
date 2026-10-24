@@ -51,7 +51,7 @@ https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.
 
 Multisig thefts at [Bybit](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report) (February 2025, about $1.5 billion) and [Radiant Capital](https://decrypt.co/286728/radiant-capital-exploited-50-million) (October 2024, about $50 million) show that a compromised interface can display a routine transfer while the wallet signs a different transaction. Clear signing lets signers check it on the wallet itself: readable details, and hashes to compare against an independent source.
 
-As of October 8, 2026, none of the 32 hardware and software wallets listed passes Walletbeat's transaction legibility test, and all 11 hardware wallets are unrated.
+As of October 8, 2026, none of the 32 hardware and software wallets listed passes Walletbeat's transaction legibility test.
 
 ## The team
 
@@ -61,14 +61,14 @@ As of October 8, 2026, none of the 32 hardware and software wallets listed passe
 
 No team member is affiliated with a rated wallet.
 
-Other funding: the Ethereum Foundation gave $106,100 in 2025 and is funding $50,000 through January 2027 for software wallet work. Giveth, TheDAO and donors gave in the May 2026 Giveth QF round: https://beta.walletbeat.eth.limo/about
+Other funding: https://beta.walletbeat.eth.limo/about
 
 ## Why a grant: what already exists
 
 - A live transaction legibility rating, with a written methodology and benchmark transactions covering transactions of varying complexity (from simple token approvals to complex nested Safe multisend batch transactions).
-- A public test page sending the benchmarks to any wallet: https://beta.walletbeat.eth.limo/test
-- Six software wallets tested. Existing tooling keeps costs below a new build.
-- A public impact log linking wallet fixes to the teams' announcements.
+- A public test page applying the benchmarks to any wallet: https://beta.walletbeat.eth.limo/test
+- Six software wallets already tested for clear signing.
+- A track record of wallet impact: https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
 
 ## In scope
 
