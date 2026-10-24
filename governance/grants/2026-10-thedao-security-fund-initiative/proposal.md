@@ -74,7 +74,7 @@ The grant pays for the remaining tests and for the work with wallet teams on the
 
 ## In scope
 
-- Clear signing ratings for 11 hardware wallets and 16 software wallets: readable benchmark transactions (ERC-7730) and transaction and message hashes (ERC-8213). Hardware ratings use only what the device screen shows.
+- Clear signing ratings for 11 hardware wallets and 16 software wallets: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213). Hardware ratings use only what the device screen shows.
 - Retail purchases of each rated hardware wallet (about $2,500 of devices).
 - For every rated wallet, a public explanation of the fix for each check it fails.
 - Retests of new releases that fix a failed check, with results in the public impact log.
@@ -83,7 +83,7 @@ Most of the time goes into working with wallet teams until they fix their failed
 
 ## Out of scope
 
-- Writing ERC-7730 descriptor files for applications, or building wallet features.
+- Writing ERC-7730 descriptor files for applications, or building new clear signing technology, such as standards or on-device verifiers.
 - Transaction simulation, scam warnings and other legibility checks beyond clear signing.
 
 ## Commitments
@@ -111,11 +111,11 @@ Most of the time goes into working with wallet teams until they fix their failed
 
 ## Who is likely to fund this
 
-polymutex | Walletbeat lead, pledging personal funds, collected only if the initiative is fully funded | own team | not applicable | $5,000
+polymutex | Walletbeat lead, pledging personal funds, collected only if the initiative is fully funded | know them well | yes | $5,000
 
 Ethereum Foundation | clear signing is a Trillion Dollar Security priority, and the EF already funds Walletbeat's software wallet ratings | know them well | yes | $5,000
 
-Coinspect | backs DappFence, a frontend security initiative on this board built in response to the Bybit attack, and publishes its own wallet security ranking | none | no | $5,000
+Coinspect | develops DappFence, a frontend security initiative on this board, and publishes its own wallet security ranking | none | no | $5,000
 
 ## Contact
 
