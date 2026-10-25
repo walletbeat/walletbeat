@@ -17,7 +17,7 @@ the form as is.
 
 ## Title
 
-Clear Signing: Using ratings to push adoption
+Clear signing ratings and fixes for hardware and software wallets
 
 ## Short summary
 
