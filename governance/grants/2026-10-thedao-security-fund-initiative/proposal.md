@@ -17,7 +17,7 @@ the form as is.
 
 ## Title
 
-Clear signing ratings and fixes for hardware and software wallets
+Clear signing: ratings, fixes and ecosystem adoption for hardware and software wallets
 
 ## Short summary
 
