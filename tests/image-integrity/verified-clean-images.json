@@ -1655,10 +1655,6 @@
 		"hash": "6abf0c4b532101838bd47478e01aac477152a8872371864d5a801ad6c58e1948",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/chain_verification.png": {
-		"hash": "e3ae5b19066ea73752e8ffbc52ebbf114a5a87e51c6231ddf23d50b79c624ba0",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/l1_provider_independence.png": {
 		"hash": "3ac9e526c787861df91fc196c7456ba594e4fc5522662ad5d44298e817530abc",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
