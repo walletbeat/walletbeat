@@ -73,7 +73,7 @@ Other funding: https://beta.walletbeat.eth.limo/about
 ## In scope
 
 - Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213).
-- One device per rated hardware wallet, bought at retail (about $2,500).
+- One device per rated hardware wallet, bought at retail (about 2,500 USD total).
 - Retests of new releases, with results in the public impact log.
 - Working with wallet teams to drive adoption.
 
@@ -85,7 +85,7 @@ Other funding: https://beta.walletbeat.eth.limo/about
 ## Commitments
 
 - Code and data under the MIT license. Methodology and data public in the repository.
-- Walletbeat maintains the ratings for 12 months after the last milestone at no further cost, funded by grants and donations.
+- Walletbeat maintains the ratings for 6 months after the last milestone at no further cost, funded by grants and donations.
 - Pinned target: every listed hardware and software wallet rated on clear signing.
 - Walletbeat accepts no payment from wallet teams for reviews or rating changes. A rating changes only when the wallet fixes its transaction legibility.
 
