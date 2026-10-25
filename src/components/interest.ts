@@ -56,6 +56,14 @@ export function interest(
 	sources.add(node)
 	sourcesByTarget.set(target, sources)
 
+	const scheduleShow = (delay: number) => {
+		clearTimeout(timer)
+		timer = setTimeout(() => {
+			if (hasVisiblePopoverInvoker(node)) {
+				target.showPopover()
+			}
+		}, delay)
+	}
 	const show = (event: Event) => {
 		if (event instanceof PointerEvent && event.pointerType === 'touch') {
 			return
@@ -69,16 +77,8 @@ export function interest(
 			return
 		}
 
-		clearTimeout(timer)
 		// Like native interest, passing the pointer over a trigger is not yet intent.
-		timer = setTimeout(
-			() => {
-				if (hasVisiblePopoverInvoker(node)) {
-					target.showPopover()
-				}
-			},
-			event instanceof PointerEvent ? 500 : 0,
-		)
+		scheduleShow(event instanceof PointerEvent ? 500 : 0)
 	}
 	const hide = () => {
 		clearTimeout(timer)
@@ -100,6 +100,11 @@ export function interest(
 		element.addEventListener('pointerleave', hide)
 		element.addEventListener('focusin', element === node ? show : keepOpen)
 		element.addEventListener('focusout', hide)
+	}
+
+	// A pointer may already cover the SSR trigger before these listeners attach.
+	if (node.matches(':hover')) {
+		scheduleShow(500)
 	}
 
 	return {
