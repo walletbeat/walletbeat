@@ -76,6 +76,16 @@ describe('interest fallback lifecycle', () => {
 		expect(target.showPopover).toHaveBeenCalledOnce()
 	})
 
+	it('honors existing hover during hydration with the ordinary pointer dwell', () => {
+		cleanup?.destroy()
+		node.hovered = true
+		cleanup = interest(htmlElement(node), { id: 'details' })
+		vi.advanceTimersByTime(499)
+		expect(target.showPopover).not.toHaveBeenCalled()
+		vi.advanceTimersByTime(1)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
 	it('cancels pending entry when the pointer leaves', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(100)
