@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 86,
+	"highlightLastLine": 87,
+	"segments": [
+		{
+			"lines": [
+				"export function useSimulation(",
+				"  request: EthSignRequest,",
+				"  tx: ParsedTx,",
+				"  chainId: number | undefined,",
+				") {"
+			],
+			"startLine": 13
+		},
+		{
+			"lines": [
+				"  const handleSimulate = useCallback(() => {"
+			],
+			"startLine": 78
+		},
+		{
+			"lines": [
+				"    } else {",
+				"      addressOp.start();",
+				"    }",
+				"  }, [cachedAddress, addressOp, runSimulation]);",
+				"",
+				"  const showSimulationTab =",
+				"    credentials !== null && tx.to !== undefined && chainId !== undefined;",
+				"",
+				"  return { showSimulationTab, simulationState, handleSimulate };",
+				"}"
+			],
+			"startLine": 81
+		}
+	]
+}
