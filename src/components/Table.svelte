@@ -126,7 +126,7 @@
 				Math.max(
 					1,
 					...columns.map(column =>
-						column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+						column.subcolumns?.length && this.expandedColumnIds.has(column.id)
 							? 1 + getMaxLevel(column.subcolumns)
 							: 1,
 					),
