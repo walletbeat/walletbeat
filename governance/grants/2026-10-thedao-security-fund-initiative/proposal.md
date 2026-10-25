@@ -17,11 +17,11 @@ the form as is.
 
 ## Title
 
-Clear signing ratings and fixes for hardware and software wallets
+Clear Signing: Using ratings to push adoption
 
 ## Short summary
 
-Walletbeat will rate hardware and software wallets on clear signing: can users read what they sign in the wallet's own interface? We publish the fix for every check a wallet fails and retest new releases. $10,000 pays only for fixes our retests confirm.
+Walletbeat will rate hardware and software wallets on clear signing support and publish the results on our website. We'll work with teams to fix the checks they fail and expand clear signing support across the ecosystem.
 
 ## Categories
 
@@ -49,7 +49,7 @@ https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.
 
 ## Why this matters
 
-Multisig thefts at [Bybit](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report) (February 2025, about $1.5 billion) and [Radiant Capital](https://decrypt.co/286728/radiant-capital-exploited-50-million) (October 2024, about $50 million) show that a compromised interface can display a routine transfer while the wallet signs a different transaction. Clear signing lets signers check it on the wallet itself: readable details, and hashes to compare against an independent source.
+Multisig thefts at [Bybit](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report) (February 2025, about $1.5 billion) and [Radiant Capital](https://decrypt.co/286728/radiant-capital-exploited-50-million) (October 2024, about $50 million) show that a compromised interface can display a routine transfer while the wallet signs a different transaction. Clear signing lets users understand the transaction payload in a human-readable way with hashes to compare against an independent source (e.g. "Deposit $100 into Aave" vs. an unintelligible hexadecimal string). As an industry, we can't expect to onboard the masses if the expectation is for them to decode raw transaction data themselves or otherwise lose their life savings because nobody is going to do the former.
 
 As of October 8, 2026, none of the 32 hardware and software wallets listed passes Walletbeat's transaction legibility test.
 
@@ -75,8 +75,7 @@ Other funding: https://beta.walletbeat.eth.limo/about
 - Clear signing ratings: readable benchmark transactions (ERC-7730), plus calldata and EIP-712 message hashes (ERC-8213).
 - One device per rated hardware wallet, bought at retail (about $2,500).
 - Retests of new releases, with results in the public impact log.
-
-Most of the time goes into working with wallet teams on their failed checks.
+- Working with wallet teams to drive adoption.
 
 ## Out of scope
 
@@ -87,14 +86,14 @@ Most of the time goes into working with wallet teams on their failed checks.
 
 - Code and data under the MIT license. Methodology and data public in the repository.
 - Walletbeat maintains the ratings for 12 months after the last milestone at no further cost, funded by grants and donations.
-- Pinned target: every listed hardware wallet rated on clear signing.
-- No wallet team pays for, reviews in advance, or changes its rating except by fixing its transaction legibility.
+- Pinned target: every listed hardware and software wallet rated on clear signing.
+- Walletbeat accepts no payment from wallet teams for reviews or rating changes. A rating changes only when the wallet fixes its transaction legibility.
 
 ## Milestones
 
 ### Clear signing ratings published - $20,000
 
-- [ ] At least 11 hardware and 16 software wallets rated on the clear signing checks of Walletbeat's transaction legibility rating, with a reference for every tested field, verified by the independent reviewer
+- [ ] At least 11 hardware and 16 software wallets rated on the clear signing checks of Walletbeat's transaction legibility rating, with a reference for every tested field, verified by an independent reviewer
 
 ### Software wallets release clear signing fixes - $4,000 (adoption)
 
@@ -103,7 +102,7 @@ Most of the time goes into working with wallet teams on their failed checks.
 
 ### Hardware wallets release on-device clear signing fixes - $6,000 (adoption)
 
-- [ ] At least 3 hardware wallet vendors release firmware that changes at least one failed clear signing check to a pass on the device screen, at least 1 of them Ledger or Trezor
+- [ ] At least 3 hardware wallet vendors release firmware that changes at least one failed clear signing check to a pass, at least 1 of them Ledger or Trezor
 - [ ] The independent reviewer verifies each fix from Walletbeat's retest and the vendor's release notes or direct confirmation
 
 ## Who is likely to fund this
