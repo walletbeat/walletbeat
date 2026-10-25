@@ -18,6 +18,7 @@
 	import type { Column } from '@/components/Table.svelte'
 	import { startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
 	import type { Ladders } from '@/schema/ladders'
+	import type { Eip } from '@/schema/eips'
 	import { variants } from '@/constants/variants'
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
@@ -301,6 +302,7 @@
 		/** Tag text, where a cell abbreviates the filter's label. */
 		tagLabel?: string
 		tag?: string
+		eip?: Eip
 		icon?: string
 		matches: (wallet: RatedWallet<_AttributeGroupId>, variant: Variant | 'ALL_VARIANTS') => boolean
 	}
@@ -419,6 +421,7 @@
 					label: 'EIP-7702',
 					tagLabel: `#${eip7702.number}`,
 					tag: 'eip',
+					eip: eip7702,
 					matches: accountTypeMatches(AccountType.eip7702),
 				},
 				{
@@ -426,6 +429,7 @@
 					label: 'ERC-4337',
 					tagLabel: `#${erc4337.number}`,
 					tag: 'eip',
+					eip: erc4337,
 					matches: accountTypeMatches(AccountType.rawErc4337),
 				},
 				{
@@ -659,6 +663,8 @@
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
+	import Tooltip from '@/components/Tooltip.svelte'
+	import EipDetails from '@/views/EipDetails.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
 
@@ -746,9 +752,11 @@
 	{#snippet FacetTags({ wallet, facetId }: { wallet: RatedWallet<_AttributeGroupId>, facetId: string })}
 		{@const facet = walletFacets.find(facet => facet.id === facetId)!}
 		<div class="tags" data-row="start gap-1 wrap">
-			{#each facet.values.filter(({ matches }) => matches(wallet, selectedVariant ?? 'ALL_VARIANTS')) as { id, label, tagLabel, tag } (id)}
+			{#each facet.values.filter(({ matches }) => matches(wallet, selectedVariant ?? 'ALL_VARIANTS')) as { id, label, tagLabel, tag, eip } (id)}
 				{#if tag !== undefined}
-					{#if visibleWalletFilterSets.some(set => set.id === facet.id)}
+					{@const canFilter = visibleWalletFilterSets.some(set => set.id === facet.id)}
+					{#snippet Tag()}
+					{#if canFilter}
 					<button
 							data-tag={tag}
 							disabled={!interactive}
@@ -762,6 +770,17 @@
 					</button>
 					{:else}
 						<span data-tag={tag}>{tagLabel ?? label}</span>
+					{/if}
+					{/snippet}
+					{#if eip}
+						<Tooltip placement="inline-end" buttonTriggerPlacement={canFilter ? 'behind' : 'around'}>
+							{@render Tag()}
+							{#snippet TooltipContent()}
+								<div class="eip-tooltip-content"><EipDetails {eip} /></div>
+							{/snippet}
+						</Tooltip>
+					{:else}
+						{@render Tag()}
 					{/if}
 				{/if}
 			{/each}
@@ -1739,6 +1758,11 @@
 
 
 <style>
+	.eip-tooltip-content {
+		width: 34rem;
+		max-inline-size: 100%;
+	}
+
 	section {
 		---filters-blockSize: 4rem;
 		--filter-cluster-size: 1.3rem;
