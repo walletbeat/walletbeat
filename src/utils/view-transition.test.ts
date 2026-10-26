@@ -42,6 +42,23 @@ class TestScope {
 	})
 }
 
+class TestItemMotion {
+	transitionProperty = 'translate'
+	finish!: () => void
+	finished = new Promise<void>(resolve => {
+		this.finish = resolve
+	})
+}
+
+class TestLayoutItem extends TestScope {
+	y = 0
+	motion = new TestItemMotion()
+	style = { setProperty: vi.fn(), removeProperty: vi.fn() }
+	setAttribute = (name: string) => this.attributes.add(name)
+	getBoundingClientRect = () => ({ x: 0, y: this.y })
+	getAnimations = () => [this.motion]
+}
+
 function htmlElement(node: TestScope) {
 	if (!(node instanceof HTMLElement)) {
 		throw new TypeError('Expected an HTML element in the test environment')
@@ -72,6 +89,108 @@ afterEach(() => {
 })
 
 describe('startScopedViewTransition', () => {
+	it('preserves live item motion during a direct update', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
+		const root = new TestScope()
+		const item = new TestLayoutItem()
+		const reorder = vi.fn(() => {
+			item.y = 100
+		})
+		const direct = vi.fn()
+
+		Object.assign(root, { querySelectorAll: () => [item] })
+		startScopedViewTransition(htmlElement(root), reorder, 'live')
+		startScopedViewTransition(htmlElement(root), direct, 'none')
+		expect(reorder).toHaveBeenCalledOnce()
+		expect(direct).toHaveBeenCalledOnce()
+		expect(item.attributes).toContain('data-layout-transition')
+		expect(item.style.removeProperty).not.toHaveBeenCalled()
+		item.motion.finish()
+		await vi.waitFor(() => expect(item.attributes).not.toContain('data-layout-transition'))
+	})
+
+	it('keeps a replacement live generation when an old completion arrives', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
+		const root = new TestScope()
+		const item = new TestLayoutItem()
+		const oldMotion = item.motion
+
+		Object.assign(root, { querySelectorAll: () => [item] })
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				item.y = 100
+			},
+			'live',
+		)
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				item.y = 200
+				item.motion = new TestItemMotion()
+			},
+			'live',
+		)
+		const cleaned = item.style.removeProperty.mock.calls.length
+
+		oldMotion.finish()
+		await oldMotion.finished
+		await Promise.resolve()
+		await Promise.resolve()
+		expect(item.attributes).toContain('data-layout-transition')
+		expect(item.style.removeProperty).toHaveBeenCalledTimes(cleaned)
+		item.motion.finish()
+		await vi.waitFor(() => expect(item.attributes).not.toContain('data-layout-transition'))
+	})
+
+	it('uses live layout without depending on native capture support', async () => {
+		installEnvironment()
+		vi.stubGlobal('document', {})
+		vi.stubGlobal('CSS', { supports: () => false })
+		const root = new TestScope()
+		const querySelectorAll = vi.fn(() => [])
+		const update = vi.fn()
+
+		Object.assign(root, { querySelectorAll })
+		expect(startScopedViewTransition(htmlElement(root), update, 'live')).toBeUndefined()
+		expect(update).toHaveBeenCalledOnce()
+		expect(querySelectorAll).toHaveBeenCalled()
+		expect(root.attributes).not.toContain('data-view-transition-active')
+		await Promise.resolve()
+	})
+
+	it('does not measure live layout under reduced motion', () => {
+		installEnvironment({ reducedMotion: true })
+		const root = new TestScope()
+		const update = vi.fn()
+
+		expect(startScopedViewTransition(htmlElement(root), update, 'live')).toBeUndefined()
+		expect(update).toHaveBeenCalledOnce()
+	})
+
+	it('propagates a live update failure without capturing or retaining state', () => {
+		const native = installEnvironment()
+		const root = new TestScope()
+		const failure = new Error('Update failed')
+
+		Object.assign(root, { querySelectorAll: () => [] })
+		expect(() =>
+			startScopedViewTransition(
+				htmlElement(root),
+				() => {
+					throw failure
+				},
+				'live',
+			),
+		).toThrow(failure)
+		expect(native.skipTransition).not.toHaveBeenCalled()
+		expect(root.attributes).not.toContain('data-view-transition-active')
+	})
+
 	it('updates directly when reduced motion is requested', () => {
 		installEnvironment({ reducedMotion: true })
 		const root = new TestScope()
