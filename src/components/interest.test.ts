@@ -74,6 +74,7 @@ describe('interest fallback lifecycle', () => {
 		expect(target.showPopover).not.toHaveBeenCalled()
 		vi.advanceTimersByTime(1)
 		expect(target.showPopover).toHaveBeenCalledOnce()
+		expect(target.showPopover).toHaveBeenCalledWith({ source: node })
 	})
 
 	it('honors existing hover during hydration with the ordinary pointer dwell', () => {
@@ -118,6 +119,7 @@ describe('interest fallback lifecycle', () => {
 		node.dispatchEvent(new TestFocusEvent('focusin'))
 		vi.advanceTimersByTime(0)
 		expect(target.showPopover).toHaveBeenCalledOnce()
+		expect(target.showPopover).toHaveBeenCalledWith({ source: node })
 	})
 
 	it('ignores touch entry and focus that is not visibly keyboard-driven', () => {
@@ -183,6 +185,7 @@ describe('interest fallback lifecycle', () => {
 		expect(target.showPopover).not.toHaveBeenCalled()
 		node.dispatchEvent(new Event('click'))
 		expect(target.showPopover).toHaveBeenCalledOnce()
+		expect(target.showPopover).toHaveBeenCalledWith({ source: node })
 		cleanup?.destroy()
 		cleanup = undefined
 		node.dispatchEvent(new Event('click'))
