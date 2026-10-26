@@ -111,13 +111,6 @@
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
-	const sliceUsesBackdropFilter = (slice: ComputedSlice): boolean =>
-		Boolean(
-			slice.gradient ||
-				slice.color === 'var(--rating-unrated)' ||
-				slice.children?.some(sliceUsesBackdropFilter),
-		)
-	const usesBackdropFilter = $derived(computedSlices.some(sliceUsesBackdropFilter))
 	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
 	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
 	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
@@ -221,11 +214,7 @@
 		style:--view-transition-class={transitionsPie ? 'pie' : undefined}
 		data-stack
 	>
-		<div
-			class="slices"
-			data-stack
-			style:--pie-backdropFilter={usesBackdropFilter ? 'var(--rating-unrated-backdropFilter)' : 'none'}
-		>
+		<div class="slices" data-stack>
 			{#each computedSlices as slice (slice.id)}
 				{@render Slice(slice)}
 			{/each}
@@ -329,11 +318,6 @@
 			> .slices {
 				contain: content;
 				pointer-events: none;
-				backdrop-filter: var(--pie-backdropFilter, none);
-
-				@media (prefers-reduced-transparency: reduce) {
-					backdrop-filter: none;
-				}
 			}
 
 			.slice {
