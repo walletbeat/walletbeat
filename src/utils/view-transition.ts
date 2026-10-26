@@ -5,7 +5,10 @@ type TransitionScope = HTMLElement & {
 type ActiveTransition = {
 	transition: ViewTransition
 	update: () => void
+	interrupted: boolean
 }
+
+export type ViewTransitionStrategy = 'auto' | 'document' | 'none'
 
 export type TransitionUpdateKind = 'sort' | 'columns' | 'filters'
 export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdateKind> = (
@@ -15,7 +18,7 @@ export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdat
 
 const activeByScope = new WeakMap<HTMLElement, ActiveTransition>()
 let activeDocumentTransition:
-	({ document: Document; scope: HTMLElement } & ActiveTransition) | undefined
+	{ document: Document; scope: HTMLElement; active: ActiveTransition } | undefined
 
 const canTransition = () =>
 	typeof document !== 'undefined' &&
@@ -23,9 +26,9 @@ const canTransition = () =>
 	CSS.supports('view-transition-name: match-element') &&
 	!matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const isExpectedInterruption = (error: unknown) =>
+const isExpectedInterruption = (error: unknown, interrupted: boolean) =>
 	error instanceof DOMException &&
-	(error.name === 'AbortError' || error.name === 'InvalidStateError')
+	(error.name === 'AbortError' || (interrupted && error.name === 'InvalidStateError'))
 
 const hasHorizontalScroll = (scope: HTMLElement) => {
 	for (let element: HTMLElement | null = scope; element; element = element.parentElement) {
@@ -48,47 +51,53 @@ export const viewTransitionName = (...parts: (number | string)[]) =>
 /**
  * Run a synchronous UI update inside an element-scoped View Transition when
  * that does not risk clamping horizontal scroll. Otherwise, use a document
- * transition while the active marker keeps CSS capture local.
+ * transition while the active marker keeps CSS capture local. Callers can force
+ * document capture or disable capture while preserving pending update order.
  */
 export function startScopedViewTransition(
 	scope: TransitionScope,
 	update: () => void,
+	strategy: ViewTransitionStrategy = 'auto',
 ): ViewTransition | undefined {
-	if (!canTransition()) {
-		update()
+	const interrupt = (owner: HTMLElement, active: ActiveTransition) => {
+		active.interrupted = true
+		active.transition.skipTransition()
+		active.update()
+		activeByScope.delete(owner)
+		owner.removeAttribute('data-view-transition-active')
 
-		return
+		if (activeDocumentTransition?.active === active) {
+			activeDocumentTransition = undefined
+		}
 	}
-
-	// An element-scoped capture can temporarily hide a descendant's overflow from
-	// its scrolling ancestor, clamping that ancestor's horizontal position.
-	const elementStart =
-		scope.startViewTransition && !hasHorizontalScroll(scope) ? scope.startViewTransition : undefined
 	const previous = activeByScope.get(scope)
 
 	if (previous) {
-		previous.transition.skipTransition()
-		previous.update()
-		activeByScope.delete(scope)
-		scope.removeAttribute('data-view-transition-active')
-
-		if (activeDocumentTransition?.transition === previous.transition) {
-			activeDocumentTransition = undefined
-		}
-
+		interrupt(scope, previous)
 		update()
 
 		return
 	}
 
-	if (!elementStart && activeDocumentTransition?.document === document) {
-		const active = activeDocumentTransition
+	const enabled = strategy !== 'none' && canTransition()
+	// Element capture can hide overflow and clamp a scrolling ancestor's position.
+	const elementStart =
+		enabled && strategy === 'auto' && scope.startViewTransition && !hasHorizontalScroll(scope)
+			? scope.startViewTransition
+			: undefined
 
-		active.transition.skipTransition()
-		active.update()
-		active.scope.removeAttribute('data-view-transition-active')
-		activeByScope.delete(active.scope)
-		activeDocumentTransition = undefined
+	if (
+		!elementStart &&
+		typeof document !== 'undefined' &&
+		activeDocumentTransition?.document === document
+	) {
+		interrupt(activeDocumentTransition.scope, activeDocumentTransition.active)
+		update()
+
+		return
+	}
+
+	if (!enabled) {
 		update()
 
 		return
@@ -118,17 +127,17 @@ export function startScopedViewTransition(
 		return
 	}
 
-	const active = { transition, update: applyUpdate }
+	const active = { transition, update: applyUpdate, interrupted: false }
 
 	activeByScope.set(scope, active)
 
 	if (!elementStart) {
-		activeDocumentTransition = { document, scope, ...active }
+		activeDocumentTransition = { document, scope, active }
 	}
 
 	let failureReported = false
-	const reportUnexpectedFailure = (error: unknown) => {
-		if (failureReported || isExpectedInterruption(error)) {
+	const reportUnexpectedFailure = (error: unknown, interrupted = false) => {
+		if (failureReported || isExpectedInterruption(error, interrupted)) {
 			return
 		}
 
@@ -152,12 +161,12 @@ export function startScopedViewTransition(
 			scope.removeAttribute('data-view-transition-active')
 		}
 
-		if (activeDocumentTransition?.transition === transition) {
+		if (activeDocumentTransition?.active === active) {
 			activeDocumentTransition = undefined
 		}
 	}
 
-	void transition.ready.catch(reportUnexpectedFailure)
+	void transition.ready.catch(error => reportUnexpectedFailure(error, active.interrupted))
 	void transition.updateCallbackDone.catch(reportUnexpectedFailure)
 	void transition.finished.then(finish, error => {
 		finish()
