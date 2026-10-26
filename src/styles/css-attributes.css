@@ -2049,7 +2049,7 @@ ol {
 	@function --breadcrumb-clearance-post(--t <number>) {
 		--v: calc(
 			var(---breadcrumb-clearance-view-size) +
-				(var(---breadcrumb-clearance-flow-height) - var(---breadcrumb-clearance-view-size)) *
+				(var(---breadcrumb-clearance-arrival-end) - var(---breadcrumb-clearance-view-size)) *
 				--breadcrumb-ease-time(var(--t))
 		);
 		--y: calc(
@@ -2064,7 +2064,7 @@ ol {
 	@function --breadcrumb-arrival-stop(--t <number>) {
 		--v: calc(
 			var(---breadcrumb-clearance-view-size) +
-				(var(---breadcrumb-clearance-flow-height) - var(---breadcrumb-clearance-view-size)) *
+				(var(---breadcrumb-clearance-arrival-end) - var(---breadcrumb-clearance-view-size)) *
 				--breadcrumb-ease-time(var(--t))
 		);
 		result: --breadcrumb-ease-distance(var(--t)) --breadcrumb-cover-position(var(--v));
@@ -2073,7 +2073,7 @@ ol {
 		--y: calc(
 			max(
 					var(---breadcrumb-clearance-arc-baseY),
-					var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-flow-height)
+					var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-arrival-end)
 				) +
 				var(---breadcrumb-clearance-arc-deltaY)
 		);
@@ -3464,6 +3464,9 @@ ol {
 					--stickyBreadcrumb-endPaintAnimation: var(---breadcrumb-arrivalAnimation, breadcrumb-arrival) auto var(---breadcrumb-endPaintEasing) both;
 					@container style(--stickyBreadcrumb-clearance: circle) and style(---breadcrumb-clearance-supported: 1) {
 						---breadcrumb-clearance-view-size: var(---breadcrumb-blockEnd);
+						---breadcrumb-clearance-arrival-end: max(
+							var(---breadcrumb-clearance-flow-height), var(---breadcrumb-clearance-view-size)
+						);
 						---breadcrumb-clearance-arc-deltaY: var(---breadcrumb-endTranslateBlock);
 						---breadcrumb-clearance-arc-centerY: var(--stickyBreadcrumb-clearanceCenterBlock);
 						---breadcrumb-clearance-arc-radius: calc(
@@ -3666,19 +3669,19 @@ ol {
 										var(---breadcrumb-clearance-arc-baseY),
 										calc(
 											var(---breadcrumb-clearance-native-a) -
-												var(---breadcrumb-clearance-flow-height)
+												var(---breadcrumb-clearance-arrival-end)
 										)
 									),
-									var(---breadcrumb-clearance-flow-height)
+									var(---breadcrumb-clearance-arrival-end)
 								),
 								--breadcrumb-clearance-final()
-									--breadcrumb-cover-position(var(---breadcrumb-clearance-flow-height)),
+									--breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
 								--breadcrumb-clearance-final() 100%
 							);
 							---breadcrumb-clearance-full-y-easing: linear(
 								0 0%,
-								0 --breadcrumb-cover-position(var(---breadcrumb-clearance-flow-height)),
-								1 --breadcrumb-cover-position(var(---breadcrumb-clearance-flow-height)),
+								0 --breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
+								1 --breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
 								1 100%
 							);
 						}
