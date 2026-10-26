@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { readable } from 'svelte/store'
-	import { tooltipUsesDrawer } from './Tooltip.svelte'
+	import { tooltipUsesDrawer } from './tooltip-presentation'
 
 	const compactDisclosures = readable(false, set => {
 		if (typeof window === 'undefined') return
