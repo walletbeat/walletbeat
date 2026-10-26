@@ -2027,12 +2027,12 @@
 		.wallet-table {
 			tr {
 				td {
-					&:not(:has(details:open)) {
+					&:not(:has(> details[open] > [popover]:not(:popover-open))) {
 						transition-property: vertical-align;
 						transition-delay: 0.25s;
 					}
 
-					&:has(details:open) {
+					&:has(> details[open] > [popover]:not(:popover-open)) {
 						--table-cell-verticalAlign: top;
 					}
 				}
@@ -2053,7 +2053,7 @@
 						}
 					}
 
-					&:open summary {
+					&[open]:has(> [popover]:not(:popover-open)) summary {
 						min-block-size: 5rem;
 
 						> * {
