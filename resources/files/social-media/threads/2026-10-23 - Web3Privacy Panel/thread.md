@@ -10,7 +10,7 @@ Privacy is finally being integrated in web3 wallets.
 
 It's a long road, and there are many practical hurdles left to solve. 
 
-In this panel, we'll discuss what several wallets are doing to solve privacy's last-mile problem. From onchain privacy to network-level privacy, Tor integration, address and amount correlations, private wallet recovery, and dealing with the plethora of intermediaries learning of your transaction before it gets onchain.
+In this panel, we'll discuss what several wallets are doing to solve privacy's last-mile problem. 
 
 Meet our panelists 👇
 
@@ -23,19 +23,25 @@ His focus is on translating cryptographic into products that are secure by defau
 
 ---
 
-@LucemansNL does standard coordination at the Ethereum Foundation. He's focused on privacy, self-sovereignty, and more. 
+@LucemansNL does standard coordination at the Ethereum Foundation. He's focused on privacy, self-sovereignty, and Kohaku.
+
+It is a set of primitives that enables wallets to be secure and to process private transactions while minimizing dependencies on trusted third parties.
 
 ![Luc Ethereum Foundation](./luc_ef.png)
 
 ---
 
-@apoorveth is a smart contracts and full-stack developer. He's aiming to fix Ethereum UX with his own wallet: @WalletChan_
+@apoorveth is a solo dev building @WalletChan_. 
+
+With this open-sourced wallet, he's aiming to fix Ethereum UX and bring the latest innovation into the users hands, to show what's already possible.  
 
 ![Apoorv WalletChan](./apoorv_walletchan.png)
 
 ---
 
-@sethforprivacy is building freedom tech as COO of @cakewallet and @radarchat. He also talks about freedom tech as host of the @optoutpod
+@sethforprivacy is building freedom tech as COO of @cakewallet and @radarchat.
+
+@cakewallet is an open source, privacy first, and noncustodial wallet aiming to put financial privacy and control back in the hands of users.
  
 ![Seth Cake Wallet](./seth_cake_wallet.png)
 
@@ -53,9 +59,7 @@ He wants to see Ethereum fulfill its cypherpunk mission. Hence, the Walletbeat r
 
 Privacy is where wallets have to make the most progress. Data posted on public blockchains like Ethereum is publicly available to everyone.  
 
-But nevertheless, it's still possible. Many privacy solutions have emerged: stealth addresses, @TornadoCash, @RAILGUN_Project, @0xprivacypools, Kohaku.
-
-However, to be actually usable by users, these solutions must be tightly integrated in wallets and easy to use.
+But nevertheless, it's still possible. The panel will cover from onchain privacy to network-level privacy, Tor integration, address and amount correlations, private wallet recovery, and dealing with the plethora of intermediaries learning of wallet transaction before it gets onchain.
 
 ---
 
