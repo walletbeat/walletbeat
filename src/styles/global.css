@@ -1,7 +1,11 @@
 :root {
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
-	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
-	--transition-easeInOutExpo: cubic-bezier(0.87, 0, 0.13, 1);
+	--transition-easeOutExpo-x1: 0.16;
+	--transition-easeOutExpo-x2: 0.3;
+	--transition-easeOutExpo: cubic-bezier(var(--transition-easeOutExpo-x1), 1, var(--transition-easeOutExpo-x2), 1);
+	--transition-easeInOutExpo-x1: 0.87;
+	--transition-easeInOutExpo-x2: 0.13;
+	--transition-easeInOutExpo: cubic-bezier(var(--transition-easeInOutExpo-x1), 0, var(--transition-easeInOutExpo-x2), 1);
 	--transition-blob: var(--transition-easeInOutExpo);
 
 	--pressable-transitionInDuration: 0.125s;
@@ -136,6 +140,12 @@
 	text-size-adjust: 100%;
 
 	color-scheme: light dark;
+	&:has(#theme-toggle:checked) {
+		color-scheme: dark;
+		@media (prefers-color-scheme: dark) {
+			color-scheme: light;
+		}
+	}
 	color: var(--text-primary);
 	background-color: var(--background-primary);
 	outline-color: var(--accent);
@@ -144,6 +154,19 @@
 
 	/* Block panning the root (content scrolls in `[data-scroll-container]`), but keep pinch zoom */
 	touch-action: pinch-zoom;
+}
+
+:not(pre) > code {
+	overflow-wrap: anywhere;
+}
+
+/* Physical transforms follow the native inline direction of each direction owner. */
+:root,
+[dir] {
+	---inlineDirection: 1;
+	&:dir(rtl) {
+		---inlineDirection: -1;
+	}
 }
 
 label:has(> input) {
@@ -228,7 +251,6 @@ label:has(> input) {
 	transition-behavior: allow-discrete;
 }
 
-
 hr {
 	margin-inline: 10%;
 	border: none;
@@ -267,4 +289,5 @@ h5,
 h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
+	overflow-wrap: break-word;
 }
