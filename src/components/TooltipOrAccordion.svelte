@@ -68,11 +68,15 @@
 
 	let disclosure: HTMLDetailsElement
 	let enhanced = $state(false)
+	// Floating presentation continues through the native popover's exit transition.
+	let floatingTooltip = $state(false)
 	$effect(() => {
 		if (!enhanced) return
 
 		const body = disclosure.querySelector<HTMLElement>(':scope > [popover]')
 		const expanded = isExpanded
+
+		if (expanded) floatingTooltip = false
 
 		if ($compactDisclosures && expanded) {
 			if (body && !body.matches(':popover-open'))
@@ -94,6 +98,7 @@
 		{...restProps}
 		name={enhanced && $compactDisclosures ? 'walletbeat-compact-disclosures' : disclosureName}
 		data-tooltip-enhanced={enhanced ? '' : undefined}
+		data-tooltip-floating={floatingTooltip ? '' : undefined}
 	>
 		<summary class:no-marker={!showAccordionMarker}>
 			{@render Trigger()}
@@ -112,6 +117,9 @@
 		--popover-borderColor: transparent;
 	"
 	onbeforetoggle={(event: ToggleEvent & { currentTarget: HTMLDivElement }) => {
+		if (event.newState === 'open')
+			floatingTooltip = !event.currentTarget.parentElement?.matches('details[open]')
+
 		if (!event.currentTarget.parentElement?.matches('details[open]')) return
 
 		if (event.newState === 'open' && !tooltipUsesDrawer()) event.preventDefault()
@@ -138,20 +146,53 @@
 		&:not([data-tooltip-enhanced]) :global(summary > [data-stack] > [data-tooltip-trigger]) {
 			display: none;
 		}
+		&::details-content,
 		&:not([open])::details-content {
-			display: contents;
+			display: grid;
+			block-size: auto;
+			grid-template-rows: 0fr;
 			content-visibility: visible;
+			visibility: hidden;
+			overflow: visible;
+			transition-property: grid-template-rows, visibility;
+		}
+
+		&[open]::details-content {
+			grid-template-rows: 1fr;
+			visibility: visible;
+		}
+
+		&[data-tooltip-floating]::details-content {
+			visibility: visible;
+		}
+
+		&:not([data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			display: block;
+			position: static;
+			inline-size: auto;
+			block-size: auto;
+			min-block-size: 0;
+			max-inline-size: none;
+			max-block-size: none;
+			overflow: hidden;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			opacity: 1;
+			scale: none;
+			translate: none;
+			pointer-events: auto;
+			transition-property: none;
+		}
+
+		&:not([open], [data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			visibility: hidden;
 		}
 
 		transition-property: gap;
 
 		&[open] {
 			gap: 1rem;
-			> :global([popover]:not(:popover-open)) {
-				display: block;
-				position: static;
-				inline-size: auto;
-			}
 			:global(summary > [data-stack] > [data-tooltip-trigger]) {
 				display: none;
 			}
@@ -172,19 +213,22 @@
 		}
 
 		/* The expanded disclosure owns the surface around its content. */
-		&[open] .expanded-content :global([data-card~="popover"]) {
+		&[open] .expanded-content :global([data-card~="popover"]),
+		&:not([data-tooltip-floating]) .expanded-content :global([data-card~="popover"]) {
 			padding: 0;
 			background: none;
 			border: 0;
 		}
 
-		&[open] .expanded-content {
+		&[open] .expanded-content,
+		&:not([data-tooltip-floating]) .expanded-content {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 
 			inline-size: 0;
 			min-inline-size: 100%;
 			min-inline-size: -webkit-fill-available;
+			max-width: none;
 			padding-block: 0.75rem;
 
 			font-size: 1rem;
@@ -193,9 +237,16 @@
 		}
 	}
 
-	details:not([open]) .expanded-content {
+	details[data-tooltip-floating] .expanded-content {
 		max-width: var(--tooltip-maxWidth, 16em);
 		font-size: 0.66em;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		details,
+		details::details-content {
+			transition-duration: 0s;
+		}
 	}
 
 	/* Without enhancement, open disclosures stay inline and cannot overlap.
