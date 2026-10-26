@@ -66,7 +66,21 @@
 	// Components
 	import Tooltip from '@/components/Tooltip.svelte'
 
+	let disclosure: HTMLDetailsElement
 	let enhanced = $state(false)
+	$effect(() => {
+		if (!enhanced) return
+
+		const body = disclosure.querySelector<HTMLElement>(':scope > [popover]')
+		const expanded = isExpanded
+
+		if ($compactDisclosures && expanded) {
+			if (body && !body.matches(':popover-open'))
+				body.showPopover({ source: disclosure.querySelector('summary') ?? disclosure })
+		} else {
+			body?.hidePopover()
+		}
+	})
 	onMount(() => {
 		enhanced = true
 	})
@@ -75,14 +89,11 @@
 
 {#snippet Disclosure(Trigger: Snippet, Popover: Snippet)}
 	<details
+		bind:this={disclosure}
 		bind:open={isExpanded}
 		{...restProps}
 		name={enhanced && $compactDisclosures ? 'walletbeat-compact-disclosures' : disclosureName}
 		data-tooltip-enhanced={enhanced ? '' : undefined}
-		ontoggle={event => {
-			if (event.currentTarget.open)
-				event.currentTarget.querySelector<HTMLElement>(':scope > [popover]:popover-open')?.hidePopover()
-		}}
 	>
 		<summary class:no-marker={!showAccordionMarker}>
 			{@render Trigger()}
@@ -101,8 +112,11 @@
 		--popover-borderColor: transparent;
 	"
 	onbeforetoggle={(event: ToggleEvent & { currentTarget: HTMLDivElement }) => {
-		if (event.newState === 'open' && event.currentTarget.parentElement?.matches('details[open]'))
-			event.preventDefault()
+		if (!event.currentTarget.parentElement?.matches('details[open]')) return
+
+		if (event.newState === 'open' && !tooltipUsesDrawer()) event.preventDefault()
+
+		if (event.newState === 'closed' && tooltipUsesDrawer()) isExpanded = false
 	}}
 >
 	{@render children()}
@@ -157,6 +171,13 @@
 			}
 		}
 
+		/* The expanded disclosure owns the surface around its content. */
+		&[open] .expanded-content :global([data-card~="popover"]) {
+			padding: 0;
+			background: none;
+			border: 0;
+		}
+
 		&[open] .expanded-content {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
@@ -185,7 +206,7 @@
 			transition-property: none;
 		}
 
-		details[data-tooltip-enhanced][open] > :global([popover]:not(:popover-open)) {
+		details[data-tooltip-enhanced][open] > :global([popover]) {
 			display: block;
 			position: fixed;
 			z-index: 3;
