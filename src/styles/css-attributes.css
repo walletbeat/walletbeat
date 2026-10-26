@@ -4913,8 +4913,12 @@ ol {
 		 * - width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`
 		 * - `flow`: retain inline-detached sizing in normal flow without a sticky stacking context
 		 * - attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`
+		 * - `visible-center`: center normal-flow inline content in the visible sticky interval, with inline clipping supplied by its parent. Reserves `translate` and `animation`; requires horizontal LTR, native view timelines and normal motion.
 		 * - snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`
 		 * - `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.
+		 *
+		 * ### CSS Variables
+		 * - `--scrollItem-visibleCenter-animation`: defaults to `scroll-item-visible-center`; set to `none` when a consumer's additional native capabilities are unavailable.
 		 *
 		 * ### Examples
 		 * - Bleed + block-end padding match (`inline-detached` + `padding-match-end`):
@@ -4936,6 +4940,15 @@ ol {
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`
 		 */
 		[data-scroll-item] {
+			@media (prefers-reduced-motion: no-preference) {
+				@supports (animation-timeline: view(inline)) and (animation-range: entry) {
+					&[data-scroll-item~="visible-center"]:dir(ltr) {
+						animation: scroll-item-visible-center auto linear both;
+						animation-name: var(--scrollItem-visibleCenter-animation, scroll-item-visible-center);
+						animation-timeline: view(inline var(--sticky-insetInlineStart) var(--sticky-insetInlineEnd));
+					}
+				}
+			}
 			&[data-scroll-item~='inline-detached'] {
 				/* Rules */
 				--scrollItem-paddingInlineStart: max(
@@ -5051,6 +5064,13 @@ ol {
 			}
 		}
 	}
+}
+
+@keyframes scroll-item-visible-center {
+	entry 0% { translate: -50% 0; }
+	entry 100% { translate: min(0px, calc((var(--sticky-sizeInline) - 100%) / 2)) 0; }
+	exit 0% { translate: max(0px, calc((100% - var(--sticky-sizeInline)) / 2)) 0; }
+	exit 100% { translate: 50% 0; }
 }
 
 [data-sticky-breadcrumb~="scope"][data-sticky-container]:not([data-sticky-breadcrumb~="root"]) {

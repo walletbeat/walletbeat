@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__table-sticky-size',
+				entrypoint: './tests/browser/fixtures/table-sticky-size.astro',
+			})
+			injectRoute({
 				pattern: '/__wallet-page/[fixture]',
 				entrypoint: './tests/browser/fixtures/fixture.astro',
 			})
