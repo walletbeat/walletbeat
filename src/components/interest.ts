@@ -2,8 +2,11 @@
  * changes popover state; positioning and responsive presentation remain CSS. */
 const sourcesByTarget = new WeakMap<HTMLElement, Set<HTMLElement>>()
 
+const popoverInvoker = (node: HTMLElement) =>
+	node.querySelector<HTMLElement>('[popovertarget]') ?? node
+
 export function hasVisiblePopoverInvoker(node: HTMLElement) {
-	return (node.querySelector<HTMLElement>('[popovertarget]') ?? node).checkVisibility({
+	return popoverInvoker(node).checkVisibility({
 		visibilityProperty: true,
 	})
 }
@@ -56,11 +59,11 @@ export function interest(
 	sources.add(node)
 	sourcesByTarget.set(target, sources)
 
-	const scheduleShow = (delay: number) => {
+	const scheduleShow = (delay: number, source?: HTMLElement) => {
 		clearTimeout(timer)
 		timer = setTimeout(() => {
 			if (hasVisiblePopoverInvoker(node)) {
-				target.showPopover({ source: node })
+				target.showPopover({ source: source ?? popoverInvoker(node) })
 			}
 		}, delay)
 	}
@@ -78,7 +81,10 @@ export function interest(
 		}
 
 		// Like native interest, passing the pointer over a trigger is not yet intent.
-		scheduleShow(event instanceof PointerEvent ? 500 : 0)
+		scheduleShow(
+			event instanceof PointerEvent ? 500 : 0,
+			event instanceof FocusEvent && event.target instanceof HTMLElement ? event.target : undefined,
+		)
 	}
 	const hide = () => {
 		clearTimeout(timer)
