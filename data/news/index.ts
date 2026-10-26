@@ -15,6 +15,7 @@ import rabbySilentSignatureExtraction from './2026-08-19-rabby-silent-signature-
 import newsletterProviderBreachPhishing from './2026-09-10-newsletter-provider-breach-phishing'
 import payyBridgeExploit from './2026-09-24-payy-bridge-exploit'
 import metamaskInfrastructureSecurityIncident from './2026-09-30-metamask-infrastructure-security-incident'
+import keystoneWebsiteDataBreach from './2026-10-24-keystone-website-data-breach'
 
 /**
  * All news articles about wallet security incidents, sorted by date (newest first)
@@ -36,6 +37,7 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	newsletterProviderBreachPhishing,
 	payyBridgeExploit,
 	metamaskInfrastructureSecurityIncident,
+	keystoneWebsiteDataBreach,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**
