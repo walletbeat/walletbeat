@@ -828,13 +828,6 @@
 
 							> span[data-sticky] {
 								pointer-events: none;
-
-								:global(
-									[data-pressable], [role='button'], summary, a, select, button, input,
-									textarea, label, dialog, [contenteditable], [tabindex], [popover]
-								) {
-									pointer-events: auto;
-								}
 							}
 
 							.sort-button {
@@ -1081,4 +1074,10 @@
 		}
 	}
 
+	:where(.sort-label > span[data-sticky]) :global(:where(
+		[data-pressable], [role='button'], summary, a, select, button, input,
+		textarea, label, dialog, [contenteditable], [tabindex], [popover]:popover-open
+	)) {
+		pointer-events: auto;
+	}
 </style>
