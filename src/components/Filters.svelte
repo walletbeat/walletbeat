@@ -97,6 +97,7 @@
 		{@const activeInSet = choices.filter(choice => activeChoices.has(choice) && choice.id !== '')}
 
 		{#if choices.filter(choice => choice.id).length > 1}
+			{@const closedAnchor = closedAnchorPrefix ? `${closedAnchorPrefix}-${set.id}` : undefined}
 			<fieldset
 				data-filter-set={set.id}
 				data-panel-member={!visibleSetIds || visibleSetIds.includes(set.id) ? '' : undefined}
@@ -104,7 +105,8 @@
 				data-match={set.match}
 				data-active-count={activeInSet.length}
 				data-column="gap-1"
-				style:--closed-anchor={closedAnchorPrefix ? `${closedAnchorPrefix}-${set.id}` : undefined}
+				style:--closed-anchor={closedAnchor}
+				style:--closed-block-timeline={closedAnchor ? `${closedAnchor}-block` : undefined}
 				style:--active-count={activeInSet.length}
 			>
 				<legend>{set.label}</legend>
@@ -115,6 +117,7 @@
 						{@const checked = activeChoices.has(choice)}
 						{@const activeIndex = activeInSet.indexOf(choice)}
 						{@const count = choiceCount(set, choice)}
+						{@const choiceAnchor = `--filter-choice-${instanceId}-${set.id}-${choice.id || 'all'}`}
 						<svelte:element
 							this={navigates ? 'a' : 'label'}
 							href={navigates ? choice.href : undefined}
@@ -143,7 +146,8 @@
 
 							<span
 								class="choice-icon-helipad"
-								style:--choice-anchor={`--filter-choice-${instanceId}-${set.id}-${choice.id || 'all'}`}
+								style:--choice-anchor={choiceAnchor}
+								style:--choice-block-timeline={`${choiceAnchor}-block`}
 							>
 								<span class="choice-icon" data-icon={choice.icon ? '' : undefined} aria-hidden="true">
 									{#if choice.icon}{@html choice.icon}{:else}{choice.compactLabel ?? choice.label}{/if}
@@ -336,20 +340,20 @@
 				}
 			}
 			fieldset:not([data-active-count="0"]) {
-				timeline-scope: --filter-closed-inline, --filter-closed-block;
+				timeline-scope: var(--closed-anchor), var(--closed-block-timeline);
 				animation: filter-closed-inline-measure auto linear both, filter-closed-block-measure auto linear both;
-				animation-timeline: --filter-closed-inline, --filter-closed-block;
+				animation-timeline: var(--closed-anchor), var(--closed-block-timeline);
 				&::before, &::after { position-anchor: var(--closed-anchor); }
-				&::before { view-timeline: --filter-closed-inline inline 0; }
-				&::after { view-timeline: --filter-closed-block block 0; }
+				&::before { view-timeline: var(--closed-anchor) inline 0; }
+				&::after { view-timeline: var(--closed-block-timeline) block 0; }
 			}
 			[data-active-choice] .choice-icon-helipad {
-				timeline-scope: --filter-inline, --filter-block;
+				timeline-scope: var(--choice-anchor), var(--choice-block-timeline);
 				animation: filter-inline-measure auto linear both, filter-block-measure auto linear both;
-				animation-timeline: --filter-inline, --filter-block;
+				animation-timeline: var(--choice-anchor), var(--choice-block-timeline);
 				&::before, &::after { position-anchor: var(--choice-anchor); }
-				&::before { view-timeline: --filter-inline inline 0; }
-				&::after { view-timeline: --filter-block block 0; }
+				&::before { view-timeline: var(--choice-anchor) inline 0; }
+				&::after { view-timeline: var(--choice-block-timeline) block 0; }
 			}
 			[data-active-choice] .choice-icon {
 				inset: auto;
