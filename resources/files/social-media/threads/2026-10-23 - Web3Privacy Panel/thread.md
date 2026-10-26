@@ -23,17 +23,15 @@ His focus is on translating cryptographic into products that are secure by defau
 
 ---
 
-@LucemansNL does standard coordination at the Ethereum Foundation. He's focused on privacy, self-sovereignty, and Kohaku.
+@LucemansNL works on standards coordination at the Ethereum Foundation, focusing on privacy and self-sovereignty.
 
-It is a set of primitives that enables wallets to be secure and to process private transactions while minimizing dependencies on trusted third parties.
+He's also involved in Kohaku, an initiative to help wallets improve security and privacy while minimizing reliance on trusted third parties.
 
 ![Luc Ethereum Foundation](./luc_ef.png)
 
 ---
 
-@apoorveth is a solo dev building @WalletChan_. 
-
-With this open-sourced wallet, he's aiming to fix Ethereum UX and bring the latest innovation into the users hands, to show what's already possible.  
+@apoorveth is a solo developer building @WalletChan_, an open-source Ethereum wallet focused on improving UX and bringing Ethereum's CROPS values to users through their wallets. 
 
 ![Apoorv WalletChan](./apoorv_walletchan.png)
 
@@ -41,7 +39,7 @@ With this open-sourced wallet, he's aiming to fix Ethereum UX and bring the late
 
 @sethforprivacy is building freedom tech as COO of @cakewallet and @radarchat.
 
-@cakewallet is an open source, privacy first, and noncustodial wallet aiming to put financial privacy and control back in the hands of users.
+@cakewallet an open source, noncustodial wallet aiming to make crypto simple for users.
  
 ![Seth Cake Wallet](./seth_cake_wallet.png)
 
