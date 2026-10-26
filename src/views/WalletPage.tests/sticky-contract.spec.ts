@@ -728,105 +728,151 @@ for (const width of [390, 1073, 1440]) {
 	})
 }
 
-test('a growing compact foreground reaches its contact endpoint without an arrival interval', async ({
-	page,
-}, info) => {
-	await page.setViewportSize({ width: 390, height: 900 })
-	await page.goto('/__wallet-page/software/')
-	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-	await page.evaluate(() => document.fonts.ready)
-	test.skip(
-		!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
-		'Native breadcrumb geometry is required',
-	)
-	const sample = await page.evaluate(async () => {
-		const root = document.querySelector<HTMLElement>('#layout')
-		const scope = document.querySelector<HTMLElement>(
-			'.attribute:has(> details[open] > summary > [data-sticky-breadcrumb~="support"])',
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+	test(`a growing foreground and its metadata reach contact together with ${reducedMotion} motion`, async ({
+		page,
+	}, info) => {
+		await page.emulateMedia({ reducedMotion })
+		await page.setViewportSize({ width: 390, height: 900 })
+		await page.goto('/__wallet-page/software/')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		test.skip(
+			!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
+			'Native breadcrumb geometry is required',
 		)
-		const position = scope?.querySelector<HTMLElement>(':scope > details > summary')
-		const flow = scope?.querySelector<HTMLElement>(
-			':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-		)
+		const sample = await page.evaluate(async () => {
+			const root = document.querySelector<HTMLElement>('#layout')
+			const scope = document.querySelector<HTMLElement>(
+				'.attribute:has(> details[open] > summary > [data-sticky-breadcrumb~="support"])',
+			)
+			const position = scope?.querySelector<HTMLElement>(':scope > details > summary')
+			const flow = scope?.querySelector<HTMLElement>(
+				':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
+			)
 
-		if (!root || !scope || !position || !flow) {
-			throw new Error('Required foreground composition absent')
-		}
-
-		scope.style.setProperty('--stickyBreadcrumb-minBlockSize', '200px')
-		root.style.scrollSnapType = 'none'
-		root.style.scrollBehavior = 'auto'
-		const frames = () =>
-			new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-
-		await frames()
-		const clock = new ViewTimeline({
-			subject: flow,
-			axis: 'block',
-			inset: getComputedStyle(flow).viewTimelineInset,
-		})
-		const start = clock.startOffset
-		const end = clock.endOffset
-
-		if (!start || !end) {
-			throw new Error('Native foreground interval unresolved')
-		}
-
-		const height = flow.getBoundingClientRect().height
-		const extent = 2 * height - (end.to('px').value - start.to('px').value)
-		const poses = []
-
-		for (const top of [4, -4, -40, 4]) {
-			for (let n = 0; n < 6; n++) {
-				root.scrollTop += flow.getBoundingClientRect().top - top
-				await frames()
-
-				if (Math.abs(flow.getBoundingClientRect().top - top) < 0.5) {
-					break
-				}
+			if (!root || !scope || !position || !flow) {
+				throw new Error('Required foreground composition absent')
 			}
-			const animation = position
-				.getAnimations()
-				.find(
-					animation =>
-						animation instanceof CSSAnimation && animation.animationName === 'breadcrumb-entry',
-				)
-			const title = position.querySelector('h3')?.getBoundingClientRect()
 
-			poses.push({
-				requested: top,
-				top: flow.getBoundingClientRect().top,
-				entry: getComputedStyle(position).getPropertyValue('---breadcrumb-entry').trim(),
-				pending: animation?.pending,
-				width: title?.width,
-				height: title?.height,
+			scope.style.setProperty('--stickyBreadcrumb-minBlockSize', '200px')
+			root.style.scrollSnapType = 'none'
+			root.style.scrollBehavior = 'auto'
+			const frames = () =>
+				new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+
+			await frames()
+			const clock = new ViewTimeline({
+				subject: flow,
+				axis: 'block',
+				inset: getComputedStyle(flow).viewTimelineInset,
 			})
-		}
+			const start = clock.startOffset
+			const clockEnd = clock.endOffset
 
-		return { extent, poses }
-	})
+			if (!start || !clockEnd) {
+				throw new Error('Native foreground interval unresolved')
+			}
 
-	await info.attach('growing-foreground-contact', {
-		body: JSON.stringify(sample),
-		contentType: 'application/json',
-	})
-	expect(Number.isFinite(sample.extent)).toBe(true)
-	expect(
-		sample.extent,
-		'The compact row is genuinely larger than its natural subject',
-	).toBeLessThan(0)
+			const height = flow.getBoundingClientRect().height
+			const extent = 2 * height - (clockEnd.to('px').value - start.to('px').value)
+			const metadataEnd = position.querySelector<HTMLElement>('[data-sticky-breadcrumb~="end"]')
+			const paint =
+				metadataEnd &&
+				[...metadataEnd.children].find(
+					element =>
+						!element.matches('[data-sticky-breadcrumb~="size-export"]') &&
+						element.checkVisibility(),
+				)
 
-	for (const pose of sample.poses) {
+			if (!metadataEnd || !paint) {
+				throw new Error('Required visible metadata paint owner absent')
+			}
+
+			const poses = []
+
+			for (const top of [4, -4, -40, 4]) {
+				for (let n = 0; n < 6; n++) {
+					root.scrollTop += flow.getBoundingClientRect().top - top
+					await frames()
+
+					if (Math.abs(flow.getBoundingClientRect().top - top) < 0.5) {
+						break
+					}
+				}
+				const animation = position
+					.getAnimations()
+					.find(
+						animation =>
+							animation instanceof CSSAnimation && animation.animationName === 'breadcrumb-entry',
+					)
+				const title = position.querySelector('h3')?.getBoundingClientRect()
+				const translate = getComputedStyle(paint).translate
+				const endY =
+					translate === 'none' ? 0 : Number.parseFloat(translate.split(/\s+/)[1] ?? '0px')
+				const endDeltaY = Number.parseFloat(
+					getComputedStyle(metadataEnd).getPropertyValue('---breadcrumb-clearance-arc-deltaY'),
+				)
+				const endAnimation = paint
+					.getAnimations()
+					.find(
+						animation =>
+							animation instanceof CSSAnimation &&
+							animation.animationName === 'breadcrumb-clearance-block' &&
+							animation.effect instanceof KeyframeEffect &&
+							animation.effect.target === paint,
+					)
+
+				poses.push({
+					requested: top,
+					endY,
+					endDeltaY,
+					endAnimation: !!endAnimation,
+					top: flow.getBoundingClientRect().top,
+					entry: getComputedStyle(position).getPropertyValue('---breadcrumb-entry').trim(),
+					pending: animation?.pending,
+					width: title?.width,
+					height: title?.height,
+				})
+			}
+
+			return { extent, poses }
+		})
+
+		await info.attach('growing-foreground-contact', {
+			body: JSON.stringify(sample),
+			contentType: 'application/json',
+		})
+		expect(Number.isFinite(sample.extent)).toBe(true)
 		expect(
-			Math.abs(pose.top - pose.requested),
-			'The requested contact pose is attained',
-		).toBeLessThan(1)
-		expect(pose.entry).toBe(pose.requested > 0 ? '0' : '1')
-		expect(pose.pending).toBe(false)
-		expect(pose.width).toBeGreaterThan(0)
-		expect(pose.height).toBeGreaterThan(0)
-	}
-})
+			sample.extent,
+			'The compact row is genuinely larger than its natural subject',
+		).toBeLessThan(0)
+
+		for (const pose of sample.poses) {
+			expect(
+				Math.abs(pose.top - pose.requested),
+				'The requested contact pose is attained',
+			).toBeLessThan(1)
+			expect(pose.entry).toBe(pose.requested > 0 ? '0' : '1')
+			expect(pose.pending).toBe(false)
+			expect(pose.width).toBeGreaterThan(0)
+			expect(pose.height).toBeGreaterThan(0)
+			expect(pose.endAnimation, 'The actual metadata owns its native block-motion effect').toBe(
+				true,
+			)
+			expect(Number.isFinite(pose.endY) && Number.isFinite(pose.endDeltaY)).toBe(true)
+			expect(
+				Math.abs(pose.endDeltaY),
+				'The fixture requires a visible metadata displacement',
+			).toBeGreaterThan(1)
+			expect(
+				Math.abs(pose.endY - (pose.requested > 0 ? 0 : pose.endDeltaY)),
+				'Metadata reaches its endpoint with the heading, including reverse contact',
+			).toBeLessThan(0.125)
+		}
+	})
+}
 
 test('reduced caption fading preserves visible and hidden flow endpoints', async ({
 	page,
