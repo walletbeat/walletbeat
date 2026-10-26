@@ -783,6 +783,10 @@
 
 						> [data-sticky-container] {
 							--sticky-paddingInlineEnd: 1em;
+
+							> span[data-sticky] {
+								display: inline-block;
+							}
 						}
 					}
 
