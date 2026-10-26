@@ -27,7 +27,7 @@ export function interest(
 	// cannot suppress the actual around trigger by stopping propagation.
 	const showOnClick = () => {
 		if (!target.matches(':popover-open') && hasVisiblePopoverInvoker(node)) {
-			target.showPopover()
+			target.showPopover({ source: node })
 		}
 	}
 	const hasClickInvoker = node.matches('button[popovertarget]')
@@ -60,7 +60,7 @@ export function interest(
 		clearTimeout(timer)
 		timer = setTimeout(() => {
 			if (hasVisiblePopoverInvoker(node)) {
-				target.showPopover()
+				target.showPopover({ source: node })
 			}
 		}, delay)
 	}
