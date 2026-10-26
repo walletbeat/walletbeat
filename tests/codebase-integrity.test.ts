@@ -41,6 +41,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.svg',
 	'.pdf',
 	'.sh',
+	'.ps1',
 	'.py',
 	'.sty',
 	'.sha256',

@@ -1,0 +1,84 @@
+name: Walletbeat TV installation
+
+on:
+  pull_request:
+    paths:
+      - 'deploy/walletbeat-tv/**'
+      - 'tests/walletbeat-tv.test.ts'
+      - 'tests/walletbeat-tv-shortcuts.mjs'
+      - 'tests/walletbeat-tv-installation.mjs'
+      - 'package.json'
+      - '.github/workflows/walletbeat-tv.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          [
+            macos-latest,
+            macos-15-intel,
+            windows-latest,
+            windows-11-arm,
+            ubuntu-latest,
+            ubuntu-24.04-arm,
+          ]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 24
+      - run: node --test tests/walletbeat-tv-shortcuts.mjs
+      - run: node deploy/walletbeat-tv/build-launchers.mjs "${{ runner.temp }}/walletbeat-tv"
+      - name: Check macOS without installed Node, then offline in full screen
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          export HOME="${{ runner.temp }}/walletbeat-tv-home"
+          mkdir -p "$HOME"
+          env PATH=/usr/bin:/bin:/usr/sbin:/sbin sh "${{ runner.temp }}/walletbeat-tv.sh" --check
+          env PATH=/usr/bin:/bin:/usr/sbin:/sbin npm_config_offline=true HTTPS_PROXY=http://127.0.0.1:9 sh "${{ runner.temp }}/walletbeat-tv.sh" --check-headed
+      - name: Check Linux, then offline in full screen
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          export HOME="${{ runner.temp }}/walletbeat-tv-home"
+          export XDG_CACHE_HOME="$HOME/.cache"
+          mkdir -p "$HOME"
+          sh "${{ runner.temp }}/walletbeat-tv.sh" --check
+          npm_config_offline=true HTTPS_PROXY=http://127.0.0.1:9 xvfb-run -a sh "${{ runner.temp }}/walletbeat-tv.sh" --check-headed
+      - name: Check Linux without Node or browser libraries
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          docker run --rm -v "${{ runner.temp }}:/launchers:ro" ubuntu:24.04 sh -c \
+            'apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && sh /launchers/walletbeat-tv.sh --check && npm_config_offline=true HTTPS_PROXY=http://127.0.0.1:9 sh /launchers/walletbeat-tv.sh --check'
+      - name: Check Windows without installed Node, then offline in full screen
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $env:LOCALAPPDATA = Join-Path '${{ runner.temp }}' 'walletbeat-tv-home'
+          $env:Path = "$env:SystemRoot\System32;$env:SystemRoot;$env:SystemRoot\System32\WindowsPowerShell\v1.0"
+          if (Get-Command node -ErrorAction SilentlyContinue) { throw 'Cold installation must not have Node on PATH.' }
+          & "${{ runner.temp }}/walletbeat-tv.ps1" -Check
+          $lockPath = Join-Path $env:LOCALAPPDATA 'walletbeat-tv/launch.lock'
+          $heldLock = [IO.File]::Open($lockPath, [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+          try {
+            $rejected = $false
+            try { & "${{ runner.temp }}/walletbeat-tv.ps1" -Check }
+            catch {
+              if ($_.Exception.Message -notlike '*already running or installing*') { throw }
+              $rejected = $true
+            }
+            if (-not $rejected) { throw 'Concurrent launcher must be rejected.' }
+          } finally { $heldLock.Dispose() }
+          $env:npm_config_offline = 'true'
+          $env:HTTPS_PROXY = 'http://127.0.0.1:9'
+          & "${{ runner.temp }}/walletbeat-tv.ps1" -CheckHeaded
