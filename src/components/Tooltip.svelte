@@ -2,14 +2,13 @@
 	declare global {
 		interface HTMLButtonElement {
 			interestForElement?: HTMLElement | null
-			showPopover(): void
-			hidePopover(): void
 		}
+	}
 
-		interface HTMLElement {
-			showPopover(): void
-			hidePopover(): void
-		}
+	/** The presentation selected by the tooltip's CSS; server rendering remains inline. */
+	export function tooltipUsesDrawer(): boolean {
+		return typeof document !== 'undefined' &&
+			getComputedStyle(document.documentElement).getPropertyValue('---tooltip-presentation').trim() === 'drawer'
 	}
 
 	export type TooltipPlacement = 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
@@ -147,6 +146,10 @@
 
 
 <style>
+	:global(:root) {
+		---tooltip-presentation: anchored;
+	}
+
 	/* The popover sits in the top layer and the scroll container is a page ancestor:
 	   the root is their closest shared scope. */
 	:global(:root) {
@@ -254,6 +257,10 @@
 
 	/* Keep the anchoring element reachable in the viewport left above the drawer. */
 	@media (width <= 40rem) {
+		:global(:root) {
+			---tooltip-presentation: drawer;
+		}
+
 		/* A behind trigger only enhances a disclosure on wide layouts. Removing the
 		 * overlay restores the native summary hit target and keyboard behavior. */
 		:global(summary) > [data-stack] > [data-tooltip-trigger] {
