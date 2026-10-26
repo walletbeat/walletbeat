@@ -691,6 +691,9 @@
 
 <style>
 	.container {
+		inline-size: var(--table-inlineSize, max-content);
+		min-inline-size: 100%;
+
 		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
 		--table-outerBorderColor: var(--border-color);
 		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
@@ -715,7 +718,7 @@
 
 	:where(table) {
 		min-width: 100%;
-		width: var(--table-inlineSize, max-content);
+		width: 100%;
 		/* margin-inline: calc(-1 * var(--table-borderWidth)); */
 
 		border-collapse: separate;
