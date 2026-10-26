@@ -19,6 +19,10 @@ class TestElement extends EventTarget {
 		return this.visible
 	}
 
+	contains(element: TestElement) {
+		return element === this || element === this.invoker
+	}
+
 	matches(selector: string) {
 		return selector === ':focus-visible' ? this.focusVisible : this.hovered || this.focused
 	}
@@ -37,6 +41,7 @@ class TestFocusEvent extends Event {
 	constructor(
 		type: string,
 		private readonly focusedElement?: TestElement,
+		readonly relatedTarget: TestElement | null = null,
 	) {
 		super(type)
 	}
@@ -144,6 +149,19 @@ describe('interest fallback lifecycle', () => {
 		node.dispatchEvent(new TestFocusEvent('focusin'))
 		vi.advanceTimersByTime(1000)
 		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('preserves dismissal when focus returns from the panel, then accepts fresh focus', () => {
+		const input = new TestElement()
+
+		target.invoker = input
+		node.focusVisible = true
+		node.dispatchEvent(new TestFocusEvent('focusin', node, input))
+		vi.advanceTimersByTime(0)
+		expect(target.showPopover).not.toHaveBeenCalled()
+		node.dispatchEvent(new TestFocusEvent('focusin', node, new TestElement()))
+		vi.advanceTimersByTime(0)
+		expect(target.showPopover).toHaveBeenCalledOnce()
 	})
 
 	it('preserves an open target when the pointer moves into its content', () => {
