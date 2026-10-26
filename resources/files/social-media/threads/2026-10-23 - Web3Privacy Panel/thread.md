@@ -20,18 +20,27 @@ Meet our panelists 👇
 His focus is on translating cryptographic into products that are secure by default, and usable by real organizations and real people.
  
 ![Raul Safe Labs](./raul_safelabs.png)
+
 ---
 
 @LucemansNL does standard coordination at the Ethereum Foundation. He's focused on privacy, self-sovereignty, and more. 
 
 ![Luc Ethereum Foundation](./luc_ef.png)
+
 ---
 
-@apoorveth is a Smart Contracts & Full-Stack Developer. He's fixing Ethereum UX with his own wallet: @WalletChan_
+@apoorveth is a smart contracts and full-stack developer. He's aiming to fix Ethereum UX with his own wallet: @WalletChan_
 
 ![Apoorv WalletChan](./apoorv_walletchan.png)
 
 ---
+
+@sethforprivacy is building freedom tech as COO of @cakewallet and @radarchat. He also talks about freedom tech as host of the @optoutpod
+ 
+![Seth Cake Wallet](./seth_cake_wallet.png)
+
+---
+
 @polymutex will be moderating the panel 🌸
 
 polymutex leads Walletbeat, an open source database that grades wallets based on CROPS values.
