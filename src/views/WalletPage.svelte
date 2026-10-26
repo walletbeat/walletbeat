@@ -2937,9 +2937,9 @@
 				}
 
 				[data-sticky-breadcrumb~="root"]
-					:global(article [data-column~="span-start"] > [data-row]::after),
+					:global(article [data-column~="span-start"] > [data-row]:not([data-row-item~="wrap-end"])::after),
 				[data-sticky-breadcrumb~="root"]
-					:global(article [data-column~="span-start"] > :is(header, [data-sticky]) > [data-row]::after) {
+					:global(article [data-column~="span-start"] > :is(header, [data-sticky]) > [data-row]:not([data-row-item~="wrap-end"])::after) {
 					content: '';
 					position: absolute;
 					visibility: hidden;
