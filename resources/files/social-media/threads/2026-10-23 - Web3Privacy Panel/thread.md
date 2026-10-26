@@ -39,7 +39,7 @@ He's also involved in Kohaku, an initiative to help wallets improve security and
 
 @sethforprivacy is building freedom tech as COO of @cakewallet and @radarchat.
 
-@cakewallet an open source, noncustodial wallet aiming to make crypto simple for users.
+@cakewallet is an open source, noncustodial wallet aiming to make crypto simple for users.
  
 ![Seth Cake Wallet](./seth_cake_wallet.png)
 
