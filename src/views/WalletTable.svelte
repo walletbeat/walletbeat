@@ -604,7 +604,9 @@
 		}
 
 		flushSync(() => { transitionKind = kind })
-		const transition = startScopedViewTransition(transitionRoot, () => flushSync(update))
+		const strategy = kind === 'disclosure' && tooltipUsesDrawer() ? 'none'
+			: kind === 'columns' ? 'document' : 'auto'
+		const transition = startScopedViewTransition(transitionRoot, () => flushSync(update), strategy)
 
 		if (!transition) {
 			flushSync(() => { transitionKind = undefined })
@@ -664,6 +666,7 @@
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
+	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import EipDetails from '@/views/EipDetails.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
@@ -850,7 +853,7 @@
 						filterSets={slot.filterSets}
 						bind:activeChoices={attributeActiveChoices}
 						bind:toggleFilterById={toggleAttributeFilterById}
-						{transitionUpdate}
+						transitionUpdate={update => transitionUpdate(update, 'columns')}
 						closedAnchorPrefix={slot.clusterAnchorName}
 					/>
 				{:else}
