@@ -523,7 +523,7 @@
 		},
 		{
 			"name": "data-scroll-item",
-			"description": "## [data-scroll-item]\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- `flow`: retain inline-detached sizing in normal flow without a sticky stacking context\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`\n- `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
+			"description": "## [data-scroll-item]\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- `flow`: retain inline-detached sizing in normal flow without a sticky stacking context\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- `visible-center`: center normal-flow inline content in the visible sticky interval, with inline clipping supplied by its parent. Reserves `translate` and `animation`; requires horizontal LTR, native view timelines and normal motion.\n- snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`\n- `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.\n\n### CSS Variables\n- `--scrollItem-visibleCenter-animation`: defaults to `scroll-item-visible-center`; set to `none` when a consumer's additional native capabilities are unavailable.\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
 			"values": [
 				{
 					"name": "block-size-max",
@@ -588,6 +588,10 @@
 				{
 					"name": "underflow-start",
 					"description": "`[data-scroll-item~=\"underflow-start\"]`"
+				},
+				{
+					"name": "visible-center",
+					"description": "`[data-scroll-item~=\"visible-center\"]`"
 				}
 			]
 		},

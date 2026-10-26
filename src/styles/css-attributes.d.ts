@@ -670,8 +670,12 @@ declare global {
 		 * - width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`
 		 * - `flow`: retain inline-detached sizing in normal flow without a sticky stacking context
 		 * - attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`
+		 * - `visible-center`: center normal-flow inline content in the visible sticky interval, with inline clipping supplied by its parent. Reserves `translate` and `animation`; requires horizontal LTR, native view timelines and normal motion.
 		 * - snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`
 		 * - `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.
+		 *
+		 * ### CSS Variables
+		 * - `--scrollItem-visibleCenter-animation`: defaults to `scroll-item-visible-center`; set to `none` when a consumer's additional native capabilities are unavailable.
 		 *
 		 * ### Examples
 		 * - Bleed + block-end padding match (`inline-detached` + `padding-match-end`):
