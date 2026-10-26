@@ -128,7 +128,7 @@ export function startScopedViewTransition(
 		const active: LiveActiveTransition = { kind: 'live', cancel: live.cancel }
 
 		activeByScope.set(scope, active)
-		void live.finished.then(() => {
+		void live.finished.finally(() => {
 			if (activeByScope.get(scope) === active) {
 				live.cancel()
 				activeByScope.delete(scope)
