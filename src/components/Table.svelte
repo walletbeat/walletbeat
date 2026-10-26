@@ -339,6 +339,7 @@
 
 	// IDs
 	const id = $props.id()
+	const stickySizeClock = (level: number) => `--table-${id}-sticky-size-${level}`
 	type TableTransitionUpdate = TransitionUpdate<'sort' | 'columns'>
 	const directTransitionUpdate: TableTransitionUpdate = update => update()
 
@@ -481,10 +482,19 @@
 			{/each}
 		</colgroup>
 
-		<thead data-sticky="block backdrop-before backdrop-stuck">
-			{@render headerRows(table.columns, 0)}
+		<thead
+			data-sticky="block backdrop-before backdrop-stuck"
+			style:--table-sticky-size-clocks={Array.from({ length: table.maxHeaderLevel }, (_, level) =>
+				['zero', 'reference', 'width'].map(kind => `${stickySizeClock(level)}-${kind}`).join(', ')
+			).join(', ')}
+		>
+			{@render headerRows(table.columns, 0, undefined, true)}
 
-			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
+			{#snippet headerRows(columns: (_Column | undefined)[], level: number, inheritedClock: string | undefined, inheritedSupported: boolean)}
+				{@const stickyColumns = columns.filter(column => column?.isSticky)}
+				{@const sourceColumn = stickyColumns.length === 1 && columns[0]?.isSticky ? columns[0] : undefined}
+				{@const sizeClock = sourceColumn ? stickySizeClock(level) : stickyColumns.length ? undefined : inheritedClock}
+				{@const sizeSupported = !!sourceColumn || (!stickyColumns.length && inheritedSupported)}
 				{@const nextLevelColumns = (
 					columns
 						.flatMap(column => (
@@ -497,10 +507,17 @@
 						))
 				)}
 
-				<tr>
+				<tr
+					data-sticky-size={sizeClock ? '' : undefined}
+					data-visible-center={sizeSupported ? '' : undefined}
+					style:--table-sticky-size-clock={sizeClock}
+					style:--table-sticky-size-zero-clock={sizeClock ? `${sizeClock}-zero` : undefined}
+					style:--table-sticky-size-reference-clock={sizeClock ? `${sizeClock}-reference` : undefined}
+					style:--table-sticky-size-width-clock={sizeClock ? `${sizeClock}-width` : undefined}
+				>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
-							{@render headerCell(column, level, index)}
+							{@render headerCell(column, level, index, column === sourceColumn)}
 						{:else if !expandHeaderCells}
 							<th class="blank-cell"></th>
 						{/if}
@@ -508,11 +525,11 @@
 				</tr>
 
 				{#if nextLevelColumns.some(column => column)}
-					{@render headerRows(nextLevelColumns, level + 1)}
+					{@render headerRows(nextLevelColumns, level + 1, sizeClock, sizeSupported)}
 				{/if}
 			{/snippet}
 
-			{#snippet headerCell(column: _Column, level: number, index: number)}
+			{#snippet headerCell(column: _Column, level: number, index: number, isSizeSource: boolean)}
 				{@const colspan = getColumnSpan(column)}
 				{@const isSortable = !!column.sort}
 				{@const isExpandable = !!column.subcolumns?.length}
@@ -530,6 +547,7 @@
 					}
 					data-table-column={String(column.id)}
 					data-header-level={level}
+					data-sticky-size-source={isSizeSource ? '' : undefined}
 					aria-sort={table.sortState?.columnId === column.id ? (table.sortState.direction === SortDirection.Ascending ? 'ascending' : 'descending') : undefined}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
@@ -538,6 +556,9 @@
 					data-expandable={isExpandable || hasHeaderExtra ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
+					{#if isSizeSource}
+						<span class="sticky-size-probe" aria-hidden="true"></span>
+					{/if}
 					<div
 						class="header-cell-content"
 						data-sticky-container
@@ -554,7 +575,7 @@
 							</span>
 						{/snippet}
 
-						<div data-sticky-container>
+						<div data-sticky-container data-scroll-item="visible-center">
 							{#if isSortable}
 								<div class="sort-label" data-pressable="to-containing">
 									<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
@@ -690,7 +711,111 @@
 
 
 <style>
+	@property ---table-sticky-size-zero {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---table-sticky-size-reference {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---table-sticky-size-width {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---table-sticky-size {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@keyframes table-sticky-size-zero {
+		from { ---table-sticky-size-zero: -1; }
+		to { ---table-sticky-size-zero: 2; }
+	}
+	@keyframes table-sticky-size-reference {
+		from { ---table-sticky-size-reference: -1; }
+		to { ---table-sticky-size-reference: 2; }
+	}
+	@keyframes table-sticky-size-width {
+		from { ---table-sticky-size-width: -1; }
+		to { ---table-sticky-size-width: 2; }
+	}
+
+	.sticky-size-probe { display: none; }
+	.header-cell-content > [data-scroll-item] {
+		--scrollItem-visibleCenter-animation: none;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: view(inline)) and (animation-range: cover -100% cover 200%) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
+			@container (width >= 48rem) {
+				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
+					--sticky-marginInlineStart: var(---table-sticky-size);
+					overflow-x: clip;
+					overflow-y: visible;
+
+					> [data-scroll-item] {
+						--scrollItem-visibleCenter-animation: scroll-item-visible-center;
+					}
+					> [data-scroll-item] [data-sticky] {
+						position: relative;
+						inset-inline: auto;
+						max-inline-size: none;
+					}
+				}
+		thead { timeline-scope: var(--table-sticky-size-clocks); }
+		tr[data-sticky-size] {
+			animation: table-sticky-size-zero auto linear both, table-sticky-size-reference auto linear both, table-sticky-size-width auto linear both;
+			animation-timeline: var(--table-sticky-size-zero-clock), var(--table-sticky-size-reference-clock), var(--table-sticky-size-width-clock);
+			animation-range: cover -100% cover 200%;
+			/* Block-axis clocks cancel their common source size and position without tracking inline scrolling. */
+			---table-sticky-size: round(up, max(0px, calc(100vh * (var(---table-sticky-size-zero) / max(0.000001, var(---table-sticky-size-width)) - 1) / max(0.000001, var(---table-sticky-size-zero) / max(0.000001, var(---table-sticky-size-reference)) - 1))), 0.0625px);
+		}
+		th[data-sticky-size-source] {
+			anchor-name: var(--table-sticky-size-clock);
+		}
+		.sticky-size-probe {
+			display: block;
+			position: fixed;
+			position-anchor: var(--table-sticky-size-clock);
+			left: 0;
+			top: 0;
+			inline-size: 1px;
+			block-size: anchor-size(inline);
+			overflow: clip;
+			contain: paint;
+			visibility: hidden;
+			/* View timelines use layout bounds; the zero-scale box contributes no scroll overflow. */
+			scale: 0;
+			transform-origin: 0 0;
+			pointer-events: none;
+			view-timeline: var(--table-sticky-size-width-clock) block;
+			view-timeline-inset: 0;
+		}
+		.sticky-size-probe::before, .sticky-size-probe::after {
+			content: '';
+			position: absolute;
+			inset: 0 auto auto 0;
+			inline-size: 1px;
+			view-timeline-axis: block;
+			view-timeline-inset: 0;
+		}
+		.sticky-size-probe::before {
+			block-size: 0;
+			view-timeline-name: var(--table-sticky-size-zero-clock);
+		}
+		.sticky-size-probe::after {
+			block-size: 100vh;
+			view-timeline-name: var(--table-sticky-size-reference-clock);
+		}
+	}
+	}
+	}
 	.container {
+		---table-sticky-size: 0px;
 		inline-size: var(--table-inlineSize, max-content);
 		min-inline-size: 100%;
 
