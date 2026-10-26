@@ -1231,6 +1231,7 @@ summary:where(:not([data-column])) {
 	> details::details-content {
 		grid-row: 2;
 		grid-column: 1 / -1;
+		overflow: visible;
 		/* The body paints at viewport width without sizing the first tab track.
 		   Implicit tracks therefore need neither a tab count nor a fixed limit. */
 		min-inline-size: 0;
