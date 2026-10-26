@@ -700,6 +700,9 @@
 				{/if}
 			</div>
 		{/if}
+		<noscript>
+			<p>Sorting and column expansion require JavaScript. You can still open wallet details.</p>
+		</noscript>
 	</header>
 
 	{#snippet FilterHeaderTitle({ column }: { column: Column<RatedWallet<_AttributeGroupId>> })}
