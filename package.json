@@ -24,7 +24,7 @@
 		"check:misc:no-console-logging": "bash deploy/misc-tests/no_console_logging.sh",
 		"check:misc:no-fixme": "bash deploy/misc-tests/no_fixme.sh",
 		"check:misc:no-undefined-wallet-features": "bash deploy/misc-tests/no_undefined_in_wallet_features.sh",
-		"check:svelte": "svelte-check --tsconfig ./tsconfig.json",
+		"check:svelte": "svelte-check --tsconfig ./tsconfig.json --diagnostic-sources js,svelte",
 		"check:spelling": "cspell lint .",
 		"check:spelling:reorder": "tests/cspell/reorder-cspell.sh",
 		"check:spelling:quiet": "cspell lint --quiet --no-progress .",
@@ -57,18 +57,22 @@
 		"deploy:ipfs-availability-check": "tsx src/tools/ipfs-availability-checker/ipfs-availability-checker.ts",
 		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:agent": "cross-env WALLETBEAT_ENV=AGENT tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
-		"wallet-data-collection:ci": "cross-env WALLETBEAT_ENV=CI tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts"
+		"wallet-data-collection:ci": "cross-env WALLETBEAT_ENV=CI tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
+		"test:browser": "pnpm run test:browser:collect && pnpm run test:browser:accept",
+		"test:browser:collect": "playwright test --project=chromium --project=firefox --project=webkit",
+		"test:browser:accept": "node tests/browser/contract-evidence.mjs",
+		"test:browser:record": "playwright test --project=\"recording-*\""
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.4",
-		"@astrojs/svelte": "^9.0.1",
+		"@astrojs/svelte": "9.0.1",
 		"@eslint/js": "^10.0.1",
 		"@floating-ui/dom": "^1.8.0",
 		"@fontsource/space-grotesk": "^5.3.0",
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.6.5",
-		"astro": "^7.2.10",
+		"astro": "7.3.8",
 		"autoprefixer": "^10.5.4",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.6",
@@ -77,7 +81,7 @@
 		"lucide-static": "^0.562.0",
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.26",
-		"svelte": "5.57.0",
+		"svelte": "5.57.2",
 		"typescript-eslint": "^8.69.0",
 		"wagmi": "3.7.7"
 	},
@@ -87,6 +91,7 @@
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
+		"@playwright/test": "1.63.0",
 		"@types/node": "^22.20.4",
 		"@types/prompts": "^2.4.9",
 		"@types/semver": "^7.8.0",
@@ -96,6 +101,7 @@
 		"chalk": "^6.0.0",
 		"cross-env": "^10.1.0",
 		"cspell": "10.2.0",
+		"esbuild": "0.28.2",
 		"eslint": "10.9.1",
 		"eslint-config-love": "^155.0.0",
 		"eslint-config-prettier": "^10.1.8",
@@ -145,6 +151,7 @@
 		"useTabs": true,
 		"plugins": [
 			"prettier-plugin-astro",
+			"./prettier-css.mjs",
 			"prettier-plugin-curly"
 		]
 	}

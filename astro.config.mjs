@@ -1,11 +1,15 @@
 // @ts-check
 import { resolve } from 'node:path'
 
+import spaceGroteskUnicode from '@fontsource/space-grotesk/unicode.json' with { type: 'json' }
+
 import { satteri } from '@astrojs/markdown-satteri'
 import sitemap from '@astrojs/sitemap'
 import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig, fontProviders } from 'astro/config'
+
+import { assertNonEmptyArray, nonEmptyGet } from './src/types/utils/non-empty'
 
 import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
 import {
@@ -15,6 +19,24 @@ import {
 
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
+
+/** @typedef {NonNullable<Parameters<ReturnType<typeof fontProviders.local>['resolveFont']>[0]['options']>['variants'][number]} LocalFontVariant */
+const spaceGroteskVariants = assertNonEmptyArray(
+	Object.entries(spaceGroteskUnicode).flatMap(([subset, unicodeRange]) =>
+		[400, 500, 600, 700].map(
+			/** @returns {LocalFontVariant} */
+			weight => {
+				const ranges = assertNonEmptyArray(unicodeRange.split(','))
+				return {
+					src: [`@fontsource/space-grotesk/files/space-grotesk-${subset}-${weight}-normal.woff2`],
+					weight,
+					style: 'normal',
+					unicodeRange: [nonEmptyGet(ranges), ...ranges.slice(1)],
+				}
+			},
+		),
+	),
+)
 
 const isLinux = process.platform === 'linux'
 
@@ -41,7 +63,11 @@ export default defineConfig({
 				],
 	),
 	vite: {
+		cacheDir: process.env.WALLETBEAT_DEV === 'true' ? '.astro/vite-dev' : '.astro/vite',
 		build: {
+			// Both bundled CSS compressors currently drop valid named-range keyframes or
+			// individual animation-timeline properties. Preserve the authored modern CSS.
+			cssMinify: false,
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},
@@ -70,9 +96,10 @@ export default defineConfig({
 		{
 			name: 'Space Grotesk',
 			cssVariable: '--fontFamily-spaceGrotesk',
-			provider: fontProviders.fontsource(),
-			weights: [400, 500, 600, 700],
-			styles: ['normal'],
+			provider: fontProviders.local(),
+			options: {
+				variants: [nonEmptyGet(spaceGroteskVariants), ...spaceGroteskVariants.slice(1)],
+			},
 		},
 		{
 			name: 'SP Monorium',
