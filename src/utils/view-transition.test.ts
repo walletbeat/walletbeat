@@ -227,11 +227,96 @@ describe('startScopedViewTransition', () => {
 			},
 		})
 
+		const reportError = vi.fn()
+
+		vi.stubGlobal('reportError', reportError)
 		startScopedViewTransition(htmlElement(root), vi.fn())
+		startScopedViewTransition(htmlElement(root), vi.fn(), 'none')
 		await Promise.resolve()
 		await Promise.resolve()
 
 		expect(root.attributes).not.toContain('data-view-transition-active')
+		expect(reportError).not.toHaveBeenCalled()
+	})
+
+	it('forces document capture without reading element geometry', () => {
+		const documentTransition = installEnvironment()
+		const root = new TestScope()
+		const scopedStart = vi.fn()
+
+		Object.assign(root, { startViewTransition: scopedStart })
+		Object.defineProperty(root, 'scrollLeft', {
+			get: () => {
+				throw new Error('Unexpected layout read')
+			},
+		})
+		expect(startScopedViewTransition(htmlElement(root), vi.fn(), 'document')).toBe(
+			documentTransition,
+		)
+		expect(scopedStart).not.toHaveBeenCalled()
+	})
+
+	it.each(['none', 'reduced-motion'] as const)(
+		'flushes pending updates before disabling capture with %s',
+		mode => {
+			const nativeTransition = installEnvironment()
+			const first = new TestScope()
+			const second = new TestScope()
+			const updates: string[] = []
+			let deferred!: () => void
+
+			Object.assign(document, {
+				startViewTransition: vi.fn((callback: () => void) => {
+					deferred = callback
+
+					return nativeTransition
+				}),
+			})
+			startScopedViewTransition(htmlElement(first), () => updates.push('first'))
+
+			if (mode === 'reduced-motion') {
+				vi.stubGlobal('matchMedia', () => ({ matches: true }))
+			}
+
+			startScopedViewTransition(
+				htmlElement(second),
+				() => updates.push('second'),
+				mode === 'none' ? 'none' : 'auto',
+			)
+			deferred()
+			expect(updates).toEqual(['first', 'second'])
+			expect(nativeTransition.skipTransition).toHaveBeenCalledOnce()
+			expect(first.attributes).not.toContain('data-view-transition-active')
+			expect(second.attributes).not.toContain('data-view-transition-active')
+		},
+	)
+
+	it('updates directly without starting capture when disabled', () => {
+		installEnvironment()
+		const update = vi.fn()
+		const start = vi.fn()
+
+		Object.assign(document, { startViewTransition: start })
+
+		expect(startScopedViewTransition(htmlElement(new TestScope()), update, 'none')).toBeUndefined()
+		expect(update).toHaveBeenCalledOnce()
+		expect(start).not.toHaveBeenCalled()
+	})
+
+	it('reports a native layout rejection without converting readiness to success', async () => {
+		installEnvironment()
+		const failure = new DOMException('Layout capture failed', 'InvalidStateError')
+		const nativeTransition = transition({ ready: Promise.reject(failure) })
+		const root = new TestScope()
+		const reportError = vi.fn()
+
+		vi.stubGlobal('reportError', reportError)
+		Object.assign(root, { startViewTransition: () => nativeTransition })
+		const result = startScopedViewTransition(htmlElement(root), vi.fn())
+
+		await expect(result?.ready).rejects.toBe(failure)
+		expect(reportError).toHaveBeenCalledExactlyOnceWith(failure)
+		nativeTransition.finish()
 	})
 
 	it('reports an unexpected transition failure once', async () => {
