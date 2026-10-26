@@ -33,7 +33,18 @@ class TestPointerEvent extends Event {
 	}
 }
 
-class TestFocusEvent extends Event {}
+class TestFocusEvent extends Event {
+	constructor(
+		type: string,
+		private readonly focusedElement?: TestElement,
+	) {
+		super(type)
+	}
+
+	override get target() {
+		return this.focusedElement ?? super.target
+	}
+}
 
 function htmlElement(node: TestElement) {
 	if (!(node instanceof HTMLElement)) {
@@ -68,13 +79,14 @@ describe('interest fallback lifecycle', () => {
 	})
 
 	it('requires sustained pointer interest rather than opening during a scroll crossing', () => {
+		node.invoker = new TestElement()
 		node.hovered = true
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(499)
 		expect(target.showPopover).not.toHaveBeenCalled()
 		vi.advanceTimersByTime(1)
 		expect(target.showPopover).toHaveBeenCalledOnce()
-		expect(target.showPopover).toHaveBeenCalledWith({ source: node })
+		expect(target.showPopover).toHaveBeenCalledWith({ source: node.invoker })
 	})
 
 	it('honors existing hover during hydration with the ordinary pointer dwell', () => {
@@ -114,13 +126,18 @@ describe('interest fallback lifecycle', () => {
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 
-	it('opens for visible keyboard focus without the pointer dwell', () => {
-		node.focusVisible = true
-		node.dispatchEvent(new TestFocusEvent('focusin'))
-		vi.advanceTimersByTime(0)
-		expect(target.showPopover).toHaveBeenCalledOnce()
-		expect(target.showPopover).toHaveBeenCalledWith({ source: node })
-	})
+	it.each([false, true])(
+		'opens for visible keyboard focus (descendant: %s) without the pointer dwell',
+		descendant => {
+			const source = descendant ? new TestElement() : node
+
+			source.focusVisible = true
+			node.dispatchEvent(new TestFocusEvent('focusin', source))
+			vi.advanceTimersByTime(0)
+			expect(target.showPopover).toHaveBeenCalledOnce()
+			expect(target.showPopover).toHaveBeenCalledWith({ source })
+		},
+	)
 
 	it('ignores touch entry and focus that is not visibly keyboard-driven', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter', 'touch'))
