@@ -14,10 +14,10 @@ import LuSun from 'lucide-static/icons/sun.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
+	currentHref?: string
 }
 
-const { navigationItems } = Astro.props
-const currentHref = Astro.url.pathname
+const { navigationItems, currentHref = Astro.url.pathname } = Astro.props
 const secondaryNavigationItems = [
 	navigationAbout,
 	navigationFaq,
