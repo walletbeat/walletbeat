@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, promises as fs, readFileSync } from 'node:fs'
 import path from 'node:path'
 
+import { create as createFont } from 'fontkitten'
 import { format, resolveConfig } from 'prettier'
 import sax from 'sax'
 import { type Config, loadConfig, optimize } from 'svgo'
@@ -216,7 +217,7 @@ export type IconUnicodeSequences = Readonly<Record<string, string>>
 
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
-const iconFontGeneratorVersion = 'emoji-unicode-sequence-cmap14-v2'
+const iconFontGeneratorVersion = 'emoji-unicode-sequence-cmap14-ink-bounds-v4'
 const saxMaxBufferLengthCap = 1024 * 1024 * 1024
 
 const svgToFontOptions = {
@@ -385,6 +386,43 @@ const glyphIdByName = (fontBuffer: Buffer) => {
 	}
 
 	return result
+}
+
+/** Native outline bounds in em units, independent of advance width and empty bearings. */
+export const iconFontOutlineCSS = (fontBuffer: Buffer, variant: string) => {
+	const font = createFont(fontBuffer)
+
+	if (!('getGlyph' in font)) {
+		throw new Error('Icon outline metadata requires a single font')
+	}
+
+	return [...glyphIdByName(fontBuffer)]
+		.filter(([, glyphId]) => font.getGlyph(glyphId).path.commands.length > 0)
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(([name, glyphId]) => {
+			const bounds = font.getGlyph(glyphId).path.bbox
+			const metrics = {
+				minX: bounds.minX / font.unitsPerEm,
+				maxX: bounds.maxX / font.unitsPerEm,
+				height: (bounds.maxY - bounds.minY) / font.unitsPerEm,
+				top: (font.ascent - bounds.maxY) / font.unitsPerEm,
+				advance: font.getGlyph(glyphId).advanceWidth / font.unitsPerEm,
+			}
+
+			if (!Object.values(metrics).every(Number.isFinite) || !(metrics.height > 0)) {
+				throw new Error(`Icon ${name} has no finite outline`)
+			}
+
+			return [
+				`[data-icon~='${name}'],`,
+				`[data-icon-metrics='${name}'] {`,
+				...Object.entries(metrics).map(
+					([metric, value]) =>
+						`\t---icon-ink-${metric}-${variant}: ${Number(value.toPrecision(10))};`,
+				),
+				'}',
+			].join('\n')
+		})
 }
 
 // Replace a single SFNT table and recompute table checksums. This is intentionally
@@ -1097,6 +1135,7 @@ export class SVGFont {
 		// The font asset files are generated once per variant, each into its own
 		// derived output directory. The generated CSS/TS are shared across variants.
 		const cssRules: string[] = []
+		const outlineRules: string[] = []
 		const generatedIconUnicodeSequences: Record<string, string> = {}
 		const { knownSingleVariantIcons } = this
 
@@ -1194,6 +1233,13 @@ export class SVGFont {
 				])
 			}
 
+			outlineRules.push(
+				...iconFontOutlineCSS(
+					await fs.readFile(path.join(fontOutputDir, `${fullFontName}.ttf`)),
+					variant,
+				),
+			)
+
 			const generatedSVGPath = path.join(fontOutputDir, `${fullFontName}.svg`)
 			const optimizedSVG = optimize((await fs.readFile(generatedSVGPath)).toString('utf-8'), {
 				path: generatedSVGPath,
@@ -1225,7 +1271,8 @@ export class SVGFont {
 			}
 		}
 
-		const generatedCSS = generatedIconFontCSS(this.fullFontNames, cssRules)
+		const generatedCSS =
+			generatedIconFontCSS(this.fullFontNames, cssRules) + outlineRules.join('\n\n') + '\n'
 		let typescriptContent = generatedIconFontTypescript(
 			this.fontName,
 			this.fontTypeName,
