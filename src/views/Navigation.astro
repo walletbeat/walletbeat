@@ -83,6 +83,10 @@ const secondaryNavigationItems = [
 
 <style>
 	nav {
+		&[data-scroll-container]:not(:popover-open) {
+			overscroll-behavior-x: auto;
+		}
+
 		width: 100%;
 		height: 100dvh;
 
@@ -223,7 +227,7 @@ const secondaryNavigationItems = [
 			}
 
 			&:not(:popover-open) {
-				overscroll-behavior: none;
+				overscroll-behavior-y: auto;
 
 				header ~ * {
 					display: none;
