@@ -1173,9 +1173,24 @@ for (const { width, direction, open } of [
 									})()
 								: null
 
+						const markerOwner = end.querySelector('[data-collapsible-marker]')
+						const marker = getComputedStyle(markerOwner ?? end, markerOwner ? null : '::after')
+						const sourceRow = heading.closest(
+							'[data-row]:has(> [data-sticky-breadcrumb~="source"])',
+						)
+
 						samples.push({
 							enhanced,
 							encounter,
+							marker: {
+								width: Number.parseFloat(marker.width),
+								height: Number.parseFloat(marker.height),
+								visibility: marker.visibility,
+								timeline: marker.getPropertyValue('view-timeline-name'),
+							},
+							sourceTimeline: sourceRow
+								? getComputedStyle(sourceRow, '::after').getPropertyValue('view-timeline-name')
+								: null,
 							target,
 							actualTop: scope.getBoundingClientRect().top,
 							scroll: root.scrollTop,
@@ -1212,8 +1227,21 @@ for (const { width, direction, open } of [
 				expect(sample.title.length, `${context}: nonempty title text`).toBeGreaterThan(0)
 				expect(sample.count.length, `${context}: nonempty transformed end text`).toBeGreaterThan(0)
 				expect(sample.collisions, `${context}: actual text lines remain separated`).toEqual([])
+				expect(
+					sample.marker.width,
+					`${context}: marker reserves its intrinsic width`,
+				).toBeGreaterThan(0)
+				expect(sample.marker.height, `${context}: marker retains its line box`).toBeGreaterThan(0)
+				expect(sample.marker.visibility, `${context}: marker remains painted`).toBe('visible')
+				expect(
+					sample.marker.timeline,
+					`${context}: marker does not own the row probe`,
+				).not.toContain('pie-inline')
 
 				if (sample.enhanced && journey.open) {
+					expect(sample.sourceTimeline, `${context}: source row retains its probe`).toContain(
+						'pie-inline',
+					)
 					expect(sample.encounter, `${context}: physical pie encounter observed`).not.toBeNull()
 
 					if (!sample.encounter) {
