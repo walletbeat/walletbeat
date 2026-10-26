@@ -1,6 +1,6 @@
 What does ecosystem alignment actually looks like in practice? 
 
-Beyond CROPS, there are a few things that are valuable for wallets to have. But they don't neatly fit into any of the CROPS values. And they're all generaly around making sure that the wallet plays well in the Ethereum wallet ecosystem. 
+Beyond CROPS, there are a few things that are valuable for wallets to have. But they don't neatly fit into any of the CROPS values. And they're all generally around making sure that the wallet plays well in the Ethereum wallet ecosystem. 
 
 That's why Walletbeat evaluate this attribute. Here's how 👇
 
