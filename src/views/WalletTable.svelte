@@ -1786,7 +1786,7 @@
 		position: relative;
 		z-index: 1;
 		anchor-name: var(--filter-anchor);
-		display: grid;
+		display: inline-grid;
 		justify-items: center;
 		gap: 0.35em;
 		font: inherit;
