@@ -605,7 +605,7 @@
 
 		flushSync(() => { transitionKind = kind })
 		const strategy = kind === 'disclosure' ? 'none'
-			: kind === 'columns' ? 'document' : 'auto'
+			: kind === 'columns' ? 'document' : 'live'
 		const transition = startScopedViewTransition(transitionRoot, () => flushSync(update), strategy)
 
 		if (!transition) {
