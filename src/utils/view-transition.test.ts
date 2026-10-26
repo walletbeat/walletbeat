@@ -73,6 +73,12 @@ const installEnvironment = ({ reducedMotion = false } = {}) => {
 	vi.stubGlobal('CSS', { supports: () => true })
 	vi.stubGlobal('matchMedia', () => ({ matches: reducedMotion }))
 	vi.stubGlobal('HTMLElement', TestScope)
+	vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+		queueMicrotask(() => callback(0))
+
+		return 1
+	})
+	vi.stubGlobal('cancelAnimationFrame', vi.fn())
 	vi.stubGlobal('document', {
 		startViewTransition: vi.fn((update: () => void) => {
 			update()
@@ -89,6 +95,42 @@ afterEach(() => {
 })
 
 describe('startScopedViewTransition', () => {
+	it('cancels pending frame activation without losing either update', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
+		let activate!: FrameRequestCallback
+		const cancelFrame = vi.fn()
+
+		vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+			activate = callback
+
+			return 7
+		})
+		vi.stubGlobal('cancelAnimationFrame', cancelFrame)
+		const root = new TestScope()
+		const item = new TestLayoutItem()
+		const animations = vi.spyOn(item, 'getAnimations')
+		const first = vi.fn(() => {
+			item.y = 100
+		})
+		const direct = vi.fn()
+
+		Object.assign(root, { querySelectorAll: () => [item] })
+		startScopedViewTransition(htmlElement(root), first, 'live')
+		expect(animations).not.toHaveBeenCalled()
+		vi.stubGlobal('matchMedia', () => ({ matches: true }))
+		startScopedViewTransition(htmlElement(root), direct, 'none')
+		activate(0)
+		await Promise.resolve()
+		await Promise.resolve()
+		expect(first).toHaveBeenCalledOnce()
+		expect(direct).toHaveBeenCalledOnce()
+		expect(cancelFrame).toHaveBeenCalledWith(7)
+		expect(animations).not.toHaveBeenCalled()
+		expect(item.attributes).not.toContain('data-layout-transition')
+	})
+
 	it('preserves live item motion during a direct update', async () => {
 		installEnvironment()
 		vi.stubGlobal('CSSTransition', TestItemMotion)
