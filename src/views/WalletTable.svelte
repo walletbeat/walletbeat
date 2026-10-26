@@ -1,4 +1,5 @@
 <script module lang="ts">
+
 	export enum SummaryVisualization {
 		None = 'none',
 		ScoreDot = 'dot',
@@ -12,6 +13,7 @@
 <script lang="ts" generics="
 	_AttributeGroupId extends string
 ">
+	import { defaultStageQualification, stageQualificationChoices, type StageQualificationId } from './wallet-table-stage'
 	// Types/constants
 	import { applyFilterSets, changeFilterChoice, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
 	import { hasVisiblePopoverInvoker, interest } from '@/components/interest'
@@ -41,6 +43,8 @@
 		wallets,
 		attributeTree,
 		summaryVisualization = SummaryVisualization.Stage,
+		initialStageSelection = defaultStageQualification,
+		stageNavigationBase,
 	}: {
 		tableId?: string,
 		title?: string
@@ -49,6 +53,8 @@
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
 		summaryVisualization?: SummaryVisualization
+		initialStageSelection?: StageQualificationId
+		stageNavigationBase?: string
 	} = $props()
 
 	const attributeGroupList = $derived(
@@ -482,30 +488,24 @@
 		label: 'Stage qualification',
 		cardinality: 'exclusive',
 		match: 'union',
-		defaultChoice: 'stage-qualified',
+		defaultChoice: defaultStageQualification,
 		alwaysShowChoices: true,
-		choices: [
-			{ id: '', label: 'All' },
-			{
-				id: 'stage-qualified',
-				label: 'Stage 0+',
-				compactLabel: '0+',
-				matches: wallet => {
-					const { stage } = getWalletStageAndLadder(wallet)
-					return stage !== null && typeof stage === 'object'
-				},
+		choices: stageQualificationChoices.map(({ path, ...choice }) => ({
+			...choice,
+			href: stageNavigationBase === undefined ? undefined : stageNavigationBase + path + (path ? '/' : ''),
+			matches: choice.id === '' ? undefined : (wallet: RatedWallet<_AttributeGroupId>) => {
+				const { stage } = getWalletStageAndLadder(wallet)
+				return choice.id === defaultStageQualification
+					? stage !== null && typeof stage === 'object'
+					: stage === 'QUALIFIED_FOR_NO_STAGES'
 			},
-			{
-				id: 'stage-unqualified',
-				label: 'Below Stage 0',
-				compactLabel: '–',
-				matches: wallet => getWalletStageAndLadder(wallet).stage === 'QUALIFIED_FOR_NO_STAGES',
-			},
-		],
+		})),
 	}] : []
 	const walletFilterSets = [...walletFacetFilterSets, ...stageStatusFilterSets]
 	let activeChoices = $state<Set<FilterChoice<RatedWallet<_AttributeGroupId>>>>(
-		resetFilterSets(walletFilterSets, new Set())
+		resetFilterSets(walletFacetFilterSets, new Set()).union(new Set(
+			stageStatusFilterSets.flatMap(set => set.choices.filter(choice => choice.id === initialStageSelection))
+		))
 	)
 
 	let filteredWallets = $derived(
