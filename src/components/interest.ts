@@ -74,8 +74,8 @@ export function interest(
 
 		if (
 			event instanceof FocusEvent &&
-			event.target instanceof Element &&
-			!event.target.matches(':focus-visible')
+			((event.target instanceof Element && !event.target.matches(':focus-visible')) ||
+				(event.relatedTarget instanceof Element && target.contains(event.relatedTarget)))
 		) {
 			return
 		}
