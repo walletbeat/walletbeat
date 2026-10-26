@@ -1,8 +1,8 @@
-Wallets should play well within the ecosystem. What ecosystem alignment actually looks like in practice? 
+What does ecosystem alignment actually looks like in practice? 
 
-Here's how Walletbeat evaluate this attribute.
+Beyond CROPS, there are a few things that are valuable for wallets to have. But they don't neatly fit into any of the CROPS values. And they're all generaly around making sure that the wallet plays well in the Ethereum wallet ecosystem. 
 
-A Walletbeat thread 🧵
+That's why Walletbeat evaluate this attribute. Here's how 👇
 
 ![Ecosystem Attribute Group](./ecosystem.png)
 
@@ -21,7 +21,6 @@ Wallets are rated based on whether they support:
 ![Account Abstraction](./account_abstraction.png)
 
 ---
-Why does this matter?
 
 EIP-7702 creates a clean path for existing EOAs to obtain all the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. 
 
@@ -33,18 +32,17 @@ Address resolution 📇
 
 Can the wallet send funds to human-readable Ethereum addresses?
 
-Ethereum addresses are unreadable to humans. Address naming registries like ENS partially solve this problem.
+Wallets should support ENS resolution. This solves the unreadability of Ethereum addresses.
 
 Some address format standards improve upon this further by including the destination chain information as part of the address itself.
 
 ![Address Resolution](./address_resolution.png)
 
 ---
-Why does this matter?
 
-Ethereum addresses are hexadecimal strings (0x...) which are unreadable to humans.
+Ethereum addresses are hexadecimal strings (0x...) which are unreadable to humans. 
 
-Additionally, the users need to ensure that they are sending funds on the correct chain, increasing the potential for mistakenly sending funds to the wrong place or the wrong chain.
+Phishing scams have used this to trick users into sending funds to invalid addresses, by generating lookalike-addresses and tricking users into copy/pasting them without noticing the difference.
 
 ---
 
@@ -52,16 +50,14 @@ Browser integration 🌐
 
 Does the wallet support all the prominent standards for web browser integration?
 
-Wallets are rated based on whether they implement the following Ethereum standards for web browser integration:
-- EIP-1193 JavaScript Provider API
-- EIP-2700 JavaScript Provider Events
-- EIP-6963 Multiple JavaScript Providers
+Browser integration standards make sure that wallets integrate with apps in a way that's transparent, open, and competitive. That ensures that the ecosystem has open competition and wallets are all on a level playing field.
 
 ![Browser Integration](./browser_integration.png)
 
+Instead of the name, we should explain what is the purpose of each EIP
+
 ---
 
-Why does this matter?
 The Ethereum community has defined web browser integration standards, which dictate how wallets and web pages can interact with each other.
 
 By ensuring that wallets implement this standard interface, applications automatically support all wallets that implement it. 
@@ -84,8 +80,6 @@ To get a passing rating, wallets must be cross-chain aware in how they display a
 
 ---
 
-Why does this matter?
-
 Wallets must now deal with token balances fragmented across multiple chains.
 
 To address the UX impact of this complexity, wallets should provide features to abstract away these issues, while remaining transparent to the user when cross-chain bridging risks or fees are involved.
@@ -96,18 +90,15 @@ Transaction batching 🧺
 
 Does the wallet support bundling multiple operations as a single transaction?
 
-Transaction batching is one of the longstanding features without which Ethereum user experience (UX) has suffered. One of the most common pain points for DeFi, for example, has been the need to perform separate "token approval" transactions, followed by a separate transaction to actually execute the user's original intent.
+Transaction batching is one of the longstanding features without which Ethereum user experience has suffered. One of the most common pain points for DeFi, for example, has been the need to perform separate "token approval" transactions, followed by a separate transaction to actually execute the user's original intent.
 
 ![Transaction Batching](./transaction_batching.png)
 
 ---
 
-Why does this matter?
+Users don't want to approve every transaction. But transaction batching can solve that problem without giving contracts unlimited spending power.
 
-Smart account types such as ERC-4337 and EIP-7702 unlock the ability to perform multiple operations as a single transaction. This is exposed to applications through EIP-5792 Wallet Call API.
-
-To qualify for a passing rating, the wallet must support at least one type of smart account, implement EIP-5792 Wallet Call API and support atomic transaction bundles.
-
+Transaction batching give users a better UX: Approve the exact amount AND swap at the same time, in a single transaction. No need for unlimited approvals. No lingering permissions afterward.
 ---
 
 Hardware wallet interoperability 🧱
@@ -122,19 +113,14 @@ A wallet receives a passing rating if it supports hardware wallets from at least
 
 ---
 
-Why does this matter?
-
 Supporting multiple hardware wallet manufacturers preserves a healthy, open, competitive, interoperable market for hardware wallets.
 
 It also increases the total addressable market of users for the software wallet, as users that already own a specific hardware wallets will want to use a software wallet that supports it.
 
 ---
+Ecosystem attributes refer to present-day Ethereum ecosystem priorities and transitions that impact the feature set of Ethereum wallets. 
 
-Wallets are how users use and experience Ethereum. Doesn't matter how CROPS-y the protocol layer is: no CROPS in wallets means no CROPS for users.
-
-Ethereum values, like Ecosystem alignment, only matter if users actually experience them.
-
-![CROPS for Users](./crops_for_users.png)
+Unlike other attribute groups, which are mostly timeless principles, the set of ecosystem attributes should be expected to change quickly as the Ethereum ecosystem itself evolves.
 
 ---
 

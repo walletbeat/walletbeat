@@ -1695,10 +1695,6 @@
 		"hash": "b33b18031d40e135238b355e1c19fa424c6e8d6ec73a8b465cdd701f9b4f710c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/crops_for_users.png": {
-		"hash": "ef6df0e7a4a01b4a47ec2d9a9e29d0962069c1f0fb4e1e6fd86b1d35bb36315a",
-		"passedTests": ["file-format", "png-optimized"]
-	},
 	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/ecosystem.png": {
 		"hash": "c7ecc33d710974e317173da564fac6e134466434b6dc19c01a2c074119a632aa",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
