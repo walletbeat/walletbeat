@@ -315,7 +315,7 @@
 	 * header position, and each helipad owns its slot. Native anchoring owns the
 	 * sticky position; view clocks supply only the open slot's relative offset.
 	 * No probe changes its anchor on open/close. */
-	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) {
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px)) {
 		@container wallet-table (width >= 42rem) {
 			fieldset:not([data-active-count="0"]),
 			[data-active-choice] .choice-icon-helipad {
@@ -376,6 +376,46 @@
 						calc(100vw * (1 / var(---filter-inlineFraction) - 1 / var(---filter-closedInlineFraction)) - 50%),
 						calc(100vh * (1 / var(---filter-blockFraction) - 1 / var(---filter-closedBlockFraction)) - 50%)
 						) scale(calc(1.25em / var(---filter-clusterSize)));
+				}
+			}
+		}
+	}
+	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px))) {
+		@property ---filter-openProgress {
+			syntax: '<number>';
+			inherits: false;
+			initial-value: 0;
+		}
+
+		@container wallet-table (width >= 42rem) {
+			:where(form[data-anchored]) [data-active-choice] .choice-icon,
+			:global([popover]:popover-open) form[data-anchored] [data-panel-member] [data-active-choice] .choice-icon {
+				position-anchor: var(--closed-anchor);
+				inline-size: var(---filter-clusterSize);
+				block-size: var(---filter-clusterSize);
+				translate: none;
+				left: calc(
+					(1 - var(---filter-openProgress)) * (anchor(var(--closed-anchor) center) + cos(var(---filter-packingAngle)) * var(---filter-packingDistance))
+					+ var(---filter-openProgress) * anchor(var(--choice-anchor) center)
+				);
+				top: calc(
+					(1 - var(---filter-openProgress)) * (anchor(var(--closed-anchor) center) + sin(var(---filter-packingAngle)) * var(---filter-packingDistance))
+					+ var(---filter-openProgress) * anchor(var(--choice-anchor) center)
+				);
+				transform: translate(-50%, -50%) scale(calc(
+					(1 - var(---filter-openProgress)) * tan(atan2(calc(2 * var(---filter-packingRadius)), var(---filter-clusterSize)))
+					+ var(---filter-openProgress) * tan(atan2(1.25em, var(---filter-clusterSize)))
+				));
+			}
+
+			:global([popover]:popover-open) form[data-anchored] [data-panel-member] .choice-icon {
+				---filter-openProgress: 1;
+				@starting-style { ---filter-openProgress: 0; }
+			}
+
+			@media (prefers-reduced-motion: no-preference) {
+				:where(form[data-anchored]) [data-active-choice] .choice-icon {
+					transition-property: ---filter-openProgress;
 				}
 			}
 		}
