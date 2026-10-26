@@ -61,29 +61,54 @@ export function prepareItemReorder(
 			item.setAttribute('data-layout-transition', 'before')
 		}
 
+		if (!moving[0]) {
+			return { finished: Promise.resolve(), cancel: clean }
+		}
+
 		// Commit the inverted positions before enabling their native transitions.
-		if (moving[0]) {
-			getComputedStyle(moving[0]).getPropertyValue('translate')
-		}
+		getComputedStyle(moving[0]).getPropertyValue('translate')
+		let frame: number | undefined
+		let finish!: () => void
+		const finished = new Promise<void>(resolve => {
+			finish = resolve
+			// A frame boundary refreshes the animation clock after synchronous layout work.
+			frame = requestAnimationFrame(() => resolve())
+		}).then(() => {
+			if (frame === undefined) {
+				return
+			}
 
-		for (const item of moving) {
-			item.setAttribute('data-layout-transition', 'after')
-		}
+			frame = undefined
 
-		const animations = moving.flatMap(item =>
-			item
-				.getAnimations()
-				.filter(
-					animation =>
-						animation instanceof CSSTransition && animation.transitionProperty === 'translate',
-				),
-		)
+			for (const item of moving) {
+				item.setAttribute('data-layout-transition', 'after')
+			}
+
+			const animations = moving.flatMap(item =>
+				item
+					.getAnimations()
+					.filter(
+						animation =>
+							animation instanceof CSSTransition && animation.transitionProperty === 'translate',
+					),
+			)
+
+			return Promise.allSettled(animations.map(animation => animation.finished)).then(
+				() => undefined,
+			)
+		})
 
 		return {
-			finished: Promise.allSettled(animations.map(animation => animation.finished)).then(
-				() => undefined,
-			),
-			cancel: clean,
+			finished,
+			cancel: () => {
+				if (frame !== undefined) {
+					cancelAnimationFrame(frame)
+					frame = undefined
+					finish()
+				}
+
+				clean()
+			},
 		}
 	} catch (error) {
 		clean()
