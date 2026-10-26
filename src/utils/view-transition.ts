@@ -1,14 +1,24 @@
+import { prepareItemReorder } from './layout-transition'
+
 type TransitionScope = HTMLElement & {
 	startViewTransition?: (update: () => void) => ViewTransition
 }
 
-type ActiveTransition = {
+type NativeActiveTransition = {
+	kind: 'native'
 	transition: ViewTransition
 	update: () => void
 	interrupted: boolean
 }
 
-export type ViewTransitionStrategy = 'auto' | 'document' | 'none'
+type LiveActiveTransition = {
+	kind: 'live'
+	cancel: () => void
+}
+
+type ActiveTransition = NativeActiveTransition | LiveActiveTransition
+
+export type ViewTransitionStrategy = 'auto' | 'document' | 'live' | 'none'
 
 export type TransitionUpdateKind = 'sort' | 'columns' | 'filters'
 export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdateKind> = (
@@ -18,7 +28,7 @@ export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdat
 
 const activeByScope = new WeakMap<HTMLElement, ActiveTransition>()
 let activeDocumentTransition:
-	{ document: Document; scope: HTMLElement; active: ActiveTransition } | undefined
+	{ document: Document; scope: HTMLElement; active: NativeActiveTransition } | undefined
 
 const canTransition = () =>
 	typeof document !== 'undefined' &&
@@ -52,17 +62,33 @@ export const viewTransitionName = (...parts: (number | string)[]) =>
  * Run a synchronous UI update inside an element-scoped View Transition when
  * that does not risk clamping horizontal scroll. Otherwise, use a document
  * transition while the active marker keeps CSS capture local. Callers can force
- * document capture or disable capture while preserving pending update order.
+ * document capture, use live position transitions for retained HTML items in an
+ * unscaled axis-aligned scope, or disable capture while preserving update order.
+ * Direct updates preserve existing live motion; pending native captures are canceled.
  */
 export function startScopedViewTransition(
 	scope: TransitionScope,
 	update: () => void,
 	strategy: ViewTransitionStrategy = 'auto',
 ): ViewTransition | undefined {
+	let updated = false
+	const applyUpdate = () => {
+		if (updated) {
+			return
+		}
+
+		updated = true
+		update()
+	}
 	const interrupt = (owner: HTMLElement, active: ActiveTransition) => {
-		active.interrupted = true
-		active.transition.skipTransition()
-		active.update()
+		if (active.kind === 'native') {
+			active.interrupted = true
+			active.transition.skipTransition()
+			active.update()
+		} else {
+			active.cancel()
+		}
+
 		activeByScope.delete(owner)
 		owner.removeAttribute('data-view-transition-active')
 
@@ -72,14 +98,54 @@ export function startScopedViewTransition(
 	}
 	const previous = activeByScope.get(scope)
 
-	if (previous) {
-		interrupt(scope, previous)
-		update()
+	if (
+		previous?.kind === 'live' &&
+		strategy === 'none' &&
+		typeof document !== 'undefined' &&
+		!matchMedia('(prefers-reduced-motion: reduce)').matches
+	) {
+		if (activeDocumentTransition?.document === document) {
+			interrupt(activeDocumentTransition.scope, activeDocumentTransition.active)
+		}
+
+		applyUpdate()
 
 		return
 	}
 
-	const enabled = strategy !== 'none' && canTransition()
+	if (
+		strategy === 'live' &&
+		typeof document !== 'undefined' &&
+		!matchMedia('(prefers-reduced-motion: reduce)').matches &&
+		activeDocumentTransition?.document !== document &&
+		(!previous || previous.kind === 'live')
+	) {
+		const live = prepareItemReorder(scope, applyUpdate, () => {
+			if (previous) {
+				interrupt(scope, previous)
+			}
+		})
+		const active: LiveActiveTransition = { kind: 'live', cancel: live.cancel }
+
+		activeByScope.set(scope, active)
+		void live.finished.then(() => {
+			if (activeByScope.get(scope) === active) {
+				live.cancel()
+				activeByScope.delete(scope)
+			}
+		})
+
+		return
+	}
+
+	if (previous) {
+		interrupt(scope, previous)
+		applyUpdate()
+
+		return
+	}
+
+	const enabled = strategy !== 'none' && strategy !== 'live' && canTransition()
 	// Element capture can hide overflow and clamp a scrolling ancestor's position.
 	const elementStart =
 		enabled && strategy === 'auto' && scope.startViewTransition && !hasHorizontalScroll(scope)
@@ -92,28 +158,19 @@ export function startScopedViewTransition(
 		activeDocumentTransition?.document === document
 	) {
 		interrupt(activeDocumentTransition.scope, activeDocumentTransition.active)
-		update()
+		applyUpdate()
 
 		return
 	}
 
 	if (!enabled) {
-		update()
+		applyUpdate()
 
 		return
 	}
 
 	scope.toggleAttribute('data-view-transition-active', true)
 
-	let updated = false
-	const applyUpdate = () => {
-		if (updated) {
-			return
-		}
-
-		updated = true
-		update()
-	}
 	let transition: ViewTransition
 
 	try {
@@ -127,7 +184,12 @@ export function startScopedViewTransition(
 		return
 	}
 
-	const active = { transition, update: applyUpdate, interrupted: false }
+	const active: NativeActiveTransition = {
+		kind: 'native',
+		transition,
+		update: applyUpdate,
+		interrupted: false,
+	}
 
 	activeByScope.set(scope, active)
 
