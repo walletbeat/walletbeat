@@ -2061,14 +2061,6 @@ ol {
 		);
 		result: --breadcrumb-clearance-stop(var(--y), var(--v));
 	}
-	@function --breadcrumb-arrival-stop(--t <number>) {
-		--v: calc(
-			var(---breadcrumb-clearance-view-size) +
-				(var(---breadcrumb-clearance-arrival-end) - var(---breadcrumb-clearance-view-size)) *
-				--breadcrumb-ease-time(var(--t))
-		);
-		result: --breadcrumb-ease-distance(var(--t)) --breadcrumb-cover-position(var(--v));
-	}
 	@function --breadcrumb-clearance-final() returns <number> {
 		--y: calc(
 			max(
@@ -3520,6 +3512,7 @@ ol {
 							--breadcrumb-clearance-pre(75.9375deg), --breadcrumb-clearance-pre(78.75deg),
 							--breadcrumb-clearance-pre(81.5625deg), --breadcrumb-clearance-pre(84.375deg),
 							--breadcrumb-clearance-pre(87.1875deg), --breadcrumb-clearance-pre(90deg);
+						---breadcrumb-endPaintEasing: var(--transition-easeInOutExpo);
 						---breadcrumb-clearance-full-x-easing: linear(
 							0 0%,
 							var(---breadcrumb-clearance-preStops),
@@ -3590,77 +3583,9 @@ ol {
 							--breadcrumb-clearance-post(1),
 							--breadcrumb-clearance-final() 100%
 						);
-						---breadcrumb-clearance-full-y-easing: linear(
-							0 0%,
-							--breadcrumb-arrival-stop(0),
-							--breadcrumb-arrival-stop(0.015625),
-							--breadcrumb-arrival-stop(0.03125),
-							--breadcrumb-arrival-stop(0.046875),
-							--breadcrumb-arrival-stop(0.0625),
-							--breadcrumb-arrival-stop(0.078125),
-							--breadcrumb-arrival-stop(0.09375),
-							--breadcrumb-arrival-stop(0.109375),
-							--breadcrumb-arrival-stop(0.125),
-							--breadcrumb-arrival-stop(0.140625),
-							--breadcrumb-arrival-stop(0.15625),
-							--breadcrumb-arrival-stop(0.171875),
-							--breadcrumb-arrival-stop(0.1875),
-							--breadcrumb-arrival-stop(0.203125),
-							--breadcrumb-arrival-stop(0.21875),
-							--breadcrumb-arrival-stop(0.234375),
-							--breadcrumb-arrival-stop(0.25),
-							--breadcrumb-arrival-stop(0.265625),
-							--breadcrumb-arrival-stop(0.28125),
-							--breadcrumb-arrival-stop(0.296875),
-							--breadcrumb-arrival-stop(0.3125),
-							--breadcrumb-arrival-stop(0.328125),
-							--breadcrumb-arrival-stop(0.34375),
-							--breadcrumb-arrival-stop(0.359375),
-							--breadcrumb-arrival-stop(0.375),
-							--breadcrumb-arrival-stop(0.390625),
-							--breadcrumb-arrival-stop(0.40625),
-							--breadcrumb-arrival-stop(0.421875),
-							--breadcrumb-arrival-stop(0.4375),
-							--breadcrumb-arrival-stop(0.453125),
-							--breadcrumb-arrival-stop(0.46875),
-							--breadcrumb-arrival-stop(0.484375),
-							--breadcrumb-arrival-stop(0.5),
-							--breadcrumb-arrival-stop(0.515625),
-							--breadcrumb-arrival-stop(0.53125),
-							--breadcrumb-arrival-stop(0.546875),
-							--breadcrumb-arrival-stop(0.5625),
-							--breadcrumb-arrival-stop(0.578125),
-							--breadcrumb-arrival-stop(0.59375),
-							--breadcrumb-arrival-stop(0.609375),
-							--breadcrumb-arrival-stop(0.625),
-							--breadcrumb-arrival-stop(0.640625),
-							--breadcrumb-arrival-stop(0.65625),
-							--breadcrumb-arrival-stop(0.671875),
-							--breadcrumb-arrival-stop(0.6875),
-							--breadcrumb-arrival-stop(0.703125),
-							--breadcrumb-arrival-stop(0.71875),
-							--breadcrumb-arrival-stop(0.734375),
-							--breadcrumb-arrival-stop(0.75),
-							--breadcrumb-arrival-stop(0.765625),
-							--breadcrumb-arrival-stop(0.78125),
-							--breadcrumb-arrival-stop(0.796875),
-							--breadcrumb-arrival-stop(0.8125),
-							--breadcrumb-arrival-stop(0.828125),
-							--breadcrumb-arrival-stop(0.84375),
-							--breadcrumb-arrival-stop(0.859375),
-							--breadcrumb-arrival-stop(0.875),
-							--breadcrumb-arrival-stop(0.890625),
-							--breadcrumb-arrival-stop(0.90625),
-							--breadcrumb-arrival-stop(0.921875),
-							--breadcrumb-arrival-stop(0.9375),
-							--breadcrumb-arrival-stop(0.953125),
-							--breadcrumb-arrival-stop(0.96875),
-							--breadcrumb-arrival-stop(0.984375),
-							--breadcrumb-arrival-stop(1),
-							1 100%
-						);
 
 						@media (prefers-reduced-motion: reduce) {
+							---breadcrumb-endPaintEasing: steps(1, end);
 							---breadcrumb-clearance-full-x-easing: linear(
 								0 0%,
 								var(---breadcrumb-clearance-preStops),
@@ -3678,12 +3603,6 @@ ol {
 									--breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
 								--breadcrumb-clearance-final() 100%
 							);
-							---breadcrumb-clearance-full-y-easing: linear(
-								0 0%,
-								0 --breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
-								1 --breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
-								1 100%
-							);
 						}
 
 						animation: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-full-x-easing)
@@ -3691,17 +3610,19 @@ ol {
 						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 						animation-range: cover -100% cover 100%;
 						--stickyBreadcrumb-endPaintAnimation: breadcrumb-clearance-block auto
-							var(---breadcrumb-clearance-full-y-easing) both;
-						--stickyBreadcrumb-endPaintRange: cover -100% cover 100%;
+							var(---breadcrumb-endPaintEasing) both;
+						--stickyBreadcrumb-endPaintRange: var(--stickyBreadcrumb-entryRange);
 						&[data-sticky-breadcrumb~="contents"] {
 							animation: none;
+							--stickyBreadcrumb-endPaintRange: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange);
 							--stickyBreadcrumb-endPaintAnimation:
 								breadcrumb-clearance-inline auto var(---breadcrumb-clearance-full-x-easing) both,
-								breadcrumb-clearance-block auto var(---breadcrumb-clearance-full-y-easing) both;
+								breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both;
 						}
 						&:not([data-sticky-breadcrumb~="contents"]) {
 							animation-name: breadcrumb-clearance-inline, breadcrumb-clearance-block;
-							animation-timing-function: var(---breadcrumb-clearance-full-x-easing), var(---breadcrumb-clearance-full-y-easing);
+							animation-range: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange);
+							animation-timing-function: var(---breadcrumb-clearance-full-x-easing), var(---breadcrumb-endPaintEasing);
 						}
 						> *,
 						&::after {
