@@ -2226,5 +2226,9 @@
 	"src/assets/fonts/wbicons-simple/wbicons-simple.svg": {
 		"hash": "dd6af0f59536199f4c1e5c9b9769c046d411d80ed94eb2968adade7e8a6892c0",
 		"passedTests": ["file-format"]
+	},
+	"tests/browser/fixtures/wide-wallet.svg": {
+		"hash": "5a5c57cf3b58ac167529042d92f5e2922c205409b72d5cee6be299b6c80b9d62",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	}
 }
