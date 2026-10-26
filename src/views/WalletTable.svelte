@@ -17,6 +17,7 @@
 	// Types/constants
 	import { applyFilterSets, changeFilterChoice, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
 	import { hasVisiblePopoverInvoker, interest } from '@/components/interest'
+	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import type { Column } from '@/components/Table.svelte'
 	import { startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
 	import type { Ladders } from '@/schema/ladders'
@@ -1083,6 +1084,27 @@
 
 					<TooltipOrAccordion
 						class="wallet-info-details"
+						onclick={event => {
+							const details = event.currentTarget
+							const cell = details.parentElement
+
+							if (
+								!interactive || event.defaultPrevented || !cell
+								|| !(event.target instanceof Element)
+								|| event.target.closest('summary')?.parentElement !== details
+								|| event.target.closest('a, button, input, select, textarea, [contenteditable]')
+								|| tooltipUsesDrawer()
+							) return
+
+							const nextOpen = !details.open
+							event.preventDefault()
+							details.setAttribute('data-view-transition', 'item')
+							try {
+								startScopedViewTransition(cell, () => setIsExpanded(nextOpen), 'live')
+							} finally {
+								details.removeAttribute('data-view-transition')
+							}
+						}}
 						bind:isExpanded={
 							() => isExpanded,
 							setIsExpanded
@@ -2032,6 +2054,10 @@
 					&:not(:has(> details[open] > [popover]:not(:popover-open))) {
 						transition-property: vertical-align;
 						transition-delay: 0.25s;
+
+						&:has(> details.wallet-info-details[data-view-transition~="item"]) {
+							transition-property: none;
+						}
 					}
 
 					&:has(> details[open] > [popover]:not(:popover-open)) {
@@ -2040,6 +2066,10 @@
 				}
 
 				details.wallet-info-details {
+					&[data-layout-transition="after"] {
+						transition-property: gap, translate;
+					}
+
 					summary {
 						box-sizing: content-box;
 						margin: calc(-1 * var(--table-cell-padding));
