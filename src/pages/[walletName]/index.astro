@@ -3,7 +3,7 @@
 import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
-import { walletOgImage } from '@/utils/wallet-og-image'
+import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
 
 // Routes
 export const prerender = true
@@ -21,6 +21,7 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
+const walletIcon = await getWalletIcon(wallet.metadata)
 const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
 
 if (walletEntry === undefined) {
@@ -58,7 +59,12 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container>
-		<WalletPageContext walletId={wallet.metadata.id} codeSnippets={codeSnippets} client:idle />
+	<main data-column-item='flexible'>
+		<WalletPageContext
+			{walletIcon}
+			walletId={wallet.metadata.id}
+			codeSnippets={codeSnippets}
+			client:idle
+		/>
 	</main>
 </Layout>
