@@ -3,6 +3,8 @@ export type FilterChoice<Item, ChoiceId extends string = string> = {
 	label: string
 	compactLabel?: string
 	icon?: string
+	/** Native navigation when the choice has a server-rendered destination. */
+	href?: string
 	matches?: (item: Item) => boolean
 }
 
