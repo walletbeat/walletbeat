@@ -500,7 +500,7 @@
 				<tr>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
-							{@render headerCell(column, level)}
+							{@render headerCell(column, level, index)}
 						{:else if !expandHeaderCells}
 							<th class="blank-cell"></th>
 						{/if}
@@ -512,12 +512,13 @@
 				{/if}
 			{/snippet}
 
-			{#snippet headerCell(column: _Column, level: number)}
+			{#snippet headerCell(column: _Column, level: number, index: number)}
 				{@const colspan = getColumnSpan(column)}
 				{@const isSortable = !!column.sort}
 				{@const isExpandable = !!column.subcolumns?.length}
 				{@const isExpanded = table.isColumnExpanded(column.id)}
 				{@const hasHeaderExtra = !!column.HeaderExtra}
+				{@const sortButtonId = `${id}-sort-${level}-${index}`}
 
 				<th
 					{colspan}
@@ -556,10 +557,12 @@
 						<div data-sticky-container>
 							{#if isSortable}
 								<div class="sort-label" data-pressable="to-containing">
+									<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
 									<span data-sticky="backdrop-before backdrop-stuck">
 										{@render HeaderTitle()}
 
 										<button
+											id={sortButtonId}
 											type="button"
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
@@ -818,6 +821,22 @@
 
 							padding: var(--table-cell-padding);
 
+							.sort-hit-area {
+								position: absolute;
+								inset: 0;
+							}
+
+							> span[data-sticky] {
+								pointer-events: none;
+
+								:global(
+									[data-pressable], [role='button'], summary, a, select, button, input,
+									textarea, label, dialog, [contenteditable], [tabindex], [popover]
+								) {
+									pointer-events: auto;
+								}
+							}
+
 							.sort-button {
 								margin-inline-start: 0.5em;
 								display: inline-block;
@@ -1061,4 +1080,5 @@
 			padding: var(--table-cell-padding);
 		}
 	}
+
 </style>
