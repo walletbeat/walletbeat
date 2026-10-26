@@ -1,0 +1,29 @@
+---
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+import type { StageQualificationId } from '@/views/wallet-table-stage'
+
+type Props = {
+	initialStageSelection?: StageQualificationId
+}
+
+const { initialStageSelection } = Astro.props
+---
+
+<Layout
+	metadata={{
+		title: 'Ethereum Wallets - Walletbeat',
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<main data-column-item='flexible' data-sticky-container data-scroll-item='inline-attached'>
+		<SoftwareWalletTable
+			client:load
+			title='Software Wallets'
+			{initialStageSelection}
+			stageNavigationBase='/wallet/summary/'
+		/>
+	</main>
+</Layout>

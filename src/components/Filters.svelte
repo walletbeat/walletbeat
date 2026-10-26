@@ -98,7 +98,6 @@
 
 		{#if choices.filter(choice => choice.id).length > 1}
 			<fieldset
-				disabled={!interactive}
 				data-filter-set={set.id}
 				data-panel-member={!visibleSetIds || visibleSetIds.includes(set.id) ? '' : undefined}
 				data-cardinality={set.cardinality}
@@ -112,28 +111,35 @@
 
 				<div class="choices" data-column="gap-1">
 					{#each choices as choice (choice.id)}
+						{@const navigates = !interactive && choice.href !== undefined}
 						{@const checked = activeChoices.has(choice)}
 						{@const activeIndex = activeInSet.indexOf(choice)}
 						{@const count = choiceCount(set, choice)}
-						<label
+						<svelte:element
+							this={navigates ? 'a' : 'label'}
+							href={navigates ? choice.href : undefined}
+							aria-current={navigates && checked ? 'page' : undefined}
+							data-input={navigates ? '' : undefined}
+							data-link={navigates ? 'camouflaged' : undefined}
 							data-filter-choice={choice.id || 'all'}
 							data-has-icon={choice.icon ? '' : undefined}
 							data-active-choice={checked && choice.id ? '' : undefined}
 							data-row="gap-3"
 							style:--active-index={activeIndex}
 						>
-							<input
+							{#if !navigates}<input
 								type={set.cardinality === 'exclusive' ? 'radio' : 'checkbox'}
 								name={set.id}
 								value={choice.id}
 								defaultChecked={defaultChoices.has(choice)}
 								{checked}
+									disabled={!interactive}
 								onchange={() => {
 									updateFilters(() => {
 										activeChoices = changeFilterChoice(filterSets, activeChoices, choice)
 									})
 								}}
-							/>
+							/>{/if}
 
 							<span
 								class="choice-icon-helipad"
@@ -146,7 +152,7 @@
 
 							<span class="label" data-row-item="flexible">{choice.label}</span>
 							<span class="count"><span hidden>(</span>{count}<span hidden>)</span></span>
-						</label>
+						</svelte:element>
 					{/each}
 				</div>
 			</fieldset>
@@ -221,7 +227,7 @@
 
 		&:hover { background-color: color-mix(in srgb, currentColor 10%, transparent); }
 
-		&:has(input:checked) {
+		&:is(:has(input:checked), [aria-current="page"]) {
 			background-color: var(--accent-backgroundColor);
 			border-color: var(--accent);
 			color: var(--accent);
@@ -391,7 +397,7 @@
 		line-height: 1;
 	}
 
-	label:has(input:checked) .count {
+	:is(label:has(input:checked), a[aria-current="page"]) .count {
 		background-color: var(--accent);
 		color: var(--accent-backgroundColor);
 	}
