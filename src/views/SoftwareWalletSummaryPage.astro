@@ -10,6 +10,7 @@ type Props = {
 }
 
 const { initialStageSelection } = Astro.props
+const summaryHref = '/wallet/summary/'
 ---
 
 <Layout
@@ -17,13 +18,13 @@ const { initialStageSelection } = Astro.props
 		title: 'Ethereum Wallets - Walletbeat',
 	}}
 >
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} currentHref={summaryHref} />
 	<main data-column-item='flexible' data-sticky-container data-scroll-item='inline-attached'>
 		<SoftwareWalletTable
 			client:load
 			title='Software Wallets'
 			{initialStageSelection}
-			stageNavigationBase='/wallet/summary/'
+			stageNavigationBase={summaryHref}
 		/>
 	</main>
 </Layout>
