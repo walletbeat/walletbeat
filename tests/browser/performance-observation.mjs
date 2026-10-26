@@ -1,6 +1,6 @@
 /**
  * @typedef {{frames: number[], longTasks: {startTime:number,duration:number,name:string,attribution:{name:string,containerType:string,containerName:string}[]}[],scrolls:{time:number,top:number}[],stopped:boolean,instrumentation:string,profileStart?:number}} PerformanceCapture
- * @typedef {{name?:string,cat?:string,ts?:number,dur?:number,args?:unknown,pid?:number,ph?:string,id?:unknown,id2?:unknown}} TraceEvent
+ * @typedef {{name?:string,cat?:string,ts?:number,dur?:number,args?:unknown,pid?:number,ph?:string,id?:unknown,id2?:unknown,scope?:unknown}} TraceEvent
  */
 export function installPerformanceObservation() {
 	/** @type {PerformanceCapture} */
@@ -149,9 +149,8 @@ export function summarizeChromeTrace(trace) {
 			throw new Error('Chrome trace event must be an object')
 		}
 
-		const { name, cat, ts, dur, args, pid, ph, id, id2 } = /** @type {Record<string, unknown>} */ (
-			value
-		)
+		const { name, cat, ts, dur, args, pid, ph, id, id2, scope } =
+			/** @type {Record<string, unknown>} */ (value)
 
 		if (
 			(name !== undefined && typeof name !== 'string') ||
@@ -164,7 +163,7 @@ export function summarizeChromeTrace(trace) {
 			throw new Error('Invalid Chrome trace event fields')
 		}
 
-		return { name, cat, ts, dur, args, pid, ph, id, id2 }
+		return { name, cat, ts, dur, args, pid, ph, id, id2, scope }
 	})
 	/** @type {Record<string, number>} */
 	const counts = {}
@@ -213,36 +212,51 @@ export function summarizeChromeTrace(trace) {
 		inspect(event.args, '', event)
 	}
 
-	/** @type {Map<string, {identity:string, starts:{timestampMicros:number|undefined,data:unknown}[], reports:{timestampMicros:number|undefined,flags:unknown}[]}>} */
-	const actors = new Map()
+	/** @typedef {{identity:string, starts:{timestampMicros:number,data:unknown}[], reports:{timestampMicros:number,flags:unknown}[], endTimestampMicros:number|null}} AnimationLifetime */
+	/** @type {AnimationLifetime[]} */
+	const actors = []
+	/** @type {Map<string, AnimationLifetime>} */
+	const active = new Map()
 	let unattributedAnimationEvents = 0
 
-	for (const event of events) {
-		if (event.name !== 'Animation') {
-			continue
-		}
-
+	// Trace batches can arrive out of timestamp order; stable ties retain capture order.
+	for (const event of events
+		.filter(event => event.name === 'Animation')
+		.sort((a, b) => (a.ts ?? Infinity) - (b.ts ?? Infinity))) {
 		const scoped = event.id2 && typeof event.id2 === 'object' ? event.id2 : null
 		const local = scoped && 'local' in scoped ? scoped.local : event.id
 		const global = scoped && 'global' in scoped ? scoped.global : undefined
 		/** @param {unknown} value */
-		const validId = value => typeof value === 'string' || typeof value === 'number'
-		const identity = validId(global)
-			? `global:${global}`
-			: validId(local) && typeof event.pid === 'number'
-				? `${event.pid}:${local}`
-				: null
+		const validId = value =>
+			typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value))
+		const scope = event.scope === undefined ? '' : event.scope
 
-		if (identity === null) {
+		if (typeof scope !== 'string') {
 			unattributedAnimationEvents++
 			continue
 		}
 
-		let actor = actors.get(identity)
+		const identity = validId(global)
+			? JSON.stringify(['global', global, scope])
+			: validId(local) && typeof event.pid === 'number' && Number.isFinite(event.pid)
+				? JSON.stringify(['local', event.pid, local, scope])
+				: null
 
-		if (!actor) {
-			actor = { identity, starts: [], reports: [] }
-			actors.set(identity, actor)
+		if (identity === null || typeof event.ts !== 'number' || !Number.isFinite(event.ts)) {
+			unattributedAnimationEvents++
+			continue
+		}
+
+		let actor = active.get(identity)
+
+		if (event.ph === 'b' || !actor) {
+			if (actor) {
+				actor.endTimestampMicros = event.ts
+			}
+
+			actor = { identity, starts: [], reports: [], endTimestampMicros: null }
+			actors.push(actor)
+			active.set(identity, actor)
 		}
 
 		const args = event.args && typeof event.args === 'object' ? event.args : null
@@ -255,6 +269,11 @@ export function summarizeChromeTrace(trace) {
 		if (data && typeof data === 'object' && 'compositeFailed' in data) {
 			actor.reports.push({ timestampMicros: event.ts, flags: data.compositeFailed })
 		}
+
+		if (event.ph === 'e') {
+			actor.endTimestampMicros = event.ts
+			active.delete(identity)
+		}
 	}
 
 	return {
@@ -262,8 +281,8 @@ export function summarizeChromeTrace(trace) {
 		counts,
 		durationMicros,
 		reasons,
-		animationCompositing: { actors: [...actors.values()], unattributedAnimationEvents },
+		animationCompositing: { actors, unattributedAnimationEvents },
 		interpretation:
-			'Native Chrome event names and reason fields are retained verbatim. Zero flags are neutral reports; repeated starts require timestamp-based lifetime attribution. Missing reason events do not certify compositor-only execution; event availability depends on the actual browser build and trace categories.',
+			'Native Chrome event names and reason fields are retained verbatim. Zero flags are neutral reports; each actor entry is one timestamp-ordered tracking lifetime, retaining native begin data; entries without starts have unresolved ownership. Missing reason events do not certify compositor-only execution; event availability depends on the actual browser build and trace categories.',
 	}
 }
