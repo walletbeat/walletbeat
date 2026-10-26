@@ -165,7 +165,7 @@
 										</summary>
 
 										<div class="wallet-card-content" data-column="gap-3">
-											<ReferenceLinks references={card.references} cardBackground="secondary" />
+											<ReferenceLinks headingLevel={5} references={card.references} cardBackground="secondary" />
 
 											<div class="card-meta" data-row="wrap gap-3">
 												{#if lastVerified}

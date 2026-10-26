@@ -1,15 +1,18 @@
 <script lang="ts">
+	import type { ImageMetadata } from 'astro'
 	import { allRatedWalletsBySlug, attributeTreeForWallet } from '@/data/wallets'
 	import { allWalletLadders } from '@/schema/ladders'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 	import WalletPage from './WalletPage.svelte'
 
 	const {
+		walletIcon,
 		walletId,
 		showStage = true,
 		showScores = false,
 		codeSnippets = {},
 	}: {
+		walletIcon: ImageMetadata,
 		walletId: string,
 		showStage?: boolean,
 		showScores?: boolean,
@@ -33,6 +36,7 @@
 </script>
 
 <WalletPage
+	{walletIcon}
 	ladders={allWalletLadders}
 	{attributeTree}
 	{wallet}

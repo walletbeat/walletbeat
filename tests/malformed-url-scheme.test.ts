@@ -49,14 +49,40 @@ interface MalformedUrl {
 	line: number
 }
 
+/** Locate delimiters before matching so long non-URL spans are scanned only once. */
+function* findLineUrls(lineText: string) {
+	const lineRe = new RegExp(URL_RE.source, 'y')
+	const schemeCharacter = /[a-zA-Z0-9+.-]/
+	const schemeInitial = /[a-zA-Z]/
+	let cursor = 0
+	let delimiter: number
+
+	while ((delimiter = lineText.indexOf('://', cursor)) !== -1) {
+		let start = delimiter
+
+		while (start > 0 && schemeCharacter.test(lineText[start - 1])) {
+			start--
+		}
+		while (start < delimiter && !schemeInitial.test(lineText[start])) {
+			start++
+		}
+		lineRe.lastIndex = start
+		const match = start < delimiter ? lineRe.exec(lineText) : null
+
+		if (match) {
+			yield match
+			cursor = lineRe.lastIndex
+		} else {
+			cursor = delimiter + 3
+		}
+	}
+}
+
 function findMalformedUrls(source: string): MalformedUrl[] {
 	const malformed: MalformedUrl[] = []
 
 	source.split('\n').forEach((lineText, lineIndex) => {
-		const lineRe = new RegExp(URL_RE.source, 'g')
-		let match: RegExpExecArray | null
-
-		while ((match = lineRe.exec(lineText)) !== null) {
+		for (const match of findLineUrls(lineText)) {
 			const scheme = match[1]
 
 			// An unrecognized scheme means the URL is malformed (e.g. a typo such
@@ -75,6 +101,57 @@ function findMalformedUrls(source: string): MalformedUrl[] {
 
 	return malformed
 }
+
+describe('source URL recognition', () => {
+	it('preserves global URL recognition and line indices across delimiters and scheme boundaries', () => {
+		const spans = ['', '0', '+.-123', 'abc', 'a-b.C+0', '_', 'é', 'a/b', 'a:b', '\t']
+		const suffixes = ['', 'host', 'a://nested', 'host/path', 'host]tail', 'host"tail', 'host\nnext']
+		const sources = spans.flatMap(prefix =>
+			suffixes.map(suffix => `${prefix}://${suffix} bad://tail`),
+		)
+
+		for (const source of sources) {
+			const actual = source.split('\n').flatMap((line, index) =>
+				[...findLineUrls(line)].map(match => ({
+					url: match[0],
+					scheme: match[1],
+					index: match.index,
+					line: index + 1,
+				})),
+			)
+			const expected = source.split('\n').flatMap((line, index) =>
+				[...line.matchAll(new RegExp(URL_RE.source, 'g'))].map(match => ({
+					url: match[0],
+					scheme: match[1],
+					index: match.index,
+					line: index + 1,
+				})),
+			)
+
+			expect(actual).toEqual(expected)
+		}
+	})
+
+	it('handles long scheme-free spans after an earlier URL and around later URLs', () => {
+		const payload = 'a'.repeat(1_000_000)
+		const source = `<svg xmlns="http://www.w3.org/2000/svg" data="${payload}"/>\n${payload}\n"ftp://later" ${payload}`
+
+		expect(findMalformedUrls(source)).toEqual([
+			{ url: 'ftp://later', reason: 'unrecognized scheme "ftp://"', line: 3 },
+		])
+	})
+
+	it('validates recognized schemes without reinterpreting nested URL delimiters', () => {
+		expect(
+			findMalformedUrls(
+				'HTTPS://*/* ws://socket\n123ftp://host "https://outer/ftp://nested" ftp://last',
+			),
+		).toEqual([
+			{ url: 'ftp://host', reason: 'unrecognized scheme "ftp://"', line: 2 },
+			{ url: 'ftp://last', reason: 'unrecognized scheme "ftp://"', line: 2 },
+		])
+	})
+})
 
 describe('URLs in authored source must be well-formed', async () => {
 	const fileMap = new Map<string, MalformedUrl[]>()

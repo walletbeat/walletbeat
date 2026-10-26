@@ -6,7 +6,7 @@ import {
 } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { setContains } from '@/types/utils/non-empty'
+import { nonEmptySetFromArray, setContains } from '@/types/utils/non-empty'
 
 /**
  * Get the primary stage and ladder evaluation for a wallet.
@@ -70,12 +70,18 @@ function getCanonicalLadderEvaluation(
 	return ladder ? evaluateWalletOnLadder(wallet, ladder) : undefined
 }
 
-export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
+export function getWalletStageAndLadder(
+	wallet: RatedWalletStageSlice,
+	walletType?: WalletType,
+): {
 	stage: WalletLadderEvaluation<string>['stage'] | null
 	ladderEvaluation: WalletLadderEvaluation<string> | null
 	ladderType: WalletLadderType | null
 } {
-	if (wallet.types === undefined) {
+	if (
+		wallet.types === undefined ||
+		(walletType !== undefined && !setContains(wallet.types, walletType))
+	) {
 		return {
 			stage: null,
 			ladderEvaluation: null,
@@ -83,8 +89,18 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 		}
 	}
 
+	const acceptsType = (ladderType: WalletLadderType): boolean =>
+		walletType === undefined ||
+		allWalletLadders[ladderType].applicableTo({
+			...wallet,
+			types: nonEmptySetFromArray([walletType]),
+		})
+
 	// Prioritize SOFTWARE ladder if the wallet is a software wallet
-	if (setContains<WalletType>(wallet.types, WalletType.SOFTWARE)) {
+	if (
+		setContains<WalletType>(wallet.types, WalletType.SOFTWARE) &&
+		acceptsType(WalletLadderType.SOFTWARE)
+	) {
 		const softwareLadder = getCanonicalLadderEvaluation(wallet, WalletLadderType.SOFTWARE)
 
 		if (softwareLadder && softwareLadder.stage !== 'NOT_APPLICABLE') {
@@ -98,6 +114,10 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 
 	// Otherwise, return the first applicable ladder evaluation
 	for (const ladderType of Object.values(WalletLadderType)) {
+		if (!acceptsType(ladderType)) {
+			continue
+		}
+
 		const ladderEvaluation = getCanonicalLadderEvaluation(wallet, ladderType)
 
 		if (ladderEvaluation === undefined || ladderEvaluation.stage === 'NOT_APPLICABLE') {
