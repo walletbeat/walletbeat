@@ -288,15 +288,19 @@ declare global {
 		/**
 		 * ## [data-layout-transition]
 		 *
-		 * Live position interpolation for retained HTML items. `startScopedViewTransition` with strategy `live` owns
-		 * this temporary attribute and its native box inputs; controls remain in the live
-		 * document throughout the transition. Layout and scroll remain native.
+		 * Live position interpolation for retained HTML items and uniquely named replacement peers.
+		 * `startScopedViewTransition` with strategy `live` owns this temporary attribute and
+		 * its native box inputs; controls remain in the live document. Layout and scroll remain native.
 		 *
 		 * ### Placement
-		 * Mark retained items with `data-view-transition="item"` inside the helper's scope.
-		 * Only outermost participants move, so a nested participant does not move twice.
-		 * Items and ancestors use an unscaled, axis-aligned coordinate space. Items reserve
-		 * CSS `translate` for this motion.
+		 * Mark retained items with `data-view-transition="item"` and replacement HTML peers with
+		 * `data-view-transition="named"` and a unique `--view-transition-name` inside the helper's scope.
+		 * Keep identities declared across updates that should preserve continuity. Missing or duplicate
+		 * names are excluded from live matching. Nested peers subtract their matched ancestor's movement
+		 * and use one CSS-configured native clock for the update. Items and ancestors use an
+		 * unscaled, axis-aligned coordinate space. Motion owners reserve CSS `translate` and their
+		 * CSS animation list. Put independently animated controls inside these neutral owners;
+		 * their opacity, scale and other effects remain separate.
 		 *
 		 * ### Tokens
 		 * - `before`: Commit the old position in the updated layout without interpolation.
@@ -307,6 +311,12 @@ declare global {
 		 * - `--layoutTransition-beforeY`: Old native viewport y-coordinate; does not inherit.
 		 * - `--layoutTransition-afterX`: New native viewport x-coordinate; does not inherit.
 		 * - `--layoutTransition-afterY`: New native viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-parentBeforeX`: Matched ancestor's old viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-parentBeforeY`: Matched ancestor's old viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-parentAfterX`: Matched ancestor's new viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-parentAfterY`: Matched ancestor's new viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-duration`: Motion duration in milliseconds, configured on the update scope; defaults to 250. Zero disables live motion.
+		 * - `--layoutTransition-easing`: Motion easing, configured on the update scope; defaults to the global exit easing.
 		 *
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-layout-transition]`
@@ -982,14 +992,14 @@ declare global {
 		/**
 		 * ## [data-view-transition]
 		 *
-		 * Stable element identity inside a same-document View Transition started by `startScopedViewTransition`. Callers mark transition participants with this attribute; the helper owns the temporary `[data-view-transition-active]` scope marker so the document fallback does not capture unrelated UI.
+		 * Semantic participant identity for native capture and live position transitions started by `startScopedViewTransition`. The helper owns the temporary `[data-view-transition-active]` scope marker so native document capture stays local.
 		 *
 		 * ### Placement
 		 * - On an element inside the scope passed to `startScopedViewTransition`, or on that scope element itself.
 		 *
 		 * ### Tokens
 		 * - `item`: preserves the identity of an element that survives the update.
-		 * - `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`.
+		 * - `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`; live HTML peers require unique names in the scope.
 		 *
 		 * ### CSS Variables
 		 * - `--view-transition-name`: unique `<custom-ident>` required by `named`.

@@ -28,6 +28,8 @@ const transition = ({
 
 class TestScope {
 	attributes = new Set<string>()
+	layoutDuration = 250
+	layoutEasing = 'ease-out'
 	parentElement: TestScope | null = null
 	scrollLeft = 0
 	scrollWidth = 0
@@ -42,22 +44,57 @@ class TestScope {
 	})
 }
 
+class TestItemEffect {
+	target: TestScope | null = null
+	pseudoElement: string | null = null
+}
+
 class TestItemMotion {
-	transitionProperty = 'translate'
+	transitionProperty = ''
+	animationName = 'layout-transition'
+	startTime: Animation['startTime'] = null
+	effect = new TestItemEffect()
 	finish!: () => void
 	finished = new Promise<void>(resolve => {
 		this.finish = resolve
 	})
+	cancel = vi.fn(() => this.finish())
 }
 
 class TestLayoutItem extends TestScope {
+	x = 0
 	y = 0
+	name: string | undefined
 	motion = new TestItemMotion()
+	extraMotions: TestItemMotion[] = []
 	style = { setProperty: vi.fn(), removeProperty: vi.fn() }
+	matches = () => this.name !== undefined
 	setAttribute = (name: string) => this.attributes.add(name)
-	getBoundingClientRect = () => ({ x: 0, y: this.y })
-	getAnimations = () => [this.motion]
+	getBoundingClientRect = () => ({ x: this.x, y: this.y })
+	getAnimations = () => {
+		this.motion.effect.target = this
+
+		return [this.motion, ...this.extraMotions]
+	}
 }
+
+const layoutStyle = (item: TestScope) => ({
+	getPropertyValue: (name: string) => {
+		if (name === '--layoutTransition-duration') {
+			return String(item.layoutDuration)
+		}
+
+		if (name === '--layoutTransition-easing') {
+			return item.layoutEasing
+		}
+
+		if (name === '--view-transition-name' && item instanceof TestLayoutItem) {
+			return item.name ?? ''
+		}
+
+		return '0px'
+	},
+})
 
 function htmlElement(node: TestScope) {
 	if (!(node instanceof HTMLElement)) {
@@ -73,6 +110,9 @@ const installEnvironment = ({ reducedMotion = false } = {}) => {
 	vi.stubGlobal('CSS', { supports: () => true })
 	vi.stubGlobal('matchMedia', () => ({ matches: reducedMotion }))
 	vi.stubGlobal('HTMLElement', TestScope)
+	vi.stubGlobal('KeyframeEffect', TestItemEffect)
+	vi.stubGlobal('CSSAnimation', TestItemMotion)
+	vi.stubGlobal('getComputedStyle', layoutStyle)
 	vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
 		queueMicrotask(() => callback(0))
 
@@ -80,6 +120,7 @@ const installEnvironment = ({ reducedMotion = false } = {}) => {
 	})
 	vi.stubGlobal('cancelAnimationFrame', vi.fn())
 	vi.stubGlobal('document', {
+		timeline: { currentTime: 0 },
 		startViewTransition: vi.fn((update: () => void) => {
 			update()
 
@@ -95,10 +136,112 @@ afterEach(() => {
 })
 
 describe('startScopedViewTransition', () => {
+	it('composes nested replacement peers with one CSS-configured native clock', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		const root = new TestScope()
+		const parent = new TestLayoutItem()
+
+		parent.x = 10
+		parent.y = 20
+		let child = new TestLayoutItem()
+
+		child.name = 'peer'
+		child.x = 20
+		child.y = 30
+		child.parentElement = parent
+		let leaf = new TestLayoutItem()
+
+		leaf.name = 'leaf'
+		leaf.x = 25
+		leaf.y = 35
+		leaf.parentElement = child
+		const oldChild = child
+		const unrelated = new TestItemMotion()
+
+		unrelated.transitionProperty = 'translate'
+		unrelated.effect.target = parent
+		unrelated.effect.pseudoElement = '::before'
+		parent.extraMotions.push(unrelated)
+		Object.assign(root, { querySelectorAll: () => [parent, child, leaf] })
+
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				parent.x = 40
+				parent.y = 120
+				child = new TestLayoutItem()
+				child.name = 'peer'
+				child.x = 70
+				child.y = 140
+				child.parentElement = parent
+				leaf = new TestLayoutItem()
+				leaf.name = 'leaf'
+				leaf.x = 25
+				leaf.y = 35
+				leaf.parentElement = child
+			},
+			'live',
+		)
+
+		expect(oldChild.style.setProperty).not.toHaveBeenCalled()
+		expect(child.style.setProperty).toHaveBeenCalledWith('--layoutTransition-beforeX', '20px')
+		expect(child.style.setProperty).toHaveBeenCalledWith('--layoutTransition-parentAfterY', '120px')
+		expect(leaf.style.setProperty).toHaveBeenCalledWith('--layoutTransition-parentBeforeX', '20px')
+		expect(leaf.style.setProperty).toHaveBeenCalledWith('--layoutTransition-parentAfterX', '70px')
+		await Promise.resolve()
+		await Promise.resolve()
+
+		for (const item of [parent, child, leaf]) {
+			expect(item.motion.startTime).toBe(0)
+			expect(item.style.setProperty).toHaveBeenCalledWith('--layoutTransition-duration', '250')
+			expect(item.style.setProperty).toHaveBeenCalledWith('--layoutTransition-easing', 'ease-out')
+		}
+		parent.motion.finish()
+		child.motion.finish()
+		leaf.motion.finish()
+		await vi.waitFor(() => expect(leaf.attributes).not.toContain('data-layout-transition'))
+		expect(unrelated.cancel).not.toHaveBeenCalled()
+	})
+
+	it('excludes ambiguous named peers and non-HTML nodes without losing retained items', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		const root = new TestScope()
+		const retained = new TestLayoutItem()
+		const first = new TestLayoutItem()
+
+		first.name = 'duplicate'
+		const second = new TestLayoutItem()
+
+		second.name = 'duplicate'
+		const replacement = new TestLayoutItem()
+
+		replacement.name = 'duplicate'
+		const foreign = { getBoundingClientRect: vi.fn() }
+		let peers = [first, second]
+
+		Object.assign(root, { querySelectorAll: () => [retained, ...peers, foreign] })
+
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				retained.y = 100
+				peers = [replacement]
+			},
+			'live',
+		)
+
+		expect(retained.attributes).toContain('data-layout-transition')
+		expect(replacement.style.setProperty).not.toHaveBeenCalled()
+		expect(foreign.getBoundingClientRect).not.toHaveBeenCalled()
+		retained.motion.finish()
+		await vi.waitFor(() => expect(retained.attributes).not.toContain('data-layout-transition'))
+	})
+
 	it('cancels pending frame activation without losing either update', async () => {
 		installEnvironment()
 		vi.stubGlobal('CSSTransition', TestItemMotion)
-		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
 		let activate!: FrameRequestCallback
 		const cancelFrame = vi.fn()
 
@@ -110,7 +253,6 @@ describe('startScopedViewTransition', () => {
 		vi.stubGlobal('cancelAnimationFrame', cancelFrame)
 		const root = new TestScope()
 		const item = new TestLayoutItem()
-		const animations = vi.spyOn(item, 'getAnimations')
 		const first = vi.fn(() => {
 			item.y = 100
 		})
@@ -118,7 +260,7 @@ describe('startScopedViewTransition', () => {
 
 		Object.assign(root, { querySelectorAll: () => [item] })
 		startScopedViewTransition(htmlElement(root), first, 'live')
-		expect(animations).not.toHaveBeenCalled()
+		expect(item.motion.startTime).toBeNull()
 		vi.stubGlobal('matchMedia', () => ({ matches: true }))
 		startScopedViewTransition(htmlElement(root), direct, 'none')
 		activate(0)
@@ -127,14 +269,13 @@ describe('startScopedViewTransition', () => {
 		expect(first).toHaveBeenCalledOnce()
 		expect(direct).toHaveBeenCalledOnce()
 		expect(cancelFrame).toHaveBeenCalledWith(7)
-		expect(animations).not.toHaveBeenCalled()
+		expect(item.motion.startTime).toBeNull()
 		expect(item.attributes).not.toContain('data-layout-transition')
 	})
 
 	it('preserves live item motion during a direct update', async () => {
 		installEnvironment()
 		vi.stubGlobal('CSSTransition', TestItemMotion)
-		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
 		const root = new TestScope()
 		const item = new TestLayoutItem()
 		const reorder = vi.fn(() => {
@@ -156,7 +297,6 @@ describe('startScopedViewTransition', () => {
 	it('keeps a replacement live generation when an old completion arrives', async () => {
 		installEnvironment()
 		vi.stubGlobal('CSSTransition', TestItemMotion)
-		vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '0px' }))
 		const root = new TestScope()
 		const item = new TestLayoutItem()
 		const oldMotion = item.motion
