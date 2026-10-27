@@ -1,0 +1,14 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import TableSortNavigation, { modes } from './TableSortNavigation.svelte'
+
+export function getStaticPaths() {
+	return modes.map(mode => ({ params: { mode }, props: { mode } }))
+}
+
+const { mode } = Astro.props
+---
+
+<Layout metadata={{ title: 'Native table sort navigation fixture' }}>
+	<TableSortNavigation {mode} client:load />
+</Layout>
