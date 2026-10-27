@@ -2957,6 +2957,11 @@
 		[data-sticky-breadcrumb~="root"] {
 			grid-template: "Header Nav" auto "Content Nav" 1fr / minmax(0, 1fr) auto;
 			> .wallet-header-flow { grid-area: Header; }
+			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+				grid-area: Header;
+				block-size: auto;
+				inset-block-end: 0;
+			}
 			@media (width <= 1024px) {
 				grid-template: "Header" "Nav" "Content" / minmax(0, 1fr);
 			}
