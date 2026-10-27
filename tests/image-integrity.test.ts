@@ -80,7 +80,11 @@ interface CleanImageEntry {
  */
 const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
+<<<<<<< HEAD
 	'resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg',
+=======
+	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
+>>>>>>> 1985d8449f7e20a2c069a0286557d84a3243fe1f
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
