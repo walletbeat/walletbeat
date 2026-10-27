@@ -1,4 +1,4 @@
-What does ecosystem alignment actually looks like in practice? 
+What does ecosystem alignment actually look like in practice? 
 
 Beyond CROPS, there are a few things that are valuable for wallets to have. But they don't neatly fit into any of the CROPS values. And they're all generally around making sure that the wallet plays well in the Ethereum wallet ecosystem. 
 
