@@ -1,0 +1,40 @@
+{
+	"highlightRanges": [
+		{
+			"first": 39,
+			"last": 46
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  dep-age:"
+			],
+			"startLine": 17
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 24
+		},
+		{
+			"lines": [
+				"",
+				"      - name: Install dependencies (frozen lockfile)",
+				"        run: yarn install --frozen-lockfile",
+				"",
+				"      - name: Dependency age check",
+				"        shell: bash",
+				"        run: |",
+				"          echo \"Fetching base branch origin/${{ github.base_ref }} for lockfile diff\"",
+				"          git fetch origin \"${{ github.base_ref }}\" --depth=1",
+				"",
+				"          echo \"Running dependency age check\"",
+				"          node check-dep-age.js 14"
+			],
+			"startLine": 35
+		}
+	]
+}

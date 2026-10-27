@@ -1,0 +1,60 @@
+{
+	"highlightRanges": [
+		{
+			"first": 359,
+			"last": 364
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"  publish-release-assets:"
+			],
+			"startLine": 305
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 315
+		},
+		{
+			"lines": [
+				"      - name: Verify what is about to be published",
+				"        run: |"
+			],
+			"startLine": 334
+		},
+		{
+			"lines": [
+				"          if [ \"$ZIP_COUNT\" -ne 3 ]; then"
+			],
+			"startLine": 352
+		},
+		{
+			"lines": [
+				"            exit 1",
+				"          fi",
+				"        shell: bash",
+				"",
+				"      - name: Generate SHA256SUMS",
+				"        run: |",
+				"          set -euo pipefail",
+				"          cd assets",
+				"          sha256sum *.zip | LC_ALL=C sort -k 2 > SHA256SUMS",
+				"          cat SHA256SUMS",
+				"        shell: bash",
+				"",
+				"      - name: Attach the assets to this repo's release",
+				"        env:"
+			],
+			"startLine": 355
+		}
+	]
+}

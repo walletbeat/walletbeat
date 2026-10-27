@@ -1,0 +1,39 @@
+{
+	"highlightRanges": [
+		{
+			"first": 142,
+			"last": 151
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"function processManifest(content, mode) {"
+			],
+			"startLine": 49
+		},
+		{
+			"lines": [
+				"  const manifestJSON = JSON.stringify(manifest, null, 2)",
+				"  return manifestJSON",
+				"}",
+				"",
+				"// The LavaMoat plugin set, enabled only for production webkit builds: the",
+				"// LavaMoatPlugin itself, a verifier for ignored modules, and a plugin that",
+				"// always emits the SES lockdown source as a standalone asset. See the inline",
+				"// comments and README.MD for the policy-generation workflow.",
+				"function createLavaMoatPlugins() {",
+				"  return [",
+				"    new LavaMoatPlugin({",
+				"      generatePolicy: process.env.LAVAMOAT_GENERATE_POLICY === 'true',",
+				"      // Where policy.json and policy-override.json live",
+				"      policyLocation: path.resolve(ROOT_DIR, 'lavamoat/webpack'),",
+				"      // Inline the SES lockdown shim directly into the background and main UI chunks.",
+				"      // This is critical for MV3 service workers where we can't control",
+				"      // script load order via <script> tags and ensures that popup/tab UIs",
+				"      // run under SES lockdown."
+			],
+			"startLine": 138
+		}
+	]
+}
