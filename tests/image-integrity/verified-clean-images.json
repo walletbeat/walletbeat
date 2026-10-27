@@ -1675,6 +1675,38 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/account_abstraction.png": {
+		"hash": "86f92a7309de03353653e5f243a2992158f226cb9acaa2adc279936553b7dcc5",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/address_resolution.png": {
+		"hash": "3f30ba811f50d30bbe121d5fa891e4ced47c9359804af76906206dfcb900f5cc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/browser_integration.png": {
+		"hash": "b6b87702d197a524827ce72502af3cb3d0819ae7d2740cdc7c66656553c4963f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/chain_abstraction.png": {
+		"hash": "b33b18031d40e135238b355e1c19fa424c6e8d6ec73a8b465cdd701f9b4f710c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/ecosystem.png": {
+		"hash": "c7ecc33d710974e317173da564fac6e134466434b6dc19c01a2c074119a632aa",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/hardware_wallet_interoperability.png": {
+		"hash": "1b61356d3b25b857c014eab2dc92334bc14304e8e8d650fe13695a75557ab8e4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/transaction_batching.png": {
+		"hash": "5e26075bbb1667e71db2aabe4023cf7b079acdc9b3e0d0cd810b11fb43a0f818",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/walletbeat_image.png": {
+		"hash": "6d56565b6f9e15e75620045f9f1c42d8d63c2d0136ac154d0022f0db2373712b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
