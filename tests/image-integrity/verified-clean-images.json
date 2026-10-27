@@ -1675,6 +1675,18 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-13 - Darryl Devcon Talk/cover.png": {
+		"hash": "ccaa42d2c5f3805fcd48b400de087337f195c113a36d59f3885ebc5f7af9e859",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-13 - Darryl Devcon Talk/darryl.png": {
+		"hash": "35c23854d5d60371c0fb581d71c9ed648aa1fee14877c7ee91cb1987755ba4da",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-13 - Darryl Devcon Talk/walletbeat.png": {
+		"hash": "f1ddda183db99a4b6342a841bfb9e6cd788ee6fc2c6518f8e8312fd0049f750a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
