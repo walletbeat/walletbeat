@@ -114,7 +114,7 @@
 				<div class="choices" data-column="gap-1">
 					{#each choices as choice (choice.id)}
 						{@const navigates = !interactive && choice.href !== undefined}
-						{@const checked = activeChoices.has(choice)}
+						{@const checked = activeChoices.has(choice) || (set.cardinality === 'exclusive' && choice.id === '' && !set.choices.some(candidate => activeChoices.has(candidate)))}
 						{@const activeIndex = activeInSet.indexOf(choice)}
 						{@const count = choiceCount(set, choice)}
 						{@const choiceAnchor = `--filter-choice-${instanceId}-${set.id}-${choice.id || 'all'}`}
