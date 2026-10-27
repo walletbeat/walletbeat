@@ -1,0 +1,36 @@
+diff --git a/src/internal/client/dom/blocks/each.js b/src/internal/client/dom/blocks/each.js
+index 58d59a6825000d48bc6234b030d006e16014a6d4..2f5badbe5cf3a80d591fc01e0be955bd569b32d6 100644
+--- a/src/internal/client/dom/blocks/each.js
++++ b/src/internal/client/dom/blocks/each.js
+@@ -721,7 +721,30 @@ function move(effect, next, anchor) {
+ 
+ 	while (node !== null) {
+ 		var next_node = /** @type {TemplateNode} */ (get_next_sibling(node));
+-		dest.before(node);
++		var parent = dest.parentNode;
++		if (
++			parent instanceof Element &&
++			typeof parent.moveBefore === 'function' &&
++			node.isConnected && dest.isConnected &&
++			node.ownerDocument === dest.ownerDocument
++		) {
++			parent.moveBefore(node, dest);
++		} else {
++			var document = node.ownerDocument;
++			var focused = document.activeElement;
++			var retained_focus = focused instanceof HTMLElement && node.contains(focused);
++
++			dest.before(node);
++
++			if (
++				retained_focus && focused.isConnected &&
++				document.activeElement === document.body && !document.body.matches(':focus') &&
++				!focused.matches(':disabled') && !focused.closest('[inert]') &&
++				focused.checkVisibility({ visibilityProperty: true })
++			) {
++				focused.focus({ preventScroll: true });
++			}
++		}
+ 
+ 		if (node === end) {
+ 			return;
