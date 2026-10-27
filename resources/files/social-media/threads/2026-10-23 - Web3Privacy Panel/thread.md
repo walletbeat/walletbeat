@@ -57,7 +57,7 @@ He wants to see Ethereum fulfill its cypherpunk mission. Hence, the Walletbeat r
 
 Privacy is where wallets have to make the most progress. Data posted on public blockchains like Ethereum is publicly available to everyone.  
 
-But nevertheless, it's still possible. The panel will cover from onchain privacy to network-level privacy, Tor integration, address and amount correlations, private wallet recovery, and dealing with the plethora of intermediaries learning of wallet transaction before it gets onchain.
+But nevertheless, it's still possible. The panel will cover from onchain privacy to network-level privacy, Tor integration, correlations between addresses and amounts, private wallet recovery, and dealing with the plethora of intermediaries learning of wallet transaction before it gets onchain.
 
 ---
 
