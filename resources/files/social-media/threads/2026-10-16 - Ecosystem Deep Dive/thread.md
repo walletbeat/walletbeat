@@ -38,7 +38,7 @@ Some address format standards improve upon this further by including the destina
 
 ---
 
-Ethereum addresses are hexadecimal strings (0x...) which are unreadable to humans. 
+Ethereum addresses are long hexadecimal strings, so they are unreadable to humans. 
 
 Phishing scams have used this to trick users into sending funds to invalid addresses, by generating lookalike-addresses and tricking users into copy/pasting them without noticing the difference.
 
@@ -48,7 +48,7 @@ Browser integration 🌐
 
 Does the wallet support all the prominent standards for web browser integration?
 
-Browser integration standards make sure that wallets integrate with apps in a way that's transparent, open, and competitive. That ensures that the ecosystem has open competition and wallets are all on a level playing field.
+Browser integration standards make sure that wallets integrate with apps in a way that is transparent, open, and competitive. This keeps competition open and puts every wallet on a level playing field.
 
 ![Browser Integration](./browser_integration.png)
 
