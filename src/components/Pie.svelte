@@ -423,4 +423,12 @@
 			align-items: center;
 		}
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pie-container,
+		.pie-container .slice {
+			/* Motion preference takes precedence over shared pressable durations. */
+			transition-duration: 0s !important;
+		}
+	}
 </style>
