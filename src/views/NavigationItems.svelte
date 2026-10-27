@@ -203,6 +203,7 @@
 		{#each effectiveSearchValue ? items.filter( item => matchesSearch(item, effectiveSearchValue) ) : items as item (item.id)}
 			<li {...!item.children?.length && destinationState?.(item.href)}
 				style:--slice-fill={item.sliceStyle ? (item.sliceStyle.fill ?? 'initial') : undefined}
+				style:--slice-labelBackground={item.sliceStyle?.labelBackground}
 				style:--slice-totalAngle={item.sliceStyle?.totalAngle}
 				style:--slice-midAngle={item.sliceStyle?.midAngle}
 				style:--slice-offset={item.sliceStyle?.offset}

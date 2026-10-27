@@ -8,7 +8,7 @@
 	import type { Snippet } from 'svelte'
 	import { knownSingleVariantIcons, type WBIconID } from '@/styles/wbicons'
 	import '../components/pie-shape.css'
-	import { attributeGroupFlowerGradient, sliceFill } from '@/components/pie-fill'
+	import { attributeGroupFlowerGradient, sliceFill, sliceLabelBackground } from '@/components/pie-fill'
 
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -585,11 +585,14 @@
 			return {
 				...group,
 				sliceStyle: computedGroup
-					? { ...computedGroup.computed, fill: sliceFill(computedGroup) }
+					? { ...computedGroup.computed, fill: sliceFill(computedGroup), labelBackground: sliceLabelBackground(computedGroup) }
 					: undefined,
 				children: group.children?.map((attribute, attributeIndex) => ({
 					...attribute,
-					sliceStyle: computedGroup?.children?.[attributeIndex]?.computed,
+					sliceStyle: computedGroup?.children?.[attributeIndex] && {
+						...computedGroup.children[attributeIndex].computed,
+						labelBackground: sliceLabelBackground(computedGroup.children[attributeIndex]),
+					},
 				})),
 			}
 		})
@@ -2714,10 +2717,6 @@
 		}
 	}
 
-	.pie-navigation-icon {
-		color: #fff;
-		filter: opacity(0.75) drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15));
-	}
 
 	@property ---pie-sourceInlineOffset {
 		syntax: '<length>';

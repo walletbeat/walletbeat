@@ -52,13 +52,17 @@ cases.push({
 		id: `${id}-${group}`,
 		href: `#${id}`,
 		color: 'teal',
+		gradient: {
+			colors: ['var(--rating-unrated)', 'var(--rating-fail)', 'var(--rating-pass)'],
+			transparentStopColor: 'var(--rating-unrated)',
+		},
 		weight: 1,
 		arcLabel: 'x',
 		ariaLabel: `Group ${group + 1}`,
-		children: Array.from({ length: group + 2 }, (_, child) => ({
+		children: Array.from({ length: group + 3 }, (_, child) => ({
 			id: `${id}-${group}-${child}`,
 			href: `#${id}`,
-			color: 'gold',
+			color: ['var(--rating-unrated)', 'var(--rating-fail)', 'var(--rating-pass)'][child % 3],
 			weight: 1,
 			arcLabel: 'x',
 			ariaLabel: `Child ${child + 1}`,
