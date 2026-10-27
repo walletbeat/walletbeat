@@ -111,14 +111,29 @@
 			return getVisibleColumns(this.columns)
 		})
 
-		#defaultColumnSort?: SortState<_ColumnId>
+		#defaultColumnSort = $derived.by(() => {
+			const column = this.columns.find(column => column.sort?.isDefault)
 
-		sortState?: SortState<_ColumnId> = $state(
-			this.#defaultColumnSort
-		)
+			return column?.sort ? {
+				columnId: column.id,
+				direction: column.sort.defaultDirection,
+			} : undefined
+		})
+
+		#requestedSort?: SortState<_ColumnId> = $state(undefined)
+
+		get sortState(): SortState<_ColumnId> | undefined {
+			return this.#requestedSort && this.#columnsById.get(this.#requestedSort.columnId)?.sort
+				? this.#requestedSort
+				: this.#defaultColumnSort
+		}
+
+		set sortState(sort: SortState<_ColumnId> | undefined) {
+			this.#requestedSort = sort
+		}
 
 		sortedColumn = $derived(
-			this.sortState?.columnId && this.#columnsById.get(this.sortState.columnId),
+			this.sortState && this.#columnsById.get(this.sortState.columnId),
 		)
 
 		maxHeaderLevel = $derived.by(() => {
@@ -260,13 +275,6 @@
 
 			this.pageSize = pageSize || Infinity
 
-			const defaultSortedColumn = this.columns.find(column => column.sort?.isDefault)
-
-			this.#defaultColumnSort = this.sortState = defaultSortedColumn && {
-				columnId: defaultSortedColumn.id,
-				direction: defaultSortedColumn.sort?.defaultDirection ?? SortDirection.Ascending,
-			}
-
 			this.rowIsDisabled = rowIsDisabled
 			this.displaceDisabledRows = displaceDisabledRows ?? false
 
@@ -303,7 +311,7 @@
 						direction: column.sort.defaultDirection === SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending,
 					}
 				:
-					this.#defaultColumnSort
+					undefined
 			)
 
 			return true
