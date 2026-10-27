@@ -149,7 +149,7 @@ export const funding: Attribute = {
 		* Venture capital funding
 		* Charging fees on convenience functions (e.g. swapping and bridging
 			tokens)
-		* Referral rewards from third-party services (e.g. trading platforms)
+		* Referral rewards from external services (e.g. trading platforms)
 			earned by attaching the wallet's referral code to the user's account
 		* Governance tokens
 		* Commemorative NFT sales
@@ -206,7 +206,7 @@ export const funding: Attribute = {
 			),
 			exampleRating(
 				paragraph(
-					"The wallet silently attaches its own referral code to the user's account on a third-party trading platform without informing the user, and earns referral rewards from the user's trading activity.",
+					"The wallet silently attaches its own referral code to the user's account on an external trading platform without informing the user, and earns referral rewards from the user's trading activity.",
 				),
 				exampleRatingUnimplemented,
 			),

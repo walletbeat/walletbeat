@@ -639,9 +639,11 @@ export const rainbow: SoftwareWallet = {
 				governanceTokenLowFloat: true, // ~180M circulating of 1B total supply (~18% float) per CoinGecko as of 2026 04 24
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: true, // Questionnaire: fees on perpetual futures and prediction markets are not explicitly displayed
+				hiddenReferralCodes: null,
 				publicOffering: true, // Public RNBW sale on CoinList (Dec 2025, 3% of supply at $0.10) plus a public Uniswap continuous auction at the Feb 2026 TGE
 				selfFunded: false, // VC-backed ($19.5M across seed + Series A) and token-funded, not developer self-funded
 				transparentConvenienceFees: true, // Questionnaire: swap review sheet shows fees
+				transparentReferralCodes: null,
 				ventureCapital: true, // $18M Series A led by Seven Seven Six, $1.5M seed including Y Combinator
 			},
 		},

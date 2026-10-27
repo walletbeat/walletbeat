@@ -22,13 +22,13 @@ export enum MonetizationStrategy {
 	/** Earns revenue through undisclosed markups or routing fees hidden from the user. */
 	HIDDEN_CONVENIENCE_FEES = 'hiddenConvenienceFees',
 	/**
-	 * Earns referral rewards from third-party services (e.g. trading
+	 * Earns referral rewards from external services (e.g. trading
 	 * platforms) by attaching its own referral code to the user's account,
 	 * where the user is clearly informed before the code is applied.
 	 */
 	TRANSPARENT_REFERRAL_CODES = 'transparentReferralCodes',
 	/**
-	 * Earns referral rewards from third-party services (e.g. trading
+	 * Earns referral rewards from external services (e.g. trading
 	 * platforms) by silently attaching its own referral code to the user's
 	 * account, without informing the user.
 	 */
