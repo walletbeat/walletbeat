@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__table-header-controls',
+				entrypoint: './tests/browser/fixtures/table-header-controls.astro',
+			})
+			injectRoute({
 				pattern: '/__table-sticky-size',
 				entrypoint: './tests/browser/fixtures/table-sticky-size.astro',
 			})
@@ -33,5 +37,6 @@ const fixtures = {
 
 export default {
 	...config,
+	devToolbar: { enabled: false },
 	integrations: [...(config.integrations ?? []), fixtures],
 }

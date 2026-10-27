@@ -731,6 +731,7 @@
 			@container (width >= 48rem) {
 				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
 					--sticky-marginInlineStart: var(---table-sticky-size);
+					--sticky-paddingInlineEnd: 0.5em;
 					overflow-x: clip;
 					overflow-y: visible;
 
@@ -739,7 +740,7 @@
 					}
 					> [data-scroll-item] [data-sticky] {
 						position: relative;
-						inset-inline: auto;
+						inset: auto;
 						max-inline-size: none;
 					}
 				}
@@ -970,6 +971,9 @@
 
 					&[data-expandable] {
 						---table-isExpanded: 0;
+						> .header-cell-content[data-sticky-container] {
+							--sticky-paddingInlineEnd: 2em;
+						}
 
 						cursor: pointer;
 
