@@ -446,13 +446,6 @@
 		color: var(--accent-backgroundColor);
 	}
 
-	form {
-		&:not(:has([data-panel-member] input:is(:default:not(:checked), :checked:not(:default)))) [data-reset="group"],
-		&:not(:has(input:is(:default:not(:checked), :checked:not(:default)))) [data-reset="all"] {
-			display: none;
-		}
-	}
-
 	@container wallet-table (width < 42rem) {
 		form {
 			&[data-row] {
