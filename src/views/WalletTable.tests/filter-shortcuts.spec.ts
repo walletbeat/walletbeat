@@ -64,6 +64,14 @@ const expectMatching = async (page: Page, names: string[]) => {
 	).toBe(true)
 }
 
+const expectNativeDestination = (page: Page, path: string, id: string) =>
+	expect(page).toHaveURL(
+		url =>
+			url.pathname === path &&
+			url.searchParams.size === 0 &&
+			decodeURIComponent(url.hash) === `#${id}`,
+	)
+
 for (const width of [1280, 390]) {
 	test.describe(`wallet qualification shortcuts at ${width}`, () => {
 		test.use({ viewport: { width, height: 900 } })
@@ -73,6 +81,14 @@ for (const width of [1280, 390]) {
 		}) => {
 			await page.goto('/wallet/summary/')
 			await expect(page.getByRole('button', { name: 'Sort by Wallet', exact: true })).toBeEnabled()
+			await expect(
+				page.getByRole('button', { name: 'Sort by Wallet', exact: true }),
+			).toHaveAttribute('type', 'button')
+			await expect(
+				page.locator('[data-filter-set="stageStatus"] input[value="stage-qualified"]'),
+			).toBeEnabled()
+			const initialUrl = page.url()
+
 			await expectMatching(page, qualifiedNames)
 			const shortcut = page.getByRole('button', { name: 'Filter by No Stage', exact: true }).first()
 
@@ -84,15 +100,30 @@ for (const width of [1280, 390]) {
 
 			const qualification = page.locator('[data-filter-set="stageStatus"]')
 
+			await expect(shortcut).toHaveAttribute('type', 'button')
+			const shortcutNode = await shortcut.elementHandle()
+
+			if (!shortcutNode) {
+				throw new Error('Missing enhanced qualification shortcut')
+			}
+
 			await shortcut.focus()
 			await shortcut.press('Enter')
 			await expectMatching(page, unqualifiedNames)
 			await expect(shortcut).toBeFocused()
+			expect(page.url()).toBe(initialUrl)
+			expect(
+				await shortcutNode.evaluate(node => node.isConnected && document.activeElement === node),
+			).toBe(true)
 			await expect(qualification.locator('input[value="stage-unqualified"]')).toBeChecked()
 			await expect(page.locator('[data-filter-set="stage"] input:checked')).toHaveCount(0)
 			await shortcut.press('Enter')
 			await expectMatching(page, allNames)
 			await expect(shortcut).toBeFocused()
+			expect(page.url()).toBe(initialUrl)
+			expect(
+				await shortcutNode.evaluate(node => node.isConnected && document.activeElement === node),
+			).toBe(true)
 			await expect(qualification.locator('input[value=""]')).toBeChecked()
 
 			if (width >= 768) {
@@ -111,18 +142,59 @@ for (const width of [1280, 390]) {
 		test.describe('without JavaScript', () => {
 			test.use({ javaScriptEnabled: false })
 
-			test('keeps the native table and marks row filtering as unavailable', async ({ page }) => {
+			test('native sorting and No Stage shortcuts preserve qualification and focus', async ({
+				page,
+			}) => {
 				await page.goto('/wallet/summary/')
 				await expectMatching(page, qualifiedNames)
-				await expect(
-					page.getByRole('button', { name: 'Sort by Wallet', exact: true }),
-				).toBeDisabled()
+				const sort = page.getByRole('button', { name: 'Sort by Wallet', exact: true })
 
-				if (unqualifiedNames.length > 0) {
-					await expect(
-						page.getByRole('button', { name: 'Filter by No Stage', exact: true }).first(),
-					).toBeDisabled()
+				await expect(sort).toBeEnabled()
+				await sort.press('Space')
+				await expectNativeDestination(
+					page,
+					'/wallet/summary/wallet-asc/',
+					'software-wallets-sort-wallet',
+				)
+				await expect(sort).toBeFocused()
+				await expectMatching(page, qualifiedNames)
+				await expect(page.locator('thead th[data-table-column="wallet"]')).toHaveAttribute(
+					'aria-sort',
+					'ascending',
+				)
+				await expect(page.locator('thead button[aria-label="Expand"]').first()).toBeDisabled()
+
+				if (unqualifiedNames.length === 0) {
+					return
 				}
+
+				const shortcut = page
+					.getByRole('button', { name: 'Filter by No Stage', exact: true })
+					.first()
+				const shortcutId = await shortcut.getAttribute('id')
+
+				if (!shortcutId) {
+					throw new Error('Native shortcut needs a stable focus destination')
+				}
+
+				await shortcut.press('Enter')
+				await expectNativeDestination(page, '/wallet/summary/below-stage-0/wallet-asc/', shortcutId)
+				await expectMatching(page, unqualifiedNames)
+				const retainedShortcut = page.locator(`[id="${shortcutId}"]`)
+
+				await expect(retainedShortcut).toBeFocused()
+				await retainedShortcut.press('Space')
+				await expectNativeDestination(page, '/wallet/summary/all/wallet-asc/', shortcutId)
+				await expectMatching(page, allNames)
+				await expect(retainedShortcut).toBeFocused()
+				await sort.press('Enter')
+				await expectNativeDestination(
+					page,
+					'/wallet/summary/all/wallet-desc/',
+					'software-wallets-sort-wallet',
+				)
+				await expectMatching(page, allNames)
+				await expect(sort).toBeFocused()
 			})
 		})
 	})
