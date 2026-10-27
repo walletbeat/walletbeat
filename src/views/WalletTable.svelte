@@ -612,11 +612,11 @@
 	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
 
 	const toggleFilterById = (filterId: string, exclusive = false) => {
-		const choice = walletFacetFilterSets.flatMap(set => set.choices).find(candidate => candidate.id === filterId)
+		const choice = walletFilterSets.flatMap(set => set.choices).find(candidate => candidate.id === filterId)
 		if (!choice) return
 
 		transitionUpdate(() => {
-			activeChoices = changeFilterChoice(walletFacetFilterSets, activeChoices, choice, exclusive)
+			activeChoices = changeFilterChoice(walletFilterSets, activeChoices, choice, exclusive)
 		}, 'filters')
 	}
 
@@ -1052,7 +1052,10 @@
 							onclick={event => {
 								event.preventDefault()
 								event.stopPropagation()
-								toggleAttributeFilterById?.(stageFilterId)
+								if (stage === 'QUALIFIED_FOR_NO_STAGES')
+									toggleFilterById('stage-unqualified', true)
+								else
+									toggleAttributeFilterById?.(stageFilterId)
 							}}
 						>
 							<WalletStageBadge
