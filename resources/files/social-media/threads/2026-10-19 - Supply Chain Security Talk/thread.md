@@ -20,6 +20,6 @@ Learn about existing measures for software supply chain integrity, their underly
 
 Walletbeat is a rating system for Ethereum wallets. A place where users know what to expect from a wallet, developers have a clear standard to build toward, and wallets compete on Ethereum values.
 
-See you in Mumbai 🇮🇳
+See you in Mumbai! 🇮🇳
 
 https://x.com/walletbeat/status/2112203994399469805
