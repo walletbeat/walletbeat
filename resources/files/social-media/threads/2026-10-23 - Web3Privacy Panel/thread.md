@@ -25,7 +25,7 @@ His focus is on translating cryptographic into products that are secure by defau
 
 @LucemansNL works on standards coordination at the Ethereum Foundation, focusing on privacy and self-sovereignty.
 
-He's also involved in Kohaku, an initiative to help wallets improve security and privacy while minimizing reliance on trusted third parties.
+He's also involved in Kohaku, an initiative to help wallets improve security and privacy while minimizing reliance on trusted external parties.
 
 ![Luc Ethereum Foundation](./luc_ef.png)
 
