@@ -188,6 +188,7 @@ export const sliceFill = (slice: ComputedSlice) => {
 		: `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${stops.map(({ color, position }) => `${color} ${position}px`).join(', ')}), var(--rating-unrated)`
 }
 
+// Match the nearest gradient stop; CSS owns the radius-dependent selection.
 export const sliceLabelBackground = (slice: ComputedSlice) => {
 	const stops = sliceGradientStops(slice)
 
@@ -195,12 +196,12 @@ export const sliceLabelBackground = (slice: ComputedSlice) => {
 		return stops
 	}
 
-	const nearest = stops.reduce((best, stop) =>
-		Math.abs(stop.position - slice.computed.labelR) <
-		Math.abs(best.position - slice.computed.labelR)
-			? stop
-			: best,
-	)
+	const colorAtStop = (color: string) => (color === 'transparent' ? 'var(--rating-unrated)' : color)
 
-	return nearest.color === 'transparent' ? 'var(--rating-unrated)' : nearest.color
+	return stops.slice(1).reduce((background, stop, index) => {
+		const previous = stops[index]
+		const selected = `max(0, sign(var(--slice-labelR) - ${(previous.position + stop.position) / 2}))`
+
+		return `color-mix(in oklch, ${background}, ${colorAtStop(stop.color)} calc(${selected} * 100%))`
+	}, colorAtStop(stops[0].color))
 }

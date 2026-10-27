@@ -140,3 +140,17 @@
 		close
 	);
 }
+
+/* Both renderers use the nearest gradient stop for label contrast. */
+:where(.pie-container .slice-shape > .label, .pie-navigation .pie-navigation-icon) {
+	color: light-dark(
+		rgb(19 10 43 / 0.62),
+		oklch(from var(--slice-labelBackground, var(--slice-color, #000)) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
+	);
+}
+:where(
+	.pie-container .slice:not(:hover, :focus-within) > .slice-shape > .label,
+	.pie-navigation a:not(:is(:hover, :focus-visible, :interest-source)) > .pie-navigation-icon
+) {
+	filter: opacity(0.8);
+}
