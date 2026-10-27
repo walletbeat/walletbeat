@@ -178,7 +178,7 @@ for (const wallet of ['metamask', 'ambire']) {
 						throw Error('Rendered outgoing foreground/support owners absent')
 					}
 
-					const ancestors = []
+					const ancestors: Element[] = []
 
 					for (
 						let ancestor = child.parentElement;
