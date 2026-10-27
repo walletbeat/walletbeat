@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__table-sort-navigation/[mode]',
+				entrypoint: './tests/browser/fixtures/table-sort-navigation.astro',
+			})
+			injectRoute({
 				pattern: '/__reorder-focus',
 				entrypoint: './tests/browser/fixtures/reorder-focus.astro',
 			})

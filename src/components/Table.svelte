@@ -1,8 +1,8 @@
 <script module lang="ts">
 	// Types
 	import type { Snippet } from 'svelte'
-
-	type Value = object | string | number | bigint | boolean | undefined | null
+	import { SortDirection, type SortState, type TableValue as Value } from './table-sort'
+	export { SortDirection, type SortState } from './table-sort'
 
 	export type Column<
 		_RowValue extends Value = Value,
@@ -58,18 +58,6 @@
 		Start = 'Start',
 		Center = 'Center',
 		End = 'End',
-	}
-
-	export enum SortDirection {
-		Ascending = 'asc',
-		Descending = 'desc',
-	}
-
-	type SortState<
-		_ColumnId extends Value = Value,
-	> = {
-		columnId: _ColumnId
-		direction: SortDirection
 	}
 
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
@@ -262,16 +250,19 @@
 			pageSize,
 			rowIsDisabled,
 			displaceDisabledRows,
+			initialSort,
 		}: {
 			rows: _RowValue[]
 			columns: Column<_RowValue, _CellValue, _ColumnId>[]
 			pageSize?: number
 			rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
 			displaceDisabledRows?: boolean
+			initialSort?: SortState<_ColumnId>
 		}) {
 			this.rows = rows
 
 			this.columns = columns
+			this.#requestedSort = initialSort && { ...initialSort }
 
 			this.pageSize = pageSize || Infinity
 
@@ -293,13 +284,13 @@
 			initializeIsColumnExpanded(columns)
 		}
 
-		toggleColumnSort = (columnId: _ColumnId) => {
+		getNextColumnSort = (columnId: _ColumnId): SortState<_ColumnId> | undefined | false => {
 			const column = this.#columnsById.get(columnId)
 
 			if (!column?.sort)
 				return false
 
-			this.sortState = (
+			return (
 				this.sortState?.columnId !== columnId ?
 					{
 						columnId,
@@ -313,7 +304,12 @@
 				:
 					undefined
 			)
+		}
 
+		toggleColumnSort = (columnId: _ColumnId) => {
+			const nextSort = this.getNextColumnSort(columnId)
+			if (nextSort === false) return false
+			this.sortState = nextSort
 			return true
 		}
 
@@ -363,6 +359,8 @@
 		onRowClick,
 
 		columns,
+		initialSort,
+		sortNavigation,
 		sortedColumn = $bindable(),
 		expandedColumnIds = $bindable(
 			new SvelteSet<_ColumnId>()
@@ -386,6 +384,12 @@
 		displaceDisabledRows?: boolean
 
 		columns: _Column[]
+		initialSort?: SortState<_ColumnId>
+		sortNavigation?: {
+			form: string
+			// Each column's control ID must be unique and stable across destination documents.
+			action: (columnId: _ColumnId, sort: SortState<_ColumnId> | undefined) => { id: string; url: string } | undefined
+		}
 		sortedColumn?: _Column | undefined
 		expandedColumnIds?: SvelteSet<_ColumnId>
 
@@ -407,6 +411,8 @@
 
 	// State
 	let table = new TableState({
+		// svelte-ignore state_referenced_locally -- the initial request is independent of the default sort and subsequent user choices
+		initialSort,
 		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
 		rows,
 		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
@@ -538,7 +544,9 @@
 				{@const isExpandable = !!column.subcolumns?.length}
 				{@const isExpanded = table.isColumnExpanded(column.id)}
 				{@const hasHeaderExtra = !!column.HeaderExtra}
-				{@const sortButtonId = `${id}-sort-${level}-${index}`}
+				{@const nextSort = table.getNextColumnSort(column.id)}
+				{@const sortAction = nextSort === false ? undefined : sortNavigation?.action(column.id, nextSort)}
+				{@const sortButtonId = sortAction?.id ?? `${id}-sort-${level}-${index}`}
 
 				<th
 					{colspan}
@@ -587,14 +595,16 @@
 
 										<button
 											id={sortButtonId}
-											type="button"
+											type={!interactive && sortAction !== undefined ? 'submit' : 'button'}
+											form={sortNavigation?.form}
+											formaction={!interactive ? sortAction?.url : undefined}
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
 											onclick={event => {
 												event.stopPropagation()
-												toggleColumnSort(column.id)
+												if (interactive) toggleColumnSort(column.id)
 											}}
-											disabled={!interactive || !column.sort}
+											disabled={!interactive && sortAction === undefined}
 										></button>
 									</span>
 								</div>
