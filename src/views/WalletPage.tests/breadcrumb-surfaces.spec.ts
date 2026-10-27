@@ -154,6 +154,182 @@ for (const wallet of ['metamask', 'ambire']) {
 					Math.abs(compact.support.top - natural.support.top + (compact.scroll - natural.scroll)),
 					'Supporting content must retain ordinary document travel',
 				).toBeLessThan(0.5)
+				const outgoing = await scope.evaluate(async element => {
+					const applicable = CSS.supports(
+						'(animation-timeline: scroll()) and (animation-range: 0% 100%) and (width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and (color: if(style(---breadcrumb-wrap: 1): red))',
+					)
+
+					if (!applicable) {
+						return {
+							applicable: false as const,
+							reason: 'Native breadcrumb enhancement unavailable',
+						}
+					}
+
+					const root = document.querySelector<HTMLElement>('#layout')
+					const position = element.querySelector<HTMLElement>(
+						':scope > [data-sticky-breadcrumb~="position"], :scope > details > [data-sticky-breadcrumb~="position"]',
+					)
+					const header = position?.querySelector<HTMLElement>(':scope > [data-sticky]')
+					const support = position?.querySelector(':scope > [data-sticky-breadcrumb~="support"]')
+					const child = support?.firstElementChild
+
+					if (!root || !position || !header || !child || !child.getClientRects().length) {
+						throw Error('Rendered outgoing foreground/support owners absent')
+					}
+
+					const ancestors = []
+
+					for (
+						let ancestor = child.parentElement;
+						ancestor && ancestors.length < 3;
+						ancestor = ancestor.parentElement
+					) {
+						ancestors.push(ancestor)
+					}
+					const subjects = [child, ...ancestors, header]
+					const settle = async () => {
+						let previous = '',
+							stable = 0
+						const start = performance.now()
+
+						do {
+							await new Promise(resolve => requestAnimationFrame(resolve))
+							const geometry = JSON.stringify([
+								root.scrollTop,
+								child.getBoundingClientRect().top,
+								header.getBoundingClientRect().top,
+							])
+							const finite = subjects.some(subject =>
+								subject
+									.getAnimations()
+									.some(
+										animation =>
+											animation.timeline?.constructor.name === 'DocumentTimeline' &&
+											(animation.pending || animation.playState === 'running') &&
+											Number.isFinite(animation.effect?.getComputedTiming().endTime),
+									),
+							)
+
+							stable = geometry === previous && !finite ? stable + 1 : 0
+							previous = geometry
+
+							if (stable >= 3) {
+								return
+							}
+						} while (performance.now() - start < 10000)
+						throw Error('Outgoing support geometry or finite transitions did not settle')
+					}
+
+					await settle()
+					const contentBottom = () => {
+						const style = getComputedStyle(position)
+
+						return (
+							position.getBoundingClientRect().bottom -
+							Number.parseFloat(style.borderBlockEndWidth) -
+							Number.parseFloat(style.paddingBlockEnd)
+						)
+					}
+					const origin = () => root.getBoundingClientRect().top + root.clientTop
+					const inset = Number.parseFloat(getComputedStyle(header).insetBlockStart)
+					const containerWorldBottom = contentBottom() + root.scrollTop - origin()
+					const rowHeight = header.getBoundingClientRect().height
+					const boundary = containerWorldBottom - inset - rowHeight
+
+					if (
+						getComputedStyle(header).position !== 'sticky' ||
+						!Number.isFinite(boundary) ||
+						boundary < 16 ||
+						boundary + 16 > root.scrollHeight - root.clientHeight
+					) {
+						throw Error('Enhanced outgoing row lacks a reachable native release boundary')
+					}
+
+					const read = (subject: Element) => {
+						const style = getComputedStyle(subject)
+						const { x, y, top, bottom, left, right, width, height } =
+							subject.getBoundingClientRect()
+
+						return {
+							tag: subject.tagName,
+							breadcrumb: subject.getAttribute('data-sticky-breadcrumb'),
+							rect: { x, y, top, bottom, left, right, width, height },
+							transform: style.transform,
+							translate: style.translate,
+							opacity: style.opacity,
+							animationName: style.animationName,
+							animationTimeline: style.getPropertyValue('animation-timeline'),
+							animationRange: style.getPropertyValue('animation-range'),
+						}
+					}
+					const capture = () => ({
+						scroll: root.scrollTop,
+						worldTop: child.getBoundingClientRect().top + root.scrollTop - origin(),
+						containerGap: contentBottom() - header.getBoundingClientRect().bottom,
+						scopeGap:
+							element.getBoundingClientRect().bottom - header.getBoundingClientRect().bottom,
+						child: read(child),
+						header: read(header),
+						ancestors: ancestors.map(read),
+					})
+					const samples = []
+
+					for (const offset of [-16, 0, 16, 2, -2, -16]) {
+						const requested = boundary + offset
+
+						root.scrollTo({ top: requested, behavior: 'instant' })
+						await settle()
+						const observed = capture()
+
+						await new Promise(resolve => requestAnimationFrame(resolve))
+
+						if (JSON.stringify(observed) !== JSON.stringify(capture())) {
+							throw Error('Outgoing support observation changed the settled pose')
+						}
+
+						samples.push({ offset, requested, ...observed })
+					}
+
+					return {
+						applicable: true as const,
+						derivation: { containerWorldBottom, inset, rowHeight, boundary },
+						samples,
+					}
+				})
+
+				await info.attach('outgoing-support-geometry', {
+					body: JSON.stringify(outgoing),
+					contentType: 'application/json',
+				})
+
+				if (outgoing.applicable) {
+					for (const sample of outgoing.samples) {
+						expect(
+							Math.abs(sample.scroll - sample.requested),
+							'Outgoing pose delivered',
+						).toBeLessThanOrEqual(1)
+						expect(
+							Math.abs(sample.worldTop - outgoing.samples[0].worldTop),
+							'Support retains ordinary travel through release and reverse',
+						).toBeLessThanOrEqual(0.5)
+
+						if (sample.offset < 0) {
+							expect(
+								sample.containerGap,
+								'Native row has containing-block space before release',
+							).toBeGreaterThan(1)
+						} else {
+							expect(
+								Math.abs(sample.containerGap),
+								'Native row follows its content edge after release',
+							).toBeLessThanOrEqual(1)
+						}
+					}
+				} else {
+					info.annotations.push({ type: 'coverage', description: outgoing.reason })
+				}
+
 				await info.attach('surface-geometry', {
 					body: JSON.stringify(observations),
 					contentType: 'application/json',
