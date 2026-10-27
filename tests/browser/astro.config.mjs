@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__pie-motion',
+				entrypoint: './tests/browser/fixtures/pie-motion.astro',
+			})
+			injectRoute({
 				pattern: '/__tooltip-timing',
 				entrypoint: './tests/browser/fixtures/tooltip-timing.astro',
 			})
