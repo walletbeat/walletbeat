@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__native-tabs',
+				entrypoint: './tests/browser/fixtures/native-tabs.astro',
+			})
+			injectRoute({
 				pattern: '/__table-header-controls',
 				entrypoint: './tests/browser/fixtures/table-header-controls.astro',
 			})
