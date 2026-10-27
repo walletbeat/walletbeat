@@ -16,7 +16,7 @@
 	import { defaultStageQualification, stageQualificationChoices, type StageQualificationId } from './wallet-table-stage'
 	// Types/constants
 	import { applyFilterSets, changeFilterChoice, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
-	import { hasVisiblePopoverInvoker, interest } from '@/components/interest'
+	import { hasVisiblePopoverInvoker, interest, interestDelayMs } from '@/components/interest'
 	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import type { Column } from '@/components/Table.svelte'
 	import { startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
@@ -713,6 +713,8 @@
 				type="button"
 				class="filter-trigger"
 				interestfor={slot.panelId}
+				style:interest-delay-start={`${interestDelayMs.start}ms`}
+				style:interest-delay-end={`${interestDelayMs.end}ms`}
 				popovertarget={slot.panelId}
 				popovertargetaction="show"
 				onpointerenter={() => { if (slot.kind === 'wallet') walletFilterOwner = String(column.id) }}
