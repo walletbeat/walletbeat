@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__table-sort-state',
+				entrypoint: './tests/browser/fixtures/table-sort-state.astro',
+			})
+			injectRoute({
 				pattern: '/__tooltip-hydration',
 				entrypoint: './tests/browser/fixtures/tooltip-hydration.astro',
 			})
