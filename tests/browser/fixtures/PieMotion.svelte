@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import Pie from '@/components/Pie.svelte'
+	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import { PieLayout, type LevelConfig, type Slice } from '@/components/pie-geometry'
 
 	let changed = $state(false)
@@ -24,13 +25,20 @@
 				<Pie
 					slices={slices.map(slice => ({ ...slice, href: kind === 'link' ? '#pie-destination' : undefined }))}
 					{layout} {levels} radius={40} padding={4}
-					onSliceClick={kind === 'button' ? () => { activations++ } : undefined}
+					onSliceClick={kind !== 'static' ? () => { activations++ } : undefined}
 				/>
 			</section>
 		{/each}
 	{/each}
 </div>
 <p id="pie-destination">Pie destination</p>
+
+<section id="disclosure-pie">
+	<TooltipOrAccordion isExpanded={false}>
+		<Pie {slices} {levels} radius={40} padding={4} onSliceClick={() => { activations++ }} />
+		{#snippet ExpandedContent()}<p>Native pie disclosure content</p>{/snippet}
+	</TooltipOrAccordion>
+</section>
 
 <style>
 	.cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }

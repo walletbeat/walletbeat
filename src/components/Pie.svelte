@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import './pie-shape.css'
+	import { onMount } from 'svelte'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { sliceFill, sliceLabelBackground } from './pie-fill'
 	import { viewTransitionName } from '@/utils/view-transition'
@@ -108,6 +109,9 @@
 	} = $props()
 
 	// State
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
+
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
@@ -134,7 +138,7 @@
 {#snippet Slice(slice: ComputedSlice)}
 	<svelte:element
 		this={slice.href ? 'a' : onSliceClick ? 'button' : 'div'}
-		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button' } : {}}
+		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button', disabled: !interactive } : {}}
 		class="slice"
 		title={slice.arcIconId ? `${wbIconEmojiSequences[slice.arcIconId]} ${slice.ariaLabel}` : slice.ariaLabel}
 		aria-label={slice.ariaLabel}
@@ -343,7 +347,7 @@
 
 				pointer-events: none;
 
-				> * {
+				&:not(:disabled) > * {
 					pointer-events: auto;
 				}
 
