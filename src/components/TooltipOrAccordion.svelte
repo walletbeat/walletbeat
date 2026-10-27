@@ -28,7 +28,7 @@
 
 <script lang="ts">
 	// Types/constants
-	import { onMount, type Snippet } from 'svelte'
+	import { onMount, untrack, type Snippet } from 'svelte'
 	import type { HTMLDetailsAttributes } from 'svelte/elements'
 	import type {
 		TooltipButtonTriggerPlacement,
@@ -66,6 +66,9 @@
 	// Components
 	import Tooltip from '@/components/Tooltip.svelte'
 
+	const generatedId = $props.id()
+	const disclosureId = $derived(restProps.id ?? generatedId)
+	const initialExpanded = untrack(() => isExpanded)
 	let disclosure: HTMLDetailsElement
 	let enhanced = $state(false)
 	// Floating presentation continues through the native popover's exit transition.
@@ -86,6 +89,9 @@
 		}
 	})
 	onMount(() => {
+		// Untouched peers must not reset a shared controller's adopted native state.
+		if (disclosure.open !== initialExpanded) isExpanded = disclosure.open
+
 		enhanced = true
 	})
 </script>
@@ -94,8 +100,20 @@
 {#snippet Disclosure(Trigger: Snippet, Popover: Snippet)}
 	<details
 		bind:this={disclosure}
-		bind:open={isExpanded}
+		bind:open={
+			() => {
+				if (!enhanced && typeof document !== 'undefined') {
+					const nativeDisclosure = document.getElementById(disclosureId)
+
+					if (nativeDisclosure instanceof HTMLDetailsElement) return nativeDisclosure.open
+				}
+
+				return isExpanded
+			},
+			(expanded: boolean) => isExpanded = expanded
+		}
 		{...restProps}
+		id={disclosureId}
 		name={enhanced && $compactDisclosures ? 'walletbeat-compact-disclosures' : disclosureName}
 		data-tooltip-enhanced={enhanced ? '' : undefined}
 		data-tooltip-floating={floatingTooltip ? '' : undefined}

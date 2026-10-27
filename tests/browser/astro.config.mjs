@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__tooltip-hydration',
+				entrypoint: './tests/browser/fixtures/tooltip-hydration.astro',
+			})
+			injectRoute({
 				pattern: '/__native-tabs',
 				entrypoint: './tests/browser/fixtures/native-tabs.astro',
 			})
