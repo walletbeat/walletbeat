@@ -805,6 +805,10 @@
 			0 0 0 0
 			round calc(var(--table-cornerRadius) + var(--table-outerBorderWidth))
 		);
+		&:has(:global([data-layout-transition])) {
+			contain: layout;
+			clip-path: none;
+		}
 
 	}
 
