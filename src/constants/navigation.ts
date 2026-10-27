@@ -33,7 +33,7 @@ export type NavigationItem = {
 	icon?: NavigationIconID
 	accentColor?: string | null
 	href?: string
-	sliceStyle?: ComputedSlice['computed'] & { fill?: string }
+	sliceStyle?: ComputedSlice['computed'] & { fill?: string; labelBackground?: string }
 	children?: NavigationItem[]
 }
 
