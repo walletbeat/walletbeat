@@ -16,7 +16,7 @@
 	// Types/constants
 	import type { HTMLAttributes } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
-	import { interest } from './interest'
+	import { interest, interestDelayMs } from './interest'
 
 
 	// IDs
@@ -33,7 +33,7 @@
 		hoverTriggerPlacement = 'around',
 		offset = 8,
 		TooltipContent,
-		hideDelay = 200,
+		hideDelay = interestDelayMs.end,
 		isEnabled = true,
 		children,
 		Layout,
@@ -100,6 +100,8 @@
 				aria-label={title ?? 'Show details'}
 				data-tooltip-trigger
 				style:--tooltip-anchor={hoverTriggerPlacement === 'button' ? anchorName : 'none'}
+				style:interest-delay-start={`${interestDelayMs.start}ms`}
+				style:interest-delay-end={`${hideDelay}ms`}
 				interestfor={wrapperInterest ? undefined : popoverId}
 				popovertarget={popoverId}
 				popovertargetaction="show"
@@ -116,6 +118,8 @@
 			type="button"
 			data-tooltip-trigger
 			style:--tooltip-anchor={anchorName}
+			style:interest-delay-start={`${interestDelayMs.start}ms`}
+			style:interest-delay-end={`${hideDelay}ms`}
 			interestfor={popoverId}
 			popovertarget={popoverId}
 			popovertargetaction="show"
