@@ -5,7 +5,7 @@
 <script lang="ts" generics="Item">
 	import type { SvelteHTMLElements } from 'svelte/elements'
 	import { flushSync, onMount } from 'svelte'
-	import type { TransitionUpdate } from '@/utils/view-transition'
+	import { viewTransitionName, type TransitionUpdate } from '@/utils/view-transition'
 	import { SvelteSet } from 'svelte/reactivity'
 	type FiltersTransitionUpdate = TransitionUpdate<'filters'>
 	const directTransitionUpdate: FiltersTransitionUpdate = update => update()
@@ -117,7 +117,7 @@
 						{@const checked = activeChoices.has(choice) || (set.cardinality === 'exclusive' && choice.id === '' && !set.choices.some(candidate => activeChoices.has(candidate)))}
 						{@const activeIndex = activeInSet.indexOf(choice)}
 						{@const count = choiceCount(set, choice)}
-						{@const choiceAnchor = `--filter-choice-${instanceId}-${set.id}-${choice.id || 'all'}`}
+						{@const choiceAnchor = `--${viewTransitionName('filter-choice', instanceId, set.id, choice.id)}`}
 						<svelte:element
 							this={navigates ? 'a' : 'label'}
 							href={navigates ? choice.href : undefined}
