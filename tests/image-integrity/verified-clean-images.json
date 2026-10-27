@@ -1678,6 +1678,29 @@
 	"resources/files/social-media/threads/2026-10-28 - Booth Activities/walletbeat_booth.jpg": {
 		"hash": "c0c329c11ead04e2d257228253b09aae263b6fbd190ca5829d50cef2695cef5b",
 		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/apoorv_walletchan.png": {
+		"hash": "006a8e5e4c41856f5e06be3adf4653ba847072f063a22d8ec9faa2adad86d25a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/luc_ef.png": {
+		"hash": "9342bf5b5c85ccacb06c63f7dc96d87a7595779ec298c002caaa9ecff873c05d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg": {
+		"hash": "1849043ddd17da91f447eece3b3efb10e4a29d3a01d768f6d88231168800881f",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_walletbeat.png": {
+		"hash": "329c6dbfa0b68a98732bd645241ea85f46ae0c4699b6631677dbd3e9f8e86c23",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/raul_safelabs.png": {
+		"hash": "20a9b81ef5a4f140e3eec1bc353b4f127d69ed55b0380a12bffca5c90be85969",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/seth_cake_wallet.png": {
+		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
