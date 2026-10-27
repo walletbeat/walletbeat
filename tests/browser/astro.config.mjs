@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__tooltip-timing',
+				entrypoint: './tests/browser/fixtures/tooltip-timing.astro',
+			})
+			injectRoute({
 				pattern: '/__table-sort-navigation/[mode]',
 				entrypoint: './tests/browser/fixtures/table-sort-navigation.astro',
 			})
