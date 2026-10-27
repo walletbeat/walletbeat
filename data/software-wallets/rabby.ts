@@ -524,9 +524,11 @@ export const rabby: SoftwareWallet = {
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: false,
+				hiddenReferralCodes: null,
 				publicOffering: false,
 				selfFunded: false,
 				transparentConvenienceFees: true, // Swap fees
+				transparentReferralCodes: null,
 				ventureCapital: true,
 			},
 		},

@@ -149,6 +149,8 @@ export const funding: Attribute = {
 		* Venture capital funding
 		* Charging fees on convenience functions (e.g. swapping and bridging
 			tokens)
+		* Referral rewards from external services (e.g. trading platforms)
+			earned by attaching the wallet's referral code to the user's account
 		* Governance tokens
 		* Commemorative NFT sales
 
@@ -157,8 +159,10 @@ export const funding: Attribute = {
 		"user alignment" refers to whether a source of funding grows as a
 		function of the user's own goals, rather than being uncorrelated or
 		anti-correlated. For example, funding acquired through hidden swap fees
-		or governance token sales with undisclosed insider token allocations are
-		not user-aligned. Funding acquired through transparent swap fees, user
+		governance token sales with undisclosed insider token allocations, or
+		referral codes silently attached to the user's account are not
+		user-aligned. Referral codes are typically permanent once set, so users
+		must be told before the wallet applies one on their behalf. Funding acquired through transparent swap fees, user
 		donations, or ecosystem grants are user-aligned.
 
 		In order to pass this criterion, wallets must have at least one source of
@@ -197,6 +201,12 @@ export const funding: Attribute = {
 			exampleRating(
 				paragraph(
 					'The wallet is funded from user-visible swap fees and governance token sales with undisclosed vesting schedule. While users can use onchain lookups to determine how much revenue is generated from both sources, making the funding technically transparent, the undisclosed nature of governance token makes makes this not user-aligned.',
+				),
+				exampleRatingUnimplemented,
+			),
+			exampleRating(
+				paragraph(
+					"The wallet silently attaches its own referral code to the user's account on an external trading platform without informing the user, and earns referral rewards from the user's trading activity.",
 				),
 				exampleRatingUnimplemented,
 			),
@@ -260,6 +270,14 @@ export const funding: Attribute = {
 										referenceCountsAs: Verifiability.VERIFIABLE,
 									})
 								case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.HIDDEN_REFERRAL_CODES:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.TRANSPARENT_REFERRAL_CODES:
 									return verifiabilityRequiresAtLeastOneReference({
 										referenceCountsAs: Verifiability.VERIFIABLE,
 									})
