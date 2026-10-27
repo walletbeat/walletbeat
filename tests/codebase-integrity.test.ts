@@ -59,6 +59,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.yaml',
 	'.toml',
 	'.snippet',
+	'.patch',
 ])
 
 /** Filenames that are allowed without a recognized extension. */
