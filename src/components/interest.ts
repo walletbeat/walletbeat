@@ -1,5 +1,7 @@
 /** Native interest invokers own hover/focus when available. The fallback only
  * changes popover state; positioning and responsive presentation remain CSS. */
+export const interestDelayMs = { start: 150, end: 200 } as const
+
 const sourcesByTarget = new WeakMap<HTMLElement, Set<HTMLElement>>()
 
 const popoverInvoker = (node: HTMLElement) =>
@@ -13,7 +15,7 @@ export function hasVisiblePopoverInvoker(node: HTMLElement) {
 
 export function interest(
 	node: HTMLElement,
-	{ id, hideDelay = 200 }: { id?: string; hideDelay?: number },
+	{ id, hideDelay = interestDelayMs.end }: { id?: string; hideDelay?: number },
 ) {
 	if (!id) {
 		return
@@ -82,7 +84,7 @@ export function interest(
 
 		// Like native interest, passing the pointer over a trigger is not yet intent.
 		scheduleShow(
-			event instanceof PointerEvent ? 500 : 0,
+			event instanceof PointerEvent ? interestDelayMs.start : 0,
 			event instanceof FocusEvent && event.target instanceof HTMLElement ? event.target : undefined,
 		)
 	}
@@ -110,7 +112,7 @@ export function interest(
 
 	// A pointer may already cover the SSR trigger before these listeners attach.
 	if (node.matches(':hover')) {
-		scheduleShow(500)
+		scheduleShow(interestDelayMs.start)
 	}
 
 	return {

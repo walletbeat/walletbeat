@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { interest } from './interest'
+import { interest, interestDelayMs } from './interest'
 
 class TestElement extends EventTarget {
 	hovered = false
@@ -87,7 +87,7 @@ describe('interest fallback lifecycle', () => {
 		node.invoker = new TestElement()
 		node.hovered = true
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(499)
+		vi.advanceTimersByTime(interestDelayMs.start - 1)
 		expect(target.showPopover).not.toHaveBeenCalled()
 		vi.advanceTimersByTime(1)
 		expect(target.showPopover).toHaveBeenCalledOnce()
@@ -98,7 +98,7 @@ describe('interest fallback lifecycle', () => {
 		cleanup?.destroy()
 		node.hovered = true
 		cleanup = interest(htmlElement(node), { id: 'details' })
-		vi.advanceTimersByTime(499)
+		vi.advanceTimersByTime(interestDelayMs.start - 1)
 		expect(target.showPopover).not.toHaveBeenCalled()
 		vi.advanceTimersByTime(1)
 		expect(target.showPopover).toHaveBeenCalledOnce()
@@ -106,9 +106,9 @@ describe('interest fallback lifecycle', () => {
 
 	it('cancels pending entry when the pointer leaves', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(100)
+		vi.advanceTimersByTime(interestDelayMs.start / 2)
 		node.dispatchEvent(new TestPointerEvent('pointerleave'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 
@@ -116,18 +116,18 @@ describe('interest fallback lifecycle', () => {
 		node.invoker = new TestElement()
 		node.invoker.visible = false
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(500)
+		vi.advanceTimersByTime(interestDelayMs.start)
 		expect(target.showPopover).not.toHaveBeenCalled()
 		node.invoker.visible = true
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(500)
+		vi.advanceTimersByTime(interestDelayMs.start)
 		expect(target.showPopover).toHaveBeenCalledOnce()
 	})
 
 	it('checks native availability after the dwell, including a responsive layout change', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		node.visible = false
-		vi.advanceTimersByTime(500)
+		vi.advanceTimersByTime(interestDelayMs.start)
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 
@@ -147,7 +147,7 @@ describe('interest fallback lifecycle', () => {
 	it('ignores touch entry and focus that is not visibly keyboard-driven', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter', 'touch'))
 		node.dispatchEvent(new TestFocusEvent('focusin'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 
@@ -168,7 +168,7 @@ describe('interest fallback lifecycle', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerleave'))
 		target.hovered = true
 		target.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.hidePopover).not.toHaveBeenCalled()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
@@ -176,14 +176,14 @@ describe('interest fallback lifecycle', () => {
 	it('lets native toggling supersede pending hover so Escape cannot be followed by a reopen', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		target.dispatchEvent(new Event('beforetoggle'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 
 	it('preserves keyboard focus within the target after the pointer leaves', () => {
 		target.focused = true
 		node.dispatchEvent(new TestPointerEvent('pointerleave'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.hidePopover).not.toHaveBeenCalled()
 	})
 
@@ -194,16 +194,16 @@ describe('interest fallback lifecycle', () => {
 		try {
 			node.hovered = true
 			node.dispatchEvent(new TestPointerEvent('pointerenter'))
-			vi.advanceTimersByTime(500)
+			vi.advanceTimersByTime(interestDelayMs.start)
 			node.hovered = false
 			node.dispatchEvent(new TestPointerEvent('pointerleave'))
 			other.hovered = true
 			other.dispatchEvent(new TestPointerEvent('pointerenter'))
-			vi.advanceTimersByTime(200)
+			vi.advanceTimersByTime(interestDelayMs.end)
 			expect(target.hidePopover).not.toHaveBeenCalled()
 			other.hovered = false
 			other.dispatchEvent(new TestPointerEvent('pointerleave'))
-			vi.advanceTimersByTime(200)
+			vi.advanceTimersByTime(interestDelayMs.end)
 			expect(target.hidePopover).toHaveBeenCalledOnce()
 		} finally {
 			otherCleanup?.destroy()
@@ -216,7 +216,7 @@ describe('interest fallback lifecycle', () => {
 		vi.spyOn(node, 'matches').mockImplementation(selector => selector.includes('button'))
 		cleanup = interest(htmlElement(node), { id: 'details' })
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 		node.dispatchEvent(new Event('click'))
 		expect(target.showPopover).toHaveBeenCalledOnce()
@@ -231,7 +231,7 @@ describe('interest fallback lifecycle', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		cleanup?.destroy()
 		cleanup = undefined
-		vi.advanceTimersByTime(1000)
+		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
 })
