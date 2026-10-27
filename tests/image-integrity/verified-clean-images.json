@@ -1695,10 +1695,6 @@
 		"hash": "c7ecc33d710974e317173da564fac6e134466434b6dc19c01a2c074119a632aa",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/ecosystem_attribute.png": {
-		"hash": "d8febb27304584341dbfdaca2f61c07f9f8c0445395ba423a1d664c740db9010",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/hardware_wallet_interoperability.png": {
 		"hash": "1b61356d3b25b857c014eab2dc92334bc14304e8e8d650fe13695a75557ab8e4",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
