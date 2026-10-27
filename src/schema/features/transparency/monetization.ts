@@ -21,6 +21,18 @@ export enum MonetizationStrategy {
 	TRANSPARENT_CONVENIENCE_FEES = 'transparentConvenienceFees',
 	/** Earns revenue through undisclosed markups or routing fees hidden from the user. */
 	HIDDEN_CONVENIENCE_FEES = 'hiddenConvenienceFees',
+	/**
+	 * Earns referral rewards from third-party services (e.g. trading
+	 * platforms) by attaching its own referral code to the user's account,
+	 * where the user is clearly informed before the code is applied.
+	 */
+	TRANSPARENT_REFERRAL_CODES = 'transparentReferralCodes',
+	/**
+	 * Earns referral rewards from third-party services (e.g. trading
+	 * platforms) by silently attaching its own referral code to the user's
+	 * account, without informing the user.
+	 */
+	HIDDEN_REFERRAL_CODES = 'hiddenReferralCodes',
 	/** Has a governance token where most supply is held not by the community. */
 	GOVERNANCE_TOKEN_LOW_FLOAT = 'governanceTokenLowFloat',
 	/** Has a governance token where most supply is distributed to the community. */
@@ -44,6 +56,10 @@ export function monetizationStrategyName(monetization: MonetizationStrategy): st
 			return 'hidden fees'
 		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
 			return 'transparent fees'
+		case MonetizationStrategy.TRANSPARENT_REFERRAL_CODES:
+			return 'transparent referral codes'
+		case MonetizationStrategy.HIDDEN_REFERRAL_CODES:
+			return 'hidden referral codes'
 		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
 			return 'a low-float governance token'
 		case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
@@ -74,6 +90,10 @@ export function monetizationStrategyIsUserAligned(monetization: MonetizationStra
 		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
 			return true
 		case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
+			return false
+		case MonetizationStrategy.TRANSPARENT_REFERRAL_CODES:
+			return true
+		case MonetizationStrategy.HIDDEN_REFERRAL_CODES:
 			return false
 		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
 			return false
