@@ -33,6 +33,8 @@
 	import { Variant } from '@/schema/variants'
 	import { isRatedEvaluationTreeGroup, type RatedWallet } from '@/schema/wallet'
 	import { WalletType } from '@/schema/wallet-types'
+	import type { SortState } from '@/components/table-sort'
+	import { walletSummaryHref } from './wallet-table-navigation'
 
 
 	// Props
@@ -45,6 +47,7 @@
 		attributeTree,
 		summaryVisualization = SummaryVisualization.Stage,
 		initialStageSelection = defaultStageQualification,
+		initialSort,
 		stageNavigationBase,
 	}: {
 		tableId?: string,
@@ -55,6 +58,7 @@
 		attributeTree: AttributeTree<_AttributeGroupId>
 		summaryVisualization?: SummaryVisualization
 		initialStageSelection?: StageQualificationId
+		initialSort?: SortState<string>
 		stageNavigationBase?: string
 	} = $props()
 
@@ -183,10 +187,6 @@
 		attributeGroupId: _AttributeGroupId
 		attributeId?: string
 	} | undefined = $state(
-		undefined
-	)
-
-	let sortedColumn: Column<RatedWallet<_AttributeGroupId>> | undefined = $state(
 		undefined
 	)
 
@@ -491,9 +491,9 @@
 		match: 'union',
 		defaultChoice: defaultStageQualification,
 		alwaysShowChoices: true,
-		choices: stageQualificationChoices.map(({ path, ...choice }) => ({
+		choices: stageQualificationChoices.map(choice => ({
 			...choice,
-			href: stageNavigationBase === undefined ? undefined : stageNavigationBase + path + (path ? '/' : ''),
+			href: stageNavigationBase === undefined ? undefined : walletSummaryHref(stageNavigationBase, choice.id, initialSort),
 			matches: choice.id === '' ? undefined : (wallet: RatedWallet<_AttributeGroupId>) => {
 				const { stage } = getWalletStageAndLadder(wallet)
 				return choice.id === defaultStageQualification
@@ -687,7 +687,11 @@
 			</div>
 		{/if}
 		<noscript>
-			<p>Sorting and column expansion require JavaScript. You can still open wallet details.</p>
+			{#if stageNavigationBase !== undefined && tableId !== undefined}
+				<p>Column expansion and additional filters require JavaScript. You can sort columns and open wallet details.</p>
+			{:else}
+				<p>Sorting and column expansion require JavaScript. You can still open wallet details.</p>
+			{/if}
 		</noscript>
 	</header>
 
@@ -846,6 +850,7 @@
 					/>
 				{:else}
 					<Filters
+						id={slot.kind === 'stage' && stageNavigationBase !== undefined ? `${viewId}-stage-sort` : undefined}
 						aria-label={slot.kind === 'stage' ? 'Stage filters' : 'Wallet filters'}
 						items={wallets}
 						filterSets={slot.filterSets}
@@ -867,13 +872,22 @@
 	>
 		<Table
 			{tableId}
+			{initialSort}
+			sortNavigation={stageNavigationBase === undefined || tableId === undefined ? undefined : {
+				form: `${viewId}-stage-sort`,
+				action: (columnId, sort) => {
+					const url = walletSummaryHref(stageNavigationBase, initialStageSelection, sort)
+					const id = `${tableId}-sort-${columnId}`
+					return url === undefined ? undefined : { id, url: `${url}#${encodeURIComponent(id)}` }
+				},
+			}}
 			class="wallet-table"
 
 			rows={wallets}
 			rowId={wallet => wallet.metadata.id}
-			rowIsDisabled={wallet => (
+			rowIsDisabled={(wallet, table) => (
 				!filteredWalletIds.has(wallet.metadata.id)
-				|| (sortedColumn?.value !== undefined && sortedColumn.value(wallet) === undefined)
+				|| (table.sortedColumn?.value !== undefined && table.sortedColumn.value(wallet) === undefined)
 			)}
 			displaceDisabledRows={true}
 
@@ -1014,7 +1028,6 @@
 					] as Column<RatedWallet<_AttributeGroupId>>[]
 				})()
 			}
-			bind:sortedColumn
 			bind:expandedColumnIds
 			{transitionUpdate}
 		>
@@ -1044,11 +1057,19 @@
 					{:else}
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
+						{@const stageControlId = `${tableId ?? viewId}-stage-${wallet.metadata.id}`}
+						{@const stageShortcut = stage === 'QUALIFIED_FOR_NO_STAGES' && stageNavigationBase !== undefined
+							? walletSummaryHref(stageNavigationBase, initialStageSelection === 'stage-unqualified' ? '' : 'stage-unqualified', initialSort)
+							: undefined}
+
 
 						<button
-							type="button"
+							id={stageControlId}
+							type={!interactive && stageShortcut !== undefined ? 'submit' : 'button'}
+							form={stageShortcut === undefined ? undefined : `${viewId}-stage-sort`}
+							formaction={stageShortcut === undefined ? undefined : `${stageShortcut}#${encodeURIComponent(stageControlId)}`}
 							aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-							disabled={!interactive}
+							disabled={!interactive && stageShortcut === undefined}
 							onclick={event => {
 								event.preventDefault()
 								event.stopPropagation()
