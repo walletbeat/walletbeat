@@ -1,0 +1,22 @@
+---
+import type { InferGetStaticPropsType } from 'astro'
+import SoftwareWalletSummaryPage from '@/views/SoftwareWalletSummaryPage.astro'
+import { stageQualificationChoices } from '@/views/wallet-table-stage'
+import { walletSummarySortChoices, walletSummarySelection } from '@/views/wallet-table-navigation'
+
+export function getStaticPaths() {
+	return stageQualificationChoices.flatMap(stage =>
+		walletSummarySortChoices.flatMap(({ sort }) => {
+			const selection = walletSummarySelection(stage.id, sort)
+			return selection
+				? [{ params: { selection }, props: { initialStageSelection: stage.id, initialSort: sort } }]
+				: []
+		}),
+	)
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>
+const { initialStageSelection, initialSort } = Astro.props
+---
+
+<SoftwareWalletSummaryPage {initialStageSelection} {initialSort} />
