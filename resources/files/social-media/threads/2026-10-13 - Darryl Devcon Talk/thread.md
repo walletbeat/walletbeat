@@ -11,7 +11,7 @@ He also built http://blockhead.info and is a veteran hackathon bounty hunter.
 
 Catch this talk on the Open & Verifiable Stack track!
 
-![Darryl](./darryl.webp)
+![Darryl](./darryl.png)
 
 ---
 Why should you listen to us about wallets?
