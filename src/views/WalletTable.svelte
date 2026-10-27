@@ -594,8 +594,6 @@
 	let interactive = $state(false)
 	let transitionRoot: HTMLElement | undefined = $state()
 	type TransitionKind = 'sort' | 'columns' | 'filters' | 'disclosure'
-	let transitionKind: TransitionKind | undefined = $state()
-	let activeTransition: ViewTransition | undefined
 	onMount(() => { interactive = true })
 
 	const transitionUpdate = (update: () => void, kind: TransitionKind = 'disclosure') => {
@@ -604,24 +602,11 @@
 			return
 		}
 
-		flushSync(() => { transitionKind = kind })
-		const strategy = kind === 'disclosure' ? 'none'
-			: kind === 'columns' ? 'document' : 'live'
-		const transition = startScopedViewTransition(transitionRoot, () => flushSync(update), strategy)
-
-		if (!transition) {
-			flushSync(() => { transitionKind = undefined })
-			return
-		}
-
-		activeTransition = transition
-		const finish = () => {
-			if (activeTransition === transition) {
-				activeTransition = undefined
-				transitionKind = undefined
-			}
-		}
-		void transition.finished.then(finish, finish)
+		startScopedViewTransition(
+			transitionRoot,
+			() => flushSync(update),
+			kind === 'disclosure' ? 'none' : 'live',
+		)
 	}
 
 	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
@@ -1117,11 +1102,8 @@
 						<div
 							class="wallet-info"
 							data-row="start"
-							data-view-transition={transitionKind === 'columns' ? 'named' : undefined}
-							style:--view-transition-name={transitionKind === 'columns' ?
-								viewTransitionName(viewId, 'wallet', wallet.metadata.id)
-								: undefined}
-							style:--view-transition-class={transitionKind === 'columns' ? 'wallet-info' : undefined}
+							data-view-transition="named"
+							style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
 						>
 							<span class="row-count" data-row="center"></span>
 
@@ -1233,11 +1215,8 @@
 					<div
 						class="wallet-info"
 						data-row="start"
-						data-view-transition={transitionKind === 'columns' ? 'named' : undefined}
-						style:--view-transition-name={transitionKind === 'columns' ?
-							viewTransitionName(viewId, 'wallet', wallet.metadata.id)
-							: undefined}
-						style:--view-transition-class={transitionKind === 'columns' ? 'wallet-info' : undefined}
+						data-view-transition="named"
+						style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
 					>
 						<span class="row-count" data-row="center"></span>
 
@@ -2228,14 +2207,12 @@
 		padding: 0;
 	}
 
-	:global(::view-transition-group(*.wallet-info)),
 	:global(::view-transition-group(*.pie)) {
 		animation-duration: 300ms;
 		animation-timing-function: var(--transition-easeOutExpo);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		:global(::view-transition-group(*.wallet-info)),
 		:global(::view-transition-group(*.pie)) {
 			animation-duration: 0s;
 		}
