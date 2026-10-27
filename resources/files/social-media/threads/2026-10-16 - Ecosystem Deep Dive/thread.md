@@ -2,7 +2,7 @@ What does ecosystem alignment actually looks like in practice?
 
 Beyond CROPS, there are a few things that are valuable for wallets to have. But they don't neatly fit into any of the CROPS values. And they're all generally around making sure that the wallet plays well in the Ethereum wallet ecosystem. 
 
-That's why Walletbeat evaluate this attribute. Here's how 👇
+Here's how Walletbeat evaluates this attribute 👇
 
 ![Ecosystem Attribute Group](./ecosystem.png)
 
@@ -14,9 +14,7 @@ Is the wallet Account Abstraction ready?
 
 User experience on Ethereum has historically suffered from the limitations of EOAs, which is the type of account most Ethereum users use today. By contrast, smart wallet accounts offer many UX and security improvements. 
 
-Wallets are rated based on whether they support:
-- EIP-7702: Account Abstraction via smart contract authority delegation for Externally-Owned Accounts (EOAs) wallets. 
-- ERC-4337: Account Abstraction for smart contract wallets. 
+Wallets are rated based on whether they support EIP-7702 or ERC-4337.
 
 ![Account Abstraction](./account_abstraction.png)
 
@@ -25,6 +23,10 @@ Wallets are rated based on whether they support:
 EIP-7702 creates a clean path for existing EOAs to obtain all the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. 
 
 This represents a large User Experience upgrade for all Ethereum EOA users.
+
+Add 4337 explanation, could be longer since we're cutting down previous tweet. Then explain in the next tweet what's the difference:
+- EIP-7702: Account Abstraction via smart contract authority delegation for Externally-Owned Accounts (EOAs) wallets. 
+- ERC-4337: Account Abstraction for smart contract wallets. 
 
 ---
 
@@ -54,8 +56,6 @@ Browser integration standards make sure that wallets integrate with apps in a wa
 
 ![Browser Integration](./browser_integration.png)
 
-Instead of the name, we should explain what is the purpose of each EIP
-
 ---
 
 The Ethereum community has defined web browser integration standards, which dictate how wallets and web pages can interact with each other.
@@ -70,8 +70,6 @@ Chain abstraction 🌉
 
 Does the wallet smooth out the complexities of dealing with multiple chains?
 
-Ethereum activity is not limited to the main L1 chain; a lot of activity has moved onto rollups and Layer 2 chains. This has allowed Ethereum to scale beyond what its L1 chain can handle, but has also introduced complexity and fragmentation for users and wallets to deal with.
-
 Wallets are rated based on how much of the complexity involved in dealing with multiple chains is abstracted away from users, while keeping risks and fees transparent.
 
 To get a passing rating, wallets must be cross-chain aware in how they display account value and individual token balances.
@@ -80,9 +78,9 @@ To get a passing rating, wallets must be cross-chain aware in how they display a
 
 ---
 
-Wallets must now deal with token balances fragmented across multiple chains.
+A lot of Ethereum activity has moved onto rollups and Layer 2 chains. This has introduced complexity and fragmentation for users and wallets to deal with.
 
-To address the UX impact of this complexity, wallets should provide features to abstract away these issues, while remaining transparent to the user when cross-chain bridging risks or fees are involved.
+To address the UX impact of token balances fragmented across multiple chains, wallets should provide features to abstract away these issues, while remaining transparent to the user when cross-chain bridging risks or fees are involved.
 
 ---
 
@@ -96,18 +94,18 @@ Transaction batching is one of the longstanding features without which Ethereum 
 
 ---
 
-Users don't want to approve every transaction. But transaction batching can solve that problem without giving contracts unlimited spending power.
+Users don't want to approve every transaction. Transaction batching can solve that problem without giving contracts unlimited spending power.
 
-Transaction batching give users a better UX: Approve the exact amount AND swap at the same time, in a single transaction. No need for unlimited approvals. No lingering permissions afterward.
+It gives users a better UX: Approve the exact amount AND swap at the same time, in a single transaction. No need for unlimited approvals. No lingering permissions afterward.
 ---
 
 Hardware wallet interoperability 🧱
 
 Does the wallet support directly connecting to hardware wallets from a plurality of manufacturers?
 
-This check is only about hardware wallet interoperability. Wallets are evaluated based on whether they directly integrate with hardware wallets from a plurality of major hardware wallet manufacturers.
+Wallets are evaluated based on whether they directly integrate with hardware wallets from a plurality of major hardware wallet manufacturers.
 
-A wallet receives a passing rating if it supports hardware wallets from at least 3 major hardware wallet manufacturers:Ledger, Trezor, Keystone, GridPlus, imKey.
+A wallet receives a passing rating if it supports hardware wallets from at least 3 major hardware wallet manufacturers.
 
 ![Hardware Wallet Interoperability](./hardware_wallet_interoperability.png)
 
