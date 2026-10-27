@@ -1855,11 +1855,18 @@
 		z-index: 3;
 		top: calc(anchor(bottom) + 0.5rem);
 		margin: 0;
-		inline-size: max-content;
+		inline-size: fit-content;
 		max-inline-size: calc(100dvi - 1rem);
 		border: 1px solid transparent;
 		backdrop-filter: none;
 		pointer-events: none;
+
+		@supports (position-area: block-end span-all) {
+			/* The anchor area supplies the remaining viewport block size. */
+			position-area: block-end span-all;
+			top: 0.5rem;
+			max-block-size: calc(100% - 1rem);
+		}
 
 		@container wallet-table (width >= 42rem) {
 			&:not(:popover-open) {
@@ -1871,7 +1878,7 @@
 
 	.filter-popover:not([data-filter-kind="attribute"]) {
 		left: max(0.5rem, anchor(left));
-		right: auto;
+		right: 0.5rem;
 	}
 
 	.filter-popover[data-filter-kind="attribute"] {
