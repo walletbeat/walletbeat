@@ -20,13 +20,9 @@ Wallets are rated based on whether they support EIP-7702 or ERC-4337.
 
 ---
 
-EIP-7702 creates a clean path for existing EOAs to obtain all the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. 
+EIP-7702 creates a clean path for existing EOAs to obtain all the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. This represents a large User Experience upgrade for all Ethereum EOA users.
 
-This represents a large User Experience upgrade for all Ethereum EOA users.
-
-Add 4337 explanation, could be longer since we're cutting down previous tweet. Then explain in the next tweet what's the difference:
-- EIP-7702: Account Abstraction via smart contract authority delegation for Externally-Owned Accounts (EOAs) wallets. 
-- ERC-4337: Account Abstraction for smart contract wallets. 
+ERC-4337 allows users of Ethereum to use smart contract account features. This gives users better UX and more flexibility over how their wallet is secured and recoverable, can be used to avoid needing to keep the wallet topped up with Ether to pay for gas fees, etc.
 
 ---
 
