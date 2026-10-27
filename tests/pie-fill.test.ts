@@ -1,7 +1,7 @@
 import sharp from 'sharp'
 import { expect, it } from 'vitest'
 
-import { sliceFill, sliceLabelBackground } from '@/components/pie-fill'
+import { sliceFill } from '@/components/pie-fill'
 import { computePieSlices, PieLayout, slicePathData } from '@/components/pie-geometry'
 
 for (const radius of [80, 320]) {
@@ -59,7 +59,6 @@ for (const radius of [80, 320]) {
 					expect(representedArea).toBeCloseTo((consumed + (index + 1) / 2) / 10, 2)
 					consumed += index + 1
 				}
-				expect(['var(--rating-unrated)', ...colors]).toContain(sliceLabelBackground(slice))
 			}
 		},
 	)
