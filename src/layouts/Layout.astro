@@ -74,7 +74,14 @@ import Footer from '@/views/Footer.astro'
 					if (!(target instanceof HTMLInputElement) || target.id !== 'theme-toggle') {
 						return
 					}
-					preference = target.checked !== systemDark.matches ? 'dark' : 'light'
+					const initialScheme = document.documentElement.style.colorScheme
+					preference = initialScheme
+						? initialScheme === 'dark'
+							? 'light'
+							: 'dark'
+						: target.checked !== systemDark.matches
+							? 'dark'
+							: 'light'
 					try {
 						localStorage.setItem('theme', preference)
 					} catch {
