@@ -301,7 +301,7 @@ test.describe('interruption', () => {
 						String(
 							event.isTrusted &&
 								!!document
-									.querySelector('[data-layout-transition="after"]')
+									.querySelector('[data-layout-transition]')
 									?.getAnimations()
 									.some(
 										a =>
@@ -453,7 +453,7 @@ test('canceling a native opening preserves an admitted closing clock', async ({ 
 	await page.keyboard.press('Escape')
 	await page.waitForFunction(() =>
 		document
-			.querySelector('[data-layout-transition="after"]')
+			.querySelector('[data-layout-transition]')
 			?.getAnimations()
 			.some(
 				a =>
@@ -570,5 +570,114 @@ test.describe('native baseline', () => {
 				}),
 			)
 			.toBe(true)
+	})
+})
+
+test('CSS cancellation between capture and activation does not restart retained clocks', async ({
+	page,
+}, info) => {
+	await page.goto(route)
+	await expect(page.locator('[data-native-motion-ready]')).toHaveCount(1)
+	await page.addStyleTag({
+		content: '[data-cancel-prepared-clock] [data-motion-id] { animation-name: none !important; }',
+	})
+	await page.evaluate(() => {
+		const scope = document.querySelector('[data-native-motion-ready]')
+
+		if (!(scope instanceof HTMLElement)) {
+			throw new Error('Missing motion scope')
+		}
+
+		const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'getAnimations')
+		const original: unknown = descriptor?.value
+
+		if (!descriptor || typeof original !== 'function') {
+			throw new Error('Missing native animation reader')
+		}
+
+		function isAnimationList(value: unknown): value is Animation[] {
+			return Array.isArray(value) && value.every((entry: unknown) => entry instanceof Animation)
+		}
+
+		const captured = new Set<CSSAnimation>()
+		let queued = false
+
+		Element.prototype.getAnimations = function (this: Element, options?: GetAnimationsOptions) {
+			const animations: unknown = Reflect.apply(original, this, [options])
+
+			if (!isAnimationList(animations)) {
+				throw new Error('Expected native animations')
+			}
+
+			if (this.hasAttribute('data-layout-transition')) {
+				for (const animation of animations) {
+					if (
+						animation instanceof CSSAnimation &&
+						animation.animationName === 'layout-transition'
+					) {
+						captured.add(animation)
+					}
+				}
+
+				if (captured.size && !queued) {
+					queued = true
+					queueMicrotask(() => {
+						scope.setAttribute('data-cancel-prepared-clock', '')
+						requestAnimationFrame(() =>
+							requestAnimationFrame(() => {
+								Object.defineProperty(Element.prototype, 'getAnimations', descriptor)
+								scope.setAttribute(
+									'data-clock-cancellation',
+									JSON.stringify(
+										[...captured].map(animation => ({
+											state: animation.playState,
+											start: animation.startTime,
+										})),
+									),
+								)
+							}),
+						)
+					})
+				}
+			}
+
+			return animations
+		}
+	})
+	await page.locator('#native-toggle').click()
+	const scope = page.locator('[data-native-motion-ready]')
+
+	await expect(scope).toHaveAttribute('data-clock-cancellation', /idle/)
+	const observation = await scope.getAttribute('data-clock-cancellation')
+
+	if (!observation) {
+		throw new Error('Missing native cancellation observation')
+	}
+
+	const clocks: unknown = JSON.parse(observation)
+
+	if (!Array.isArray(clocks)) {
+		throw new Error('Expected native clock observations')
+	}
+
+	expect(clocks.length).toBeGreaterThan(0)
+	expect(
+		clocks.every(
+			(clock: unknown) =>
+				typeof clock === 'object' &&
+				clock !== null &&
+				'state' in clock &&
+				clock.state === 'idle' &&
+				'start' in clock &&
+				clock.start === null,
+		),
+	).toBe(true)
+	await expect(page.locator('[data-layout-transition],[data-view-transition-active]')).toHaveCount(
+		0,
+	)
+	await page.getByRole('checkbox', { name: 'Native choice 1', exact: true }).check()
+	await info.attach('canceled-native-clocks', {
+		body: observation,
+		contentType: 'application/json',
 	})
 })
