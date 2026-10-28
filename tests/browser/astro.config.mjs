@@ -43,6 +43,10 @@ const fixtures = {
 				entrypoint: './tests/browser/fixtures/table-header-controls.astro',
 			})
 			injectRoute({
+				pattern: '/__table-header-controls-deep',
+				entrypoint: './tests/browser/fixtures/table-header-controls.astro',
+			})
+			injectRoute({
 				pattern: '/__table-sticky-size',
 				entrypoint: './tests/browser/fixtures/table-sticky-size.astro',
 			})

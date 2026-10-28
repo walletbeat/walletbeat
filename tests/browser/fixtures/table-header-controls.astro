@@ -4,5 +4,5 @@ import TableHeaderControls from './TableHeaderControls.svelte'
 ---
 
 <Layout metadata={{ title: 'Table header controls fixture' }}>
-	<TableHeaderControls client:load />
+	<TableHeaderControls deep={Astro.url.pathname.includes('controls-deep')} client:load />
 </Layout>

@@ -7,10 +7,22 @@ for (const javaScriptEnabled of [true, false]) {
 		test.describe(`table header controls, scripts ${javaScriptEnabled}, motion ${reducedMotion}`, () => {
 			test.use({ javaScriptEnabled, reducedMotion })
 			test('sorting and expansion retain separate native pointer surfaces', async ({ page }) => {
-				for (const width of [1280, 390]) {
+				for (const [width, route] of [
+					[1280, '/__table-header-controls'],
+					[390, '/__table-header-controls'],
+					[1280, '/__table-header-controls-deep'],
+					[390, '/__table-header-controls-deep'],
+				] as const) {
 					await page.setViewportSize({ width, height: 900 })
-					await page.goto('/__table-header-controls')
+					await page.goto(route)
 					const viewport = page.locator('[data-header-controls]')
+					const table = route.endsWith('-deep')
+						? viewport.locator(
+								':scope > [data-sticky-container] > [data-sticky-container] > [data-sticky-container] > [data-sticky-container] > .container',
+							)
+						: viewport.locator(':scope > .container')
+
+					await expect(table).toHaveCount(1)
 					const header = viewport.locator('th[data-table-column="attributes"]')
 					const sort = header.getByRole('button', { name: 'Sort by Attributes', exact: true })
 
@@ -29,6 +41,9 @@ for (const javaScriptEnabled of [true, false]) {
 
 					if (!javaScriptEnabled) {
 						await expect(sort).toBeDisabled()
+						await expect(
+							viewport.getByRole('button', { name: 'Custom action', exact: true }),
+						).toBeDisabled()
 						await expect(
 							header.getByRole('button', { name: 'Collapse', exact: true }),
 						).toBeDisabled()
@@ -53,13 +68,22 @@ for (const javaScriptEnabled of [true, false]) {
 								const bottom = Math.min(box.bottom, viewport.bottom, innerHeight)
 								const x = (left + right) / 2
 								const y = (top + bottom) / 2
-								const hit = document.elementFromPoint(x, y)
+								const points = [0.2, 0.5, 0.8].flatMap(inline =>
+									[0.2, 0.5, 0.8].map(block => {
+										const target = document.elementFromPoint(
+											left + (right - left) * inline,
+											top + (bottom - top) * block,
+										)
+
+										return !!target && element.contains(target)
+									}),
+								)
 
 								return {
 									x,
 									y,
 									visible: right > left && bottom > top,
-									hit: !!hit && element.contains(hit),
+									hit: points.every(Boolean),
 									withinHeader:
 										!!header && box.top >= header.top - 1 && box.bottom <= header.bottom + 1,
 								}
@@ -90,7 +114,7 @@ for (const javaScriptEnabled of [true, false]) {
 						await click(sort)
 
 						if (left === 0 && reducedMotion === 'no-preference') {
-							const container = viewport.locator(':scope > .container')
+							const container = viewport.locator('.container')
 
 							await expect(container).toHaveCSS('contain', 'layout')
 							await expect(container).toHaveCSS('clip-path', 'none')
@@ -106,6 +130,18 @@ for (const javaScriptEnabled of [true, false]) {
 						await click(header.getByRole('button', { name: 'Expand', exact: true }))
 						await expect(header).toHaveAttribute('data-expanded', '')
 					}
+
+					await viewport.evaluate(element =>
+						element.scrollTo({ left: element.scrollWidth, behavior: 'instant' }),
+					)
+					await click(viewport.getByRole('button', { name: 'Custom action', exact: true }))
+					await expect(page.getByLabel('Extra action count')).toHaveText('1')
+					await click(viewport.getByRole('button', { name: 'Sort by Custom', exact: true }))
+					await expect(viewport.locator('th[data-table-column="custom"]')).toHaveAttribute(
+						'aria-sort',
+						'ascending',
+					)
+					await expect(page.getByLabel('Extra action count')).toHaveText('1')
 				}
 			})
 		})
