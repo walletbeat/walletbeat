@@ -789,7 +789,7 @@
 		},
 		{
 			"name": "data-tag",
-			"description": "## [data-tag]\n\nSemantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Examples\n- Neutral palette (omit category token):\n  ```html\n  <span data-tag>Label</span>\n  ```\n- `eip` family:\n  ```html\n  <button type=\"button\" data-tag=\"eip\">EIP-7702</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
+			"description": "## [data-tag]\n\nSemantic labels with category colors derived against the current theme. Omit a category token for the accent palette. Native buttons and links retain interactive targets; passive labels keep compact padding.\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Examples\n- Accent palette (omit category token):\n  ```html\n  <span data-tag>Label</span>\n  ```\n- `eip` family:\n  ```html\n  <button type=\"button\" data-tag=\"eip\">EIP-7702</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
 			"values": [
 				{
 					"name": "account-type",

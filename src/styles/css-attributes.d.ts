@@ -989,7 +989,7 @@ declare global {
 		/**
 		 * ## [data-tag]
 		 *
-		 * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.
+		 * Semantic labels with category colors derived against the current theme. Omit a category token for the accent palette. Native buttons and links retain interactive targets; passive labels keep compact padding.
 		 *
 		 * ### Tokens
 		 * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
@@ -1003,7 +1003,7 @@ declare global {
 		 * - `--tag-hover-borderColor`
 		 *
 		 * ### Examples
-		 * - Neutral palette (omit category token):
+		 * - Accent palette (omit category token):
 		 *   ```html
 		 *   <span data-tag>Label</span>
 		 *   ```
