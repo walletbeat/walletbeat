@@ -248,6 +248,7 @@ export const okx: SoftwareWallet = {
 			// SlowMist's 2023 OKX audits cover the OKX exchange app, not the OKX Wallet app or extension, so they are not listed.
 			publicSecurityAudits: [],
 			scamAlerts: null,
+			secretKeyBackup: null,
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

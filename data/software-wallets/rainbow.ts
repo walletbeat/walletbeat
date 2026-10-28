@@ -1683,6 +1683,7 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: [

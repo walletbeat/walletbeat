@@ -350,6 +350,7 @@ export const phantom: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: securityAudits,
 			scamAlerts: null,
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
