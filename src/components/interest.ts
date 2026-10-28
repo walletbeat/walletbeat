@@ -1,6 +1,6 @@
 /** Native interest invokers own hover/focus when available. The fallback only
  * changes popover state; positioning and responsive presentation remain CSS. */
-export const interestDelayMs = { start: 150, end: 200 } as const
+export const interestDelayMs = { start: 50, end: 200 } as const
 
 const sourcesByTarget = new WeakMap<HTMLElement, Set<HTMLElement>>()
 
