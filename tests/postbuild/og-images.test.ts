@@ -4,15 +4,46 @@ import * as path from 'node:path'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
+import { getBaseUrl } from '@/base-url'
+import { eips } from '@/data/eips'
+import { allRatedWalletsBySlug } from '@/data/wallets'
 import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/utils/codebase'
 
 const distDir = path.join(getRepositoryRoot(), 'dist')
+// The build's base path is independent of Vitest's own Vite base.
+const buildBasePath = `${(process.env.BASE_URL ?? '/').replace(/\/+$/, '')}/`
 
 /** Content of the `<meta>` tag with the given `property` or `name`, if any. */
 const metaContent = (html: string, key: string): string | undefined =>
 	new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`).exec(html)?.[1]
 
 describe('Open Graph images', () => {
+	it('wallet and EIP pages use their own generated preview', () => {
+		const pages = [
+			...Object.values(allRatedWalletsBySlug).map(
+				(wallet): { page: string; image: `/${string}` } => ({
+					page: `${wallet.metadata.id}/index.html`,
+					image: `/${wallet.metadata.id}/og.png`,
+				}),
+			),
+			...Object.values(eips).map((eip): { page: string; image: `/${string}` } => ({
+				page:
+					eip.number === '7702' ? 'wallet/7702/index.html' : `wallet/eip/${eip.number}/index.html`,
+				image: `/wallet/eip/${eip.number}/og.png`,
+			})),
+		]
+
+		for (const { page, image } of pages) {
+			const html = fs.readFileSync(path.join(distDir, page), 'utf8')
+
+			expect(new URL(metaContent(html, 'og:image')!).pathname, page).toBe(
+				`${buildBasePath}${image.slice(1)}`,
+			)
+			expect(metaContent(html, 'og:image:width'), page).toBe('1200')
+			expect(metaContent(html, 'og:image:height'), page).toBe('630')
+		}
+	})
+
 	it('every page declares a preview image that exists at its declared size', async () => {
 		const htmlFiles: string[] = []
 
@@ -45,11 +76,38 @@ describe('Open Graph images', () => {
 				violations.push(`${relativePath}: twitter:image does not match og:image ${imageUrl}`)
 			}
 
-			const imagePath = path.join(distDir, new URL(imageUrl).pathname)
+			const url = new URL(imageUrl)
+			const basePath = buildBasePath
+
+			if (url.origin !== new URL(getBaseUrl()).origin || !url.pathname.startsWith(basePath)) {
+				violations.push(
+					`${relativePath}: image URL does not match the configured site origin/base path`,
+				)
+				continue
+			}
+
+			if (
+				metaContent(html, 'og:image:type') !== 'image/png' ||
+				!metaContent(html, 'og:image:alt') ||
+				metaContent(html, 'twitter:image:alt') !== metaContent(html, 'og:image:alt')
+			) {
+				violations.push(`${relativePath}: missing MIME type or matching nonempty alternative text`)
+			}
+
+			const imagePath = path.join(distDir, url.pathname.slice(basePath.length))
 
 			if (!fs.existsSync(imagePath)) {
 				violations.push(`${relativePath}: og:image ${imageUrl} is not in the build output`)
 				continue
+			}
+
+			if (
+				!fs
+					.readFileSync(imagePath)
+					.subarray(0, 8)
+					.equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+			) {
+				violations.push(`${relativePath}: preview is not a PNG`)
 			}
 
 			const imageSize = imageSizes.get(imagePath) ?? sharp(imagePath).metadata()
