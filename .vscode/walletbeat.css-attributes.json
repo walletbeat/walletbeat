@@ -202,6 +202,10 @@
 			]
 		},
 		{
+			"name": "data-content-page",
+			"description": "## [data-content-page]\n\nContent-page typography and detached content bounds. Set page-specific widths on the sticky container.\n\n### Placement\n- On a page's main content container, with its title and optional description in a direct header.\n\n### Examples\n- A content page with a title and description:\n  ```html\n  <main data-content-page data-sticky-container data-column=\"gap-8\">\n    <header><hgroup><h1>Title</h1><p>Description</p></hgroup></header>\n  </main>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-content-page]`"
+		},
+		{
 			"name": "data-icon",
 			"description": "## [data-icon]\n\nShared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 32px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.\n\n### Tokens\n- shape: `circle`, `filled`\n- color: `accent`\n- source: `wbicons-simple`, `wbicons-complex`, `emoji`\n- effect: `shadow`, `grayscale`\n\n### CSS Variables\n- `--icon-scale`: scale supplied by a transformed container (default `1`); style-range queries include it in icon detail selection\n- `--icon-content`\n- `--icon-size`\n- `--icon-navigation-borderColor`\n- `--icon-navigation-color`\n- `--icon-grayscale-filter` — filter applied by `grayscale`; set to `none` to show the icon in color.\n\n### Examples\n```html\n<span data-icon=\"&#x21b5;\"></span>\n<span data-icon=\"wbicons-complex security\"></span>\n<button data-icon=\"circle\" type=\"button\"><svg aria-hidden=\"true\">...</svg></button>\n<span data-icon=\"shadow\"><img src=\"/images/wallets/rabby.svg\" alt=\"Rabby\" /></span>\n<span data-icon=\"grayscale\"><img src=\"/images/wallets/rabby.svg\" alt=\"\" /></span>\n```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`",
 			"values": [
@@ -368,6 +372,10 @@
 		{
 			"name": "data-pressable-targets",
 			"description": "## [data-pressable-targets]\n\nSpace-separated canonical destination memberships published by a source link. The own destination and its ancestor destinations remain distinct from the paint owner's single `[data-pressable-name]` identity, so interacting with a child highlights its parent without highlighting its siblings.\n\n### CSS Variables\n- `--link-current-sources`: native current timelines corresponding to the destination memberships.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-targets]`"
+		},
+		{
+			"name": "data-prose",
+			"description": "## [data-prose]\n\nReading line height for prose content.\n\n### Examples\n- A prose body:\n  ```html\n  <div data-prose><p>Paragraph</p></div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`"
 		},
 		{
 			"name": "data-row",

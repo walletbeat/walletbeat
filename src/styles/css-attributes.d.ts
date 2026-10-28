@@ -200,6 +200,27 @@ declare global {
 		'data-column-item'?: string | boolean
 
 		/**
+		 * ## [data-content-page]
+		 *
+		 * Content-page typography and detached content bounds. Set page-specific widths on the sticky container.
+		 *
+		 * ### Placement
+		 * - On a page's main content container, with its title and optional description in a direct header.
+		 *
+		 * ### Examples
+		 * - A content page with a title and description:
+		 *   ```html
+		 *   <main data-content-page data-sticky-container data-column="gap-8">
+		 *     <header><hgroup><h1>Title</h1><p>Description</p></hgroup></header>
+		 *   </main>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-content-page]`
+		 */
+		'data-content-page'?: string | boolean
+
+		/**
 		 * ## [data-icon]
 		 *
 		 * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 32px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
@@ -506,6 +527,22 @@ declare global {
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-targets]`
 		 */
 		'data-pressable-targets'?: string | boolean
+
+		/**
+		 * ## [data-prose]
+		 *
+		 * Reading line height for prose content.
+		 *
+		 * ### Examples
+		 * - A prose body:
+		 *   ```html
+		 *   <div data-prose><p>Paragraph</p></div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+		 */
+		'data-prose'?: string | boolean
 
 		/**
 		 * ## [data-row], [data-badge]
