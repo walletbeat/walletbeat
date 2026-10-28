@@ -133,7 +133,7 @@ import Footer from '@/views/Footer.astro'
 			}}
 		/>
 		<div id='layout' data-scroll-container data-sticky-container>
-			<a class='skip-link' href='#content' data-badge='large' data-row>
+			<a class='skip-link' href='#content' data-astro-reload data-badge='large' data-row>
 				<span data-icon={String.fromCodePoint(0x21b5)}></span>
 				<span>Skip to main content</span>
 			</a>
@@ -206,7 +206,7 @@ import Footer from '@/views/Footer.astro'
 
 		> .skip-link {
 			position: fixed;
-			z-index: 2;
+			z-index: 3;
 			inset: calc(var(--safeArea-insetTop) + 1rem) auto auto 50%;
 
 			translate: -50% 0;
