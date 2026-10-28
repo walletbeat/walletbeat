@@ -1921,6 +1921,7 @@
 			block-size: var(---filters-blockSize);
 			overflow-x: auto;
 			overflow-y: clip;
+			scrollbar-width: none;
 			padding-inline: 0.5rem;
 			z-index: 2;
 		}
