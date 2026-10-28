@@ -12,6 +12,10 @@ const fixtures = {
 			})
 			injectRoute({ pattern: '/__pie-geometry', entrypoint: './tests/browser/fixtures/pie.astro' })
 			injectRoute({
+				pattern: '/__wallet-page/series.json',
+				entrypoint: './tests/browser/fixtures/wallet-series.ts',
+			})
+			injectRoute({
 				pattern: '/__wallet-page/source.json',
 				entrypoint: './tests/browser/fixtures/source.ts',
 			})
