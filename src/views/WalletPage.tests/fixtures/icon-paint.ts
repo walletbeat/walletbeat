@@ -51,6 +51,7 @@ type InputWindow = {
 	after: Observation
 	frozen?: Observation
 	frozenPose?: number
+	referencePose?: number
 }
 export type IconPaintReport = {
 	mode: IconPaintMode
@@ -841,55 +842,63 @@ export async function observeIconPaint({
 					},
 					{ mode, frozen },
 				)
-				// Native reverse input supplies the origin; no direct seek precedes these fast controls.
-				const origin = Math.min(result.before.maximum, D + H)
-				const current = await state.evaluate(({ root }) => root.scrollTop)
 
-				await cdp.send('Input.synthesizeScrollGesture', {
-					x: point.x,
-					y: point.y,
-					yDistance: current - origin,
-					speed: 12000,
-					gestureSourceType: 'mouse',
-				})
-				await delay(400)
-				const before = await state.evaluate(observeActor)
+				// Independent native journeys exercise each already calibrated reference pose.
+				for (const reference of refs) {
+					const origin = Math.min(result.before.maximum, D + H)
+					const current = await state.evaluate(({ root }) => root.scrollTop)
 
-				assert.ok(before.scroll > D + 0.5)
-				const first = frames.length
-
-				await startScreencast()
-				await delay(100)
-				const start = Date.now()
-
-				await Promise.all([
-					cdp.send('Input.synthesizeScrollGesture', {
+					await cdp.send('Input.synthesizeScrollGesture', {
 						x: point.x,
 						y: point.y,
-						yDistance: before.scroll - D,
+						yDistance: current - origin,
 						speed: 12000,
 						gestureSourceType: 'mouse',
-					}),
-					delay(800),
-				])
-				const end = Date.now()
+					})
+					await delay(400)
+					const before = await state.evaluate(observeActor)
 
-				await cdp.send('Page.stopScreencast')
-				await Promise.all(acknowledgements.splice(0))
-				const after = await state.evaluate(observeActor)
+					assert.ok(before.scroll > reference.actual + 0.5)
+					const first = frames.length
 
-				windows.push({
-					mode,
-					start,
-					end,
-					first,
-					last: frames.length - 1,
-					before,
-					after,
-					frozen,
-					frozenPose,
-				})
-				await writeFile(new URL('result.json', out), json(result))
+					await startScreencast()
+					await delay(100)
+					const start = Date.now()
+
+					await Promise.all([
+						cdp.send('Input.synthesizeScrollGesture', {
+							x: point.x,
+							y: point.y,
+							yDistance: before.scroll - reference.actual,
+							speed: 12000,
+							gestureSourceType: 'mouse',
+						}),
+						delay(800),
+					])
+					const end = Date.now()
+
+					await cdp.send('Page.stopScreencast')
+					await Promise.all(acknowledgements.splice(0))
+					const after = await state.evaluate(observeActor)
+
+					assert.ok(
+						Math.abs(after.scroll - reference.actual) <= poseTolerance,
+						'Native control input must reach its calibrated reference pose',
+					)
+					windows.push({
+						mode,
+						start,
+						end,
+						first,
+						last: frames.length - 1,
+						before,
+						after,
+						frozen,
+						frozenPose,
+						referencePose: reference.actual,
+					})
+					await writeFile(new URL('result.json', out), json(result))
+				}
 			}
 		}
 
@@ -955,8 +964,13 @@ export async function observeIconPaint({
 			: null
 		result.phaseComparisons = windows.map(window => ({
 			mode: window.mode,
+			referencePose: window.referencePose,
 			frames: result.frames.filter(
-				frame => frame.phase === window.mode && frame.classification !== 'instrument-rejected',
+				frame =>
+					frame.index >= window.first &&
+					frame.index <= window.last &&
+					frame.phase === window.mode &&
+					frame.classification !== 'instrument-rejected',
 			),
 		}))
 		result.controlsQualified =
@@ -974,8 +988,12 @@ export async function observeIconPaint({
 									frame.cyanReferencePose !== null &&
 									frame.referencePose !== frame.cyanReferencePose,
 							) &&
-							admitted.length >= 3 &&
-							admitted.filter(frame => frame.classification !== 'correct').length >= 3
+							refs.every(reference =>
+								admitted.some(
+									frame =>
+										frame.referencePose === reference.actual && frame.classification !== 'correct',
+								),
+							)
 						)
 					})
 		result.poseComparisons = refs.map(ref => {
