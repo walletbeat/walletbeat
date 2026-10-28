@@ -13,12 +13,21 @@
 	const {
 		wallet,
 		lightClients,
+		enabledByDefault,
+		verifiesTransactionSimulation,
 		refs,
 	}: {
 		wallet: { metadata: WalletMetadata }
 		lightClients?: NonEmptyArray<EthereumL1LightClient>
+		enabledByDefault?: boolean
+		verifiesTransactionSimulation?: boolean
 		refs?: FullyQualifiedReference[]
 	} = $props()
+
+	const coverageLimitations = $derived([
+		...(enabledByDefault === false ? ['Verification is opt-in: users must enable it in the settings.'] : []),
+		...(verifiesTransactionSimulation === false ? ['Transaction simulations are not verified, so the predicted outcome of a transaction still relies on the RPC provider.'] : []),
+	])
 
 
 	// Components
@@ -38,7 +47,7 @@
 					const clientUrl = ethereumL1LightClientUrl(client)
 
 					return `${commaListPrefix(i, lightClients.length)}[${client}](${typeof clientUrl === 'string' ? clientUrl : clientUrl.url})`
-				}).join('')}${lightClients.length === 1 ? ' light client.' : ' light clients.'}`
+				}).join('')}${lightClients.length === 1 ? ' light client.' : ' light clients.'}${coverageLimitations.map(limitation => `\n\n${limitation}`).join('')}`
 		)
 	}}
 	strings={{ WALLET_NAME: wallet.metadata.displayName }}
