@@ -1951,6 +1951,17 @@
 	.desktop-table-container {
 		z-index: 1;
 
+		@container wallet-table (width >= 42rem) {
+			:global(th[data-table-column="stage"][rowspan]:not([rowspan="1"]):has(.filter-cluster-target)) {
+				vertical-align: top;
+
+				.filter-trigger {
+					grid-auto-flow: column;
+					align-items: center;
+				}
+			}
+		}
+
 		/* Block rows stop producing a max-content track to centre. */
 		@container wallet-table (width < 42rem) {
 			grid-template-columns: 100%;
