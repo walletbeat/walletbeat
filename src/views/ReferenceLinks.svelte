@@ -235,7 +235,7 @@
 									<cite>{url.label}</cite>
 									{#if sourceLocation !== url.label}
 										<br>
-										<span class="source-location">{sourceLocation}</span>
+										<code class="source-location">{sourceLocation}</code>
 									{/if}
 									<span>{@html CodeIcon}</span>
 								</a>
@@ -461,7 +461,7 @@
 			}
 		}
 
-		code {
+		pre > code {
 			display: block;
 			inline-size: max-content;
 			min-inline-size: 100%;

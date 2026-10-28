@@ -1,4 +1,3 @@
-// cspell:ignore noopener
 import { expect, test } from '@playwright/test'
 
 for (const javaScriptEnabled of [false, true]) {
@@ -41,7 +40,7 @@ for (const javaScriptEnabled of [false, true]) {
 
 						return {
 							expected,
-							urls: [...new Set(citations.map(link => link.getAttribute('href')))],
+							urls: citations.map(link => link.getAttribute('href')),
 							records: items.length,
 							hidden: items.some(
 								item => item.hasAttribute('hidden') || getComputedStyle(item).display === 'none',
