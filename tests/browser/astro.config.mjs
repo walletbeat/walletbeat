@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__modal-lifecycle',
+				entrypoint: './tests/browser/fixtures/modal-lifecycle.astro',
+			})
+			injectRoute({
 				pattern: '/__native-popover-motion',
 				entrypoint: './tests/browser/fixtures/native-popover-motion.astro',
 			})
