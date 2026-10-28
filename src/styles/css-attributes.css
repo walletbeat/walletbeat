@@ -1712,6 +1712,9 @@ ol {
 		scroll-snap-align: start;
 		scroll-margin-block-start: var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart));
 	}
+	&[data-sticky-breadcrumb~="root"] {
+		scroll-margin-block-start: var(--sticky-insetBlockStart);
+	}
 }
 
 [data-sticky-breadcrumb~="support"] {
