@@ -48,11 +48,12 @@ export function eipOgImageSvg(eip: Eip): string {
 		size: number,
 		maxWidth: number,
 		heavy = false,
+		centered = false,
 	) => {
 		const font = heavy ? fonts().heavy : fonts().roman
 		const outline = textOutline(font, value, fittingFontSize(font, value, size, maxWidth))
 
-		return `<path d="${outline.pathData}" transform="translate(${x} ${y})" fill="${resolveCssColor('var(--text-primary)')}"/>`
+		return `<path d="${outline.pathData}" transform="translate(${centered ? x - outline.width / 2 : x} ${y})" fill="${resolveCssColor('var(--text-primary)')}"/>`
 	}
 	const titleWords = eip.friendlyName.split(/\s+/)
 	const titleLines: string[] = []
@@ -91,7 +92,7 @@ export function eipOgImageSvg(eip: Eip): string {
 			),
 			text('support on at least one platform', 72, 508, 24, 520),
 			`<g transform="translate(878 280) scale(3.1)">${chart}</g>`,
-			text(`${summary.supportedWalletCount}/${summary.walletCount}`, 815, 298, 40, 126, true),
+			text(`${summary.supportedWalletCount}/${summary.walletCount}`, 878, 298, 40, 126, true, true),
 			...summary.slices.map(
 				(slice, index) =>
 					`<circle cx="685" cy="${502 + index * 30}" r="7" fill="${resolveCssColor(slice.color)}"/>` +
