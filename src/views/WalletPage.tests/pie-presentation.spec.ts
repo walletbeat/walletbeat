@@ -75,38 +75,48 @@ for (const colorScheme of ['light', 'dark'] as const) {
 		}
 	})
 
-	test(`WalletPage pie icons share label ink in ${colorScheme} mode`, async ({ page }) => {
-		await page.setViewportSize({ width: 1280, height: 900 })
-		await page.emulateMedia({ colorScheme })
-		await page.goto('/metamask/?variant=BROWSER')
-		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 180000 })
-		await page.evaluate(() => document.fonts.ready)
-		await page.mouse.move(1, 899)
-		const inks = await page.locator('.pie-navigation-icon').evaluateAll(elements =>
-			elements.map(element => {
-				const style = getComputedStyle(element)
-				const canvas = document.createElement('canvas')
-				const context = canvas.getContext('2d')!
+	for (const width of [390, 900, 1280]) {
+		test(`WalletPage pie icons share label ink at ${width}px in ${colorScheme} mode`, async ({
+			page,
+		}) => {
+			await page.setViewportSize({ width, height: 900 })
+			await page.emulateMedia({ colorScheme })
+			await page.goto('/metamask/?variant=BROWSER')
+			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 180000 })
+			await page.evaluate(() => document.fonts.ready)
+			await page.mouse.move(1, 899)
+			const inks = await page.locator('.pie-navigation-icon').evaluateAll(elements =>
+				elements.map(element => {
+					const style = getComputedStyle(element)
+					const canvas = document.createElement('canvas')
+					const context = canvas.getContext('2d')!
 
-				context.fillStyle = style.color
-				context.fillRect(0, 0, 1, 1)
+					context.fillStyle = style.color
+					context.fillRect(0, 0, 1, 1)
 
-				return {
-					alpha: context.getImageData(0, 0, 1, 1).data[3],
-					background: style.getPropertyValue('--slice-labelBackground'),
-					filter: style.filter,
-				}
-			}),
-		)
+					return {
+						alpha: context.getImageData(0, 0, 1, 1).data[3],
+						visible: element.checkVisibility(),
+						width: element.getBoundingClientRect().width,
+						height: element.getBoundingClientRect().height,
+						background: style.getPropertyValue('--slice-labelBackground'),
+						filter: style.filter,
+					}
+				}),
+			)
 
-		expect(inks.length).toBeGreaterThan(0)
+			expect(inks.length).toBeGreaterThan(0)
 
-		for (const ink of inks) {
-			expect(ink.background).not.toBe('')
-			expect(
-				Math.abs(ink.alpha - (colorScheme === 'light' ? 0.62 : 0.7) * 255),
-			).toBeLessThanOrEqual(1)
-			expect(ink.filter).toBe('opacity(0.8)')
-		}
-	})
+			for (const ink of inks) {
+				expect(ink.visible).toBe(true)
+				expect(ink.width).toBeGreaterThan(0)
+				expect(ink.height).toBeGreaterThan(0)
+				expect(ink.background).not.toBe('')
+				expect(
+					Math.abs(ink.alpha - (colorScheme === 'light' ? 0.62 : 0.7) * 255),
+				).toBeLessThanOrEqual(1)
+				expect(ink.filter).toBe('opacity(0.8)')
+			}
+		})
+	}
 }
