@@ -329,76 +329,9 @@
 		background: transparent;
 	}
 
-	/* Each endpoint has a permanent measurement owner: the set owns its shared
-	 * header position, and each helipad owns its slot. Native anchoring owns the
-	 * sticky position; view clocks supply only the open slot's relative offset.
-	 * No probe changes its anchor on open/close. */
-	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px)) {
-		@container wallet-table (width >= 42rem) {
-			fieldset:not([data-active-count="0"]),
-			[data-active-choice] .choice-icon-helipad {
-				&::before, &::after {
-					content: '';
-					position: fixed;
-					inset: 0 auto auto 0;
-					visibility: hidden;
-					pointer-events: none;
-				}
-				&::before {
-					right: anchor(center);
-					block-size: 1px;
-				}
-				&::after {
-					bottom: anchor(center);
-					inline-size: 1px;
-				}
-			}
-			fieldset:not([data-active-count="0"]) {
-				timeline-scope: var(--closed-anchor), var(--closed-block-timeline);
-				animation: filter-closed-inline-measure auto linear both, filter-closed-block-measure auto linear both;
-				animation-timeline: var(--closed-anchor), var(--closed-block-timeline);
-				&::before, &::after { position-anchor: var(--closed-anchor); }
-				&::before { view-timeline: var(--closed-anchor) inline 0; }
-				&::after { view-timeline: var(--closed-block-timeline) block 0; }
-			}
-			[data-active-choice] .choice-icon-helipad {
-				timeline-scope: var(--choice-anchor), var(--choice-block-timeline);
-				animation: filter-inline-measure auto linear both, filter-block-measure auto linear both;
-				animation-timeline: var(--choice-anchor), var(--choice-block-timeline);
-				&::before, &::after { position-anchor: var(--choice-anchor); }
-				&::before { view-timeline: var(--choice-anchor) inline 0; }
-				&::after { view-timeline: var(--choice-block-timeline) block 0; }
-			}
-			[data-active-choice] .choice-icon {
-				inset: auto;
-				top: anchor(center);
-				left: anchor(center);
-				inline-size: var(---filter-clusterSize);
-				block-size: var(---filter-clusterSize);
-				translate: none;
-				transform:
-					translate(
-						calc(-50% + cos(var(---filter-packingAngle)) * var(---filter-packingDistance)),
-						calc(-50% + sin(var(---filter-packingAngle)) * var(---filter-packingDistance))
-					)
-					scale(calc(2 * var(---filter-packingRadius) / var(---filter-clusterSize)));
-				transition-property: transform;
-			}
-			:global([popover]:popover-open) form [data-panel-member] [data-active-choice] {
-				.choice-icon {
-					position-anchor: var(--closed-anchor);
-					inline-size: var(---filter-clusterSize);
-					block-size: var(---filter-clusterSize);
-					translate: none;
-					transform: translate(
-						calc(100vw * (1 / var(---filter-inlineFraction) - 1 / var(---filter-closedInlineFraction)) - 50%),
-						calc(100vh * (1 / var(---filter-blockFraction) - 1 / var(---filter-closedBlockFraction)) - 50%)
-						) scale(calc(1.25em / var(---filter-clusterSize)));
-				}
-			}
-		}
-	}
-	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px))) {
+	/* Enabled controls use the unscaled position owner for live updates; the glyph
+	 * owns its scale. Native input availability also preserves the CSS-only baseline. */
+
 		@container wallet-table (width >= 42rem) {
 			:where(form[data-anchored]) [data-active-choice] .choice-position {
 				--view-transition-name: var(--choice-motion-name);
@@ -423,7 +356,6 @@
 				block-size: var(---filter-clusterSize);
 				translate: none;
 				transform: scale(tan(atan2(calc(2 * var(---filter-packingRadius)), var(---filter-clusterSize))));
-				transition-property: transform;
 			}
 
 			:global([popover]:popover-open) form[data-anchored] [data-panel-member] [data-active-choice] {
@@ -435,10 +367,86 @@
 				.choice-icon { transform: scale(tan(atan2(1.25em, var(---filter-clusterSize)))); }
 			}
 		}
+	/* Before controls are enabled, native CSS owns motion between permanent
+	 * measurement endpoints: the set owns its shared
+	 * header position, and each helipad owns its slot. Native anchoring owns the
+	 * sticky position; view clocks supply only the open slot's relative offset.
+	 * No probe changes its anchor on open/close. */
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px)) {
+		@container wallet-table (width >= 42rem) {
+			form:not(:has(input:enabled)) .choice-position {
+				display: contents;
+				--view-transition-name: none;
+			}
+			form:not(:has(input:enabled)) fieldset:not([data-active-count="0"]),
+			form:not(:has(input:enabled)) [data-active-choice] .choice-icon-helipad {
+				&::before, &::after {
+					content: '';
+					position: fixed;
+					inset: 0 auto auto 0;
+					visibility: hidden;
+					pointer-events: none;
+				}
+				&::before {
+					right: anchor(center);
+					block-size: 1px;
+				}
+				&::after {
+					bottom: anchor(center);
+					inline-size: 1px;
+				}
+			}
+			form:not(:has(input:enabled)) fieldset:not([data-active-count="0"]) {
+				timeline-scope: var(--closed-anchor), var(--closed-block-timeline);
+				animation: filter-closed-inline-measure auto linear both, filter-closed-block-measure auto linear both;
+				animation-timeline: var(--closed-anchor), var(--closed-block-timeline);
+				&::before, &::after { position-anchor: var(--closed-anchor); }
+				&::before { view-timeline: var(--closed-anchor) inline 0; }
+				&::after { view-timeline: var(--closed-block-timeline) block 0; }
+			}
+			form:not(:has(input:enabled)) [data-active-choice] .choice-icon-helipad {
+				timeline-scope: var(--choice-anchor), var(--choice-block-timeline);
+				animation: filter-inline-measure auto linear both, filter-block-measure auto linear both;
+				animation-timeline: var(--choice-anchor), var(--choice-block-timeline);
+				&::before, &::after { position-anchor: var(--choice-anchor); }
+				&::before { view-timeline: var(--choice-anchor) inline 0; }
+				&::after { view-timeline: var(--choice-block-timeline) block 0; }
+			}
+			form:not(:has(input:enabled)) [data-active-choice] .choice-icon {
+				position: fixed;
+				inset: auto;
+				top: anchor(center);
+				left: anchor(center);
+				inline-size: var(---filter-clusterSize);
+				block-size: var(---filter-clusterSize);
+				translate: none;
+				transform:
+					translate(
+						calc(-50% + cos(var(---filter-packingAngle)) * var(---filter-packingDistance)),
+						calc(-50% + sin(var(---filter-packingAngle)) * var(---filter-packingDistance))
+					)
+					scale(calc(2 * var(---filter-packingRadius) / var(---filter-clusterSize)));
+			}
+			:global([popover]:popover-open) form:not(:has(input:enabled)) [data-panel-member] [data-active-choice] {
+				.choice-icon {
+					position: fixed;
+					position-anchor: var(--closed-anchor);
+					inline-size: var(---filter-clusterSize);
+					block-size: var(---filter-clusterSize);
+					translate: none;
+					transform: translate(
+						calc(100vw * (1 / var(---filter-inlineFraction) - 1 / var(---filter-closedInlineFraction)) - 50%),
+						calc(100vh * (1 / var(---filter-blockFraction) - 1 / var(---filter-closedBlockFraction)) - 50%)
+						) scale(calc(1.25em / var(---filter-clusterSize)));
+				}
+			}
+		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		[data-active-choice] .choice-icon { transition-property: none; }
+	@media (prefers-reduced-motion: no-preference) {
+		@container wallet-table (width >= 42rem) {
+			:where(form[data-anchored]) [data-active-choice] .choice-icon { transition-property: transform; }
+		}
 	}
 
 	.count {
