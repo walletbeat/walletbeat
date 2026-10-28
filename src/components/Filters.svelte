@@ -149,8 +149,10 @@
 								style:--choice-anchor={choiceAnchor}
 								style:--choice-block-timeline={`${choiceAnchor}-block`}
 							>
+								<span class="choice-position" data-view-transition="named" style:--choice-motion-name={viewTransitionName(instanceId, set.id, choice.id)}>
 								<span class="choice-icon" data-icon={choice.icon ? '' : undefined} aria-hidden="true">
 									{#if choice.icon}{@html choice.icon}{:else}{choice.compactLabel ?? choice.label}{/if}
+								</span>
 								</span>
 							</span>
 
@@ -253,6 +255,11 @@
 		anchor-name: var(--choice-anchor);
 	}
 
+	.choice-position {
+		display: contents;
+		--view-transition-name: none;
+	}
+
 	.choice-icon {
 		display: grid;
 		place-items: center;
@@ -264,7 +271,7 @@
 		:global(svg) { inline-size: 100%; block-size: 100%; }
 	}
 
-	:where(form[data-anchored]) [data-active-choice] .choice-icon {
+	:where(form[data-anchored]) [data-active-choice] .choice-icon-helipad {
 		---filter-clusterSize: var(--filter-cluster-size, 1.3rem);
 		---filter-packingStartAngle: -90deg;
 		---filter-packingAngle: calc(var(---filter-packingStartAngle) + var(--active-index) * 1turn / max(var(--active-count), 1));
@@ -273,7 +280,9 @@
 			/ (1 + sin(0.5turn / max(var(--active-count), 2)))
 		);
 		---filter-packingDistance: calc(0.5 * var(---filter-clusterSize) - var(---filter-packingRadius));
+	}
 
+	:where(form[data-anchored]) [data-active-choice] .choice-icon {
 		position: fixed;
 		min-inline-size: 0;
 		min-block-size: 0;
@@ -294,16 +303,16 @@
 		pointer-events: none;
 	}
 
-	[data-active-count="1"] [data-active-choice] .choice-icon {
+	[data-active-count="1"] [data-active-choice] .choice-icon-helipad {
 		---filter-packingRadius: calc(0.5 * var(---filter-clusterSize));
 		---filter-packingDistance: 0px;
 	}
 
-	[data-active-count="2"] [data-active-choice] .choice-icon {
+	[data-active-count="2"] [data-active-choice] .choice-icon-helipad {
 		---filter-packingStartAngle: 0deg;
 	}
 
-	[data-active-count="4"] [data-active-choice] .choice-icon {
+	[data-active-count="4"] [data-active-choice] .choice-icon-helipad {
 		---filter-packingStartAngle: 45deg;
 	}
 
@@ -385,45 +394,44 @@
 		}
 	}
 	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --filter-inline) and (scale: calc(1px / 1px))) {
-		@property ---filter-openProgress {
-			syntax: '<number>';
-			inherits: false;
-			initial-value: 0;
-		}
-
 		@container wallet-table (width >= 42rem) {
+			:where(form[data-anchored]) [data-active-choice] .choice-position {
+				--view-transition-name: var(--choice-motion-name);
+				display: block;
+				position: fixed;
+				position-anchor: var(--closed-anchor);
+				inset: auto;
+				left: calc(anchor(center) + cos(var(---filter-packingAngle)) * var(---filter-packingDistance) - var(---filter-clusterSize) / 2);
+				top: calc(anchor(center) + sin(var(---filter-packingAngle)) * var(---filter-packingDistance) - var(---filter-clusterSize) / 2);
+				inline-size: var(---filter-clusterSize);
+				block-size: var(---filter-clusterSize);
+				visibility: visible;
+				pointer-events: none;
+				z-index: 8;
+				transition-property: none;
+			}
+
 			:where(form[data-anchored]) [data-active-choice] .choice-icon,
 			:global([popover]:popover-open) form[data-anchored] [data-panel-member] [data-active-choice] .choice-icon {
-				position-anchor: var(--closed-anchor);
+				position: static;
 				inline-size: var(---filter-clusterSize);
 				block-size: var(---filter-clusterSize);
 				translate: none;
-				left: calc(
-					(1 - var(---filter-openProgress)) * (anchor(var(--closed-anchor) center) + cos(var(---filter-packingAngle)) * var(---filter-packingDistance))
-					+ var(---filter-openProgress) * anchor(var(--choice-anchor) center)
-				);
-				top: calc(
-					(1 - var(---filter-openProgress)) * (anchor(var(--closed-anchor) center) + sin(var(---filter-packingAngle)) * var(---filter-packingDistance))
-					+ var(---filter-openProgress) * anchor(var(--choice-anchor) center)
-				);
-				transform: translate(-50%, -50%) scale(calc(
-					(1 - var(---filter-openProgress)) * tan(atan2(calc(2 * var(---filter-packingRadius)), var(---filter-clusterSize)))
-					+ var(---filter-openProgress) * tan(atan2(1.25em, var(---filter-clusterSize)))
-				));
+				transform: scale(tan(atan2(calc(2 * var(---filter-packingRadius)), var(---filter-clusterSize))));
+				transition-property: transform;
 			}
 
-			:global([popover]:popover-open) form[data-anchored] [data-panel-member] .choice-icon {
-				---filter-openProgress: 1;
-				@starting-style { ---filter-openProgress: 0; }
-			}
-
-			@media (prefers-reduced-motion: no-preference) {
-				:where(form[data-anchored]) [data-active-choice] .choice-icon {
-					transition-property: ---filter-openProgress;
+			:global([popover]:popover-open) form[data-anchored] [data-panel-member] [data-active-choice] {
+				.choice-position {
+					position-anchor: var(--choice-anchor);
+					left: calc(anchor(center) - var(---filter-clusterSize) / 2);
+					top: calc(anchor(center) - var(---filter-clusterSize) / 2);
 				}
+				.choice-icon { transform: scale(tan(atan2(1.25em, var(---filter-clusterSize)))); }
 			}
 		}
 	}
+
 	@media (prefers-reduced-motion: reduce) {
 		[data-active-choice] .choice-icon { transition-property: none; }
 	}
