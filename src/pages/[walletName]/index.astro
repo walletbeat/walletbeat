@@ -1,6 +1,12 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
+import { allHardwareModels } from '@/data/hardware-wallets'
+import {
+	allRatedWalletsBySlug,
+	allWallets,
+	isValidWalletSlug,
+	walletOfTypeBySlug,
+} from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
 import { walletOgImage } from '@/utils/wallet-og-image'
@@ -29,6 +35,11 @@ if (walletEntry === undefined) {
 
 const [walletDataName, walletData] = walletEntry
 const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
+const walletOfType = walletOfTypeBySlug(walletName)
+
+if (walletOfType === undefined) {
+	throw new Error(`no wallet data for slug "${walletName}"`)
+}
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -59,6 +70,11 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<WalletPageContext walletId={wallet.metadata.id} codeSnippets={codeSnippets} client:idle />
+		<WalletPageContext
+			{walletOfType}
+			hardwareModels={allHardwareModels}
+			codeSnippets={codeSnippets}
+			client:idle
+		/>
 	</main>
 </Layout>
