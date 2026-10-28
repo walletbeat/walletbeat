@@ -14,11 +14,22 @@ const inputProperties = [
 	'--layoutTransition-easing',
 ] as const
 
-const cancelInputTransitions = (items: Iterable<HTMLElement>) => {
+const cancelInputTransitions = (items: Iterable<HTMLElement>, layoutAnimations?: Animation[]) => {
 	const transitions: Animation[] = []
 
 	for (const item of items) {
 		for (const animation of item.getAnimations()) {
+			if (
+				layoutAnimations &&
+				animation instanceof CSSAnimation &&
+				animation.animationName === 'layout-transition' &&
+				animation.effect instanceof KeyframeEffect &&
+				animation.effect.target === item &&
+				animation.effect.pseudoElement === null
+			) {
+				layoutAnimations.push(animation)
+			}
+
 			if (
 				animation instanceof CSSTransition &&
 				(animation.transitionProperty === 'translate' ||
@@ -179,7 +190,7 @@ export function prepareItemReorder(
 				item.style.setProperty('--layoutTransition-parentAfterY', `${parent.end.y}px`)
 			}
 
-			item.setAttribute('data-layout-transition', 'before')
+			item.setAttribute('data-layout-transition', '')
 		}
 
 		const firstItem = releases.keys().next().value
@@ -189,8 +200,7 @@ export function prepareItemReorder(
 		}
 
 		// Commit the paused keyframe pose before starting the shared native clock.
-		cancelInputTransitions(releases.keys())
-		getComputedStyle(firstItem).getPropertyValue('translate')
+		cancelInputTransitions(releases.keys(), animations)
 		let frame: number | undefined
 		let finish!: () => void
 		const finished = new Promise<void>(resolve => {
@@ -204,39 +214,22 @@ export function prepareItemReorder(
 
 			frame = undefined
 
-			for (const item of releases.keys()) {
-				if (ownerByItem.get(item) === releases.get(item)) {
-					item.setAttribute('data-layout-transition', 'after')
-				}
-			}
+			const eligible = animations.filter(animation => {
+				const item = animation.effect instanceof KeyframeEffect ? animation.effect.target : null
 
-			for (const item of releases.keys()) {
-				if (ownerByItem.get(item) !== releases.get(item)) {
-					continue
-				}
-
-				animations.push(
-					...item
-						.getAnimations()
-						.filter(
-							animation =>
-								animation instanceof CSSAnimation &&
-								animation.animationName === 'layout-transition' &&
-								animation.effect instanceof KeyframeEffect &&
-								animation.effect.target === item &&
-								animation.effect.pseudoElement === null,
-						),
+				return (
+					item instanceof HTMLElement &&
+					ownerByItem.get(item) === releases.get(item) &&
+					animation.playState !== 'idle'
 				)
-			}
+			})
 			const startTime = document.timeline.currentTime
 
-			for (const animation of animations) {
+			for (const animation of eligible) {
 				animation.startTime = startTime
 			}
 
-			return Promise.allSettled(animations.map(animation => animation.finished)).then(
-				() => undefined,
-			)
+			return Promise.allSettled(eligible.map(animation => animation.finished)).then(() => undefined)
 		})
 
 		return {
