@@ -351,6 +351,7 @@ export const bitget: SoftwareWallet = {
 					},
 				}),
 			},
+			softwareUpdates: null,
 		},
 		walletCall: notSupported,
 	},
