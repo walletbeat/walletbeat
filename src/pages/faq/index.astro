@@ -266,7 +266,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+	<main data-content-page data-column-item='flexible' data-sticky-container data-column='gap-8'>
 		<header id='top' data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-2'>
 				<h1>Frequently Asked Questions</h1>
@@ -282,7 +282,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 							<h2>{entry.question}</h2>
 						</summary>
 
-						<div data-column='gap-5'>
+						<div data-prose data-column='gap-5'>
 							<Typography client:visible content={entry.answer} />
 						</div>
 					</details>
@@ -295,17 +295,11 @@ import { defaultNavigationItems } from '@/constants/navigation'
 <style>
 	main {
 		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
 			--scrollItem-inlineDetached-paddingStart: 4.5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
 		}
-
-		line-height: 1.4;
 	}
 
 	hgroup p {
-		color: var(--text-secondary);
 		font-size: 1rem;
 	}
 
@@ -348,10 +342,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			&::after {
 				transform: rotate(180deg);
 			}
-		}
-
-		> div {
-			line-height: 1.8;
 		}
 
 		div :global(ul) {

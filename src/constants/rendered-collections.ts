@@ -36,7 +36,7 @@ export type RenderedMarkdownCollection = {
 )
 
 export const RENDERED_MARKDOWN_COLLECTIONS = {
-	about: { name: 'about', repoDir: '/src/pages/about', urlPrefix: '/about', dirIndex: false },
+	about: { name: 'about', repoDir: '/src/content/about', urlPrefix: '/about', dirIndex: false },
 	docs: {
 		name: 'docs',
 		repoDir: '/resources/docs',
