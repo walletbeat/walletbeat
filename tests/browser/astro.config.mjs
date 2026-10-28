@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__native-popover-motion',
+				entrypoint: './tests/browser/fixtures/native-popover-motion.astro',
+			})
+			injectRoute({
 				pattern: '/__pie-motion',
 				entrypoint: './tests/browser/fixtures/pie-motion.astro',
 			})
