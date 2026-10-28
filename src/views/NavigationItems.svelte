@@ -144,10 +144,11 @@
 					{@attach (input: HTMLInputElement) => {
 						const abortController = new AbortController()
 
-						const navPopover = input.closest('nav[popover]')
 						const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
 
 						const openNavPopover = () => {
+							const navPopover = input.closest('[popover]')
+
 							if (
 								isMobileNav.matches &&
 								navPopover instanceof HTMLElement &&
