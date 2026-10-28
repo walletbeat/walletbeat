@@ -1862,11 +1862,29 @@
 		backdrop-filter: none;
 		pointer-events: none;
 
-		@supports (position-area: block-end span-all) {
+		&:not([data-filter-kind="attribute"]) {
+			left: max(0.5rem, anchor(left));
+			right: 0.5rem;
+		}
+
+		&[data-filter-kind="attribute"] {
+			left: auto;
+			right: 0.5rem;
+		}
+
+		@supports (position-area: block-end span-inline-end) {
 			/* The anchor area supplies the remaining viewport block size. */
 			position-area: block-end span-all;
 			top: 0.5rem;
 			max-block-size: calc(100% - 1rem);
+
+			&:popover-open {
+				/* The visible panel can use viewport space beyond its anchor's side. */
+				position-area: block-end span-inline-end;
+				inset-inline: auto;
+				inline-size: max-content;
+				margin-inline: 0.5rem;
+			}
 		}
 
 		@container wallet-table (width >= 42rem) {
@@ -1875,16 +1893,6 @@
 				:global([data-active-choice] .choice-icon) { visibility: visible; }
 			}
 		}
-	}
-
-	.filter-popover:not([data-filter-kind="attribute"]) {
-		left: max(0.5rem, anchor(left));
-		right: 0.5rem;
-	}
-
-	.filter-popover[data-filter-kind="attribute"] {
-		left: auto;
-		right: 0.5rem;
 	}
 
 	.filter-popover:popover-open {

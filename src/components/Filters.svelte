@@ -213,6 +213,11 @@
 	}
 
 	@container wallet-table (width >= 42rem) {
+		:where(form[data-anchored]) [data-filter-choice] {
+			/* Floating glyphs and probes retain the viewport as their containing block. */
+			--pressable-pressed-scale: none;
+		}
+
 		fieldset:not([data-panel-member]) {
 			position: fixed;
 			visibility: hidden;
