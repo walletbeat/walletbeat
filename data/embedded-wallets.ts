@@ -5,6 +5,7 @@ import { embeddedLadders } from '@/schema/ladders'
 import type { Variant } from '@/schema/variants'
 import { type BaseWallet, rateWallet } from '@/schema/wallet'
 
+import { privy } from './embedded-wallets/privy'
 import { unratedEmbeddedTemplate } from './embedded-wallets/unrated.tmpl'
 
 const embeddedWalletAttributeGroupIds = [
@@ -35,7 +36,9 @@ export type EmbeddedWallet = BaseWallet<EmbeddedAttributeGroupId> & {
 	}
 }
 
-export const embeddedWallets: Record<string, EmbeddedWallet> = {}
+export const embeddedWallets: Record<string, EmbeddedWallet> = {
+	privy,
+}
 
 export const ratedEmbeddedWallets = Object.fromEntries(
 	Object.entries(embeddedWallets).map(([name, wallet]) => [
