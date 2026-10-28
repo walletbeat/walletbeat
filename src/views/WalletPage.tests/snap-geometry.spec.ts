@@ -1,6 +1,63 @@
 import { observeStickyChain } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
+for (const width of [390, 934, 1440]) {
+	test(`page-start snapping preserves the natural header at ${width}px`, async ({ page }, info) => {
+		await page.setViewportSize({ width, height: 900 })
+
+		for (const wallet of ['rainbow', 'metamask']) {
+			await page.goto(`/${wallet}/#top`)
+			await page.evaluate(() => document.fonts.ready)
+			const root = page.locator('#layout')
+			const start = page.locator('#top')
+
+			const settle = async () => {
+				let previous = Number.NaN
+				let stable = 0
+
+				await expect
+					.poll(
+						async () => {
+							const current = await root.evaluate(element => element.scrollTop)
+
+							stable =
+								Math.abs(current - previous) < 0.25 && Math.abs(current) <= 1 ? stable + 1 : 0
+							previous = current
+
+							return stable
+						},
+						{ intervals: [80] },
+					)
+					.toBeGreaterThanOrEqual(4)
+			}
+
+			await settle()
+			await root.evaluate(element => element.scrollTo({ top: 1, behavior: 'instant' }))
+			await settle()
+			const observation = await start.evaluate(element => {
+				const header = element.querySelector(':scope > header')!
+				const h1 = header.querySelector('h1')!
+
+				return {
+					top: element.getBoundingClientRect().top,
+					header: header.getBoundingClientRect().top,
+					h1: h1.getBoundingClientRect().top,
+					margin: parseFloat(getComputedStyle(element).scrollMarginBlockStart),
+					hydrated: !element.closest('astro-island')?.hasAttribute('ssr'),
+				}
+			})
+
+			expect(observation.top).toBeGreaterThanOrEqual(observation.margin - 1)
+			expect(observation.header).toBeGreaterThanOrEqual(observation.top - 1)
+			expect(observation.h1).toBeGreaterThanOrEqual(observation.header - 1)
+			await info.attach(`${wallet}-page-start`, {
+				body: JSON.stringify(observation),
+				contentType: 'application/json',
+			})
+		}
+	})
+}
+
 for (const width of [390, 690, 1440]) {
 	test(`native summary measurements belong to every rendered sticky owner at ${width}px`, async ({
 		page,
