@@ -2,18 +2,13 @@ import { observeStickyChain } from '../../../tests/browser/sticky-observation.mj
 import { expect, test } from '../../../tests/browser/verified-test'
 
 for (const width of [390, 690, 1440]) {
-	test(`scrollIntoView targets clear occupied sticky rows and wheel snapping preserves the H1 endpoint at ${width}px`, async ({
+	test(`native summary measurements belong to every rendered sticky owner at ${width}px`, async ({
 		page,
 	}, info) => {
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/__wallet-page/credits/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
-		expect(
-			await page.locator('#content').evaluate(element => getComputedStyle(element).scrollSnapAlign),
-			'The content wrapper does not compete with owned scope snap points',
-		).toBe('none')
-		const evidence = []
 		const nativeH4Sizes = await page
 			.locator(
 				'#top [data-sticky-container]:not([data-sticky-breadcrumb]):has(> summary[data-sticky~="block-start"] h4)',
@@ -21,18 +16,8 @@ for (const width of [390, 690, 1440]) {
 			.evaluateAll(elements =>
 				elements.flatMap(element => {
 					const summary = element.querySelector(':scope > summary')
-					const activeProducer = element
-						.getAnimations()
-						.some(
-							animation =>
-								animation instanceof CSSAnimation &&
-								animation.animationName === 'breadcrumb-item-block' &&
-								animation.effect instanceof KeyframeEffect &&
-								animation.effect.target === element &&
-								!animation.effect.pseudoElement,
-						)
 
-					if (!activeProducer || !element.matches('details[open]') || !summary?.checkVisibility()) {
+					if (!element.matches('details[open]') || !summary?.checkVisibility()) {
 						return []
 					}
 
@@ -45,6 +30,11 @@ for (const width of [390, 690, 1440]) {
 					return [
 						{
 							id: element.id,
+							sticky: getComputedStyle(summary).position === 'sticky',
+							enhanced:
+								getComputedStyle(element.closest('[data-sticky-breadcrumb~="scope"]') ?? element)
+									.getPropertyValue('--sticky-position')
+									.trim() === 'sticky',
 							actualHeight: box.height,
 							measuredHeight: getComputedStyle(element)
 								.getPropertyValue('---breadcrumb-itemHeight')
@@ -59,7 +49,17 @@ for (const width of [390, 690, 1440]) {
 			contentType: 'application/json',
 		})
 
+		expect(
+			nativeH4Sizes.length,
+			'The fixture exposes rendered open native summaries',
+		).toBeGreaterThan(0)
+
 		for (const owner of nativeH4Sizes) {
+			if (!owner.enhanced) {
+				continue
+			}
+
+			expect(owner.sticky, `${owner.id} participates in its enabled sticky scope`).toBe(true)
 			expect(
 				/^-?(?:\d+(?:\.\d*)?|\.\d+)px$/.test(owner.measuredHeight),
 				`${owner.id} native header measurement resolves`,
@@ -69,6 +69,20 @@ for (const width of [390, 690, 1440]) {
 				`${owner.id} native header measurement matches its own rendered Summary`,
 			).toBeLessThanOrEqual(0.125)
 		}
+	})
+
+	test(`scrollIntoView targets clear occupied sticky rows and wheel snapping preserves the H1 endpoint at ${width}px`, async ({
+		page,
+	}, info) => {
+		await page.setViewportSize({ width, height: 900 })
+		await page.goto('/__wallet-page/credits/')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		expect(
+			await page.locator('#content').evaluate(element => getComputedStyle(element).scrollSnapAlign),
+			'The content wrapper does not compete with owned scope snap points',
+		).toBe('none')
+		const evidence = []
 		const cards = await page.locator('#top [data-card]').evaluateAll(elements =>
 			elements
 				.filter(element => {
