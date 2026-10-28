@@ -572,7 +572,6 @@
 					{/if}
 					<div
 						class="header-cell-content"
-						data-sticky-container
 					>
 						{#snippet HeaderTitle()}
 							<span
@@ -618,6 +617,7 @@
 						{#if hasHeaderExtra}
 							<div
 								class="header-extra"
+								data-sticky-container
 								data-sticky="backdrop-before backdrop-stuck"
 							>
 								{@render column.HeaderExtra?.({ column })}
@@ -627,6 +627,7 @@
 								type="button"
 								class="expansion-button"
 								disabled={!interactive}
+								data-sticky-container
 								data-sticky="backdrop-before backdrop-stuck"
 							onclick={() => {
 								transitionUpdate(() => {
@@ -748,11 +749,12 @@
 		@supports (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
 			@container (width >= 48rem) {
 				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
-					--sticky-marginInlineStart: var(---table-sticky-size);
-					--sticky-paddingInlineEnd: 0.5em;
 					overflow-x: clip;
 					overflow-y: visible;
 
+					> [data-sticky-container] {
+						--sticky-marginInlineStart: var(---table-sticky-size);
+					}
 					> [data-scroll-item] {
 						--scrollItem-visibleCenter-animation: scroll-item-visible-center;
 					}
@@ -898,11 +900,8 @@
 						align-items: center;
 						gap: 0.25em;
 
-						&[data-sticky-container] {
-							--sticky-paddingInlineEnd: 0.5em;
-						}
-
-						> [data-sticky-container] {
+						> [data-scroll-item] {
+							--sticky-marginInlineEnd: 0.5em;
 							--sticky-paddingInlineEnd: 1em;
 
 							> span[data-sticky] {
@@ -989,8 +988,8 @@
 
 					&[data-expandable] {
 						---table-isExpanded: 0;
-						> .header-cell-content[data-sticky-container] {
-							--sticky-paddingInlineEnd: 2em;
+						> .header-cell-content > [data-scroll-item] {
+							--sticky-marginInlineEnd: 2em;
 						}
 
 						cursor: pointer;
