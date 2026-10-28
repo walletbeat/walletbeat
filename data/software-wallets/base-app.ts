@@ -490,6 +490,7 @@ export const baseApp: SoftwareWallet = {
 				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: 'SOURCE_NOT_AVAILABLE',
 			},
+			securityLibraries: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
