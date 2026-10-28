@@ -504,8 +504,7 @@
 	}
 
 	.detail-code {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.8rem;
 		background-color: var(--background-secondary);
 		padding: 0.75rem;
@@ -518,8 +517,7 @@
 	}
 
 	.address-input {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.85rem;
 		background-color: var(--background-secondary);
 		color: var(--text-primary);
@@ -569,8 +567,7 @@
 	}
 
 	.permit-value {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.8rem;
 		color: var(--text-primary);
 		word-break: break-all;
@@ -588,8 +585,7 @@
 		background: color-mix(in srgb, var(--rating-partial) 15%, transparent);
 		color: var(--rating-partial-text);
 		border: 1px solid color-mix(in srgb, var(--rating-partial) 40%, transparent);
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 	}
 
 	.risk-badge {
@@ -672,8 +668,7 @@
 		font-size: 0.8rem;
 		cursor: pointer;
 		text-align: left;
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		word-break: break-all;
 		overflow-wrap: break-word;
 		min-width: 0;
@@ -684,8 +679,7 @@
 	}
 
 	.result-sig {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.8rem;
 		color: var(--text-primary);
 		word-break: break-all;

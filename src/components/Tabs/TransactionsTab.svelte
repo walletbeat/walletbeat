@@ -365,8 +365,7 @@
 	}
 
 	.detail-code {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.8rem;
 		background-color: var(--background-secondary);
 		padding: 0.75rem;
@@ -380,8 +379,7 @@
 	}
 
 	.address-input {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.85rem;
 		background-color: var(--background-secondary);
 		color: var(--text-primary);
@@ -442,8 +440,7 @@
 	}
 
 	.parameter-value {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.75rem;
 		color: var(--text-primary);
 		word-break: break-all;
@@ -486,8 +483,7 @@
 		font-size: 0.8rem;
 		cursor: pointer;
 		text-align: left;
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 	}
 
 	.result-link:hover {
