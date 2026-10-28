@@ -527,6 +527,7 @@ describe('codebase integrity', () => {
 			'[attrGroupId].astro',
 			'[eip].astro',
 			'[walletName]',
+			'[walletTypeSlug]',
 			'[...slug]',
 			'[...path].[ext].ts',
 			'_about.md',
