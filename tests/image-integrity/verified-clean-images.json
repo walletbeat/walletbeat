@@ -1699,6 +1699,26 @@
 		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/darryl_lightning_talk.jpg": {
+		"hash": "e59bd85170c829a275b27f68e3c672eee1d6e4dc2c3688122181f12a13fcef2c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/matt_lightning_talk.jpg": {
+		"hash": "52af429bd900175dac59beb0c6316483d5ae25ffaeeefd4236b69aded6bdd403",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/matt_workshop.jpg": {
+		"hash": "e1bddcb47d823ffd072738c0f2926761b2d3ea499a113c8e9b89bbc7b301ceae",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_lightning_talk.jpg": {
+		"hash": "edfea5db7f2da18a12803b6049bf668bd21ca3c66e83c1912e4943815bdd74f1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_matt.jpg": {
+		"hash": "c5f107a19cff842e2358de9e79b8f437d09aa023e4fa3094f9f5510f1d12f555",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
