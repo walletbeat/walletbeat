@@ -999,6 +999,52 @@ export async function observeIconPaint({
 				recoveredFrame: value.laterCorrect,
 				catchupMs: value.convergenceMs,
 			}))
+		const naturalFrames = result.frames.filter(frame => frame.natural)
+		const inputStart = result.criticalStart
+		const inputAck = result.inputFinished
+		const targetFrames = naturalFrames.filter(
+			frame =>
+				frame.referencePose !== null &&
+				Math.abs(frame.referencePose - D) <= poseTolerance &&
+				frame.referencePose === frame.cyanReferencePose,
+		)
+		const arrival = (frame: ClassifiedFrame | undefined) =>
+			frame
+				? {
+						index: frame.index,
+						timestampMs: frame.timestamp * 1000,
+						sinceInputStartMs: frame.timestamp * 1000 - inputStart,
+						sinceInputAckMs: frame.timestamp * 1000 - inputAck,
+					}
+				: null
+		const firstTarget = targetFrames[0]
+		const predecessor = firstTarget
+			? result.frames.findLast(frame => frame.index < firstTarget.index)
+			: undefined
+
+		result.targetArrival = {
+			targetScroll: D,
+			inputAckDurationMs: result.nativeInputDuration,
+			firstTargetFrame: arrival(firstTarget),
+			firstCorrectTargetFrame: arrival(
+				targetFrames.find(frame => frame.classification === 'correct'),
+			),
+			firstTargetCaptureBracket: firstTarget
+				? {
+						predecessorIndex: predecessor?.index ?? null,
+						predecessorTimestampMs: predecessor ? predecessor.timestamp * 1000 : null,
+						firstTargetTimestampMs: firstTarget.timestamp * 1000,
+						captureGapMs: predecessor
+							? (firstTarget.timestamp - predecessor.timestamp) * 1000
+							: null,
+					}
+				: null,
+			staleTargetFrameIndices: targetFrames
+				.filter(frame => frame.classification === 'wrong' || frame.classification === 'missing')
+				.map(frame => frame.index),
+			interpretation:
+				'Captured target arrival is distinct from raster correctness. Input acknowledgement is not a presentation deadline; capture gaps may include dropped frames. Null means unobserved. These timestamps do not establish physical display latency.',
+		}
 		result.cleanup =
 			'Dedicated browser process is disposed in finally; no control stylesheet restoration is used as baseline acceptance'
 		result.interpretation =
