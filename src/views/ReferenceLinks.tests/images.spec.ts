@@ -70,7 +70,7 @@ for (const javaScriptEnabled of [false, true]) {
 					}
 				}
 
-				await page.evaluate(() => document.fonts.ready)
+				await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded')
 				const images = page.locator(imageSelector)
 
 				expect(await images.count()).toBeGreaterThan(0)
