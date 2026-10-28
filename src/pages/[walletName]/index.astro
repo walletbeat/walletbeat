@@ -1,11 +1,16 @@
 ---
 // Types/constants
 import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
+import { allHardwareModels } from '@/data/hardware-wallets'
+import { getNewsForWallet } from '@/data/news'
+import type { Variant } from '@/schema/variants'
+import type { ResolvedWallet } from '@/schema/wallet'
+import { nonEmptyValues } from '@/types/utils/non-empty'
+import { walletPageData } from '@/views/wallet-page-data'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
 import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
 
-import { getNewsForWallet } from '@/data/news'
 import { collectWalletRefs, refs } from '@/schema/reference'
 import { referenceImageDimensions } from '@/utils/reference-image-metadata'
 
@@ -25,6 +30,25 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
+const data = walletPageData(wallet)
+const walletNews = getNewsForWallet(wallet.metadata.id)
+const supportedBrands = new Set(
+	[
+		wallet.overall,
+		...nonEmptyValues<Variant, ResolvedWallet<string>>(wallet.variants).map(
+			variant => variant.attributes,
+		),
+	]
+		.flatMap(tree => Object.values(tree).flatMap(group => Object.values(group)))
+		.flatMap(({ evaluation: { outcome } }) =>
+			'supportedHardwareWallets' in outcome && Array.isArray(outcome.supportedHardwareWallets)
+				? outcome.supportedHardwareWallets
+				: [],
+		),
+)
+const hardwareModels = allHardwareModels.filter(
+	model => model.brandId === wallet.metadata.id || supportedBrands.has(model.brandId.toUpperCase()),
+)
 const walletIcon = await getWalletIcon(wallet.metadata)
 const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
 
@@ -36,7 +60,7 @@ const [walletDataName, walletData] = walletEntry
 const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
 const imageDimensions = await referenceImageDimensions([
 	...collectWalletRefs(walletDataName, walletData).flatMap(ref => ref.fullyQualifiedRefs),
-	...getNewsForWallet(walletName).flatMap(refs),
+	...walletNews.flatMap(refs),
 ])
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -70,7 +94,9 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	<main data-column-item='flexible'>
 		<WalletPageContext
 			{walletIcon}
-			walletId={wallet.metadata.id}
+			{data}
+			{hardwareModels}
+			{walletNews}
 			codeSnippets={codeSnippets}
 			{imageDimensions}
 			client:idle
