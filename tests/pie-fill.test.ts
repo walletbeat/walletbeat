@@ -149,3 +149,54 @@ for (const count of [2, 5, 12]) {
 		)
 	}
 }
+
+for (const totalAngle of [5, 45, 90, 175, 180, 185, 200, 270, 355, 360]) {
+	it(`keeps rounded ${totalAngle}-degree slices within their annulus and angular extent`, async () => {
+		const radius = 64
+		const innerR = radius * 0.58
+		const path = slicePathData({
+			totalAngle,
+			outerR: radius,
+			innerR,
+			outerCornerRadius: 6,
+			innerCornerRadius: 4,
+			gap: 0,
+			midAngle: 0,
+			level: 0,
+			offset: 0,
+			labelSize: 14,
+			labelR: 50,
+		})
+		const extent = radius * 2
+		const { data, info } = await sharp(
+			Buffer.from(
+				`<svg xmlns="http://www.w3.org/2000/svg" width="${extent * 2}" height="${extent * 2}" viewBox="${-extent} ${-extent} ${extent * 2} ${extent * 2}"><path d="${path}" fill="white"/></svg>`,
+			),
+		)
+			.ensureAlpha()
+			.raw()
+			.toBuffer({ resolveWithObject: true })
+		let painted = 0
+		let outside = 0
+
+		for (let y = 0; y < info.height; y++) {
+			for (let x = 0; x < info.width; x++) {
+				if (data[(y * info.width + x) * info.channels + info.channels - 1] < 128) {
+					continue
+				}
+
+				painted++
+				const px = x + 0.5 - extent
+				const py = y + 0.5 - extent
+				const distance = Math.hypot(px, py)
+				const angle = (Math.abs(Math.atan2(px, -py)) * 180) / Math.PI
+
+				if (distance < innerR - 1 || distance > radius + 1 || angle > totalAngle / 2 + 1) {
+					outside++
+				}
+			}
+		}
+		expect(painted).toBeGreaterThan(0)
+		expect(outside).toBe(0)
+	})
+}
