@@ -468,6 +468,11 @@
 	}
 
 	@container wallet-table (width < 42rem) {
+		fieldset,
+		[data-reset="all"] {
+			flex-shrink: 0;
+		}
+
 		form {
 			&[data-row] {
 				flex-wrap: nowrap;
