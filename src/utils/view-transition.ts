@@ -1,4 +1,4 @@
-import { prepareItemReorder } from './layout-transition'
+import { captureItemPositions, prepareItemReorder } from './layout-transition'
 
 type TransitionScope = HTMLElement & {
 	startViewTransition?: (update: () => void) => ViewTransition
@@ -29,6 +29,23 @@ export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdat
 const activeByScope = new WeakMap<HTMLElement, ActiveTransition>()
 let activeDocumentTransition:
 	{ document: Document; scope: HTMLElement; active: NativeActiveTransition } | undefined
+
+const interrupt = (owner: HTMLElement, active: ActiveTransition) => {
+	if (active.kind === 'native') {
+		active.interrupted = true
+		active.transition.skipTransition()
+		active.update()
+	} else {
+		active.cancel()
+	}
+
+	activeByScope.delete(owner)
+	owner.removeAttribute('data-view-transition-active')
+
+	if (activeDocumentTransition?.active === active) {
+		activeDocumentTransition = undefined
+	}
+}
 
 const canTransition = () =>
 	typeof document !== 'undefined' &&
@@ -71,6 +88,101 @@ export function startScopedViewTransition(
 	update: () => void,
 	strategy: ViewTransitionStrategy = 'auto',
 ): ViewTransition | undefined {
+	return runScopedViewTransition(scope, update, strategy)
+}
+
+/**
+ * Preserve live positions across a native popover update without taking control of its state.
+ * Eligible items must remain laid out in both states and use unscaled, axis-aligned motion
+ * owners. Keep scale and other visual effects on their children. CSS can opt out by resolving
+ * named participants to `none`, so native CSS motion and this enhancement share one capability gate.
+ */
+export function livePopoverTransition(scope: HTMLElement) {
+	let before: ReturnType<typeof captureItemPositions> | undefined
+	let frame: number | undefined
+	let queued = false
+	let expectedOpen = false
+	let initialOpen = false
+
+	const apply = () => {
+		if (frame !== undefined) {
+			cancelAnimationFrame(frame)
+			frame = undefined
+		}
+
+		const positions = before
+
+		before = undefined
+
+		if (positions && scope.matches(':popover-open') !== initialOpen) {
+			runScopedViewTransition(scope, () => {}, 'live', positions)
+		}
+	}
+	const capture = (event: Event) => {
+		if (event.target !== scope || !(event instanceof ToggleEvent)) {
+			return
+		}
+
+		const positions = before ?? captureItemPositions(scope)
+
+		if (positions.size === 0) {
+			return
+		}
+
+		if (!before) {
+			initialOpen = scope.matches(':popover-open')
+		}
+
+		before = positions
+		expectedOpen = event.newState === 'open'
+
+		if (queued) {
+			return
+		}
+
+		queued = true
+		queueMicrotask(() => {
+			queued = false
+
+			if (!before) {
+				return
+			}
+
+			// Native default actions can checkpoint microtasks before committing their state.
+			if (scope.matches(':popover-open') === expectedOpen) {
+				apply()
+			} else if (frame === undefined) {
+				frame = requestAnimationFrame(apply)
+			}
+		})
+	}
+
+	scope.addEventListener('beforetoggle', capture)
+
+	return {
+		destroy() {
+			scope.removeEventListener('beforetoggle', capture)
+			before = undefined
+
+			if (frame !== undefined) {
+				cancelAnimationFrame(frame)
+			}
+
+			const active = activeByScope.get(scope)
+
+			if (active) {
+				interrupt(scope, active)
+			}
+		},
+	}
+}
+
+function runScopedViewTransition(
+	scope: TransitionScope,
+	update: () => void,
+	strategy: ViewTransitionStrategy,
+	before?: ReturnType<typeof captureItemPositions>,
+): ViewTransition | undefined {
 	let updated = false
 	const applyUpdate = () => {
 		if (updated) {
@@ -79,22 +191,6 @@ export function startScopedViewTransition(
 
 		updated = true
 		update()
-	}
-	const interrupt = (owner: HTMLElement, active: ActiveTransition) => {
-		if (active.kind === 'native') {
-			active.interrupted = true
-			active.transition.skipTransition()
-			active.update()
-		} else {
-			active.cancel()
-		}
-
-		activeByScope.delete(owner)
-		owner.removeAttribute('data-view-transition-active')
-
-		if (activeDocumentTransition?.active === active) {
-			activeDocumentTransition = undefined
-		}
 	}
 	const previous = activeByScope.get(scope)
 
@@ -120,11 +216,16 @@ export function startScopedViewTransition(
 		activeDocumentTransition?.document !== document &&
 		(!previous || previous.kind === 'live')
 	) {
-		const live = prepareItemReorder(scope, applyUpdate, () => {
-			if (previous) {
-				interrupt(scope, previous)
-			}
-		})
+		const live = prepareItemReorder(
+			scope,
+			applyUpdate,
+			() => {
+				if (previous) {
+					interrupt(scope, previous)
+				}
+			},
+			before,
+		)
 		const active: LiveActiveTransition = { kind: 'live', cancel: live.cancel }
 
 		activeByScope.set(scope, active)

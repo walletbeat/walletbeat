@@ -29,7 +29,7 @@ const cancelInputTransitions = (item: HTMLElement) => {
 	}
 }
 
-const measureItems = (scope: HTMLElement) => {
+export const captureItemPositions = (scope: HTMLElement) => {
 	const items = new Map<HTMLElement | string, HTMLElement>()
 	const duplicates = new Set<string>()
 
@@ -74,24 +74,25 @@ export function prepareItemReorder(
 	scope: HTMLElement,
 	update: () => void,
 	interrupt: () => void,
+	before?: ReturnType<typeof captureItemPositions>,
 ): { finished: Promise<void>; cancel: () => void } {
 	const style = getComputedStyle(scope)
 	const duration = Number(style.getPropertyValue('--layoutTransition-duration'))
 	const easing = style.getPropertyValue('--layoutTransition-easing').trim()
-	const before = measureItems(scope)
+	const positions = before ?? captureItemPositions(scope)
 
 	interrupt()
 
-	for (const { item } of before.values()) {
+	for (const { item } of positions.values()) {
 		ownerByItem.get(item)?.()
 	}
 	update()
 
-	const after = measureItems(scope)
+	const after = captureItemPositions(scope)
 	const pairs = new Map<HTMLElement, { start: DOMRect; end: DOMRect }>()
 
 	for (const [key, { item, box }] of after) {
-		const start = before.get(key)
+		const start = positions.get(key)
 
 		if (start) {
 			pairs.set(item, { start: start.box, end: box })
