@@ -1976,6 +1976,7 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				// Source: testing in the Rainbow iOS app (2026-07-03).

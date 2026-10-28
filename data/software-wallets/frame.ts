@@ -171,6 +171,7 @@ export const frame: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			orderflowPractices: null,
