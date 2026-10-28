@@ -2951,9 +2951,6 @@
 					inline-size: 0;
 					block-size: 0;
 					inset-block-start: 0;
-					inset-inline-start: calc(
-						anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
-					);
 					view-timeline: var(---pie-inlineTimeline, --pie-inline) inline;
 				}
 			}
