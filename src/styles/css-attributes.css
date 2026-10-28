@@ -5134,3 +5134,51 @@ details {
 		}
 	}
 }
+
+
+/**
+ * Content-page typography and detached content bounds. Set page-specific widths on the sticky container.
+ *
+ * ### Placement
+ * - On a page's main content container, with its title and optional description in a direct header.
+ *
+ * ### Examples
+ * - A content page with a title and description:
+ *   ```html
+ *   <main data-content-page data-sticky-container data-column="gap-8">
+ *     <header><hgroup><h1>Title</h1><p>Description</p></hgroup></header>
+ *   </main>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-content-page]`
+ */
+[data-content-page] {
+	line-height: 1.4;
+
+	&[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 58rem;
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+		--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+	}
+
+	> header hgroup p {
+		color: var(--text-secondary);
+	}
+}
+
+/**
+ * Reading line height for prose content.
+ *
+ * ### Examples
+ * - A prose body:
+ *   ```html
+ *   <div data-prose><p>Paragraph</p></div>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+ */
+[data-prose] {
+	line-height: 1.8;
+}
