@@ -2449,7 +2449,7 @@
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 					(color: if(style(---breadcrumb-wrap: 1): red)) {
 					z-index: auto;
-					anchor-name: --wallet-pie-source;
+					container-type: inline-size;
 					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear both;
 
 					view-timeline-name: --wallet-pie-source, --wallet-pie-source-inline;
@@ -2474,6 +2474,7 @@
 					}
 					.pie-navigation-geometry,
 					&::before {
+						---pie-sourceInlineOffset: inherit;
 						position: fixed;
 
 						position-visibility: always;
@@ -2503,8 +2504,8 @@
 							exit-crossing 0px exit-crossing calc(var(---pie-size) - var(---pie-compactSize)),
 							var(--stickyBreadcrumb-entryRange);
 						inset-block-start: var(---pie-compactBlockStart);
-						inset-inline-start: anchor(--wallet-pie-source inside);
-						inline-size: anchor-size(--wallet-pie-source inline);
+						inset-inline: auto;
+						inline-size: 100cqi;
 						margin: 0;
 						transform-origin: 100% 0;
 						&:dir(rtl) {
@@ -2513,10 +2514,6 @@
 					}
 				}
 
-				/* At badge size the attribute icons are a few pixels wide; the colors carry the meaning. */
-				:global(.navigation-items menu[data-navigation-depth='1'] .pie-navigation-icon) {
-					display: none;
-				}
 			}
 		}
 	}
@@ -2725,7 +2722,7 @@
 
 	@property ---pie-sourceInlineOffset {
 		syntax: '<length>';
-		inherits: true;
+		inherits: false;
 		initial-value: 0px;
 	}
 
