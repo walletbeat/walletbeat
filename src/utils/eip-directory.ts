@@ -14,9 +14,6 @@ export interface EipImplementer {
 	/** Wallet display name. */
 	displayName: string
 
-	/** Extension of the wallet icon under `/images/wallets/`. */
-	iconExtension: string
-
 	/** Platforms on which support is verified. */
 	variants: Variant[]
 
@@ -48,7 +45,6 @@ export function eipImplementers(
 						{
 							id: wallet.metadata.id,
 							displayName: wallet.metadata.displayName,
-							iconExtension: wallet.metadata.iconExtension,
 							url: getWalletUrl(wallet),
 							variants: support.variants,
 						},

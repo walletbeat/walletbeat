@@ -6,9 +6,12 @@ import { eips } from '@/data/eips'
 import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { EipSupportStatus, ratedWalletEipSupportByStatus } from '@/schema/eip-support'
 import { featureSupported, notSupported } from '@/schema/features/support'
+import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { getVariantResolvedWallet } from '@/schema/wallet'
 import { eipImplementers } from '@/utils/eip-directory'
+import EipDetails from '@/views/EipDetails.svelte'
+import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import EipSupportPie from '@/views/EipSupportPie.svelte'
 
 const browser = getVariantResolvedWallet(unratedSoftwareWallet, Variant.BROWSER)
@@ -62,6 +65,40 @@ describe('EIP support presentation', () => {
 
 		expect(body).toContain('no verified support')
 		expect(body).toContain('Support may be unknown')
+	})
+
+	it('places sources beneath the wallet heading and respects EIP caller context', () => {
+		const references = refs({
+			ref: { url: 'https://example.com/evidence', lastRetrieved: '2026-10-01' },
+		})
+		const { body } = render(EipStatusSupportCards, {
+			props: {
+				title: 'Software wallets',
+				cards: [
+					{
+						id: 'mixed',
+						displayName: 'Mixed wallet',
+						iconExtension: 'svg',
+						url: '/wallet/mixed/',
+						status: EipSupportStatus.SUPPORTED,
+						variants: [Variant.BROWSER],
+						references,
+					},
+				],
+			},
+		})
+
+		expect([...body.matchAll(/<h([1-6])(?:\s|>)/g)].map(match => Number(match[1]))).toEqual([
+			2, 3, 4, 5,
+		])
+
+		for (const headingLevel of [1, 2] as const) {
+			const details = render(EipDetails, { props: { eip: eips['7702'], headingLevel } }).body
+			const levels = [...details.matchAll(/<h([1-6])(?:\s|>)/g)].map(match => Number(match[1]))
+
+			expect(levels[0]).toBe(headingLevel)
+			expect(levels.slice(1).every(level => level === headingLevel + 1)).toBe(true)
+		}
 	})
 
 	it('distinguishes status entry counts from wallets and links each status', () => {
