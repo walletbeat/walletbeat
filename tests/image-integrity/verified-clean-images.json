@@ -1655,6 +1655,18 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/access_layer.png": {
+		"hash": "2c652ac9807cc36c6689f34ddad170c9c0b03970467b77b84942636dea48a8af",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/beyond_clear_signing.jpg": {
+		"hash": "0b24eb51371401942b963fce22b8d316680cce1f6d947c824472275419cb4dbe",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/walletbeat.png": {
+		"hash": "f1ddda183db99a4b6342a841bfb9e6cd788ee6fc2c6518f8e8312fd0049f750a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
