@@ -10,8 +10,8 @@ import type { sourceSnapshot } from '../../../../tests/browser/fixtures/source-s
 import { verifyServerSource } from '../../../../tests/browser/fixtures/source-snapshot.mjs'
 import type { Comparison, Paint, Region } from './icon-paint-reader'
 import { createPaintReader, observeActor, observeGeometry } from './icon-paint-reader'
+import { createNativeScreencast, type NativeFrame } from './native-screencast'
 
-type NativeFrame = { data: string; metadata: { timestamp?: number }; sessionId: number }
 export type IconPaintMode = 'baseline' | 'frozen-parent' | 'frozen-pseudo'
 type Observation = ReturnType<typeof observeActor>
 type Geometry = ReturnType<typeof observeGeometry>
@@ -160,6 +160,7 @@ export async function observeIconPaint({
 
 	await mkdir(out, { recursive: true })
 	let browser: Browser | null = null
+	let nativeCapture: ReturnType<typeof createNativeScreencast> | undefined
 	const capturedFrames: NativeFrame[] = []
 
 	try {
@@ -583,34 +584,12 @@ export async function observeIconPaint({
 		const cdp = await context.newCDPSession(page)
 
 		await cdp.send('Page.enable')
-		const frames = capturedFrames,
-			acknowledgements: Promise<unknown>[] = []
-		let firstFrameResolve: () => void = () => {},
-			firstFrameTimer: ReturnType<typeof setTimeout>
-		const firstFrame = new Promise<void>((resolve, reject) => {
-			firstFrameResolve = resolve
-			firstFrameTimer = setTimeout(() => reject(Error('No pre-input native frame')), 3000)
-		})
+		const frames = capturedFrames
 
-		cdp.on('Page.screencastFrame', (frame: NativeFrame) => {
-			frames.push(frame)
-			clearTimeout(firstFrameTimer)
-			firstFrameResolve()
-			acknowledgements.push(
-				cdp
-					.send('Page.screencastFrameAck', { sessionId: frame.sessionId })
-					.catch(error => result.errors.push(String(error))),
-			)
-		})
-		const startScreencast = () =>
-			cdp.send('Page.startScreencast', {
-				format: 'png',
-				everyNthFrame: 1,
-				maxWidth: viewport.width,
-				maxHeight: viewport.height,
-			})
+		nativeCapture = createNativeScreencast(cdp, viewport, frames, result.errors)
+		const { firstFrame, acknowledgements } = nativeCapture
 
-		await startScreencast()
+		await nativeCapture.start()
 		await firstFrame
 		result.criticalStart = Date.now()
 		await Promise.all([
@@ -861,7 +840,7 @@ export async function observeIconPaint({
 					assert.ok(before.scroll > reference.actual + 0.5)
 					const first = frames.length
 
-					await startScreencast()
+					await nativeCapture.start()
 					await delay(100)
 					const start = Date.now()
 
@@ -1125,6 +1104,8 @@ export async function observeIconPaint({
 		result.errors.push(result.failure.message)
 		result.failed = true
 	} finally {
+		nativeCapture?.dispose()
+
 		try {
 			await browser?.close()
 		} finally {

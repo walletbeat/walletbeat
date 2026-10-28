@@ -1,12 +1,6 @@
 import { qualifyNativeBreadcrumbClock } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
-declare global {
-	interface HTMLElement {
-		arrowTrajectory?: { samples: number[]; ended: boolean }
-	}
-}
-
 for (const width of [390, 1440]) {
 	test(`real header composition and native input at ${width}px`, async ({ page }, info) => {
 		await page.setViewportSize({ width, height: 900 })
@@ -340,7 +334,9 @@ for (const width of [390, 1440]) {
 }
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
-	test(`native section arrow trajectory with ${reducedMotion} motion`, async ({ page }, info) => {
+	test(`native section arrow delegates to CSS with ${reducedMotion} motion`, async ({
+		page,
+	}, info) => {
 		await page.setViewportSize({ width: 390, height: 900 })
 		await page.emulateMedia({ reducedMotion })
 		await page.goto('/__wallet-page/software/?variant=MOBILE')
@@ -363,18 +359,22 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			}
 
 			const style = getComputedStyle(target),
-				box = target.getBoundingClientRect()
+				box = target.getBoundingClientRect(),
+				currentRaw = getComputedStyle(owner).getPropertyValue('---pie-currentIndex').trim()
 
 			return {
 				href: first.getAttribute('href')!,
 				scroll: root.scrollTop,
-				current: Number(getComputedStyle(owner).getPropertyValue('---pie-currentIndex')),
+				currentRaw,
+				current: Number(currentRaw),
 				firstLanding: box.top - parseFloat(style.scrollMarginBlockStart),
 				rootStart: root.getBoundingClientRect().top + root.clientTop,
 				targetHeight: box.height,
 			}
 		})
 
+		expect(initial.currentRaw, 'The native current-state input is present').toMatch(/\S/)
+		expect(Number.isFinite(initial.current)).toBe(true)
 		expect(initial.current, 'The initial pose has no current semantic destination').toBe(0)
 		expect(initial.targetHeight).toBeGreaterThan(0)
 		expect(
@@ -405,80 +405,109 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 		await next.hover()
 		const root = page.locator('#layout')
 
-		await root.evaluate(element => {
-			if (!(element instanceof HTMLElement)) {
-				throw new Error('Scroll owner must be an HTML element')
+		const point = await next.boundingBox()
+
+		if (!point) {
+			throw new Error('The native Next control must have a pointer target')
+		}
+
+		const navigation = await root.evaluateHandle(element => {
+			const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView')
+
+			const original: unknown = descriptor?.value
+
+			if (!descriptor || typeof original !== 'function') {
+				throw new Error('Native scrollIntoView must be an own prototype method')
 			}
 
-			const owner = element
-			const trajectory = { samples: [owner.scrollTop], ended: false }
+			const calls: { target: string; options: boolean | ScrollIntoViewOptions | null }[] = []
+			let ended = false
+			const observe = function (this: Element, ...args: Parameters<Element['scrollIntoView']>) {
+				const options = args[0]
 
-			owner.arrowTrajectory = trajectory
-			owner.addEventListener(
-				'scrollend',
-				() => {
-					trajectory.ended = true
-				},
-				{ once: true },
-			)
-			const sample = () => {
-				trajectory.samples.push(owner.scrollTop)
+				calls.push({
+					target: this.id,
+					options: options && typeof options === 'object' ? { ...options } : (options ?? null),
+				})
 
-				if (!trajectory.ended) {
-					requestAnimationFrame(sample)
+				Reflect.apply(original, this, args)
+			}
+			const finish = () => {
+				if (calls.length) {
+					ended = true
 				}
 			}
 
-			requestAnimationFrame(sample)
-		})
-		await next.click()
-		await expect.poll(() => new URL(page.url()).hash).toBe(initial.href)
-		expect(new URL(page.url()).search).toBe(search)
-		expect(
-			await page.locator('#top').evaluate((element, original) => element === original, original),
-		).toBe(true)
-		await expect
-			.poll(() =>
-				root.evaluate(element => {
-					if (!(element instanceof HTMLElement) || !element.arrowTrajectory) {
-						throw new Error('Missing native arrow trajectory')
-					}
+			Element.prototype.scrollIntoView = observe
+			element.addEventListener('scrollend', finish, { passive: true })
 
-					return element.arrowTrajectory.ended
-				}),
-			)
-			.toBe(true)
-		const trajectory = await root.evaluate(element => {
-			if (!(element instanceof HTMLElement) || !element.arrowTrajectory) {
-				throw new Error('Missing native arrow trajectory')
+			return {
+				start: element.scrollTop,
+				behavior: getComputedStyle(element).scrollBehavior,
+				calls,
+				get ended() {
+					return ended
+				},
+				restore() {
+					Object.defineProperty(Element.prototype, 'scrollIntoView', descriptor)
+					element.removeEventListener('scrollend', finish)
+				},
+			}
+		})
+
+		try {
+			const configuration = await navigation.evaluate(capture => ({
+				start: capture.start,
+				behavior: capture.behavior,
+			}))
+
+			expect(configuration.behavior).toBe(reducedMotion === 'reduce' ? 'auto' : 'smooth')
+			// Cached native pointer bounds avoid actionability geometry reads during scroll.
+			await page.mouse.click(point.x + point.width / 2, point.y + point.height / 2)
+			await expect.poll(() => navigation.evaluate(capture => capture.ended)).toBe(true)
+			await page.waitForTimeout(250)
+			const calls = await navigation.evaluate(capture => capture.calls)
+			const end = await root.evaluate(element => element.scrollTop)
+
+			expect(new URL(page.url()).hash).toBe(initial.href)
+			expect(new URL(page.url()).search).toBe(search)
+			expect(
+				await page.locator('#top').evaluate((element, original) => element === original, original),
+			).toBe(true)
+			expect(calls, 'One actual native call owns this arrow journey').toHaveLength(1)
+			expect(calls[0].target).toBe(decodeURIComponent(initial.href.slice(1)))
+			expect(calls[0].options).toMatchObject({ block: 'start' })
+
+			const options = calls[0].options
+
+			expect(options !== null && typeof options === 'object').toBe(true)
+
+			if (options !== null && typeof options === 'object') {
+				expect(
+					[undefined, 'auto'],
+					'Native CSS owns smooth versus reduced-motion behavior',
+				).toContain(options.behavior)
 			}
 
-			return element.arrowTrajectory
-		})
-
-		await info.attach('native-arrow-trajectory', {
-			body: JSON.stringify({ reducedMotion, hash: new URL(page.url()).hash, ...trajectory }),
-			contentType: 'application/json',
-		})
-		const start = trajectory.samples[0],
-			end = await root.evaluate(element => element.scrollTop)
-
-		expect(
-			Math.abs(end - start),
-			'Arrow must navigate to another actual destination',
-		).toBeGreaterThan(50)
-
-		if (reducedMotion === 'no-preference') {
-			const low = Math.min(start, end),
-				high = Math.max(start, end)
-			const intermediate = trajectory.samples.filter(
-				position => position > low + 2 && position < high - 2,
-			)
-
 			expect(
-				new Set(intermediate.map(position => Math.round(position))).size,
-				'Native arrow navigation must traverse intermediate positions rather than jump',
-			).toBeGreaterThan(1)
+				Math.abs(end - configuration.start),
+				'Arrow reaches another actual destination',
+			).toBeGreaterThan(50)
+			await info.attach('native-arrow-path', {
+				body: JSON.stringify({
+					reducedMotion,
+					hash: new URL(page.url()).hash,
+					configuration,
+					end,
+					calls,
+					observation:
+						'Native input preserves the real page/query, performs one start-aligned scrollIntoView call, delegates behavior to CSS and completes root scrolling. No per-frame DOM-position samples are collected. Intermediate painted positions, frame pacing and smoothness require a separately qualified native paint capture; this configuration check does not establish them.',
+				}),
+				contentType: 'application/json',
+			})
+		} finally {
+			await navigation.evaluate(capture => capture.restore())
+			await navigation.dispose()
 		}
 	})
 }
