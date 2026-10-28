@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { prepareItemReorder } from './layout-transition'
 import { startScopedViewTransition, viewTransitionName } from './view-transition'
 
 const transition = ({
@@ -133,6 +134,110 @@ const installEnvironment = ({ reducedMotion = false } = {}) => {
 
 afterEach(() => {
 	vi.unstubAllGlobals()
+})
+
+describe('live layout cleanup', () => {
+	it('releases every item before reading transitions and reads every transition before cancellation', async () => {
+		installEnvironment()
+		class InputTransition extends TestItemMotion {}
+
+		vi.stubGlobal('CSSTransition', InputTransition)
+		const scope = new TestScope()
+		const items = [new TestLayoutItem(), new TestLayoutItem(), new TestLayoutItem()]
+		const events: string[] = []
+		let cleaning = false
+
+		Object.assign(scope, { querySelectorAll: () => items })
+
+		for (const [index, item] of items.entries()) {
+			const input = new InputTransition()
+
+			input.transitionProperty = 'translate'
+			input.effect.target = item
+			input.cancel.mockImplementation(() => {
+				if (cleaning) {
+					events.push(`cancel ${index}`)
+				}
+
+				input.finish()
+			})
+			item.extraMotions.push(input)
+			item.removeAttribute.mockImplementation(name => {
+				if (cleaning && name === 'data-layout-transition') {
+					events.push(`write ${index}`)
+				}
+
+				return item.attributes.delete(name)
+			})
+			const getAnimations = item.getAnimations.bind(item)
+
+			item.getAnimations = () => {
+				if (cleaning) {
+					events.push(`read ${index}`)
+				}
+
+				return getAnimations()
+			}
+		}
+		const controller = prepareItemReorder(
+			htmlElement(scope),
+			() => {
+				for (const item of items) {
+					item.y = 100
+				}
+			},
+			() => {},
+		)
+
+		cleaning = true
+		controller.cancel()
+		expect(events).toEqual([
+			'write 0',
+			'write 1',
+			'write 2',
+			'read 0',
+			'read 1',
+			'read 2',
+			'cancel 0',
+			'cancel 1',
+			'cancel 2',
+		])
+		await controller.finished
+	})
+
+	it('preserves a nested scope owner when the outer generation is cancelled', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		const outer = new TestScope(),
+			inner = new TestScope()
+		const shared = new TestLayoutItem(),
+			independent = new TestLayoutItem()
+
+		Object.assign(outer, { querySelectorAll: () => [shared, independent] })
+		Object.assign(inner, { querySelectorAll: () => [shared] })
+		const old = prepareItemReorder(
+			htmlElement(outer),
+			() => {
+				shared.y = 100
+				independent.y = 100
+			},
+			() => {},
+		)
+		const current = prepareItemReorder(
+			htmlElement(inner),
+			() => {
+				shared.y = 200
+			},
+			() => {},
+		)
+
+		old.cancel()
+		expect(shared.attributes).toContain('data-layout-transition')
+		expect(independent.attributes).not.toContain('data-layout-transition')
+		current.cancel()
+		expect(shared.attributes).not.toContain('data-layout-transition')
+		await Promise.all([old.finished, current.finished])
+	})
 })
 
 describe('startScopedViewTransition', () => {
