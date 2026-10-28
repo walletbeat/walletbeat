@@ -97,7 +97,7 @@
 	// Functions
 	import { ContentType, isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletUrl } from '@/utils/urls'
+	import { getWalletAttributeUrl } from '@/utils/urls'
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
@@ -234,7 +234,7 @@
 															{@const attributeLink = attributeId
 																? isLocalAttribute(attributeId)
 																? `#${slugifyCamelCase(attributeId)}`
-																: getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) })
+																: getWalletAttributeUrl(wallet, attributeId)
 																: null}
 															{@const attribute = attributeId
 																? (attributesById.get(attributeId) ?? null)

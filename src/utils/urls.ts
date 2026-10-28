@@ -1,6 +1,9 @@
 import { allWallets, type WalletName } from '@/data/wallets'
+import type { EvaluationTree } from '@/schema/attribute-groups'
+import { Rating } from '@/schema/attributes'
 import type { Eip, EipNumber } from '@/schema/eips'
 import type { Variant } from '@/schema/variants'
+import { slugifyCamelCase } from '@/types/utils/text'
 
 /**
  * Returns the relative URL for a wallet page, optionally including a variant
@@ -47,6 +50,20 @@ export function getWalletUrl(
 	}
 
 	return url
+}
+
+/** Returns an attribute destination only when the default wallet page renders it. */
+export function getWalletAttributeUrl(
+	wallet: { metadata: { id: string }; overall: EvaluationTree<string> },
+	attributeId: string,
+): string | null {
+	const rendered = Object.values(wallet.overall).some(group => {
+		const attribute = group[attributeId]
+
+		return attribute !== undefined && attribute.evaluation.outcome.rating !== Rating.EXEMPT
+	})
+
+	return rendered ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null
 }
 
 /**
