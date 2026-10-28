@@ -169,6 +169,8 @@ export function summarizeChromeTrace(trace) {
 	const counts = {}
 	/** @type {Record<string, number>} */
 	const durationMicros = {}
+	/** @type {Record<string, number>} */
+	const maxDurationMicros = {}
 	const reasons = []
 	/** @param {unknown} value @param {string} path @param {TraceEvent} event */
 	const inspect = (value, path, event) => {
@@ -204,8 +206,9 @@ export function summarizeChromeTrace(trace) {
 		) {
 			counts[event.name] = (counts[event.name] ?? 0) + 1
 
-			if (typeof event.dur === 'number' && Number.isFinite(event.dur)) {
+			if (event.ph === 'X' && typeof event.dur === 'number' && Number.isFinite(event.dur)) {
 				durationMicros[event.name] = (durationMicros[event.name] ?? 0) + event.dur
+				maxDurationMicros[event.name] = Math.max(maxDurationMicros[event.name] ?? 0, event.dur)
 			}
 		}
 
@@ -280,9 +283,42 @@ export function summarizeChromeTrace(trace) {
 		totalEvents: events.length,
 		counts,
 		durationMicros,
+		maxDurationMicros,
 		reasons,
 		animationCompositing: { actors, unattributedAnimationEvents },
 		interpretation:
 			'Native Chrome event names and reason fields are retained verbatim. Zero flags are neutral reports; each actor entry is one timestamp-ordered tracking lifetime, retaining native begin data; entries without starts have unresolved ownership. Missing reason events do not certify compositor-only execution; event availability depends on the actual browser build and trace categories.',
 	}
+}
+
+/**
+ * Drain a native trace even when the observed journey fails.
+ * @param {import('@playwright/test').CDPSession} session
+ * @param {Promise<{stream?: string}>} completed
+ */
+export async function finishChromeTrace(session, completed) {
+	await session.send('Tracing.end')
+	const { stream } = await completed
+
+	if (!stream) {
+		throw new Error('Native Chrome tracing did not return its artifact stream')
+	}
+
+	const chunks = []
+
+	try {
+		for (;;) {
+			const chunk = await session.send('IO.read', { handle: stream })
+
+			chunks.push(Buffer.from(chunk.data, chunk.base64Encoded ? 'base64' : 'utf8'))
+
+			if (chunk.eof) {
+				break
+			}
+		}
+	} finally {
+		await session.send('IO.close', { handle: stream })
+	}
+
+	return Buffer.concat(chunks)
 }
