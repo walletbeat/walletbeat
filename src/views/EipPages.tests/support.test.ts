@@ -5,7 +5,7 @@ import WalletEipList from '@/components/WalletEipList.svelte'
 import { eips } from '@/data/eips'
 import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { EipSupportStatus, ratedWalletEipSupportByStatus } from '@/schema/eip-support'
-import { featureSupported, notSupported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { getVariantResolvedWallet } from '@/schema/wallet'
@@ -20,12 +20,18 @@ if (browser === null) {
 	throw new Error('Expected a browser variant in the software template')
 }
 
-const mixedWallet = {
+const mixedWallet: typeof unratedSoftwareWallet = {
 	...unratedSoftwareWallet,
 	variants: {
 		[Variant.BROWSER]: {
 			...browser,
-			features: { ...browser.features, walletCall: featureSupported },
+			features: {
+				...browser.features,
+				walletCall: supported({
+					atomicMultiTransactions: featureSupported,
+					ref: { url: 'https://example.com/batching' },
+				}),
+			},
 		},
 		[Variant.MOBILE]: {
 			...browser,
