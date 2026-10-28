@@ -601,7 +601,15 @@ export async function observeIconPaint({
 					.catch(error => result.errors.push(String(error))),
 			)
 		})
-		await cdp.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
+		const startScreencast = () =>
+			cdp.send('Page.startScreencast', {
+				format: 'png',
+				everyNthFrame: 1,
+				maxWidth: viewport.width,
+				maxHeight: viewport.height,
+			})
+
+		await startScreencast()
 		await firstFrame
 		result.criticalStart = Date.now()
 		await Promise.all([
@@ -850,7 +858,7 @@ export async function observeIconPaint({
 				assert.ok(before.scroll > D + 0.5)
 				const first = frames.length
 
-				await cdp.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
+				await startScreencast()
 				await delay(100)
 				const start = Date.now()
 
