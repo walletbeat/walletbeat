@@ -71,6 +71,8 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 
 			expect(maximum).toBeGreaterThan(1)
 
+			let referencePaint: Buffer | undefined
+
 			for (const fraction of [0, 0.5, 1]) {
 				expect(await layout.evaluate(layout => layout.scrollWidth - layout.clientWidth)).toBe(
 					maximum,
@@ -78,6 +80,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				const target = Math.round(maximum * fraction)
 
 				await page.locator('#nav header .logo').hover()
+				await page.locator('#nav header .logo').focus()
 				await expect
 					.poll(
 						async () => {
@@ -93,6 +96,44 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					)
 					.toBeLessThanOrEqual(1)
 
+				const slot = trigger.locator('.filter-cluster-target')
+				const slotBox = await slot.boundingBox()
+
+				if (!slotBox) {
+					throw new Error('Closed filter glyph needs its header slot geometry')
+				}
+
+				const paint = await page.screenshot({ clip: slotBox })
+
+				await test.info().attach(`closed-filter-glyph-${fraction}`, {
+					body: paint,
+					contentType: 'image/png',
+				})
+
+				if (!referencePaint) {
+					const visibility = await glyph.evaluate(glyph => {
+						const previous = glyph.style.visibility
+
+						glyph.style.visibility = 'hidden'
+
+						return previous
+					})
+					let hiddenPaint: Buffer
+
+					try {
+						hiddenPaint = await page.screenshot({ clip: slotBox })
+					} finally {
+						await glyph.evaluate((glyph, visibility) => {
+							glyph.style.visibility = visibility
+						}, visibility)
+					}
+
+					expect(hiddenPaint).not.toEqual(paint)
+					referencePaint = paint
+				}
+
+				await expect.poll(() => page.screenshot({ clip: slotBox })).toEqual(referencePaint)
+
 				for (const [xFraction, yFraction] of [
 					[0.5, 0.5],
 					[0.15, 0.5],
@@ -101,10 +142,10 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					[0.5, 0.85],
 				]) {
 					await settled()
-					const box = await glyph.boundingBox()
+					const box = await slot.boundingBox()
 
 					if (!box) {
-						throw new Error('Closed filter glyph needs visible geometry')
+						throw new Error('Closed filter glyph needs its header slot geometry')
 					}
 
 					const point = { x: box.x + box.width * xFraction, y: box.y + box.height * yFraction }
