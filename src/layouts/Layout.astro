@@ -156,6 +156,10 @@ import Footer from '@/views/Footer.astro'
 	}
 
 	#layout {
+		&:has(#nav-menu:is(:popover-open, [data-closing])) {
+			overflow: hidden;
+		}
+
 		/* Constants */
 		--navigation-desktop-inlineSize: min(20rem, 320px);
 		--navigation-mobile-blockSize: 4.16rem;
@@ -231,7 +235,7 @@ import Footer from '@/views/Footer.astro'
 					transform: translateZ(0);
 					transition-property: transform;
 
-					nav:popover-open ~ & {
+					nav:has(> #nav-menu:is(:popover-open, [data-closing])) ~ & {
 						transform: translateZ(-2.5rem);
 					}
 				}
@@ -456,7 +460,11 @@ import Footer from '@/views/Footer.astro'
 						animation-timing-function: steps(1, end);
 					}
 				}
-				&:is([data-wallet-toc-state="open"], [data-wallet-toc-state="closing"])
+				&:is(
+						[data-wallet-toc-state="open"],
+						[data-wallet-toc-state="closing"],
+						:has(#nav-menu:is(:popover-open, [data-closing]))
+					)
 					#nav
 					> header
 					> .logo {
@@ -494,7 +502,11 @@ import Footer from '@/views/Footer.astro'
 						)
 				);
 			}
-			#layout:is([data-wallet-toc-state="open"], [data-wallet-toc-state="closing"])
+			#layout:is(
+					[data-wallet-toc-state="open"],
+					[data-wallet-toc-state="closing"],
+					:has(#nav-menu:is(:popover-open, [data-closing]))
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"] {
 				:is([data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"]) {

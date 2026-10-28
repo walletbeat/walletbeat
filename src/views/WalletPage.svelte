@@ -8,6 +8,7 @@
 	import type { Snippet } from 'svelte'
 	import { knownSingleVariantIcons, type WBIconID } from '@/styles/wbicons'
 	import '../components/pie-shape.css'
+	import { finishPopoverExit } from './popover-transition'
 	import { attributeGroupFlowerGradient, sliceFill, sliceLabelBackground } from '@/components/pie-fill'
 
 	// Types/constants
@@ -119,10 +120,7 @@
 		const closing = tocClosing
 		if (closing === null) return
 		const panel = event.currentTarget
-		const animations = getComputedStyle(panel).display === 'none' ? [] : panel.getAnimations().filter(
-			animation => animation.timeline instanceof DocumentTimeline && Number.isFinite(animation.effect?.getComputedTiming().endTime),
-		)
-		await Promise.allSettled(animations.map(animation => animation.finished))
+		await finishPopoverExit(panel)
 		if (tocClosing === closing && !panel.matches(':popover-open')) {
 			tocClosing = null
 			publishTocState('closed')
@@ -1014,8 +1012,6 @@
 	<aside
 		class="page-navigation"
 		data-scroll-item="inline-detached"
-		data-scroll-container="block"
-		data-scroll-snap="block unless-hovered"
 		data-sticky-container
 		data-column="gap-0"
 	>
@@ -1061,6 +1057,7 @@
 
 		<nav
 			id="wallet-toc"
+			data-scroll-container="block"
 			data-scroll-snap="block unless-hovered"
 			data-closing={tocClosing !== null || undefined}
 			inert={tocClosing !== null}
@@ -1755,20 +1752,6 @@
 			> header {
 				display: none;
 			}
-			/* Nested scroll root: don't inherit page content's TOC clearance as sticky insets. */
-			--sticky-marginInlineStart: 0px;
-			--sticky-marginInlineEnd: 0px;
-			--sticky-marginBlockStart: 0px;
-			--sticky-marginBlockEnd: 0px;
-			--sticky-paddingBlockStart: 0px;
-			--sticky0-insetInlineStart: 0px;
-			--sticky0-insetInlineEnd: 0px;
-			--sticky0-insetBlockStart: 0px;
-			--sticky0-insetBlockEnd: 0px;
-			--sticky-insetInlineStart: 0px;
-			--sticky-insetInlineEnd: 0px;
-			--sticky-insetBlockStart: 0px;
-			--sticky-insetBlockEnd: 0px;
 
 			grid-area: Nav;
 			z-index: 3;
@@ -1787,19 +1770,16 @@
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
 			> nav:not(.pie-navigation) {
-				/* The desktop rail owns scrolling; the native popover does only on mobile. */
-				overflow: visible;
+				&[data-scroll-container] {
+					/* Preserve intrinsic width while this element owns the scroll and sticky scope. */
+					container-type: normal;
+					--scrollContainer-perspective: none;
+				}
 				position: relative;
 				z-index: 0;
 				align-content: stretch;
-				min-block-size: max-content;
+				min-block-size: 0;
 				padding: 0.75rem;
-
-				&[data-sticky-container] {
-					--sticky-marginBlockStart: 0px;
-					--sticky-paddingBlockStart: 0.75rem;
-					--sticky-paddingBlockEnd: 0.75rem;
-				}
 
 				display: flex;
 
@@ -1972,9 +1952,6 @@
 			}
 			&[data-wallet-toc-state="open"] > header {
 				display: flex;
-			}
-			&[data-scroll-container] {
-				--scrollContainer-perspective: none;
 			}
 			&[data-sticky-container] {
 				isolation: auto;
@@ -2243,8 +2220,6 @@
 			---pie-size: var(---wallet-page-navigation-inline-size);
 
 			box-sizing: border-box;
-			--sticky0-insetBlockStart: calc(var(---pie-size) + 0.5rem);
-			--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
@@ -2432,11 +2407,6 @@
 		@media (width <= 1024px) {
 			.container .page-navigation {
 				padding-block-start: 0;
-				&[data-scroll-container] {
-					overflow: visible;
-				}
-				--sticky0-insetBlockStart: 0px;
-				--sticky-insetBlockStart: 0px
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {

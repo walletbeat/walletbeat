@@ -30,10 +30,8 @@ const secondaryNavigationItems = [
 <nav
 	id='nav'
 	aria-label='Site'
-	popover='auto'
 	data-column='gap-0'
-	data-sticky='backdrop-self backdrop-always'
-	data-scroll-container
+	data-sticky='backdrop-none'
 	data-sticky-container
 >
 	<header data-sticky='backdrop-self backdrop-always' data-row>
@@ -54,7 +52,7 @@ const secondaryNavigationItems = [
 					id='menu-toggle'
 					aria-label='Open navigation menu'
 					data-icon='circle'
-					popovertarget='nav'
+					popovertarget='nav-menu'
 				>
 					<span set:html={LuMenu} />
 				</button>
@@ -70,7 +68,15 @@ const secondaryNavigationItems = [
 		</menu>
 	</header>
 
-	<div id='nav-menu' data-column data-column-item='flexible' data-sticky-container>
+	<div
+		id='nav-menu'
+		popover='auto'
+		data-scroll-container='block'
+		data-sticky='block backdrop-self backdrop-always'
+		data-column
+		data-column-item='flexible'
+		data-sticky-container
+	>
 		<NavigationItems
 			client:load
 			transition:persist
@@ -81,9 +87,46 @@ const secondaryNavigationItems = [
 	</div>
 </nav>
 
+<script>
+	import { finishPopoverExit } from './popover-transition'
+
+	let closing: symbol | null = null
+
+	document.addEventListener(
+		'beforetoggle',
+		event => {
+			const panel = event.target
+
+			if (!(panel instanceof HTMLElement) || panel.id !== 'nav-menu') {
+				return
+			}
+			closing = event.newState === 'closed' ? Symbol() : null
+			panel.toggleAttribute('data-closing', closing !== null)
+		},
+		true,
+	)
+	document.addEventListener(
+		'toggle',
+		async event => {
+			const panel = event.target
+			const token = closing
+
+			if (!(panel instanceof HTMLElement) || panel.id !== 'nav-menu' || token === null) {
+				return
+			}
+			await finishPopoverExit(panel)
+			if (closing === token && !panel.matches(':popover-open')) {
+				closing = null
+				panel.removeAttribute('data-closing')
+			}
+		},
+		true,
+	)
+</script>
+
 <style>
 	nav {
-		&[data-scroll-container]:not(:popover-open) {
+		&:not(:has(> #nav-menu:popover-open)) > #nav-menu[data-scroll-container] {
 			overscroll-behavior: auto;
 		}
 
@@ -91,6 +134,7 @@ const secondaryNavigationItems = [
 		height: 100dvh;
 
 		&[data-sticky][data-sticky] {
+			--sticky-offset: 0px;
 			--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 90%, transparent);
 		}
 
@@ -141,24 +185,18 @@ const secondaryNavigationItems = [
 		}
 
 		#nav-menu {
+			--sticky-offset: initial;
+			inline-size: 100%;
 			position: relative;
 			z-index: 0;
 			align-content: stretch;
-			min-block-size: max-content;
+			min-block-size: 0;
 			padding: 1rem 0.75rem;
-
-			&[data-sticky-container] {
-				--sticky-marginBlockStart: var(--navigation-mobile-blockSize);
-				--sticky-paddingBlockStart: 1rem;
-				--sticky-paddingBlockEnd: 1rem;
-				--sticky-paddingInlineStart: 0.75rem;
-				--sticky-paddingInlineEnd: 0.75rem;
-			}
 		}
 	}
 
 	@media (width > 1024px) {
-		nav:not(:popover-open) li:has(#menu-toggle) {
+		nav:not(:has(> #nav-menu:popover-open)) li:has(#menu-toggle) {
 			display: none;
 		}
 	}
@@ -167,19 +205,8 @@ const secondaryNavigationItems = [
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
-			clip-path: inset(0 0 calc(100% - var(--navigation-mobile-blockSize)) 0);
-			transition-property:
-				background-color,
-				-webkit-backdrop-filter,
-				backdrop-filter,
-				clip-path,
-				display,
-				overlay;
-			transition-behavior: allow-discrete;
-
-			block-size: 100dvh;
-			height: 100dvh;
-			transform-style: preserve-3d;
+			block-size: var(--navigation-mobile-blockSize);
+			height: var(--navigation-mobile-blockSize);
 
 			> header {
 				display: grid;
@@ -205,7 +232,10 @@ const secondaryNavigationItems = [
 				}
 			}
 
-			header ~ * {
+			#nav-menu {
+				position: fixed;
+				inset: var(--navigation-mobile-blockSize) 0 0;
+				block-size: auto;
 				filter: blur(0);
 				mask-image: linear-gradient(
 					to bottom,
@@ -226,8 +256,8 @@ const secondaryNavigationItems = [
 				transition-property: translate;
 			}
 
-			&:not(:popover-open) {
-				header ~ * {
+			&:not(:has(> #nav-menu:popover-open)) {
+				#nav-menu {
 					display: none;
 					filter: blur(0.375rem);
 					interactivity: inert;
@@ -243,17 +273,13 @@ const secondaryNavigationItems = [
 				}
 			}
 
-			&:popover-open {
-				clip-path: inset(0);
-
+			&:has(> #nav-menu:popover-open) {
 				.navigation-items > label {
 					transition-delay: 0.08s;
 				}
 
 				@starting-style {
-					clip-path: inset(0 0 calc(100% - var(--navigation-mobile-blockSize)) 0);
-
-					header ~ * {
+					#nav-menu {
 						filter: blur(0.375rem);
 						mask-size: 100% 0;
 						opacity: 0;
@@ -269,7 +295,7 @@ const secondaryNavigationItems = [
 
 		@media (prefers-reduced-motion: reduce) {
 			nav,
-			nav header ~ * {
+			nav #nav-menu {
 				translate: 0 0 0;
 			}
 		}
