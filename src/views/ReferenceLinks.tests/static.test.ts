@@ -21,7 +21,7 @@ describe('static reference evidence', () => {
 
 	it.each([0, 1, 2, 3, 4, 8, 20])('renders every record in a list of %i', count => {
 		const references: FullyQualifiedReference[] = Array.from({ length: count }, (_, index) => ({
-			urls: [{ url: `https://example.com/source-${index}`, label: `Source ${index}` }],
+			urls: [{ url: `https://example.com/source-${index % 2}`, label: `Source ${index}` }],
 			explanation: `Evidence ${index}.`,
 			lastRetrieved: assertCalendarDate('2026-10-01'),
 			source: coinspectDataSource,
@@ -34,7 +34,11 @@ describe('static reference evidence', () => {
 		expect(document.getElementsByTagName('h3').length).toBe(count === 0 ? 0 : 1)
 
 		for (const reference of references) {
-			const citation = links.find(link => link.getAttribute('href') === reference.urls[0].url)
+			const citation = links.find(
+				link =>
+					link.getAttribute('href') === reference.urls[0].url &&
+					link.getElementsByTagName('cite')[0]?.textContent === reference.urls[0].label,
+			)
 
 			expect(citation?.getElementsByTagName('cite')[0].textContent).toBe(reference.urls[0].label)
 			expect(document.documentElement?.textContent).toContain(reference.explanation)
