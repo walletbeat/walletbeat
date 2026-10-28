@@ -1,0 +1,44 @@
+name: Update wallet usage statistics
+on:
+  workflow_dispatch: {} # On demand; add a schedule once a few manual runs succeed
+permissions:
+  contents: read
+jobs:
+  update-usage-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y $(cat deploy/debian-packages.txt)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.9
+      - name: Install Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Collect usage statistics
+        run: pnpm collect:usage-stats
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Commit snapshot
+        run: |
+          ./deploy/setup-git.sh
+          ./deploy/usage-stats/usage-stats-push.sh
+        env:
+          GIT_USERNAME: walletbeat-bot
+          GIT_EMAIL: walletbeat-bot@users.noreply.github.com
+          GIT_REMOTE_URL: git@github.com:walletbeat/walletbeat.git
+          GIT_REMOTE_BRANCH: beta
+          GIT_SSH_AUTHENTICATION_KEY_TYPE: ed25519
+          GIT_SSH_AUTHENTICATION_KEY_PUBLIC: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCBvEBIVY5uNBq0a1sqOKojgI/pReRR4PtDQXiWnj6U walletbeat-bot@walletbeat.eth'
+          GIT_SSH_AUTHENTICATION_KEY_PRIVATE: ${{ secrets.WALLETBEAT_BOT_GIT_SSH_AUTHENTICATION_KEY_PRIVATE }}
+          GIT_SSH_SIGNING_KEY_TYPE: ed25519
+          GIT_SSH_SIGNING_KEY_PUBLIC: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBw+NZEg1p71wrjIngH8PZQ1GDeACirHUjposkeYdurM walletbeat-bot@walletbeat.eth'
+          GIT_SSH_SIGNING_KEY_PRIVATE: ${{ secrets.WALLETBEAT_BOT_GIT_SSH_SIGNING_KEY_PRIVATE }}
