@@ -608,7 +608,7 @@
 			const related = [group, ...(group.children ?? [])]
 			const interacting = `#top:has(a[data-pressable-targets~="${group.href}"]:is(:hover, :focus-visible, :active, :interest-source))`
 			peerStyles.push(`
-				${interacting} .pie-navigation-geometry { ---pie-hasRelevant: 1; }
+				${interacting} .pie-navigation-geometry { ---pie-hasRelevant: 1; ---pie-opacityAnimation: none; }
 				${related.map(item => `${interacting} .pie-navigation :is(li, details)[data-pressable-name="${item.href}"]`).join(', ')} { ---pie-relevant: 1; }
 			`)
 			for (const item of related) {
@@ -2133,7 +2133,7 @@
 				:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 					animation:
 						link-current auto linear both,
-						var(---pie-opacityAnimation, none) auto var(--transition-easeInOutExpo),
+						if(style(---pie-turn-timeline: none): none; else: var(---pie-opacityAnimation, none)) auto var(--transition-easeInOutExpo),
 						if(style(---pie-interacting: 1): none; else: wallet-pie-scale) auto var(--transition-easeInOutExpo);
 					animation-timeline: var(--link-current, none), var(---pie-turn-timeline, none), var(---pie-turn-timeline, none);
 					animation-range: normal, var(---pie-turnRange), var(---pie-turnRange);
@@ -2182,8 +2182,10 @@
 	.pie-navigation {
 		:global(#top) & .pie-navigation-geometry[data-pressable-state~="related"] {
 			---pie-hasRelevant: 1;
+			---pie-opacityAnimation: none;
 		}
 
+		---pie-turn-timeline: none;
 		---pie-turnRange: exit-crossing -100% exit-crossing 0%;
 		---pie-hasRelevant: 0;
 		:global(:is(li, details)[data-pressable-name]) {
@@ -2377,6 +2379,9 @@
 				transform: rotate(var(---slice-mid-angle)) translateY(calc(var(--slice-offset) * -1px));
 
 				transition-property: scale, opacity;
+				@supports (animation-timeline: scroll()) and (timeline-scope: --link) and (color: if(style(---link-active: 1): red)) {
+					transition-property: if(style(---pie-turn-timeline: none): scale, opacity; style(---pie-opacityAnimation: wallet-pie-opacity): scale; else: scale, opacity);
+				}
 				&:global(:is(:active, [data-pressable-state~="pressed"])) {
 					---pie-opacityAnimation: none;
 				}
