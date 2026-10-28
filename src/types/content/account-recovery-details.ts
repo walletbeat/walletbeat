@@ -20,6 +20,7 @@ export function isAccountRecoveryMetadata(value: unknown): value is AccountRecov
 	if (
 		!isRecord(value) ||
 		!Object.hasOwn(value, 'minimumGuardianPolicy') ||
+		!Object.hasOwn(value, 'alternateRecovery') ||
 		!Object.hasOwn(value, 'outcomes') ||
 		!Object.hasOwn(value, 'drills')
 	) {
@@ -28,6 +29,8 @@ export function isAccountRecoveryMetadata(value: unknown): value is AccountRecov
 
 	const validGuardianPolicy =
 		value.minimumGuardianPolicy === null || isRecord(value.minimumGuardianPolicy)
+	const validAlternateRecovery =
+		value.alternateRecovery === null || isRecord(value.alternateRecovery)
 	const validOutcomes = value.outcomes === null || Array.isArray(value.outcomes)
 	const validDrills =
 		value.drills === null ||
@@ -35,7 +38,7 @@ export function isAccountRecoveryMetadata(value: unknown): value is AccountRecov
 			Array.isArray(value.drills.configured) &&
 			Array.isArray(value.drills.missing))
 
-	return validGuardianPolicy && validOutcomes && validDrills
+	return validGuardianPolicy && validAlternateRecovery && validOutcomes && validDrills
 }
 
 export function accountRecoveryDetailsContent(
