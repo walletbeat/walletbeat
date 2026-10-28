@@ -266,7 +266,8 @@ export interface BrowserExtensionManifest {
 	 * channel to the wallet (e.g. to send RPC requests).
 	 * Maps to the `externally_connectable` manifest field.
 	 * Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the
-	 * manifest, meaning no external connections are permitted.
+	 * manifest, meaning no web page may connect. Browsers still let any
+	 * installed extension connect in that case.
 	 */
 	externallyConnectable:
 		| {
