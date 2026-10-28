@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { setTimeout as delay } from 'node:timers/promises'
+import { gzipSync } from 'node:zlib'
 
 import {
+	finishChromeTrace,
 	finishPerformanceObservation,
 	installPerformanceObservation,
 	markPerformanceProfile,
@@ -113,7 +115,6 @@ test.describe('constrained mobile performance observations after structural acce
 		})
 		const gestures: unknown[] = []
 		let touchActive = false
-		let missingTraceStream: boolean
 		const swipe = async (up: boolean) => {
 			const before = await page
 				.locator('#layout')
@@ -225,55 +226,313 @@ test.describe('constrained mobile performance observations after structural acce
 				contentType: 'application/json',
 			})
 		} finally {
-			if (touchActive) {
-				await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] })
-			}
-
-			await cdp.send('Tracing.end')
-			const { stream } = await tracingComplete
-
-			missingTraceStream = !stream
-
-			if (stream) {
-				const chunks: Buffer[] = []
-
+			try {
 				try {
-					for (;;) {
-						const chunk = await cdp.send('IO.read', { handle: stream })
-
-						chunks.push(Buffer.from(chunk.data, chunk.base64Encoded ? 'base64' : 'utf8'))
-
-						if (chunk.eof) {
-							break
-						}
+					if (touchActive) {
+						await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] })
 					}
 				} finally {
-					await cdp.send('IO.close', { handle: stream })
+					const trace = await finishChromeTrace(cdp, tracingComplete)
+
+					await writeFile(tracePath, trace)
+					await info.attach('native-chrome-performance-trace', {
+						path: tracePath,
+						contentType: 'application/json',
+					})
+					await info.attach('native-chrome-rendering-reasons', {
+						body: JSON.stringify({
+							...summarizeChromeTrace(JSON.parse(trace.toString())),
+							captureScope:
+								'Load, warmup and measured interactions; wallet-page-performance-profile marks the measured interaction boundary.',
+						}),
+						contentType: 'application/json',
+					})
 				}
-
-				const trace = Buffer.concat(chunks)
-
-				await writeFile(tracePath, trace)
-				await info.attach('native-chrome-performance-trace', {
-					path: tracePath,
-					contentType: 'application/json',
-				})
-				await info.attach('native-chrome-rendering-reasons', {
-					body: JSON.stringify({
-						...summarizeChromeTrace(JSON.parse(trace.toString())),
-						captureScope:
-							'Load, warmup and measured interactions; wallet-page-performance-profile marks the measured interaction boundary.',
-					}),
-					contentType: 'application/json',
-				})
+			} finally {
+				try {
+					await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+				} finally {
+					await cdp.detach()
+				}
 			}
-
-			await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
-			await cdp.detach()
-		}
-
-		if (missingTraceStream) {
-			throw new Error('Native Chrome tracing did not return its artifact stream')
 		}
 	})
+})
+
+test.describe('native window resize diagnostics', () => {
+	test.skip(
+		!process.env.WALLET_PAGE_NATIVE_RESIZE,
+		'Opt in to native resize capture independently of full performance acceptance',
+	)
+	test.skip(
+		({ browserName }) => browserName !== 'chromium',
+		'Native window bounds and rendering traces use Chromium CDP',
+	)
+	test.skip(({ headless }) => headless, 'Native browser-window capture requires --headed')
+	test.use({ viewport: null })
+
+	// A unique terminal width prevents an earlier frame from satisfying final capture admission.
+	const journeys = [
+		{
+			name: 'within desktop',
+			start: 1100,
+			widths: [1150, 1100, 1130, 1160, 1110, 1140, 1120, 1100, 1170],
+		},
+		{
+			name: 'across responsive breakpoints',
+			start: 1100,
+			widths: [690, 1100, 960, 800, 690, 540, 800, 1000, 1150],
+		},
+		{ name: 'within mobile', start: 690, widths: [720, 690, 700, 720, 710, 690, 720, 700, 715] },
+	]
+
+	for (const journey of journeys) {
+		for (const manualScroll of [false, true]) {
+			test(`${journey.name}, ${manualScroll ? 'user-scrolled' : 'retained fragment'}`, async ({
+				page,
+				context,
+				browser,
+			}, info) => {
+				const cdp = await context.newCDPSession(page)
+				const host = await browser.newBrowserCDPSession()
+				let restoreWindow: (() => Promise<void>) | undefined
+
+				try {
+					expect(
+						[journey.start, ...journey.widths.slice(0, -1)],
+						'Terminal frame identity must be distinct from earlier requested widths',
+					).not.toContain(journey.widths.at(-1))
+					const { targetInfo } = await cdp.send('Target.getTargetInfo')
+					const { windowId } = await host.send('Browser.getWindowForTarget', {
+						targetId: targetInfo.targetId,
+					})
+					const { bounds } = await host.send('Browser.getWindowBounds', { windowId })
+
+					expect(bounds.windowState, 'Native resize requires a normal browser window').toBe(
+						'normal',
+					)
+
+					restoreWindow = async () => {
+						await host.send('Browser.setWindowBounds', {
+							windowId,
+							bounds: {
+								left: bounds.left,
+								top: bounds.top,
+								width: bounds.width,
+								height: bounds.height,
+							},
+						})
+					}
+					const commands: { width: number; start: number; acknowledged: number }[] = []
+					const frames: {
+						received: number
+						metadata: { deviceWidth: number; deviceHeight: number; timestamp?: number }
+						data: string
+					}[] = []
+					const resize = async (width: number) => {
+						const start = Date.now()
+
+						await host.send('Browser.setWindowBounds', {
+							windowId,
+							bounds: { width, height: 1000 },
+						})
+						commands.push({ width, start, acknowledged: Date.now() })
+					}
+
+					await resize(journey.start)
+					await page.goto('/metamask/?variant=BROWSER#security')
+					await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+					await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded')
+					await page.bringToFront()
+					await expect.poll(() => page.evaluate(() => document.visibilityState)).toBe('visible')
+
+					let manualAdmission: { x: number; y: number; before: number; after: number } | undefined
+
+					if (manualScroll) {
+						const point = await page
+							.locator('#security h2')
+							.first()
+							.evaluate(heading => {
+								const root = document.querySelector('#layout')
+
+								if (!root || !root.contains(heading)) {
+									throw new Error('Heading lacks the real scroll owner')
+								}
+
+								const box = heading.getBoundingClientRect()
+								const x = box.left + box.width / 2
+								const y = box.top + box.height / 2
+								const hit = document.elementFromPoint(x, y)
+
+								if (!hit || !heading.contains(hit)) {
+									throw new Error('Root wheel target is occluded')
+								}
+
+								for (
+									let node: Element | null = hit;
+									node && node !== root;
+									node = node.parentElement
+								) {
+									if (
+										/auto|scroll/.test(getComputedStyle(node).overflowY) &&
+										node.scrollHeight > node.clientHeight + 1
+									) {
+										throw new Error('Wheel target belongs to a nested scroller')
+									}
+								}
+
+								return { x, y, before: root.scrollTop }
+							})
+
+						await page.mouse.move(point.x, point.y)
+						await page.mouse.wheel(0, 160)
+						await expect
+							.poll(() => page.locator('#layout').evaluate(root => root.scrollTop), {
+								message: 'Manual mode requires actual native root movement',
+							})
+							.not.toBe(point.before)
+						manualAdmission = {
+							...point,
+							after: await page.locator('#layout').evaluate(root => root.scrollTop),
+						}
+					}
+
+					let previous = ''
+					let stable = 0
+
+					await expect
+						.poll(
+							async () => {
+								const current = await page.evaluate(() =>
+									JSON.stringify({
+										width: innerWidth,
+										height: innerHeight,
+										scroll: document.querySelector('#layout')?.scrollTop,
+									}),
+								)
+
+								stable = current === previous ? stable + 1 : 0
+								previous = current
+
+								return stable
+							},
+							{
+								intervals: [100],
+								message: 'Native initial viewport and root scrolling settle before capture',
+							},
+						)
+						.toBeGreaterThanOrEqual(3)
+					const initial = await page.evaluate(() => ({
+						width: innerWidth,
+						height: innerHeight,
+						dpr: devicePixelRatio,
+						visibility: document.visibilityState,
+						focused: document.hasFocus(),
+						scroll: document.querySelector('#layout')?.scrollTop,
+					}))
+
+					expect(initial.width).toBe(journey.start)
+					commands.length = 0
+					cdp.on('Page.screencastFrame', frame => {
+						frames.push({ received: Date.now(), metadata: frame.metadata, data: frame.data })
+						void cdp
+							.send('Page.screencastFrameAck', { sessionId: frame.sessionId })
+							.catch(() => undefined)
+					})
+					const completed = new Promise<{ stream?: string }>(resolve =>
+						host.once('Tracing.tracingComplete', resolve),
+					)
+
+					await host.send('Tracing.start', {
+						transferMode: 'ReturnAsStream',
+						categories: 'devtools.timeline,blink.user_timing',
+						options: 'record-as-much-as-possible',
+					})
+
+					try {
+						await cdp.send('Page.startScreencast', {
+							format: 'jpeg',
+							quality: 45,
+							everyNthFrame: 1,
+						})
+						await host.send('Tracing.recordClockSyncMarker', { syncId: 'resize-idle-start' })
+						await delay(600)
+
+						for (const [index, width] of journey.widths.entries()) {
+							await host.send('Tracing.recordClockSyncMarker', {
+								syncId: `resize-width-${index}-${width}`,
+							})
+							await resize(width)
+							await delay(index === 0 ? 1200 : 80)
+						}
+						await host.send('Tracing.recordClockSyncMarker', { syncId: 'resize-settle-start' })
+						await delay(1800)
+						await host.send('Tracing.recordClockSyncMarker', { syncId: 'resize-end' })
+					} finally {
+						try {
+							const trace = await finishChromeTrace(host, completed)
+
+							await info.attach('native-resize-trace', {
+								body: gzipSync(trace),
+								contentType: 'application/gzip',
+							})
+							await info.attach('native-resize-observations', {
+								body: JSON.stringify({
+									status: 'unverified',
+									journey: journey.name,
+									manualScroll,
+									browser: browser.version(),
+									initial,
+									...summarizeChromeTrace(JSON.parse(trace.toString())),
+									interpretation:
+										'Native bounds changes and passive browser frames are collected without geometry reads during the timed journey. Frame arrivals do not establish physical display deadlines. Trace and visual review, source-equivalent comparisons and independent final layout/navigation checks remain required for performance acceptance. No presentation-altering control is a passing causal comparison.',
+								}),
+								contentType: 'application/json',
+							})
+						} finally {
+							try {
+								await cdp.send('Page.stopScreencast')
+							} finally {
+								await info.attach('native-resize-frames', {
+									body: gzipSync(JSON.stringify(frames)),
+									contentType: 'application/gzip',
+								})
+								await info.attach('native-resize-inputs', {
+									body: JSON.stringify({
+										initial,
+										manualAdmission,
+										windowBounds: bounds,
+										commands,
+										frameMetadata: frames.map(({ received, metadata }) => ({ received, metadata })),
+									}),
+									contentType: 'application/json',
+								})
+							}
+						}
+					}
+
+					expect(commands.map(command => command.width)).toEqual(journey.widths)
+					expect(
+						frames.length,
+						'Native resize capture must contain browser frames',
+					).toBeGreaterThan(1)
+					expect(
+						frames.some(frame => frame.metadata.deviceWidth === journey.widths.at(-1)),
+						'Capture must include a frame at the final resized width',
+					).toBe(true)
+					await expect.poll(() => page.evaluate(() => innerWidth)).toBe(journey.widths.at(-1))
+					await info.attach('native-resize-final-paint', {
+						body: await page.screenshot(),
+						contentType: 'image/png',
+					})
+				} finally {
+					try {
+						await restoreWindow?.()
+					} finally {
+						await Promise.all([host.detach(), cdp.detach()])
+					}
+				}
+			})
+		}
+	}
 })

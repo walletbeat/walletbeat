@@ -216,3 +216,17 @@ it('preserves delimiter, native ID type and scope identity without merging inval
 	])
 	expect(summary.animationCompositing.unattributedAnimationEvents).toBe(1)
 })
+
+it('keeps aggregate rendering work separate from the longest completed pass', () => {
+	const summary = summarizeChromeTrace({
+		traceEvents: [
+			{ name: 'Layout', ph: 'X', ts: 1, dur: 3000 },
+			{ name: 'Layout', ph: 'X', ts: 4, dur: 5000 },
+			{ name: 'Layout', ph: 'b', ts: 9, dur: 100000 },
+			{ name: 'Paint', ph: 'X', ts: 10, dur: 2000 },
+		],
+	})
+
+	expect(summary.durationMicros).toEqual({ Layout: 8000, Paint: 2000 })
+	expect(summary.maxDurationMicros).toEqual({ Layout: 5000, Paint: 2000 })
+})

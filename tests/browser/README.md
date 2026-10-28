@@ -37,3 +37,9 @@ For a focused development run, use `pnpm test:browser:collect src/views/WalletPa
 The Android requirement is a later low-end-browser performance target per the human clarification. A constrained native Chromium mobile profile is identified as emulation; no attached physical device is required. Structural first-pass acceptance precedes this performance validation.
 
 After the accepted recording matrix, run `node tests/browser/recording-gallery.mjs <report.json> <new-output-directory>` to validate metadata and fully decode all 18 videos. The resulting gallery retains visual review as pending until every video is inspected.
+
+### Focused native resize diagnosis
+
+Run `WALLET_PAGE_NATIVE_RESIZE=1 pnpm test:browser:collect src/views/WalletPage.tests/performance.spec.ts --project=chromium --headed --grep "native window resize diagnostics"` against the source-matched fixture server. This opt-in, headed Chromium capture uses real browser-window bounds with viewport emulation disabled. It covers resizing within desktop/mobile bands and across responsive breakpoints, both with a retained fragment and after native manual scrolling. It is available before structural first-pass acceptance for focused diagnosis; it does not replace the gated final performance profile.
+
+The journey retains clock markers, native window command acknowledgements, passive browser frame data, a compressed rendering trace, a final screenshot and the existing source/browser identity attachments. Geometry polling occurs before or after the timed journey. A passing collection proves successful capture and eventual viewport delivery; performance remains explicitly unverified pending trace/pixel review and qualified, source-equivalent comparisons. Frame-stream timestamps are not physical-display deadlines. Keep failed captures as evidence; do not promote presentation-changing ablations into causal acceptance.
