@@ -69,7 +69,9 @@ describe('static reference evidence', () => {
 			})),
 		]
 		const imageDimensions = await referenceImageDimensions(references)
-		const { body } = render(WithImageDimensions, { props: { references, parentHeadingLevel: 3, imageDimensions } })
+		const { body } = render(WithImageDimensions, {
+			props: { references, parentHeadingLevel: 3, imageDimensions },
+		})
 		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
 
 		expect(

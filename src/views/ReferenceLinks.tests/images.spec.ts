@@ -119,11 +119,8 @@ for (const javaScriptEnabled of [false, true]) {
 					expect(image.href).toBe(image.src)
 				}
 				releaseImages()
-				const after = []
 
-				for (let index = 0; index < (await images.count()); index++) {
-					const image = images.nth(index)
-
+				for (const image of await images.all()) {
 					await image.scrollIntoViewIfNeeded()
 					await expect
 						.poll(() =>
@@ -132,26 +129,31 @@ for (const javaScriptEnabled of [false, true]) {
 							),
 						)
 						.toBe(true)
-					after.push(
-						await image.evaluate(element => {
-							if (!(element instanceof HTMLImageElement)) {
-								throw new Error('Expected image')
-							}
+				}
+				const after = await images.evaluateAll(elements =>
+					elements.map(element => {
+						if (!(element instanceof HTMLImageElement)) {
+							throw new Error('Expected image')
+						}
 
-							const box = element.getBoundingClientRect()
+						const box = element.getBoundingClientRect()
 
-							return {
-								width: box.width,
-								height: box.height,
-								naturalWidth: element.naturalWidth,
-								naturalHeight: element.naturalHeight,
-							}
-						}),
-					)
-					expect(Math.abs(after[index].width - before[index].width)).toBeLessThan(1)
-					expect(Math.abs(after[index].height - before[index].height)).toBeLessThan(1)
-					expect(after[index].naturalWidth).toBe(before[index].intrinsicWidth)
-					expect(after[index].naturalHeight).toBe(before[index].intrinsicHeight)
+						return {
+							width: box.width,
+							height: box.height,
+							naturalWidth: element.naturalWidth,
+							naturalHeight: element.naturalHeight,
+						}
+					}),
+				)
+
+				expect(after).toHaveLength(before.length)
+
+				for (const [index, image] of after.entries()) {
+					expect(Math.abs(image.width - before[index].width)).toBeLessThan(1)
+					expect(Math.abs(image.height - before[index].height)).toBeLessThan(1)
+					expect(image.naturalWidth).toBe(before[index].intrinsicWidth)
+					expect(image.naturalHeight).toBe(before[index].intrinsicHeight)
 				}
 				expect(externalImages).toEqual([])
 				await info.attach('image-geometry', {
