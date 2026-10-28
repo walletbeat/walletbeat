@@ -119,7 +119,7 @@ const radiusAtArea = (computed: ComputedSlice['computed'], fraction: number): nu
 	return radius
 }
 
-const sliceGradientStops = (
+export const sliceGradientStops = (
 	slice: ComputedSlice,
 ): string | { color: string; position: number }[] => {
 	const { children, gradient } = slice

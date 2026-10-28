@@ -1,7 +1,7 @@
 ---
 // Types/constants
 import { betaImagesRoot } from '@/constants'
-import { getBaseUrl } from '@/base-url'
+import { getBaseUrl, withBasePath } from '@/base-url'
 
 type Icon = {
 	url: string
@@ -42,7 +42,7 @@ const locale = 'en-US'
 
 // Default OG image — falls back to /banner.png in the public folder.
 const defaultOgImage: OpenGraphImage = {
-	url: '/banner.png',
+	url: withBasePath('/banner.png'),
 	width: 955,
 	height: 500,
 	alt: 'Walletbeat - Who watches the wallets?',
@@ -56,7 +56,7 @@ const toAbsolute = (url: string): string => {
 		return url
 	}
 	const path = url.startsWith('/') ? url : `/${url}`
-	return `${getBaseUrl()}${path}`
+	return `${getBaseUrl().replace(/\/+$/, '')}${path}`
 }
 
 // Functions
@@ -109,6 +109,7 @@ const ogImageUrl = toAbsolute(metadata.openGraph.image.url)
 <meta property='og:siteName' content={metadata.openGraph.siteName} />
 <meta property='og:locale' content={metadata.openGraph.locale} />
 <meta property='og:image' content={ogImageUrl} />
+<meta property='og:image:type' content='image/png' />
 <meta property='og:image:width' content={String(metadata.openGraph.image.width)} />
 <meta property='og:image:height' content={String(metadata.openGraph.image.height)} />
 <meta property='og:image:alt' content={metadata.openGraph.image.alt} />

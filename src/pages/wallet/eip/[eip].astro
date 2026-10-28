@@ -1,4 +1,5 @@
 ---
+import { eipOgImage } from '@/utils/eip-og-image'
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
@@ -98,6 +99,7 @@ const embeddedCards = eipStatusSupportCards(
 
 <Layout
 	metadata={{
+		image: eipOgImage(eip),
 		title: `Walletbeat - ${eipShortLabel(eip)} wallet adoption`,
 		description: `Which wallets implement ${eipShortLabel(eip)} (${eip.friendlyName})? Track the adoption of ${eipShortLabel(eip)} across the Ethereum wallet ecosystem.`,
 	}}
