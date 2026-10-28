@@ -60,7 +60,7 @@
 				</section>
 				<footer data-row="start wrap">
 					<a href={getEipTrackerUrl(eip)}>Wallet support tracker →</a>
-					<a href={eipEthereumDotOrgUrl(eip)}>Read full specification →</a>
+					<a href={eipEthereumDotOrgUrl(eip)} target="_blank" rel="noopener noreferrer">Read full specification →</a>
 				</footer>
 			</div>
 		</details>

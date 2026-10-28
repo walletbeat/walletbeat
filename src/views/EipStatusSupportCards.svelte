@@ -95,8 +95,7 @@
 					>{label}</h3>
 				</header>
 
-				<div data-scroll-item="inline-attached underflow-center overflow-start">
-					<div class="wallet-card-list" data-column="gap-5">
+				<div data-scroll-item="inline-detached" data-column="gap-5">
 						{#each statusCards as card (card.id)}
 							{@const hasReferences = card.references.length > 0}
 
@@ -110,12 +109,9 @@
 									/>
 								</span>
 
-								<div class="wallet-heading" data-row-item="flexible" data-row="start wrap gap-2">
-									<h4>
-                                        <a data-link="camouflaged" href={card.url}>{card.displayName}</a>
-									</h4>
-
-								</div>
+								<h4 class="wallet-heading" data-row-item="flexible">
+									<a data-link="camouflaged" href={card.url}>{card.displayName}</a>
+								</h4>
 
 								<span class="platform-label">{card.variants.map(variantLabel).join(', ')}</span>
 							{/snippet}
@@ -158,7 +154,6 @@
 								{/if}
 							</div>
 						{/each}
-					</div>
 				</div>
 			</div>
 		{/if}
@@ -173,12 +168,6 @@
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 		}
-	}
-
-	/* A stable list width keeps disclosure expansion from changing its inline size. */
-	.wallet-card-list {
-		inline-size: 56rem;
-		max-inline-size: 100%;
 	}
 
 	h3 {
@@ -200,13 +189,8 @@
 	}
 
 	.wallet-heading {
-		min-inline-size: 0;
-
-		h4 {
-			flex-shrink: 1;
-			font-size: 0.9rem;
-			font-weight: 600;
-		}
+		font-size: 0.9rem;
+		font-weight: 600;
 	}
 
 	/* Matches the "Updated <date>" secondary text on the wallet security news
