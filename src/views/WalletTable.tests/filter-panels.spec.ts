@@ -18,9 +18,37 @@ const expectWithinViewport = async (panel: Locator, page: Page) => {
 	expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1)
 }
 
+const expectReachable = async (control: Locator, page: Page) => {
+	await expectWithinViewport(control, page)
+	const samples = await control.evaluate(async control => {
+		const samples: boolean[] = []
+
+		for (let frame = 0; frame < 3; frame++) {
+			await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+			const box = control.getBoundingClientRect()
+
+			samples.push(
+				control.isConnected &&
+					box.x >= -1 &&
+					box.y >= -1 &&
+					box.right <= innerWidth + 1 &&
+					box.bottom <= innerHeight + 1 &&
+					control.contains(
+						document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2),
+					),
+			)
+		}
+
+		return samples
+	})
+
+	expect(samples).toEqual([true, true, true])
+}
+
 for (const viewport of [
 	{ width: 1280, height: 900 },
 	{ width: 1025, height: 320 },
+	{ width: 1025, height: 240 },
 	{ width: 390, height: 844 },
 ]) {
 	for (const javaScriptEnabled of [true, false]) {
@@ -111,6 +139,7 @@ for (const viewport of [
 
 						await input.locator('..').click()
 						await expect(input).toBeChecked()
+						await expectReachable(input.locator('..'), page)
 						await reset.click()
 						await expect(input).not.toBeChecked()
 					} else {
@@ -161,6 +190,7 @@ for (const viewport of [
 
 						await input.locator('..').click()
 						await expect(input).toBeChecked()
+						await expectReachable(input.locator('..'), page)
 						await panel.getByRole('button', { name: /Reset/ }).filter({ visible: true }).click()
 						await expect(input).not.toBeChecked()
 						await expect
