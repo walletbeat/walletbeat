@@ -48,7 +48,7 @@ for (const javaScriptEnabled of [false, true]) {
 							'astro-island[component-url*="WalletPageContext"], astro-island[component-url*="EipStatusSupportCards"]',
 						)
 						.all()) {
-						await island.scrollIntoViewIfNeeded()
+						await island.locator('h1, h2').first().scrollIntoViewIfNeeded()
 						await expect(island).not.toHaveAttribute('ssr')
 					}
 				}
@@ -64,7 +64,7 @@ for (const javaScriptEnabled of [false, true]) {
 
 				if (javaScriptEnabled) {
 					for (const button of await page
-						.getByRole('button', { name: /^Show all .* sources$/ })
+						.getByRole('button', { name: /^Show (?:all .* sources|fewer sources)$/ })
 						.all()) {
 						await button.click()
 					}
