@@ -5,6 +5,10 @@ import { defaultNavigationItems } from '@/constants/navigation'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
 import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
 
+import { getNewsForWallet } from '@/data/news'
+import { collectWalletRefs, refs } from '@/schema/reference'
+import { referenceImageDimensions } from '@/utils/reference-image-metadata'
+
 // Routes
 export const prerender = true
 
@@ -30,6 +34,10 @@ if (walletEntry === undefined) {
 
 const [walletDataName, walletData] = walletEntry
 const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
+const imageDimensions = await referenceImageDimensions([
+	...collectWalletRefs(walletDataName, walletData).flatMap(ref => ref.fullyQualifiedRefs),
+	...getNewsForWallet(walletName).flatMap(refs),
+])
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -64,6 +72,7 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 			{walletIcon}
 			walletId={wallet.metadata.id}
 			codeSnippets={codeSnippets}
+			{imageDimensions}
 			client:idle
 		/>
 	</main>

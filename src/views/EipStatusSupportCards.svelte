@@ -8,6 +8,7 @@
 	} from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
 	import type { CalendarDate } from '@/types/date'
+	import { type ReferenceImageDimensions, setReferenceImageContext } from '@/utils/reference-image-context'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
@@ -49,16 +50,19 @@
 		title,
 		cards,
 		codeSnippets = {},
+		imageDimensions = {},
 	}: {
 		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
 		id?: string
 		title?: string
 		cards: EipStatusSupportCard[]
+		imageDimensions?: ReferenceImageDimensions,
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
 	} = $props()
 
 	setCodeSnippetContext(() => codeSnippets)
+	setReferenceImageContext(() => imageDimensions)
 
 
 	// Functions

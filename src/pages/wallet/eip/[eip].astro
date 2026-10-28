@@ -19,6 +19,8 @@ import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { sortEipSupportCards } from '@/utils/eip-support-sort'
 import { getWalletUrl } from '@/utils/urls'
 
+import { referenceImageDimensions } from '@/utils/reference-image-metadata'
+
 // Components
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
@@ -129,6 +131,9 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
 					codeSnippets={cardCodeSnippets(softwareCards)}
+					imageDimensions={await referenceImageDimensions(
+						softwareCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)
@@ -140,6 +145,9 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
 					codeSnippets={cardCodeSnippets(hardwareCards)}
+					imageDimensions={await referenceImageDimensions(
+						hardwareCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)
@@ -151,6 +159,9 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
 					codeSnippets={cardCodeSnippets(embeddedCards)}
+					imageDimensions={await referenceImageDimensions(
+						embeddedCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)
