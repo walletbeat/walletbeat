@@ -1102,7 +1102,8 @@
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
 			>
-				{@render sectionHeader('stages', 'Stage Progress', 'checklist')}
+				{#snippet stageDescription()}<p>How far has {wallet.metadata.displayName} progressed?</p>{/snippet}
+				{@render sectionHeader('stages', 'Stage Progress', 'checklist', stageDescription)}
 
 				<WalletStageOverview
 					{wallet} {stage} {ladderEvaluation}
