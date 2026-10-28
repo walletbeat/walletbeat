@@ -1163,7 +1163,7 @@
 			>
 		</footer>
 	{/if}
-	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-scroll-item="snap-block-start"></span></span>
+	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
 	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </div>
 
@@ -2507,16 +2507,11 @@
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
-				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
+				var(--stickyBreadcrumb-entryTimeline),
 				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
 		}
 	}
 
-	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
-		[data-sticky-breadcrumb~="root"] {
-			timeline-scope: var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links);
-		}
-	}
 
 	@property --wallet-icon-size {
 		syntax: '<length>';
@@ -2794,6 +2789,11 @@
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 		(color: if(style(---breadcrumb-wrap: 1): red)) {
+		@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+			[data-sticky-breadcrumb~="root"] {
+				timeline-scope: none;
+			}
+		}
 		@media (width <= 1024px) {
 			[data-sticky-breadcrumb~="root"] {
 				--stickyBreadcrumb-clearance: circle;
