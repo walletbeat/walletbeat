@@ -541,6 +541,7 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		ecosystem: {
+			appTriggeredDelegation: null,
 			// Delegation is never offered at EOA creation or import; it is applied lazily,
 			// bundled into the first operation (e.g. a swap) that benefits from it.
 			delegation: {

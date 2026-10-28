@@ -4,7 +4,10 @@ import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nul
 import type { Entity } from './entity'
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
-import type { DelegationHandling } from './features/ecosystem/delegation-handling'
+import type {
+	AppTriggeredDelegation,
+	DelegationHandling,
+} from './features/ecosystem/delegation-handling'
 import type { AppConnectionSupport } from './features/ecosystem/hw-app-connection-support'
 import {
 	notApplicableWalletIntegration,
@@ -243,6 +246,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** Ecosystem features. */
 	ecosystem: {
+		/** Whether an app's call batch can trigger an EIP-7702 delegation, and how it is shown. */
+		appTriggeredDelegation: VariantFeature<AppTriggeredDelegation>
+
 		/** EIP-7702 delegation handling. */
 		delegation: VariantFeature<DelegationHandling>
 	}
@@ -443,6 +449,9 @@ export interface ResolvedFeatures {
 			repositoryChangeControls: ResolvedFeature<RepositoryChangeControls>
 			reproducibleBuilds: ResolvedFeature<ReproducibleBuilds>
 		}
+	}
+	ecosystem: {
+		appTriggeredDelegation: ResolvedFeature<AppTriggeredDelegation>
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
@@ -690,6 +699,12 @@ export function resolveFeatures(
 					features => features.transparency.releaseTransparency.reproducibleBuilds,
 				),
 			},
+		},
+		ecosystem: {
+			appTriggeredDelegation: softwareFeat(
+				'ecosystem.appTriggeredDelegation',
+				features => features.ecosystem.appTriggeredDelegation,
+			),
 		},
 		chainAbstraction: nullable(
 			softwareFeat('chainAbstraction', features => features.chainAbstraction),

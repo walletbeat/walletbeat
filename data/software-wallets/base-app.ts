@@ -188,6 +188,7 @@ export const baseApp: SoftwareWallet = {
 			[Variant.MOBILE]: notSupported,
 		},
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {

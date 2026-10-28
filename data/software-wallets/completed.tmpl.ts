@@ -343,6 +343,11 @@ export const completedTemplate: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
+			appTriggeredDelegation: supported({
+				ref: refTodo,
+				batchCallDetailsIdenticalToDelegatedFlow: true,
+				delegationDisclosed: true,
+			}),
 			delegation: {
 				duringEOACreation: 'NO',
 				duringEOAImport: 'NO',
