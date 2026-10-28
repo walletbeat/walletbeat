@@ -177,6 +177,7 @@ export const rainbow: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			// Rainbow ships EIP-7702 "smart wallets": EOAs are delegated to Rainbow's
