@@ -1,0 +1,56 @@
+{
+	"highlightFirstLine": 19,
+	"highlightLastLine": 43,
+	"segments": [
+		{
+			"lines": [
+				"if (typeof process === 'undefined' || !process.exit) {"
+			],
+			"startLine": 9
+		},
+		{
+			"lines": [
+				"  globalObj.process = {"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"    },",
+				"  };",
+				"}",
+				"",
+				"export const initializeSecurity = ({ isUI = false }: SecurityConfig = {}) => {",
+				"  if (typeof lockdown !== 'function') {",
+				"    console.error('SES is not properly initialized');",
+				"    return;",
+				"  }",
+				"",
+				"  const defaultLockdownConfig: LockdownOptions = {",
+				"    errorTaming: 'unsafe',",
+				"    overrideTaming: 'moderate',",
+				"    consoleTaming: 'unsafe',",
+				"    domainTaming: 'unsafe',",
+				"    evalTaming: 'unsafeEval',",
+				"    __hardenTaming__: 'unsafe',",
+				"  };",
+				"",
+				"  const lockdownConfig: LockdownOptions = isUI",
+				"    ? defaultLockdownConfig",
+				"    : {",
+				"        ...defaultLockdownConfig,",
+				"        overrideTaming: 'severe',",
+				"        evalTaming: 'noEval',",
+				"        mathTaming: 'unsafe',",
+				"      };",
+				"",
+				"  lockdown(lockdownConfig);",
+				"",
+				"  if (isUI) {",
+				"    configureDOMSecurity();",
+				"  }"
+			],
+			"startLine": 15
+		}
+	]
+}
