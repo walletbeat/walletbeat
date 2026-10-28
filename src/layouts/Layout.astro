@@ -307,6 +307,48 @@ import Footer from '@/views/Footer.astro'
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+		#layout:has([data-sticky-breadcrumb~="root"]) {
+			timeline-scope:
+				--wallet-end-inline, --wallet-end-block, --wallet-item-inline, --wallet-item-block;
+			@supports (timeline-scope: all) and (view-timeline-name: ident('a' 'b')) {
+				timeline-scope: --wallet-end-inline, --wallet-end-block;
+			}
+			animation:
+				breadcrumb-size-item-inline-cover auto linear both,
+				breadcrumb-size-item-inline-crossing auto linear both,
+				breadcrumb-size-item-block-cover auto linear both,
+				breadcrumb-size-item-block-crossing auto linear both;
+			animation-timeline:
+				--wallet-item-inline, --wallet-item-inline, --wallet-item-block, --wallet-item-block;
+			animation-range:
+				cover 0% cover 100%,
+				cover 0% cover calc(100% + 100vw),
+				cover 0% cover 100%,
+				cover 0% cover calc(100% + 100vw);
+			---breadcrumb-itemInline: if(
+				style(---breadcrumb-itemInlineCover > 0) and style(---breadcrumb-itemInlineCover < 1) and
+					style(---breadcrumb-itemInlineCrossing > 0): calc(
+						(var(---breadcrumb-itemInlineCover) / var(---breadcrumb-itemInlineCrossing) - 1) /
+							(1 - var(---breadcrumb-itemInlineCover))
+					)
+					; else: 1
+			);
+			---breadcrumb-itemBlock: if(
+				style(---breadcrumb-itemBlockCover > 0) and style(---breadcrumb-itemBlockCover < 1) and
+					style(---breadcrumb-itemBlockCrossing > 0): calc(
+						(var(---breadcrumb-itemBlockCover) / var(---breadcrumb-itemBlockCrossing) - 1) /
+							(1 - var(---breadcrumb-itemBlockCover))
+					)
+					; else: 1
+			);
+			---breadcrumb-itemWidth: round(
+				up,
+				calc(100vw * (1 / var(---breadcrumb-itemInline) - 1)),
+				0.0625px
+			);
+			---breadcrumb-naturalItemHeight: calc(100vw * (1 / var(---breadcrumb-itemBlock) - 1));
+			---breadcrumb-itemHeight: round(nearest, var(---breadcrumb-naturalItemHeight), 0.0625px);
+		}
 		@media (width <= 1024px) {
 			#layout:has([data-sticky-breadcrumb~="root"]) {
 				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
@@ -336,7 +378,7 @@ import Footer from '@/views/Footer.astro'
 				--navigation-mobile-blockSize: max(
 					4.16rem,
 					calc(
-						100vw * (1 / var(---breadcrumb-itemBlock) - 1) * var(---wallet-compact-h1) /
+						var(---breadcrumb-naturalItemHeight) * var(---wallet-compact-h1) /
 							var(---wallet-name-flow-font-size) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)
 					)
 				);
@@ -346,8 +388,6 @@ import Footer from '@/views/Footer.astro'
 				@supports (timeline-scope: all) and (view-timeline-name: ident('a' 'b')) {
 					timeline-scope: --wallet-entry;
 				}
-				animation: breadcrumb-item-block auto linear both;
-				animation-timeline: --wallet-item-block;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])::before,
 			#layout:has([data-sticky-breadcrumb~="root"])::after {
@@ -407,16 +447,10 @@ import Footer from '@/views/Footer.astro'
 				animation:
 					navigation-logo-size auto linear both,
 					navigation-controls-size auto linear both,
-					breadcrumb-item-inline auto linear both,
 					breadcrumb-end-inline auto linear both;
 				animation-timeline:
-					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
-					--wallet-end-inline;
-				---breadcrumb-itemWidth: round(
-					up,
-					calc(100vw * (1/var(---breadcrumb-itemInline) - 1)),
-					0.0625px
-				);
+					--navigation-logo-inline, --navigation-controls-inline, --wallet-end-inline;
+				---breadcrumb-itemWidth: inherit;
 				---breadcrumb-endWidth: round(
 					up,
 					calc(100vw * (1/var(---breadcrumb-endInline) - 1)),

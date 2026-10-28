@@ -769,7 +769,7 @@ declare global {
 		 *
 		 * ### Placement
 		 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
-		 * - The entry flow marker contains one measure element for independent horizontal size clocks.
+		 * - The entry flow marker contains measure elements for independent item and row size clocks.
 		 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
 		 * - Closed summaries retain their own end-content dimensions and destination clocks; sticky motion and arrival measurements apply only to open disclosures.
 		 *
@@ -789,6 +789,7 @@ declare global {
 		 * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
 		 * - `size-export`: empty absolute size container; combine with `size-source`, `size-row` or `size-end` at the corresponding natural owner.
 		 * - `measure`: hidden dimension probes inside the flow marker
+		 * - `item-size`: combines with `measure` in a root flow marker; its local scroll container exports compact item width and natural item height to the shared layout owner
 		 *
 		 * - `contents`: on a transparent `end` cluster, existing children and marker own its paint motion; omit on a painted leaf end
 		 *
