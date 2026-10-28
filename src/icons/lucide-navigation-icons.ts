@@ -17,8 +17,8 @@ import UserCogIcon from 'lucide-static/icons/user-cog.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 import type { LucideNavigationIcon } from '@/constants/navigation'
-import { FarcasterIcon } from '@/icons/farcaster'
-import { XIcon } from '@/icons/x'
+import FarcasterIcon from '@/icons/farcaster.svg?raw'
+import XIcon from '@/icons/x.svg?raw'
 
 /** Raw SVG markup for each Lucide icon usable as a navigation or EIP icon. */
 export const lucideNavigationIcons: Record<LucideNavigationIcon, string> = {
