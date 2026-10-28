@@ -1593,7 +1593,7 @@ ol {
  *
  * ### Placement
  * - A scope contains its position (directly or inside details), followed by content and a flow marker.
- * - The entry flow marker contains one measure element for independent horizontal size clocks.
+ * - The entry flow marker contains measure elements for independent item and row size clocks.
  * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
  * - Closed summaries retain their own end-content dimensions and destination clocks; sticky motion and arrival measurements apply only to open disclosures.
  *
@@ -1613,6 +1613,7 @@ ol {
  * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
  * - `size-export`: empty absolute size container; combine with `size-source`, `size-row` or `size-end` at the corresponding natural owner.
  * - `measure`: hidden dimension probes inside the flow marker
+ * - `item-size`: combines with `measure` in a root flow marker; its local scroll container exports compact item width and natural item height to the shared layout owner
  *
  * - `contents`: on a transparent `end` cluster, existing children and marker own its paint motion; omit on a painted leaf end
  *
@@ -1741,6 +1742,11 @@ ol {
 		}
 	}
 	@property ---breadcrumb-itemWidth {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---breadcrumb-naturalItemHeight {
 		syntax: '<length>';
 		inherits: true;
 		initial-value: 0px;
@@ -3047,6 +3053,63 @@ ol {
 				---breadcrumb-parentInlineEnd: 0px;
 				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
+				---breadcrumb-sizeAnimationNames: breadcrumb-size-row-inline-cover, breadcrumb-size-row-inline-crossing;
+				---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowInlineTimeline);
+				animation-range: cover 0% cover 100%, cover 0% cover calc(100% + 100vw);
+				---breadcrumb-itemWidth: inherit;
+				---breadcrumb-itemHeight: inherit;
+				---column-inlineFraction: if(
+					style(---breadcrumb-rowInlineCover > 0) and style(---breadcrumb-rowInlineCover < 1) and style(---breadcrumb-rowInlineCrossing > 0): calc(
+						(var(---breadcrumb-rowInlineCover) / var(---breadcrumb-rowInlineCrossing) - 1) / (1 - var(---breadcrumb-rowInlineCover))
+					);
+					else: 1
+				);
+				---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
+				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
+
+				&::before,
+				&::after,
+				> [data-sticky-breadcrumb~="flow"]::before {
+					content: none;
+					view-timeline-name: none;
+				}
+				> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
+					/* Cover and extended-cover progress recover dimensions independently of the local scrollport's rounded viewport. */
+					direction: ltr;
+					writing-mode: horizontal-tb;
+					overflow: hidden;
+					view-timeline-name: none;
+					&::before,
+					&::after {
+						box-sizing: content-box;
+						position: absolute;
+						inset: 0 auto auto 0;
+						padding: 0;
+						border: 0;
+						margin: 0;
+					}
+					&::before {
+						content: '';
+						inline-size: 100%;
+						padding-inline-end: 100vw;
+						view-timeline-name: var(---breadcrumb-rowInlineTimeline);
+					}
+					&[data-sticky-breadcrumb~="item-size"] {
+						inline-size: anchor-size(--breadcrumb-compact inline, 0px);
+						block-size: anchor-size(--breadcrumb-source block, 0px);
+						&::before {
+							view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
+						}
+						&::after {
+							content: '';
+							inline-size: 1px;
+							block-size: 100%;
+							padding-block-end: 100vw;
+							view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
+						}
+					}
+				}
+
 			}
 			&::before {
 				content: '';
