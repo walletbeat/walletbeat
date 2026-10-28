@@ -19,7 +19,7 @@
 	import { hasVisiblePopoverInvoker, interest, interestDelayMs } from '@/components/interest'
 	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import type { Column } from '@/components/Table.svelte'
-	import { startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
+	import { livePopoverTransition, startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
 	import type { Ladders } from '@/schema/ladders'
 	import type { Eip } from '@/schema/eips'
 	import { variants } from '@/constants/variants'
@@ -824,6 +824,7 @@
 		{#each allFilterSlots as slot (slot.panelId)}
 			<div
 				class="filter-popover"
+				use:livePopoverTransition
 				popover="auto"
 				id={slot.panelId}
 				role="dialog"
