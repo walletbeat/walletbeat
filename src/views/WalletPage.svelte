@@ -378,11 +378,29 @@
 			globalThis.cancelAnimationFrame(landingFrame)
 		}
 		const activateLanding = (event: MouseEvent) => {
-			if (!event.isTrusted || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
-			const anchor = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
+			if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+			const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null
 			const href = anchor?.getAttribute('href')
 			if (!anchor || !href || !anchor.closest('#top') || anchor.hasAttribute('download') ||
-				(anchor.getAttribute('target') && anchor.getAttribute('target') !== '_self') || !localHashTarget(href)) return
+				(anchor.getAttribute('target') && anchor.getAttribute('target') !== '_self')) return
+			let destination: URL
+			try { destination = new URL(href, anchor.baseURI) } catch { return }
+			if (destination.origin !== location.origin || destination.pathname !== location.pathname ||
+				destination.search !== location.search) return
+			const target = localHashTarget(destination.hash)
+			if (!target) return
+			if (event.eventPhase === Event.CAPTURING_PHASE) {
+				if (!anchor.hasAttribute('data-astro-reload')) {
+					anchor.setAttribute('data-astro-reload', '')
+					setTimeout(() => {
+						if (anchor.getAttribute('data-astro-reload') === '') anchor.removeAttribute('data-astro-reload')
+					}, 0)
+				}
+				return
+			}
+			revealTargetDetails(target)
+			const panel = anchor.closest('#wallet-toc')
+			if (panel instanceof HTMLElement && panel.matches(':popover-open')) panel.hidePopover()
 			queueMicrotask(() => {
 				if (active && !event.defaultPrevented) retainLanding = true
 			})
@@ -391,6 +409,7 @@
 		globalThis.addEventListener('hashchange', openHashDetails)
 		globalThis.addEventListener('popstate', openHashDetails)
 		globalThis.addEventListener('resize', restoreLanding)
+		globalThis.addEventListener('click', activateLanding, true)
 		globalThis.addEventListener('click', activateLanding)
 		for (const event of scrollInputs) {
 			globalThis.addEventListener(event, invalidateLanding, { capture: true, passive: true })
@@ -402,6 +421,7 @@
 			globalThis.removeEventListener('hashchange', openHashDetails)
 			globalThis.removeEventListener('popstate', openHashDetails)
 			globalThis.removeEventListener('resize', restoreLanding)
+			globalThis.removeEventListener('click', activateLanding, true)
 			globalThis.removeEventListener('click', activateLanding)
 			for (const event of scrollInputs) {
 				globalThis.removeEventListener(event, invalidateLanding, true)

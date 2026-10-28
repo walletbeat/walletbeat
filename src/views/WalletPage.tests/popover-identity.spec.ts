@@ -127,3 +127,165 @@ for (const width of [390, 900]) {
 		}
 	})
 }
+
+for (const absolute of [false, true]) {
+	test(`TOC selection reveals its destination and closes through native fragment history (${absolute ? 'path-absolute' : 'fragment'} URL)`, async ({
+		page,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'reduce' })
+		await page.setViewportSize({ width: 390, height: 900 })
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		const details = page.locator('#scam-prevention > details')
+
+		await details.evaluate(element => {
+			if (!(element instanceof HTMLDetailsElement)) {
+				throw new Error('Native details required')
+			}
+
+			element.open = false
+		})
+		await page.locator('button[popovertarget="wallet-toc"]').click()
+		const toc = page.locator('#wallet-toc')
+
+		await expect.poll(() => toc.evaluate(element => element.matches(':popover-open'))).toBe(true)
+		const link = toc.locator('a[data-pressable-name="#scam-prevention"]').first()
+
+		if (absolute) {
+			await link.evaluate(element => {
+				element.setAttribute('href', `${location.pathname}${location.search}#scam-prevention`)
+				element.setAttribute('data-astro-reload', 'authored')
+			})
+		}
+
+		const length = await page.evaluate(() => history.length)
+
+		await page.evaluate(() => {
+			document.addEventListener(
+				'click',
+				event => {
+					const anchor = event.target instanceof Element ? event.target.closest('a') : null
+
+					if (!anchor) {
+						throw new Error('Destination anchor required')
+					}
+
+					anchor.setAttribute(
+						'data-test-native-policy-before-bubble',
+						String(anchor.hasAttribute('data-astro-reload')),
+					)
+					anchor.setAttribute(
+						'data-test-native-policy-value',
+						anchor.getAttribute('data-astro-reload') ?? 'missing',
+					)
+					setTimeout(
+						() =>
+							anchor.setAttribute('data-test-default-prevented', String(event.defaultPrevented)),
+						0,
+					)
+				},
+				{ once: true, capture: true },
+			)
+			window.addEventListener(
+				'click',
+				event => {
+					const anchor = event.target instanceof Element ? event.target.closest('a') : null
+
+					if (!anchor) {
+						throw new Error('Destination anchor required')
+					}
+
+					anchor.setAttribute(
+						'data-test-disclosed-before-default',
+						String(document.querySelector<HTMLDetailsElement>('#scam-prevention > details')?.open),
+					)
+				},
+				{ once: true },
+			)
+		})
+		await link.click()
+		await expect(link).toHaveAttribute('data-test-disclosed-before-default', 'true')
+		await expect(link).toHaveAttribute('data-test-native-policy-before-bubble', 'true')
+		await expect(link).toHaveAttribute('data-test-native-policy-value', absolute ? 'authored' : '')
+		await expect(link).toHaveAttribute('data-test-default-prevented', 'false')
+		await expect(details).toHaveJSProperty('open', true)
+		await expect.poll(() => toc.evaluate(element => element.matches(':popover-open'))).toBe(false)
+		await expect(page).toHaveURL(url => url.hash === '#scam-prevention')
+		await expect.poll(() => page.evaluate(() => history.length)).toBe(length + 1)
+
+		if (absolute) {
+			await expect(link).toHaveAttribute('data-astro-reload', 'authored')
+		} else {
+			await expect(link).not.toHaveAttribute('data-astro-reload')
+		}
+
+		await page.goBack()
+		await expect(page).toHaveURL(
+			url => url.hash === '' && url.searchParams.get('variant') === 'BROWSER',
+		)
+	})
+}
+
+for (const excluded of ['modified', 'cross-query', 'canceled'] as const) {
+	test(`TOC activation leaves ${excluded} links to their native owner`, async ({ page }) => {
+		await page.emulateMedia({ reducedMotion: 'reduce' })
+		await page.setViewportSize({ width: 390, height: 900 })
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		const details = page.locator('#scam-prevention > details')
+
+		await details.evaluate(element => {
+			if (!(element instanceof HTMLDetailsElement)) {
+				throw new Error('Native details required')
+			}
+
+			element.open = false
+		})
+		await page.locator('button[popovertarget="wallet-toc"]').click()
+		const toc = page.locator('#wallet-toc')
+
+		await expect.poll(() => toc.evaluate(element => element.matches(':popover-open'))).toBe(true)
+		const link = toc.locator('a[data-pressable-name="#scam-prevention"]').first()
+
+		if (excluded === 'cross-query') {
+			await link.evaluate(element =>
+				element.setAttribute('href', `${location.pathname}?variant=MOBILE#scam-prevention`),
+			)
+		}
+
+		// Suppress navigation after the app's window capture handler observes the trusted activation.
+		await page.evaluate(() =>
+			document.addEventListener(
+				'click',
+				event => {
+					const anchor = event.target instanceof Element ? event.target.closest('a') : null
+
+					if (!anchor) {
+						throw new Error('Destination anchor required')
+					}
+
+					anchor.setAttribute(
+						'data-test-native-policy-before-cancel',
+						String(anchor.hasAttribute('data-astro-reload')),
+					)
+					event.preventDefault()
+				},
+				{
+					once: true,
+					capture: true,
+				},
+			),
+		)
+		await link.click({ modifiers: excluded === 'modified' ? ['Shift'] : [] })
+		await expect(link).toHaveAttribute(
+			'data-test-native-policy-before-cancel',
+			String(excluded === 'canceled'),
+		)
+		await expect(details).toHaveJSProperty('open', false)
+		await expect.poll(() => toc.evaluate(element => element.matches(':popover-open'))).toBe(true)
+		await expect(page).toHaveURL(
+			url => url.hash === '' && url.searchParams.get('variant') === 'BROWSER',
+		)
+		await expect(link).not.toHaveAttribute('data-astro-reload')
+	})
+}
