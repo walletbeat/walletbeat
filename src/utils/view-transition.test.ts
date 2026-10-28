@@ -53,6 +53,7 @@ class TestItemEffect {
 class TestItemMotion {
 	transitionProperty = ''
 	animationName = 'layout-transition'
+	playState: AnimationPlayState = 'paused'
 	startTime: Animation['startTime'] = null
 	effect = new TestItemEffect()
 	finish!: () => void
@@ -139,7 +140,9 @@ afterEach(() => {
 describe('live layout cleanup', () => {
 	it('releases every item before reading transitions and reads every transition before cancellation', async () => {
 		installEnvironment()
-		class InputTransition extends TestItemMotion {}
+		class InputTransition extends TestItemMotion {
+			animationName = ''
+		}
 
 		vi.stubGlobal('CSSTransition', InputTransition)
 		const scope = new TestScope()
@@ -307,6 +310,61 @@ describe('startScopedViewTransition', () => {
 		leaf.motion.finish()
 		await vi.waitFor(() => expect(leaf.attributes).not.toContain('data-layout-transition'))
 		expect(unrelated.cancel).not.toHaveBeenCalled()
+	})
+
+	it('starts the prepared native clocks without a second animation query or marker phase', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		const root = new TestScope()
+		const item = new TestLayoutItem()
+		const read = vi.spyOn(item, 'getAnimations')
+		const mark = vi.spyOn(item, 'setAttribute')
+
+		Object.assign(root, { querySelectorAll: () => [item] })
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				item.y = 100
+			},
+			'live',
+		)
+		expect(read).toHaveBeenCalledOnce()
+		expect(item.motion.startTime).toBeNull()
+		await Promise.resolve()
+		await Promise.resolve()
+		expect(item.motion.startTime).toBe(0)
+		expect(read).toHaveBeenCalledOnce()
+		expect(mark).toHaveBeenCalledExactlyOnceWith('data-layout-transition', '')
+		item.motion.finish()
+		await vi.waitFor(() => expect(item.attributes).not.toContain('data-layout-transition'))
+	})
+
+	it('does not restart or await a prepared clock cancelled before activation', async () => {
+		installEnvironment()
+		vi.stubGlobal('CSSTransition', TestItemMotion)
+		let activate!: FrameRequestCallback
+
+		vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+			activate = callback
+
+			return 1
+		})
+		const root = new TestScope(),
+			item = new TestLayoutItem()
+
+		Object.assign(root, { querySelectorAll: () => [item] })
+		startScopedViewTransition(
+			htmlElement(root),
+			() => {
+				item.y = 100
+			},
+			'live',
+		)
+		item.motion.playState = 'idle'
+		item.motion.finished = new Promise<never>(() => {})
+		activate(0)
+		await vi.waitFor(() => expect(item.attributes).not.toContain('data-layout-transition'))
+		expect(item.motion.startTime).toBeNull()
 	})
 
 	it('excludes ambiguous named peers and non-HTML nodes without losing retained items', async () => {
