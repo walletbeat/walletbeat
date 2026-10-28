@@ -748,7 +748,6 @@
 
 	{#snippet FacetTags({ wallet, facetId }: { wallet: RatedWallet<_AttributeGroupId>, facetId: string })}
 		{@const facet = walletFacets.find(facet => facet.id === facetId)!}
-		<div class="tags" data-row="start gap-1 wrap">
 			{#each facet.values.filter(({ matches }) => matches(wallet, selectedVariant ?? 'ALL_VARIANTS')) as { id, label, tagLabel, tag, eip } (id)}
 				{#if tag !== undefined}
 					{@const canFilter = visibleWalletFilterSets.some(set => set.id === facet.id)}
@@ -781,7 +780,6 @@
 					{/if}
 				{/if}
 			{/each}
-		</div>
 	{/snippet}
 
 	{#snippet VariantButtons({ wallet }: { wallet: RatedWallet<_AttributeGroupId> })}
@@ -1181,9 +1179,11 @@
 									{/if}
 								</div>
 
-								{#each walletFacets.filter(facet => facet.id !== 'variant') as facet (facet.id)}
-									{@render FacetTags({ wallet, facetId: facet.id })}
-								{/each}
+								<div class="tags" data-row="start gap-1 wrap">
+									{#each walletFacets.filter(facet => facet.id !== 'variant') as facet (facet.id)}
+										{@render FacetTags({ wallet, facetId: facet.id })}
+									{/each}
+								</div>
 							</div>
 
 							{@render VariantButtons({ wallet })}
@@ -1278,7 +1278,9 @@
 					{#if facetId === 'variant'}
 						{@render VariantButtons({ wallet })}
 					{:else}
-						{@render FacetTags({ wallet, facetId })}
+						<div class="tags" data-row="start gap-1 wrap">
+							{@render FacetTags({ wallet, facetId })}
+						</div>
 					{/if}
 				{:else}
 					{@const selectedSliceId =
