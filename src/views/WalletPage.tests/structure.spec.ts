@@ -429,12 +429,12 @@ test('accessible native control names across ordinary and open navigation', asyn
 			await menu.focus()
 			await page.keyboard.press('Enter')
 			await expect
-				.poll(() => page.locator('#nav').evaluate(element => element.matches(':popover-open')))
+				.poll(() => page.locator('#nav-menu').evaluate(element => element.matches(':popover-open')))
 				.toBe(true)
 			await check('site-menu-open')
 			await page.keyboard.press('Escape')
 			await expect
-				.poll(() => page.locator('#nav').evaluate(element => element.matches(':popover-open')))
+				.poll(() => page.locator('#nav-menu').evaluate(element => element.matches(':popover-open')))
 				.toBe(false)
 		}
 	}
