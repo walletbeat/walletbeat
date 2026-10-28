@@ -44,6 +44,10 @@ export type NavigationItem = {
 		labelSize: number
 		labelSizeScale: number
 		labelR: number
+		/** CSS background for the slice, when it differs from `accentColor` (e.g. a gradient). */
+		fill?: string
+		/** The fill color under the slice's label, for picking a contrasting ink. */
+		labelBackground?: string
 	}
 	children?: NavigationItem[]
 }
