@@ -4,12 +4,14 @@ import * as path from 'node:path'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
-import { getBaseUrl, withBasePath } from '@/base-url'
+import { getBaseUrl } from '@/base-url'
 import { eips } from '@/data/eips'
 import { allRatedWalletsBySlug } from '@/data/wallets'
 import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/utils/codebase'
 
 const distDir = path.join(getRepositoryRoot(), 'dist')
+// The build's base path is independent of Vitest's own Vite base.
+const buildBasePath = `${(process.env.BASE_URL ?? '/').replace(/\/+$/, '')}/`
 
 /** Content of the `<meta>` tag with the given `property` or `name`, if any. */
 const metaContent = (html: string, key: string): string | undefined =>
@@ -34,7 +36,9 @@ describe('Open Graph images', () => {
 		for (const { page, image } of pages) {
 			const html = fs.readFileSync(path.join(distDir, page), 'utf8')
 
-			expect(new URL(metaContent(html, 'og:image')!).pathname, page).toBe(withBasePath(image))
+			expect(new URL(metaContent(html, 'og:image')!).pathname, page).toBe(
+				`${buildBasePath}${image.slice(1)}`,
+			)
 			expect(metaContent(html, 'og:image:width'), page).toBe('1200')
 			expect(metaContent(html, 'og:image:height'), page).toBe('630')
 		}
@@ -73,7 +77,7 @@ describe('Open Graph images', () => {
 			}
 
 			const url = new URL(imageUrl)
-			const basePath = withBasePath('/')
+			const basePath = buildBasePath
 
 			if (url.origin !== new URL(getBaseUrl()).origin || !url.pathname.startsWith(basePath)) {
 				violations.push(
