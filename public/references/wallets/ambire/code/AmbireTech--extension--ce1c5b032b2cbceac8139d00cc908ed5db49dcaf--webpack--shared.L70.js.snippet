@@ -1,0 +1,20 @@
+{
+	"highlightFirstLine": 70,
+	"highlightLastLine": 70,
+	"segments": [
+		{
+			"lines": [
+				"// builds (extension, benzin, legends). Returns the config plus the pruned Expo",
+				"// plugin snapshot the per-environment modules spread into their plugin arrays.",
+				"async function createBaseConfig(env, argv) {",
+				"  const config = await createExpoWebpackConfigAsync(env, argv)",
+				"  const enableLavaMoat = config.mode === 'production' && isWebkit",
+				"",
+				"  config.resolve.alias['@ledgerhq/devices/hid-framing'] = '@ledgerhq/devices/lib/hid-framing'",
+				"  config.resolve.alias.dns = 'dns-js'",
+				""
+			],
+			"startLine": 66
+		}
+	]
+}

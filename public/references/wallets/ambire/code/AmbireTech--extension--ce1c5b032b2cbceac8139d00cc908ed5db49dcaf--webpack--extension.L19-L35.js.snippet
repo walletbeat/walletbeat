@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 19,
+	"highlightLastLine": 35,
+	"segments": [
+		{
+			"lines": [
+				"const LavamoatIgnoredModulesVerifyPlugin = require('../lavamoat/plugins/lavamoat-ignored-modules-verify-plugin')",
+				"const { isWebkit, isGecko, isSafari, isAmbireNext } = require('./env')",
+				"const { CJS_RULE, hardenTerser, ROOT_DIR } = require('./shared')",
+				"",
+				"// Entries that run outside LavaMoat protection.",
+				"//",
+				"// Important: this list controls TWO mechanisms that must stay aligned:",
+				"// 1) runtimeConfigurationPerChunk_experimental -> returns { mode: 'null_unsafe' } for these names",
+				"//    so no LavaMoat runtime is injected in those chunks.",
+				"// 2) createLavamoatUnsafeLayerPlugin(...) -> marks the same entries with layer 'unsafe'",
+				"//    and applies LavaMoat.exclude so their modules are not wrapped in Compartments.",
+				"//",
+				"// If only (1) is enabled, runtime code is removed but wrapped modules may remain, which can cause",
+				"// runtime failures due to missing LavaMoat bootstrapping symbols.",
+				"const LAVAMOAT_UNSAFE_ENTRIES = new Set([",
+				"  'ambire-inpage',",
+				"  'ethereum-inpage',",
+				"  'content-script',",
+				"  'content-script-ambire-injection',",
+				"  'content-script-ethereum-injection'",
+				"])",
+				"",
+				"// style.css output file for WEB_ENGINE: GECKO",
+				"function processStyleGecko(content) {",
+				"  const style = content.toString()"
+			],
+			"startLine": 15
+		}
+	]
+}
