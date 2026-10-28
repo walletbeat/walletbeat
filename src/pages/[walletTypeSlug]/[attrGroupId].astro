@@ -1,0 +1,83 @@
+---
+import type { InferGetStaticPropsType } from 'astro'
+
+import { attributeTreeForWallet, representativeWalletForType } from '@/data/wallets'
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import { getAttributeGroupById } from '@/schema/attribute-groups'
+import { displayedAttributeIdsForWalletType } from '@/schema/wallet-navigation'
+import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
+import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
+import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
+import Navigation from '@/views/Navigation.astro'
+import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+
+export const prerender = true
+
+export const getStaticPaths = () =>
+	Object.values(
+		mapWalletTypes(walletType =>
+			['summary', ...displayedAttributeIdsForWalletType(walletType)].map(attrGroupId => ({
+				params: { walletTypeSlug: walletTypeToUrlSlug(walletType), attrGroupId },
+				props: { walletType },
+			})),
+		),
+	).flat()
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>
+
+const { walletType } = Astro.props
+const { attrGroupId } = Astro.params
+const representativeWallet = representativeWalletForType(walletType)
+const attrGroup =
+	attrGroupId === 'summary'
+		? null
+		: getAttributeGroupById(
+				attrGroupId,
+				attributeTreeForWallet(representativeWallet),
+				representativeWallet.overall,
+			)
+
+if (attrGroupId !== 'summary' && attrGroup === null) {
+	throw new Error('Invalid attribute group')
+}
+
+const metadataTitle = {
+	[WalletType.SOFTWARE]: 'Ethereum Wallets',
+	[WalletType.HARDWARE]: 'Ethereum Hardware Wallets',
+	[WalletType.EMBEDDED]: 'Ethereum Embedded Wallets',
+}[walletType]
+const metadata =
+	attrGroup === null
+		? { title: walletType === WalletType.EMBEDDED ? 'Walletbeat' : `${metadataTitle} - Walletbeat` }
+		: {
+				title: `${metadataTitle} ${attrGroup.displayName} - Walletbeat`,
+				description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
+				keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
+			}
+---
+
+<Layout metadata={metadata}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		style={attrGroup === null ? undefined : 'padding-block-end: 3rem;'}
+	>
+		{
+			walletType === WalletType.SOFTWARE && (
+				<SoftwareWalletTable client:visible title='Software Wallets' />
+			)
+		}
+		{
+			walletType === WalletType.HARDWARE && (
+				<HardwareWalletTable client:visible title='Hardware Wallets' />
+			)
+		}
+		{
+			walletType === WalletType.EMBEDDED && (
+				<EmbeddedWalletTable client:visible title='Embedded Wallets' />
+			)
+		}
+	</main>
+</Layout>
