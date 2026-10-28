@@ -721,72 +721,162 @@ for (const width of [390, 600, 690]) {
 	})
 }
 
-test('wallet height measurement resolves at the shared layout owner across breakpoints', async ({
+test('wallet intrinsic measurements resolve at their shared layout owner across breakpoints', async ({
 	page,
-}) => {
+}, info) => {
 	await page.goto('/metamask/?variant=BROWSER')
 	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 	await page.evaluate(() => document.fonts.ready)
 	test.skip(
-		await page.evaluate(
-			() =>
-				!CSS.supports(
-					'(animation-timeline: scroll()) and (animation-range: 0% 100%) and ' +
-						'(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and ' +
-						'(color: if(style(---breadcrumb-wrap: 1): red; else: blue))',
-				) ||
-				(CSS.supports('timeline-scope: all') && CSS.supports("view-timeline-name: ident('a' 'b')")),
-		),
-		'This check covers explicit named-timeline fallback ownership',
+		!(await page.evaluate(() =>
+			CSS.supports(
+				'(animation-timeline: scroll()) and (animation-range: 0% 100%) and ' +
+					'(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and ' +
+					'(color: if(style(---breadcrumb-wrap: 1): red; else: blue))',
+			),
+		)),
+		'Intrinsic ownership requires the native measured breadcrumb enhancement',
 	)
+	const observations = []
 
 	for (const width of [390, 933, 1024, 1025, 1440, 390]) {
 		await page.setViewportSize({ width, height: 1203 })
-		await expect
-			.poll(() =>
-				page.evaluate(() => {
-					const layout = document.getElementById('layout')!
-					const clocks = layout
-						.getAnimations()
-						.filter(
-							animation =>
-								animation instanceof CSSAnimation &&
-								animation.animationName === 'breadcrumb-item-block',
-						)
-
-					if (innerWidth > 1024) {
-						return clocks.length === 0
-					}
-
-					if (clocks.length !== 1) {
-						return false
-					}
-
-					const clock = clocks[0]
-					const timeline = clock.timeline
-					const subject = timeline instanceof ViewTimeline ? timeline.subject : null
-					const producer = subject?.tagName === '::after' ? subject.parentElement : subject
+		const read = () =>
+			page.evaluate(() => {
+				const layout = document.getElementById('layout')!
+				const root = document.getElementById('top')!
+				const navigation = document.querySelector('#nav > header')!
+				const source = root.querySelector('.wallet-title-source')!
+				const borderBox = (axis: 'width' | 'height') => {
+					const style = getComputedStyle(source)
+					const edges =
+						axis === 'width'
+							? ['padding-left', 'padding-right', 'border-left-width', 'border-right-width']
+							: ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width']
 
 					return (
-						timeline instanceof ViewTimeline &&
-						timeline.source === document.scrollingElement &&
-						timeline.axis === 'inline' &&
-						producer === document.getElementById('top') &&
-						getComputedStyle(producer!, '::after').viewTimelineName === '--wallet-item-block' &&
-						clock.effect?.getComputedTiming().progress !== null &&
-						getComputedStyle(layout)
-							.getPropertyValue('timeline-scope')
-							.split(',')
-							.map(value => value.trim())
-							.includes('--wallet-item-block') &&
-						!getComputedStyle(document.body)
-							.getPropertyValue('timeline-scope')
-							.split(',')
-							.map(value => value.trim())
-							.includes('--wallet-item-block')
+						Number.parseFloat(style[axis]) +
+						(style.boxSizing === 'border-box'
+							? 0
+							: edges.reduce(
+									(sum, edge) => sum + Number.parseFloat(style.getPropertyValue(edge)),
+									0,
+								))
 					)
-				}),
-			)
+				}
+				const value = (owner: Element, property: string) =>
+					Number.parseFloat(getComputedStyle(owner).getPropertyValue(property))
+				const facts = [
+					{
+						property: '---breadcrumb-itemWidth',
+						expected: Number.parseFloat(getComputedStyle(source, '::before').width),
+						owners: [layout, root, navigation],
+					},
+					{
+						property: '---breadcrumb-naturalItemHeight',
+						expected: borderBox('height'),
+						owners: [layout, root, navigation],
+					},
+					{
+						property: '---breadcrumb-itemHeight',
+						expected: Math.round(borderBox('height') * 16) / 16,
+						owners: [layout, root, navigation],
+					},
+					{
+						property: '---breadcrumb-sourceRowWidth',
+						expected: borderBox('width'),
+						owners: [root],
+					},
+				].map(({ property, expected, owners }) => ({
+					property,
+					expected,
+					consumers: owners.map(owner => ({
+						owner: owner.id || owner.tagName,
+						measured: value(owner, property),
+					})),
+				}))
+				const clocks = layout
+					.getAnimations()
+					.filter(animation => {
+						const timeline = animation.timeline
+
+						return (
+							animation instanceof CSSAnimation &&
+							animation.effect instanceof KeyframeEffect &&
+							animation.effect.target === layout &&
+							!animation.effect.pseudoElement &&
+							timeline instanceof ViewTimeline &&
+							timeline.source !== null &&
+							root.contains(timeline.source) &&
+							timeline.source.matches('[data-sticky-breadcrumb~="measure"]')
+						)
+					})
+					.map(clock => {
+						const timeline = clock.timeline
+						const subject = timeline instanceof ViewTimeline ? timeline.subject : null
+						const origin = subject?.tagName.startsWith('::') ? subject.parentElement : subject
+						const local = timeline instanceof ViewTimeline ? timeline.source : null
+
+						return {
+							axis: timeline instanceof ViewTimeline ? timeline.axis : null,
+							local: local !== null && local !== document.scrollingElement && root.contains(local),
+							ownSubject: origin === local,
+							progress: clock.effect?.getComputedTiming().progress ?? null,
+							pending: clock.pending,
+						}
+					})
+
+				return { width: innerWidth, facts, clocks }
+			})
+
+		await expect
+			.poll(async () => {
+				const observed = await read()
+
+				return (
+					['inline', 'block'].every(axis => observed.clocks.some(clock => clock.axis === axis)) &&
+					observed.clocks.every(
+						clock =>
+							clock.local &&
+							clock.ownSubject &&
+							!clock.pending &&
+							typeof clock.progress === 'number' &&
+							clock.progress > 0 &&
+							clock.progress < 1,
+					) &&
+					observed.facts.every(
+						fact =>
+							Number.isFinite(fact.expected) &&
+							fact.expected > 0 &&
+							fact.consumers.every(
+								consumer =>
+									Number.isFinite(consumer.measured) &&
+									Math.abs(consumer.measured - fact.expected) <= 0.125,
+							),
+					)
+				)
+			})
 			.toBe(true)
+		const observed = await read()
+
+		observations.push(observed)
+
+		for (const fact of observed.facts) {
+			expect(
+				Number.isFinite(fact.expected) && fact.expected > 0,
+				`${fact.property} native used size`,
+			).toBe(true)
+
+			for (const consumer of fact.consumers) {
+				expect(
+					Math.abs(consumer.measured - fact.expected),
+					`${fact.property} at ${consumer.owner}`,
+				).toBeLessThanOrEqual(0.125)
+			}
+		}
 	}
+	await info.attach('shared-wallet-intrinsic-ownership', {
+		body: JSON.stringify(observations),
+		contentType: 'application/json',
+	})
 })
