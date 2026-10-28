@@ -1699,9 +1699,9 @@
 		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-28 - Booth Activities/walletbeat_booth.jpg": {
-		"hash": "c0c329c11ead04e2d257228253b09aae263b6fbd190ca5829d50cef2695cef5b",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-10-28 - Booth Activities/booth_banner.png": {
+		"hash": "612751db87fcfe038e5f7325c4177d6592067cac3ef12cfcbf167c027b4ae12d",
+		"passedTests": ["file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
