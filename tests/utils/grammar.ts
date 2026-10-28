@@ -37,6 +37,12 @@ const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
  */
 const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
 
+/**
+ * External titles that the site quotes verbatim, such as security audit finding titles.
+ * Lints inside them are ignored, as their wording is not the site's to change.
+ */
+const VERBATIM_TITLES = ['Backup password prompt bypassable']
+
 let vocabulary: string[] | null = null
 
 function getVocabulary(): string[] {
@@ -114,14 +120,20 @@ export async function warmupHarperLinter() {
 
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
 
+function deprecatedTermMessage(matchedText: string, replacement: string | null): string {
+	return `The term "${matchedText}" is deprecated across the site. Use "${replacement}" instead.`
+}
+
 function getRegexpLinter({
 	name,
 	regExp,
 	replace,
+	message = deprecatedTermMessage,
 }: {
 	name: string
 	regExp: RegExp
 	replace: ((substring: string) => string) | null
+	message?: (matchedText: string, replacement: string | null) => string
 }): () => Promise<AbstractLinter> {
 	return (): Promise<AbstractLinter> => {
 		let linter = specificWordingLinters.get(name)
@@ -162,7 +174,7 @@ function getRegexpLinter({
 								return { start, end }
 							},
 							message(): string {
-								return `The term "${matchedText}" is deprecated across the site. Use "${replacement}" instead.`
+								return message(matchedText, replacement)
 							},
 						}
 
@@ -209,6 +221,22 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 		name: 'offchain', // Use offchain not off-chain
 		regExp: /\boff-chain\b/gi,
 		replace: () => 'offchain',
+	}),
+	getRegexpLinter({
+		// A capitalized determiner between two lowercase words, e.g. "depends on The user's password".
+		name: 'Capitalized determiner',
+		regExp:
+			/(?<=\b[a-z][\w'’-]*[ \t]+)(?:The|A|An|This|That|These|Those|Its|Their|Your|Our)\b(?=[ \t]+[a-z])/g,
+		replace: (substring: string) => substring.toLowerCase(),
+		message: matchedText => `"${matchedText}" is capitalized in the middle of a sentence.`,
+	}),
+	getRegexpLinter({
+		// A word, a colon and a capitalized word with no space after the colon, e.g.
+		// "the following:The user's device". Host names ("git@github.com:User") do not match.
+		name: 'Space after colon',
+		regExp: /(?<=(?:^|\s)[a-z]+):(?=[A-Z][a-z])/gm,
+		replace: () => ': ',
+		message: () => 'Add a space after the colon.',
 	}),
 ]
 
@@ -280,6 +308,19 @@ function collectCspellPatternRanges(text: string): { start: number; end: number 
 	return ranges
 }
 
+/** Return all character ranges in `text` that hold one of the `VERBATIM_TITLES`. */
+function collectVerbatimTitleRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+
+	for (const title of VERBATIM_TITLES) {
+		for (let start = text.indexOf(title); start !== -1; start = text.indexOf(title, start + 1)) {
+			ranges.push({ start, end: start + title.length })
+		}
+	}
+
+	return ranges
+}
+
 /** Return true if `[spanStart, spanEnd)` overlaps any entry in `ranges`. */
 function overlapsAnyRange(
 	spanStart: number,
@@ -326,8 +367,9 @@ export async function grammarLintMessages(
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
-	// Same for GitHub labels
+	// Same for GitHub labels and verbatim titles
 	const githubLabelRanges = collectGitHubLabelRanges(trimmedText)
+	const verbatimTitleRanges = collectVerbatimTitleRanges(trimmedText)
 
 	let lints: Lint[] = []
 
@@ -353,6 +395,11 @@ export async function grammarLintMessages(
 
 		lints = lints.concat(linterLints)
 	}
+
+	// Verbatim titles are external text, so no linter applies to them.
+	lints = lints.filter(
+		lint => !overlapsAnyRange(lint.span().start, lint.span().end, verbatimTitleRanges),
+	)
 
 	// Suppress Word Choice false positives for "setup" used as a noun.
 	lints = lints.filter(

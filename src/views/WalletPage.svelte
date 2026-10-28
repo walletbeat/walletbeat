@@ -20,7 +20,6 @@
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
-	import { evaluationDetailRenderData } from '@/types/content/evaluation-details'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,
@@ -350,14 +349,7 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
-	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
-	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
-	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
-	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
-	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
-	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
-	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import EvaluationDetails from '@/views/attributes/EvaluationDetails.svelte'
 	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
@@ -365,8 +357,6 @@
 	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
 	import Typography from '@/components/Typography.svelte'
-	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
-	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
@@ -1054,51 +1044,7 @@
 					data-list-item="gap-3"
 					data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
 				>
-					{#if isTypographicContent(evalAttr.evaluation.details)}
-						<Typography
-							content={evalAttr.evaluation.details}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-
-					{:else if evalAttr.evaluation.details}
-						{@const outcome = evalAttr.evaluation.outcome}
-						{@const renderData = evaluationDetailRenderData(evalAttr.evaluation.details.component, outcome)}
-						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
-
-						<div data-column>
-							{#if renderData.component === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...renderData.componentProps} {wallet} />
-							{:else if renderData.component === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...renderData.componentProps} {wallet} />
-							{:else if renderData.component === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...renderData.componentProps} {wallet} refs={references} />
-							{:else if renderData.component === 'ScamAlertDetails'}
-								<ScamAlertDetails {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
-							{:else if renderData.component === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
-							{:else if renderData.component === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...renderData.componentProps} {wallet} />
-							{:else if renderData.component === 'FundingDetails'}
-								<FundingDetails {...renderData.componentProps} {wallet} />
-							{:else if renderData.component === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
-							{:else if renderData.component === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
-							{:else if renderData.component === 'UnratedAttribute'}
-								<UnratedAttribute {...renderData.componentProps} {wallet} />
-							{/if}
-						</div>
-
-					{:else}
-						<div data-column>
-							<Typography
-								content={{
-									contentType: ContentType.TEXT,
-									text: `No detailed evaluation available for ${attribute.displayName}`,
-								}}
-							/>
-						</div>
-					{/if}
+					<EvaluationDetails {wallet} evaluation={evalAttr.evaluation} />
 				</li>
 				{#if override?.note !== undefined}
 					<li data-list-item="gap-3" data-list-item-marker="👉">
