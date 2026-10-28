@@ -51,6 +51,17 @@ async function setup(page: Page, kind: 'native' | 'wrapper' | 'stacked') {
 				{ capture: true },
 			)
 		}
+		source.addEventListener(
+			'click',
+			() => {
+				section.removeAttribute('data-explicit-open')
+				setTimeout(
+					() => section.setAttribute('data-explicit-open', String(target.matches(':popover-open'))),
+					0,
+				)
+			},
+			{ capture: true },
+		)
 		target.addEventListener('pointerleave', () => record('target-leave'))
 		target.addEventListener('beforetoggle', event => {
 			if (!(event instanceof ToggleEvent)) {
@@ -163,13 +174,13 @@ test('hover opening and closing clocks agree across native and wrapper paths', a
 	})
 
 	for (const sample of measurements) {
-		expect(sample.open.toSorted((a, b) => a - b)[1]).toBeGreaterThanOrEqual(100)
-		expect(sample.open.toSorted((a, b) => a - b)[1]).toBeLessThan(350)
+		expect(sample.open.toSorted((a, b) => a - b)[1]).toBeGreaterThanOrEqual(35)
+		expect(sample.open.toSorted((a, b) => a - b)[1]).toBeLessThan(125)
 		expect(sample.close.toSorted((a, b) => a - b)[1]).toBeGreaterThanOrEqual(130)
 		expect(sample.close.toSorted((a, b) => a - b)[1]).toBeLessThan(450)
 
 		if (sample.native) {
-			expect(sample.start).toBe('0.15s')
+			expect(sample.start).toBe('0.05s')
 			expect(sample.end).toBe('0.2s')
 		}
 	}
@@ -189,10 +200,11 @@ test('explicit activation is immediate and a brief hover cannot open late', asyn
 		await expect.poll(() => target.evaluate(target => target.matches(':popover-open'))).toBe(false)
 		await button.press(key)
 		await expect.poll(() => target.evaluate(target => target.matches(':popover-open'))).toBe(true)
+		await expect(section).toHaveAttribute('data-explicit-open', 'true')
 		const keyDelay = await elapsed(section, 'key', 'open')
 
 		expect(keyDelay).toBeGreaterThanOrEqual(0)
-		expect(keyDelay).toBeLessThan(100)
+		expect(keyDelay).toBeLessThan(35)
 	}
 	await page.keyboard.press('Escape')
 	await button.evaluate(button => {
@@ -200,12 +212,25 @@ test('explicit activation is immediate and a brief hover cannot open late', asyn
 			button.blur()
 		}
 	})
-	await button.click()
+	const point = await button.evaluate(button => {
+		const box = button.getBoundingClientRect()
+		const x = box.x + box.width / 2,
+			y = box.y + box.height / 2
+
+		if (!button.contains(document.elementFromPoint(x, y))) {
+			throw new Error('Button is not reachable')
+		}
+
+		return { x, y }
+	})
+
+	await page.mouse.click(point.x, point.y)
 	await expect.poll(() => target.evaluate(target => target.matches(':popover-open'))).toBe(true)
+	await expect(section).toHaveAttribute('data-explicit-open', 'true')
 	const clickDelay = await elapsed(section, 'down', 'open')
 
 	expect(clickDelay).toBeGreaterThanOrEqual(0)
-	expect(clickDelay).toBeLessThan(100)
+	expect(clickDelay).toBeLessThan(35)
 	await page.mouse.move(5, 5)
 	await page.keyboard.press('Escape')
 	await button.evaluate(button => {
@@ -223,23 +248,25 @@ test('explicit activation is immediate and a brief hover cannot open late', asyn
 		const previousOpen = await currentSection.getAttribute('data-open')
 
 		await currentSource.hover()
-		await page.waitForTimeout(60)
+		await page.waitForTimeout(10)
 		await page.mouse.move(5, 5)
+		expect(await elapsed(currentSection, 'enter', 'leave')).toBeLessThan(50)
 		await page.waitForTimeout(250)
 		await expect
 			.poll(() => currentTarget.evaluate(target => target.matches(':popover-open')))
 			.toBe(false)
 		expect(await currentSection.getAttribute('data-open')).toBe(previousOpen)
 		await currentSource.hover()
-		await page.waitForTimeout(60)
+		await page.waitForTimeout(10)
 		await page.mouse.move(5, 5)
+		expect(await elapsed(currentSection, 'enter', 'leave')).toBeLessThan(50)
 		await page.waitForTimeout(40)
 		await currentSource.hover()
 		await expect
 			.poll(() => currentTarget.evaluate(target => target.matches(':popover-open')))
 			.toBe(true)
-		expect(await elapsed(currentSection, 'enter', 'open')).toBeGreaterThanOrEqual(100)
-		expect(await elapsed(currentSection, 'enter', 'open')).toBeLessThan(350)
+		expect(await elapsed(currentSection, 'enter', 'open')).toBeGreaterThanOrEqual(35)
+		expect(await elapsed(currentSection, 'enter', 'open')).toBeLessThan(125)
 		await page.mouse.move(5, 5)
 		await expect
 			.poll(() => currentTarget.evaluate(target => target.matches(':popover-open')))
@@ -269,5 +296,49 @@ test.describe('native baseline', () => {
 		await page.goto('/__tooltip-timing#reset')
 		await page.getByRole('link', { name: 'Wrapper hover', exact: true }).click()
 		await expect(page).toHaveURL(/#timing-end$/)
+	})
+})
+
+test.describe('hybrid touch input', () => {
+	test.use({ hasTouch: true, viewport: { width: 1280, height: 900 } })
+	test('touch entry does not schedule fallback hover and a tap activates immediately', async ({
+		page,
+	}) => {
+		await page.goto('/__tooltip-timing')
+		await expect(page.locator('astro-island[component-url*="TooltipTiming"]')).not.toHaveAttribute(
+			'ssr',
+		)
+		const wrapper = await setup(page, 'wrapper')
+
+		await wrapper.source.dispatchEvent('pointerenter', { pointerType: 'touch' })
+		await page.waitForTimeout(100)
+		await expect
+			.poll(() => wrapper.target.evaluate(target => target.matches(':popover-open')))
+			.toBe(false)
+		expect(await wrapper.section.getAttribute('data-open')).toBeNull()
+
+		const { section, button, target } = await setup(page, 'native')
+
+		await button.evaluate(button =>
+			button.addEventListener('pointerdown', event => {
+				if (!(event instanceof PointerEvent)) {
+					throw new Error('Missing pointer input')
+				}
+
+				button.setAttribute(
+					'data-touch-input',
+					JSON.stringify({ trusted: event.isTrusted, type: event.pointerType }),
+				)
+			}),
+		)
+		await button.tap()
+		await expect.poll(() => target.evaluate(target => target.matches(':popover-open'))).toBe(true)
+		await expect(section).toHaveAttribute('data-explicit-open', 'true')
+		expect(JSON.parse((await button.getAttribute('data-touch-input')) ?? 'null')).toEqual({
+			trusted: true,
+			type: 'touch',
+		})
+		expect(await elapsed(section, 'down', 'open')).toBeGreaterThanOrEqual(0)
+		expect(await elapsed(section, 'down', 'open')).toBeLessThan(35)
 	})
 })
