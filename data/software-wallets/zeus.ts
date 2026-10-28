@@ -308,6 +308,7 @@ export const zeus: SoftwareWallet = {
 			}),
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {

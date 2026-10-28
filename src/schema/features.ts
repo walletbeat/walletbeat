@@ -38,7 +38,10 @@ import type {
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
-import type { PermissionsManagementSupport } from './features/self-sovereignty/permissions-management'
+import type {
+	DelegationRevocationSupport,
+	PermissionsManagementSupport,
+} from './features/self-sovereignty/permissions-management'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { Support } from './features/support'
 import type { BasicOperationFees } from './features/transparency/fee-display'
@@ -239,6 +242,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
 		permissionsManagement: VariantFeature<PermissionsManagementSupport>
+
+		/** Ability to inspect and remove the account's EIP-7702 delegation. */
+		delegationRevocation: VariantFeature<DelegationRevocationSupport>
 	}
 
 	/** Ecosystem features. */
@@ -426,6 +432,7 @@ export interface ResolvedFeatures {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
 		permissionsManagement: ResolvedFeature<PermissionsManagementSupport>
+		delegationRevocation: ResolvedFeature<DelegationRevocationSupport>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
@@ -619,6 +626,10 @@ export function resolveFeatures(
 			interoperability: hardwareFeat(
 				'selfSovereignty.interoperability',
 				features => features.selfSovereignty.interoperability,
+			),
+			delegationRevocation: softwareFeat(
+				'selfSovereignty.delegationRevocation',
+				features => features.selfSovereignty.delegationRevocation,
 			),
 		},
 		transparency: {
