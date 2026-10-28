@@ -1,0 +1,29 @@
+{
+	"highlightRanges": [
+		{
+			"first": 23,
+			"last": 25
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl GemScanService {"
+			],
+			"startLine": 15
+		},
+		{
+			"lines": [
+				"    }",
+				"}",
+				"",
+				"impl GemScanService {",
+				"    pub async fn scan(&self, payload: ScanTransactionPayload) -> Option<ScanTransaction> {",
+				"        self.api.client.scan_transaction(payload).await.ok()",
+				"    }",
+				"}"
+			],
+			"startLine": 19
+		}
+	]
+}

@@ -1,5 +1,6 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -90,9 +91,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman, minimalsm],
+		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-10-28',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -176,9 +177,44 @@ export const gemwallet: SoftwareWallet = {
 					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg',
 					label: 'Gem wallet allows configurable RPC.',
 				},
+				{
+					explanation:
+						'Gem can create and import wallets, show Ether and ERC-20 token balances, and send ERC-20 tokens using an Ethereum full node. Gem only accepts custom node addresses that start with https://.',
+					urls: [
+						{
+							label: 'Ether and token balances are read from the selected node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/balances.rs#L15-L23',
+						},
+						{
+							label: 'A token added by contract address is looked up on the selected node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/assets/mod.rs#L206-L216',
+						},
+						{
+							label: 'An unreachable safety check returns no result',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/scan/mod.rs#L23-L25',
+						},
+						{
+							label: 'A send with no safety-check result goes ahead',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/confirm/rules.rs#L498-L501',
+						},
+						{
+							label: 'Custom node addresses must use HTTPS',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/node/rules.rs#L83-L91',
+						},
+					],
+				},
 			],
 			customChainRpcEndpoint: notSupported,
-			l1: null,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			}),
