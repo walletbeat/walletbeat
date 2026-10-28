@@ -2227,6 +2227,14 @@
 		"hash": "dd6af0f59536199f4c1e5c9b9769c046d411d80ed94eb2968adade7e8a6892c0",
 		"passedTests": ["file-format"]
 	},
+	"src/icons/farcaster.svg": {
+		"hash": "bb86d9b045f071e99cecd7757f181fb729a81c92dc171cba349beef38980d8bb",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"src/icons/x.svg": {
+		"hash": "1cfbcf994a9a4f48ac1b1f62af44ce5c26e8724035a7b160521b9d12081f67c4",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"tests/browser/fixtures/wide-wallet.svg": {
 		"hash": "5a5c57cf3b58ac167529042d92f5e2922c205409b72d5cee6be299b6c80b9d62",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
