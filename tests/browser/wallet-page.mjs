@@ -176,7 +176,7 @@ function observeInitial() {
 				.toUpperCase(),
 			value: element.querySelector(':scope > data[data-badge]')?.getAttribute('value') ?? null,
 		})),
-		popovers: [...document.querySelectorAll('[popover]:not(#nav)')].map(element => ({
+		popovers: [...document.querySelectorAll('[popover]:not(#nav-menu)')].map(element => ({
 			id: element.id,
 			open: element.matches(':popover-open'),
 		})),
@@ -437,7 +437,7 @@ function observeMenuState() {
 		document.elementFromPoint(searchBox.x + searchBox.width / 2, searchBox.y + searchBox.height / 2)
 
 	return {
-		open: nav.matches(':popover-open'),
+		open: nav.querySelector('#nav-menu').matches(':popover-open'),
 		content: {
 			transform: getComputedStyle(content).transform,
 			translate: getComputedStyle(content).translate,
@@ -999,7 +999,7 @@ try {
 			}
 
 			menu.closedWide = await page
-				.locator('#nav')
+				.locator('#nav-menu')
 				.evaluate(element => !element.matches(':popover-open'))
 			await page.setViewportSize({ width, height: 900 })
 			await scrollRoot.evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }))
