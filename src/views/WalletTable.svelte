@@ -2089,9 +2089,6 @@
 				}
 
 				details.wallet-info-details {
-					&[data-layout-transition="after"] {
-						transition-property: gap, translate;
-					}
 
 					summary {
 						box-sizing: content-box;
