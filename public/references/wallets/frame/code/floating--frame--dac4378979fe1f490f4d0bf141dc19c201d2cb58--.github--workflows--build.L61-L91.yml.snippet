@@ -1,0 +1,64 @@
+{
+	"highlightFirstLine": 61,
+	"highlightLastLine": 91,
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"  build_release:"
+			],
+			"startLine": 33
+		},
+		{
+			"lines": [
+				"    env:"
+			],
+			"startLine": 54
+		},
+		{
+			"lines": [
+				"      APPLE_ID: ${{ secrets[matrix.apple_id_key] }}",
+				"      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets[matrix.apple_app_specific_password_key] }}",
+				"      APPLE_TEAM_ID: ${{ secrets[matrix.apple_team_id_key] }}",
+				"",
+				"    steps:",
+				"      - uses: actions/checkout@v4",
+				"      - uses: actions/setup-node@v4",
+				"        with:",
+				"          node-version: 18.12.1",
+				"          cache: 'npm'",
+				"      - name: install Linux dev tools",
+				"        if: startsWith(matrix.os, 'ubuntu')",
+				"        run: |",
+				"          sudo apt update -y",
+				"          sudo apt install -y libudev-dev",
+				"      - name: install Macos dev tools",
+				"        if: startsWith(matrix.os, 'macos')",
+				"        run: |",
+				"          sudo -H pip install setuptools",
+				"      - name: create NPM config file",
+				"        run: echo \"//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}\" > ./.npmrc",
+				"      - run: npm run setup:ci",
+				"      - run: npm run compile",
+				"      - run: npm run test:unit:main -- --testTimeout=5000 --verbose --detectOpenHandles --forceExit",
+				"      - run: npm run test:unit:components",
+				"      - run: npm run bundle",
+				"      - name: Sleep for 4 seconds",
+				"        shell: bash",
+				"        run: sleep 4",
+				"      - name: Publish",
+				"        if: ${{ startsWith(matrix.os, 'ubuntu') && endsWith(matrix.os, 'arm') }}",
+				"        run: npm run publish:linux:arm64",
+				"      - name: Publish",
+				"        if: ${{ !startsWith(matrix.os, 'ubuntu') || !endsWith(matrix.os, 'arm') }}",
+				"        run: npm run publish"
+			],
+			"startLine": 57
+		}
+	]
+}
