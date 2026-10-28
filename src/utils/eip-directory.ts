@@ -1,6 +1,7 @@
 import { allRatedWallets } from '@/data/wallets'
-import { EipSupportStatus, eipSupportStatus, ratedWalletEipSupport } from '@/schema/eip-support'
+import { EipSupportStatus, ratedWalletEipSupportByStatus } from '@/schema/eip-support'
 import type { Eip, EipNumber } from '@/schema/eips'
+import type { Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import { remap } from '@/types/utils/remap'
 import { getWalletUrl } from '@/utils/urls'
@@ -15,6 +16,9 @@ export interface EipImplementer {
 
 	/** Extension of the wallet icon under `/images/wallets/`. */
 	iconExtension: string
+
+	/** Platforms on which support is verified. */
+	variants: Variant[]
 
 	/** URL of the wallet page. */
 	url: string
@@ -35,17 +39,21 @@ export function eipImplementers(
 	wallets: Array<RatedWallet<string>> = Object.values(allRatedWallets),
 ): EipImplementer[] {
 	return wallets
-		.filter(
-			wallet =>
-				eipSupportStatus(ratedWalletEipSupport(wallet, eip.number).overall) ===
-				EipSupportStatus.SUPPORTED,
-		)
-		.map(wallet => ({
-			id: wallet.metadata.id,
-			displayName: wallet.metadata.displayName,
-			iconExtension: wallet.metadata.iconExtension,
-			url: getWalletUrl(wallet),
-		}))
+		.flatMap(wallet => {
+			const support = ratedWalletEipSupportByStatus(wallet, eip.number)[EipSupportStatus.SUPPORTED]
+
+			return support === undefined
+				? []
+				: [
+						{
+							id: wallet.metadata.id,
+							displayName: wallet.metadata.displayName,
+							iconExtension: wallet.metadata.iconExtension,
+							url: getWalletUrl(wallet),
+							variants: support.variants,
+						},
+					]
+		})
 		.sort((a, b) => a.displayName.localeCompare(b.displayName))
 }
 

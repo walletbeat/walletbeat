@@ -17,7 +17,7 @@
 
 
 	// Functions
-	import { eipEthereumDotOrgUrl, eipFinalForLabel } from '@/schema/eips'
+	import { eipEthereumDotOrgUrl, eipFinalForLabel, eipStatusLabel } from '@/schema/eips'
 	import { daysSince } from '@/types/date'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 
@@ -28,9 +28,9 @@
 </script>
 
 
-<article data-column>
+<article data-column="gap-8">
 	<header data-column="gap-6">
-		<div class="tags" data-row="start gap-2">
+		<div data-row="start wrap gap-2">
 			<div
 				data-tag="eip"
 			>
@@ -40,7 +40,7 @@
 			<div
 				data-tag="eip-status"
 			>
-				{eip.status}
+				{eipStatusLabel[eip.status]}
 			</div>
 
 			{#if eip.finalizedDate !== null}
@@ -71,7 +71,7 @@
 	</header>
 
 	{#if eip.summaryMarkdown}
-		<section data-column>
+		<section data-column="gap-6">
 			<svelte:element this={subheading} class="section-title">Summary</svelte:element>
 
 			<Typography
@@ -84,7 +84,7 @@
 	{/if}
 
 	{#if eip.whyItMattersMarkdown}
-		<section data-column>
+		<section data-column="gap-6">
 			<svelte:element this={subheading} class="section-title">Why It Matters</svelte:element>
 
 			<Typography
@@ -110,10 +110,6 @@
 
 <style>
 	article {
-		&[data-column] {
-			gap: 2.25em;
-		}
-
 		font-size: 0.875rem;
 		text-align: left;
 
@@ -127,11 +123,6 @@
 				color: var(--text-secondary);
 			}
 
-			.tags {
-				flex-wrap: wrap;
-				align-items: center;
-			}
-
 			.final-since {
 				color: var(--text-secondary);
 
@@ -142,10 +133,6 @@
 		}
 
 		> section {
-			&[data-column] {
-				gap: 1.75em;
-			}
-
 			line-height: 1.66;
 
 			color: var(--text-secondary);

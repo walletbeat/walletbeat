@@ -53,7 +53,7 @@
 							color: eipSupportStatusColor[status],
 							weight: count,
 							arcLabel: String(count),
-							ariaLabel: `${count} ${description}`,
+							ariaLabel: `${count} platform-qualified status entries: ${description}`,
 							href: `#${eipSupportStatusGroupId(listId, status)}`,
 						},
 					]
@@ -91,7 +91,8 @@
 	</Pie>
 
 	<figcaption>
-		{supportedWalletCount} of {walletCount} {walletTypeLabel} support {eipLabel}
+		{supportedWalletCount} of {walletCount} distinct {walletTypeLabel} support {eipLabel} on at least one platform.
+		Slices count platform-qualified status entries. A wallet can appear in more than one status.
 	</figcaption>
 </figure>
 
