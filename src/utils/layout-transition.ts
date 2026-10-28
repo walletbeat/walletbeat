@@ -14,18 +14,26 @@ const inputProperties = [
 	'--layoutTransition-easing',
 ] as const
 
-const cancelInputTransitions = (item: HTMLElement) => {
-	for (const animation of item.getAnimations()) {
-		if (
-			animation instanceof CSSTransition &&
-			(animation.transitionProperty === 'translate' ||
-				inputProperties.some(property => property === animation.transitionProperty)) &&
-			animation.effect instanceof KeyframeEffect &&
-			animation.effect.target === item &&
-			animation.effect.pseudoElement === null
-		) {
-			animation.cancel()
+const cancelInputTransitions = (items: Iterable<HTMLElement>) => {
+	const transitions: Animation[] = []
+
+	for (const item of items) {
+		for (const animation of item.getAnimations()) {
+			if (
+				animation instanceof CSSTransition &&
+				(animation.transitionProperty === 'translate' ||
+					inputProperties.some(property => property === animation.transitionProperty)) &&
+				animation.effect instanceof KeyframeEffect &&
+				animation.effect.target === item &&
+				animation.effect.pseudoElement === null
+			) {
+				transitions.push(animation)
+			}
 		}
+	}
+
+	for (const transition of transitions) {
+		transition.cancel()
 	}
 }
 
@@ -83,9 +91,17 @@ export function prepareItemReorder(
 
 	interrupt()
 
+	const interruptedItems: HTMLElement[] = []
+
 	for (const { item } of positions.values()) {
-		ownerByItem.get(item)?.()
+		const release = ownerByItem.get(item)
+
+		if (release) {
+			release()
+			interruptedItems.push(item)
+		}
 	}
+	cancelInputTransitions(interruptedItems)
 	update()
 
 	const after = captureItemPositions(scope)
@@ -102,11 +118,15 @@ export function prepareItemReorder(
 	const releases = new Map<HTMLElement, () => void>()
 	const animations: Animation[] = []
 	const clean = () => {
+		const releasedItems: HTMLElement[] = []
+
 		for (const [item, release] of releases) {
 			if (ownerByItem.get(item) === release) {
 				release()
+				releasedItems.push(item)
 			}
 		}
+		cancelInputTransitions(releasedItems)
 
 		for (const animation of animations) {
 			animation.cancel()
@@ -141,7 +161,6 @@ export function prepareItemReorder(
 				for (const property of inputProperties) {
 					item.style.removeProperty(property)
 				}
-				cancelInputTransitions(item)
 			}
 
 			releases.set(item, release)
@@ -170,9 +189,7 @@ export function prepareItemReorder(
 		}
 
 		// Commit the paused keyframe pose before starting the shared native clock.
-		for (const item of releases.keys()) {
-			cancelInputTransitions(item)
-		}
+		cancelInputTransitions(releases.keys())
 		getComputedStyle(firstItem).getPropertyValue('translate')
 		let frame: number | undefined
 		let finish!: () => void
