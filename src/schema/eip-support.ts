@@ -30,7 +30,7 @@ import {
 	type WithRef,
 } from './reference'
 import { getVariants, Variant } from './variants'
-import { getVariantResolvedWallet, type RatedWallet } from './wallet'
+import { getVariantResolvedWallet, type RatedWallet, type WalletMetadata } from './wallet'
 
 /**
  * Whether a wallet implements a specific EIP.
@@ -537,7 +537,7 @@ export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
 export interface EipStatusSupportCard {
 	id: string
 	displayName: string
-	iconExtension: string
+	iconExtension: WalletMetadata['iconExtension']
 	url: string
 	status: EipSupportStatus
 	variants: Variant[]
