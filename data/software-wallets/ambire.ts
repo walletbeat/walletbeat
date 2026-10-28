@@ -38,6 +38,10 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import {
+	EthereumL1LightClient,
+	type EthereumL1LightClientSupport,
+} from '@/schema/features/security/light-client'
 import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
@@ -886,7 +890,42 @@ export const ambire: SoftwareWallet = {
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
-				ethereumL1: notSupported,
+				ethereumL1: supported<WithRef<EthereumL1LightClientSupport>>({
+					ref: {
+						explanation:
+							'Ambire can verify Ethereum L1 data through the Colibri Stateless light client, which checks RPC responses against Merkle proofs and zero-knowledge proofs of the sync committee. Verification is opt-in per network (Ethereum and Gnosis) in the network settings. Once enabled, displayed balances and ENS name resolution are verified, but transaction simulations are not.',
+						lastRetrieved: '2026-10-28',
+						urls: [
+							{
+								label: 'Colibri provider requires verified responses with zero-knowledge proofs',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/4402f68f8075ae9deeea61af83c61a5903d1e4b2/src/services/provider/colibri.ts#L17-L47',
+							},
+							{
+								label: 'Colibri is disabled by default in the network settings',
+								url: 'https://github.com/AmbireTech/extension/blob/6938b0a7d506a961676aff3e82beea72f6f15861/src/common/modules/settings/components/Networks/NetworkForm/NetworkForm.tsx#L259',
+							},
+							{
+								label: 'Networks with Colibri verification (Ethereum and Gnosis)',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/4402f68f8075ae9deeea61af83c61a5903d1e4b2/src/libs/networks/colibri.ts#L3-L15',
+							},
+							{
+								label: 'Portfolio balances are verified, but not during simulations',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/4402f68f8075ae9deeea61af83c61a5903d1e4b2/src/controllers/portfolio/portfolio.ts#L1808',
+							},
+							{
+								label: 'Portfolio verification against Colibri at the RPC block',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/4402f68f8075ae9deeea61af83c61a5903d1e4b2/src/controllers/verification/verification.ts#L177',
+							},
+							{
+								label: 'ENS resolution is cross-checked against Colibri',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/4402f68f8075ae9deeea61af83c61a5903d1e4b2/src/controllers/domains/domains.ts#L281-L298',
+							},
+						],
+					},
+					[EthereumL1LightClient.colibri]: featureSupported,
+					enabledByDefault: false,
+					verifiesTransactionSimulation: false,
+				}),
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: v2Audits,

@@ -2442,13 +2442,24 @@ Known Ethereum L1 light client implementations a wallet may embed. Sometimes vis
 
 - `helios` = `'helios'`: Helios: a fast, trustless Ethereum light client written in Rust.
 - `heliosMobi` = `'heliosMobi'`: Helios-Mobi: a mobile-optimized port of Helios.
+- `colibri` = `'colibri'`: Colibri Stateless: a stateless light client that verifies RPC responses against Merkle proofs and zero-knowledge proofs of the sync committee.
+
+---
+
+### Interface: `EthereumL1LightClientCoverage`
+
+How much of the chain data the wallet relies on is verified by its light client(s).
+
+- `enabledByDefault` (`boolean`): Whether light client verification is active without the user having to opt into it (e.g. by toggling a setting).
+- `verifiesTransactionSimulation` (`boolean`): Whether the chain state used to simulate transactions before signing is verified by the light client, as opposed to only some other data such as displayed balances.
 
 ---
 
 ### Type: `EthereumL1LightClientSupport`
 
 ```typescript
-type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
+type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient> &
+	EthereumL1LightClientCoverage
 ```
 
 ---
