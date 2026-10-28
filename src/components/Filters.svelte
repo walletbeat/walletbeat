@@ -252,6 +252,20 @@
 		opacity: 0;
 	}
 
+	.menu [data-filter-choice] > input:enabled {
+		--pressable-pressed-scale: none;
+		inset-block: calc(-1 * var(---column-gap)) 0;
+		inset-inline: 0 calc(-1 * var(---column-gap));
+		place-self: unsafe center;
+		/* Inherited borders make the native target track the label's outer box. */
+		box-sizing: content-box;
+		inline-size: calc(100% + var(---column-gap));
+		block-size: calc(100% + var(---column-gap));
+		padding: 0;
+		border: inherit;
+		opacity: 0;
+	}
+
 	.choice-icon-helipad {
 		display: grid;
 		place-items: center;
@@ -523,7 +537,6 @@
 			min-inline-size: 1.1em;
 			padding: 0.15em 0.35em;
 			font-size: 0.65em;
-			pointer-events: none;
 		}
 
 		[data-active-choice] .choice-icon,
