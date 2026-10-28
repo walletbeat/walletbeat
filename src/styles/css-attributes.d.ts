@@ -302,9 +302,8 @@ declare global {
 		 * CSS animation list. Put independently animated controls inside these neutral owners;
 		 * their opacity, scale and other effects remain separate.
 		 *
-		 * ### Tokens
-		 * - `before`: Commit the old position in the updated layout without interpolation.
-		 * - `after`: Interpolate to the updated native position.
+		 * This attribute marks live motion ownership. CSS creates the animation paused;
+		 * the helper captures it once and starts the retained native animations together.
 		 *
 		 * ### CSS Variables
 		 * - `--layoutTransition-beforeX`: Old native viewport x-coordinate; does not inherit.
