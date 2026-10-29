@@ -176,17 +176,7 @@ test('destination feedback keeps current, focus and hover independent across own
 	await page.setViewportSize({ width: 1440, height: 900 })
 	await page.goto('/__wallet-page/software/')
 	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-	await expect
-		.poll(() =>
-			page.locator('[data-wallet-peer-fallback]').evaluate(element => {
-				if (!(element instanceof HTMLStyleElement)) {
-					throw new Error('Native fallback stylesheet absent')
-				}
-
-				return element.sheet?.cssRules.length ?? 0
-			}),
-		)
-		.toBe(0)
+	await expect(page.locator('style[data-wallet-peer-fallback]')).toHaveCount(0)
 	const destinations = await page.locator('#wallet-toc a[href]').evaluateAll(links => {
 		return links.flatMap(link => {
 			if (!(link instanceof HTMLAnchorElement)) {

@@ -13,20 +13,22 @@ async function generatedStyles(page: Page) {
 		expect(() => postcss.parse(css, { from: `${page.url()}#inline-style-${index}` })).not.toThrow()
 	}
 
-	return page.locator('[data-wallet-peer-fallback]').evaluateHandle(element => {
-		const pie = element.previousElementSibling
-
+	return page.locator('style[data-wallet-pie-state]').evaluateHandle(pie => {
 		if (
 			!(pie instanceof HTMLStyleElement) ||
 			!pie.sheet ||
 			!pie.textContent?.trim() ||
 			!pie.sheet.cssRules.length
 		) {
-			throw new Error('The generated pie stylesheet must have real CSS before the fallback')
+			throw new Error('The generated pie stylesheet must have a native CSS program')
 		}
 
 		return { pie, sheet: pie.sheet, program: [...pie.sheet.cssRules].map(rule => rule.cssText) }
 	})
+}
+
+async function assertScriptedFallback(page: Page) {
+	await expect(page.locator('style[data-wallet-peer-fallback]')).toHaveCount(0)
 }
 
 async function peerDomain(page: Page) {
@@ -112,6 +114,7 @@ async function exercisePeers(
 	name: string,
 	browserName: string,
 	javaScriptEnabled: boolean,
+	duringHold?: () => Promise<void>,
 ) {
 	const history: { phase: string; state: string; detail?: unknown }[] = []
 
@@ -249,6 +252,14 @@ async function exercisePeers(
 		)
 
 	type Peer = Awaited<ReturnType<typeof read>>[number]
+	const heldPaint = (peers: Peer[]) =>
+		peers.every(
+			peer =>
+				Number.isFinite(peer.pressedOpacity) &&
+				Number.isFinite(peer.pressedScale) &&
+				Math.abs(peer.opacity - peer.pressedOpacity) < 0.01 &&
+				Math.abs(peer.scale - peer.pressedScale) < 0.01,
+		)
 	const poll = (phase: string, accepts: (peers: Peer[]) => boolean) =>
 		bounded(
 			phase,
@@ -400,15 +411,29 @@ async function exercisePeers(
 		pressed = true
 		await bounded('native press', down)
 		await admitSource('native active admission', { active: true, hover: true })
-		await poll('held peer paint', peers =>
-			peers.every(
-				peer =>
-					Number.isFinite(peer.pressedOpacity) &&
-					Number.isFinite(peer.pressedScale) &&
-					Math.abs(peer.opacity - peer.pressedOpacity) < 0.01 &&
-					Math.abs(peer.scale - peer.pressedScale) < 0.01,
-			),
-		)
+		await poll('held peer paint', heldPaint)
+
+		if (duringHold) {
+			const heldSource = await source.elementHandle()
+
+			await bounded('held ownership handoff', duringHold, 15000)
+			expect(
+				await heldSource?.evaluate(
+					node =>
+						node.isConnected &&
+						node ===
+							document.querySelector(
+								'#wallet-toc a[data-pressable-name=' +
+									JSON.stringify(node.getAttribute('data-pressable-name')) +
+									']',
+							),
+				),
+			).toBe(true)
+			await admitSource('handoff active admission', { active: true, hover: true })
+			await poll('handoff held peer paint', heldPaint)
+			await heldSource?.dispose()
+		}
+
 		await bounded('release location', () => move(releasePoint.x, releasePoint.y))
 
 		if (selectLinkText) {
@@ -601,11 +626,7 @@ for (const fixture of ['software', 'hardware', 'embedded']) {
 				await expect.poll(() => held.includes(expectedURL)).toBe(true)
 				expect(held.every(url => url === expectedURL)).toBe(true)
 				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
-				const fallback = page.locator('[data-wallet-peer-fallback]')
-
-				await expect
-					.poll(async () => (await fallback.textContent())?.trim().length)
-					.toBeGreaterThan(0)
+				await assertScriptedFallback(page)
 				const original = await test.step('read generated CSS', () => generatedStyles(page), {
 					timeout: 15000,
 				})
@@ -615,21 +636,24 @@ for (const fixture of ['software', 'hardware', 'embedded']) {
 
 				await test.step(
 					'pending native peer feedback',
-					() => exercisePeers(page, before.name, browserName, javaScriptEnabled),
+					() =>
+						exercisePeers(page, before.name, browserName, javaScriptEnabled, async () => {
+							release()
+							await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+							await assertScriptedFallback(page)
+							expect(
+								await original.evaluate(
+									({ pie, sheet, program }) =>
+										pie.isConnected &&
+										pie.sheet === sheet &&
+										JSON.stringify([...sheet.cssRules].map(rule => rule.cssText)) ===
+											JSON.stringify(program),
+								),
+							).toBe(true)
+						}),
 					{ timeout: 60000 },
 				)
-				release()
-				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-				await expect.poll(() => fallback.textContent()).toBe('')
-				expect(
-					await original.evaluate(
-						({ pie, sheet, program }) =>
-							pie.isConnected &&
-							pie.sheet === sheet &&
-							JSON.stringify([...sheet.cssRules].map(rule => rule.cssText)) ===
-								JSON.stringify(program),
-					),
-				).toBe(true)
+
 				const after = await test.step('admit hydrated peer domain', () => peerDomain(page), {
 					timeout: 20000,
 				})
@@ -649,3 +673,239 @@ for (const fixture of ['software', 'hardware', 'embedded']) {
 		})
 	})
 }
+
+test('pending peer feedback reruns after client navigation and back', async ({ page }) => {
+	let release = () => {}
+	const released = new Promise<void>(resolve => {
+		release = resolve
+	})
+	const held: string[] = []
+
+	await page.route('**/WalletFixture.*.js', async route => {
+		held.push(new URL(route.request().url()).href)
+		await released
+		await route.continue()
+	})
+
+	try {
+		await page.goto('/__wallet-page/software/', { waitUntil: 'domcontentloaded' })
+		const host = page.locator('astro-island[ssr]:has(#top)')
+
+		await expect(host).toHaveCount(1)
+		const component = await host.getAttribute('component-url')
+
+		expect(component).toBeTruthy()
+		const expectedURL = new URL(component!, page.url()).href
+
+		await expect.poll(() => held.includes(expectedURL)).toBe(true)
+		expect(held.every(url => url === expectedURL)).toBe(true)
+		await assertScriptedFallback(page)
+		const root = await page.locator('#top').elementHandle()
+
+		if (!root) {
+			throw new Error('The actual pending WalletPage root is required')
+		}
+
+		const lifecycle = await host.evaluateHandle(island => {
+			const state = { unmounted: 0, loaded: 0 }
+
+			island.addEventListener('astro:unmount', () => {
+				state.unmounted++
+			})
+			document.addEventListener('astro:page-load', () => {
+				state.loaded++
+			})
+
+			return state
+		})
+		const sentinel = await page.evaluate(() => {
+			const value = crypto.randomUUID()
+
+			Reflect.set(window, value, true)
+
+			return value
+		})
+		const before = await peerDomain(page)
+		const hoverPeers = async (name: string) => {
+			const selector = `a[data-pressable-name=${JSON.stringify(name)}]`
+
+			await page.locator(`#wallet-toc ${selector}`).hover()
+			await expect
+				.poll(() =>
+					page
+						.locator(`#top ${selector}`)
+						.evaluateAll(
+							owners =>
+								owners.length >= 3 &&
+								owners.every(
+									owner =>
+										getComputedStyle(owner).getPropertyValue('---link-interacting').trim() === '1',
+								),
+						),
+				)
+				.toBe(true)
+		}
+
+		await hoverPeers(before.name)
+		const loadedBefore = await lifecycle.evaluate(state => state.loaded)
+		const home = new URL('/', page.url()).href
+
+		await page.locator('#nav a.logo').click()
+		await expect(page).toHaveURL(home)
+		expect(await page.evaluate(key => Reflect.has(window, key), sentinel)).toBe(true)
+		await expect.poll(() => lifecycle.evaluate(state => state.loaded)).toBeGreaterThan(loadedBefore)
+		await expect.poll(() => lifecycle.evaluate(state => state.unmounted)).toBe(1)
+		expect(await root.evaluate(node => node.isConnected)).toBe(false)
+		const loadedAtHome = await lifecycle.evaluate(state => state.loaded)
+
+		await page.goBack()
+		await expect(page).toHaveURL(new URL('/__wallet-page/software/', home).href)
+		expect(await page.evaluate(key => Reflect.has(window, key), sentinel)).toBe(true)
+		await expect.poll(() => lifecycle.evaluate(state => state.loaded)).toBeGreaterThan(loadedAtHome)
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
+		await assertScriptedFallback(page)
+		const after = await peerDomain(page)
+
+		expect(after).toEqual(before)
+		await hoverPeers(after.name)
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
+		await root.dispose()
+		await lifecycle.dispose()
+	} finally {
+		release()
+	}
+})
+
+test('peer publisher ownership survives warm client navigation', async ({ page }) => {
+	const key = 'walletbeat.test.peer-publishers'
+
+	await page.addInitScript(key => {
+		const active = new Set<unknown>()
+		const add = Reflect.get(EventTarget.prototype, 'addEventListener')
+		const remove = Reflect.get(EventTarget.prototype, 'removeEventListener')
+		const owns = (target: EventTarget, type: string, options?: boolean | AddEventListenerOptions) =>
+			target === document &&
+			type === 'pointerover' &&
+			(options === true || (typeof options === 'object' && options.capture))
+
+		EventTarget.prototype.addEventListener = function (
+			this: EventTarget,
+			...args: Parameters<EventTarget['addEventListener']>
+		) {
+			if (owns(this, args[0], args[2])) {
+				active.add(args[1])
+			}
+
+			return add.apply(this, args)
+		}
+		EventTarget.prototype.removeEventListener = function (
+			this: EventTarget,
+			...args: Parameters<EventTarget['removeEventListener']>
+		) {
+			if (owns(this, args[0], args[2])) {
+				active.delete(args[1])
+			}
+
+			return remove.apply(this, args)
+		}
+		document.addEventListener('astro:after-swap', () => {
+			Reflect.set(window, key + '.root', document.querySelector('#top'))
+		})
+		Reflect.set(window, key, active)
+	}, key)
+	const count = () =>
+		page.evaluate(key => {
+			const active: unknown = Reflect.get(window, key)
+
+			if (!(active instanceof Set)) {
+				throw new Error('Native listener census is required')
+			}
+
+			return active.size
+		}, key)
+
+	await page.goto('/__wallet-page/software/')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await expect.poll(count).toBe(1)
+	const sentinel = await page.evaluate(() => {
+		const key = crypto.randomUUID()
+
+		Reflect.set(window, key, true)
+
+		return key
+	})
+	const lifecycle = await page.evaluateHandle(() => {
+		const state = { loaded: 0 }
+
+		document.addEventListener('astro:page-load', () => {
+			state.loaded++
+		})
+
+		return state
+	})
+	const loadedBefore = await lifecycle.evaluate(state => state.loaded)
+
+	await page.locator('#nav a.logo').click()
+	await expect.poll(() => lifecycle.evaluate(state => state.loaded)).toBeGreaterThan(loadedBefore)
+	await expect(page.locator('#top')).toHaveCount(0)
+	await expect.poll(count).toBe(0)
+	expect(await page.evaluate(key => Reflect.has(window, key), sentinel)).toBe(true)
+	const loadedAtHome = await lifecycle.evaluate(state => state.loaded)
+
+	await page.goBack()
+	await expect.poll(() => lifecycle.evaluate(state => state.loaded)).toBeGreaterThan(loadedAtHome)
+	await expect(page.locator('#top')).toHaveCount(1)
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await expect.poll(count).toBe(1)
+	expect(await page.evaluate(key => Reflect.has(window, key), sentinel)).toBe(true)
+	await lifecycle.dispose()
+	expect(
+		await page
+			.locator('#top')
+			.evaluate(
+				(root, key) => root.isConnected && root === Reflect.get(window, key + '.root'),
+				key,
+			),
+	).toBe(true)
+	await assertScriptedFallback(page)
+
+	for (const variant of [null, 'MOBILE']) {
+		if (variant) {
+			await page
+				.getByRole('combobox', { name: 'Wallet version', exact: true })
+				.selectOption(variant)
+			await expect.poll(() => new URL(page.url()).searchParams.get('variant')).toBe(variant)
+		}
+
+		await assertScriptedFallback(page)
+		await expect.poll(count).toBe(1)
+		expect(
+			await page
+				.locator('#top')
+				.evaluate(
+					(root, key) => root.isConnected && root === Reflect.get(window, key + '.root'),
+					key,
+				),
+		).toBe(true)
+		const state = await peerDomain(page)
+		const source = page.locator(
+			'#wallet-toc a[data-pressable-name=' + JSON.stringify(state.name) + ']',
+		)
+
+		await source.hover()
+		await expect
+			.poll(() =>
+				page
+					.locator('#top a[data-pressable-name=' + JSON.stringify(state.name) + ']')
+					.evaluateAll(
+						owners =>
+							owners.length >= 3 &&
+							owners.every(
+								owner =>
+									getComputedStyle(owner).getPropertyValue('---link-interacting').trim() === '1',
+							),
+					),
+			)
+			.toBe(true)
+	}
+})
