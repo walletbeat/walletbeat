@@ -752,6 +752,10 @@
 		`
 	})
 
+	function stylesheetMarkup(css: string, peerFallback = false) {
+		return `<style${peerFallback ? ' data-wallet-peer-fallback' : ''}>${css}</style>`
+	}
+
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
@@ -870,8 +874,8 @@
 </svelte:head>
 
 
-<svelte:element this={'style'}>{pieRotation.styles}</svelte:element>
-<svelte:element this={'style'} data-wallet-peer-fallback>{peerStateReady ? '' : peerFallbackStyles}</svelte:element>
+{@html stylesheetMarkup(pieRotation.styles)}
+{@html stylesheetMarkup(peerStateReady ? '' : peerFallbackStyles, true)}
 
 <div
 	id="top"
