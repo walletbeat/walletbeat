@@ -547,6 +547,7 @@
 				{@const nextSort = table.getNextColumnSort(column.id)}
 				{@const sortAction = nextSort === false ? undefined : sortNavigation?.action(column.id, nextSort)}
 				{@const sortButtonId = sortAction?.id ?? `${id}-sort-${level}-${index}`}
+				{@const expansionButtonId = `${id}-expand-${level}-${index}`}
 
 				<th
 					{colspan}
@@ -623,7 +624,15 @@
 								{@render column.HeaderExtra?.({ column })}
 							</div>
 						{:else if isExpandable}
+							<label
+								class="expansion-hit-area"
+								for={expansionButtonId}
+								data-sticky-container
+								data-sticky
+								aria-hidden="true"
+							></label>
 							<button
+								id={expansionButtonId}
 								type="button"
 								class="expansion-button"
 								disabled={!interactive}
@@ -998,6 +1007,23 @@
 							---table-isExpanded: 1;
 						}
 
+						.expansion-hit-area,
+						.expansion-hit-area + .expansion-button {
+							grid-column: 2;
+							grid-row: 1;
+						}
+
+						.expansion-hit-area {
+							align-self: stretch;
+							justify-self: stretch;
+						}
+
+						.expansion-hit-area,
+						.expansion-button,
+						.header-extra :global(.expansion-button) {
+							font-size: 0.75em;
+						}
+
 						.expansion-button,
 						.header-extra :global(.expansion-button) {
 							margin: var(--table-cell-padding);
@@ -1006,13 +1032,13 @@
 							background-color: transparent;
 
 							flex: 0 0 auto;
-							font-size: 0.75em;
 							padding: 0.33em;
 							border: none;
 
 							transition-property: background-color, transform, opacity;
 
-							&:hover {
+							&:hover,
+							.expansion-hit-area:hover + & {
 								background-color: rgba(255, 255, 255, 0.15);
 							}
 
