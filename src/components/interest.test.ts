@@ -8,11 +8,28 @@ class TestElement extends EventTarget {
 	focusVisible = false
 	visible = true
 	invoker: TestElement | null = null
+	hoveredDescendants: TestElement[] = []
 	showPopover = vi.fn()
 	hidePopover = vi.fn()
 
 	querySelector() {
 		return this.invoker
+	}
+
+	querySelectorAll() {
+		return this.hoveredDescendants.filter(element => element.hovered)
+	}
+
+	override dispatchEvent(event: Event) {
+		if (event.type === 'pointerenter') {
+			this.hovered = true
+		}
+
+		if (event.type === 'pointerleave') {
+			this.hovered = false
+		}
+
+		return super.dispatchEvent(event)
 	}
 
 	checkVisibility() {
@@ -32,8 +49,14 @@ class TestPointerEvent extends Event {
 	constructor(
 		type: string,
 		public pointerType = 'mouse',
+		readonly relatedTarget: TestElement | null = null,
+		private readonly path?: EventTarget[],
 	) {
 		super(type)
+	}
+
+	override composedPath() {
+		return this.path ?? super.composedPath()
 	}
 }
 
@@ -42,12 +65,17 @@ class TestFocusEvent extends Event {
 		type: string,
 		private readonly focusedElement?: TestElement,
 		readonly relatedTarget: TestElement | null = null,
+		private readonly path?: EventTarget[],
 	) {
 		super(type)
 	}
 
 	override get target() {
 		return this.focusedElement ?? super.target
+	}
+
+	override composedPath() {
+		return this.path ?? super.composedPath()
 	}
 }
 
@@ -104,6 +132,13 @@ describe('interest fallback lifecycle', () => {
 		expect(target.showPopover).toHaveBeenCalledOnce()
 	})
 
+	it('checks pointer eligibility after boundary-event hover state settles', () => {
+		EventTarget.prototype.dispatchEvent.call(node, new TestPointerEvent('pointerenter'))
+		node.hovered = true
+		vi.advanceTimersByTime(interestDelayMs.start)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
 	it('cancels pending entry when the pointer leaves', () => {
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(interestDelayMs.start / 2)
@@ -111,6 +146,149 @@ describe('interest fallback lifecycle', () => {
 		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
 	})
+
+	it('rechecks pointer interest when the dwell expires', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		node.hovered = false
+		vi.advanceTimersByTime(interestDelayMs.start)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('preserves pointer interest through an unregistered descendant', () => {
+		const child = new TestElement()
+
+		child.hovered = true
+		node.hoveredDescendants = [child]
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(interestDelayMs.start)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
+	it.each([false, true])(
+		'leaves nested pointer entry with its nearest owner (native: %s)',
+		native => {
+			const inner = new TestElement()
+			const innerTarget = new TestElement()
+
+			inner.hovered = true
+			node.hoveredDescendants = [inner]
+			vi.stubGlobal('document', { getElementById: () => innerTarget })
+
+			if (native) {
+				Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+				vi.spyOn(inner, 'matches').mockImplementation(selector => selector.includes('button'))
+			}
+
+			const innerCleanup = interest(htmlElement(inner), { id: 'inner' })
+
+			try {
+				node.dispatchEvent(new TestPointerEvent('pointerenter'))
+				inner.dispatchEvent(new TestPointerEvent('pointerenter'))
+				vi.advanceTimersByTime(interestDelayMs.start)
+				expect(target.showPopover).not.toHaveBeenCalled()
+
+				if (!native) {
+					expect(innerTarget.showPopover).toHaveBeenCalledOnce()
+				}
+
+				innerCleanup?.destroy()
+				node.dispatchEvent(new TestPointerEvent('pointerenter'))
+				vi.advanceTimersByTime(interestDelayMs.start)
+				expect(target.showPopover).toHaveBeenCalledOnce()
+			} finally {
+				innerCleanup?.destroy()
+			}
+		},
+	)
+
+	it.each([false, true])(
+		'yields hydration hover to a child registered during the dwell (native: %s)',
+		native => {
+			cleanup?.destroy()
+			node.hovered = true
+			cleanup = interest(htmlElement(node), { id: 'details' })
+			vi.advanceTimersByTime(interestDelayMs.start / 2)
+			const inner = new TestElement()
+
+			inner.hovered = true
+			node.hoveredDescendants = [inner]
+			vi.stubGlobal('document', { getElementById: () => new TestElement() })
+
+			if (native) {
+				Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+				vi.spyOn(inner, 'matches').mockImplementation(selector => selector.includes('button'))
+			}
+
+			const innerCleanup = interest(htmlElement(inner), { id: 'inner' })
+
+			try {
+				vi.advanceTimersByTime(interestDelayMs.start)
+				expect(target.showPopover).not.toHaveBeenCalled()
+			} finally {
+				innerCleanup?.destroy()
+			}
+		},
+	)
+
+	it.each([false, true])('resumes outer dwell when leaving a nested owner (native: %s)', native => {
+		const inner = new TestElement()
+
+		inner.hovered = true
+		node.hoveredDescendants = [inner]
+		vi.stubGlobal('document', { getElementById: () => new TestElement() })
+
+		if (native) {
+			Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+			vi.spyOn(inner, 'matches').mockImplementation(selector => selector.includes('button'))
+		}
+
+		const innerCleanup = interest(htmlElement(inner), { id: 'inner' })
+
+		try {
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+			inner.dispatchEvent(new TestPointerEvent('pointerenter'))
+			vi.advanceTimersByTime(interestDelayMs.start)
+			expect(target.showPopover).not.toHaveBeenCalled()
+			node.dispatchEvent(new TestPointerEvent('pointerout', 'mouse', node, [inner, node]))
+			inner.hovered = false
+			vi.advanceTimersByTime(interestDelayMs.start - 1)
+			expect(target.showPopover).not.toHaveBeenCalled()
+			vi.advanceTimersByTime(1)
+			expect(target.showPopover).toHaveBeenCalledOnce()
+		} finally {
+			innerCleanup?.destroy()
+		}
+	})
+
+	it.each([false, true])(
+		'preserves nested panel focus and hover ownership (native: %s)',
+		native => {
+			const inner = new TestElement()
+			const panel = new TestElement()
+			const link = new TestElement()
+
+			panel.hovered = true
+			link.focusVisible = true
+			node.hoveredDescendants = [panel]
+			vi.stubGlobal('document', { getElementById: () => panel })
+
+			if (native) {
+				Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+				vi.spyOn(inner, 'matches').mockImplementation(selector => selector.includes('button'))
+			}
+
+			const innerCleanup = interest(htmlElement(inner), { id: 'inner' })
+
+			try {
+				node.dispatchEvent(new TestPointerEvent('pointerenter'))
+				node.dispatchEvent(new TestFocusEvent('focusin', link, null, [link, panel, node]))
+				vi.runAllTimers()
+				expect(target.showPopover).not.toHaveBeenCalled()
+			} finally {
+				innerCleanup?.destroy()
+			}
+		},
+	)
 
 	it('does not open a wrapper tooltip while CSS hides its native invoker', () => {
 		node.invoker = new TestElement()
@@ -149,6 +327,35 @@ describe('interest fallback lifecycle', () => {
 		node.dispatchEvent(new TestFocusEvent('focusin'))
 		vi.runAllTimers()
 		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it.each([false, true])('leaves nested interest with its nearest owner (native: %s)', native => {
+		const inner = new TestElement()
+		const innerTarget = new TestElement()
+		const source = new TestElement()
+
+		source.focusVisible = true
+		vi.stubGlobal('document', { getElementById: () => innerTarget })
+
+		if (native) {
+			Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+			vi.spyOn(inner, 'matches').mockImplementation(selector => selector.includes('button'))
+		}
+
+		const innerCleanup = interest(htmlElement(inner), { id: 'inner' })
+
+		try {
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+			node.dispatchEvent(new TestFocusEvent('focusin', source, null, [source, inner, node]))
+			vi.runAllTimers()
+			expect(target.showPopover).not.toHaveBeenCalled()
+			innerCleanup?.destroy()
+			node.dispatchEvent(new TestFocusEvent('focusin', source, null, [source, inner, node]))
+			vi.runAllTimers()
+			expect(target.showPopover).toHaveBeenCalledWith({ source })
+		} finally {
+			innerCleanup?.destroy()
+		}
 	})
 
 	it('preserves dismissal when focus returns from the panel, then accepts fresh focus', () => {
