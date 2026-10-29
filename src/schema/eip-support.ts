@@ -577,6 +577,7 @@ export interface Eip7702Contract {
 export interface Eip7702Row {
 	id: string
 	displayName: string
+	iconExtension: string
 	url: string
 	type: WalletTypeFor7702
 	contract: Eip7702Contract | 'UNKNOWN' | undefined
