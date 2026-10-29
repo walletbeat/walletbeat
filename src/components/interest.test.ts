@@ -7,6 +7,8 @@ class TestElement extends EventTarget {
 	focused = false
 	focusVisible = false
 	visible = true
+	disabled = false
+	ariaDisabled = false
 	invoker: TestElement | null = null
 	hoveredDescendants: TestElement[] = []
 	showPopover = vi.fn()
@@ -41,6 +43,10 @@ class TestElement extends EventTarget {
 	}
 
 	matches(selector: string) {
+		if (selector === ':disabled, [aria-disabled="true"]') {
+			return this.disabled || this.ariaDisabled
+		}
+
 		return selector === ':focus-visible' ? this.focusVisible : this.hovered || this.focused
 	}
 }
@@ -110,6 +116,26 @@ describe('interest fallback lifecycle', () => {
 		vi.useRealTimers()
 		vi.unstubAllGlobals()
 	})
+
+	it.each(['disabled', 'ariaDisabled'] as const)(
+		'checks %s availability when delayed interest resolves for direct and descendant invokers',
+		state => {
+			for (const descendant of [false, true]) {
+				const invoker = descendant ? new TestElement() : node
+
+				node.invoker = descendant ? invoker : null
+				node.dispatchEvent(new TestPointerEvent('pointerenter'))
+				invoker[state] = true
+				vi.advanceTimersByTime(interestDelayMs.start)
+				expect(target.showPopover).not.toHaveBeenCalled()
+				invoker[state] = false
+				node.dispatchEvent(new TestPointerEvent('pointerenter'))
+				vi.advanceTimersByTime(interestDelayMs.start)
+				expect(target.showPopover).toHaveBeenCalledOnce()
+				target.showPopover.mockClear()
+			}
+		},
+	)
 
 	it('requires sustained pointer interest rather than opening during a scroll crossing', () => {
 		node.invoker = new TestElement()
