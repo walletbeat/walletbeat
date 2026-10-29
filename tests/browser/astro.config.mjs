@@ -16,6 +16,10 @@ const fixtures = {
 				entrypoint: './tests/browser/fixtures/wallet-series.ts',
 			})
 			injectRoute({
+				pattern: '/__wallet-page/attribute-notes.json',
+				entrypoint: './tests/browser/fixtures/attribute-notes.ts',
+			})
+			injectRoute({
 				pattern: '/__wallet-page/source.json',
 				entrypoint: './tests/browser/fixtures/source.ts',
 			})
