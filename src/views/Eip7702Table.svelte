@@ -163,40 +163,36 @@
 					{@const typeFor7702 = row.type}
 
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
-						<span
-							onclick={event => {
-								event.stopPropagation()
-								toggleFilterById!('accountType-eip7702')
-							}}
-						>
-							<Tooltip placement="inline-end">
-								<span data-tag="eip">
-									EIP-7702
-								</span>
+						<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+							{#if interactive}
+								<button data-tag="eip" aria-label="Filter by EIP-7702" onclick={event => {
+									event.stopPropagation()
+									toggleFilterById!('accountType-eip7702')
+								}}>EIP-7702</button>
+							{:else}
+								<span data-tag="eip">EIP-7702</span>
+							{/if}
 
-								{#snippet TooltipContent()}
-									<EipDetails eip={eip7702} />
-								{/snippet}
-							</Tooltip>
-						</span>
+							{#snippet TooltipContent()}
+								<EipDetails eip={eip7702} />
+							{/snippet}
+						</Tooltip>
 					{:else}
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
-							<span
-								onclick={event => {
-									event.stopPropagation()
-									toggleFilterById!('accountType-erc4337')
-								}}
-							>
-								<Tooltip placement="inline-end">
-									<span data-tag="eip">
-										ERC-4337
-									</span>
+							<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+								{#if interactive}
+									<button data-tag="eip" aria-label="Filter by ERC-4337" onclick={event => {
+										event.stopPropagation()
+										toggleFilterById!('accountType-erc4337')
+									}}>ERC-4337</button>
+								{:else}
+									<span data-tag="eip">ERC-4337</span>
+								{/if}
 
-									{#snippet TooltipContent()}
-										<EipDetails eip={erc4337} />
-									{/snippet}
-								</Tooltip>
-							</span>
+								{#snippet TooltipContent()}
+									<EipDetails eip={erc4337} />
+								{/snippet}
+							</Tooltip>
 						{:else}
 							{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
 								<button
@@ -319,9 +315,17 @@
 		}
 	}
 
+	:global([data-tooltip-placement="behind"]):has(> button[data-tag~="eip"]) {
+		display: inline-grid;
+	}
+
 	[data-tag] {
 		&:is(button) {
 			display: inline-flex;
+		}
+
+		&[data-tag~="eip"]:is(button) {
+			min-block-size: 0;
 		}
 	}
 
