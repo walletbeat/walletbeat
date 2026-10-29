@@ -347,8 +347,12 @@
 		},
 		{
 			"name": "data-pressable",
-			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\nNative summaries own their feedback; breadcrumb summaries delegate it to their foreground row.\n\n### Tokens\n- `to-containing`\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
+			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\nNative summaries own their feedback; breadcrumb summaries delegate it to their foreground row.\n\n### Tokens\n- `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.\n- `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.\n\n### Placement\n- A paint body inherits the control's font and corner context; badges inside retain their independent appearance.\n- Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.\n- Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.\n- Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
 			"values": [
+				{
+					"name": "paint",
+					"description": "`[data-pressable~=\"paint\"]`"
+				},
 				{
 					"name": "to-containing",
 					"description": "`[data-pressable~=\"to-containing\"]`"
