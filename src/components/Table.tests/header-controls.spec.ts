@@ -51,9 +51,9 @@ for (const javaScriptEnabled of [true, false]) {
 					}
 
 					await expect(sort).toBeEnabled()
-					const click = async (control: Locator) => {
+					const click = async (control: Locator, blockFraction = 0.5) => {
 						const read = () =>
-							control.evaluate(element => {
+							control.evaluate((element, blockFraction) => {
 								const box = element.getBoundingClientRect()
 								const header = element.closest('th')?.getBoundingClientRect()
 								const viewport = element.closest('[data-header-controls]')?.getBoundingClientRect()
@@ -67,7 +67,17 @@ for (const javaScriptEnabled of [true, false]) {
 								const top = Math.max(box.top, viewport.top, 0)
 								const bottom = Math.min(box.bottom, viewport.bottom, innerHeight)
 								const x = (left + right) / 2
-								const y = (top + bottom) / 2
+								const y = top + (bottom - top) * blockFraction
+								const action = element instanceof HTMLLabelElement ? element.control : element
+								const actionBox = action?.getBoundingClientRect()
+								const ownsNewArea =
+									!(element instanceof HTMLLabelElement) ||
+									(document.elementFromPoint(x, y) === element &&
+										!!actionBox &&
+										(x < actionBox.left ||
+											x >= actionBox.right ||
+											y < actionBox.top ||
+											y >= actionBox.bottom))
 								const points = [0.2, 0.5, 0.8].flatMap(inline =>
 									[0.2, 0.5, 0.8].map(block => {
 										const target = document.elementFromPoint(
@@ -75,7 +85,7 @@ for (const javaScriptEnabled of [true, false]) {
 											top + (bottom - top) * block,
 										)
 
-										return !!target && element.contains(target)
+										return !!target && (element.contains(target) || !!action?.contains(target))
 									}),
 								)
 
@@ -86,14 +96,15 @@ for (const javaScriptEnabled of [true, false]) {
 									hit: points.every(Boolean),
 									withinHeader:
 										!!header && box.top >= header.top - 1 && box.bottom <= header.bottom + 1,
+									ownsNewArea,
 								}
-							})
+							}, blockFraction)
 
 						await expect
 							.poll(async () => {
 								const point = await read()
 
-								return point.visible && point.hit && point.withinHeader
+								return point.visible && point.hit && point.withinHeader && point.ownsNewArea
 							})
 							.toBe(true)
 						const point = await read()
@@ -101,7 +112,39 @@ for (const javaScriptEnabled of [true, false]) {
 						expect(point.visible).toBe(true)
 						expect(point.hit).toBe(true)
 						expect(point.withinHeader).toBe(true)
-						await page.mouse.click(point.x, point.y)
+						expect(point.ownsNewArea).toBe(true)
+						await page.mouse.move(point.x, point.y)
+						await page.mouse.down()
+
+						try {
+							expect(
+								await control.evaluate(async (element, point) => {
+									if (element instanceof HTMLLabelElement) {
+										await Promise.all(
+											element.control
+												?.getAnimations({ subtree: true })
+												.filter(
+													animation =>
+														animation.timeline instanceof DocumentTimeline &&
+														animation.effect?.getComputedTiming().iterations !== Infinity,
+												)
+												.map(animation => animation.finished.catch(() => {})) ?? [],
+										)
+									}
+
+									const target = document.elementFromPoint(point.x, point.y)
+
+									return element instanceof HTMLLabelElement
+										? target === element && element.control?.matches(':active') === true
+										: !!target &&
+												(element.contains(target) ||
+													(target instanceof HTMLLabelElement && target.control === element)) &&
+												element.matches(':active')
+								}, point),
+							).toBe(true)
+						} finally {
+							await page.mouse.up()
+						}
 					}
 
 					for (const left of [0, 350, 900]) {
@@ -125,9 +168,9 @@ for (const javaScriptEnabled of [true, false]) {
 
 						await expect(header).not.toHaveAttribute('aria-sort', previousSort ?? '')
 						await expect(header).toHaveAttribute('data-expanded', '')
-						await click(header.getByRole('button', { name: 'Collapse', exact: true }))
+						await click(header.locator('.expansion-hit-area'), 0.1)
 						await expect(header).not.toHaveAttribute('data-expanded')
-						await click(header.getByRole('button', { name: 'Expand', exact: true }))
+						await click(header.locator('.expansion-hit-area'), 0.9)
 						await expect(header).toHaveAttribute('data-expanded', '')
 					}
 
