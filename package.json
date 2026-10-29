@@ -106,7 +106,7 @@
 		"globals": "^17.11.0",
 		"harper.js": "^2.7.0",
 		"lightningcss": "^1.33.0",
-		"omnipin": "^3.1.3",
+		"omnipin": "^4.0.1",
 		"ox": "^0.12.4",
 		"p-limit": "^7.3.2",
 		"pnpm": "11.19.0",
