@@ -1,0 +1,41 @@
+---
+import { imageMetadata } from 'astro/assets/utils'
+import wideIconSource from './wide-wallet.svg?raw'
+import wideIconUrl from './wide-wallet.svg?url'
+import { getWalletIcon } from '@/utils/wallet-og-image'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { allWallets } from '@/data/wallets'
+import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { defaultNavigationItems } from '@/constants/navigation'
+import WalletFixture from './WalletFixture.svelte'
+import { isWalletFixture, walletFixtures } from './wallet-fixtures'
+
+export const getStaticPaths = () =>
+	Object.keys(walletFixtures).map(fixture => ({
+		params: { fixture },
+	}))
+
+const { fixture } = Astro.params
+
+if (!fixture || !isWalletFixture(fixture)) {
+	throw new Error('Unknown WalletPage fixture')
+}
+
+const wallet = walletFixtures[fixture]()
+const walletIcon =
+	fixture === 'nonSquare'
+		? { src: wideIconUrl, ...(await imageMetadata(Buffer.from(wideIconSource), wideIconUrl)) }
+		: await getWalletIcon(wallet.metadata)
+const rawEntry = Object.entries(allWallets).find(
+	([, candidate]) => candidate.metadata.id === wallet.metadata.id,
+)
+const codeSnippets = rawEntry ? codeSnippetsForWallet(rawEntry[0], rawEntry[1]) : {}
+---
+
+<Layout metadata={{ title: `WalletPage fixture: ${fixture}` }} preloadComplexIcons>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<main data-column-item='flexible'>
+		<WalletFixture {walletIcon} name={fixture} {codeSnippets} client:idle />
+	</main>
+</Layout>

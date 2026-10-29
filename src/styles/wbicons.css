@@ -571,3 +571,1226 @@
 		--icon-content: '🧪';
 	}
 }
+[data-icon~='about'],
+[data-icon-metrics='about'] {
+	---icon-ink-minX-complex: 0.152;
+	---icon-ink-maxX-complex: 0.848;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='account_abstraction'],
+[data-icon-metrics='account_abstraction'] {
+	---icon-ink-minX-complex: 0.001;
+	---icon-ink-maxX-complex: 0.999;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='account_portability'],
+[data-icon-metrics='account_portability'] {
+	---icon-ink-minX-complex: 0.007;
+	---icon-ink-maxX-complex: 0.993;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='account_recovery'],
+[data-icon-metrics='account_recovery'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.758;
+	---icon-ink-top-complex: 0.121;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='account_type'],
+[data-icon-metrics='account_type'] {
+	---icon-ink-minX-complex: 0.32;
+	---icon-ink-maxX-complex: 0.68;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='account_unruggability'],
+[data-icon-metrics='account_unruggability'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.637;
+	---icon-ink-top-complex: 0.182;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='address_resolution'],
+[data-icon-metrics='address_resolution'] {
+	---icon-ink-minX-complex: 0.08994140625;
+	---icon-ink-maxX-complex: 0.9101666667;
+	---icon-ink-height-complex: 1.000272727;
+	---icon-ink-top-complex: -0.0002727272727;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='app_isolation'],
+[data-icon-metrics='app_isolation'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.958;
+	---icon-ink-top-complex: 0.021;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='browser_integration'],
+[data-icon-metrics='browser_integration'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.941;
+	---icon-ink-top-complex: 0.029;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='bug'],
+[data-icon-metrics='bug'] {
+	---icon-ink-minX-complex: -0.0003333333333;
+	---icon-ink-maxX-complex: 1.000255319;
+	---icon-ink-height-complex: 0.7353333333;
+	---icon-ink-top-complex: 0.1326666667;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='by_rating'],
+[data-icon-metrics='by_rating'] {
+	---icon-ink-minX-complex: 0.002;
+	---icon-ink-maxX-complex: 0.998;
+	---icon-ink-height-complex: 0.999;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='by_wallet'],
+[data-icon-metrics='by_wallet'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.89;
+	---icon-ink-top-complex: 0.055;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='chain_abstraction'],
+[data-icon-metrics='chain_abstraction'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.658;
+	---icon-ink-top-complex: 0.171;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='chain_verification'],
+[data-icon-metrics='chain_verification'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.832;
+	---icon-ink-top-complex: 0.084;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='checklist'],
+[data-icon-metrics='checklist'] {
+	---icon-ink-minX-complex: 0.135;
+	---icon-ink-maxX-complex: 0.8653809524;
+	---icon-ink-height-complex: 1.000045455;
+	---icon-ink-top-complex: -0.00004545454545;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='code_repository'],
+[data-icon-metrics='code_repository'] {
+	---icon-ink-minX-complex: 0.095;
+	---icon-ink-maxX-complex: 0.905;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='contribute'],
+[data-icon-metrics='contribute'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 0.9999302326;
+	---icon-ink-height-complex: 0.9178365316;
+	---icon-ink-top-complex: 0.04092537313;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='dark_light_mode'],
+[data-icon-metrics='dark_light_mode'] {
+	---icon-ink-minX-complex: 0.077;
+	---icon-ink-maxX-complex: 0.923;
+	---icon-ink-height-complex: 1.000375;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='discuss'],
+[data-icon-metrics='discuss'] {
+	---icon-ink-minX-complex: 0.169;
+	---icon-ink-maxX-complex: 0.83004;
+	---icon-ink-height-complex: 0.9999230769;
+	---icon-ink-top-complex: 0.00007692307692;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='donation'],
+[data-icon-metrics='donation'] {
+	---icon-ink-minX-complex: 0.151;
+	---icon-ink-maxX-complex: 0.8495;
+	---icon-ink-height-complex: 1.00016;
+	---icon-ink-top-complex: -0.00016;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='duress_resistance'],
+[data-icon-metrics='duress_resistance'] {
+	---icon-ink-minX-complex: 0.001;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.992;
+	---icon-ink-top-complex: 0.004;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='ecosystem'],
+[data-icon-metrics='ecosystem'] {
+	---icon-ink-minX-complex: 0.017;
+	---icon-ink-maxX-complex: 0.984;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='eip_trackers'],
+[data-icon-metrics='eip_trackers'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.984;
+	---icon-ink-top-complex: 0.008;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='faq'],
+[data-icon-metrics='faq'] {
+	---icon-ink-minX-complex: 0.0428125;
+	---icon-ink-maxX-complex: 0.9578846154;
+	---icon-ink-height-complex: 0.9943684211;
+	---icon-ink-top-complex: -0.0003684210526;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='fee_transparency'],
+[data-icon-metrics='fee_transparency'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 0.999;
+	---icon-ink-height-complex: 0.974;
+	---icon-ink-top-complex: 0.013;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='free_and_open_source_license'],
+[data-icon-metrics='free_and_open_source_license'] {
+	---icon-ink-minX-complex: 0.129;
+	---icon-ink-maxX-complex: 0.871;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='funding_transparency'],
+[data-icon-metrics='funding_transparency'] {
+	---icon-ink-minX-complex: 0.1;
+	---icon-ink-maxX-complex: 0.899;
+	---icon-ink-height-complex: 0.998;
+	---icon-ink-top-complex: 0.001;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='graduate'],
+[data-icon-metrics='graduate'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.8672462185;
+	---icon-ink-top-complex: 0.06638235294;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='hardware_wallet_interoperability'],
+[data-icon-metrics='hardware_wallet_interoperability'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.926;
+	---icon-ink-top-complex: 0.037;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='hardware_wallet_support'],
+[data-icon-metrics='hardware_wallet_support'] {
+	---icon-ink-minX-complex: 0.006;
+	---icon-ink-maxX-complex: 0.994;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='l1_provider_independence'],
+[data-icon-metrics='l1_provider_independence'] {
+	---icon-ink-minX-complex: 0.0001428571429;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.6041428571;
+	---icon-ink-top-complex: 0.19775;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='multi_address_privacy'],
+[data-icon-metrics='multi_address_privacy'] {
+	---icon-ink-minX-complex: 0.114;
+	---icon-ink-maxX-complex: 0.886;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='newsletter'],
+[data-icon-metrics='newsletter'] {
+	---icon-ink-minX-complex: -0.00007692307692;
+	---icon-ink-maxX-complex: 0.9999473684;
+	---icon-ink-height-complex: 0.7325294118;
+	---icon-ink-top-complex: 0.134;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='orderflow_transparency'],
+[data-icon-metrics='orderflow_transparency'] {
+	---icon-ink-minX-complex: 0.001;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 1.000628205;
+	---icon-ink-top-complex: -0.0001666666667;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='passkey_verification'],
+[data-icon-metrics='passkey_verification'] {
+	---icon-ink-minX-complex: 0.047;
+	---icon-ink-maxX-complex: 0.953;
+	---icon-ink-height-complex: 0.999;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='permissions_management'],
+[data-icon-metrics='permissions_management'] {
+	---icon-ink-minX-complex: 0.03;
+	---icon-ink-maxX-complex: 0.97;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='poo'],
+[data-icon-metrics='poo'] {
+	---icon-ink-minX-complex: -0.0002222222222;
+	---icon-ink-maxX-complex: 1.00080531;
+	---icon-ink-height-complex: 0.9464;
+	---icon-ink-top-complex: 0.0266;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='privacy'],
+[data-icon-metrics='privacy'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.8885921569;
+	---icon-ink-top-complex: 0.05546666667;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='privacy_hygiene'],
+[data-icon-metrics='privacy_hygiene'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.986;
+	---icon-ink-top-complex: 0.007;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='private_token_transfers'],
+[data-icon-metrics='private_token_transfers'] {
+	---icon-ink-minX-complex: 0.037;
+	---icon-ink-maxX-complex: 0.963;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='question_mark'],
+[data-icon-metrics='question_mark'] {
+	---icon-ink-minX-complex: 0.196;
+	---icon-ink-maxX-complex: 0.804;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='release_process_transparency'],
+[data-icon-metrics='release_process_transparency'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.904;
+	---icon-ink-top-complex: 0.048;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='repository'],
+[data-icon-metrics='repository'] {
+	---icon-ink-minX-complex: 0.1727471264;
+	---icon-ink-maxX-complex: 0.82725;
+	---icon-ink-height-complex: 1.000687407;
+	---icon-ink-top-complex: -0.00028;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='scam_prevention'],
+[data-icon-metrics='scam_prevention'] {
+	---icon-ink-minX-complex: 0.028;
+	---icon-ink-maxX-complex: 0.972;
+	---icon-ink-height-complex: 0.998;
+	---icon-ink-top-complex: 0.001;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='security'],
+[data-icon-metrics='security'] {
+	---icon-ink-minX-complex: 0.209;
+	---icon-ink-maxX-complex: 0.791;
+	---icon-ink-height-complex: 0.999;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='security_audits'],
+[data-icon-metrics='security_audits'] {
+	---icon-ink-minX-complex: 0.118;
+	---icon-ink-maxX-complex: 0.882;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='security_best_practices'],
+[data-icon-metrics='security_best_practices'] {
+	---icon-ink-minX-complex: 0.236;
+	---icon-ink-maxX-complex: 0.764;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='self_sovereignty'],
+[data-icon-metrics='self_sovereignty'] {
+	---icon-ink-minX-complex: 0.1385428571;
+	---icon-ink-maxX-complex: 0.861;
+	---icon-ink-height-complex: 1.000204301;
+	---icon-ink-top-complex: -0.0002043010753;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='sharpener'],
+[data-icon-metrics='sharpener'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.8916923077;
+	---icon-ink-top-complex: 0.05423076923;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='stage_0'],
+[data-icon-metrics='stage_0'] {
+	---icon-ink-minX-complex: 0.1387777778;
+	---icon-ink-maxX-complex: 0.8613636364;
+	---icon-ink-height-complex: 1.000553571;
+	---icon-ink-top-complex: -0.0004285714286;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='stage_0_5'],
+[data-icon-metrics='stage_0_5'] {
+	---icon-ink-minX-complex: 0.2236;
+	---icon-ink-maxX-complex: 0.7763333333;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='stage_1'],
+[data-icon-metrics='stage_1'] {
+	---icon-ink-minX-complex: 0.25;
+	---icon-ink-maxX-complex: 0.7503333333;
+	---icon-ink-height-complex: 1.000272727;
+	---icon-ink-top-complex: -0.0002727272727;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='stage_2'],
+[data-icon-metrics='stage_2'] {
+	---icon-ink-minX-complex: -0.0002307692308;
+	---icon-ink-maxX-complex: 1.000142857;
+	---icon-ink-height-complex: 0.865;
+	---icon-ink-top-complex: 0.068;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='stage_none'],
+[data-icon-metrics='stage_none'] {
+	---icon-ink-minX-complex: 0.1423421053;
+	---icon-ink-maxX-complex: 0.8582857143;
+	---icon-ink-height-complex: 0.9991904762;
+	---icon-ink-top-complex: -0.0001904761905;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='stages'],
+[data-icon-metrics='stages'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.958;
+	---icon-ink-top-complex: 0.021;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='transaction_batching'],
+[data-icon-metrics='transaction_batching'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.8;
+	---icon-ink-top-complex: 0.1;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='transaction_inclusion'],
+[data-icon-metrics='transaction_inclusion'] {
+	---icon-ink-minX-complex: 0.01;
+	---icon-ink-maxX-complex: 0.99;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='transaction_legibility'],
+[data-icon-metrics='transaction_legibility'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.677;
+	---icon-ink-top-complex: 0.161;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='transparency'],
+[data-icon-metrics='transparency'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.786;
+	---icon-ink-top-complex: 0.107;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='user_privacy'],
+[data-icon-metrics='user_privacy'] {
+	---icon-ink-minX-complex: 0.158;
+	---icon-ink-maxX-complex: 0.843;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_address_privacy'],
+[data-icon-metrics='wallet_address_privacy'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 0.999;
+	---icon-ink-height-complex: 0.968;
+	---icon-ink-top-complex: 0.016;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='wallet_browser'],
+[data-icon-metrics='wallet_browser'] {
+	---icon-ink-minX-complex: 0.005;
+	---icon-ink-maxX-complex: 0.9948461538;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_desktop'],
+[data-icon-metrics='wallet_desktop'] {
+	---icon-ink-minX-complex: 0.147;
+	---icon-ink-maxX-complex: 0.853;
+	---icon-ink-height-complex: 1.000636364;
+	---icon-ink-top-complex: -0.0006363636364;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_embedded'],
+[data-icon-metrics='wallet_embedded'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.721375;
+	---icon-ink-top-complex: 0.13925;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_hardware'],
+[data-icon-metrics='wallet_hardware'] {
+	---icon-ink-minX-complex: 0;
+	---icon-ink-maxX-complex: 1;
+	---icon-ink-height-complex: 0.9136;
+	---icon-ink-top-complex: 0.0434;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_mobile'],
+[data-icon-metrics='wallet_mobile'] {
+	---icon-ink-minX-complex: 0.283;
+	---icon-ink-maxX-complex: 0.717;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='wallet_software'],
+[data-icon-metrics='wallet_software'] {
+	---icon-ink-minX-complex: 0.114;
+	---icon-ink-maxX-complex: 0.886;
+	---icon-ink-height-complex: 0.991125;
+	---icon-ink-top-complex: -0.000125;
+	---icon-ink-advance-complex: 0.999;
+}
+
+[data-icon~='wallet_test'],
+[data-icon-metrics='wallet_test'] {
+	---icon-ink-minX-complex: 0.1788181818;
+	---icon-ink-maxX-complex: 0.8212666667;
+	---icon-ink-height-complex: 1.000538462;
+	---icon-ink-top-complex: -0.0005384615385;
+	---icon-ink-advance-complex: 1;
+}
+
+[data-icon~='about'],
+[data-icon-metrics='about'] {
+	---icon-ink-minX-simple: -0.0005555555556;
+	---icon-ink-maxX-simple: 1.00052;
+	---icon-ink-height-simple: 0.784;
+	---icon-ink-top-simple: 0.108;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='account_abstraction'],
+[data-icon-metrics='account_abstraction'] {
+	---icon-ink-minX-simple: 0.001;
+	---icon-ink-maxX-simple: 1.000125;
+	---icon-ink-height-simple: 0.878;
+	---icon-ink-top-simple: 0.061;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='account_portability'],
+[data-icon-metrics='account_portability'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.888;
+	---icon-ink-top-simple: 0.056;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='account_recovery'],
+[data-icon-metrics='account_recovery'] {
+	---icon-ink-minX-simple: -0.00008888888889;
+	---icon-ink-maxX-simple: 1.000505882;
+	---icon-ink-height-simple: 0.9900738095;
+	---icon-ink-top-simple: 0.00495;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='account_type'],
+[data-icon-metrics='account_type'] {
+	---icon-ink-minX-simple: 0.2744545455;
+	---icon-ink-maxX-simple: 0.7260392157;
+	---icon-ink-height-simple: 1.000382979;
+	---icon-ink-top-simple: -0.0003829787234;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='account_unruggability'],
+[data-icon-metrics='account_unruggability'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.712125;
+	---icon-ink-top-simple: 0.144;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='address_resolution'],
+[data-icon-metrics='address_resolution'] {
+	---icon-ink-minX-simple: 0.007650793651;
+	---icon-ink-maxX-simple: 0.99196;
+	---icon-ink-height-simple: 1.000539889;
+	---icon-ink-top-simple: -0.00009090909091;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='app_isolation'],
+[data-icon-metrics='app_isolation'] {
+	---icon-ink-minX-simple: -0.00002380952381;
+	---icon-ink-maxX-simple: 1.000010753;
+	---icon-ink-height-simple: 0.9670102564;
+	---icon-ink-top-simple: 0.01658974359;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='browser_integration'],
+[data-icon-metrics='browser_integration'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='bug'],
+[data-icon-metrics='bug'] {
+	---icon-ink-minX-simple: -0.0003333333333;
+	---icon-ink-maxX-simple: 1.000255319;
+	---icon-ink-height-simple: 0.7353333333;
+	---icon-ink-top-simple: 0.1326666667;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='by_rating'],
+[data-icon-metrics='by_rating'] {
+	---icon-ink-minX-simple: 0.002;
+	---icon-ink-maxX-simple: 0.998;
+	---icon-ink-height-simple: 0.999;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='by_wallet'],
+[data-icon-metrics='by_wallet'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.89;
+	---icon-ink-top-simple: 0.055;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='chain_abstraction'],
+[data-icon-metrics='chain_abstraction'] {
+	---icon-ink-minX-simple: -0.00025;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.7673298246;
+	---icon-ink-top-simple: 0.1160701754;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='chain_verification'],
+[data-icon-metrics='chain_verification'] {
+	---icon-ink-minX-simple: -0.0003846153846;
+	---icon-ink-maxX-simple: 1.000315789;
+	---icon-ink-height-simple: 0.8326665541;
+	---icon-ink-top-simple: 0.0833875;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='checklist'],
+[data-icon-metrics='checklist'] {
+	---icon-ink-minX-simple: 0.135;
+	---icon-ink-maxX-simple: 0.8653809524;
+	---icon-ink-height-simple: 1.000045455;
+	---icon-ink-top-simple: -0.00004545454545;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='code_repository'],
+[data-icon-metrics='code_repository'] {
+	---icon-ink-minX-simple: 0.07158823529;
+	---icon-ink-maxX-simple: 0.9278125;
+	---icon-ink-height-simple: 1.00005;
+	---icon-ink-top-simple: -0.00005;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='contribute'],
+[data-icon-metrics='contribute'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 0.9999302326;
+	---icon-ink-height-simple: 0.9178365316;
+	---icon-ink-top-simple: 0.04092537313;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='dark_light_mode'],
+[data-icon-metrics='dark_light_mode'] {
+	---icon-ink-minX-simple: 0.0634025974;
+	---icon-ink-maxX-simple: 0.938;
+	---icon-ink-height-simple: 1.002;
+	---icon-ink-top-simple: -0.001;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='discuss'],
+[data-icon-metrics='discuss'] {
+	---icon-ink-minX-simple: 0.169;
+	---icon-ink-maxX-simple: 0.83004;
+	---icon-ink-height-simple: 0.9999230769;
+	---icon-ink-top-simple: 0.00007692307692;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='donation'],
+[data-icon-metrics='donation'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.7320816327;
+	---icon-ink-top-simple: 0.1339183673;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='duress_resistance'],
+[data-icon-metrics='duress_resistance'] {
+	---icon-ink-minX-simple: 0.002;
+	---icon-ink-maxX-simple: 1.000037037;
+	---icon-ink-height-simple: 0.9814641711;
+	---icon-ink-top-simple: 0.009418181818;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='ecosystem'],
+[data-icon-metrics='ecosystem'] {
+	---icon-ink-minX-simple: 0.01536363636;
+	---icon-ink-maxX-simple: 0.985;
+	---icon-ink-height-simple: 1.0002;
+	---icon-ink-top-simple: -0.0002;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='eip_trackers'],
+[data-icon-metrics='eip_trackers'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.984;
+	---icon-ink-top-simple: 0.008;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='faq'],
+[data-icon-metrics='faq'] {
+	---icon-ink-minX-simple: 0.0428125;
+	---icon-ink-maxX-simple: 0.9578846154;
+	---icon-ink-height-simple: 0.9943684211;
+	---icon-ink-top-simple: -0.0003684210526;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='fee_transparency'],
+[data-icon-metrics='fee_transparency'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000260417;
+	---icon-ink-height-simple: 0.9758780488;
+	---icon-ink-top-simple: 0.00712195122;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='free_and_open_source_license'],
+[data-icon-metrics='free_and_open_source_license'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000166667;
+	---icon-ink-height-simple: 0.908;
+	---icon-ink-top-simple: 0.046;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='funding_transparency'],
+[data-icon-metrics='funding_transparency'] {
+	---icon-ink-minX-simple: 0.1187692308;
+	---icon-ink-maxX-simple: 0.88064;
+	---icon-ink-height-simple: 1.00052381;
+	---icon-ink-top-simple: -0.0005238095238;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='graduate'],
+[data-icon-metrics='graduate'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000529412;
+	---icon-ink-height-simple: 0.8641428571;
+	---icon-ink-top-simple: 0.06785714286;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='hardware_wallet_interoperability'],
+[data-icon-metrics='hardware_wallet_interoperability'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.8585106383;
+	---icon-ink-top-simple: 0.0704893617;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='hardware_wallet_support'],
+[data-icon-metrics='hardware_wallet_support'] {
+	---icon-ink-minX-simple: 0.005;
+	---icon-ink-maxX-simple: 0.9963846154;
+	---icon-ink-height-simple: 0.9997394444;
+	---icon-ink-top-simple: -0.00004166666667;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='l1_provider_independence'],
+[data-icon-metrics='l1_provider_independence'] {
+	---icon-ink-minX-simple: 0.001;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.685875;
+	---icon-ink-top-simple: 0.157125;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='multi_address_privacy'],
+[data-icon-metrics='multi_address_privacy'] {
+	---icon-ink-minX-simple: 0.123;
+	---icon-ink-maxX-simple: 0.877;
+	---icon-ink-height-simple: 0.9981;
+	---icon-ink-top-simple: -0.0001;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='newsletter'],
+[data-icon-metrics='newsletter'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.848;
+	---icon-ink-top-simple: 0.076;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='orderflow_transparency'],
+[data-icon-metrics='orderflow_transparency'] {
+	---icon-ink-minX-simple: 0.0005;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.8917966102;
+	---icon-ink-top-simple: 0.05420338983;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='passkey_verification'],
+[data-icon-metrics='passkey_verification'] {
+	---icon-ink-minX-simple: 0.187;
+	---icon-ink-maxX-simple: 0.813;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='permissions_management'],
+[data-icon-metrics='permissions_management'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.9116153846;
+	---icon-ink-top-simple: 0.04438461538;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='poo'],
+[data-icon-metrics='poo'] {
+	---icon-ink-minX-simple: -0.0002222222222;
+	---icon-ink-maxX-simple: 1.00080531;
+	---icon-ink-height-simple: 0.9464;
+	---icon-ink-top-simple: 0.0266;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='privacy'],
+[data-icon-metrics='privacy'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.6739189189;
+	---icon-ink-top-simple: 0.163;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='privacy_hygiene'],
+[data-icon-metrics='privacy_hygiene'] {
+	---icon-ink-minX-simple: -0.0001176470588;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.8984375;
+	---icon-ink-top-simple: 0.051;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='private_token_transfers'],
+[data-icon-metrics='private_token_transfers'] {
+	---icon-ink-minX-simple: 0.1066734694;
+	---icon-ink-maxX-simple: 0.8931954023;
+	---icon-ink-height-simple: 1.00078022;
+	---icon-ink-top-simple: -0.0007802197802;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='question_mark'],
+[data-icon-metrics='question_mark'] {
+	---icon-ink-minX-simple: 0.185;
+	---icon-ink-maxX-simple: 0.815641791;
+	---icon-ink-height-simple: 1.000033333;
+	---icon-ink-top-simple: -0.00003333333333;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='release_process_transparency'],
+[data-icon-metrics='release_process_transparency'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.969;
+	---icon-ink-top-simple: 0.016;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='repository'],
+[data-icon-metrics='repository'] {
+	---icon-ink-minX-simple: 0.1358095238;
+	---icon-ink-maxX-simple: 0.8644444444;
+	---icon-ink-height-simple: 1.00035023;
+	---icon-ink-top-simple: -0.00006451612903;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='scam_prevention'],
+[data-icon-metrics='scam_prevention'] {
+	---icon-ink-minX-simple: 0.02347265625;
+	---icon-ink-maxX-simple: 0.976725;
+	---icon-ink-height-simple: 0.994;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='security'],
+[data-icon-metrics='security'] {
+	---icon-ink-minX-simple: 0.133;
+	---icon-ink-maxX-simple: 0.867;
+	---icon-ink-height-simple: 1.000352941;
+	---icon-ink-top-simple: -0.0003529411765;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='security_audits'],
+[data-icon-metrics='security_audits'] {
+	---icon-ink-minX-simple: 0.129;
+	---icon-ink-maxX-simple: 0.871;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='security_best_practices'],
+[data-icon-metrics='security_best_practices'] {
+	---icon-ink-minX-simple: 0.037;
+	---icon-ink-maxX-simple: 0.9626129032;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='self_sovereignty'],
+[data-icon-metrics='self_sovereignty'] {
+	---icon-ink-minX-simple: 0.01025;
+	---icon-ink-maxX-simple: 0.9894516129;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='sharpener'],
+[data-icon-metrics='sharpener'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.8959411765;
+	---icon-ink-top-simple: 0.05205882353;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='stage_0'],
+[data-icon-metrics='stage_0'] {
+	---icon-ink-minX-simple: 0.141;
+	---icon-ink-maxX-simple: 0.859;
+	---icon-ink-height-simple: 1.000764706;
+	---icon-ink-top-simple: -0.0007647058824;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='stage_0_5'],
+[data-icon-metrics='stage_0_5'] {
+	---icon-ink-minX-simple: 0.216;
+	---icon-ink-maxX-simple: 0.784;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='stage_1'],
+[data-icon-metrics='stage_1'] {
+	---icon-ink-minX-simple: 0.253;
+	---icon-ink-maxX-simple: 0.747;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='stage_2'],
+[data-icon-metrics='stage_2'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.922;
+	---icon-ink-top-simple: 0.039;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='stage_none'],
+[data-icon-metrics='stage_none'] {
+	---icon-ink-minX-simple: 0.1457096774;
+	---icon-ink-maxX-simple: 0.8540357143;
+	---icon-ink-height-simple: 1.000230769;
+	---icon-ink-top-simple: -0.0002307692308;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='stages'],
+[data-icon-metrics='stages'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.958;
+	---icon-ink-top-simple: 0.021;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='transaction_batching'],
+[data-icon-metrics='transaction_batching'] {
+	---icon-ink-minX-simple: 0.006;
+	---icon-ink-maxX-simple: 1.000451613;
+	---icon-ink-height-simple: 0.6634513806;
+	---icon-ink-top-simple: 0.1684897959;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='transaction_inclusion'],
+[data-icon-metrics='transaction_inclusion'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.806;
+	---icon-ink-top-simple: 0.097;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='transaction_legibility'],
+[data-icon-metrics='transaction_legibility'] {
+	---icon-ink-minX-simple: -0.0004444444444;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.6944444444;
+	---icon-ink-top-simple: 0.1525555556;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='transparency'],
+[data-icon-metrics='transparency'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.7594444444;
+	---icon-ink-top-simple: 0.12;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='user_privacy'],
+[data-icon-metrics='user_privacy'] {
+	---icon-ink-minX-simple: 0.077;
+	---icon-ink-maxX-simple: 0.9227894737;
+	---icon-ink-height-simple: 0.9997;
+	---icon-ink-top-simple: -0.0002;
+	---icon-ink-advance-simple: 0.999;
+}
+
+[data-icon~='wallet_address_privacy'],
+[data-icon-metrics='wallet_address_privacy'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000263158;
+	---icon-ink-height-simple: 0.9006098758;
+	---icon-ink-top-simple: 0.04994871795;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_browser'],
+[data-icon-metrics='wallet_browser'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000510638;
+	---icon-ink-height-simple: 0.9975098039;
+	---icon-ink-top-simple: 0.001490196078;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_desktop'],
+[data-icon-metrics='wallet_desktop'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1;
+	---icon-ink-height-simple: 0.882;
+	---icon-ink-top-simple: 0.059;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_embedded'],
+[data-icon-metrics='wallet_embedded'] {
+	---icon-ink-minX-simple: -0.0001176470588;
+	---icon-ink-maxX-simple: 0.9995263158;
+	---icon-ink-height-simple: 0.9899611111;
+	---icon-ink-top-simple: 0.005138888889;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_hardware'],
+[data-icon-metrics='wallet_hardware'] {
+	---icon-ink-minX-simple: 0.286;
+	---icon-ink-maxX-simple: 0.7141;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_mobile'],
+[data-icon-metrics='wallet_mobile'] {
+	---icon-ink-minX-simple: 0.221;
+	---icon-ink-maxX-simple: 0.779;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_software'],
+[data-icon-metrics='wallet_software'] {
+	---icon-ink-minX-simple: 0;
+	---icon-ink-maxX-simple: 1.000055556;
+	---icon-ink-height-simple: 0.752;
+	---icon-ink-top-simple: 0.124;
+	---icon-ink-advance-simple: 1;
+}
+
+[data-icon~='wallet_test'],
+[data-icon-metrics='wallet_test'] {
+	---icon-ink-minX-simple: 0.1731234568;
+	---icon-ink-maxX-simple: 0.8265818182;
+	---icon-ink-height-simple: 1;
+	---icon-ink-top-simple: 0;
+	---icon-ink-advance-simple: 0.999;
+}
