@@ -90,6 +90,7 @@ function eip7702Rows(wallets: Array<RatedWallet<string>>): Eip7702Row[] {
 		return {
 			id: wallet.metadata.id,
 			displayName: wallet.metadata.displayName,
+			iconExtension: wallet.metadata.iconExtension,
 			url: getWalletUrl(wallet),
 			type: getWalletTypeFor7702(wallet),
 			contract:
