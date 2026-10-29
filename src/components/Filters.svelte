@@ -66,7 +66,7 @@
 
 	const visibleChoices = (set: FilterSet<Item>) => set.alwaysShowChoices
 		? set.choices
-		: set.choices.filter(choice => !choice.matches || filtered(new Set([choice])).length > 0)
+		: set.choices.filter(choice => activeChoices.has(choice) || !choice.matches || filtered(new Set([choice])).length > 0)
 
 	const choiceCount = (set: FilterSet<Item>, choice: FilterChoice<Item>) => {
 		const setChoices = new Set(set.choices)
@@ -96,7 +96,7 @@
 		{@const choices = visibleChoices(set)}
 		{@const activeInSet = choices.filter(choice => activeChoices.has(choice) && choice.id !== '')}
 
-		{#if choices.filter(choice => choice.id).length > 1}
+		{#if activeInSet.length > 0 || choices.filter(choice => choice.id).length > 1}
 			{@const closedAnchor = closedAnchorPrefix ? `${closedAnchorPrefix}-${set.id}` : undefined}
 			<fieldset
 				data-filter-set={set.id}
