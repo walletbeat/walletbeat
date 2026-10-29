@@ -2462,7 +2462,7 @@
 						clip-path: circle(calc(var(---pie-size) / 2));
 						block-size: var(---pie-size);
 						---pie-backdropAnimation: breadcrumb-backdrop auto var(--transition-easeInOutExpo) both;
-						z-index: 1;
+						z-index: 2;
 						pointer-events: none;
 					}
 					.pie-navigation-geometry {
