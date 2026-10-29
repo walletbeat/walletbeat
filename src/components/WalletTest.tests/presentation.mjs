@@ -1,21 +1,205 @@
 import assert from 'node:assert/strict'
 
+/**
+ * Action identities and unavailable states for the controlled provider fixture.
+ * @type {Record<string, Array<[string, string]>>}
+ */
+const expectedCases = {
+	Transactions: [
+		['ERC20 Approve', 'Send Transaction (Testing Only)'],
+		['ERC20 Transfer', 'Send Transaction (Testing Only)'],
+		['Aave Supply', 'Send Transaction (Testing Only)'],
+		['EIP-7702 Multi-Call', 'Send Transaction (Testing Only)'],
+		['Custom Transaction', 'Send Transaction (Testing Only)'],
+	],
+	Signatures: [
+		['Simple Test Message', 'Sign Message'],
+		['SIWE (Sign-In With Ethereum)', 'Sign Message'],
+		['EIP-712 Test Signature', 'Sign Typed Data'],
+	],
+	'EIP Support': [
+		['1. Wallet Detection', 'Run Step'],
+		['2. Connect Wallet', 'Run Step'],
+		['3. Check Account', 'Run Step'],
+		['4. Check Network', 'Run Step'],
+		['5. Send Batch Calls', 'Run Step'],
+		['6. Check Batch Status', 'Run Step'],
+	],
+	'App-isolation': [
+		['eth_accounts', 'Call eth_accounts'],
+		['wallet_connect', 'Call wallet_connect'],
+	],
+	'Tx Simulations': [
+		['ERC-20 Mint', 'Send Transaction (Testing Only)'],
+		['ERC-721 Mint', 'Send Transaction (Testing Only)'],
+		['ERC-1155 Mint', 'Send Transaction (Testing Only)'],
+		['ERC-20 Transfer', 'Send Transaction (Testing Only)'],
+		['ERC-721 Transfer', 'Send Transaction (Testing Only)'],
+		['ERC-1155 Transfer', 'Send Transaction (Testing Only)'],
+		['All Token Transfer', 'Send Transaction (Testing Only)'],
+		['Misleading Selector', 'Send Transaction (Testing Only)'],
+		['Fake Airdrop', 'Send Transaction (Testing Only)'],
+		['Volatile Outcome', 'Send Transaction (Testing Only)'],
+		['Failing Transaction', 'Send Transaction (Testing Only)'],
+	],
+	'Scam Alerts': [
+		['Recent Contract Warning', 'Send Transaction (Testing Only)'],
+		['Previous Contract Transaction', 'Send Transaction (Testing Only)'],
+		['Custom Address', 'Send 0.0001 ETH (Testing Only)'],
+		['Known scam address', 'Send 0.0001 ETH (Testing Only)'],
+		['USDC', 'Send Transaction (Testing Only)'],
+		['Gasless Approval: USDC Permit', 'Sign Message (Testing Only)'],
+	],
+	'ERC-8213': [
+		['Calldata digest', 'Compute digest'],
+		['EIP-712 digest', 'Compute EIP-712 digest'],
+	],
+}
+
+const expectedDispatch = {
+	ordinary: {
+		to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+		data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000000002710',
+	},
+	batch: {
+		calls: [
+			{
+				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+				data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000000002710',
+				value: '0x0',
+			},
+			{
+				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+				data: '0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000000000000002710',
+				value: '0x0',
+			},
+		],
+	},
+}
+
 /** Local providers keep presentation journeys independent of installed wallets and RPC services. */
 export function installProviders() {
 	const address = '0x0000000000000000000000000000000000000001'
+	let chainId = '0xa'
+	let deferSwitches = false
+	let completeSends = false
+	/** @type {Array<{method: string, params: unknown}>} */
+	const dispatches = []
+	/** @type {string[]} */
+	const requests = []
+	/** @type {Array<{resolve: (value: null) => void, reject: (reason: Error) => void}>} */
+	const pending = []
+	/** @type {Map<string, Set<(value: unknown) => void>>} */
+	const listeners = new Map()
+	/** @param {string} event @param {unknown} value */
+	const emit = (event, value) => {
+		for (const listener of listeners.get(event) ?? []) {
+			listener(value)
+		}
+	}
+	const publish = () => {
+		document.documentElement.dataset.providerRequests = requests.join('\n')
+		document.documentElement.dataset.switchCount = String(pending.length)
+		document.documentElement.dataset.dispatches = JSON.stringify(dispatches)
+	}
+
+	window.addEventListener('playground:switch-control', event => {
+		if (!(event instanceof CustomEvent)) {
+			throw new Error('Invalid fixture control event')
+		}
+
+		/** @type {unknown} */
+		const detail = event.detail
+
+		if (typeof detail !== 'object' || detail === null || !('command' in detail)) {
+			throw new Error('Missing fixture command')
+		}
+
+		if (detail.command === 'defer') {
+			deferSwitches = true
+
+			return
+		}
+
+		if (detail.command === 'complete-sends') {
+			completeSends = true
+
+			return
+		}
+
+		if (
+			detail.command !== 'settle' ||
+			!('index' in detail) ||
+			typeof detail.index !== 'number' ||
+			!('outcome' in detail) ||
+			!['success', 'reject'].includes(String(detail.outcome))
+		) {
+			throw new Error('Invalid fixture settlement')
+		}
+
+		const operation = pending[detail.index]
+
+		if (!operation) {
+			throw new Error('Unknown switch request')
+		}
+
+		if (detail.outcome === 'success') {
+			chainId = '0x1'
+			emit('chainChanged', chainId)
+			operation.resolve(null)
+		} else {
+			operation.reject(new Error('Controlled switch rejection'))
+		}
+	})
 	const provider = {
-		on() {},
-		removeListener() {},
-		/** @param {{ method: string }} payload */
-		request({ method }) {
+		/** @param {string} event @param {(value: unknown) => void} listener */
+		on(event, listener) {
+			if (!listeners.has(event)) {
+				listeners.set(event, new Set())
+			}
+
+			listeners.get(event).add(listener)
+		},
+		/** @param {string} event @param {(value: unknown) => void} listener */
+		removeListener(event, listener) {
+			listeners.get(event)?.delete(listener)
+		},
+		/** @param {{ method: string, params?: unknown }} payload */
+		request({ method, params }) {
+			requests.push(method)
+			publish()
+
 			switch (method) {
 				case 'eth_accounts':
 				case 'eth_requestAccounts':
 					return Promise.resolve([address])
 				case 'eth_chainId':
-					return Promise.resolve('0xa')
+					return Promise.resolve(chainId)
 				case 'wallet_connect':
 					return Promise.resolve({ accounts: [{ address }] })
+				case 'eth_sendTransaction':
+				case 'wallet_sendCalls':
+					dispatches.push({ method, params })
+					publish()
+
+					if (completeSends) {
+						return Promise.resolve(
+							method === 'wallet_sendCalls'
+								? { id: '0x' + 'ab'.repeat(32) }
+								: '0x' + 'ab'.repeat(32),
+						)
+					}
+
+					return Promise.reject(new Error(`Mock provider does not support ${method}`))
+				case 'wallet_switchEthereumChain':
+					if (deferSwitches) {
+						return new Promise((resolve, reject) => {
+							pending.push({ resolve, reject })
+							publish()
+						})
+					}
+
+					return Promise.reject(new Error(`Mock provider does not support ${method}`))
 				default:
 					return Promise.reject(new Error(`Mock provider does not support ${method}`))
 			}
@@ -63,10 +247,17 @@ async function checkModalLifecycle(
 	const scroll = page.locator('#layout')
 
 	await dialog.waitFor()
+	const invokerAtAdmission = await invoker.evaluate(el => ({
+		disabled: el.matches(':disabled'),
+		ariaDisabled: el.getAttribute('aria-disabled'),
+		connected: el.isConnected,
+		active: el === document.activeElement,
+	}))
+	const invokerElement = await invoker.elementHandle()
 	const element = await dialog.elementHandle()
 
-	if (!element) {
-		throw new Error('Open dialog has no element')
+	if (!element || !invokerElement) {
+		throw new Error('Open dialog or invoker has no element')
 	}
 
 	await element.evaluate(el => {
@@ -137,13 +328,41 @@ async function checkModalLifecycle(
 	await dialog.waitFor({ state: 'hidden' })
 	await page.waitForFunction(el => el.dataset.closeCount === '1', element)
 	assert.equal(await element.evaluate(el => el.dataset.closeCount), '1')
-	assert.ok(await invoker.evaluate(el => el === document.activeElement))
+	const restoredEventually = await page
+		.waitForFunction(el => el === document.activeElement, invokerElement, { timeout: 400 })
+		.then(
+			() => true,
+			() => false,
+		)
+
+	const focus = await invoker.evaluate(el => {
+		const parent = el.closest('dialog')
+
+		return {
+			exact: el === document.activeElement,
+			inParent: Boolean(parent?.matches(':modal') && parent.contains(document.activeElement)),
+			tag: document.activeElement?.tagName ?? null,
+			text: (document.activeElement?.textContent ?? '').slice(0, 160),
+		}
+	})
+
+	assert.ok(
+		focus.exact,
+		JSON.stringify({
+			focus,
+			restoredEventually,
+			invokerAtAdmission,
+			chronology: await page.locator('html').getAttribute('data-focus-chronology'),
+		}),
+	)
 	assert.equal(await page.locator('dialog:modal').count(), remaining)
 	assert.equal(
 		await scroll.evaluate(el => getComputedStyle(el).overflowY === 'hidden'),
 		remaining > 0,
 	)
 	assert.equal(await scroll.evaluate(el => el.scrollTop), position)
+
+	return focus
 }
 
 /** @param {import('@playwright/test').Page} page */
@@ -186,8 +405,12 @@ export async function checkPresentation(page, baseURL, outputDir) {
 			)
 			const labels = await categories.getByRole('button').allTextContents()
 
-			assert.equal(labels.length, 7)
+			assert.equal(
+				JSON.stringify(labels.map(label => label.trim())),
+				JSON.stringify(Object.keys(expectedCases)),
+			)
 			const panes = []
+			const actions = []
 
 			for (let categoryIndex = 0; categoryIndex < labels.length; categoryIndex++) {
 				const category = categories.getByRole('button').nth(categoryIndex)
@@ -200,20 +423,46 @@ export async function checkPresentation(page, baseURL, outputDir) {
 				}
 
 				const count = await cases.getByRole('button').count()
+				const categoryName = labels[categoryIndex].trim()
+
+				assert.equal(
+					JSON.stringify(await cases.locator('strong').allTextContents()),
+					JSON.stringify(expectedCases[categoryName].map(entry => entry[0])),
+				)
+
+				if (categoryName === 'EIP Support') {
+					assert.equal(
+						await page.getByRole('button', { name: 'Reset All Tests', exact: true }).count(),
+						0,
+					)
+
+					for (let future = 0; future < count; future++) {
+						assert.equal(await cases.getByRole('button').nth(future).isDisabled(), future > 0)
+					}
+				}
 
 				for (let index = 0; index < count; index++) {
 					const item = cases.getByRole('button').nth(index)
 
-					if (await item.isDisabled()) {
-						continue
-					}
+					assert.equal(await item.isDisabled(), false)
 
 					await item.click()
 					assert.equal(await item.getAttribute('aria-pressed'), 'true')
 					assert.equal(await cases.locator('[aria-pressed="true"]').count(), 1)
 					assert.ok(await page.locator('.main-content h3').count())
 					assert.equal(await cases.getByRole('heading').count(), 0)
-					panes.push((await item.textContent()).trim())
+					panes.push((await item.locator('strong').textContent()).trim())
+
+					if (
+						['Transactions', 'Signatures', 'Tx Simulations', 'Scam Alerts'].includes(categoryName)
+					) {
+						assert.equal(await page.locator('.main-content button[data-pressable]').count(), 1)
+						assert.equal(
+							await page.locator('.main-content button[data-pressable]').isDisabled(),
+							true,
+						)
+					}
+
 					const overflow = await page.locator('main').evaluate(main => ({
 						viewport: innerWidth,
 						scrollWidth: main.scrollWidth,
@@ -236,6 +485,11 @@ export async function checkPresentation(page, baseURL, outputDir) {
 						const resultPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
 
 						await page.getByRole('button', { name: 'Run Step', exact: true }).click()
+						actions.push({
+							category: categoryName,
+							case: (await item.locator('strong').textContent()).trim(),
+							label: 'Run Step',
+						})
 
 						if (index + 1 < count) {
 							await cases
@@ -248,9 +502,29 @@ export async function checkPresentation(page, baseURL, outputDir) {
 							await checkModalLifecycle(
 								page,
 								'Test Results',
-								page.locator('.main-content .actions button').first(),
+								page.locator(
+									'.main-content .actions button[data-pressable]:not([data-pressable~="secondary"])',
+								),
 								resultPosition,
 							)
+							await page.getByRole('button', { name: 'Reset All Tests', exact: true }).click()
+							assert.equal(
+								await cases.getByRole('button').first().getAttribute('aria-pressed'),
+								'true',
+							)
+
+							for (let future = 0; future < count; future++) {
+								assert.equal(await cases.getByRole('button').nth(future).isDisabled(), future > 0)
+							}
+							assert.equal(
+								await page.getByRole('button', { name: 'Reset All Tests', exact: true }).count(),
+								0,
+							)
+							actions.push({
+								category: 'EIP Support',
+								case: 'Reset All Tests',
+								label: 'Reset All Tests',
+							})
 						}
 					}
 				}
@@ -338,7 +612,6 @@ export async function checkPresentation(page, baseURL, outputDir) {
 				parentOrigin,
 				'cancel',
 			)
-			const actions = []
 
 			for (const categoryName of [
 				'Transactions',
@@ -357,9 +630,7 @@ export async function checkPresentation(page, baseURL, outputDir) {
 				for (let index = 0; index < (await cases.getByRole('button').count()); index++) {
 					const item = cases.getByRole('button').nth(index)
 
-					if (await item.isDisabled()) {
-						continue
-					}
+					assert.equal(await item.isDisabled(), false)
 
 					await item.click()
 					const main = page.locator('.main-content')
@@ -372,8 +643,17 @@ export async function checkPresentation(page, baseURL, outputDir) {
 						await main.locator('#custom-tx-calldata').fill('0x')
 					}
 
-					const action = main.locator('button[data-pressable]').first()
+					assert.equal(await main.locator('button[data-pressable]').count(), 1)
+					const action = main.locator('button[data-pressable]')
+
+					assert.equal(await action.isDisabled(), false)
 					const label = (await action.textContent()).trim()
+					const caseName = (await item.locator('strong').textContent()).trim()
+
+					assert.equal(
+						JSON.stringify([caseName, label]),
+						JSON.stringify(expectedCases[categoryName][index]),
+					)
 
 					await action.scrollIntoViewIfNeeded()
 					const before = await page.locator('#layout').evaluate(el => el.scrollTop)
@@ -416,14 +696,424 @@ export async function checkPresentation(page, baseURL, outputDir) {
 						throw new Error(`Unhandled action: ${label}`)
 					}
 
-					actions.push({ category: categoryName, case: (await item.textContent()).trim(), label })
+					actions.push({ category: categoryName, case: caseName, label })
 				}
 			}
+			const required = Object.entries(expectedCases).flatMap(([category, entries]) =>
+				entries.map(([name, label]) => JSON.stringify([category, name, label])),
+			)
+
+			required.push(JSON.stringify(['EIP Support', 'Reset All Tests', 'Reset All Tests']))
+			required.sort()
+			const observed = actions
+				.map(action => JSON.stringify([action.category, action.case, action.label]))
+				.sort()
+
+			assert.equal(JSON.stringify(observed), JSON.stringify(required))
 			await page.locator('h1').scrollIntoViewIfNeeded()
 			await page.screenshot({ path: `${outputDir}/${width}-${colorScheme}.png` })
 			reports.push({ width, colorScheme, labels, panes, actions })
 		}
 	}
+
+	return reports
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} control
+ */
+async function activateByKeyboard(page, control) {
+	await control.waitFor()
+	assert.equal(await control.isDisabled(), false)
+	const tab = page.context().browser().browserType().name() === 'webkit' ? 'Alt+Tab' : 'Tab'
+
+	for (let step = 0; step < 80; step++) {
+		if (await control.evaluate(el => el === document.activeElement)) {
+			await page.keyboard.press('Enter')
+
+			return
+		}
+
+		await page.keyboard.press(tab)
+	}
+
+	throw new Error(`Keyboard navigation did not reach ${await control.textContent()}`)
+}
+
+/**
+ * Dismissed and superseded provider work cannot own a later transaction intent.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} baseURL
+ */
+export async function checkSwitchContinuations(page, baseURL) {
+	const reports = []
+	/** @type {string[]} */
+	const errors = []
+	/** @param {Error} error */
+	const onError = error => errors.push(error.message)
+
+	page.on('pageerror', onError)
+	await page.clock.install()
+
+	try {
+		for (const scenario of [
+			{ dismiss: 'escape', outcome: 'success', reopen: false },
+			{ dismiss: 'light', outcome: 'reject', reopen: false },
+			{ dismiss: 'escape', outcome: 'success', reopen: true },
+			{ dismiss: 'light', outcome: 'reject', reopen: true },
+			{ dismiss: 'escape', outcome: 'success', reopen: false, settleBeforeDismiss: true },
+		]) {
+			await page.goto(`${baseURL}/test/`)
+			await page
+				.locator('astro-island[component-url*="WalletTest"][ssr]')
+				.waitFor({ state: 'detached' })
+			/** @param {{command: 'defer'} | {command: 'settle', index: number, outcome: string}} detail */
+			const control = detail =>
+				page.evaluate(
+					value =>
+						window.dispatchEvent(new CustomEvent('playground:switch-control', { detail: value })),
+					detail,
+				)
+
+			await control({ command: 'defer' })
+			await page.getByRole('button', { name: 'Connect wallet', exact: true }).click()
+			await page.getByRole('button', { name: 'Mock Wallet 1', exact: true }).click()
+			await page
+				.getByRole('dialog', { name: 'Select a wallet', exact: true })
+				.waitFor({ state: 'hidden' })
+			const send = page.getByRole('button', {
+				name: 'Send Transaction (Testing Only)',
+				exact: true,
+			})
+			const parent = page.getByRole('dialog', { name: 'Switch to Ethereum Mainnet', exact: true })
+			const startSwitch = async count => {
+				await activateByKeyboard(page, send)
+				await activateByKeyboard(
+					page,
+					parent.getByRole('button', { name: 'Switch to Mainnet', exact: true }),
+				)
+				await page.waitForFunction(
+					expected => Number(document.documentElement.dataset.switchCount) === expected,
+					count,
+				)
+				assert.equal(
+					await parent.getByRole('button', { name: 'Switching…', exact: true }).isDisabled(),
+					true,
+				)
+				assert.equal(
+					await parent.getByRole('button', { name: 'Cancel', exact: true }).isDisabled(),
+					true,
+				)
+			}
+			const dismiss = async () => {
+				if (scenario.dismiss === 'light') {
+					await page.mouse.click(5, 5)
+				} else {
+					await page.keyboard.press('Escape')
+				}
+
+				await parent.waitFor({ state: 'hidden' })
+				await page
+					.getByRole('heading', {
+						name: 'Switch to Ethereum Mainnet',
+						exact: true,
+						includeHidden: true,
+					})
+					.waitFor({ state: 'detached' })
+				assert.ok(await send.evaluate(el => el === document.activeElement))
+				assert.equal(await send.isDisabled(), false)
+			}
+
+			await startSwitch(1)
+
+			if (scenario.settleBeforeDismiss) {
+				await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100))
+				await control({ command: 'settle', index: 0, outcome: scenario.outcome })
+				await page.clock.runFor(100)
+				assert.ok(await parent.evaluate(el => el.matches(':modal')))
+			}
+
+			await dismiss()
+
+			if (scenario.reopen) {
+				await startSwitch(2)
+			}
+
+			if (!scenario.settleBeforeDismiss) {
+				await control({ command: 'settle', index: 0, outcome: scenario.outcome })
+			}
+
+			await page.clock.runFor(1000)
+
+			if (scenario.reopen) {
+				assert.ok(await parent.evaluate(el => el.matches(':modal')))
+				assert.equal(
+					await parent.getByRole('button', { name: 'Switching…', exact: true }).isDisabled(),
+					true,
+				)
+				await dismiss()
+				await control({
+					command: 'settle',
+					index: 1,
+					outcome: scenario.outcome === 'success' ? 'reject' : 'success',
+				})
+				await page.clock.runFor(1000)
+			}
+
+			assert.ok(
+				(await page.getByRole('alert').count()) === 0,
+				`Unexpected error after ${JSON.stringify(scenario)}: ${(await page.getByRole('alert').allTextContents()).join(' ')}`,
+			)
+			assert.ok(
+				(await page.locator('dialog:modal').count()) === 0,
+				`Unexpected modal after ${JSON.stringify(scenario)}`,
+			)
+			assert.ok(
+				(await send.isDisabled()) === false,
+				`Pending transaction after ${JSON.stringify(scenario)}`,
+			)
+			const requests = (
+				(await page.locator('html').getAttribute('data-provider-requests')) ?? ''
+			).split('\n')
+
+			assert.equal(requests.includes('wallet_switchEthereumChain'), true)
+
+			assert.equal(requests.includes('eth_sendTransaction'), false)
+			assert.equal(requests.includes('wallet_sendCalls'), false)
+			reports.push({ ...scenario, requests })
+		}
+		const completions = await checkCurrentSwitchCompletions(page, baseURL)
+
+		assert.equal(JSON.stringify(errors), '[]')
+
+		return { cancellations: reports, completions }
+	} finally {
+		await page.clock.resume()
+		page.off('pageerror', onError)
+	}
+}
+
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+function isRecord(value) {
+	return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** @param {unknown} value @returns {value is unknown[]} */
+function isUnknownArray(value) {
+	return Array.isArray(value)
+}
+
+/** @param {import('@playwright/test').Page} page */
+async function readDispatches(page) {
+	/** @type {unknown} */
+	const value = JSON.parse((await page.locator('html').getAttribute('data-dispatches')) ?? '[]')
+
+	assert.ok(isUnknownArray(value))
+
+	return value.map(entry => {
+		assert.ok(isRecord(entry) && typeof entry.method === 'string' && 'params' in entry)
+
+		return { method: entry.method, params: entry.params }
+	})
+}
+
+/** @param {{method: string, params: unknown}} dispatch @param {'ordinary'|'batch'} kind */
+function checkDispatchPayload(dispatch, kind) {
+	assert.ok(isUnknownArray(dispatch.params) && dispatch.params.length === 1)
+	const payload = dispatch.params[0]
+
+	assert.ok(isRecord(payload))
+	assert.equal(payload.from, '0x0000000000000000000000000000000000000001')
+
+	if (kind === 'ordinary') {
+		assert.equal(dispatch.method, 'eth_sendTransaction')
+		assert.equal(String(payload.to).toLowerCase(), expectedDispatch.ordinary.to)
+		assert.equal(payload.data, expectedDispatch.ordinary.data)
+		assert.equal(payload.value ?? '0x0', '0x0')
+	} else {
+		assert.equal(dispatch.method, 'wallet_sendCalls')
+		assert.equal(payload.chainId, '0x1')
+		assert.equal(payload.version, '2.0.0')
+		assert.equal(payload.atomicRequired, false)
+		assert.ok(isUnknownArray(payload.calls) && payload.calls.length === 2)
+
+		for (let index = 0; index < 2; index++) {
+			const call = payload.calls[index]
+
+			assert.ok(isRecord(call))
+			assert.equal(String(call.to).toLowerCase(), expectedDispatch.batch.calls[index].to)
+			assert.equal(call.data, expectedDispatch.batch.calls[index].data)
+			assert.equal(call.value ?? '0x0', expectedDispatch.batch.calls[index].value)
+		}
+	}
+}
+
+/**
+ * Current work must dispatch once, and a current rejection must retain ownership for retry.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} baseURL
+ */
+async function checkCurrentSwitchCompletions(page, baseURL) {
+	const reports = []
+	/** @type {Array<{kind: 'complete'|'retry', transaction: 'ordinary'|'batch'}>} */
+	const scenarios = [
+		{ kind: 'complete', transaction: 'ordinary' },
+		{ kind: 'complete', transaction: 'batch' },
+		{ kind: 'retry', transaction: 'ordinary' },
+	]
+
+	for (const scenario of scenarios) {
+		await page.clock.resume()
+		await page.goto(`${baseURL}/test/`)
+		await page
+			.locator('astro-island[component-url*="WalletTest"][ssr]')
+			.waitFor({ state: 'detached' })
+		/** @param {{command: 'defer'|'complete-sends'} | {command: 'settle', index: number, outcome: string}} detail */
+		const control = detail =>
+			page.evaluate(
+				value =>
+					window.dispatchEvent(new CustomEvent('playground:switch-control', { detail: value })),
+				detail,
+			)
+
+		await control({ command: 'defer' })
+		await control({ command: 'complete-sends' })
+		await page.getByRole('button', { name: 'Connect wallet', exact: true }).click()
+		await page.getByRole('button', { name: 'Mock Wallet 1', exact: true }).click()
+		await page
+			.getByRole('dialog', { name: 'Select a wallet', exact: true })
+			.waitFor({ state: 'hidden' })
+		const cases = page.getByRole('group', { name: 'Test cases', exact: true })
+
+		await cases
+			.getByRole('button', {
+				name: scenario.transaction === 'batch' ? /^EIP-7702 Multi-Call/ : /^ERC20 Approve/,
+			})
+			.click()
+		const send = page.getByRole('button', { name: 'Send Transaction (Testing Only)', exact: true })
+		const parent = page.getByRole('dialog', { name: 'Switch to Ethereum Mainnet', exact: true })
+
+		if (scenario.kind === 'retry') {
+			await page.evaluate(() => {
+				/** @type {unknown[]} */
+				const events = []
+				/** @param {Element|null} el */
+				const describe = el =>
+					el
+						? {
+								tag: el.tagName,
+								text: (el.textContent ?? '').slice(0, 100),
+								disabled: el.matches(':disabled'),
+								connected: el.isConnected,
+								dialog: el.closest('dialog')?.querySelector('h3')?.textContent ?? null,
+							}
+						: null
+				/** @param {string} type @param {Element|null} target @param {string|null} [previous] */
+				const record = (type, target, previous = null) => {
+					events.push({
+						at: performance.now(),
+						type,
+						previous,
+						target: describe(target),
+						active: describe(document.activeElement),
+					})
+					document.documentElement.dataset.focusChronology = JSON.stringify(events)
+				}
+
+				for (const type of ['focusin', 'focusout', 'close', 'cancel']) {
+					document.addEventListener(
+						type,
+						event => record(type, event.target instanceof Element ? event.target : null),
+						true,
+					)
+				}
+				new MutationObserver(mutations => {
+					for (const mutation of mutations) {
+						if (mutation.target instanceof Element && mutation.target.matches('button,dialog')) {
+							record('attribute:' + mutation.attributeName, mutation.target, mutation.oldValue)
+						}
+					}
+				}).observe(document, {
+					subtree: true,
+					attributes: true,
+					attributeFilter: ['disabled', 'aria-disabled', 'open'],
+					attributeOldValue: true,
+				})
+				record('installed', document.activeElement)
+			})
+		}
+
+		await send.scrollIntoViewIfNeeded()
+		await activateByKeyboard(page, send)
+		await activateByKeyboard(
+			page,
+			parent.getByRole('button', { name: 'Switch to Mainnet', exact: true }),
+		)
+		await page.waitForFunction(() => document.documentElement.dataset.switchCount === '1')
+		const busy = parent.getByRole('button', { name: 'Switching…', exact: true })
+
+		await busy.waitFor()
+		assert.equal(await busy.isDisabled(), true)
+		assert.ok(await busy.evaluate(el => el === document.activeElement))
+		await page.keyboard.press('Enter')
+		await page.evaluate(
+			() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+		)
+		assert.equal(await page.locator('html').getAttribute('data-switch-count'), '1')
+		const origin = await page.locator('#layout').evaluate(el => el.scrollTop)
+		let index = 0
+		/** @type {unknown[]} */
+		const focusEvents = []
+
+		if (scenario.kind === 'retry') {
+			await page.evaluate(
+				() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+			)
+			await control({ command: 'settle', index, outcome: 'reject' })
+			const error = page.getByRole('dialog', { name: 'Error', exact: true })
+
+			await error.waitFor()
+			assert.ok(
+				(await error.getByRole('alert').textContent()).includes('Controlled switch rejection'),
+			)
+			assert.equal(await page.locator('dialog:modal').count(), 2)
+			assert.equal((await readDispatches(page)).length, 0)
+			focusEvents.push(
+				await checkModalLifecycle(
+					page,
+					'Error',
+					parent.getByRole('button', { name: 'Switch to Mainnet', exact: true }),
+					origin,
+					'escape',
+					1,
+				),
+			)
+			const retry = parent.getByRole('button', { name: 'Switch to Mainnet', exact: true })
+
+			assert.ok(await retry.evaluate(el => el === document.activeElement))
+			await page.keyboard.press('Enter')
+			index = 1
+			await page.waitForFunction(() => document.documentElement.dataset.switchCount === '2')
+		}
+
+		await control({ command: 'settle', index, outcome: 'success' })
+		await page.clock.runFor(1000)
+		await page.getByRole('button', { name: 'Transaction Sent ✓', exact: true }).waitFor()
+		await page.clock.runFor(1000)
+		const dispatches = await readDispatches(page)
+
+		assert.equal(dispatches.length, 1)
+		checkDispatchPayload(dispatches[0], scenario.transaction)
+		assert.equal(
+			await page.getByRole('button', { name: 'Transaction Sent ✓', exact: true }).isDisabled(),
+			false,
+		)
+		assert.equal(await page.getByRole('alert').count(), 0)
+		assert.equal(await page.locator('dialog:modal').count(), 0)
+		reports.push({ ...scenario, dispatches, focusEvents })
+	}
+	assert.equal(reports.length, 3)
 
 	return reports
 }

@@ -29,7 +29,14 @@
 		<button type="button" class="secondary-button" onclick={onClose} disabled={isSwitching}>
 			Cancel
 		</button>
-		<button type="button" data-pressable onclick={onSwitch} disabled={isSwitching}>
+		<button
+			type="button"
+			data-pressable
+			aria-disabled={isSwitching}
+			onclick={() => {
+				if (!isSwitching) onSwitch()
+			}}
+		>
 			{isSwitching ? 'Switching…' : 'Switch to Mainnet'}
 		</button>
 	{/snippet}
