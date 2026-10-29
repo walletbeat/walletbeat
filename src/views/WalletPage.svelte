@@ -9,6 +9,8 @@
 	import { knownSingleVariantIcons, type WBIconID } from '@/styles/wbicons'
 	import '../components/pie-shape.css'
 	import { finishPopoverExit } from './popover-transition'
+	import publishPeerState from './wallet-page-peer-state.js'
+	import peerStateSource from './wallet-page-peer-state.js?raw'
 	import { attributeGroupFlowerGradient, sliceFill, sliceLabelBackground } from '@/components/pie-fill'
 
 	// Types/constants
@@ -88,7 +90,6 @@
 	import { getNewsForWallet } from '@/data/news'
 
 	let tocClosing = $state<symbol | null>(null)
-	let peerStateReady = $state(false)
 
 	let tocStateOwners: Element[] = []
 
@@ -211,7 +212,7 @@
 	}
 
 	// Resolve semantic destination membership once per rendered evaluation; CSS owns presentation and scroll state.
-	function shareLinkDestinations(container: HTMLElement) {
+	function shareLinkDestinations(container: HTMLElement, groups: Map<string, string[]>) {
 		const links = Array.from(container.querySelectorAll<HTMLAnchorElement | SVGAElement>('a[href]')).flatMap(link => {
 			try {
 				const url = new URL(link.getAttribute('href') ?? '', link.baseURI)
@@ -262,68 +263,9 @@
 			const navigationOwner = link.closest('.navigation-items') ? (link.closest('summary')?.parentElement ?? link.parentElement) : null
 			for (const owner of [header, navigationOwner]) if (owner && !owner.hasAttribute('data-pressable-name')) bind(owner, identity, ownDestination)
 		}
-		const peers = new Map<string, (HTMLElement | SVGElement)[]>()
-		for (const owner of container.querySelectorAll<HTMLElement | SVGElement>('[data-pressable-name]')) {
-			const identity = owner.getAttribute('data-pressable-name')!
-			const owners = peers.get(identity) ?? []
-			owners.push(owner)
-			peers.set(identity, owners)
-		}
-		const groups = new Map(pieNavigationItems.map(group => [group.href!, [group, ...(group.children ?? [])].map(item => item.href!)]))
-		const flower = container.querySelector<HTMLElement>('.pie-navigation-geometry')
-		let published = new Map<HTMLElement | SVGElement, string>()
-		let pending: ReturnType<typeof setTimeout> | undefined
-		const publish = () => {
-			const states = new Map<HTMLElement | SVGElement, Set<string>>()
-			const mark = (owner: HTMLElement | SVGElement, state: string) => {
-				const tokens = states.get(owner) ?? new Set<string>()
-				tokens.add(state)
-				states.set(owner, tokens)
-			}
-			for (const source of container.querySelectorAll<HTMLElement | SVGElement>('a[data-pressable-name]:is(:hover, :focus-visible, :active, :interest-source)')) {
-				const targets = source.getAttribute('data-pressable-targets')?.split(/\s+/).filter(Boolean) ?? []
-				if (source.matches(':is(:hover, :focus-visible, :active)')) {
-					mark(source, 'interacting')
-					for (const identity of targets) for (const owner of peers.get(identity) ?? []) {
-						mark(owner, 'interacting')
-						if (source.matches(':active')) mark(owner, 'pressed')
-					}
-				}
-				for (const owner of peers.get(source.getAttribute('data-pressable-name')!) ?? []) {
-					if (owner.matches('.pie-navigation :is(li, details)')) mark(owner, 'exact')
-				}
-				for (const identity of targets) {
-					const related = groups.get(identity)
-					if (!related) continue
-					if (flower) mark(flower, 'related')
-					for (const destination of related) for (const owner of peers.get(destination) ?? []) {
-						if (owner.matches('.pie-navigation :is(li, details)')) mark(owner, 'related')
-					}
-				}
-			}
-			const next = new Map([...states].map(([owner, tokens]) => [owner, ['interacting', 'pressed', 'exact', 'related'].filter(token => tokens.has(token)).join(' ')]))
-			for (const owner of new Set([...published.keys(), ...next.keys()])) {
-				const value = next.get(owner)
-				if (value !== published.get(owner)) attribute(owner, 'data-pressable-state', value ?? null)
-			}
-			published = next
-		}
-		// Interest state changes after its event's default action, beyond the microtask checkpoint.
-		const schedule = (event: Event) => {
-			if (published.size === 0 && event.target instanceof Node && !container.contains(event.target)) return
-			if (pending !== undefined) return
-			pending = setTimeout(() => { pending = undefined; publish() }, 0)
-		}
-		const events = ['pointerover', 'pointerout', 'pointerdown', 'pointerup', 'pointercancel', 'dragend', 'focusin', 'focusout', 'keydown', 'keyup', 'interest', 'loseinterest']
-		for (const event of events) document.addEventListener(event, schedule, true)
-		window.addEventListener('blur', schedule)
-		publish()
-		peerStateReady = true
+		const stopPublishing = publishPeerState(container, groups, true)
 		return () => {
-			peerStateReady = false
-			if (pending !== undefined) clearTimeout(pending)
-			for (const event of events) document.removeEventListener(event, schedule, true)
-			window.removeEventListener('blur', schedule)
+			stopPublishing()
 			for (const [owner, originals] of attributes) for (const [name, original] of originals) {
 				if (original === null) owner.removeAttribute(name)
 				else owner.setAttribute(name, original)
@@ -616,6 +558,8 @@
 		})
 	})
 
+	const peerGroups = $derived(pieNavigationItems.map((group): [string, string[]] => [group.href!, [group, ...(group.children ?? [])].map(item => item.href!)]))
+
 	const pieRotation = $derived.by(() => {
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
 		const styles: string[] = []
@@ -752,8 +696,17 @@
 		`
 	})
 
+	function peerBootstrapMarkup() {
+		const groups = JSON.stringify(peerGroups).replaceAll('<', '\\u003c')
+		// Parser-time and hydrated delivery use the same dependency-free publisher.
+		return `<script data-astro-rerun>(() => {
+const root = document.currentScript.closest('astro-island').querySelector('#top');
+(${peerStateSource.replace('export default ', '')})(root, new Map(${groups}));})();<\/script>`
+	}
+
 	function stylesheetMarkup(css: string, peerFallback = false) {
-		return `<style${peerFallback ? ' data-wallet-peer-fallback' : ''}>${css}</style>`
+		const style = `<style${peerFallback ? ' data-wallet-peer-fallback' : ' data-wallet-pie-state'}>${css}</style>`
+		return peerFallback ? `<noscript hidden>${style}</noscript>` : style
 	}
 
 	const attrToRelevantVariants = $derived.by(() => {
@@ -875,7 +828,9 @@
 
 
 {@html stylesheetMarkup(pieRotation.styles)}
-{@html stylesheetMarkup(peerStateReady ? '' : peerFallbackStyles, true)}
+<!-- The no-JavaScript stylesheet payload is server-only; client mounting keeps an inert placeholder. -->
+<!-- svelte-ignore hydration_html_changed -->
+{@html import.meta.env.SSR ? stylesheetMarkup(peerFallbackStyles, true) : '<noscript hidden></noscript>'}
 
 <div
 	id="top"
@@ -897,7 +852,7 @@
 			// Rebind semantic destinations after selection changes replace the rendered links.
 			void evalTree
 			void queryParams?.toString()
-			return shareLinkDestinations(container)
+			return shareLinkDestinations(container, new Map(peerGroups))
 		})
 	}}
 >
@@ -1190,6 +1145,7 @@
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
 	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </div>
+{@html peerBootstrapMarkup()}
 
 {#snippet sectionHeader(id: string, label: string, icon: WBIconID, description?: Snippet, end?: Snippet)}
 	<header data-column="span-start" data-icon-metrics={icon} data-sticky-breadcrumb="position" data-sticky="block block-start backdrop-after backdrop-stuck" data-scroll-item="inline-detached" style:--column-spanSize={description ? undefined : 'calc(1.5lh * 1.1)'}>
