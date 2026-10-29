@@ -13,9 +13,12 @@ const popoverInvoker = (node: HTMLElement) =>
 	node.querySelector<HTMLElement>('[popovertarget]') ?? node
 
 export function hasVisiblePopoverInvoker(node: HTMLElement) {
-	return popoverInvoker(node).checkVisibility({
-		visibilityProperty: true,
-	})
+	const invoker = popoverInvoker(node)
+
+	return (
+		!invoker.matches(':disabled, [aria-disabled="true"]') &&
+		invoker.checkVisibility({ visibilityProperty: true })
+	)
 }
 
 export function interest(
