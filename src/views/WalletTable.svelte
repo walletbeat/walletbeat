@@ -2178,40 +2178,42 @@
 			}
 		}
 
-		.variants {
-			margin-inline-start: auto;
 
-			font-size: 1.25em;
+	}
 
-			button {
-				aspect-ratio: 1;
-				padding: 0.33em;
+	.variants {
+		margin-inline-start: auto;
 
-				background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
-				border-radius: 50%;
+		font-size: 1.25em;
 
-				transition-property: background-color, opacity;
+		button {
+			aspect-ratio: 1;
+			padding: 0.33em;
 
-				&[data-selected] {
-					background-color: var(--accent-backgroundColor);
-					border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
-				}
+			background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
+			border-radius: 50%;
 
-				&:focus {
-					border-color: var(--accent);
-				}
+			transition-property: background-color, opacity;
 
-				&:hover:not(:disabled) {
-					filter: contrast(1.25) brightness(1.1);
-				}
+			&[data-selected] {
+				background-color: var(--accent-backgroundColor);
+				border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
+			}
 
-				&:disabled {
-					opacity: 0.4;
-				}
+			&:focus {
+				border-color: var(--accent);
+			}
 
-				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-					opacity: 0.75;
-				}
+			&:hover:not(:disabled) {
+				filter: contrast(1.25) brightness(1.1);
+			}
+
+			&:disabled {
+				opacity: 0.4;
+			}
+
+			.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
+				opacity: 0.75;
 			}
 		}
 	}
