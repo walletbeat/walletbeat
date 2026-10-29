@@ -170,7 +170,13 @@
 	}
 
 	/* Overlay trigger must cover the stacked content without contributing size. */
+	[data-stack] {
+		position: relative;
+	}
+
 	[data-stack] > [data-tooltip-trigger] {
+		position: absolute;
+		inset: 0;
 		min-inline-size: 0;
 		min-block-size: 0;
 	}
