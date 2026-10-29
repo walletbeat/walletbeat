@@ -144,6 +144,7 @@
 								}}
 							/>{/if}
 
+							<span data-input data-row="gap-3" data-pressable="paint">
 							<span
 								class="choice-icon-helipad"
 								style:--choice-anchor={choiceAnchor}
@@ -158,6 +159,7 @@
 
 							<span class="label" data-row-item="flexible">{choice.label}</span>
 							<span class="count"><span hidden>(</span>{count}<span hidden>)</span></span>
+							</span>
 						</svelte:element>
 					{/each}
 				</div>
@@ -234,14 +236,34 @@
 	}
 
 	[data-filter-choice] {
-		transition-property: background-color, border-color, color, opacity;
+		padding: 0;
+		border-width: 0;
+		background: none;
+		transition-property: border-color, color;
 
-		&:hover { background-color: color-mix(in srgb, currentColor 10%, transparent); }
+		> [data-pressable~="paint"] {
+			inline-size: 100%;
+			block-size: 100%;
+			border-style: inherit;
+			border-color: inherit;
+			transition-property: background-color, opacity;
+		}
+
+		&:where(label) > [data-pressable~="paint"] {
+			padding: 0.6em 0.8em;
+		}
+
+		&:hover > [data-pressable~="paint"] {
+			background-color: color-mix(in srgb, currentColor 10%, transparent);
+		}
 
 		&:is(:has(input:checked), [aria-current="page"]) {
-			background-color: var(--accent-backgroundColor);
 			border-color: var(--accent);
 			color: var(--accent);
+
+			> [data-pressable~="paint"] {
+				background-color: var(--accent-backgroundColor);
+			}
 		}
 	}
 
@@ -252,18 +274,31 @@
 		opacity: 0;
 	}
 
-	.menu [data-filter-choice] > input:enabled {
-		--pressable-pressed-scale: none;
-		inset-block: calc(-1 * var(---column-gap)) 0;
-		inset-inline: 0 calc(-1 * var(---column-gap));
+	.menu [data-filter-choice] > input:enabled,
+	.menu [data-filter-choice]:is(a[href], :has(> input:enabled))::before {
 		place-self: unsafe center;
-		/* Inherited borders make the native target track the label's outer box. */
 		box-sizing: content-box;
 		inline-size: calc(100% + var(---column-gap));
 		block-size: calc(100% + var(---column-gap));
 		padding: 0;
 		border: inherit;
+	}
+
+	.menu [data-filter-choice] > input:enabled {
+		inset-block: calc(-1 * var(---column-gap)) 0;
+		inset-inline: 0 calc(-1 * var(---column-gap));
+		pointer-events: none;
 		opacity: 0;
+	}
+
+	.menu [data-filter-choice]:is(a[href], :has(> input:enabled)) {
+		&::before {
+			content: '';
+			position: absolute;
+			inset-block: calc(-1 * var(---column-gap)) 0;
+			inset-inline: calc(-0.5 * var(---column-gap));
+		}
+
 	}
 
 	.choice-icon-helipad {
@@ -518,6 +553,8 @@
 			block-size: 2.5rem;
 			padding: 0;
 			border-radius: 50%;
+
+			> [data-pressable~="paint"] { padding: 0; }
 		}
 
 		[data-filter-choice] .label {
