@@ -139,7 +139,7 @@
 
 						<span class="wallet-icon" data-icon="shadow">
 							<img
-								src={`/images/wallets/${row.id}.svg`}
+								src={`/images/wallets/${row.id}.${row.iconExtension}`}
 								alt=""
 								onerror={event => {
 									if (event.currentTarget instanceof HTMLImageElement)
