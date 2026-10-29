@@ -408,9 +408,10 @@
 
 		img {
 			display: block;
-			inline-size: min(var(--referenceImage-width), 20em * var(--referenceImage-ratio));
+			box-sizing: content-box;
+			inline-size: calc(min(var(--referenceImage-width), 20em * var(--referenceImage-ratio)) - 2px);
 			block-size: auto;
-			max-inline-size: 100%;
+			max-inline-size: calc(100% - 2px);
 
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
@@ -524,7 +525,8 @@
 
 		img {
 			display: block;
-			inline-size: 8em;
+			box-sizing: content-box;
+			inline-size: calc(8em - 2px);
 			block-size: auto;
 
 			border: 1px solid var(--border-color);
