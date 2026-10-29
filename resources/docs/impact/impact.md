@@ -23,3 +23,6 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
 - **2026-09**: Walletbeat asked: Can your wallet send and receive tokens without exposing your transaction history to others?: https://x.com/walletbeat/status/2099669827568996377 & https://x.com/walletbeat/status/2099669769343439312
   - **Reaction**: Ambire announces they're fixing this very soon: https://x.com/ambire/status/2099770434400969010
   - **Reaction**: Ambire announces they're working hard to change soon their score on privacy transfers: https://x.com/0xSuperKalo/status/2099864981852262633 & https://x.com/0xSuperKalo/status/2099863323193827407
+- **2026-09**: Walletbeat posted Ambire's official breakdown: https://x.com/walletbeat/status/2113699746070299093
+  - **Reaction**: Ambire announces they now support ERC-721 token transfer transaction simulation: https://x.com/ambire/status/2115633972189315404
+  - **Reaction**: Ambire team member (Kalo) commits to strengthen browser extension security by not allowing any extension to connect to Ambire: https://x.com/0xSuperKalo/status/2115757525517717577
