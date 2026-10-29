@@ -1454,7 +1454,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							{:else if renderData.component === 'ScamAlertDetails'}
 								<ScamAlertDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
 							{:else if renderData.component === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+								<SecurityAuditsDetails references={references ?? []} parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
 							{:else if renderData.component === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'FundingDetails'}
