@@ -1,3 +1,4 @@
+import { DOMParser } from '@xmldom/xmldom'
 import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
 
@@ -77,26 +78,33 @@ describe('EIP support presentation', () => {
 		const references = refs({
 			ref: { url: 'https://example.com/evidence', lastRetrieved: '2026-10-01' },
 		})
-		const { body } = render(EipStatusSupportCards, {
-			props: {
-				title: 'Software wallets',
-				cards: [
-					{
-						id: 'mixed',
-						displayName: 'Mixed wallet',
-						iconExtension: 'svg',
-						url: '/wallet/mixed/',
-						status: EipSupportStatus.SUPPORTED,
-						variants: [Variant.BROWSER],
-						references,
-					},
-				],
-			},
-		})
 
-		expect([...body.matchAll(/<h([1-6])(?:\s|>)/g)].map(match => Number(match[1]))).toEqual([
-			2, 3, 4, 5,
-		])
+		for (const headingLevel of [1, 2, 3] as const) {
+			const { body } = render(EipStatusSupportCards, {
+				props: {
+					title: 'Software wallets',
+					headingLevel,
+					cards: [
+						{
+							id: 'mixed',
+							displayName: 'Mixed wallet',
+							iconExtension: 'svg',
+							url: '/wallet/mixed/',
+							status: EipSupportStatus.SUPPORTED,
+							variants: [Variant.BROWSER],
+							references,
+						},
+					],
+				},
+			})
+
+			expect([...body.matchAll(/<h([1-6])(?:\s|>)/g)].map(match => Number(match[1]))).toEqual([
+				headingLevel,
+				headingLevel + 1,
+				headingLevel + 2,
+				headingLevel + 3,
+			])
+		}
 
 		for (const headingLevel of [1, 2] as const) {
 			const details = render(EipDetails, { props: { eip: eips['7702'], headingLevel } }).body
@@ -104,6 +112,17 @@ describe('EIP support presentation', () => {
 
 			expect(levels[0]).toBe(headingLevel)
 			expect(levels.slice(1).every(level => level === headingLevel + 1)).toBe(true)
+			const document = new DOMParser().parseFromString(`<html>${details}</html>`, 'text/html')
+			const formalTitle = Array.from(document.getElementsByTagName('p')).find(element =>
+				element.getAttribute('class')?.split(/\s+/).includes('formal-title'),
+			)
+
+			expect(formalTitle?.textContent?.trim()).toBe(eips['7702'].formalTitle)
+			expect(
+				Array.from(document.getElementsByTagName(`h${headingLevel + 1}`)).every(
+					element => element.textContent?.trim() !== eips['7702'].formalTitle,
+				),
+			).toBe(true)
 		}
 	})
 

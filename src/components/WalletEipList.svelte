@@ -2,12 +2,14 @@
 	import { lucideNavigationIcons } from '@/icons/lucide-navigation-icons'
 	import { eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
 	import { variantLabel } from '@/schema/variants'
+	import { childHeadingLevel, type ParentHeadingLevel } from '@/types/heading'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
 	import type { EipDirectoryEntry } from '@/utils/eip-directory'
 	import { getEipTrackerUrl } from '@/utils/urls'
 
-	let { eips }: { eips: EipDirectoryEntry[] } = $props()
+	let { eips, headingLevel = 2 }: { eips: EipDirectoryEntry[]; headingLevel?: ParentHeadingLevel } = $props()
+	const sectionHeadingLevel = $derived(childHeadingLevel[headingLevel])
 </script>
 
 <div class="directory" data-column="gap-4">
@@ -28,26 +30,26 @@
 						<span data-icon="wbicons-simple {eip.icon}"></span>
 					{/if}
 				</span>
-				<h2 data-row-item="flexible">{eipShortLabel(eip)}: {eip.friendlyName}</h2>
+				<svelte:element this={`h${headingLevel}`} data-row-item="flexible">{eipShortLabel(eip)}: {eip.friendlyName}</svelte:element>
 				<span data-tag="eip-status">{eipStatusLabel[eip.status]}</span>
 			</summary>
 			<div data-column="gap-6">
 				<section data-column="gap-2">
-					<h3>Summary</h3>
+					<svelte:element this={`h${sectionHeadingLevel}`}>Summary</svelte:element>
 					<Typography content={markdown(eip.summaryMarkdown)} />
 				</section>
 				<section data-column="gap-2">
-					<h3>Why it matters for wallets</h3>
+					<svelte:element this={`h${sectionHeadingLevel}`}>Why it matters for wallets</svelte:element>
 					<Typography content={markdown(eip.whyItMattersMarkdown)} />
 				</section>
 				{#if eip.noteMarkdown}
 					<section data-column="gap-2">
-						<h3>Notes</h3>
+						<svelte:element this={`h${sectionHeadingLevel}`}>Notes</svelte:element>
 						<Typography content={markdown(eip.noteMarkdown)} />
 					</section>
 				{/if}
 				<section data-column="gap-2">
-					<h3>Verified support</h3>
+					<svelte:element this={`h${sectionHeadingLevel}`}>Verified support</svelte:element>
 					{#if eip.implementers.length > 0}
 						<ul data-list="unstyled" data-column="gap-2">
 							{#each eip.implementers as wallet (wallet.id)}

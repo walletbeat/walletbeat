@@ -1,29 +1,33 @@
 <script lang="ts">
 	// Types/constants
 	import type { Eip } from '@/schema/eips'
+	import type { Snippet } from 'svelte'
+	import { childHeadingLevel } from '@/types/heading'
 
 
 	// Props
 	const {
 		eip,
 		headingLevel = 2,
+		timestamp,
 	}: {
 		eip: Eip
-		// Level of the EIP name heading; the formal title and sections sit one level below.
+		// Level of the EIP name heading; sections derive their level from it.
 		headingLevel?: 1 | 2
+		timestamp?: Snippet
 	} = $props()
 
-	const subheading = $derived(`h${headingLevel + 1}`)
+	const subheading = $derived(`h${childHeadingLevel[headingLevel]}`)
 
 
 	// Functions
-	import { eipEthereumDotOrgUrl, eipFinalForLabel, eipStatusLabel } from '@/schema/eips'
-	import { daysSince } from '@/types/date'
+	import { eipEthereumDotOrgUrl, eipStatusLabel } from '@/schema/eips'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
+	import Timestamp from '@/components/Timestamp.svelte'
 	import { ContentType } from '@/types/content'
 </script>
 
@@ -44,18 +48,13 @@
 			</div>
 
 			{#if eip.finalizedDate !== null}
-				<!-- `data-final-since` lets pages refresh the day count client-side. -->
-				<span class="final-since">
-					<strong data-final-since={eip.finalizedDate}>{eipFinalForLabel(daysSince(eip.finalizedDate))}</strong>,
-					since <time datetime={eip.finalizedDate}>{
-						new Date(eip.finalizedDate).toLocaleDateString('en-US', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-							timeZone: 'UTC',
-						})
-					}</time>
-				</span>
+				<span class="final-since">since
+                    {#if timestamp}
+                        {@render timestamp()}
+                    {:else}
+                        <Timestamp date={eip.finalizedDate} />
+                    {/if}
+                </span>
 			{/if}
 		</div>
 
@@ -63,10 +62,10 @@
 			{eip.friendlyName ? eip.friendlyName : eip.formalTitle}
 		</svelte:element>
 
-		{#if eip.formalTitle && eip.formalTitle !== eip.friendlyName}
-			<svelte:element this={subheading} class="formal-title">
+		{#if eip.friendlyName && eip.formalTitle !== eip.friendlyName}
+			<p class="formal-title">
 				{eip.formalTitle}
-			</svelte:element>
+			</p>
 		{/if}
 	</header>
 
@@ -126,9 +125,6 @@
 			.final-since {
 				color: var(--text-secondary);
 
-				strong {
-					color: var(--text-primary);
-				}
 			}
 		}
 

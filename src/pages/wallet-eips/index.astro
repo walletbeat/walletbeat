@@ -5,8 +5,10 @@ import { defaultNavigationItems } from '@/constants/navigation'
 import WalletEipList from '@/components/WalletEipList.svelte'
 import { eips as trackedEips } from '@/data/eips'
 import { eipDirectoryEntries } from '@/utils/eip-directory'
+import { childHeadingLevel } from '@/types/heading'
 
 // Tracked EIPs with the wallets implementing them, computed at build time.
+const pageHeadingLevel = 1 as const
 const eips = eipDirectoryEntries(trackedEips)
 ---
 
@@ -28,7 +30,10 @@ const eips = eipDirectoryEntries(trackedEips)
 		</header>
 
 		<div data-scroll-item='inline-detached padding-match-end'>
-			<WalletEipList eips={Object.values(eips)} />
+			<WalletEipList
+				headingLevel={childHeadingLevel[pageHeadingLevel]}
+				eips={Object.values(eips)}
+			/>
 		</div>
 	</main>
 </Layout>

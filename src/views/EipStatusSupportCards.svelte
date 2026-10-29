@@ -7,6 +7,7 @@
 		eipSupportStatusGroupId,
 	} from '@/schema/eip-support'
 	import { variantLabel } from '@/schema/variants'
+	import { childHeadingLevel } from '@/types/heading'
 	import type { CalendarDate } from '@/types/date'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 
@@ -32,14 +33,19 @@
 		title,
 		cards,
 		codeSnippets = {},
+		headingLevel = 2,
 	}: {
 		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
 		id?: string
 		title?: string
+		headingLevel?: 1 | 2 | 3
 		cards: EipStatusSupportCard[]
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
 	} = $props()
+
+	const statusHeadingLevel = $derived(title ? childHeadingLevel[headingLevel] : headingLevel)
+	const walletHeadingLevel = $derived(childHeadingLevel[statusHeadingLevel])
 
 	setCodeSnippetContext(() => codeSnippets)
 
@@ -78,7 +84,7 @@
 			data-row="wrap"
 			data-scroll-item='inline-detached padding-match-start'
 		>
-			<h2>{title}</h2>
+			<svelte:element this={`h${headingLevel}`}>{title}</svelte:element>
 		</header>
 	{/if}
 
@@ -88,11 +94,11 @@
 		{#if statusCards.length > 0}
 			<div data-column="gap-4">
 				<header data-scroll-item='inline-detached'>
-					<h3
+					<svelte:element this={`h${statusHeadingLevel}`}
 						id={id === undefined ? undefined : eipSupportStatusGroupId(id, status)}
 						data-support-status={status}
 						style:--accent={headingColor[status]}
-					>{label}</h3>
+					>{label}</svelte:element>
 				</header>
 
 				<div data-scroll-item="inline-detached" data-column="gap-5">
@@ -109,9 +115,9 @@
 									/>
 								</span>
 
-								<h4 class="wallet-heading" data-row-item="flexible">
+								<svelte:element this={`h${walletHeadingLevel}`} class="wallet-heading" data-row-item="flexible">
 									<a data-link="camouflaged" href={card.url}>{card.displayName}</a>
-								</h4>
+								</svelte:element>
 
 								<span class="platform-label">{card.variants.map(variantLabel).join(', ')}</span>
 							{/snippet}
@@ -129,7 +135,7 @@
 										</summary>
 
 										<div class="wallet-card-content" data-column="gap-3">
-											<ReferenceLinks parentHeadingLevel={4} references={card.references} cardBackground="secondary" />
+											<ReferenceLinks parentHeadingLevel={walletHeadingLevel} references={card.references} cardBackground="secondary" />
 
 											<div class="card-meta" data-row="wrap gap-3">
 												{#if lastVerified}
@@ -170,7 +176,7 @@
 		}
 	}
 
-	h3 {
+	[data-support-status] {
 		font-size: 1.2rem;
 		font-weight: 700;
 		margin: 0;

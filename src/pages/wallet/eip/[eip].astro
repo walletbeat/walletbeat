@@ -18,10 +18,12 @@ import { type CodeSnippetIndex } from '@/utils/code-snippet-index'
 import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { sortEipSupportCards } from '@/utils/eip-support-sort'
 import { getWalletUrl } from '@/utils/urls'
+import { childHeadingLevel } from '@/types/heading'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
+import Timestamp from '@/components/Timestamp.svelte'
 import EipSupportPie from '@/views/EipSupportPie.svelte'
 import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import Navigation from '@/views/Navigation.astro'
@@ -37,12 +39,9 @@ export const getStaticPaths = () =>
 
 type Props = { eip: Eip }
 
-const { eip } = Astro.props
+const { eip }: Props = Astro.props
 
-/**
- * Precompute the per-status EIP support cards at build time, ordered by
- * earliest evidence of support and then by the homepage order.
- */
+/** Group each wallet's platform-qualified status entries for the tracker. */
 function eipStatusSupportCards<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
 	wallets: Array<RatedWallet<_AttributeGroupId>>,
@@ -82,6 +81,9 @@ function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
 	)
 }
 
+const pageHeadingLevel = 1 as const
+const supportHeadingLevel = childHeadingLevel[pageHeadingLevel]
+
 const softwareCards = eipStatusSupportCards(
 	softwareWalletAttributeTree,
 	Object.values(ratedSoftwareWallets),
@@ -107,7 +109,11 @@ const embeddedCards = eipStatusSupportCards(
 	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start' data-row='start wrap gap-8'>
 			<div data-row-item='flexible basis-4'>
-				<EipDetails eip={eip} headingLevel={1} />
+				<EipDetails eip={eip} headingLevel={pageHeadingLevel}>
+					<Fragment slot='timestamp'>
+						{eip.finalizedDate !== null && <Timestamp date={eip.finalizedDate} client:visible />}
+					</Fragment>
+				</EipDetails>
 			</div>
 
 			{
@@ -125,6 +131,7 @@ const embeddedCards = eipStatusSupportCards(
 		{
 			softwareCards.length > 0 && (
 				<EipStatusSupportCards
+					headingLevel={supportHeadingLevel}
 					id='software-wallets'
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
@@ -137,6 +144,7 @@ const embeddedCards = eipStatusSupportCards(
 		{
 			hardwareCards.length > 0 && (
 				<EipStatusSupportCards
+					headingLevel={supportHeadingLevel}
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
 					codeSnippets={cardCodeSnippets(hardwareCards)}
@@ -148,6 +156,7 @@ const embeddedCards = eipStatusSupportCards(
 		{
 			embeddedCards.length > 0 && (
 				<EipStatusSupportCards
+					headingLevel={supportHeadingLevel}
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
 					codeSnippets={cardCodeSnippets(embeddedCards)}
@@ -169,20 +178,6 @@ const embeddedCards = eipStatusSupportCards(
 		</footer>
 	</main>
 </Layout>
-
-<script>
-	import { eipFinalForLabel } from '@/schema/eips'
-	import { assertCalendarDate, daysSince } from '@/types/date'
-
-	// Recompute "Final for N days" in the browser, so it is current between builds.
-	for (const element of document.querySelectorAll<HTMLElement>('[data-final-since]')) {
-		const finalizedDate = element.dataset.finalSince
-
-		if (finalizedDate !== undefined) {
-			element.textContent = eipFinalForLabel(daysSince(assertCalendarDate(finalizedDate)))
-		}
-	}
-</script>
 
 <style>
 	main {
