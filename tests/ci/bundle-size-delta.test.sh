@@ -21,7 +21,7 @@ set -euo pipefail
 # It can be invoked manually with: pnpm run check:build:size-delta
 
 # Known reference branches, in priority order.
-REFERENCES=('beta' 'main')
+REFERENCES=('master' 'beta')
 
 log() {
 	echo "[Bundle size]" "$@" >&2

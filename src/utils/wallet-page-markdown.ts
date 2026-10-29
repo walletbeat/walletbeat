@@ -42,7 +42,7 @@ import { getWalletUrl } from '@/utils/urls'
  *
  * @param attributeTree Attribute tree for this wallet class; must match the shape of `wallet.overall`.
  * @param wallet The fully-rated wallet to render.
- * @param siteUrl The site root URL without trailing slash (e.g. "https://wallet.page").
+ * @param siteUrl The site root URL without trailing slash (e.g. "https://walletbeat.eth.limo").
  */
 export function walletPageMarkdown<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,

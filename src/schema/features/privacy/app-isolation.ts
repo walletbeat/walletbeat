@@ -10,7 +10,7 @@ import type { Support, Supported } from '../support'
  * before they approve the connection, not necessarily what `eth_accounts` returns.
  * The actual `eth_accounts` result follows whatever the user chose in that dialog.
  *
- * To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test/)
+ * To identify: use the Walletbeat test page (https://walletbeat.eth.limo/test/)
  * which calls `eth_accounts` after connecting and shows how many accounts are returned.
  */
 export enum ExposedAccountsBehavior {
@@ -83,7 +83,7 @@ export const appConnectionNotSupported = {
 interface BaseAppIsolation {
 	/**
 	 * How does the wallet handle the `eth_accounts` RPC?
-	 * Use the Walletbeat test page to verify: https://beta.walletbeat.eth.limo/test/
+	 * Use the Walletbeat test page to verify: https://walletbeat.eth.limo/test/
 	 * It calls `eth_accounts` after connecting and shows exactly which accounts
 	 * are returned, letting you observe the `ExposedAccountsBehavior` directly.
 	 */
@@ -92,7 +92,7 @@ interface BaseAppIsolation {
 	/**
 	 * If the wallet supports ERC-7846 (`wallet_connect` RPC), what set of
 	 * accounts are exposed?
-	 * Use the Walletbeat test page to verify: https://beta.walletbeat.eth.limo/test/
+	 * Use the Walletbeat test page to verify: https://walletbeat.eth.limo/test/
 	 * It tests ERC-7846 `wallet_connect` support and shows the returned account set.
 	 */
 	erc7846WalletConnect: Support<WithRef<ExposedAccountSet>>
@@ -105,7 +105,7 @@ interface BaseAppIsolation {
 	 * a fresh address specifically for this app, rather than only letting you
 	 * pick from existing accounts.
 	 *
-	 * Contributors can use https://beta.walletbeat.eth.limo/test/ to test.
+	 * Contributors can use https://walletbeat.eth.limo/test/ to test.
 	 */
 	createInAppConnectionFlow: Support<WithRef<{}>>
 

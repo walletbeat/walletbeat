@@ -106,7 +106,7 @@ export enum TransactionOutcome {
  * instead we evaluate whether the transaction outcome is explained.
  * To test: initiate the relevant benchmark transaction and observe the approval screen.
  *
- * Users can test on https://beta.walletbeat.eth.limo/test and
+ * Users can test on https://walletbeat.eth.limo/test/ and
  * test a transaction request under `Transactions` tab.
  */
 export interface DisplayedComplexTransactionDetails {
@@ -535,7 +535,7 @@ export enum DataLocation {
  * uses EIP-712 signatures, or via the browser console) and observe what the
  * wallet's approval screen shows.
  *
- * Users can test on https://beta.walletbeat.eth.limo/test and
+ * Users can test on https://walletbeat.eth.limo/test and
  * test a EIP-712 message signing request under `Signatures` tab.
  */
 export enum MessageSigningDetails {
@@ -671,7 +671,7 @@ export interface HardwareTransactionLegibilitySupport extends BaseTransactionLeg
  * To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check
  * what calldata options the wallet provides.
  *
- * Users can test on https://beta.walletbeat.eth.limo/test and
+ * Users can test on https://walletbeat.eth.limo/test/ and
  * test a USDC approval transaction under `Transactions` tab.
  */
 export enum CallDataDisplay {

@@ -651,7 +651,7 @@ type BrowserIntegrationEip = '1193' | '2700' | '6963'
 
 Browser-level integration of a wallet. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
 
-Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
+Use the Walletbeat test page to verify support: https://walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
 
 ```typescript
 type WalletBrowserIntegration =
@@ -666,7 +666,7 @@ Level of integration of a wallet within browsers, mobile phones, etc.
 
 - `browser` (`WalletBrowserIntegration`): Browser-level integrations. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
 
-  Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
+  Use the Walletbeat test page to verify support: https://walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
 
 ---
 
@@ -863,7 +863,7 @@ What set of accounts the wallet presents as the default selection in the connect
 
 Note: these values describe the wallet's default _selection_ shown to the user before they approve the connection, not necessarily what `eth_accounts` returns. The actual `eth_accounts` result follows whatever the user chose in that dialog.
 
-To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test/) which calls `eth_accounts` after connecting and shows how many accounts are returned.
+To identify: use the Walletbeat test page (https://walletbeat.eth.limo/test/) which calls `eth_accounts` after connecting and shows how many accounts are returned.
 
 - `ALL_ACCOUNTS` = `'ALL_ACCOUNTS'`: The wallet exposes all user accounts to every connected app. (e.g. `eth_accounts` returns three addresses even though only one is active.) To identify: connect the wallet to an app while having multiple accounts set up, then call `eth_accounts` — all accounts are returned, not just the active one.
 - `ACTIVE_ACCOUNT_ONLY` = `'ACTIVE_ACCOUNT_ONLY'`: The wallet exposes only the currently active/selected account. (e.g. `eth_accounts` returns a single address — whichever account is selected in the wallet at that moment.) To identify: switch accounts in the wallet and call `eth_accounts` from an app — only one address is returned and it matches the currently active account.
@@ -3100,7 +3100,7 @@ To test: initiate the benchmark transaction and check whether the approval scree
 
 How are the essential transaction data displayed by the wallet for complex transactions? Complex transactions interact with contracts, so there is no simple "to" address or "value" — instead we evaluate whether the transaction outcome is explained. To test: initiate the relevant benchmark transaction and observe the approval screen.
 
-Users can test on https://beta.walletbeat.eth.limo/test and test a transaction request under `Transactions` tab.
+Users can test on https://walletbeat.eth.limo/test/ and test a transaction request under `Transactions` tab.
 
 - `gas` (`DataDisplayOptions`): The gas fee / estimated network cost.
 - `nonce` (`DataDisplayOptions`): The transaction nonce.
@@ -3370,7 +3370,7 @@ Where does the calldata decoding actually happen? To identify: initiate a contra
 
 What does the wallet provide for message signing legibility? To test: trigger an `eth_signTypedData_v4` request (e.g. via an app that uses EIP-712 signatures, or via the browser console) and observe what the wallet's approval screen shows.
 
-Users can test on https://beta.walletbeat.eth.limo/test and test a EIP-712 message signing request under `Signatures` tab.
+Users can test on https://walletbeat.eth.limo/test and test a EIP-712 message signing request under `Signatures` tab.
 
 - `EIP712_STRUCT` = `'EIP712_STRUCT'`: The wallet shows the full decoded EIP-712 struct — domain fields and message fields rendered as human-readable key-value pairs.
 - `DOMAIN_HASH` = `'DOMAIN_HASH'`: The wallet shows the EIP-712 domain separator hash.
@@ -3450,7 +3450,7 @@ A record of transaction legibility support (both message and transaction)
 
 What can the user do with the calldata on the approval screen? To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check what calldata options the wallet provides.
 
-Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval transaction under `Transactions` tab.
+Users can test on https://walletbeat.eth.limo/test/ and test a USDC approval transaction under `Transactions` tab.
 
 - `RAW_HEX` = `'RAW_HEX'`: The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
 - `COPY_HEX_TO_CLIPBOARD` = `'COPY_HEX_TO_CLIPBOARD'`: A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.

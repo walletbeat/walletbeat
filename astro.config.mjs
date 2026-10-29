@@ -21,7 +21,7 @@ const isLinux = process.platform === 'linux'
 // https://astro.build/config
 export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
-	site: process.env.SITE_URL ?? 'https://wallet.page', // Set your production site URL here
+	site: process.env.SITE_URL ?? 'https://walletbeat.eth.limo', // Set your production site URL here
 	output: 'static',
 	integrations: [svelte()].concat(
 		process.env.WALLETBEAT_DEV === 'true'

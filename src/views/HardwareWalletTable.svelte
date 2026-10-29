@@ -19,7 +19,7 @@
 		title?: string
 	} = $props()
 
-	const titleDisclaimer = 'Hardware wallets are in beta and our methodology is subject to change at any time.'
+	const titleDisclaimer = 'Hardware wallets are in beta and our methodology is subject to change.'
 </script>
 
 <WalletTable

@@ -1,6 +1,7 @@
 ---
 // Constants
 import { defaultNavigationItems } from '@/constants/navigation'
+import { GITHUB_REPO_URL, githubBlobUrl } from '@/constants/github'
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
@@ -19,8 +20,6 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
 		<header data-scroll-item='inline-detached padding-match-start padding-match-end'>
-			<span class='hero-status' data-badge='small'>Beta</span>
-
 			<h1>Who watches the wallets?</h1>
 
 			<p>
@@ -29,19 +28,10 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 			</p>
 
 			<nav class='hero-actions' aria-label='Contribute' data-row='start gap-3 wrap'>
-				<a
-					class='hero-action-primary'
-					href='https://github.com/walletbeat/walletbeat'
-					target='_blank'
-					rel='noreferrer'
-				>
+				<a class='hero-action-primary' href={GITHUB_REPO_URL} target='_blank' rel='noreferrer'>
 					GitHub repository
 				</a>
-				<a
-					href='https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md'
-					target='_blank'
-					rel='noreferrer'
-				>
+				<a href={githubBlobUrl('/CONTRIBUTING.md')} target='_blank' rel='noreferrer'>
 					How to contribute →
 				</a>
 			</nav>
