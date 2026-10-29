@@ -1264,11 +1264,6 @@
 									</h3>
 								</div>
 
-								{#if selectedVariant && selectedVariant in wallet.variants}
-									<div class="variant">
-										<a data-link="camouflaged" href={walletUrl}>{variants[selectedVariant].label}</a>
-									</div>
-								{/if}
 							</div>
 						</div>
 					</div>
