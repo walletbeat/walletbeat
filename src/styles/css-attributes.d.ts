@@ -348,7 +348,7 @@ declare global {
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`
 		 */
-		'data-link'?: 'camouflaged' | boolean
+		'data-link'?: 'camouflaged' | 'contents' | boolean
 
 		/**
 		 * ## [data-list]
@@ -479,7 +479,14 @@ declare global {
 		 * Native summaries own their feedback; breadcrumb summaries delegate it to their foreground row.
 		 *
 		 * ### Tokens
-		 * - `to-containing`
+		 * - `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.
+		 * - `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.
+		 *
+		 * ### Placement
+		 * - A paint body inherits the control's font and corner context; badges inside retain their independent appearance.
+		 * - Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.
+		 * - Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.
+		 * - Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.
 		 *
 		 * ### CSS Variables
 		 * - `--pressable-transitionOutDuration`
@@ -498,7 +505,7 @@ declare global {
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`
 		 */
-		'data-pressable'?: 'to-containing' | boolean
+		'data-pressable'?: 'paint' | 'to-containing' | boolean
 
 		/**
 		 * ## [data-pressable-name]

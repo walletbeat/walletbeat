@@ -80,12 +80,10 @@ const buildDocLines = (entry: CssAttributeEntry): string[] => {
 	]
 }
 
-const attributeValueType = (name: string): string =>
-	name === 'data-link'
-		? "'camouflaged' | boolean"
-		: name === 'data-pressable'
-			? "'to-containing' | boolean"
-			: 'string | boolean'
+const attributeValueType = (entry: CssAttributeEntry): string =>
+	entry.name === 'data-link' || entry.name === 'data-pressable'
+		? [...entry.values].sort().map(quote).concat('boolean').join(' | ')
+		: 'string | boolean'
 
 const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 	(() => {
@@ -94,7 +92,7 @@ const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 			'interface CssAttributes {',
 			...sortedEntries.flatMap((entry, i) => [
 				...buildDocLines(entry),
-				`\t${quote(entry.name)}?: ${attributeValueType(entry.name)}`,
+				`\t${quote(entry.name)}?: ${attributeValueType(entry)}`,
 				...(i < sortedEntries.length - 1 ? [''] : []),
 			]),
 			'}',

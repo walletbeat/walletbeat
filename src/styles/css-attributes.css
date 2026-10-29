@@ -132,10 +132,22 @@ a {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-state]`
 	 */
-	&:is(a)[data-pressable-state~="pressed"] {
+	&:is(a):not([aria-disabled="true"])[data-pressable-state~="pressed"] {
 		transition-duration: var(--pressable-transitionInDuration);
 		opacity: var(--pressable-pressed-opacity);
-		scale: var(--pressable-pressed-scale);
+		&:where(:not([data-pressable~='to-containing'], :has(> [data-pressable~='paint']))) {
+			scale: var(--pressable-pressed-scale);
+		}
+
+		&:has(> [data-pressable~='paint']) {
+			opacity: 1;
+		}
+
+		& > [data-pressable~='paint'] {
+			opacity: var(--pressable-pressed-opacity);
+			scale: var(--pressable-pressed-scale);
+			transition-duration: var(--pressable-transitionInDuration);
+		}
 	}
 }
 @supports (animation-timeline: scroll()) and (timeline-scope: --link)
@@ -373,7 +385,14 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  * Native summaries own their feedback; breadcrumb summaries delegate it to their foreground row.
  *
  * ### Tokens
- * - `to-containing`
+ * - `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.
+ * - `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.
+ *
+ * ### Placement
+ * - A paint body inherits the control's font and corner context; badges inside retain their independent appearance.
+ * - Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.
+ * - Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.
+ * - Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.
  *
  * ### CSS Variables
  * - `--pressable-transitionOutDuration`
@@ -402,10 +421,35 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	option,
 	button,
 	input,
-	label:has(> input:is([type="checkbox"], [type="radio"]), button),
+	label:has(> input, button),
 	::scroll-marker
 ) {
-	position: relative;
+	&:where(:not([data-pressable~='paint'])) {
+		position: relative;
+	}
+
+	& > [data-pressable~='paint'] {
+		position: relative;
+		display: inherit;
+		align-items: inherit;
+		justify-content: inherit;
+		gap: inherit;
+		font: inherit;
+		border-radius: inherit;
+	}
+
+	&:focus-visible:has(> [data-pressable~='paint']) {
+		---pressable-outlineColor: var(--accent);
+		outline-color: transparent;
+		outline-style: solid;
+
+		> [data-pressable~='paint'] {
+			outline: inherit;
+			outline-style: auto;
+			outline-color: var(---pressable-outlineColor);
+			outline-offset: inherit;
+		}
+	}
 
 	&[data-pressable~='to-containing'] {
 		position: static;
@@ -420,12 +464,12 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	transition-property: opacity, scale, ---pressable-opacity;
 	transition-duration: var(--pressable-transitionOutDuration);
 
-	&:is(:active, summary[data-sticky-breadcrumb~="position"]:active:where(:not(:has(:where([data-pressable], [role="button"], summary, a, select, option, button, input, label:has(> input:is([type="checkbox"], [type="radio"]), button)):active))) > header > [data-row]):is(
-			label:has(> input:is([type="checkbox"], [type="radio"]), button),
+	&:where(:not([data-pressable~='paint'], :disabled, [aria-disabled='true'], label:has(> input:disabled), label:has(> [data-pressable~='paint']) > input)):is(:active, summary[data-sticky-breadcrumb~="position"]:active:where(:not(:has(:where([data-pressable]:not([data-pressable~='paint']), [role="button"], summary, a, select, option, button, input, label:has(> input, button)):active))) > header > [data-row]):is(
+			label:has(> input, button),
 			:not(
 				:has(
 					:where(
-						[data-pressable],
+						[data-pressable]:not([data-pressable~='paint']),
 						[role="button"],
 						:where(
 							summary,
@@ -434,7 +478,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 							option,
 							button,
 							input,
-							label:has(> input:is([type="checkbox"], [type="radio"]), button)
+							label:has(> input, button)
 						)
 					):active
 				)
@@ -443,7 +487,19 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 		transition-duration: var(--pressable-transitionInDuration);
 		opacity: var(--pressable-pressed-opacity);
 		---pressable-opacity: var(--pressable-pressed-opacity);
-		scale: var(--pressable-pressed-scale);
+		&:where(:not([data-pressable~='to-containing'], :has(> [data-pressable~='paint']))) {
+			scale: var(--pressable-pressed-scale);
+		}
+
+		&:has(> [data-pressable~='paint']) {
+			opacity: 1;
+		}
+
+		& > [data-pressable~='paint'] {
+			opacity: var(--pressable-pressed-opacity);
+			scale: var(--pressable-pressed-scale);
+			transition-duration: var(--pressable-transitionInDuration);
+		}
 	}
 }
 ::scroll-marker:active {
