@@ -43,6 +43,121 @@ export function installProviders() {
 }
 
 /**
+ * Verify the shared dialog lifecycle through a real Playground invoker.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} name
+ * @param {import('@playwright/test').Locator} invoker
+ * @param {number} position
+ * @param {'escape'|'light'|'close'|'cancel'} [dismiss]
+ * @param {number} [remaining]
+ */
+async function checkModalLifecycle(
+	page,
+	name,
+	invoker,
+	position,
+	dismiss = 'escape',
+	remaining = 0,
+) {
+	const dialog = page.getByRole('dialog', { name, exact: true })
+	const scroll = page.locator('#layout')
+
+	await dialog.waitFor()
+	const element = await dialog.elementHandle()
+
+	if (!element) {
+		throw new Error('Open dialog has no element')
+	}
+
+	await element.evaluate(el => {
+		el.dataset.closeCount = '0'
+
+		if (!el.dataset.closeProbe) {
+			el.addEventListener('close', () => {
+				el.dataset.closeCount = String(Number(el.dataset.closeCount) + 1)
+			})
+			el.dataset.closeProbe = 'true'
+		}
+	})
+	assert.ok(
+		await dialog.evaluate(el => el.matches(':modal') && el.contains(document.activeElement)),
+	)
+	assert.equal(await scroll.evaluate(el => getComputedStyle(el).overflowY), 'hidden')
+	const browserName = page.context().browser().browserType().name()
+
+	for (const direction of ['forward', 'reverse']) {
+		const key =
+			direction === 'forward'
+				? browserName === 'webkit'
+					? 'Alt+Tab'
+					: 'Tab'
+				: browserName === 'webkit'
+					? 'Alt+Shift+Tab'
+					: 'Shift+Tab'
+
+		for (let index = 0; index < 8; index++) {
+			await page.keyboard.press(key)
+			const contained = await dialog.evaluate(el => el.contains(document.activeElement))
+
+			if (!contained) {
+				assert.ok(
+					await dialog.evaluate(
+						() => document.activeElement === document.body && !document.hasFocus(),
+					),
+				)
+				await page.keyboard.press(key)
+				assert.ok(await dialog.evaluate(el => el.contains(document.activeElement)))
+			}
+		}
+	}
+	await page.mouse.move(5, 5)
+	await page.mouse.wheel(0, 500)
+	await scroll.evaluate(
+		el =>
+			new Promise(resolve => {
+				const start = performance.now()
+				const sample = now =>
+					now - start >= 300 ? resolve(el.scrollTop) : requestAnimationFrame(sample)
+
+				requestAnimationFrame(sample)
+			}),
+	)
+	assert.equal(await scroll.evaluate(el => el.scrollTop), position)
+
+	if (dismiss === 'light') {
+		await page.mouse.click(5, 5)
+	} else if (dismiss === 'close' || dismiss === 'cancel') {
+		await dialog
+			.getByRole('button', { name: dismiss === 'close' ? 'Close' : 'Cancel', exact: true })
+			.click()
+	} else {
+		await page.keyboard.press('Escape')
+	}
+
+	await dialog.waitFor({ state: 'hidden' })
+	await page.waitForFunction(el => el.dataset.closeCount === '1', element)
+	assert.equal(await element.evaluate(el => el.dataset.closeCount), '1')
+	assert.ok(await invoker.evaluate(el => el === document.activeElement))
+	assert.equal(await page.locator('dialog:modal').count(), remaining)
+	assert.equal(
+		await scroll.evaluate(el => getComputedStyle(el).overflowY === 'hidden'),
+		remaining > 0,
+	)
+	assert.equal(await scroll.evaluate(el => el.scrollTop), position)
+}
+
+/** @param {import('@playwright/test').Page} page */
+async function acceptScamConsent(page) {
+	await page
+		.getByRole('checkbox', {
+			name: 'I understand the risks and will only use disposable wallets for testing',
+			exact: true,
+		})
+		.check()
+	await page.getByRole('button', { name: 'I Understand', exact: true }).click()
+}
+
+/**
  * Exercise actual compiled tester navigation; callers own browser launch and evidence storage.
  * @param {import('@playwright/test').Page} page
  * @param {string} baseURL
@@ -81,13 +196,7 @@ export async function checkPresentation(page, baseURL, outputDir) {
 				assert.equal(await category.getAttribute('aria-pressed'), 'true')
 
 				if (labels[categoryIndex].trim() === 'Scam Alerts') {
-					await page
-						.getByRole('checkbox', {
-							name: 'I understand the risks and will only use disposable wallets for testing',
-							exact: true,
-						})
-						.check()
-					await page.getByRole('button', { name: 'I Understand', exact: true }).click()
+					await acceptScamConsent(page)
 				}
 
 				const count = await cases.getByRole('button').count()
@@ -121,6 +230,11 @@ export async function checkPresentation(page, baseURL, outputDir) {
 					)
 
 					if (labels[categoryIndex].trim() === 'EIP Support') {
+						await page
+							.getByRole('button', { name: 'Run Step', exact: true })
+							.scrollIntoViewIfNeeded()
+						const resultPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+
 						await page.getByRole('button', { name: 'Run Step', exact: true }).click()
 
 						if (index + 1 < count) {
@@ -131,7 +245,12 @@ export async function checkPresentation(page, baseURL, outputDir) {
 								.waitFor()
 						} else {
 							await page.getByRole('heading', { name: 'Test Results', exact: true }).waitFor()
-							await page.getByRole('button', { name: 'Close', exact: true }).click()
+							await checkModalLifecycle(
+								page,
+								'Test Results',
+								page.locator('.main-content .actions button').first(),
+								resultPosition,
+							)
 						}
 					}
 				}
@@ -159,6 +278,18 @@ export async function checkPresentation(page, baseURL, outputDir) {
 			await page
 				.getByRole('heading', { name: 'Select a wallet', exact: true })
 				.waitFor({ state: 'hidden' })
+			await page
+				.getByRole('button', { name: 'Connect wallet', exact: true })
+				.scrollIntoViewIfNeeded()
+			const connectorPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+
+			await page.getByRole('button', { name: 'Connect wallet', exact: true }).click()
+			await checkModalLifecycle(
+				page,
+				'Select a wallet',
+				page.getByRole('button', { name: 'Connect wallet', exact: true }),
+				connectorPosition,
+			)
 			await page.getByRole('button', { name: 'Connect wallet', exact: true }).click()
 			await page.getByRole('button', { name: 'Mock Wallet 1', exact: true }).click()
 			await page
@@ -170,17 +301,127 @@ export async function checkPresentation(page, baseURL, outputDir) {
 				'Custom Transaction',
 			)
 			await cases.getByRole('button').first().click()
-			await page
-				.getByRole('button', { name: 'Send Transaction (Testing Only)', exact: true })
-				.click()
-			await page.getByRole('heading', { name: 'Switch to Ethereum Mainnet', exact: true }).waitFor()
-			await page.getByRole('button', { name: 'Cancel', exact: true }).click()
-			await page
-				.getByRole('heading', { name: 'Switch to Ethereum Mainnet', exact: true })
-				.waitFor({ state: 'hidden' })
+			const sendInvoker = page.getByRole('button', {
+				name: 'Send Transaction (Testing Only)',
+				exact: true,
+			})
+
+			await sendInvoker.scrollIntoViewIfNeeded()
+			const parentOrigin = await page.locator('#layout').evaluate(el => el.scrollTop)
+
+			await sendInvoker.click()
+			const parent = page.getByRole('dialog', { name: 'Switch to Ethereum Mainnet', exact: true })
+			const switchInvoker = parent.getByRole('button', { name: 'Switch to Mainnet', exact: true })
+
+			await parent.waitFor()
+
+			for (const dismiss of ['escape', 'close']) {
+				await switchInvoker.click()
+				const error = page.getByRole('dialog', { name: 'Error', exact: true })
+
+				await error.waitFor()
+				assert.equal(await page.locator('dialog:modal').count(), 2)
+				assert.ok(
+					(await error.getByRole('alert').textContent()).includes(
+						'Mock provider does not support wallet_switchEthereumChain',
+					),
+				)
+				await checkModalLifecycle(page, 'Error', switchInvoker, parentOrigin, dismiss, 1)
+				assert.ok(
+					await parent.evaluate(el => el.matches(':modal') && el.contains(document.activeElement)),
+				)
+			}
+			await checkModalLifecycle(
+				page,
+				'Switch to Ethereum Mainnet',
+				sendInvoker,
+				parentOrigin,
+				'cancel',
+			)
+			const actions = []
+
+			for (const categoryName of [
+				'Transactions',
+				'Signatures',
+				'Tx Simulations',
+				'Scam Alerts',
+				'App-isolation',
+				'ERC-8213',
+			]) {
+				await categories.getByRole('button', { name: categoryName, exact: true }).click()
+
+				if (categoryName === 'Scam Alerts') {
+					await acceptScamConsent(page)
+				}
+
+				for (let index = 0; index < (await cases.getByRole('button').count()); index++) {
+					const item = cases.getByRole('button').nth(index)
+
+					if (await item.isDisabled()) {
+						continue
+					}
+
+					await item.click()
+					const main = page.locator('.main-content')
+
+					for (const field of await main.locator('input.address-input').all()) {
+						await field.fill('0x0000000000000000000000000000000000000001')
+					}
+
+					if (await main.locator('#custom-tx-calldata').count()) {
+						await main.locator('#custom-tx-calldata').fill('0x')
+					}
+
+					const action = main.locator('button[data-pressable]').first()
+					const label = (await action.textContent()).trim()
+
+					await action.scrollIntoViewIfNeeded()
+					const before = await page.locator('#layout').evaluate(el => el.scrollTop)
+
+					await action.click()
+
+					if (label.startsWith('Send')) {
+						await checkModalLifecycle(page, 'Switch to Ethereum Mainnet', action, before)
+					} else if (label.startsWith('Sign')) {
+						await page.getByRole('alert').waitFor()
+						const method =
+							categoryName === 'Scam Alerts' || label.includes('Typed Data')
+								? 'eth_signTypedData_v4'
+								: 'personal_sign'
+
+						assert.ok(
+							(await page.getByRole('alert').textContent()).includes(
+								`Mock provider does not support ${method}`,
+							),
+						)
+						await checkModalLifecycle(page, 'Error', action, before)
+						await action.click()
+						await page.getByRole('alert').waitFor()
+						await checkModalLifecycle(page, 'Error', action, before, 'light')
+						await action.click()
+						await checkModalLifecycle(page, 'Error', action, before, 'close')
+					} else if (label.startsWith('Compute')) {
+						await main.locator('.hash-value').first().waitFor()
+						assert.ok((await main.locator('.hash-value').first().textContent()).startsWith('0x'))
+					} else if (label === 'Call eth_accounts') {
+						await main.getByText('1 account(s) exposed', { exact: true }).waitFor()
+					} else if (label === 'Call wallet_connect') {
+						await main.locator('.result-json').waitFor()
+						assert.ok(
+							(await main.locator('.result-json').textContent()).includes(
+								'0x0000000000000000000000000000000000000001',
+							),
+						)
+					} else {
+						throw new Error(`Unhandled action: ${label}`)
+					}
+
+					actions.push({ category: categoryName, case: (await item.textContent()).trim(), label })
+				}
+			}
 			await page.locator('h1').scrollIntoViewIfNeeded()
 			await page.screenshot({ path: `${outputDir}/${width}-${colorScheme}.png` })
-			reports.push({ width, colorScheme, labels, panes })
+			reports.push({ width, colorScheme, labels, panes, actions })
 		}
 	}
 
