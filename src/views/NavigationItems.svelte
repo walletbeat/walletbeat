@@ -282,7 +282,7 @@
 	{:else if item.icon}
 		{@const iconShape = depth === 0 ? 'circle' : ''}
 		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-			<span aria-hidden="true" data-icon="grayscale">
+			<span aria-hidden="true" data-icon="">
 				<img
 					src={item.icon.slice('ICON_WALLET_IMG:'.length)}
 					alt=""
@@ -437,7 +437,6 @@
 				&:is(details[data-pressable-state~="interacting"] > summary) {
 					---backgroundColor: var(--navItem-hover-backgroundColor);
 					---color: var(--accent);
-					--icon-grayscale-filter: none;
 				}
 
 				&:is(a)[aria-current="page"],
@@ -446,7 +445,6 @@
 						:not(details:open > &):has(~ menu a[aria-current="page"])
 					) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
-					--icon-grayscale-filter: none;
 
 					&:hover,
 					&:focus-visible,
@@ -534,12 +532,10 @@
 	@supports (color: if(style(---link-current: 1): red)) {
 		.navigation-items :is(a[data-pressable-name], details[data-pressable-name] > summary) {
 			---backgroundColor: if(style(---link-current: 1): var(--navItem-current-backgroundColor); else: transparent);
-			--icon-grayscale-filter: if(style(---link-current: 1): none; else: grayscale(1) opacity(0.8));
 
 			&:is(:hover, :focus-visible, :focus-within, [data-pressable-state~="interacting"]),
 			&:is(details[data-pressable-state~="interacting"] > summary) {
 				---backgroundColor: if(style(---link-current: 1): var(--navItem-current-hover-backgroundColor); else: var(--navItem-hover-backgroundColor));
-				--icon-grayscale-filter: none;
 			}
 		}
 	}
