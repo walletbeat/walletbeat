@@ -21,5 +21,5 @@
 
 <section id="audit-composition">
 	<svelte:element this={`h${parentHeadingLevel}`}>Security audits</svelte:element>
-	<SecurityAuditsDetails wallet={ambire} metadata={audits} {parentHeadingLevel} />
+	<SecurityAuditsDetails references={[]} wallet={ambire} metadata={audits} {parentHeadingLevel} />
 </section>

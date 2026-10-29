@@ -49,6 +49,7 @@
 		wallet,
 		parentHeadingLevel,
 		metadata,
+		references,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
 		bugBountyDetails,
@@ -56,6 +57,7 @@
 		parentHeadingLevel: 1 | 2 | 3 | 4
 		wallet: { metadata: WalletMetadata }
 		metadata: SecurityAuditsMetadata
+		references: FullyQualifiedReference[]
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 		bugBountyDetails?: string
@@ -71,6 +73,9 @@
 			))
 	)
 
+	const auditReferences = $derived(securityAudits.flatMap(audit => toFullyQualified(audit.ref)))
+	const remainingReferences = $derived(references.filter(reference => !auditReferences.some(auditReference => isRefEqual(reference, auditReference))))
+
 	const mostRecentAudit = $derived(
 		securityAudits[0]
 	)
@@ -78,7 +83,7 @@
 
 	// Functions
 	import { securityAuditId, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
-	import { toFullyQualified } from '@/schema/reference'
+	import { isRefEqual, toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
 	import { isUrl } from '@/schema/url'
 
 
@@ -238,6 +243,8 @@
 	</section>
 {/if}
 
+
+<ReferenceLinks {parentHeadingLevel} references={remainingReferences} />
 
 <style>
 	.fixed-flaw {
