@@ -71,14 +71,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 
 			expect(maximum).toBeGreaterThan(1)
 
-			let referencePaint: Buffer | undefined
-
-			for (const fraction of [0, 0.5, 1]) {
-				expect(await layout.evaluate(layout => layout.scrollWidth - layout.clientWidth)).toBe(
-					maximum,
-				)
-				const target = Math.round(maximum * fraction)
-
+			const panTo = async (target: number) => {
 				await page.locator('#nav header .logo').hover()
 				await page.locator('#nav header .logo').focus()
 				await expect
@@ -95,6 +88,17 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 						{ timeout: 15000 },
 					)
 					.toBeLessThanOrEqual(1)
+			}
+
+			let referencePaint: Buffer | undefined
+
+			for (const fraction of [0, 0.5, 1]) {
+				expect(await layout.evaluate(layout => layout.scrollWidth - layout.clientWidth)).toBe(
+					maximum,
+				)
+				const target = Math.round(maximum * fraction)
+
+				await panTo(target)
 
 				const slot = trigger.locator('.filter-cluster-target')
 				const slotBox = await slot.boundingBox()
@@ -110,27 +114,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					contentType: 'image/png',
 				})
 
-				if (!referencePaint) {
-					const visibility = await glyph.evaluate(glyph => {
-						const previous = glyph.style.visibility
-
-						glyph.style.visibility = 'hidden'
-
-						return previous
-					})
-					let hiddenPaint: Buffer
-
-					try {
-						hiddenPaint = await page.screenshot({ clip: slotBox })
-					} finally {
-						await glyph.evaluate((glyph, visibility) => {
-							glyph.style.visibility = visibility
-						}, visibility)
-					}
-
-					expect(hiddenPaint).not.toEqual(paint)
-					referencePaint = paint
-				}
+				referencePaint ??= paint
 
 				await expect.poll(() => page.screenshot({ clip: slotBox })).toEqual(referencePaint)
 
@@ -186,6 +170,48 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				baselineAlignment,
 			)
 			await expect(rows).toHaveCount(rowCount)
+
+			await trigger.press('Enter')
+			await expect.poll(() => panel.evaluate(panel => panel.matches(':popover-open'))).toBe(true)
+			await panel
+				.locator('[data-filter-set="stageStatus"] [data-filter-choice="stage-qualified"]')
+				.click()
+			await settled()
+			await page.mouse.move(5, 5)
+			await page.keyboard.press('Escape')
+			await expect.poll(() => panel.evaluate(panel => panel.matches(':popover-open'))).toBe(false)
+			await settled()
+			await expect(glyph).toHaveCount(1)
+			await panTo(0)
+			const slotBox = await trigger.locator('.filter-cluster-target').boundingBox()
+
+			if (!slotBox) {
+				throw new Error('Restored Stage filter needs its header slot')
+			}
+
+			const paint = await page.screenshot({ clip: slotBox })
+
+			expect(paint).toEqual(referencePaint)
+
+			// Keep visibility interventions after native journeys so they cannot disturb input state.
+			const visibility = await glyph.evaluate(glyph => {
+				const previous = glyph.style.visibility
+
+				glyph.style.visibility = 'hidden'
+
+				return previous
+			})
+			let hiddenPaint: Buffer
+
+			try {
+				hiddenPaint = await page.screenshot({ clip: slotBox })
+			} finally {
+				await glyph.evaluate((glyph, visibility) => {
+					glyph.style.visibility = visibility
+				}, visibility)
+			}
+
+			expect(hiddenPaint).not.toEqual(paint)
 		})
 	})
 }
