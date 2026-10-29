@@ -1511,6 +1511,11 @@
 							</div>
 						{/if}
 					</li>
+					{#if override?.note}
+						<li data-list-item="gap-3" data-scroll-item="snap-prose" data-list-item-marker="👉">
+							<Typography content={override.note} strings={{ WALLET_NAME: wallet.metadata.displayName }} />
+						</li>
+					{/if}
 				</ul>
 
 				{#if variantSpecificCaption}
@@ -1667,7 +1672,7 @@
 							<section data-column data-scroll-item="snap-prose">
 								<Typography content={howToImprove} strings={getWalletEvalStrings(wallet)} />
 
-								{#if override}
+								{#if override?.howToImprove}
 									<div class="note" data-card="padding-3" data-row="gap-4">
 										<div class="icon">ℹ️</div>
 										<p>
