@@ -14,6 +14,7 @@
 	import { attributeGroupFlowerGradient, sliceFill, sliceLabelBackground } from '@/components/pie-fill'
 
 	// Types/constants
+	import { childHeadingLevel } from '@/types/heading'
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import {
 		type Attribute,
@@ -62,6 +63,11 @@
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 	import { allCriteriaInStage, getAttributeStagesForWallet, getCriterionAttributeId } from '@/utils/stage-attributes'
 
+
+	const pageHeadingLevel = 1
+	const sectionHeadingLevel = childHeadingLevel[pageHeadingLevel]
+	const attributeHeadingLevel = childHeadingLevel[sectionHeadingLevel]
+	const attributeDetailHeadingLevel = childHeadingLevel[attributeHeadingLevel]
 
 	// Props
 	const {
@@ -876,7 +882,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				data-row="start gap-2 wrap"
 				style="--select-compactTimeline: var(--stickyBreadcrumb-entryTimeline); --select-compactScale: var(--stickyBreadcrumb-scale, 1); --select-compactRange: var(--stickyBreadcrumb-entryRange); --select-compactEasing: var(---breadcrumb-inlineEasing)"
 			>
-			<h1>
+			<svelte:element this={`h${pageHeadingLevel}`}>
 				<a
 					data-link="camouflaged"
 					class="wallet-name"
@@ -893,7 +899,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					/>
 					<span>{wallet.metadata.displayName}</span>
 				</a>
-			</h1>
+			</svelte:element>
 			{#if Object.keys(wallet.variants).length > 1 || (Variant.HARDWARE in wallet.variants && brandModels.length > 1)}
 				<div class="wallet-device-controls" data-row="gap-2 wrap" inert={!queryParams}>
 					{#if Object.keys(wallet.variants).length > 1}
@@ -1069,7 +1075,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	<article data-column="gap-8">
 		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
-			<SecurityNews news={walletNews} {allNewsResolved} heading={sectionHeader} />
+			<SecurityNews parentHeadingLevel={sectionHeadingLevel} news={walletNews} {allNewsResolved} heading={sectionHeader} />
 		{/if}
 
 		{#if showStage && primaryStage.ladderEvaluation !== null}
@@ -1108,7 +1114,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />
-			<SecurityNews news={walletNews} {allNewsResolved} heading={sectionHeader} />
+			<SecurityNews parentHeadingLevel={sectionHeadingLevel} news={walletNews} {allNewsResolved} heading={sectionHeader} />
 		{/if}
 
 		{#if attributeNavigationItems.length}
@@ -1156,7 +1162,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				<div data-sticky-breadcrumb="source" data-row-item="flexible">
 					<a data-row="start" data-sticky-breadcrumb="item" data-link="camouflaged" href={`#${id}`} {...destinationState(`#${id}`, true, true)} interestfor={id}>
 						<span aria-hidden="true" data-icon={`wbicons-${knownSingleVariantIcons[icon] ?? 'complex'} accent ${icon}`}></span>
-						<h2>{label}</h2>
+						<svelte:element this={`h${sectionHeadingLevel}`}>{label}</svelte:element>
 					</a>
 					<span data-sticky-breadcrumb="size-export size-source" aria-hidden="true"></span>
 				</div>
@@ -1304,7 +1310,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				<header data-sticky="block block-start backdrop-before backdrop-stuck">
 					<div data-row="start wrap" {...destinationState(`#${slugifyCamelCase(attribute.id)}`)}>
 						<div data-sticky-breadcrumb="source" data-row-item="flexible">
-							<h3 data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
+							<svelte:element this={`h${attributeHeadingLevel}`} data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
 								<a
 									data-row="start"
 									data-link="camouflaged"
@@ -1352,7 +1358,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 										{/if}
 									{/if}
 								{/if}
-							</h3>
+							</svelte:element>
 							<span data-sticky-breadcrumb="size-export size-source" aria-hidden="true"></span>
 						</div>
 						<div
@@ -1444,15 +1450,15 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							{:else if renderData.component === 'PrivateTransfersDetails'}
 								<PrivateTransfersDetails {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...renderData.componentProps} {wallet} refs={references} />
+								<ChainVerificationDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} refs={references} />
 							{:else if renderData.component === 'ScamAlertDetails'}
-								<ScamAlertDetails {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
+								<ScamAlertDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
 							{:else if renderData.component === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+								<SecurityAuditsDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
 							{:else if renderData.component === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'FundingDetails'}
-								<FundingDetails {...renderData.componentProps} {wallet} />
+								<FundingDetails parentHeadingLevel={attributeHeadingLevel} {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
 							{:else if renderData.component === 'AccountUnruggabilityDetails'}
@@ -1498,6 +1504,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				{#if evalAttr.evaluation.references?.length && (isTypographicContent(evalAttr.evaluation.details) || !(// Custom components that render their own reference links
 							['ChainVerificationDetails', 'FundingDetails', 'ScamAlertDetails', 'SecurityAuditsDetails'].includes(evalAttr.evaluation.details.component.component)))}
 					<ReferenceLinks
+						parentHeadingLevel={attributeHeadingLevel}
 						references={toFullyQualified(evalAttr.evaluation.references)}
 						cardBackground="secondary"
 					/>
@@ -1511,7 +1518,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					)}
 
 					<div class="supported-hardware-wallets" data-card="secondary padding-6">
-						<h4>Supported hardware wallets:</h4>
+						<svelte:element this={`h${attributeDetailHeadingLevel}`}>Supported hardware wallets:</svelte:element>
 						<div data-row="gap-2 wrap start">
 							{#each supportedModels.filter(m => !selectedModel || m.modelId === selectedModel) as model}
 								<a href={`/${model.brandId}/?model=${model.modelId}`} data-badge="medium">
@@ -1532,14 +1539,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						data-sticky-container
 					>
 						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-							<h4>
+							<svelte:element this={`h${attributeDetailHeadingLevel}`}>
 								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-why`}>
 									{evalAttr.evaluation.outcome.rating === Rating.PASS ||
 									evalAttr.evaluation.outcome.rating === Rating.UNRATED
 										? 'Why does this matter?'
 										: 'Why should I care?'}
 								</a>
-							</h4>
+							</svelte:element>
 						</summary>
 
 						<section data-column="gap-6" data-scroll-item="snap-prose">
@@ -1559,11 +1566,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						data-sticky-container
 					>
 						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-							<h4>
+							<svelte:element this={`h${attributeDetailHeadingLevel}`}>
 								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-methodology`}>
 									{getHowIsEvaluatedHeading(attribute)}
 								</a>
-							</h4>
+							</svelte:element>
 						</summary>
 
 						<section class="attribute-rating-methodology" data-column="gap-6" data-scroll-item="snap-prose">
@@ -1581,7 +1588,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 								{:else}
 									<aside data-card="radius-4" data-column="gap-5" data-scroll-item="snap-prose">
 										{#if attribute.ratingScale.exhaustive}
-											<h5>A few examples:</h5>
+											<svelte:element this={`h${childHeadingLevel[attributeDetailHeadingLevel]}`}>A few examples:</svelte:element>
 										{/if}
 
 										<ul data-list="gap-4">
@@ -1621,14 +1628,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							data-sticky-container
 						>
 							<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-								<h4>
+								<svelte:element this={`h${attributeDetailHeadingLevel}`}>
 									<a
 										data-link="camouflaged"
 										href={`#${slugifyCamelCase(attribute.id)}-improvement`}
 									>
 										{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
 									</a>
-								</h4>
+								</svelte:element>
 							</summary>
 
 							<section data-column data-scroll-item="snap-prose">

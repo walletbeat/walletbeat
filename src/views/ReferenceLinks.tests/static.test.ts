@@ -9,14 +9,14 @@ import { assertCalendarDate } from '@/types/date'
 import ReferenceLinks from '../ReferenceLinks.svelte'
 
 describe('static reference evidence', () => {
-	it.each([2, 3, 4, 5, 6] as const)('uses the caller heading level %i', headingLevel => {
+	it.each([1, 2, 3, 4, 5] as const)('derives Sources from parent level %i', parentHeadingLevel => {
 		const references: FullyQualifiedReference[] = [
 			{ urls: [{ url: 'https://example.com', label: 'Source' }] },
 		]
-		const { body } = render(ReferenceLinks, { props: { references, headingLevel } })
+		const { body } = render(ReferenceLinks, { props: { references, parentHeadingLevel } })
 		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
 
-		expect(document.getElementsByTagName(`h${headingLevel}`).length).toBe(1)
+		expect(document.getElementsByTagName(`h${parentHeadingLevel + 1}`).length).toBe(1)
 	})
 
 	it.each([0, 1, 2, 3, 4, 8, 20])('renders every record in a list of %i', count => {
@@ -26,7 +26,7 @@ describe('static reference evidence', () => {
 			lastRetrieved: assertCalendarDate('2026-10-01'),
 			source: coinspectDataSource,
 		}))
-		const { body } = render(ReferenceLinks, { props: { references, headingLevel: 3 } })
+		const { body } = render(ReferenceLinks, { props: { references, parentHeadingLevel: 2 } })
 		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
 		const links = Array.from(document.getElementsByTagName('a'))
 
@@ -62,7 +62,7 @@ describe('static reference evidence', () => {
 				urls: [{ url: `/references/local-${index}.png`, label: `Local image ${index}` }],
 			})),
 		]
-		const { body } = render(ReferenceLinks, { props: { references } })
+		const { body } = render(ReferenceLinks, { props: { references, parentHeadingLevel: 3 } })
 		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
 
 		expect(

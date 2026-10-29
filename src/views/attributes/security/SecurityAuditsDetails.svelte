@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import { childHeadingLevel } from '@/types/heading'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
@@ -46,17 +47,21 @@
 	// Props
 	const {
 		wallet,
+		parentHeadingLevel,
 		metadata,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
 		bugBountyDetails,
 	}: {
+		parentHeadingLevel: 1 | 2 | 3 | 4
 		wallet: { metadata: WalletMetadata }
 		metadata: SecurityAuditsMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 		bugBountyDetails?: string
 	} = $props()
+
+	const headingLevel = $derived(childHeadingLevel[parentHeadingLevel])
 
 	const securityAudits = $derived(
 		metadata
@@ -117,7 +122,7 @@
 							data-row-item="flexible basis-1"
 							data-row="start wrap gap-2"
 						>
-							<h4>
+							<svelte:element this={`h${headingLevel}`}>
 								Audit by
 								<cite>
 									{#if isUrl(audit.auditor.url)}
@@ -134,7 +139,7 @@
 										{audit.auditor.name}
 									{/if}
 								</cite>
-							</h4>
+							</svelte:element>
 
 							{#if hasFlaws && flawGroups}
 								<div data-row="gap-1 wrap">
@@ -211,7 +216,7 @@
 					{/if}
 
 					{#if audit.ref}
-						<ReferenceLinks headingLevel={5} references={toFullyQualified(audit.ref)} />
+						<ReferenceLinks parentHeadingLevel={headingLevel} references={toFullyQualified(audit.ref)} />
 					{/if}
 				</section>
 			</details>
@@ -221,7 +226,7 @@
 
 {#if bugBountyDetails}
 	<section data-column="gap-2">
-		<h4>Bug bounty program</h4>
+		<svelte:element this={`h${headingLevel}`}>Bug bounty program</svelte:element>
 
 		<Typography
 			content={{

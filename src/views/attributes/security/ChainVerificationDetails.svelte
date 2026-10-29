@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { ParentHeadingLevel } from '@/types/heading'
 	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
 	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
@@ -12,9 +13,11 @@
 	// Props
 	const {
 		wallet,
+		parentHeadingLevel,
 		lightClients,
 		refs,
 	}: {
+		parentHeadingLevel: ParentHeadingLevel
 		wallet: { metadata: WalletMetadata }
 		lightClients?: NonEmptyArray<EthereumL1LightClient>
 		refs?: FullyQualifiedReference[]
@@ -45,5 +48,5 @@
 />
 
 {#if refs && refs.length > 0}
-	<ReferenceLinks references={refs} />
+	<ReferenceLinks {parentHeadingLevel} references={refs} />
 {/if}

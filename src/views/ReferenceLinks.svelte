@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import { childHeadingLevel, type ParentHeadingLevel } from '@/types/heading'
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
@@ -12,11 +13,11 @@
 	const {
 		references,
 		cardBackground = 'primary',
-		headingLevel = 4,
+		parentHeadingLevel,
 	}: {
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
-		headingLevel?: 2 | 3 | 4 | 5 | 6
+		parentHeadingLevel: ParentHeadingLevel
 	} = $props()
 
 
@@ -24,6 +25,7 @@
 	let lightbox = $state<{ open: (url: string) => void }>()
 
 	// (Derived)
+	const headingLevel = $derived(childHeadingLevel[parentHeadingLevel])
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
