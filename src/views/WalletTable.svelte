@@ -1066,6 +1066,7 @@
 
 						<button
 							id={stageControlId}
+							data-pressable="to-containing"
 							type={!interactive && stageShortcut !== undefined ? 'submit' : 'button'}
 							form={stageShortcut === undefined ? undefined : `${viewId}-stage-sort`}
 							formaction={stageShortcut === undefined ? undefined : `${stageShortcut}#${encodeURIComponent(stageControlId)}`}
@@ -1080,11 +1081,13 @@
 									toggleAttributeFilterById?.(stageFilterId)
 							}}
 						>
-							<WalletStageBadge
-								{stage}
-								{ladderEvaluation}
-								size="medium"
-							/>
+							<span data-pressable="paint">
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</span>
 						</button>
 					{/if}
 				{:else if column.id === 'wallet'}
@@ -1946,6 +1949,10 @@
 	.desktop-table-container {
 		z-index: 1;
 
+		:global(td[data-table-column="stage"]) {
+			position: relative;
+		}
+
 		@container wallet-table (width >= 42rem) {
 			:global(th[data-table-column="stage"][rowspan]:not([rowspan="1"]):has(.filter-cluster-target)) {
 				vertical-align: top;
@@ -2249,7 +2256,8 @@
 		line-height: 1;
 	}
 
-	button:has([data-badge]) {
+	button:has(:global([data-badge])) {
+		font: inherit;
 		background: none;
 		border: none;
 		padding: 0;
