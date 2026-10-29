@@ -307,46 +307,28 @@ function evaluateExternallyConnectable(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	manifest: BrowserExtensionManifest,
 ): Evaluation<SecurityBestPracticesValue> {
-	if (manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE') {
-		return ctx.build({
-			outcome: {
-				id: 'externally_connectable_pass',
-				rating: Rating.PASS,
-				displayName: 'No external message connections',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} does not expose a direct message channel to web pages or other extensions.',
-				),
-			},
-			details: mdParagraph(
-				'{{WALLET_NAME}} does not declare `externally_connectable`, so no web page or external extension can send it messages directly.',
-			),
-		})
-	}
+	// When `externally_connectable` is absent, browsers let any installed extension (but no web
+	// page) connect, which is the same as declaring `"ids": ["*"]`, so both are rated the same.
+	const { extensionIds, pageMatches } =
+		manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE'
+			? { extensionIds: ExternalExtensionIdScope.ANY, pageMatches: HostPermissionScope.NONE }
+			: manifest.externallyConnectable
 
-	const { extensionIds, pageMatches } = manifest.externallyConnectable
-
-	if (
-		extensionIds === ExternalExtensionIdScope.ANY ||
-		pageMatches === HostPermissionScope.UNRESTRICTED
-	) {
+	if (pageMatches === HostPermissionScope.UNRESTRICTED) {
 		return ctx.build({
 			outcome: {
 				id: 'externally_connectable_fail',
 				rating: Rating.FAIL,
 				displayName: 'Unrestricted external message connections',
 				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} allows any extension or web page to send it wallet messages directly.',
+					'{{WALLET_NAME}} allows any web page to send it wallet messages directly.',
 				),
 			},
 			details: mdParagraph(
-				`{{WALLET_NAME}}'s \`externally_connectable\` is open to ${
-					extensionIds === ExternalExtensionIdScope.ANY
-						? 'any installed extension'
-						: 'all origins including non-web schemes'
-				}, allowing malicious actors to send it wallet requests directly.`,
+				"{{WALLET_NAME}}'s `externally_connectable` is open to all origins including non-web schemes, allowing malicious actors to send it wallet requests directly.",
 			),
 			howToImprove: mdParagraph(
-				'{{WALLET_NAME}} should restrict `externally_connectable` to specific trusted extension IDs and HTTPS origins only.',
+				'{{WALLET_NAME}} should restrict `externally_connectable` page matches to HTTPS origins only.',
 			),
 		})
 	}
@@ -370,6 +352,31 @@ function evaluateExternallyConnectable(
 		})
 	}
 
+	if (extensionIds === ExternalExtensionIdScope.ANY) {
+		return ctx.build({
+			outcome: {
+				id: 'externally_connectable_any_extension',
+				rating: Rating.PARTIAL,
+				displayName: 'External connections allowed from any extension',
+				shortExplanation: mdSentence(
+					'{{WALLET_NAME}} allows any other installed extension to send it messages directly.',
+				),
+			},
+			details: mdParagraph(
+				'{{WALLET_NAME}} does not restrict which extensions may connect to it, either by omitting `externally_connectable` (the browser default) or by declaring `"ids": ["*"]`. A malicious extension could open a direct message channel to the wallet.',
+			),
+			howToImprove: mdParagraph(
+				'{{WALLET_NAME}} should declare `"ids": []` in `externally_connectable`, or list only the specific extension IDs it trusts.',
+			),
+		})
+	}
+
+	const allowedPages = pageMatches === HostPermissionScope.NONE ? 'no web page' : 'only HTTPS pages'
+	const allowedExtensions =
+		extensionIds === ExternalExtensionIdScope.SPECIFIC
+			? 'only specific named extensions'
+			: 'no other extension'
+
 	return ctx.build({
 		outcome: {
 			id: 'externally_connectable_pass',
@@ -380,7 +387,7 @@ function evaluateExternallyConnectable(
 			),
 		},
 		details: mdParagraph(
-			'{{WALLET_NAME}} restricts `externally_connectable` to specific named extension IDs and HTTPS origins, limiting who can send it direct messages.',
+			`{{WALLET_NAME}}'s \`externally_connectable\` lets ${allowedPages} and ${allowedExtensions} send it messages directly.`,
 		),
 	})
 }
