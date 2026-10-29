@@ -308,25 +308,11 @@ function evaluateExternallyConnectable(
 	manifest: BrowserExtensionManifest,
 ): Evaluation<SecurityBestPracticesValue> {
 	// When `externally_connectable` is absent, browsers let any installed extension (but no web
-	// page) connect. `"ids": ["*"]` grants nothing beyond that default, so only the web page
-	// origins that `externally_connectable` opens up affect the rating.
-	if (manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE') {
-		return ctx.build({
-			outcome: {
-				id: 'externally_connectable_pass',
-				rating: Rating.PASS,
-				displayName: 'No web page message connections',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} does not expose a direct message channel to web pages.',
-				),
-			},
-			details: mdParagraph(
-				'{{WALLET_NAME}} does not declare `externally_connectable`, so no web page can send it messages directly. Other installed extensions can still message it, as the browser allows by default for every extension.',
-			),
-		})
-	}
-
-	const { extensionIds, pageMatches } = manifest.externallyConnectable
+	// page) connect, which is the same as declaring `"ids": ["*"]`, so both are rated the same.
+	const { extensionIds, pageMatches } =
+		manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE'
+			? { extensionIds: ExternalExtensionIdScope.ANY, pageMatches: HostPermissionScope.NONE }
+			: manifest.externallyConnectable
 
 	if (pageMatches === HostPermissionScope.UNRESTRICTED) {
 		return ctx.build({
@@ -366,13 +352,30 @@ function evaluateExternallyConnectable(
 		})
 	}
 
+	if (extensionIds === ExternalExtensionIdScope.ANY) {
+		return ctx.build({
+			outcome: {
+				id: 'externally_connectable_any_extension',
+				rating: Rating.PARTIAL,
+				displayName: 'External connections allowed from any extension',
+				shortExplanation: mdSentence(
+					'{{WALLET_NAME}} allows any other installed extension to send it messages directly.',
+				),
+			},
+			details: mdParagraph(
+				'{{WALLET_NAME}} does not restrict which extensions may connect to it, either by omitting `externally_connectable` (the browser default) or by declaring `"ids": ["*"]`. A malicious extension could open a direct message channel to the wallet.',
+			),
+			howToImprove: mdParagraph(
+				'{{WALLET_NAME}} should declare `"ids": []` in `externally_connectable`, or list only the specific extension IDs it trusts.',
+			),
+		})
+	}
+
 	const allowedPages = pageMatches === HostPermissionScope.NONE ? 'no web page' : 'only HTTPS pages'
 	const allowedExtensions =
-		extensionIds === ExternalExtensionIdScope.ANY
-			? 'any installed extension, as the browser allows by default'
-			: extensionIds === ExternalExtensionIdScope.SPECIFIC
-				? 'only specific named extensions'
-				: 'no other extension'
+		extensionIds === ExternalExtensionIdScope.SPECIFIC
+			? 'only specific named extensions'
+			: 'no other extension'
 
 	return ctx.build({
 		outcome: {
@@ -380,7 +383,7 @@ function evaluateExternallyConnectable(
 			rating: Rating.PASS,
 			displayName: 'Restricted external message connections',
 			shortExplanation: mdSentence(
-				'{{WALLET_NAME}} does not let insecure web pages send it wallet messages directly.',
+				'{{WALLET_NAME}} restricts external message connections to specific trusted extensions and HTTPS pages.',
 			),
 		},
 		details: mdParagraph(
