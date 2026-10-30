@@ -41,13 +41,28 @@ const exclusive: FilterSet<Item> = {
 
 describe('filter-set selection semantics', () => {
 	const eoa = matches('eoa')
+	const smart = matches('smart')
 	const account: FilterSet<Item> = {
 		id: 'account',
 		label: 'Account',
 		cardinality: 'inclusive',
 		match: 'union',
-		choices: [eoa, matches('smart')],
+		choices: [eoa, smart],
 	}
+
+	it.each(['union', 'intersection'] as const)(
+		'isolates a selected shortcut before toggling it off with %s matching',
+		match => {
+			const inclusiveAccount: FilterSet<Item> = { ...account, match }
+			const sets = [exclusive, inclusiveAccount]
+			const selected = new Set([browser, eoa, smart])
+			const isolated = changeFilterChoice(sets, selected, eoa, true)
+
+			expect(isolated).toEqual(new Set([browser, eoa]))
+			expect(changeFilterChoice(sets, isolated, eoa, true)).toEqual(new Set([browser]))
+			expect(changeFilterChoice(sets, selected, eoa)).toEqual(new Set([browser, smart]))
+		},
+	)
 
 	it('composes independent sets regardless of their owning panel', () => {
 		expect(
