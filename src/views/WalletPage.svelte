@@ -2797,11 +2797,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
 				[data-sticky-breadcrumb~="root"]
 					:global([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="root"])) {
+					---pie-inlineDirection: normal;
 					&:dir(rtl) {
-						animation-direction: normal, normal, normal, normal, normal, normal, normal, reverse;
-						&[data-sticky-breadcrumb~="size"] {
-							animation-direction: normal, normal, normal, normal, normal, normal, normal, normal, normal, normal, normal, normal, normal, reverse;
-						}
+						---pie-inlineDirection: reverse;
 					}
 					---pie-inlineTimeline: --pie-inline;
 					timeline-scope:
@@ -2811,6 +2809,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						timeline-scope: none;
 					}
 					animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
+					animation-direction: var(---breadcrumb-sizeDirections), var(---pie-inlineDirection);
 					animation-timeline: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
 					> :global(*) {
 						--stickyBreadcrumb-availableInlineSize: calc(var(---pie-inlineSpace) - var(--stickyBreadcrumb-gap, 1rem) / 2);

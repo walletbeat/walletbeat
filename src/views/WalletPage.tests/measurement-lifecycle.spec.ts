@@ -128,7 +128,14 @@ for (const family of families) {
 										.filter(
 											(animation): animation is CSSAnimation =>
 												animation instanceof CSSAnimation &&
-												animation.animationName.startsWith('breadcrumb-size-'),
+												[
+													'breadcrumb-item-inline',
+													'breadcrumb-item-block',
+													'breadcrumb-end-inline',
+													'breadcrumb-end-block',
+													'column-inline-size',
+													'column-block-size',
+												].includes(animation.animationName),
 										)
 									const source = position.querySelector('[data-sticky-breadcrumb~="source"]')
 									const end = position.querySelector('[data-sticky-breadcrumb~="end"]')
@@ -225,11 +232,11 @@ for (const family of families) {
 										}
 									}
 									const rowClocks = clocks.filter(clock =>
-										clock.animationName.startsWith('breadcrumb-size-row-'),
+										['column-inline-size', 'column-block-size'].includes(clock.animationName),
 									)
 
-									if (rowClocks.length !== 4) {
-										throw new Error(`Missing four own row clocks: ${scope.id}`)
+									if (rowClocks.length !== 2) {
+										throw new Error(`Missing two own row clocks: ${scope.id}`)
 									}
 
 									for (const clock of rowClocks) {
@@ -243,10 +250,11 @@ for (const family of families) {
 										const origin = subject?.tagName.startsWith('::')
 											? subject.parentElement
 											: subject
-										const pseudo = clock.animationName.includes('-inline-') ? '::before' : '::after'
+										const pseudo = clock.animationName.includes('inline') ? '::before' : '::after'
 
 										if (
 											origin !== rowHelper ||
+											timeline.source !== rowHelper ||
 											timeline.axis !== 'inline' ||
 											getComputedStyle(rowHelper, pseudo).viewTimelineName === 'none'
 										) {
@@ -304,16 +312,26 @@ for (const family of families) {
 											}
 										}
 									}
-									const expected = 4 + (closed ? 0 : 4) + (hasEnd ? 4 : 0)
+									const expected = 2 + (closed ? 0 : 2) + (hasEnd ? 2 : 0)
 
 									if (clocks.length !== expected) {
 										throw new Error(`Wrong clock membership: ${scope.id}`)
 									}
 
 									for (const clock of clocks) {
+										const role = clock.animationName.startsWith('column-')
+											? 'row'
+											: clock.animationName.startsWith('breadcrumb-item-')
+												? 'source'
+												: 'end'
+										const helper = position.querySelector(
+											`[data-sticky-breadcrumb~="size-${role}"]`,
+										)
+
 										if (
-											!(clock.timeline instanceof ScrollTimeline) ||
-											clock.timeline.source !== root ||
+											!helper ||
+											!(clock.timeline instanceof ViewTimeline) ||
+											clock.timeline.source !== helper ||
 											typeof clock.effect?.getComputedTiming().progress !== 'number'
 										) {
 											throw new Error(
@@ -1073,3 +1091,310 @@ for (const path of ['/metamask/?variant=BROWSER', '/ambire/']) {
 		}
 	}
 }
+
+test('local size exporters preserve zero and fractional owner dimensions through resize', async ({
+	page,
+}, info) => {
+	await page.goto('/metamask/?variant=BROWSER')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	const capable = await page.evaluate(() =>
+		CSS.supports(
+			'(animation-timeline: scroll()) and (width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and (color: if(style(---breadcrumb-wrap: 1): red))',
+		),
+	)
+
+	test.skip(!capable, 'Native breadcrumb size export is unavailable')
+	const stylesheets = await page
+		.locator('link[rel="stylesheet"]')
+		.evaluateAll(elements =>
+			elements
+				.map(element => element.getAttribute('href'))
+				.filter((href): href is string => !!href),
+		)
+
+	if (!stylesheets.length) {
+		throw new Error('Size exporter fixture requires delivered production styles')
+	}
+
+	const head = stylesheets
+		.map(href => `<link rel="stylesheet" href="${new URL(href, page.url()).href}">`)
+		.join('')
+	const quantum = 1 / 16
+	// These fixture lengths stay below 1000px; two six-significant-digit CSSOM reads lose at most 0.001px.
+	const serializationUncertainty = 0.001
+	const dimensions = [
+		{ name: 'zero', width: 0, height: 0 },
+		{ name: 'fractional', width: 0.0625, height: 0.0625 },
+		{ name: 'pixel', width: 1, height: 1 },
+		{ name: 'natural', width: 170.375, height: 51.625 },
+		{ name: 'badge', width: 170.375, height: 51.625 },
+	]
+	const profiles = [
+		{ name: 'ltr', direction: 'ltr', writing: 'horizontal-tb' },
+		{ name: 'rtl', direction: 'rtl', writing: 'horizontal-tb' },
+		{ name: 'vertical', direction: 'rtl', writing: 'vertical-rl' },
+	]
+	const cases = profiles.flatMap(profile =>
+		dimensions.map(dimension => ({
+			...dimension,
+			...profile,
+			id: `size-domain-${profile.name}-${dimension.name}`,
+			dimension: dimension.name,
+		})),
+	)
+	const fixture = cases
+		.map(
+			item =>
+				`<section id="${item.id}" data-sticky-breadcrumb="scope size" style="--stickyBreadcrumb-entryTimeline: --${item.id}; animation: column-inline-size auto linear reverse both, column-block-size auto linear reverse both; animation-timeline: var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline); animation-range: exit-crossing 0% exit-crossing 100%"><header data-sticky-breadcrumb="position"><div data-row${item.dimension === 'badge' ? ' data-badge="small"' : ''} data-size-domain="${item.dimension}" dir="${item.direction}" style="box-sizing: border-box; width: ${item.width}px; height: ${item.height}px; min-width: 0; min-height: 0; padding: 0; gap: 0; flex: none; writing-mode: ${item.writing}"><span data-sticky-breadcrumb="size-export size-row" aria-hidden="true"></span></div></header></section>`,
+		)
+		.join('')
+	const fixtureURL = new URL('/__wallet-page/size-export-domain/', page.url()).href
+
+	await page.route(fixtureURL, route =>
+		route.fulfill({
+			contentType: 'text/html',
+			body: `<!doctype html><html><head>${head}</head><body>${fixture}</body></html>`,
+		}),
+	)
+	await page.goto(fixtureURL)
+	await page.evaluate(() => document.fonts.ready)
+	const samples = []
+
+	for (const phase of ['initial', 'viewport-resize', 'owner-resize']) {
+		if (phase === 'viewport-resize') {
+			await page.setViewportSize({ width: 690, height: 1203 })
+		}
+
+		if (phase === 'owner-resize') {
+			await page
+				.locator('[data-size-domain="natural"], [data-size-domain="badge"]')
+				.evaluateAll(rows => {
+					for (const row of rows) {
+						if (!(row instanceof HTMLElement)) {
+							throw new Error('Dimension owner is not an HTMLElement')
+						}
+
+						row.style.width = '213.625px'
+						row.style.height = '83.375px'
+					}
+				})
+		}
+
+		const read = () =>
+			page.locator('section[data-sticky-breadcrumb~="size"]').evaluateAll(scopes =>
+				scopes.map(scope => {
+					const row = scope.querySelector<HTMLElement>(':scope > header > [data-row]'),
+						exporter = row?.querySelector<HTMLElement>(
+							':scope > [data-sticky-breadcrumb~="size-export"]',
+						)
+
+					if (!row || !exporter) {
+						throw new Error('Actual row/exporter ownership is missing')
+					}
+
+					const s = getComputedStyle(row),
+						e = getComputedStyle(exporter),
+						published = getComputedStyle(scope)
+					const edges = (style: CSSStyleDeclaration, axis: 'width' | 'height') =>
+						(axis === 'width'
+							? ['padding-left', 'padding-right', 'border-left-width', 'border-right-width']
+							: ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width']
+						).reduce((sum, property) => sum + parseFloat(style.getPropertyValue(property)), 0)
+					const actual = {
+						width: parseFloat(s.width) + (s.boxSizing === 'content-box' ? edges(s, 'width') : 0),
+						height: parseFloat(s.height) + (s.boxSizing === 'content-box' ? edges(s, 'height') : 0),
+					}
+					const content = {
+						width: parseFloat(e.width) - (e.boxSizing === 'border-box' ? edges(e, 'width') : 0),
+						height: parseFloat(e.height) - (e.boxSizing === 'border-box' ? edges(e, 'height') : 0),
+					}
+					const measured = {
+						width: parseFloat(published.getPropertyValue('---breadcrumb-sourceRowWidth')),
+						height: parseFloat(published.getPropertyValue('---breadcrumb-sourceRowHeight')),
+					}
+					const names = published.animationName.split(',').map(name => name.trim()),
+						timelines = published.animationTimeline.split(',').map(name => name.trim())
+					const bindings = scope
+						.getAnimations()
+						.filter((animation): animation is CSSAnimation => animation instanceof CSSAnimation)
+						.map(animation => {
+							const timeline = animation.timeline
+
+							if (!(timeline instanceof ViewTimeline)) {
+								throw new Error('Exporter consumer has no native ViewTimeline')
+							}
+
+							const subject = timeline.subject,
+								origin = subject?.tagName.startsWith('::') ? subject.parentElement : subject
+							const pseudo =
+									animation.animationName === 'column-inline-size' ? '::before' : '::after',
+								producer = getComputedStyle(exporter, pseudo)
+							const start = timeline.startOffset?.to('px').value ?? null,
+								end = timeline.endOffset?.to('px').value ?? null
+							const index = names.indexOf(animation.animationName)
+
+							if (!('rangeStart' in animation) || !('rangeEnd' in animation)) {
+								throw new Error('Native animation range metadata is unavailable')
+							}
+
+							const range = (value: unknown) => {
+								if (
+									typeof value !== 'object' ||
+									value === null ||
+									!('rangeName' in value) ||
+									typeof value.rangeName !== 'string' ||
+									!('offset' in value)
+								) {
+									throw new Error('Native named animation range is unresolved')
+								}
+
+								return { name: value.rangeName, offset: String(value.offset) }
+							}
+
+							return {
+								name: animation.animationName,
+								ownSubject: origin === exporter,
+								ownSource: timeline.source === exporter,
+								ownConsumer:
+									animation.effect instanceof KeyframeEffect && animation.effect.target === scope,
+								axis: timeline.axis,
+								producer: producer.viewTimelineName,
+								consumer: timelines[index % timelines.length],
+								progress: animation.effect?.getComputedTiming().progress ?? null,
+								direction: animation.effect?.getTiming().direction,
+								rangeStart: range(animation.rangeStart),
+								rangeEnd: range(animation.rangeEnd),
+								start,
+								end,
+								denominator: start !== null && end !== null ? end - start : null,
+							}
+						})
+
+					return {
+						id: scope.id,
+						dimension: row.getAttribute('data-size-domain'),
+						actual,
+						content,
+						boxSizing: s.boxSizing,
+						raw: {
+							width: s.width,
+							height: s.height,
+							measuredWidth: published.getPropertyValue('---breadcrumb-sourceRowWidth'),
+							measuredHeight: published.getPropertyValue('---breadcrumb-sourceRowHeight'),
+						},
+						measured,
+						clientWidth: exporter.clientWidth,
+						clientHeight: exporter.clientHeight,
+						scrollLeft: exporter.scrollLeft,
+						scrollTop: exporter.scrollTop,
+						ownOffsetParent: exporter.offsetParent === row,
+						badgeBorder: row.hasAttribute('data-badge')
+							? parseFloat(s.borderLeftWidth) + parseFloat(s.borderTopWidth)
+							: null,
+						bindings,
+					}
+				}),
+			)
+		let previous = '',
+			sampled: Awaited<ReturnType<typeof read>> | undefined
+
+		await expect
+			.poll(
+				async () => {
+					sampled = await read()
+					const current = JSON.stringify(sampled),
+						stable = current === previous
+
+					previous = current
+
+					return stable
+				},
+				{ timeout: 10000 },
+			)
+			.toBe(true)
+
+		if (!sampled) {
+			throw new Error('No local exporter sample')
+		}
+
+		await info.attach(`size-export-domain-${phase}`, {
+			body: JSON.stringify(sampled),
+			contentType: 'application/json',
+		})
+		expect(sampled.map(row => row.id).sort()).toEqual(cases.map(item => item.id).sort())
+		expect(sampled.some(row => row.dimension === 'badge' && (row.badgeBorder ?? 0) > 0)).toBe(true)
+
+		for (const row of sampled) {
+			const evidence = JSON.stringify(row)
+
+			expect(
+				[row.actual.width, row.actual.height, row.measured.width, row.measured.height].every(
+					Number.isFinite,
+				),
+				evidence,
+			).toBe(true)
+			expect(row.ownOffsetParent, evidence).toBe(true)
+			expect(row.clientWidth, evidence).toBeGreaterThan(0)
+			expect(row.clientHeight, evidence).toBeGreaterThan(0)
+			expect(row.scrollLeft, evidence).toBe(0)
+			expect(row.scrollTop, evidence).toBe(0)
+			expect(Math.abs(row.content.width - row.actual.width), evidence).toBeLessThanOrEqual(0.02)
+			expect(Math.abs(row.content.height - row.actual.height), evidence).toBeLessThanOrEqual(0.02)
+			expect(row.boxSizing, evidence).toBe('border-box')
+
+			for (const value of [
+				row.actual.width,
+				row.actual.height,
+				row.measured.width,
+				row.measured.height,
+			]) {
+				expect(value, evidence).toBeGreaterThanOrEqual(0)
+				expect(value, evidence).toBeLessThan(1000)
+			}
+
+			if (row.actual.width === 0) {
+				expect(row.measured.width, evidence).toBe(0)
+			} else {
+				expect(row.measured.width, evidence).toBeGreaterThanOrEqual(
+					row.actual.width - serializationUncertainty,
+				)
+				expect(row.measured.width - row.actual.width, evidence).toBeLessThanOrEqual(
+					quantum + serializationUncertainty,
+				)
+			}
+
+			if (row.actual.height === 0) {
+				expect(row.measured.height, evidence).toBe(0)
+			} else {
+				expect(Math.abs(row.measured.height - row.actual.height), evidence).toBeLessThanOrEqual(
+					quantum / 2 + serializationUncertainty,
+				)
+			}
+
+			expect(row.bindings.map(binding => binding.name).sort(), evidence).toEqual([
+				'column-block-size',
+				'column-inline-size',
+			])
+
+			for (const binding of row.bindings) {
+				expect(binding.ownSubject && binding.ownSource && binding.ownConsumer, evidence).toBe(true)
+				expect(binding.axis, evidence).toBe('inline')
+				expect(binding.producer, evidence).not.toBe('none')
+				expect(binding.consumer, evidence).toBe(binding.producer)
+				expect(binding.direction, evidence).toBe('reverse')
+				expect(binding.rangeStart, evidence).toEqual({ name: 'exit-crossing', offset: '0%' })
+				expect(binding.rangeEnd, evidence).toEqual({ name: 'exit-crossing', offset: '100%' })
+				expect(binding.progress, evidence).not.toBeNull()
+				expect(binding.progress!, evidence).toBeGreaterThan(0)
+				expect(binding.progress!, evidence).toBeLessThanOrEqual(1)
+				expect(Number.isFinite(binding.denominator), evidence).toBe(true)
+				expect(binding.denominator!, evidence).toBeGreaterThan(0)
+			}
+		}
+		samples.push({ phase, rows: sampled })
+	}
+	await info.attach('size-export-domain', {
+		body: JSON.stringify({ quantum, serializationUncertainty, samples }),
+		contentType: 'application/json',
+	})
+})
