@@ -184,5 +184,105 @@ for (const width of [1280, 390]) {
 			await expect(expanded.first()).toHaveAttribute('aria-pressed', 'false')
 			await expect(rows).toHaveCount(rowCount)
 		})
+		test('row variant shortcuts select their named choice from combined filters', async ({
+			page,
+		}) => {
+			await page.goto('/wallet/summary/')
+			await expect(
+				page.getByRole('button', { name: 'Sort by Wallet', exact: true }),
+			).toHaveAttribute('type', 'button')
+			await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded')
+			const settled = () =>
+				expect(page.locator('[data-layout-transition], [data-view-transition-active]')).toHaveCount(
+					0,
+				)
+			const rows = page.locator('.wallet-table tbody tr')
+			const rowCount = await rows.count()
+			const variant = page.locator('[data-filter-set="variant"]')
+			const account = page.locator('[data-filter-set="accountType"]')
+
+			if (width === 1280) {
+				const trigger = page.locator('thead th[data-table-column="wallet"] .filter-trigger')
+				const panelId = await trigger.getAttribute('popovertarget')
+
+				if (!panelId) {
+					throw new Error('Wallet filters need their native popover target')
+				}
+
+				await nativeClick(page, trigger)
+				await expect
+					.poll(() =>
+						page.locator(`[id="${panelId}"]`).evaluate(panel => panel.matches(':popover-open')),
+					)
+					.toBe(true)
+			}
+
+			for (const id of ['variant-BROWSER', 'variant-MOBILE']) {
+				const input = variant.locator(`input[value="${id}"]`)
+
+				await expect(input).toBeEnabled()
+				await input.press('Space')
+				await expect(input).toBeChecked()
+			}
+			const accountInput = account.locator('input[value="accountType-eoa"]')
+
+			await accountInput.press('Space')
+			await expect(accountInput).toBeChecked()
+
+			if (width === 1280) {
+				await page.keyboard.press('Escape')
+			}
+
+			await settled()
+
+			const name = await rows.evaluateAll(rows =>
+				rows
+					.find(
+						row =>
+							!row.hasAttribute('data-disabled') &&
+							row.querySelector(
+								'.variants button[aria-label="Select Browser extension variant"]',
+							) &&
+							row.querySelector('.variants button[aria-label="Select Mobile app variant"]'),
+					)
+					?.querySelector('h3 a')
+					?.textContent?.trim(),
+			)
+
+			if (!name) {
+				throw new Error('The shortcut needs a matching wallet with Browser and Mobile variants')
+			}
+
+			const row = rows.filter({ has: page.getByRole('link', { name, exact: true }) })
+			const browser = row.getByRole('button', {
+				name: 'Select Browser extension variant',
+				exact: true,
+			})
+			const mobile = row.getByRole('button', { name: 'Select Mobile app variant', exact: true })
+
+			await expect(browser).toHaveAttribute('aria-pressed', 'false')
+			await expect(mobile).toHaveAttribute('aria-pressed', 'false')
+			await nativeClick(page, browser)
+			await settled()
+			await expect(browser).toHaveAttribute('aria-pressed', 'true')
+			await expect(mobile).toHaveAttribute('aria-pressed', 'false')
+			await expect(variant.locator('input[value="variant-BROWSER"]')).toBeChecked()
+			await expect(variant.locator('input[value="variant-MOBILE"]')).not.toBeChecked()
+			await expect(accountInput).toBeChecked()
+			await expect(
+				page.locator('[data-filter-set="stageStatus"] input[value="stage-qualified"]'),
+			).toBeChecked()
+
+			await nativeClick(page, browser)
+			await settled()
+			await expect(browser).toHaveAttribute('aria-pressed', 'false')
+			await expect(mobile).toHaveAttribute('aria-pressed', 'false')
+			await expect(variant.locator('input:checked')).toHaveCount(0)
+			await expect(accountInput).toBeChecked()
+			await expect(
+				page.locator('[data-filter-set="stageStatus"] input[value="stage-qualified"]'),
+			).toBeChecked()
+			await expect(rows).toHaveCount(rowCount)
+		})
 	})
 }

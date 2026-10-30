@@ -89,7 +89,11 @@ export const changeFilterChoice = <Item>(
 		return activeChoices
 	}
 
-	if (activeChoices.has(choice)) {
+	if (
+		activeChoices.has(choice) &&
+		(!forceExclusive ||
+			!set.choices.some(candidate => candidate !== choice && activeChoices.has(candidate)))
+	) {
 		return activeChoices.difference(new Set([choice]))
 	}
 
