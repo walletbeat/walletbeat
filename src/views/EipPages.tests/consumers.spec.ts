@@ -169,7 +169,11 @@ for (const colorScheme of ['light', 'dark'] as const) {
 						}),
 					})
 
-					const chart = page.locator('main figure')
+					const chart = page.locator('main figure').filter({
+						has: page.locator('a[href^="#software-wallets-"]'),
+					})
+
+					await expect(chart).toHaveCount(1)
 					const slices = chart.locator('a[href^="#software-wallets-"]')
 					const expectedTargets = [
 						'#software-wallets-supported',
