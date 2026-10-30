@@ -89,8 +89,27 @@ TV stores its runtime, Playwright packages, and npm download cache in:
 
 Deleting the dependency cache is safe: the icon can install missing dependencies
 again. Reusable launchers live separately in `~/Library/Application Support/walletbeat-tv`
-on macOS and `${XDG_DATA_HOME:-$HOME/.local/share}/walletbeat-tv` on Linux. Windows stores reusable launchers in `%APPDATA%/walletbeat-tv`. To uninstall, also remove the reusable
-launcher directory and the Desktop icon or Linux application entry.
+on macOS and `${XDG_DATA_HOME:-$HOME/.local/share}/walletbeat-tv` on Linux. Windows stores reusable launchers in `%APPDATA%/walletbeat-tv`.
+
+### Uninstall
+
+Close Walletbeat TV, then run the saved uninstaller:
+
+- macOS: `sh "$HOME/Library/Application Support/walletbeat-tv/uninstall-walletbeat-tv.sh"`
+- Linux: `sh "${XDG_DATA_HOME:-$HOME/.local/share}/walletbeat-tv/uninstall-walletbeat-tv.sh"`
+- Windows, in PowerShell: `& ([ScriptBlock]::Create((Get-Content -LiteralPath "$env:APPDATA/walletbeat-tv/uninstall-walletbeat-tv.ps1" -Raw)))`
+
+The launcher build also produces standalone `uninstall-walletbeat-tv.sh` and
+`uninstall-walletbeat-tv.ps1` files. Keep one to uninstall even if installation was
+interrupted before the reusable launcher was saved. Running a standalone uninstaller
+again is safe. No download, Node installation, or administrator access is needed.
+Use the same `XDG_CACHE_HOME`, `XDG_DATA_HOME`, or `WALLETBEAT_TV_DESKTOP` overrides
+used when installing, if any.
+
+Uninstall removes TV's dependency cache, saved launcher, uninstaller, and shortcut.
+It keeps shared Playwright browsers, existing Node installations, Linux system
+libraries, and downloaded launcher files. Delete downloaded files separately.
+
 Matching browsers use
 Playwright's shared cache, so other Playwright tools can reuse them too. Each run
 still checks that Chromium can launch before starting the tour.
@@ -149,14 +168,15 @@ by another browser check. This can request an administrator password in the same
 terminal; no second command is needed. Without permission to install missing OS
 libraries, that device cannot complete setup. `--with-deps` installs them upfront.
 
-To build the two self-contained release assets from this checkout:
+To build the standalone launchers and uninstallers from this checkout:
 
 ```sh
 pnpm walletbeat-tv:build-launchers /tmp/walletbeat-tv
 ```
 
-Upload the resulting `.sh` and `.ps1` files to the `walletbeat-tv` GitHub release.
-They embed the current tour and derive the Playwright version from the project's
+Upload `walletbeat-tv.sh`, `walletbeat-tv.ps1`, `uninstall-walletbeat-tv.sh`, and
+`uninstall-walletbeat-tv.ps1` to the `walletbeat-tv` GitHub release.
+The launchers embed the current tour and derive the Playwright version from the project's
 package manifest. The installer does not fetch moving source files at runtime.
 The installation workflow is configured to check the native launcher on macOS,
 Windows, and Linux.

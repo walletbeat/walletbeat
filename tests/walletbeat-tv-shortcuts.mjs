@@ -1,4 +1,5 @@
 import './walletbeat-tv-installation.mjs'
+import './walletbeat-tv-uninstall.mjs'
 
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'

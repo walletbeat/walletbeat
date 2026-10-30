@@ -7,6 +7,7 @@ on:
       - 'tests/walletbeat-tv.test.ts'
       - 'tests/walletbeat-tv-shortcuts.mjs'
       - 'tests/walletbeat-tv-installation.mjs'
+      - 'tests/walletbeat-tv-uninstall.mjs'
       - 'package.json'
       - '.github/workflows/walletbeat-tv.yaml'
   workflow_dispatch:

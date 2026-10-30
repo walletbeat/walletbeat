@@ -6,6 +6,7 @@ export function createShortcut({
 	desktopDirectory,
 	dataDirectory,
 	launcherSource,
+	uninstallerSource,
 	siteUrl,
 }) {
 	const launcherDirectory = path.join(dataDirectory, 'walletbeat-tv')
@@ -21,6 +22,15 @@ export function createShortcut({
 		} finally {
 			fs.rmSync(temporary, { force: true })
 		}
+	}
+	if (uninstallerSource) {
+		save(
+			path.join(
+				launcherDirectory,
+				`uninstall-walletbeat-tv.${platform === 'win32' ? 'ps1' : 'sh'}`,
+			),
+			uninstallerSource,
+		)
 	}
 	if (platform === 'win32') {
 		const launcher = path.join(launcherDirectory, 'walletbeat-tv.ps1')

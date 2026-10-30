@@ -45,7 +45,7 @@ describe('Walletbeat TV standalone launchers', () => {
 				/@(?:NODE_VERSION|RUNTIME_PROBE|ENCODED_RUNTIME_PROBE|INSTALLATION_SCRIPT|TOUR_SOURCE|PACKAGE_MANIFEST)@/,
 			)
 			expect(installationScript).not.toMatch(
-				/@(?:TOUR_SOURCE|PACKAGE_MANIFEST|LAUNCHER_TEMPLATES|SHORTCUT_SCRIPT)@/,
+				/@(?:TOUR_SOURCE|PACKAGE_MANIFEST|LAUNCHER_TEMPLATES|SHORTCUT_SCRIPT|UNINSTALLERS)@/,
 			)
 			expect(installationScript).toContain(
 				readFileSync('deploy/walletbeat-tv/create-shortcut.mjs', 'utf8').replace(

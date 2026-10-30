@@ -7,11 +7,12 @@ import { homedir } from 'node:os'
 
 // @SHORTCUT_SCRIPT@
 
+const encodedUninstallers = '@UNINSTALLERS@'
 const encodedTour = '@TOUR_SOURCE@'
 const encodedPackageManifest = '@PACKAGE_MANIFEST@'
 const encodedLauncherTemplates = '@LAUNCHER_TEMPLATES@'
 if (
-	[encodedTour, encodedPackageManifest, encodedLauncherTemplates].some(value =>
+	[encodedTour, encodedPackageManifest, encodedLauncherTemplates, encodedUninstallers].some(value =>
 		value.startsWith('@'),
 	)
 ) {
@@ -82,6 +83,9 @@ if (!checkInstallation) {
 						? process.env.APPDATA
 						: process.env.XDG_DATA_HOME || join(homedir(), '.local/share'),
 			launcherSource,
+			uninstallerSource: JSON.parse(Buffer.from(encodedUninstallers, 'base64').toString('utf8'))[
+				process.platform === 'win32' ? 'ps1' : 'sh'
+			],
 			siteUrl: siteUrl.href,
 		})
 		console.log(`Walletbeat TV: open it again using ${shortcut}`)

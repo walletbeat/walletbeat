@@ -29,6 +29,12 @@ const npmCli = candidates.find(candidate => fs.existsSync(candidate));
 if (!npmCli) process.exit(1);
 process.stdout.write(npmCli);`
 const encode = value => Buffer.from(value).toString('base64')
+const uninstallers = Object.fromEntries(
+	['sh', 'ps1'].map(extension => [
+		extension,
+		readFileSync(new URL(`./uninstall.${extension}`, import.meta.url), 'utf8'),
+	]),
+)
 const templates = Object.fromEntries(
 	['sh', 'ps1'].map(extension => [
 		extension,
@@ -42,6 +48,7 @@ const installationScript = readFileSync(new URL('./install.mjs', import.meta.url
 	.replace('@TOUR_SOURCE@', encode(readFileSync(new URL('./tour.mjs', import.meta.url))))
 	.replace('@PACKAGE_MANIFEST@', encode(JSON.stringify(packageManifest, null, 2)))
 	.replace('@LAUNCHER_TEMPLATES@', encode(JSON.stringify(templates)))
+	.replace('@UNINSTALLERS@', encode(JSON.stringify(uninstallers)))
 	.replace(
 		'// @SHORTCUT_SCRIPT@',
 		readFileSync(new URL('./create-shortcut.mjs', import.meta.url), 'utf8').replace(
@@ -55,5 +62,10 @@ const encodedInstallationScript = encode(installationScript)
 for (const extension of ['sh', 'ps1']) {
 	const launcher = templates[extension].replace('@INSTALLATION_SCRIPT@', encodedInstallationScript)
 	writeFileSync(`${outputPrefix}.${extension}`, launcher, { mode: 0o755 })
+	writeFileSync(
+		resolve(outputPrefix, '..', `uninstall-walletbeat-tv.${extension}`),
+		uninstallers[extension],
+		{ mode: 0o755 },
+	)
 	console.log(`Walletbeat TV launcher: ${resolve(`${outputPrefix}.${extension}`)}`)
 }
