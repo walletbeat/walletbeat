@@ -2313,162 +2313,6 @@ ol {
 		inherits: true;
 		initial-value: 0px;
 	}
-	@property ---breadcrumb-itemInlineCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-item-inline-cover {
-		from {
-			---breadcrumb-itemInlineCover: 0
-		}
-		to {
-			---breadcrumb-itemInlineCover: 1
-		}
-	}
-	@property ---breadcrumb-itemInlineCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-item-inline-crossing {
-		from {
-			---breadcrumb-itemInlineCrossing: 0
-		}
-		to {
-			---breadcrumb-itemInlineCrossing: 1
-		}
-	}
-	@property ---breadcrumb-itemBlockCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-item-block-cover {
-		from {
-			---breadcrumb-itemBlockCover: 0
-		}
-		to {
-			---breadcrumb-itemBlockCover: 1
-		}
-	}
-	@property ---breadcrumb-itemBlockCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-item-block-crossing {
-		from {
-			---breadcrumb-itemBlockCrossing: 0
-		}
-		to {
-			---breadcrumb-itemBlockCrossing: 1
-		}
-	}
-	@property ---breadcrumb-endInlineCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-end-inline-cover {
-		from {
-			---breadcrumb-endInlineCover: 0
-		}
-		to {
-			---breadcrumb-endInlineCover: 1
-		}
-	}
-	@property ---breadcrumb-endInlineCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-end-inline-crossing {
-		from {
-			---breadcrumb-endInlineCrossing: 0
-		}
-		to {
-			---breadcrumb-endInlineCrossing: 1
-		}
-	}
-	@property ---breadcrumb-endBlockCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-end-block-cover {
-		from {
-			---breadcrumb-endBlockCover: 0
-		}
-		to {
-			---breadcrumb-endBlockCover: 1
-		}
-	}
-	@property ---breadcrumb-endBlockCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-end-block-crossing {
-		from {
-			---breadcrumb-endBlockCrossing: 0
-		}
-		to {
-			---breadcrumb-endBlockCrossing: 1
-		}
-	}
-	@property ---breadcrumb-rowInlineCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-row-inline-cover {
-		from {
-			---breadcrumb-rowInlineCover: 0
-		}
-		to {
-			---breadcrumb-rowInlineCover: 1
-		}
-	}
-	@property ---breadcrumb-rowInlineCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-row-inline-crossing {
-		from {
-			---breadcrumb-rowInlineCrossing: 0
-		}
-		to {
-			---breadcrumb-rowInlineCrossing: 1
-		}
-	}
-	@property ---breadcrumb-rowBlockCover {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-row-block-cover {
-		from {
-			---breadcrumb-rowBlockCover: 0
-		}
-		to {
-			---breadcrumb-rowBlockCover: 1
-		}
-	}
-	@property ---breadcrumb-rowBlockCrossing {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1
-	}
-	@keyframes breadcrumb-size-row-block-crossing {
-		from {
-			---breadcrumb-rowBlockCrossing: 0
-		}
-		to {
-			---breadcrumb-rowBlockCrossing: 1
-		}
-	}
 	@keyframes breadcrumb-item-inline {
 		from {
 			---breadcrumb-itemInline: 0;
@@ -2819,6 +2663,7 @@ ol {
 				if(style(---breadcrumb-hasEnd: 0): none; else: breadcrumb-end-block);
 			---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size;
 			---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			---breadcrumb-sizeDirections: normal, normal, normal, normal;
 			timeline-scope: var(---breadcrumb-sizeTimelines);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				timeline-scope: none;
@@ -2829,6 +2674,7 @@ ol {
 			}
 			animation: none auto linear both;
 			animation-name: var(---breadcrumb-sizeAnimationNames);
+			animation-direction: var(---breadcrumb-sizeDirections);
 			animation-timeline: var(---breadcrumb-sizeTimelines);
 			---breadcrumb-endWidth: round(up, calc(100vw * (1 / var(---breadcrumb-endInline) - 1)), 0.0625px);
 			---breadcrumb-endHeight: round(nearest, calc(100vw * (1 / var(---breadcrumb-endBlock) - 1)), 0.0625px);
@@ -2840,6 +2686,7 @@ ol {
 					var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
 					if(style(---breadcrumb-hasEnd: 1) and style(---breadcrumb-endFlowSupported: 1) and style(--collapsible-markerMotion: clearance): clearance-inline-measure; else: none);
 				---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-endPositionTimeline);
+				---breadcrumb-sizeDirections: normal, normal, normal, normal, normal;
 				timeline-scope: var(---breadcrumb-sizeTimelines), var(---breadcrumb-endFlowTimeline);
 				@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 					timeline-scope: none;
@@ -2851,10 +2698,11 @@ ol {
 						(0.5 + var(---inlineDirection) * (0.5 - var(---clearance-inlineFraction)))
 				);
 				&[data-sticky-breadcrumb~="size"] {
-					---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), breadcrumb-size-row-inline-cover, breadcrumb-size-row-inline-crossing, breadcrumb-size-row-block-cover, breadcrumb-size-row-block-crossing,
-					if(style(---breadcrumb-hasEnd: 1) and style(---breadcrumb-endFlowSupported: 1) and style(--collapsible-markerMotion: clearance): clearance-inline-measure; else: none);
-					---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%;
-					---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-endPositionTimeline);
+					---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
+						if(style(---breadcrumb-hasEnd: 1) and style(---breadcrumb-endFlowSupported: 1) and style(--collapsible-markerMotion: clearance): clearance-inline-measure; else: none);
+					---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, cover 0% cover 100%;
+					---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-endPositionTimeline);
+					---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse, normal;
 				}
 			}
 			--stickyBreadcrumb-minBlockSize: 0px;
@@ -2927,16 +2775,12 @@ ol {
 				view-timeline-inset: 0;
 			}
 			&[data-sticky-breadcrumb~="size"] {
-				---breadcrumb-endAnimationNames: if(style(---breadcrumb-hasEnd: 0): none, none; else: breadcrumb-size-end-inline-cover, breadcrumb-size-end-inline-crossing), if(style(---breadcrumb-hasEnd: 0): none, none; else: breadcrumb-size-end-block-cover, breadcrumb-size-end-block-crossing);
-				---breadcrumb-endSizeRanges: cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw;
-				---column-inlineFraction: calc(var(---breadcrumb-rowInlineCover) / var(---breadcrumb-rowInlineCrossing));
-				---column-blockFraction: calc(var(---breadcrumb-rowBlockCover) / var(---breadcrumb-rowBlockCrossing));
-				---breadcrumb-endInline: calc(var(---breadcrumb-endInlineCover) / var(---breadcrumb-endInlineCrossing));
-				---breadcrumb-endBlock: calc(var(---breadcrumb-endBlockCover) / var(---breadcrumb-endBlockCrossing));
-				---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), breadcrumb-size-row-inline-cover, breadcrumb-size-row-inline-crossing, breadcrumb-size-row-block-cover, breadcrumb-size-row-block-crossing;
-				---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw;
-				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-rowBlockTimeline);
+				---breadcrumb-endSizeRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%;
+				---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size;
+				---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%;
+				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
 				animation-range: var(---breadcrumb-sizeRanges);
+				---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse;
 			}
 
 		}
@@ -3007,6 +2851,7 @@ ol {
 				---breadcrumb-exitTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-exit");
 				timeline-scope: none;
 			}
+			---breadcrumb-sizeDirections: normal, normal, normal, normal, normal, normal, normal;
 			view-timeline: var(---breadcrumb-exitTimeline) block;
 			view-timeline-inset: 0;
 			---breadcrumb-sizeAnimationNames:
@@ -3056,17 +2901,12 @@ ol {
 				---breadcrumb-parentInlineEnd: 0px;
 				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
-				---breadcrumb-sizeAnimationNames: breadcrumb-size-row-inline-cover, breadcrumb-size-row-inline-crossing;
-				---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowInlineTimeline);
-				animation-range: cover 0% cover 100%, cover 0% cover calc(100% + 100vw);
+				---breadcrumb-sizeAnimationNames: column-inline-size;
+				---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline);
+				---breadcrumb-sizeDirections: reverse;
+				animation-range: exit-crossing 0% exit-crossing 100%;
 				---breadcrumb-itemWidth: inherit;
 				---breadcrumb-itemHeight: inherit;
-				---column-inlineFraction: if(
-					style(---breadcrumb-rowInlineCover > 0) and style(---breadcrumb-rowInlineCover < 1) and style(---breadcrumb-rowInlineCrossing > 0): calc(
-						(var(---breadcrumb-rowInlineCover) / var(---breadcrumb-rowInlineCrossing) - 1) / (1 - var(---breadcrumb-rowInlineCover))
-					);
-					else: 1
-				);
 				---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
 				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
 
@@ -3077,7 +2917,7 @@ ol {
 					view-timeline-name: none;
 				}
 				> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
-					/* Cover and extended-cover progress recover dimensions independently of the local scrollport's rounded viewport. */
+					/* Exit-crossing at local zero reads native dimensions independently of rounded scrollport bounds. */
 					direction: ltr;
 					writing-mode: horizontal-tb;
 					overflow: hidden;
@@ -3093,8 +2933,8 @@ ol {
 					}
 					&::before {
 						content: '';
-						inline-size: 100%;
-						padding-inline-end: 100vw;
+						inset-inline-start: -100%;
+						inline-size: calc(100% + 100vw);
 						view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 					}
 					&[data-sticky-breadcrumb~="item-size"] {
@@ -3106,8 +2946,8 @@ ol {
 						&::after {
 							content: '';
 							inline-size: 1px;
-							block-size: 100%;
-							padding-block-end: 100vw;
+							inset-block-start: -100%;
+							block-size: calc(100% + 100vw);
 							view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
 						}
 					}
@@ -3698,18 +3538,12 @@ ol {
 				}
 			}
 			&[data-sticky-breadcrumb~="size"] {
-				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline), var(--stickyBreadcrumb-itemBlockTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(--stickyBreadcrumb-endBlockTimeline),
-				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-clearance-sizeTimeline);
-				---breadcrumb-sizeAnimationNames: breadcrumb-size-item-inline-cover, breadcrumb-size-item-inline-crossing, breadcrumb-size-item-block-cover, breadcrumb-size-item-block-crossing,
-				var(---breadcrumb-endAnimationNames),
-				breadcrumb-size-row-inline-cover, breadcrumb-size-row-inline-crossing, breadcrumb-size-row-block-cover, breadcrumb-size-row-block-crossing,
-				if(
-					style(--stickyBreadcrumb-clearance: circle) and
-						style(---breadcrumb-clearance-supported: 1): breadcrumb-clearance-measure; else: none
-				);
-				---breadcrumb-sizeRanges: cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, var(---breadcrumb-endSizeRanges), cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%, entry-crossing 0px entry-crossing 100vw, cover 0% cover 100%;
-				---breadcrumb-itemInline: calc(var(---breadcrumb-itemInlineCover) / var(---breadcrumb-itemInlineCrossing));
-				---breadcrumb-itemBlock: calc(var(---breadcrumb-itemBlockCover) / var(---breadcrumb-itemBlockCrossing));
+				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
+					var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-clearance-sizeTimeline);
+				---breadcrumb-sizeAnimationNames: breadcrumb-item-inline, breadcrumb-item-block, var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
+					if(style(--stickyBreadcrumb-clearance: circle) and style(---breadcrumb-clearance-supported: 1): breadcrumb-clearance-measure; else: none);
+				---breadcrumb-sizeRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, cover 0% cover 100%;
+				---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse, reverse, reverse, normal;
 			}
 		}
 
@@ -3879,10 +3713,16 @@ ol {
 			display: block;
 			position: absolute;
 			inset: calc(-1 * var(---breadcrumb-sizeBorderWidth));
+			inset-block-end: calc(-1px - var(---breadcrumb-sizeBorderWidth));
+			inset-inline-end: calc(-1px - var(---breadcrumb-sizeBorderWidth));
+			overflow: hidden;
 			container-type: size;
+			writing-mode: horizontal-tb;
+			direction: ltr;
 			visibility: hidden;
 			pointer-events: none;
-			padding: 0;
+			/* The content box measures the owner; padding keeps subpixel scrollports active. */
+			padding: 0 1px 1px 0;
 			border: 0;
 			margin: 0;
 			animation: none;
@@ -3891,21 +3731,22 @@ ol {
 			scale: none;
 			rotate: none;
 			&::before,&::after {
+				---breadcrumb-measuredSize: 100cqi;
 				content: '';
 				position: absolute;
-				inset: 0 auto auto 0;
+				inset: 0 auto auto calc(-1 * var(---breadcrumb-measuredSize));
 				block-size: 1px;
-				inline-size: 100cqi;
+				inline-size: calc(var(---breadcrumb-measuredSize) + 100vw);
 				view-timeline-axis: inline;
 				view-timeline-inset: 0;
 				padding: 0;
 				border: 0
 			}
 			&::after {
-				inline-size: 100cqb
+				---breadcrumb-measuredSize: 100cqb
 			}
 			&[data-sticky-breadcrumb~="size-source"]::before {
-				inline-size: calc((100cqi + var(---breadcrumb-iconInlineCorrection,var(---breadcrumb-iconCorrection)))*var(--stickyBreadcrumb-scale))
+				---breadcrumb-measuredSize: round(up, calc((100cqi + var(---breadcrumb-iconInlineCorrection,var(---breadcrumb-iconCorrection)))*var(--stickyBreadcrumb-scale)), 0.0625px)
 			}
 		}
 	}

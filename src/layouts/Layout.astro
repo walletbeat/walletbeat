@@ -314,33 +314,10 @@ import Footer from '@/views/Footer.astro'
 				timeline-scope: --wallet-end-inline, --wallet-end-block;
 			}
 			animation:
-				breadcrumb-size-item-inline-cover auto linear both,
-				breadcrumb-size-item-inline-crossing auto linear both,
-				breadcrumb-size-item-block-cover auto linear both,
-				breadcrumb-size-item-block-crossing auto linear both;
-			animation-timeline:
-				--wallet-item-inline, --wallet-item-inline, --wallet-item-block, --wallet-item-block;
-			animation-range:
-				cover 0% cover 100%,
-				cover 0% cover calc(100% + 100vw),
-				cover 0% cover 100%,
-				cover 0% cover calc(100% + 100vw);
-			---breadcrumb-itemInline: if(
-				style(---breadcrumb-itemInlineCover > 0) and style(---breadcrumb-itemInlineCover < 1) and
-					style(---breadcrumb-itemInlineCrossing > 0): calc(
-						(var(---breadcrumb-itemInlineCover) / var(---breadcrumb-itemInlineCrossing) - 1) /
-							(1 - var(---breadcrumb-itemInlineCover))
-					)
-					; else: 1
-			);
-			---breadcrumb-itemBlock: if(
-				style(---breadcrumb-itemBlockCover > 0) and style(---breadcrumb-itemBlockCover < 1) and
-					style(---breadcrumb-itemBlockCrossing > 0): calc(
-						(var(---breadcrumb-itemBlockCover) / var(---breadcrumb-itemBlockCrossing) - 1) /
-							(1 - var(---breadcrumb-itemBlockCover))
-					)
-					; else: 1
-			);
+				breadcrumb-item-inline auto linear reverse both,
+				breadcrumb-item-block auto linear reverse both;
+			animation-timeline: --wallet-item-inline, --wallet-item-block;
+			animation-range: exit-crossing 0% exit-crossing 100%;
 			---breadcrumb-itemWidth: round(
 				up,
 				calc(100vw * (1 / var(---breadcrumb-itemInline) - 1)),
