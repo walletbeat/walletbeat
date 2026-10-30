@@ -8,7 +8,9 @@ import matrix from './tests/browser/recording-matrix.json' with { type: 'json' }
 const port = Number(process.env.WALLET_PAGE_PORT ?? 4558)
 const baseURL = process.env.WALLET_PAGE_URL ?? `http://127.0.0.1:${port}`
 const outputDir = process.env.WALLET_PAGE_RESULTS ?? 'test-results/browser'
-const webkitLaunchOptions = { executablePath: process.env.WALLET_PAGE_WEBKIT_EXECUTABLE }
+const launchOptions = (engine: string) => ({
+	executablePath: process.env[`WALLET_PAGE_${engine.toUpperCase()}_EXECUTABLE`],
+})
 
 export default defineConfig({
 	testDir: '.',
@@ -46,7 +48,7 @@ export default defineConfig({
 			testIgnore: '**/recording.spec.ts',
 			use: {
 				browserName: browserName as 'chromium' | 'firefox' | 'webkit',
-				...(browserName === 'webkit' ? { launchOptions: webkitLaunchOptions } : {}),
+				launchOptions: launchOptions(browserName),
 			},
 		})),
 		...matrix.map((cell): Project => ({
@@ -58,16 +60,16 @@ export default defineConfig({
 				viewport: { width: cell.width, height: cell.height },
 				colorScheme: cell.theme as 'light' | 'dark',
 				video: { mode: 'on', size: { width: cell.width, height: cell.height } },
-				launchOptions:
-					cell.engine === 'firefox'
+				launchOptions: {
+					...launchOptions(cell.engine),
+					...(cell.engine === 'firefox'
 						? {
 								firefoxUserPrefs: {
 									'ui.prefersReducedTransparency': cell.transparency === 'reduce' ? 1 : 0,
 								},
 							}
-						: cell.engine === 'webkit'
-							? webkitLaunchOptions
-							: {},
+						: {}),
+				},
 			},
 		})),
 	],
