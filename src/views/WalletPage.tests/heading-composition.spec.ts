@@ -11,6 +11,7 @@ const enhancedBreadcrumbs = () =>
 	CSS.supports('color: if(style(---breadcrumb-wrap: 1): red)')
 
 const headingVariants = [
+	{ name: 'stage-h2', selector: '#stages > header h2' },
 	{ name: 'attribute-h2', selector: 'article .attribute-group > header h2' },
 	{
 		name: 'attribute-h3',
@@ -43,7 +44,7 @@ for (const width of [390, 1440]) {
 		})
 		const scopes = await page
 			.locator(
-				'#top .attribute-group, #top .attribute-group section.attribute, #security-news, #stages section[data-sticky-breadcrumb~="scope"]',
+				'#top .attribute-group, #top .attribute-group section.attribute, #security-news, #stages, #stages section[data-sticky-breadcrumb~="scope"]',
 			)
 			.evaluateAll(elements => elements.map(element => element.id))
 		const observations = []
@@ -351,6 +352,11 @@ for (const width of [390, 1440]) {
 			'A real Stage title/support composition must be exercised',
 		).toBe(true)
 
+		expect(
+			applicable.some(row => row.id === 'stages' && row.level === 2 && row.supportLines.length > 0),
+			'The Stage Progress H2 must include its mandatory visible supporting caption',
+		).toBe(true)
+
 		for (const row of applicable) {
 			expect(row.titleLines.length, row.id).toBeGreaterThan(0)
 			expect(row.supportLines.length, row.id).toBeGreaterThan(0)
@@ -497,7 +503,6 @@ for (const width of [390, 1440]) {
 
 		for (const variant of [
 			...headingVariants,
-			{ name: 'stage-h2', selector: '#stages > header h2' },
 			{ name: 'news-h2', selector: '#security-news > header h2' },
 		]) {
 			const heading = page.locator(variant.selector).first()
@@ -767,7 +772,6 @@ for (const width of [390, 1440]) {
 
 		for (const variant of [
 			...headingVariants,
-			{ name: 'stage-h2', selector: '#stages > header h2' },
 			{ name: 'news-h2', selector: '#security-news > header h2' },
 		]) {
 			const heading = page.locator(variant.selector).first()
@@ -1278,76 +1282,5 @@ for (const width of [390, 1440]) {
 				expect(wrap, `${id}: ${delta}px from its intrinsic boundary`).toBe(delta < 0 ? 1 : 0)
 			}
 		}
-	})
-}
-
-for (const width of [390, 1440]) {
-	test(`description-free Stage H2 retains natural icon composition at ${width}px`, async ({
-		page,
-	}, info) => {
-		await page.setViewportSize({ width, height: 900 })
-		await page.goto('/__wallet-page/software/')
-		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 180_000 })
-		await page.evaluate(() => document.fonts.ready)
-		const stage = page.locator('#stages')
-
-		await stage.evaluate(element => {
-			const root = document.querySelector('#layout')!
-
-			root.setAttribute(
-				'style',
-				`${root.getAttribute('style') ?? ''};scroll-snap-type:none;scroll-behavior:auto`,
-			)
-			root.scrollTop += element.getBoundingClientRect().top - 250
-		})
-		await expect
-			.poll(() => stage.evaluate(element => element.getBoundingClientRect().top))
-			.toBeGreaterThan(180)
-		const composition = await stage.evaluate(element => {
-			const header = element.querySelector(':scope > header')!
-			const title = header.querySelector('h2')!
-			const icon = header.querySelector('[data-icon]')!
-			const style = getComputedStyle(icon, '::before')
-			const glyph: unknown = JSON.parse(style.content)
-
-			if (typeof glyph !== 'string' || !glyph) {
-				throw new Error('Stage icon must expose its actual font glyph')
-			}
-
-			const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
-
-			const primaryFont = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily.split(',')[0]}`
-
-			if (!document.fonts.check(primaryFont, glyph)) {
-				throw new Error(`Stage icon font is unavailable: ${primaryFont}`)
-			}
-
-			const context = document.createElement('canvas').getContext('2d')!
-
-			context.font = font
-			const ink = context.measureText(glyph)
-			const titleBox = title.getBoundingClientRect(),
-				iconBox = icon.getBoundingClientRect()
-
-			return {
-				support: header.querySelectorAll('[data-sticky-breadcrumb~=support]').length,
-				lineHeight: parseFloat(getComputedStyle(title).lineHeight),
-				inkHeight: ink.actualBoundingBoxAscent + ink.actualBoundingBoxDescent,
-				wrapperCenterDifference: Math.abs(
-					(titleBox.top + titleBox.bottom - iconBox.top - iconBox.bottom) / 2,
-				),
-				font,
-				naturalTop: header.getBoundingClientRect().top,
-			}
-		})
-
-		await info.attach('stage-natural-composition', {
-			body: JSON.stringify(composition),
-			contentType: 'application/json',
-		})
-		expect(composition.support).toBe(0)
-		expect(composition.naturalTop).toBeGreaterThan(180)
-		expect(Math.abs(composition.inkHeight - composition.lineHeight * 1.5 * 1.1)).toBeLessThan(2)
-		expect(composition.wrapperCenterDifference).toBeLessThan(2)
 	})
 }
