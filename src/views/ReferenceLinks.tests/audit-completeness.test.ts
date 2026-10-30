@@ -11,7 +11,7 @@ import type { ResolvedWallet } from '@/schema/wallet'
 import { isTypographicContent } from '@/types/content'
 import { evaluationDetailRenderData } from '@/types/content/evaluation-details'
 import { assertCalendarDate } from '@/types/date'
-import { nonEmptyValues } from '@/types/utils/non-empty'
+import { nonEmptyMap, nonEmptyValues } from '@/types/utils/non-empty'
 import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 
@@ -120,7 +120,10 @@ describe('custom audit reference completeness', () => {
 					},
 					{
 						...reference,
-						urls: reference.urls.map(url => ({ ...url, label: 'Independent citation label' })),
+						urls: nonEmptyMap(reference.urls, url => ({
+							...url,
+							label: 'Independent citation label',
+						})),
 					},
 					{
 						...reference,
