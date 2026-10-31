@@ -1,10 +1,14 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
-for (const direction of ['ltr', 'rtl'] as const) {
-	test(`adjacent breadcrumbs follow a reversible rounded corner (${direction})`, async ({
+for (const { direction, width, requiresCurve } of [
+	{ direction: 'ltr', width: 690, requiresCurve: true },
+	{ direction: 'rtl', width: 690, requiresCurve: false },
+	{ direction: 'rtl', width: 1440, requiresCurve: true },
+] as const) {
+	test(`adjacent breadcrumbs follow a reversible rounded corner (${direction}, ${width}px)`, async ({
 		page,
 	}) => {
-		await page.setViewportSize({ width: 690, height: 900 })
+		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/metamask/?variant=BROWSER')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
@@ -24,6 +28,8 @@ for (const direction of ['ltr', 'rtl'] as const) {
 			root.style.scrollBehavior = 'auto'
 		}, direction)
 
+		let rounded = 0
+
 		for (const id of ['transaction-legibility', 'account-recovery']) {
 			const item = page.locator(`#${id} [data-sticky-breadcrumb~="item"]`).first()
 			const natural = await page.locator(`#${id}`).evaluate(section => {
@@ -34,18 +40,14 @@ for (const direction of ['ltr', 'rtl'] as const) {
 
 				return root.scrollTop + flow.getBoundingClientRect().top - root.getBoundingClientRect().top
 			})
-			const seek = async (scroll: number) => {
-				await page.evaluate(scroll => {
-					document.querySelector('#layout')!.scrollTop = scroll
-				}, scroll)
-				await page.evaluate(
-					() =>
-						new Promise<void>(resolve =>
-							requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-						),
-				)
+			const seek = (scroll: number) =>
+				item.evaluate(async (element, scroll) => {
+					const root = document.querySelector('#layout')!
 
-				return item.evaluate(element => {
+					root.scrollTop = scroll
+					await new Promise<void>(resolve =>
+						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+					)
 					const animation = element
 						.getAnimations()
 						.find(
@@ -58,44 +60,76 @@ for (const direction of ['ltr', 'rtl'] as const) {
 						throw new Error('Resolved native rounded arrival required')
 					}
 
+					const scope = element.closest('[data-sticky-breadcrumb~="scope"]'),
+						flow = scope?.querySelector(
+							':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
+						)
+
+					if (!flow || animation.timeline.subject !== flow || animation.timeline.source !== root) {
+						throw Error('Arrival must follow its own flow subject in the page scroll root')
+					}
+
 					const style = getComputedStyle(element)
 					const [x = 0, y = 0] = style.translate.split(' ').map(Number.parseFloat)
+					const time = animation.timeline.currentTime,
+						start = animation.startTime,
+						duration = animation.effect.getComputedTiming().duration
+
+					if (
+						!(time instanceof CSSUnitValue) ||
+						time.unit !== 'percent' ||
+						!(start instanceof CSSUnitValue) ||
+						start.unit !== 'percent' ||
+						!(duration instanceof CSSUnitValue) ||
+						duration.unit !== 'percent' ||
+						duration.value <= 0 ||
+						animation.playbackRate !== 1
+					) {
+						throw Error('Finite native percentage clock and duration required')
+					}
 
 					return {
 						x,
 						y,
+						clock: (time.value - start.value) / duration.value,
 						phase: animation.effect.getComputedTiming().progress,
-						scroll: document.querySelector('#layout')!.scrollTop,
+						scroll: root.scrollTop,
 					}
-				})
-			}
+				}, scroll)
 			const start = await seek(natural - 500)
 			const end = await seek(natural + 500)
 
 			expect(start.phase).toBe(0)
 			expect(end.phase).toBe(1)
-			expect(Math.abs(end.x)).toBeGreaterThan(20)
 			expect(Math.abs(end.y)).toBeGreaterThan(10)
+			const curved = Math.abs(end.x) > 20
+
+			if (curved) {
+				rounded++
+			} else {
+				expect(Math.abs(end.x)).toBeLessThan(0.5)
+			}
+
+			const slope = (end.clock - start.clock) / (end.scroll - start.scroll)
+
+			expect(Number.isFinite(slope) && slope > 0).toBe(true)
 			const samples = []
 
 			for (const target of [0.35, 0.45, 0.5, 0.55, 0.65]) {
-				let low = natural - 500,
-					high = natural + 500
+				const row = await seek(start.scroll + (target - start.clock) / slope)
 
-				for (let attempt = 0; attempt < 12; attempt++) {
-					const row = await seek((low + high) / 2)
+				expect(Math.abs(row.clock - target)).toBeLessThanOrEqual(slope + 0.001)
+				expect(row.phase).toBeGreaterThan(0)
+				expect(row.phase).toBeLessThan(1)
 
-					if (typeof row.phase !== 'number') {
-						throw new Error('Arrival phase unavailable')
-					}
-
-					if (row.phase < target) {
-						low = row.scroll
-					} else {
-						high = row.scroll
-					}
+				if (!curved) {
+					expect(Math.abs(row.x)).toBeLessThan(0.5)
+					expect(row.y).toBeGreaterThan(Math.min(start.y, end.y))
+					expect(row.y).toBeLessThan(Math.max(start.y, end.y))
+					samples.push(row)
+					continue
 				}
-				const row = await seek(high)
+
 				const x = row.x / end.x,
 					y = row.y / end.y
 
@@ -117,6 +151,13 @@ for (const direction of ['ltr', 'rtl'] as const) {
 				expect(Math.abs(reversed.x - sample.x)).toBeLessThan(0.5)
 				expect(Math.abs(reversed.y - sample.y)).toBeLessThan(0.5)
 			}
+		}
+
+		if (requiresCurve) {
+			expect(
+				rounded,
+				'At least one heading must exercise a genuine two-dimensional arrival',
+			).toBeGreaterThan(0)
 		}
 	})
 }
