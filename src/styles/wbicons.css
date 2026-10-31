@@ -84,7 +84,7 @@
 	}
 
 	&[data-icon~='checklist'] {
-		--icon-content: '✅';
+		--icon-content: '📋';
 	}
 
 	&[data-icon~='code_repository'] {
@@ -209,10 +209,6 @@
 
 	&[data-icon~='security_audits'] {
 		--icon-content: '📜';
-	}
-
-	&[data-icon~='security_best_practices'] {
-		--icon-content: '📋';
 	}
 
 	&[data-icon~='self_sovereignty'] {
@@ -356,7 +352,7 @@
 	}
 
 	&[data-icon~='checklist'] {
-		--icon-content: '✅';
+		--icon-content: '📋';
 	}
 
 	&[data-icon~='code_repository'] {
@@ -481,10 +477,6 @@
 
 	&[data-icon~='security_audits'] {
 		--icon-content: '📜';
-	}
-
-	&[data-icon~='security_best_practices'] {
-		--icon-content: '📋';
 	}
 
 	&[data-icon~='self_sovereignty'] {
@@ -699,10 +691,10 @@
 
 [data-icon~='checklist'],
 [data-icon-metrics='checklist'] {
-	---icon-ink-minX-complex: 0.135;
-	---icon-ink-maxX-complex: 0.8653809524;
-	---icon-ink-height-complex: 1.000045455;
-	---icon-ink-top-complex: -0.00004545454545;
+	---icon-ink-minX-complex: 0.236;
+	---icon-ink-maxX-complex: 0.764;
+	---icon-ink-height-complex: 1;
+	---icon-ink-top-complex: 0;
 	---icon-ink-advance-complex: 1;
 }
 
@@ -980,15 +972,6 @@
 [data-icon-metrics='security_audits'] {
 	---icon-ink-minX-complex: 0.118;
 	---icon-ink-maxX-complex: 0.882;
-	---icon-ink-height-complex: 1;
-	---icon-ink-top-complex: 0;
-	---icon-ink-advance-complex: 1;
-}
-
-[data-icon~='security_best_practices'],
-[data-icon-metrics='security_best_practices'] {
-	---icon-ink-minX-complex: 0.236;
-	---icon-ink-maxX-complex: 0.764;
 	---icon-ink-height-complex: 1;
 	---icon-ink-top-complex: 0;
 	---icon-ink-advance-complex: 1;
@@ -1592,15 +1575,6 @@
 [data-icon-metrics='security_audits'] {
 	---icon-ink-minX-simple: 0.129;
 	---icon-ink-maxX-simple: 0.871;
-	---icon-ink-height-simple: 1;
-	---icon-ink-top-simple: 0;
-	---icon-ink-advance-simple: 1;
-}
-
-[data-icon~='security_best_practices'],
-[data-icon-metrics='security_best_practices'] {
-	---icon-ink-minX-simple: 0.037;
-	---icon-ink-maxX-simple: 0.9626129032;
 	---icon-ink-height-simple: 1;
 	---icon-ink-top-simple: 0;
 	---icon-ink-advance-simple: 1;

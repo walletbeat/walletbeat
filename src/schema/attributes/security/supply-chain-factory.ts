@@ -45,7 +45,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 
 export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 	id: 'supplyChainFactory',
-	icon: 'security_best_practices',
+	icon: 'checklist',
 	displayName: 'Supply chain factory',
 	wording: {
 		midSentenceName: null,
