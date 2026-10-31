@@ -1946,7 +1946,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							overflow-y: auto;
 
 							inline-size: max-content;
-							min-inline-size: 50%;
 							max-inline-size: 100%;
 							block-size: var(---pie-size);
 
@@ -2986,7 +2985,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				);
 			}
 			:global([data-sticky-container]:not([data-sticky-breadcrumb]) > summary[data-sticky~="block-start"]:has(h4)) {
-				---wallet-compactFontSize: 0.875rem;
+				---wallet-compactFontSize: 1rem;
 
 				:global(h4) {
 					font-size: var(---wallet-compactFontSize);
