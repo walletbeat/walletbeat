@@ -1661,6 +1661,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		--stickyBreadcrumb-easing: var(--transition-easeInOutExpo);
 		--wallet-icon-size: 3rem;
 		---wallet-content-inline-padding: 2rem;
+		---wallet-page-navigation-inline-size: min(20rem, 320px);
 		---wallet-group-heading-font-size: 1.8rem;
 		---wallet-compact-icon-size: 32px;
 		---pie-compactSize: 128px;
@@ -1972,6 +1973,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		row-gap: 2rem;
 
 		@media (width <= 1024px) {
+			---wallet-page-navigation-inline-size: 32rem;
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 				--sticky-marginInlineEnd: 0px;
@@ -1990,7 +1992,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	:global(#layout:has([data-sticky-breadcrumb~="root"])) {
 		/* Keep fixed controls attached to the viewport. */
 		--scrollContainer-perspective: none;
-		---wallet-page-navigation-inline-size: 32rem;
 		---wallet-page-block-offset: 0px;
 		--scrollContainer-scrollPaddingBlockStart: 0px;
 
