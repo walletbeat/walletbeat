@@ -1,6 +1,6 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
-for (const width of [1024, 1025, 1400]) {
+for (const width of [390, 690, 1024, 1025, 1400]) {
 	test(`wallet navigation leaves readable content across its layout boundary at ${width}px`, async ({
 		page,
 	}, info) => {
@@ -36,6 +36,12 @@ for (const width of [1024, 1025, 1400]) {
 					article: box(article),
 					navigation: box(navigation),
 					pie: box(pie),
+					toc: box(navigation.querySelector('#wallet-toc')!),
+					flower: box(pie.querySelector('.navigation-items')!),
+					row: {
+						direction: getComputedStyle(navigation).flexDirection,
+						wrap: getComputedStyle(navigation).flexWrap,
+					},
 					innerLeft: bounds.left + number(style.borderLeftWidth) + number(style.paddingLeft),
 					innerRight: bounds.right - number(style.borderRightWidth) - number(style.paddingRight),
 					rem: number(getComputedStyle(document.documentElement).fontSize),
@@ -56,7 +62,15 @@ for (const width of [1024, 1025, 1400]) {
 
 			expect(geometry.horizontalOverflow).toBeLessThanOrEqual(1)
 
+			expect(geometry.flower.width).toBeLessThanOrEqual(Math.min(20 * geometry.rem, 320) + 1)
+
 			if (geometry.inFlow) {
+				expect(geometry.row).toEqual({ direction: 'row', wrap: 'wrap' })
+
+				if (width === 1024) {
+					expect(Math.abs(geometry.toc.top - geometry.pie.top)).toBeLessThanOrEqual(1)
+				}
+
 				expect(geometry.pie.width).toBeLessThanOrEqual(
 					Math.min(32 * geometry.rem, geometry.innerRight - geometry.innerLeft) + 1,
 				)
