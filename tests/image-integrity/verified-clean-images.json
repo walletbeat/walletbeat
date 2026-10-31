@@ -455,6 +455,30 @@
 		"hash": "f7633cc320119eb5dfe61606e7c1b378034e9c91b54c43f0ba6bddd6e2abf5cc",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png": {
+		"hash": "b77885d3bab4eb95a6da433cc30be07e684079000b1a2ad6be6861c199df4d25",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png": {
+		"hash": "4b2a9644c16647a82be2c8af6e485d6f31edca575e1602e0243dd56587a23e9e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png": {
+		"hash": "6ed56327a19f8dc0f39ccadb20b283af5631ca9d2612da666fd377a0ed97330a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png": {
+		"hash": "bc5e4571c229559bdad0987358813c3f41e1ccf0b8140d77fe9629c2050c7e22",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-per-network-balances.png": {
+		"hash": "524dcc25c7988653753e30222cfebe5a88f54815d69117089f11230278252a3b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-total-value.png": {
+		"hash": "81fd27596efb2142da76f6468ccf10e49921569b1d51b717c3c1284faa9f77fc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
 		"hash": "15b963a47d182358a47c8f7fdaaee0b22ecf3f6a1280e21f8f225a101b7a6ac0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
