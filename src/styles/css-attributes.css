@@ -99,6 +99,10 @@ a {
 /**
  * Canonical same-page destination identity consumed by destination-scope interaction publishers. Associated non-link paint owners share the identity without acquiring interactive semantics. Source links declare their own and ancestor destination membership separately with `[data-pressable-targets]`.
  *
+ * ### Applied to
+ * - Native `<a>` receives local inactive feedback defaults, independently of surrounding destinations.
+ * - `[data-pressable-name]` opts into shared destination interaction and current feedback.
+ *
  * ### CSS Variables
  * - `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.
  * - `--link-timelines`: destination timeline names at their closest shared scope.
@@ -106,10 +110,31 @@ a {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-name]`
  */
+:where(a),
 [data-pressable-name] {
 	---link-active: 0;
 	---link-interacting: 0;
 	---link-current: 0;
+}
+[data-pressable-name] {
+	/**
+	 * ## [data-pressable-current]
+	 * Current feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.
+	 *
+	 * ### Placement
+	 * On a named peer inside an ancestor publishing the same destination identity.
+	 *
+	 * ### Tokens
+	 * - `inherit`: inherit current and active feedback without creating a second current animation; native interaction remains local.
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-current]`
+	 */
+	&[data-pressable-current="inherit"] {
+		---link-active: inherit;
+		---link-current: inherit;
+		---link-currentAnimationName: none;
+	}
 	&:is(a):is(:hover, :focus-visible, :active),
 	&[data-pressable-state~="interacting"] {
 		---link-active: 1;
@@ -140,9 +165,18 @@ a {
 }
 @supports (animation-timeline: scroll()) and (timeline-scope: --link)
 	and (color: if(style(---link-active: 1): red; else: blue)) {
+	@property ---link-currentAnimationName {
+		syntax: '*';
+		inherits: false;
+		initial-value: none;
+	}
 	@scope (:root) to (details:not([open]) > :not(summary)) {
 		[data-pressable-name] {
-			animation: link-current auto linear both;
+			---link-currentAnimationName: link-current;
+			@supports (color: if(style(--link-current: none): red; style(--link-current): green; else: blue)) {
+				---link-currentAnimationName: if(style(--link-current: none): none; style(--link-current): link-current; else: none);
+			}
+			animation: auto linear both var(---link-currentAnimationName);
 			animation-timeline: var(--link-current, none);
 		}
 	}
@@ -3127,9 +3161,12 @@ ol {
 
 				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
-					animation: var(--stickyBreadcrumb-exitAnimation);
-					animation-timeline: var(---breadcrumb-exitTimeline);
-					animation-range: var(---breadcrumb-exitRange);
+					animation:
+						auto linear both var(---link-currentAnimationName, none),
+						var(--stickyBreadcrumb-exitAnimation);
+					animation-timeline:
+						var(--link-current, none), var(---breadcrumb-exitTimeline), var(---breadcrumb-exitTimeline);
+					animation-range: normal, var(---breadcrumb-exitRange), var(---breadcrumb-exitRange);
 				}
 				[data-sticky-breadcrumb~="source"] {
 					display: flex;
