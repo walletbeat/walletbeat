@@ -1982,7 +1982,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	:global(#layout:has([data-sticky-breadcrumb~="root"])) {
 		/* Keep fixed controls attached to the viewport. */
 		--scrollContainer-perspective: none;
-		---wallet-page-navigation-inline-size: min(20rem, 320px);
+		---wallet-page-navigation-inline-size: 25rem;
 		---wallet-page-block-offset: 0px;
 		--scrollContainer-scrollPaddingBlockStart: 0px;
 
