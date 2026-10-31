@@ -1743,6 +1743,10 @@
 		"hash": "28c635c81b9e783dcc01ef227457e61d11140f3ca7b173afdad10693facdf06d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
+	"resources/files/wbicons/wbicons-complex/checklist.svg": {
+		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
+		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
+	},
 	"resources/files/wbicons/wbicons-complex/code_repository.svg": {
 		"hash": "1ed18f75a6a946abe5f3316b4be6ec68419004c9c4a74305728a93d715271e0a",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
@@ -1853,10 +1857,6 @@
 	},
 	"resources/files/wbicons/wbicons-complex/security_audits.svg": {
 		"hash": "f26051c9f25db82468c159cd22b894cb687192a5014d0b8627934ae9d8178bb0",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
-	"resources/files/wbicons/wbicons-complex/security_best_practices.svg": {
-		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
 	"resources/files/wbicons/wbicons-complex/self_sovereignty.svg": {
@@ -2115,10 +2115,6 @@
 		"hash": "d67ac041d3bd09b535c8d4ad370c187dc50c6ca50656c939e1188c506fb9f848",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
-	"resources/files/wbicons/wbicons-simple/security_best_practices.svg": {
-		"hash": "1fe51ca163f24989de0756cebc18a88b1111b1a2417ffe8a0e8ece46eea5082c",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
 	"resources/files/wbicons/wbicons-simple/self_sovereignty.svg": {
 		"hash": "d5768062022593f45885a4a9131dcc84a6f7c468a3dbf330220485341d66074e",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
@@ -2220,11 +2216,11 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"src/assets/fonts/wbicons-complex/wbicons-complex.svg": {
-		"hash": "2e93ff0e3a50e747aa6fcba7b9b7e452d50d6bc0fe45d614484698ef7a5a090d",
+		"hash": "319a3696996deb21ecdc0ea4eac6e0f7c742224a4f8bf3f8b3ea30bd97bce21b",
 		"passedTests": ["file-format"]
 	},
 	"src/assets/fonts/wbicons-simple/wbicons-simple.svg": {
-		"hash": "dd6af0f59536199f4c1e5c9b9769c046d411d80ed94eb2968adade7e8a6892c0",
+		"hash": "1ea9dbe7272022b1beef4b632971f5b19e1bde55d8c8bf97f276f48ebba409f2",
 		"passedTests": ["file-format"]
 	},
 	"tests/browser/fixtures/wide-wallet.svg": {
