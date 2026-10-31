@@ -60,6 +60,9 @@ for (const direction of ['ltr', 'rtl']) {
 							width: box.width,
 							height: box.height,
 							scale: getComputedStyle(icon).scale,
+							capScales: ['::before', '::after'].map(
+								pseudo => getComputedStyle(select, pseudo).scale,
+							),
 							phase: clock.effect!.getComputedTiming().progress,
 							timeline: clock.timeline?.constructor.name,
 							properties: icon
@@ -103,6 +106,13 @@ for (const direction of ['ltr', 'rtl']) {
 			expect(Math.abs(row.width - row.height)).toBeLessThan(0.1)
 			expect(row.scale).toBe(rows[0].scale)
 			expect(row.properties).not.toContain('scale')
+
+			for (const scale of row.capScales) {
+				const axes = scale.split(' ').map(Number)
+
+				expect(axes[0]).toBeGreaterThan(0)
+				expect(axes[1] ?? axes[0]).toBeCloseTo(axes[0], 5)
+			}
 
 			if (index) {
 				expect(row.height).toBeLessThanOrEqual(rows[index - 1].height + 0.1)

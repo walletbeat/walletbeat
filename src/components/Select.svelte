@@ -75,7 +75,7 @@
 
 
 		@keyframes -global-select-compact-height {
-			from { scale: 1 var(---select-expandedScaleY); }
+			from { scale: var(---select-expandedScaleY); }
 			to { scale: 1; }
 		}
 		@keyframes -global-select-compact-tail {
@@ -83,8 +83,11 @@
 			to { translate: calc((-100% + var(---select-compactSize)) * var(---inlineDirection, 1)); }
 		}
 		@keyframes -global-select-compact-bridge {
-			from { scale: 1 var(---select-expandedScaleY); }
-			to { scale: 0 1; }
+			from { scale: 1 var(---select-expandedScaleY); translate: 0px; }
+			to {
+				scale: 0 1;
+				translate: calc(var(---select-compactSize) / 2 * (1 - var(---select-expandedScaleY)) * var(---inlineDirection, 1));
+			}
 		}
 		@keyframes -global-select-compact-icon {
 			from { translate: 0px; }
@@ -142,6 +145,7 @@
 				position: absolute;
 				inset: 0;
 				z-index: -2;
+				transform-origin: left center;
 				pointer-events: auto;
 				clip-path: circle(calc(var(---select-compactSize) / 2) at calc(var(---select-compactSize) / 2) 50%);
 				background-image: radial-gradient(circle at calc(var(---select-compactSize) / 2) 50%, var(--background-primary) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)) calc(var(---select-compactSize) / 2), transparent calc(var(---select-compactSize) / 2));
@@ -152,6 +156,7 @@
 				animation-range: var(--select-compactRange, contain 0% contain 100%);
 			}
 			&::after {
+				transform-origin: right center;
 				background-position: right center;
 				clip-path: circle(calc(var(---select-compactSize) / 2) at calc(100% - var(---select-compactSize) / 2) 50%);
 				background-image: radial-gradient(circle at calc(100% - var(---select-compactSize) / 2) 50%, var(--background-primary) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)) calc(var(---select-compactSize) / 2), transparent calc(var(---select-compactSize) / 2));
@@ -159,8 +164,8 @@
 				animation-timeline: var(---select-timeline);
 				animation-range: var(--select-compactRange, contain 0% contain 100%);
 			}
-			&:dir(rtl)::before { transform: scaleX(-1); }
-			&:dir(rtl)::after { transform: scaleX(-1); }
+			&:dir(rtl)::before { transform: translateX(-100%) scaleX(-1); transform-origin: right center; }
+			&:dir(rtl)::after { transform: translateX(100%) scaleX(-1); transform-origin: left center; }
 
 			> button {
 				font: inherit;
@@ -255,7 +260,7 @@
 				position: absolute;
 				margin: 0;
 				inset-block: 0;
-				inset-inline: calc(var(---select-compactSize) / 2);
+				inset-inline: calc(var(---select-compactSize) / 2 * var(---select-expandedScaleY));
 				background: var(--background-primary);
 				border-block: var(---select-borderWidth) solid var(---select-borderColor);
 				box-sizing: border-box;
