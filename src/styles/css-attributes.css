@@ -250,7 +250,6 @@ input,
 label:has(> input:is([type="checkbox"], [type="radio"])) {
 	cursor: pointer;
 
-	display: inline-flex;
 	align-items: center;
 	padding: 0.66em;
 	gap: 0.5em;
@@ -272,6 +271,15 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 		cursor: not-allowed;
 		opacity: 0.6;
 	}
+}
+
+/* Flat selectors retain each control's specificity and native hidden display. */
+[data-input]:where(:not([hidden])),
+select:where(:not([hidden])),
+button:where(:not([hidden])),
+input:where(:not([hidden])),
+label:has(> input:is([type="checkbox"], [type="radio"])):where(:not([hidden])) {
+	display: inline-flex;
 }
 
 /* iOS zooms the page when a text field under 16px gets focus. */
