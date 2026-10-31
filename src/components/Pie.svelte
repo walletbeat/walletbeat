@@ -1,12 +1,19 @@
 <script module lang="ts">
 	export { PieLayout } from './pie-geometry'
-	export type { LevelConfig, Slice } from './pie-geometry'
+	export type {
+		LevelConfig,
+		PieTransitionElement,
+		PieTransitionElements,
+		Slice,
+	} from './pie-geometry'
 </script>
 
 <script lang="ts">
 	import './pie-shape.css'
+	import { onMount } from 'svelte'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { sliceFill, sliceLabelBackground } from './pie-fill'
+	import { viewTransitionName } from '@/utils/view-transition'
 	// Types
 	import {
 		computePieSlices,
@@ -14,6 +21,7 @@
 		PieLayout as PieLayoutValue,
 		type ComputedSlice,
 		type LevelConfig as PieLevelConfig,
+		type PieTransitionElements as PieTransitionElementsValue,
 		type Slice as PieSlice,
 	} from './pie-geometry'
 	import type { Snippet } from 'svelte'
@@ -32,6 +40,8 @@
 		padding = 0,
 		radius = 47,
 		labelSize = radius / 4,
+		transitionNamePrefix,
+		transitionElements = 'pie slices center',
 		levels = [
 			{
 				outerRadiusFraction: 0.6,
@@ -78,6 +88,10 @@
 		radius?: number
 		padding?: number
 		labelSize?: number
+		/** Unique among mounted pies; reuse across mutually exclusive replacements. */
+		transitionNamePrefix?: string
+		/** Named parts; use `slices` when one pie may become several with a shared prefix. */
+		transitionElements?: PieTransitionElementsValue
 		levels?: PieLevelConfig[]
 
 		// State
@@ -85,7 +99,7 @@
 
 		// Events
 		onSliceClick?: (id: string) => void
-		onSliceMouseEnter?: (id: string) => void
+		onSliceMouseEnter?: (id: string, event: MouseEvent) => void
 		onSliceMouseLeave?: (id: string) => void
 		onSliceFocus?: (id: string) => void
 		onSliceBlur?: (id: string) => void
@@ -95,9 +109,16 @@
 	} = $props()
 
 	// State
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
+
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
+	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
+	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
+	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
+	const transitionsCenter = $derived(!!transitionNamePrefix && transitionedElements.has('center'))
 
 	const pieMetrics = $derived.by(() => {
 		const maxRadius = pieMaxRadius(radius, levels)
@@ -117,12 +138,12 @@
 {#snippet Slice(slice: ComputedSlice)}
 	<svelte:element
 		this={slice.href ? 'a' : onSliceClick ? 'button' : 'div'}
-		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button' } : {}}
+		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button', disabled: !interactive } : {}}
 		class="slice"
 		title={slice.arcIconId ? `${wbIconEmojiSequences[slice.arcIconId]} ${slice.ariaLabel}` : slice.ariaLabel}
 		aria-label={slice.ariaLabel}
-		onmouseenter={() => {
-			onSliceMouseEnter?.(slice.id)
+		onmouseenter={(event: MouseEvent) => {
+			onSliceMouseEnter?.(slice.id, event)
 		}}
 		onmouseleave={() => {
 			onSliceMouseLeave?.(slice.id)
@@ -150,12 +171,14 @@
 		style:--slice-opacity={slice.opacity ?? 1}
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-labelBackground={sliceLabelBackground(slice)}
-		style:--slice-backdropFilter={slice.gradient || slice.color === 'var(--rating-unrated)'
-			? 'var(--rating-unrated-backdropFilter)'
-			: 'none'}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
+		data-view-transition={transitionsSlices ? 'named' : undefined}
+		style:--view-transition-name={transitionsSlices ?
+			viewTransitionName(transitionNamePrefix ?? '', 'slice', slice.id)
+			: undefined}
+		style:--view-transition-class={transitionsSlices ? 'pie-slice' : undefined}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
 		<span class="slice-shape">
@@ -186,8 +209,13 @@
 	<div
 		class="pie"
 		aria-label={title}
+		data-view-transition={transitionsPie ? 'named' : undefined}
 		style:width={`${pieMetrics.width}px`}
 		style:height={`${pieMetrics.height}px`}
+		style:--view-transition-name={transitionsPie ?
+			viewTransitionName(transitionNamePrefix ?? '', 'pie')
+			: undefined}
+		style:--view-transition-class={transitionsPie ? 'pie' : undefined}
 		data-stack
 	>
 		<div class="slices" data-stack>
@@ -195,7 +223,15 @@
 				{@render Slice(slice)}
 			{/each}
 		</div>
-		<div class="center" data-stack>
+		<div
+			class="center"
+			data-stack
+			data-view-transition={transitionsCenter ? 'named' : undefined}
+			style:--view-transition-name={transitionsCenter ?
+				viewTransitionName(transitionNamePrefix ?? '', 'center')
+				: undefined}
+			style:--view-transition-class={transitionsCenter ? 'pie-center' : undefined}
+		>
 			{#if centerContentSnippet}
 				{@render centerContentSnippet()}
 			{:else}
@@ -285,6 +321,7 @@
 
 			> .slices {
 				contain: content;
+				pointer-events: none;
 			}
 
 			.slice {
@@ -310,7 +347,7 @@
 
 				pointer-events: none;
 
-				> * {
+				&:not(:disabled) > * {
 					pointer-events: auto;
 				}
 
@@ -328,10 +365,6 @@
 
 				.slice-shape {
 					background: var(--slice-fill);
-
-					@media (prefers-reduced-transparency: reduce) {
-						backdrop-filter: none;
-					}
 
 					transform-origin: var(--pie-originX) var(--pie-originY);
 					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
@@ -392,6 +425,14 @@
 		&[data-layout="FullLeft"] > .pie > .center,
 		&[data-layout="FullTop"] > .pie > .center {
 			align-items: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pie-container,
+		.pie-container .slice {
+			/* Motion preference takes precedence over shared pressable durations. */
+			transition-duration: 0s !important;
 		}
 	}
 </style>

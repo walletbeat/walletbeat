@@ -1,8 +1,8 @@
 <script module lang="ts">
 	// Types
 	import type { Snippet } from 'svelte'
-
-	type Value = object | string | number | bigint | boolean | undefined | null
+	import { SortDirection, type SortState, type TableValue as Value } from './table-sort'
+	export { SortDirection, type SortState } from './table-sort'
 
 	export type Column<
 		_RowValue extends Value = Value,
@@ -60,18 +60,6 @@
 		End = 'End',
 	}
 
-	export enum SortDirection {
-		Ascending = 'asc',
-		Descending = 'desc',
-	}
-
-	type SortState<
-		_ColumnId extends Value = Value,
-	> = {
-		columnId: _ColumnId
-		direction: SortDirection
-	}
-
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
 	// State
@@ -94,7 +82,7 @@
 			),
 		)
 
-		#isColumnExpanded: Set<_ColumnId> = $state(
+		expandedColumnIds: SvelteSet<_ColumnId> = $state(
 			new SvelteSet()
 		)
 
@@ -103,7 +91,7 @@
 				columns: Column<_RowValue, _CellValue, _ColumnId>[],
 			): Column<_RowValue, _CellValue, _ColumnId>[] =>
 				columns.flatMap(column =>
-					column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+					column.subcolumns?.length && this.expandedColumnIds.has(column.id)
 						? getVisibleColumns(column.subcolumns)
 						: [column],
 				)
@@ -111,14 +99,29 @@
 			return getVisibleColumns(this.columns)
 		})
 
-		#defaultColumnSort?: SortState<_ColumnId>
+		#defaultColumnSort = $derived.by(() => {
+			const column = this.columns.find(column => column.sort?.isDefault)
 
-		sortState?: SortState<_ColumnId> = $state(
-			this.#defaultColumnSort
-		)
+			return column?.sort ? {
+				columnId: column.id,
+				direction: column.sort.defaultDirection,
+			} : undefined
+		})
+
+		#requestedSort?: SortState<_ColumnId> = $state(undefined)
+
+		get sortState(): SortState<_ColumnId> | undefined {
+			return this.#requestedSort && this.#columnsById.get(this.#requestedSort.columnId)?.sort
+				? this.#requestedSort
+				: this.#defaultColumnSort
+		}
+
+		set sortState(sort: SortState<_ColumnId> | undefined) {
+			this.#requestedSort = sort
+		}
 
 		sortedColumn = $derived(
-			this.sortState?.columnId && this.#columnsById.get(this.sortState.columnId),
+			this.sortState && this.#columnsById.get(this.sortState.columnId),
 		)
 
 		maxHeaderLevel = $derived.by(() => {
@@ -126,7 +129,7 @@
 				Math.max(
 					1,
 					...columns.map(column =>
-						column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+						column.subcolumns?.length && this.expandedColumnIds.has(column.id)
 							? 1 + getMaxLevel(column.subcolumns)
 							: 1,
 					),
@@ -190,15 +193,11 @@
 		})
 
 		rowsSorted = $derived.by(() => {
-			if (!this.sortState) return this.rows
-
-			const { direction } = this.sortState
-
 			let result = this.rowsAscending
 
 			if(!result) return result
 
-			if (direction === SortDirection.Descending) {
+			if (this.sortState?.direction === SortDirection.Descending) {
 				result = result.toReversed()
 			}
 
@@ -207,7 +206,7 @@
 					const isRowADisplaced = this.rowIsDisabled!(rowValueA, this)
 					const isRowBDisplaced = this.rowIsDisabled!(rowValueB, this)
 
-					return isRowADisplaced ? 1 : isRowBDisplaced ? -1 : 0
+					return Number(isRowADisplaced) - Number(isRowBDisplaced)
 				})
 
 			return result
@@ -251,25 +250,21 @@
 			pageSize,
 			rowIsDisabled,
 			displaceDisabledRows,
+			initialSort,
 		}: {
 			rows: _RowValue[]
 			columns: Column<_RowValue, _CellValue, _ColumnId>[]
 			pageSize?: number
 			rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
 			displaceDisabledRows?: boolean
+			initialSort?: SortState<_ColumnId>
 		}) {
 			this.rows = rows
 
 			this.columns = columns
+			this.#requestedSort = initialSort && { ...initialSort }
 
 			this.pageSize = pageSize || Infinity
-
-			const defaultSortedColumn = this.columns.find(column => column.sort?.isDefault)
-
-			this.#defaultColumnSort = this.sortState = defaultSortedColumn && {
-				columnId: defaultSortedColumn.id,
-				direction: defaultSortedColumn.sort?.defaultDirection ?? SortDirection.Ascending,
-			}
 
 			this.rowIsDisabled = rowIsDisabled
 			this.displaceDisabledRows = displaceDisabledRows ?? false
@@ -277,7 +272,7 @@
 			const initializeIsColumnExpanded = (columns: Column<_RowValue, _CellValue, _ColumnId>[]) => {
 				columns.forEach(column => {
 					if (column.isDefaultExpanded) {
-						this.#isColumnExpanded.add(column.id)
+						this.expandedColumnIds.add(column.id)
 					}
 
 					if (column.subcolumns?.length) {
@@ -289,13 +284,13 @@
 			initializeIsColumnExpanded(columns)
 		}
 
-		toggleColumnSort = (columnId: _ColumnId) => {
+		getNextColumnSort = (columnId: _ColumnId): SortState<_ColumnId> | undefined | false => {
 			const column = this.#columnsById.get(columnId)
 
 			if (!column?.sort)
 				return false
 
-			this.sortState = (
+			return (
 				this.sortState?.columnId !== columnId ?
 					{
 						columnId,
@@ -307,21 +302,26 @@
 						direction: column.sort.defaultDirection === SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending,
 					}
 				:
-					this.#defaultColumnSort
+					undefined
 			)
+		}
 
+		toggleColumnSort = (columnId: _ColumnId) => {
+			const nextSort = this.getNextColumnSort(columnId)
+			if (nextSort === false) return false
+			this.sortState = nextSort
 			return true
 		}
 
 		isColumnExpanded = (columnId: _ColumnId) => (
-			this.#isColumnExpanded.has(columnId)
+			this.expandedColumnIds.has(columnId)
 		)
 
 		toggleIsColumnExpanded = (columnId: _ColumnId) => {
-			if(this.#isColumnExpanded.has(columnId))
-				this.#isColumnExpanded.delete(columnId)
+			if(this.expandedColumnIds.has(columnId))
+				this.expandedColumnIds.delete(columnId)
 			else
-				this.#isColumnExpanded.add(columnId)
+				this.expandedColumnIds.add(columnId)
 		}
 	}
 </script>
@@ -335,6 +335,7 @@
 ">
 	// Types
 	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { TransitionUpdate } from '@/utils/view-transition'
 
 	type _TableState = TableState<_RowValue, _CellValue, _ColumnId>
 	type _Column = Column<_RowValue, _CellValue, _ColumnId>
@@ -342,6 +343,9 @@
 
 	// IDs
 	const id = $props.id()
+	const stickySizeClock = (level: number) => `--table-${id}-sticky-size-${level}`
+	type TableTransitionUpdate = TransitionUpdate<'sort' | 'columns'>
+	const directTransitionUpdate: TableTransitionUpdate = update => update()
 
 
 	// Props
@@ -355,9 +359,15 @@
 		onRowClick,
 
 		columns,
+		initialSort,
+		sortNavigation,
 		sortedColumn = $bindable(),
+		expandedColumnIds = $bindable(
+			new SvelteSet<_ColumnId>()
+		),
 
 		expandHeaderCells = true,
+		transitionUpdate = directTransitionUpdate,
 
 		cellVerticalAlign,
 		Cell,
@@ -374,9 +384,17 @@
 		displaceDisabledRows?: boolean
 
 		columns: _Column[]
+		initialSort?: SortState<_ColumnId>
+		sortNavigation?: {
+			form: string
+			// Each column's control ID must be unique and stable across destination documents.
+			action: (columnId: _ColumnId, sort: SortState<_ColumnId> | undefined) => { id: string; url: string } | undefined
+		}
 		sortedColumn?: _Column | undefined
+		expandedColumnIds?: SvelteSet<_ColumnId>
 
 		expandHeaderCells?: boolean
+		transitionUpdate?: TableTransitionUpdate
 
 		Cell?: Snippet<[{
 			row: _RowValue
@@ -393,6 +411,8 @@
 
 	// State
 	let table = new TableState({
+		// svelte-ignore state_referenced_locally -- the initial request is independent of the default sort and subsequent user choices
+		initialSort,
 		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
 		rows,
 		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
@@ -419,8 +439,17 @@
 		sortedColumn = table.sortedColumn
 	})
 
+	// Expansion is owned by the table; consumers observe it.
+	$effect(() => {
+		expandedColumnIds = table.expandedColumnIds
+	})
+
 
 	// Functions
+	import { flushSync, onMount } from 'svelte'
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
+
 	const getColumnSpan = (column: _Column): number => (
 		!column.subcolumns?.length ?
 			1
@@ -437,11 +466,13 @@
 				)
 	)
 
+	const toggleColumnSort = (columnId: _ColumnId) => {
+		transitionUpdate(() => {
+			flushSync(() => table.toggleColumnSort(columnId))
+		}, 'sort')
+	}
 
-	// Transitions/animations
-	import { flip } from 'svelte/animate'
-	import { expoOut } from 'svelte/easing'
-	import { fly } from 'svelte/transition'
+
 </script>
 
 
@@ -465,10 +496,17 @@
 			{/each}
 		</colgroup>
 
-		<thead data-sticky="block backdrop-before backdrop-stuck">
-			{@render headerRows(table.columns, 0)}
+		<thead
+			data-sticky="block backdrop-before backdrop-stuck"
+			style:--table-sticky-size-clocks={Array.from({ length: table.maxHeaderLevel }, (_, level) => stickySizeClock(level)).join(', ')}
+		>
+			{@render headerRows(table.columns, 0, undefined, true)}
 
-			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
+			{#snippet headerRows(columns: (_Column | undefined)[], level: number, inheritedClock: string | undefined, inheritedSupported: boolean)}
+				{@const stickyColumns = columns.filter(column => column?.isSticky)}
+				{@const sourceColumn = inheritedSupported && stickyColumns.length === 1 && columns[0]?.isSticky ? columns[0] : undefined}
+				{@const sizeClock = sourceColumn ? stickySizeClock(level) : stickyColumns.length ? undefined : inheritedClock}
+				{@const sizeSupported = !!sourceColumn || (!stickyColumns.length && inheritedSupported)}
 				{@const nextLevelColumns = (
 					columns
 						.flatMap(column => (
@@ -481,10 +519,14 @@
 						))
 				)}
 
-				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
+				<tr
+					data-sticky-size={sizeClock ? '' : undefined}
+					data-visible-center={sizeSupported ? '' : undefined}
+					style:--table-sticky-size-clock={sizeClock}
+				>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
-							{@render headerCell(column, level)}
+							{@render headerCell(column, level, index, column === sourceColumn)}
 						{:else if !expandHeaderCells}
 							<th class="blank-cell"></th>
 						{/if}
@@ -492,16 +534,19 @@
 				</tr>
 
 				{#if nextLevelColumns.some(column => column)}
-					{@render headerRows(nextLevelColumns, level + 1)}
+					{@render headerRows(nextLevelColumns, level + 1, sizeClock, sizeSupported)}
 				{/if}
 			{/snippet}
 
-			{#snippet headerCell(column: _Column, level: number)}
+			{#snippet headerCell(column: _Column, level: number, index: number, isSizeSource: boolean)}
 				{@const colspan = getColumnSpan(column)}
 				{@const isSortable = !!column.sort}
 				{@const isExpandable = !!column.subcolumns?.length}
 				{@const isExpanded = table.isColumnExpanded(column.id)}
 				{@const hasHeaderExtra = !!column.HeaderExtra}
+				{@const nextSort = table.getNextColumnSort(column.id)}
+				{@const sortAction = nextSort === false ? undefined : sortNavigation?.action(column.id, nextSort)}
+				{@const sortButtonId = sortAction?.id ?? `${id}-sort-${level}-${index}`}
 
 				<th
 					{colspan}
@@ -511,7 +556,10 @@
 						:
 							undefined
 					}
+					data-table-column={String(column.id)}
 					data-header-level={level}
+					data-sticky-size-source={isSizeSource ? '' : undefined}
+					aria-sort={table.sortState?.columnId === column.id ? (table.sortState.direction === SortDirection.Ascending ? 'ascending' : 'descending') : undefined}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -519,9 +567,11 @@
 					data-expandable={isExpandable || hasHeaderExtra ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
+					{#if isSizeSource}
+						<span class="sticky-size-probe" aria-hidden="true"></span>
+					{/if}
 					<div
 						class="header-cell-content"
-						data-sticky-container
 					>
 						{#snippet HeaderTitle()}
 							<span
@@ -535,23 +585,28 @@
 							</span>
 						{/snippet}
 
-						<div data-sticky-container>
+						<div data-sticky-container data-scroll-item="visible-center">
 							{#if isSortable}
-								<label class="sort-label" data-pressable="to-containing">
+								<div class="sort-label" data-pressable="to-containing">
+									<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
 									<span data-sticky="backdrop-before backdrop-stuck">
 										{@render HeaderTitle()}
 
 										<button
-											type="button"
+											id={sortButtonId}
+											type={!interactive && sortAction !== undefined ? 'submit' : 'button'}
+											form={sortNavigation?.form}
+											formaction={!interactive ? sortAction?.url : undefined}
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
-											onclick={() => {
-												table.toggleColumnSort(column.id)
+											onclick={event => {
+												event.stopPropagation()
+												if (interactive) toggleColumnSort(column.id)
 											}}
-											disabled={!column.sort}
+											disabled={!interactive && sortAction === undefined}
 										></button>
 									</span>
-								</label>
+								</div>
 							{:else}
 								<span data-sticky="backdrop-before backdrop-stuck">
 									{@render HeaderTitle()}
@@ -562,6 +617,7 @@
 						{#if hasHeaderExtra}
 							<div
 								class="header-extra"
+								data-sticky-container
 								data-sticky="backdrop-before backdrop-stuck"
 							>
 								{@render column.HeaderExtra?.({ column })}
@@ -570,10 +626,14 @@
 							<button
 								type="button"
 								class="expansion-button"
+								disabled={!interactive}
+								data-sticky-container
 								data-sticky="backdrop-before backdrop-stuck"
-								onclick={() => {
-									table.toggleIsColumnExpanded(column.id)
-								}}
+							onclick={() => {
+								transitionUpdate(() => {
+									flushSync(() => table.toggleIsColumnExpanded(column.id))
+								}, 'columns')
+							}}
 								title={isExpanded ? 'Collapse' : 'Expand'}
 								aria-label={isExpanded ? 'Collapse' : 'Expand'}
 							></button>
@@ -588,6 +648,7 @@
 				{@const rowId = getRowId?.(row, index)}
 
 				<tr
+					data-view-transition="item"
 					tabIndex={onRowClick ? 0 : undefined}
 					data-pressable={onRowClick ? '' : undefined}
 					onclick={() => {
@@ -616,7 +677,6 @@
 								row.focus()
 						}
 					}}
-					animate:flip={{ duration: 300, easing: expoOut }}
 					data-disabled={rowIsDisabled?.(row, table) ? '' : undefined}
 				>
 					{#each table.columnsVisible as column (column.id)}
@@ -626,6 +686,8 @@
 
 						<td
 							colspan={columnSpan}
+							data-table-column={String(column.id)}
+							data-table-column-name={column.name}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 							data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -663,7 +725,88 @@
 
 
 <style>
+	@property ---table-sticky-size-fraction {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@property ---table-sticky-size {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@keyframes table-sticky-size {
+		from { ---table-sticky-size-fraction: 0; }
+		to { ---table-sticky-size-fraction: 1; }
+	}
+
+	.sticky-size-probe { display: none; }
+	.header-cell-content > [data-scroll-item] {
+		--scrollItem-visibleCenter-animation: none;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
+			@container (width >= 48rem) {
+				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
+					overflow-x: clip;
+					overflow-y: visible;
+
+					> [data-sticky-container] {
+						--sticky-marginInlineStart: var(---table-sticky-size);
+					}
+					> [data-scroll-item] {
+						--scrollItem-visibleCenter-animation: scroll-item-visible-center;
+					}
+					> [data-scroll-item] [data-sticky] {
+						position: relative;
+						inset: auto;
+						max-inline-size: none;
+					}
+				}
+		thead { timeline-scope: var(--table-sticky-size-clocks); }
+		tr[data-sticky-size] {
+			animation: table-sticky-size auto linear both;
+			animation-timeline: var(--table-sticky-size-clock);
+			/* A local viewport S with subject S + V yields P = S / (2S + V).
+			   Its CSS-pixel precision reserves less than one extra inline pixel. */
+			---table-sticky-size: round(nearest, max(0px, calc(100vh * var(---table-sticky-size-fraction) / max(0.000001, 1 - 2 * var(---table-sticky-size-fraction)))), 1px);
+		}
+		th[data-sticky-size-source] {
+			anchor-name: var(--table-sticky-size-clock);
+		}
+		.sticky-size-probe {
+			display: block;
+			position: fixed;
+			position-anchor: var(--table-sticky-size-clock);
+			left: 0;
+			top: 0;
+			inline-size: 1px;
+			block-size: round(up, anchor-size(inline), 1px);
+			overflow: hidden;
+			visibility: hidden;
+			/* View timelines use layout bounds; the zero-scale box contributes no scroll overflow. */
+			scale: 0;
+			transform-origin: 0 0;
+			pointer-events: none;
+		}
+		.sticky-size-probe::after {
+			content: '';
+			position: absolute;
+			inset: 0 auto auto 0;
+			inline-size: 1px;
+			block-size: calc(100% + 100vh);
+			view-timeline: var(--table-sticky-size-clock) block;
+			view-timeline-inset: 0;
+		}
+	}
+	}
+	}
 	.container {
+		---table-sticky-size: 0px;
+		inline-size: var(--table-inlineSize, max-content);
+		min-inline-size: 100%;
+
 		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
 		--table-outerBorderColor: var(--border-color);
 		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
@@ -683,11 +826,16 @@
 			0 0 0 0
 			round calc(var(--table-cornerRadius) + var(--table-outerBorderWidth))
 		);
+		&:has(:global([data-layout-transition])) {
+			contain: layout;
+			clip-path: none;
+		}
+
 	}
 
 	:where(table) {
 		min-width: 100%;
-		width: max-content;
+		width: 100%;
 		/* margin-inline: calc(-1 * var(--table-borderWidth)); */
 
 		border-collapse: separate;
@@ -752,12 +900,13 @@
 						align-items: center;
 						gap: 0.25em;
 
-						&[data-sticky-container] {
-							--sticky-paddingInlineEnd: 0.5em;
-						}
-
-						> [data-sticky-container] {
+						> [data-scroll-item] {
+							--sticky-marginInlineEnd: 0.5em;
 							--sticky-paddingInlineEnd: 1em;
+
+							> span[data-sticky] {
+								display: inline-block;
+							}
 						}
 					}
 
@@ -789,10 +938,21 @@
 
 							padding: var(--table-cell-padding);
 
+							.sort-hit-area {
+								position: absolute;
+								inset: 0;
+							}
+
+							> span[data-sticky] {
+								pointer-events: none;
+							}
+
 							.sort-button {
 								margin-inline-start: 0.5em;
 								display: inline-block;
 								padding: 0;
+								min-inline-size: 1.5em;
+								min-block-size: 1.5em;
 
 								background-color: transparent;
 								border: none;
@@ -827,12 +987,15 @@
 					}
 
 					&[data-expandable] {
-						--isExpanded: 0;
+						---table-isExpanded: 0;
+						> .header-cell-content > [data-scroll-item] {
+							--sticky-marginInlineEnd: 2em;
+						}
 
 						cursor: pointer;
 
 						&[data-expanded] {
-							--isExpanded: 1;
+							---table-isExpanded: 1;
 						}
 
 						.expansion-button,
@@ -859,7 +1022,7 @@
 								height: 1em;
 								background-color: currentColor;
 								mask-image: var(--icon-chevron);
-								transform: perspective(100px) rotateX(calc(var(--isExpanded) * -180deg));
+								transform: perspective(100px) rotateX(calc(var(---table-isExpanded) * -180deg));
 								transition-property: transform;
 							}
 						}
@@ -1012,7 +1175,8 @@
 
 			@container (width < 48rem) {
 				&[data-sticky] {
-					position: static !important;
+					/* Stop sticking without releasing the cell's containing block. */
+					position: relative !important;
 
 					&:before {
 						content: none !important;
@@ -1028,5 +1192,12 @@
 		:where(td) {
 			padding: var(--table-cell-padding);
 		}
+	}
+
+	:where(.sort-label > span[data-sticky]) :global(:where(
+		[data-pressable], [role='button'], summary, a, select, button, input,
+		textarea, label, dialog, [contenteditable], [tabindex], [popover]:popover-open
+	)) {
+		pointer-events: auto;
 	}
 </style>

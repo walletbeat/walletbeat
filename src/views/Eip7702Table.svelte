@@ -8,6 +8,8 @@
 		type Eip7702Row,
 	} from '@/schema/eip-support'
 	import { Rating } from '@/schema/attributes'
+	import { applyFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
+	import { onMount } from 'svelte'
 
 
 	// Props
@@ -21,24 +23,45 @@
 
 
 	// State
-	let activeFilters: Filters<Eip7702Row>['$$prop_def']['activeFilters'] = $state(
+	let activeChoices = $state<Set<FilterChoice<Eip7702Row>>>(
 		new Set()
 	)
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
 
-	let filteredRows: Eip7702Row[] = $state(
-		[]
-	)
+	const filterSets: FilterSet<Eip7702Row>[] = [{
+		id: 'accountType',
+		label: 'Account Type',
+		cardinality: 'inclusive',
+		match: 'union',
+		choices: [
+			{
+				id: 'accountType-eip7702',
+				label: 'EIP-7702',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.EIP7702,
+			},
+			{
+				id: 'accountType-erc4337',
+				label: 'ERC-4337',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.EIP4337,
+			},
+			{
+				id: 'accountType-eoa',
+				label: 'EOA',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.NON_7702_EOA,
+			},
+		],
+	}]
+	const matchingRows = $derived(new Set(applyFilterSets(rows, filterSets, activeChoices)))
 
 
 	// Actions
 	let toggleFilterById: Filters<Eip7702Row>['$$prop_def']['toggleFilterById'] = $state(
 		undefined
 	)
-
-	let toggleFilter: Filters<Eip7702Row>['$$prop_def']['toggleFilter'] = $state(
-		undefined
-	)
-
 
 	// Components
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
@@ -65,48 +88,18 @@
 
 		<Filters
 			items={rows}
-			filterGroups={[
-				{
-					id: 'accountType',
-					label: 'Account Type',
-					displayType: 'group',
-					exclusive: false,
-					filters: [
-						{
-							id: 'accountType-eip7702',
-							label: 'EIP-7702',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-									row.type === WalletTypeFor7702.EIP7702,
-						},
-						{
-							id: 'accountType-erc4337',
-							label: 'ERC-4337',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-								row.type === WalletTypeFor7702.EIP4337,
-						},
-						{
-							id: 'accountType-eoa',
-							label: 'EOA',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-								row.type === WalletTypeFor7702.NON_7702_EOA,
-						},
-					],
-				},
-			]}
-			bind:activeFilters
-			bind:filteredItems={filteredRows}
-			bind:toggleFilter
+			{filterSets}
+			bind:activeChoices
 			bind:toggleFilterById
 		/>
 	</header>
 
 	<div data-scroll-item="inline-attached underflow-center overflow-start">
 		<Table
-			rows={filteredRows}
+			{rows}
 			rowId={(row: Eip7702Row) => row.id}
+			rowIsDisabled={(row: Eip7702Row) => !matchingRows.has(row)}
+			displaceDisabledRows
 
 			columns={[
 				{
@@ -146,7 +139,7 @@
 
 						<span class="wallet-icon" data-icon="shadow">
 							<img
-								src={`/images/wallets/${row.id}.svg`}
+								src={`/images/wallets/${row.id}.${row.iconExtension}`}
 								alt=""
 								onerror={event => {
 									if (event.currentTarget instanceof HTMLImageElement)
@@ -170,19 +163,15 @@
 					{@const typeFor7702 = row.type}
 
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
-						<Tooltip
-							placement="inline-end"
-						>
-							<button
-								data-tag="eip"
-								aria-label="Filter by EIP-7702"
-								onclick={event => {
+						<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+							{#if interactive}
+								<button data-tag="eip" aria-label="Filter by EIP-7702" onclick={event => {
 									event.stopPropagation()
 									toggleFilterById!('accountType-eip7702')
-								}}
-							>
-								EIP-7702
-							</button>
+								}}>EIP-7702</button>
+							{:else}
+								<span data-tag="eip">EIP-7702</span>
+							{/if}
 
 							{#snippet TooltipContent()}
 								<EipDetails eip={eip7702} />
@@ -190,19 +179,15 @@
 						</Tooltip>
 					{:else}
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
-							<Tooltip
-								placement="inline-end"
-							>
-								<button
-									data-tag="eip"
-									aria-label="Filter by ERC-4337"
-									onclick={event => {
+							<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+								{#if interactive}
+									<button data-tag="eip" aria-label="Filter by ERC-4337" onclick={event => {
 										event.stopPropagation()
 										toggleFilterById!('accountType-erc4337')
-									}}
-								>
-									ERC-4337
-								</button>
+									}}>ERC-4337</button>
+								{:else}
+									<span data-tag="eip">ERC-4337</span>
+								{/if}
 
 								{#snippet TooltipContent()}
 									<EipDetails eip={erc4337} />
@@ -213,6 +198,7 @@
 								<button
 									data-tag="eoa"
 									aria-label="Filter by EOA"
+									disabled={!interactive}
 									onclick={event => {
 										event.stopPropagation()
 										toggleFilterById!('accountType-eoa')
@@ -329,9 +315,17 @@
 		}
 	}
 
+	:global([data-tooltip-placement="behind"]):has(> button[data-tag~="eip"]) {
+		display: inline-grid;
+	}
+
 	[data-tag] {
 		&:is(button) {
 			display: inline-flex;
+		}
+
+		&[data-tag~="eip"]:is(button) {
+			min-block-size: 0;
 		}
 	}
 

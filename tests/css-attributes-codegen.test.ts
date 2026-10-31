@@ -30,6 +30,29 @@ describe('css-attributes codegen', () => {
 		expect(generateWalletbeatHtmlDataJson(css)).toBe(onDisk)
 	})
 
+	it('closed attribute types include every advertised CSS token', async () => {
+		const css = await fs.readFile(cssPath, 'utf8')
+		const declarations = generateCssAttributesDts(css)
+
+		for (const entry of parseCssAttributes(css).values()) {
+			const declaration = declarations
+				.split('\n')
+				.find(line => line.trimStart().startsWith(`'${entry.name}'?: `))
+
+			expect(declaration, entry.name).toBeDefined()
+
+			if (declaration?.includes('string')) {
+				continue
+			}
+
+			const tokens = [...(declaration?.matchAll(/'([^']+)'/g) ?? [])]
+				.slice(1)
+				.map(match => match[1])
+
+			expect(tokens.sort(), entry.name).toEqual([...entry.values].sort())
+		}
+	})
+
 	it('includes sibling token rules without inventing undocumented attributes', () => {
 		const entries = parseCssAttributes(`
 /** Column child. */
@@ -81,5 +104,17 @@ describe('css-attributes codegen', () => {
 
 		expect(entries.get('data-column')?.docMarkdown).toContain('Column documentation.')
 		expect([...(entries.get('data-column')?.values ?? [])]).toEqual(['start'])
+	})
+
+	it('keeps runtime view-transition state out of the public attribute API', async () => {
+		const css = await fs.readFile(cssPath, 'utf8')
+		const entries = parseCssAttributes(css)
+
+		expect(entries.has('data-view-transition')).toBe(true)
+		expect(entries.has('data-view-transition-active')).toBe(false)
+		expect([...(entries.get('data-view-transition')?.values ?? [])].sort()).toEqual([
+			'item',
+			'named',
+		])
 	})
 })

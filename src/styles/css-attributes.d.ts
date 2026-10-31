@@ -45,6 +45,7 @@ declare global {
 		 * - radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`
 		 * - padding: `padding-0` … `padding-8`
 		 * - border: `border-accent`
+		 * - context: `popover` applies the surface only inside an open popover; inline disclosure content keeps its ordinary spacing without JavaScript.
 		 *
 		 * ### CSS Variables
 		 * - `--card-backgroundColor`
@@ -285,6 +286,43 @@ declare global {
 		'data-input'?: string | boolean
 
 		/**
+		 * ## [data-layout-transition]
+		 *
+		 * Live position interpolation for retained HTML items and uniquely named replacement peers.
+		 * `startScopedViewTransition` with strategy `live` owns this temporary attribute and
+		 * its native box inputs; controls remain in the live document. Layout and scroll remain native.
+		 *
+		 * ### Placement
+		 * Mark retained items with `data-view-transition="item"` and replacement HTML peers with
+		 * `data-view-transition="named"` and a unique `--view-transition-name` inside the helper's scope.
+		 * Keep identities declared across updates that should preserve continuity. Missing or duplicate
+		 * names are excluded from live matching. Nested peers subtract their matched ancestor's movement
+		 * and use one CSS-configured native clock for the update. Items and ancestors use an
+		 * unscaled, axis-aligned coordinate space. Motion owners reserve CSS `translate` and their
+		 * CSS animation list. Put independently animated controls inside these neutral owners;
+		 * their opacity, scale and other effects remain separate.
+		 *
+		 * This attribute marks live motion ownership. CSS creates the animation paused;
+		 * the helper captures it once and starts the retained native animations together.
+		 *
+		 * ### CSS Variables
+		 * - `--layoutTransition-beforeX`: Old native viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-beforeY`: Old native viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-afterX`: New native viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-afterY`: New native viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-parentBeforeX`: Matched ancestor's old viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-parentBeforeY`: Matched ancestor's old viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-parentAfterX`: Matched ancestor's new viewport x-coordinate; does not inherit.
+		 * - `--layoutTransition-parentAfterY`: Matched ancestor's new viewport y-coordinate; does not inherit.
+		 * - `--layoutTransition-duration`: Motion duration in milliseconds, configured on the update scope; defaults to 250. Zero disables live motion.
+		 * - `--layoutTransition-easing`: Motion easing, configured on the update scope; defaults to the global exit easing.
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-layout-transition]`
+		 */
+		'data-layout-transition'?: string | boolean
+
+		/**
 		 * ## [data-link]
 		 *
 		 * Shared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.
@@ -310,7 +348,7 @@ declare global {
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`
 		 */
-		'data-link'?: 'camouflaged' | boolean
+		'data-link'?: 'camouflaged' | 'contents' | boolean
 
 		/**
 		 * ## [data-list]
@@ -441,7 +479,14 @@ declare global {
 		 * Native summaries own their feedback; breadcrumb summaries delegate it to their foreground row.
 		 *
 		 * ### Tokens
-		 * - `to-containing`
+		 * - `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.
+		 * - `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.
+		 *
+		 * ### Placement
+		 * - A paint body inherits the control's font and corner context; badges inside retain their independent appearance.
+		 * - Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.
+		 * - Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.
+		 * - Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.
 		 *
 		 * ### CSS Variables
 		 * - `--pressable-transitionOutDuration`
@@ -460,7 +505,7 @@ declare global {
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`
 		 */
-		'data-pressable'?: 'to-containing' | boolean
+		'data-pressable'?: 'paint' | 'to-containing' | boolean
 
 		/**
 		 * ## [data-pressable-name]
@@ -641,8 +686,12 @@ declare global {
 		 * - width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`
 		 * - `flow`: retain inline-detached sizing in normal flow without a sticky stacking context
 		 * - attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`
+		 * - `visible-center`: center normal-flow inline content in the visible sticky interval, with inline clipping supplied by its parent. Reserves `translate` and `animation`; requires horizontal LTR, native view timelines and normal motion.
 		 * - snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`
 		 * - `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.
+		 *
+		 * ### CSS Variables
+		 * - `--scrollItem-visibleCenter-animation`: defaults to `scroll-item-visible-center`; set to `none` when a consumer's additional native capabilities are unavailable.
 		 *
 		 * ### Examples
 		 * - Bleed + block-end padding match (`inline-detached` + `padding-match-end`):
@@ -871,6 +920,51 @@ declare global {
 		'data-sticky-container'?: string | boolean
 
 		/**
+		 * ## [data-tab-panel]
+		 *
+		 * Panel inside a direct grouped `<details>` child of `[data-tabs]`. Keep the panel inside its owning disclosure. Add `[data-scroll-container="block"]` for the shared scroll policy.
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`
+		 */
+		'data-tab-panel'?: string | boolean
+
+		/**
+		 * ## [data-tabs]
+		 *
+		 * Native grouped disclosures presented as tabs. Each direct `<details name="...">` owns its summary and panel; use a distinct name for each group. Native disclosure keyboard behavior and the ability to close the selected panel are retained.
+		 *
+		 * ### Tokens
+		 * - orientation: `vertical` (horizontal below 54rem)
+		 * - density: `compact`
+		 *
+		 * ### CSS Variables
+		 * - `--tabs-paddingBlock`: summary padding; defaults to 0.75em
+		 * - `--tabs-paddingInline`: summary padding; defaults to 1em
+		 * - `--tabs-list-size`: vertical label column; defaults to 19rem
+		 * - `--tabs-sizeBlock`: vertical viewport and panel height; defaults to 32rem
+		 *
+		 * ### Examples
+		 * - Native tabs with independent panel scrolling:
+		 *   ```html
+		 *   <div data-tabs="vertical" data-scroll-container="block">
+		 *     <details name="settings" open>
+		 *       <summary>Profile</summary>
+		 *       <section data-tab-panel data-scroll-container="block">...</section>
+		 *     </details>
+		 *     <details name="settings">
+		 *       <summary>Security</summary>
+		 *       <section data-tab-panel data-scroll-container="block">...</section>
+		 *     </details>
+		 *   </div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`
+		 */
+		'data-tabs'?: string | boolean
+
+		/**
 		 * ## [data-tag]
 		 *
 		 * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.
@@ -900,6 +994,40 @@ declare global {
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`
 		 */
 		'data-tag'?: string | boolean
+
+		/**
+		 * ## [data-view-transition]
+		 *
+		 * Semantic participant identity for native capture and live position transitions started by `startScopedViewTransition`. The helper owns the temporary `[data-view-transition-active]` scope marker so native document capture stays local.
+		 *
+		 * ### Placement
+		 * - On an element inside the scope passed to `startScopedViewTransition`, or on that scope element itself.
+		 *
+		 * ### Tokens
+		 * - `item`: preserves the identity of an element that survives the update.
+		 * - `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`; live HTML peers require unique names in the scope.
+		 *
+		 * ### CSS Variables
+		 * - `--view-transition-name`: unique `<custom-ident>` required by `named`.
+		 * - `--view-transition-class`: optional semantic animation class; defaults to `view-transition-item`.
+		 *
+		 * ### Examples
+		 * - A keyed item that may move, enter, or leave during an update:
+		 *   ```html
+		 *   <li data-view-transition="item">Wallet row</li>
+		 *   ```
+		 * - A stable identity that survives replacement:
+		 *   ```html
+		 *   <li
+		 *     data-view-transition="named"
+		 *     style="--view-transition-name: wallet-row-metamask; --view-transition-class: wallet-row"
+		 *   >MetaMask</li>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`
+		 */
+		'data-view-transition'?: string | boolean
 
 		/**
 		 * ## [data-visually-hidden]

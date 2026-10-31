@@ -230,7 +230,7 @@ import Footer from '@/views/Footer.astro'
 			min-inline-size: 0;
 
 			@media (width <= 1024px) and (prefers-reduced-motion: no-preference) {
-				&:not(:has([data-sticky-breadcrumb~="root"])) {
+				&:not(:has([data-sticky-breadcrumb~="root"], .wallet-table)) {
 					transform-style: preserve-3d;
 					transform: translateZ(0);
 					transition-property: transform;

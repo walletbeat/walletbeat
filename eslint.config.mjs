@@ -227,6 +227,12 @@ export default [
 	{
 		files: ['**/*.svelte'],
 		rules: {
+			// https://drafts.csswg.org/css-ui/#interest-delay
+			'svelte/no-unknown-style-directive-property': [
+				'error',
+				{ ignoreProperties: ['interest-delay-start', 'interest-delay-end'] },
+			],
+
 			// Allow imports from the same file across multiple groups.
 			'import/no-duplicates': 'off',
 

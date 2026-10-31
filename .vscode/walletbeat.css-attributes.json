@@ -21,7 +21,7 @@
 		},
 		{
 			"name": "data-card",
-			"description": "## [data-card]\n\nCard surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n- `--card-borderWidth`: accent border width; defaults to 2px\n\n### Examples\n- Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):\n  ```html\n  <article data-card>\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n- Secondary tone, larger padding, accent border (omit radius when default `radius-4` / `0.5em` is fine):\n  ```html\n  <article data-card=\"secondary padding-6 border-accent\">\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
+			"description": "## [data-card]\n\nCard surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n- context: `popover` applies the surface only inside an open popover; inline disclosure content keeps its ordinary spacing without JavaScript.\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n- `--card-borderWidth`: accent border width; defaults to 2px\n\n### Examples\n- Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):\n  ```html\n  <article data-card>\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n- Secondary tone, larger padding, accent border (omit radius when default `radius-4` / `0.5em` is fine):\n  ```html\n  <article data-card=\"secondary padding-6 border-accent\">\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
 			"values": [
 				{
 					"name": "border-accent",
@@ -62,6 +62,10 @@
 				{
 					"name": "padding-8",
 					"description": "`[data-card~=\"padding-8\"]`"
+				},
+				{
+					"name": "popover",
+					"description": "`[data-card~=\"popover\"]`"
 				},
 				{
 					"name": "radius-1",
@@ -248,6 +252,10 @@
 			"description": "## [data-input]\n\nShared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.\n\n### Applied to\n- `<button>`\n- `<select>`\n- `<input>`\n- `<label>` wrapping checkbox or radio inputs\n\n### Examples\n- Native control (no `[data-input]`):\n  ```html\n  <button type=\"button\">Save</button>\n  ```\n  ```html\n  <select>\n    <option>First</option>\n    <option>Second</option>\n  </select>\n  ```\n- Non-control host that should look like a control:\n  ```html\n  <span data-input role=\"button\" tabindex=\"0\">Custom</span>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-input]`"
 		},
 		{
+			"name": "data-layout-transition",
+			"description": "## [data-layout-transition]\n\nLive position interpolation for retained HTML items and uniquely named replacement peers.\n`startScopedViewTransition` with strategy `live` owns this temporary attribute and\nits native box inputs; controls remain in the live document. Layout and scroll remain native.\n\n### Placement\nMark retained items with `data-view-transition=\"item\"` and replacement HTML peers with\n`data-view-transition=\"named\"` and a unique `--view-transition-name` inside the helper's scope.\nKeep identities declared across updates that should preserve continuity. Missing or duplicate\nnames are excluded from live matching. Nested peers subtract their matched ancestor's movement\nand use one CSS-configured native clock for the update. Items and ancestors use an\nunscaled, axis-aligned coordinate space. Motion owners reserve CSS `translate` and their\nCSS animation list. Put independently animated controls inside these neutral owners;\ntheir opacity, scale and other effects remain separate.\n\nThis attribute marks live motion ownership. CSS creates the animation paused;\nthe helper captures it once and starts the retained native animations together.\n\n### CSS Variables\n- `--layoutTransition-beforeX`: Old native viewport x-coordinate; does not inherit.\n- `--layoutTransition-beforeY`: Old native viewport y-coordinate; does not inherit.\n- `--layoutTransition-afterX`: New native viewport x-coordinate; does not inherit.\n- `--layoutTransition-afterY`: New native viewport y-coordinate; does not inherit.\n- `--layoutTransition-parentBeforeX`: Matched ancestor's old viewport x-coordinate; does not inherit.\n- `--layoutTransition-parentBeforeY`: Matched ancestor's old viewport y-coordinate; does not inherit.\n- `--layoutTransition-parentAfterX`: Matched ancestor's new viewport x-coordinate; does not inherit.\n- `--layoutTransition-parentAfterY`: Matched ancestor's new viewport y-coordinate; does not inherit.\n- `--layoutTransition-duration`: Motion duration in milliseconds, configured on the update scope; defaults to 250. Zero disables live motion.\n- `--layoutTransition-easing`: Motion easing, configured on the update scope; defaults to the global exit easing.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-layout-transition]`"
+		},
+		{
 			"name": "data-link",
 			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged`, `contents`.\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n- `--accent-textColor`: legible text override for scopes whose accent supplies rating fills or borders.\n\n### Examples\n- Default link (`<a>` — no `[data-link]`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
 			"values": [
@@ -339,8 +347,12 @@
 		},
 		{
 			"name": "data-pressable",
-			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\nNative summaries own their feedback; breadcrumb summaries delegate it to their foreground row.\n\n### Tokens\n- `to-containing`\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
+			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\nNative summaries own their feedback; breadcrumb summaries delegate it to their foreground row.\n\n### Tokens\n- `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.\n- `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.\n\n### Placement\n- A paint body inherits the control's font and corner context; badges inside retain their independent appearance.\n- Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.\n- Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.\n- Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
 			"values": [
+				{
+					"name": "paint",
+					"description": "`[data-pressable~=\"paint\"]`"
+				},
 				{
 					"name": "to-containing",
 					"description": "`[data-pressable~=\"to-containing\"]`"
@@ -515,7 +527,7 @@
 		},
 		{
 			"name": "data-scroll-item",
-			"description": "## [data-scroll-item]\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- `flow`: retain inline-detached sizing in normal flow without a sticky stacking context\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`\n- `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
+			"description": "## [data-scroll-item]\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- `flow`: retain inline-detached sizing in normal flow without a sticky stacking context\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- `visible-center`: center normal-flow inline content in the visible sticky interval, with inline clipping supplied by its parent. Reserves `translate` and `animation`; requires horizontal LTR, native view timelines and normal motion.\n- snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`\n- `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.\n\n### CSS Variables\n- `--scrollItem-visibleCenter-animation`: defaults to `scroll-item-visible-center`; set to `none` when a consumer's additional native capabilities are unavailable.\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
 			"values": [
 				{
 					"name": "block-size-max",
@@ -580,6 +592,10 @@
 				{
 					"name": "underflow-start",
 					"description": "`[data-scroll-item~=\"underflow-start\"]`"
+				},
+				{
+					"name": "visible-center",
+					"description": "`[data-scroll-item~=\"visible-center\"]`"
 				}
 			]
 		},
@@ -750,6 +766,24 @@
 			"description": "## [data-sticky-container]\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`"
 		},
 		{
+			"name": "data-tab-panel",
+			"description": "## [data-tab-panel]\n\nPanel inside a direct grouped `<details>` child of `[data-tabs]`. Keep the panel inside its owning disclosure. Add `[data-scroll-container=\"block\"]` for the shared scroll policy.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`"
+		},
+		{
+			"name": "data-tabs",
+			"description": "## [data-tabs]\n\nNative grouped disclosures presented as tabs. Each direct `<details name=\"...\">` owns its summary and panel; use a distinct name for each group. Native disclosure keyboard behavior and the ability to close the selected panel are retained.\n\n### Tokens\n- orientation: `vertical` (horizontal below 54rem)\n- density: `compact`\n\n### CSS Variables\n- `--tabs-paddingBlock`: summary padding; defaults to 0.75em\n- `--tabs-paddingInline`: summary padding; defaults to 1em\n- `--tabs-list-size`: vertical label column; defaults to 19rem\n- `--tabs-sizeBlock`: vertical viewport and panel height; defaults to 32rem\n\n### Examples\n- Native tabs with independent panel scrolling:\n  ```html\n  <div data-tabs=\"vertical\" data-scroll-container=\"block\">\n    <details name=\"settings\" open>\n      <summary>Profile</summary>\n      <section data-tab-panel data-scroll-container=\"block\">...</section>\n    </details>\n    <details name=\"settings\">\n      <summary>Security</summary>\n      <section data-tab-panel data-scroll-container=\"block\">...</section>\n    </details>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`",
+			"values": [
+				{
+					"name": "compact",
+					"description": "`[data-tabs~=\"compact\"]`"
+				},
+				{
+					"name": "vertical",
+					"description": "`[data-tabs~=\"vertical\"]`"
+				}
+			]
+		},
+		{
 			"name": "data-tag",
 			"description": "## [data-tag]\n\nSemantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Examples\n- Neutral palette (omit category token):\n  ```html\n  <span data-tag>Label</span>\n  ```\n- `eip` family:\n  ```html\n  <button type=\"button\" data-tag=\"eip\">EIP-7702</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
 			"values": [
@@ -776,6 +810,20 @@
 				{
 					"name": "wallet-type",
 					"description": "`[data-tag~=\"wallet-type\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-view-transition",
+			"description": "## [data-view-transition]\n\nSemantic participant identity for native capture and live position transitions started by `startScopedViewTransition`. The helper owns the temporary `[data-view-transition-active]` scope marker so native document capture stays local.\n\n### Placement\n- On an element inside the scope passed to `startScopedViewTransition`, or on that scope element itself.\n\n### Tokens\n- `item`: preserves the identity of an element that survives the update.\n- `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`; live HTML peers require unique names in the scope.\n\n### CSS Variables\n- `--view-transition-name`: unique `<custom-ident>` required by `named`.\n- `--view-transition-class`: optional semantic animation class; defaults to `view-transition-item`.\n\n### Examples\n- A keyed item that may move, enter, or leave during an update:\n  ```html\n  <li data-view-transition=\"item\">Wallet row</li>\n  ```\n- A stable identity that survives replacement:\n  ```html\n  <li\n    data-view-transition=\"named\"\n    style=\"--view-transition-name: wallet-row-metamask; --view-transition-class: wallet-row\"\n  >MetaMask</li>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`",
+			"values": [
+				{
+					"name": "item",
+					"description": "`[data-view-transition~=\"item\"]`"
+				},
+				{
+					"name": "named",
+					"description": "`[data-view-transition~=\"named\"]`"
 				}
 			]
 		},

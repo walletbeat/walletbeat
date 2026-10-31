@@ -90,6 +90,7 @@ function eip7702Rows(wallets: Array<RatedWallet<string>>): Eip7702Row[] {
 		return {
 			id: wallet.metadata.id,
 			displayName: wallet.metadata.displayName,
+			iconExtension: wallet.metadata.iconExtension,
 			url: getWalletUrl(wallet),
 			type: getWalletTypeFor7702(wallet),
 			contract:
@@ -131,7 +132,7 @@ const softwareRows = eip7702Rows(Object.values(ratedSoftwareWallets))
 			/>
 		</header>
 
-		<Eip7702Table title='Software Wallets by EIP-7702 Support' rows={softwareRows} client:visible />
+		<Eip7702Table title='Software Wallets by EIP-7702 Support' rows={softwareRows} client:load />
 
 		<footer data-scroll-item='inline-detached padding-match-end' data-row='center'>
 			<p>
