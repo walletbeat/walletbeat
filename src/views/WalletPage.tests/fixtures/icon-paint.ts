@@ -930,7 +930,9 @@ export async function observeIconPaint({
 				classification,
 				comparison,
 				unidentifiedNearTarget:
-					natural && cyanReference !== undefined && (!ref || ref.actual !== cyanReference.actual),
+					natural &&
+					(ref !== undefined || cyanReference !== undefined) &&
+					(!ref || !cyanReference || ref.actual !== cyanReference.actual),
 			})
 		}
 		const admitted = result.frames.filter(
@@ -1027,6 +1029,16 @@ export async function observeIconPaint({
 			? result.frames.findLast(frame => frame.index < firstTarget.index)
 			: undefined
 
+		const targetBracketAdmitted = Boolean(
+			firstTarget &&
+			predecessor &&
+			predecessor.decodedPose !== null &&
+			predecessor.decodedPose < D - poseTolerance &&
+			(predecessor.natural || predecessor.timestamp * 1000 <= inputStart) &&
+			predecessor.timestamp < firstTarget.timestamp,
+		)
+
+		result.targetBracketAdmitted = targetBracketAdmitted
 		result.targetArrival = {
 			targetScroll: D,
 			inputAckDurationMs: result.nativeInputDuration,
@@ -1065,6 +1077,7 @@ export async function observeIconPaint({
 		result.status =
 			(result.mode !== 'baseline' && !result.controlsQualified) ||
 			admitted.length < 3 ||
+			!targetBracketAdmitted ||
 			result.signedTravel <= 0.5 ||
 			result.frames.some(frame => frame.unidentifiedNearTarget)
 				? 'instrument-rejected'
