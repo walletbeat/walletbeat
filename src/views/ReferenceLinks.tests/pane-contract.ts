@@ -198,12 +198,6 @@ export async function runPaneContract(
 	const panes = page.locator('.references .code-snippet pre')
 
 	await expect(panes.first()).toBeAttached()
-	const island = panes.first().locator('xpath=ancestor::astro-island[1]')
-
-	if ((await island.getAttribute('ssr')) !== null) {
-		await island.locator(':scope > *').first().scrollIntoViewIfNeeded()
-		await expect(island).not.toHaveAttribute('ssr', '')
-	}
 
 	const candidates = await panes.evaluateAll(elements =>
 		elements.map((element, index) => {
@@ -382,9 +376,15 @@ export async function runPaneContract(
 
 	expect(await details.count(), 'Consumer must exercise a disclosure').toBe(1)
 	await step('disclosure reopening preserves the manual position', async () => {
-		await details.locator(':scope > summary').click()
+		const summary = details.locator(':scope > summary')
+		const rating = summary
+			.locator(':scope > header [data-sticky-breadcrumb~="end"] > data[data-badge]')
+			.last()
+		const activationTarget = (await rating.count()) > 0 ? rating : summary
+
+		await activationTarget.click()
 		await expect(details).not.toHaveAttribute('open', '')
-		await details.locator(':scope > summary').click()
+		await activationTarget.click()
 		await pane.scrollIntoViewIfNeeded()
 		expect((await settledPane(pane)).top).toBeCloseTo(manual.top, 0)
 	})
@@ -402,6 +402,10 @@ export async function runImageContract(page: Page) {
 
 	await expect(link).toHaveCount(1)
 	await openAncestors(link)
+	const island = link.locator('xpath=ancestor::astro-island[1]')
+
+	await expect(island).not.toHaveAttribute('ssr', '')
+	await expect(page).toHaveURL(new URL('/ambire/', page.url()).href)
 	const original = await link.evaluate(element => {
 		if (!(element instanceof HTMLAnchorElement)) {
 			throw new Error('Reference image target must be an anchor')
