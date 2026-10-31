@@ -134,7 +134,16 @@ export default function publishPeerState(container, groups, replace = false) {
 	// Interest state changes after its event's default action, beyond the microtask checkpoint.
 	/** @param {Event} event */
 	const schedule = event => {
-		if (published.size === 0 && event.target instanceof Node && !container.contains(event.target)) {
+		if (
+			published.size === 0 &&
+			!(
+				event.target instanceof Element &&
+				container.contains(event.target) &&
+				(event.type === 'interest' ||
+					event.type === 'loseinterest' ||
+					container.contains(event.target.closest('a[data-pressable-name]')))
+			)
+		) {
 			return
 		}
 
