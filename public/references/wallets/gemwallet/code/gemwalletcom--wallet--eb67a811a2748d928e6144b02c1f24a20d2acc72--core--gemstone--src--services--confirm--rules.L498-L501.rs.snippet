@@ -1,0 +1,34 @@
+{
+	"highlightRanges": [
+		{
+			"first": 498,
+			"last": 501
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"pub(super) fn broadcast_delay_milliseconds(chain: Chain) -> u64 {",
+				"    match chain.chain_type() {"
+			],
+			"startLine": 479
+		},
+		{
+			"lines": [
+				"        | ChainType::Cardano => 500,",
+				"    }",
+				"}",
+				"",
+				"pub(super) fn validate_scan(scan: Option<&ScanTransaction>, memo: Option<&str>, symbol: &str) -> Result<(), GemConfirmError> {",
+				"    let Some(scan) = scan else {",
+				"        return Ok(());",
+				"    };",
+				"    if scan.is_malicious == Some(true) {",
+				"        return Err(GemConfirmError::ScanMalicious);",
+				"    }",
+				"    if scan.is_memo_required == Some(true) && memo.unwrap_or_default().trim().is_empty() {"
+			],
+			"startLine": 494
+		}
+	]
+}
