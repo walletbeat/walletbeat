@@ -114,6 +114,13 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				},
 			}
 			const samples = []
+			const easing = new Animation(
+				new KeyframeEffect(null, [], {
+					duration: 1,
+					fill: 'both',
+					easing: getComputedStyle(root).getPropertyValue('--transition-easeInOutExpo').trim(),
+				}),
+			)
 
 			for (const requested of [-1, 0, 55, 110, 165, 220, 221, 165, 110, 55, 0, -1]) {
 				root.scrollTo({ top: contact + requested, behavior: 'instant' })
@@ -121,8 +128,21 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				const delivered = read(requested)
 
 				await settle()
-				samples.push({ ...delivered, stability: read(requested) })
+				easing.currentTime = Math.max(
+					0,
+					Math.min(
+						1,
+						(delivered.safeTop - delivered.source.top) / (flow.height - compact.pie.height),
+					),
+				)
+				samples.push({
+					...delivered,
+					stability: read(requested),
+					eased: easing.effect!.getComputedTiming().progress!,
+				})
 			}
+
+			easing.cancel()
 
 			return { flow, contact, compact, combinedControl, samples }
 		})
@@ -186,10 +206,9 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			expect(Math.abs(sample.stability.pie.top - sample.pie.top)).toBeLessThanOrEqual(1)
 
 			if (reducedMotion === 'no-preference') {
-				const expected = Math.max(
-					observations.compact.pie.height,
-					observations.flow.height - Math.max(0, displacement),
-				)
+				const expected =
+					observations.flow.height +
+					(observations.compact.pie.height - observations.flow.height) * sample.eased
 
 				expect(
 					Math.abs(sample.pie.height - expected),
