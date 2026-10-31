@@ -74,12 +74,16 @@
 	@supports (appearance: base-select) {
 
 
+		@keyframes -global-select-compact-height {
+			from { scale: 1 var(---select-expandedScaleY); }
+			to { scale: 1; }
+		}
 		@keyframes -global-select-compact-tail {
 			from { translate: 0px; }
 			to { translate: calc((-100% + var(---select-compactSize)) * var(---inlineDirection, 1)); }
 		}
 		@keyframes -global-select-compact-bridge {
-			from { scale: 1 1; }
+			from { scale: 1 var(---select-expandedScaleY); }
 			to { scale: 0 1; }
 		}
 		@keyframes -global-select-compact-icon {
@@ -107,6 +111,7 @@
 			---select-timeline: var(--select-compactTimeline, none);
 			---select-easing: var(--select-compactEasing, var(--transition-easeInOutExpo));
 			---select-naturalPadding: calc(0.66em + 1px);
+			---select-expandedScaleY: min(1, calc((1lh + 2 * var(---select-naturalPadding)) / var(---select-compactSize)));
 			isolation: isolate;
 			position: relative;
 			display: inline-flex;
@@ -142,16 +147,19 @@
 				background-image: radial-gradient(circle at calc(var(---select-compactSize) / 2) 50%, var(--background-primary) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)) calc(var(---select-compactSize) / 2), transparent calc(var(---select-compactSize) / 2));
 				background-size: calc(var(---select-compactSize) / 2) 100%;
 				background-repeat: no-repeat;
+				animation: if(style(---select-timeline: none): none; else: select-compact-height auto var(---select-easing) both);
+				animation-timeline: var(---select-timeline);
+				animation-range: var(--select-compactRange, contain 0% contain 100%);
 			}
 			&::after {
 				background-position: right center;
 				clip-path: circle(calc(var(---select-compactSize) / 2) at calc(100% - var(---select-compactSize) / 2) 50%);
 				background-image: radial-gradient(circle at calc(100% - var(---select-compactSize) / 2) 50%, var(--background-primary) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)) calc(var(---select-compactSize) / 2), transparent calc(var(---select-compactSize) / 2));
-				animation: if(style(---select-timeline: none): none; else: select-compact-tail auto var(---select-easing) both);
+				animation: if(style(---select-timeline: none): none; else: select-compact-tail auto var(---select-easing) both, select-compact-height auto var(---select-easing) both);
 				animation-timeline: var(---select-timeline);
 				animation-range: var(--select-compactRange, contain 0% contain 100%);
 			}
-			&:dir(rtl)::before { scale: -1 1; }
+			&:dir(rtl)::before { transform: scaleX(-1); }
 			&:dir(rtl)::after { transform: scaleX(-1); }
 
 			> button {
