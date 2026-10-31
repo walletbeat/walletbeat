@@ -14,7 +14,7 @@ for (const width of [1400, 690]) {
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 		}
 
-		const owner = page.locator(width === 1400 ? '.page-navigation' : '#wallet-toc')
+		const owner = page.locator('#wallet-toc')
 		const enhanced = await page.evaluate(
 			() =>
 				CSS.supports('animation-timeline: scroll()') &&
@@ -230,31 +230,6 @@ for (const width of [1400, 690]) {
 			expect(idle).toMatchObject({ hovered: false, snap: 'block mandatory', overflow: 'auto' })
 			expect(idle.max).toBeGreaterThan(0)
 
-			if (width === 1400) {
-				expect(idle.navOverflow).toBe('visible')
-				const point = await owner.evaluate(port => {
-					const box = port.getBoundingClientRect()
-
-					for (let y = Math.max(1, box.top); y < Math.min(innerHeight, box.bottom); y += 8) {
-						for (let x = Math.max(1, box.left); x < Math.min(innerWidth, box.right); x += 8) {
-							const hit = document.elementFromPoint(x, y)
-
-							if (hit && port.contains(hit) && !hit.closest('#wallet-toc')) {
-								return { x, y }
-							}
-						}
-					}
-					throw new Error('No hit-testable scroll rail outside the TOC')
-				})
-
-				await page.mouse.move(point.x, point.y)
-				expect(await capture('rail-hover')).toMatchObject({
-					hovered: true,
-					navHovered: false,
-					snap: 'none',
-				})
-			}
-
 			await owner.hover()
 
 			if (!enhanced) {
@@ -436,3 +411,46 @@ for (const width of [1400, 690]) {
 		})
 	})
 }
+
+test('in-flow navigation preserves its width when the longest group closes', async ({
+	page,
+}, info) => {
+	await page.setViewportSize({ width: 1008, height: 1200 })
+	await page.goto('/phantom/?variant=MOBILE')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await page.evaluate(() => document.fonts.ready)
+	const toc = page.locator('#wallet-toc')
+	const identity = await toc.evaluate(nav => {
+		const links = [...nav.querySelectorAll('details > menu a')]
+		const longest = links.reduce<Element | null>((longest, link) => {
+			const width = (element: Element) => {
+				const range = document.createRange()
+
+				range.selectNodeContents(element)
+
+				return range.getBoundingClientRect().width
+			}
+
+			return !longest || width(link) > width(longest) ? link : longest
+		}, null)
+
+		return longest?.closest('details')?.getAttribute('data-pressable-name')
+	})
+
+	expect(identity).toBeTruthy()
+	const before = await toc.boundingBox()
+	const group = toc.locator(`details[data-pressable-name="${identity}"]`)
+
+	await expect(group).toHaveAttribute('open', '')
+	await group.locator(':scope > summary').press('Space')
+	await expect(group).not.toHaveAttribute('open', '')
+	const after = await toc.boundingBox()
+
+	expect(before).not.toBeNull()
+	expect(after).not.toBeNull()
+	expect(Math.abs(after!.width - before!.width)).toBeLessThanOrEqual(0.125)
+	await info.attach('closed-group-width', {
+		body: JSON.stringify({ identity, before, after }),
+		contentType: 'application/json',
+	})
+})

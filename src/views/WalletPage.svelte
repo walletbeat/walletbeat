@@ -1941,7 +1941,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 			@media (width <= 1024px) {
 				> #wallet-toc:not(:popover-open):not([data-closing]) {
-							flex: 0 1 auto;
+							flex: 0 1 22rem;
 							display: flex;
 							overflow-y: auto;
 
@@ -1982,7 +1982,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	:global(#layout:has([data-sticky-breadcrumb~="root"])) {
 		/* Keep fixed controls attached to the viewport. */
 		--scrollContainer-perspective: none;
-		---wallet-page-navigation-inline-size: 25rem;
+		---wallet-page-navigation-inline-size: 32rem;
 		---wallet-page-block-offset: 0px;
 		--scrollContainer-scrollPaddingBlockStart: 0px;
 
