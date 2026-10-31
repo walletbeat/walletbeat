@@ -214,3 +214,46 @@ test('native Stage accordions preserve every applicable ladder hierarchy', async
 		contentType: 'application/json',
 	})
 })
+
+for (const javaScriptEnabled of [false, true]) {
+	test.describe(javaScriptEnabled ? 'hydrated Stage defaults' : 'no-JS Stage defaults', () => {
+		test.use({ javaScriptEnabled })
+
+		for (const scene of [
+			{ fixture: 'stageNoneCleared', openIndex: 0 },
+			{ fixture: 'stagePartlyCleared', openIndex: 1 },
+			{ fixture: 'stageUnknown', openIndex: 0 },
+			{ fixture: 'stageUnknownAfterClear', openIndex: 1 },
+			{ fixture: 'stageFullyCleared', openIndex: null },
+			{ fixture: 'embedded', openIndex: null },
+		] as const) {
+			test(`initial stage disclosure follows confirmed clearance: ${scene.fixture}`, async ({
+				page,
+			}) => {
+				await page.goto(`/__wallet-page/${scene.fixture}/`)
+				const stages = page.locator('#stages section > details[name="wallet-stages"]')
+				const expected =
+					scene.openIndex === null
+						? []
+						: [allWalletLadders[WalletLadderType.SOFTWARE].stages[scene.openIndex].id]
+				const openIds = () =>
+					stages.evaluateAll(elements =>
+						elements
+							.filter(element => element.hasAttribute('open'))
+							.map(element => element.parentElement!.id),
+					)
+
+				if (javaScriptEnabled) {
+					await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+				}
+
+				expect(await openIds()).toEqual(expected)
+				await expect(stages).toHaveCount(
+					scene.fixture === 'embedded'
+						? 0
+						: allWalletLadders[WalletLadderType.SOFTWARE].stages.length,
+				)
+			})
+		}
+	})
+}
