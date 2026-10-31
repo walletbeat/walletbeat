@@ -130,16 +130,16 @@ For motion, capture natural source and scope boxes before enhancement, actual sc
 
 ## 7. Disclosure participation and initial structural state
 
-| Requirement               | Procedure                                                                                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 🔽 `AttributeDefaults`    | Reload without stored transient page state and inspect open on every attribute-content details.                                                        |
-| 🔽 `StageAccordion`       | Keyboard-open each stage successively; inspect shared native name, mutual exclusion and stage/group/criterion ancestry.                                |
-| 🔽 `StageDefault`         | Compare initially open stage with the resolved next uncleared stage on partial ladders; leave unsettled all-cleared/unknown cases explicit.            |
-| 🔽 `DisclosureTarget`     | Close all destination ancestors, activate an actual deep link and reload that hash; inspect destination visibility and open ancestors.                 |
-| 🔽 `Chevron`              | Keyboard and pointer-toggle the real summary, including its chevron; inspect native role and end alignment.                                            |
-| 🔽 `ClosedDescendants`    | Close an active ancestor; inspect descendant boxes, clocks, anchors/collision clearance and current representations while its summary remains visible. |
-| 🔽 `HeadingParticipation` | Move a disclosed `H3` from below viewport through usable sticky space and fully under prior rows; record its visible lifetime.                         |
-| 🔽 `DisclosureMotion`     | Record supported native details open/close transitions with pointer and keyboard and inspect continuity/close-scroll behavior.                         |
+| Requirement               | Procedure                                                                                                                                                                                                                                                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🔽 `AttributeDefaults`    | Reload without stored transient page state and inspect open on every attribute-content details.                                                                                                                                                                                  |
+| 🔽 `StageAccordion`       | Keyboard-open each stage successively; inspect shared native name, mutual exclusion and stage/group/criterion ancestry.                                                                                                                                                          |
+| 🔽 `StageDefault`         | Compare initial open IDs against first not-confirmed-cleared stage for zero/positive cleared prefixes, including unknown status; fully cleared ladders have none open. Verify parsed defaults and hydration convergence; when no ladder applies, there are no stage disclosures. |
+| 🔽 `DisclosureTarget`     | Close all destination ancestors, activate an actual deep link and reload that hash; inspect destination visibility and open ancestors.                                                                                                                                           |
+| 🔽 `Chevron`              | Keyboard and pointer-toggle the real summary, including its chevron; inspect native role and end alignment.                                                                                                                                                                      |
+| 🔽 `ClosedDescendants`    | Close an active ancestor; inspect descendant boxes, clocks, anchors/collision clearance and current representations while its summary remains visible.                                                                                                                           |
+| 🔽 `HeadingParticipation` | Move a disclosed `H3` from below viewport through usable sticky space and fully under prior rows; record its visible lifetime.                                                                                                                                                   |
+| 🔽 `DisclosureMotion`     | Record supported native details open/close transitions with pointer and keyboard and inspect continuity/close-scroll behavior.                                                                                                                                                   |
 
 ## 8. Sticky row composition and hierarchy
 

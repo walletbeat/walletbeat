@@ -8,13 +8,40 @@ import { allRatedWalletsBySlug, attributeTreeForWallet } from '@/data/wallets'
 import { attributeTreeForIds } from '@/schema/attribute-tree'
 import { Rating } from '@/schema/attributes'
 import { coinspectRef } from '@/schema/data-sources'
-import { allWalletLadders, embeddedLadders } from '@/schema/ladders'
+import { allWalletLadders, embeddedLadders, WalletLadderType } from '@/schema/ladders'
 import { Variant } from '@/schema/variants'
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
 
 const shortAttributeTree = attributeTreeForIds([])
 
+function stageDisclosureFixture(clearedCount: number, unknown: boolean): RatedWallet<string> {
+	const wallet: RatedWallet<string> = allRatedWalletsBySlug.metamask
+	const ladder = allWalletLadders[WalletLadderType.SOFTWARE]
+	const highestClearedStage = clearedCount === 0 ? null : ladder.stages[clearedCount - 1]
+
+	if (clearedCount > 0 && !highestClearedStage) {
+		throw new Error('Stage disclosure fixture exceeds its ladder')
+	}
+
+	return {
+		...wallet,
+		ladders: {
+			[WalletLadderType.SOFTWARE]: {
+				ladder,
+				highestClearedStage: highestClearedStage ?? null,
+				stage: unknown ? 'UNRATED' : (highestClearedStage ?? 'QUALIFIED_FOR_NO_STAGES'),
+			},
+		},
+	}
+}
+
 export const walletFixtures = {
+	stageNoneCleared: () => stageDisclosureFixture(0, false),
+	stagePartlyCleared: () => stageDisclosureFixture(1, false),
+	stageUnknown: () => stageDisclosureFixture(0, true),
+	stageUnknownAfterClear: () => stageDisclosureFixture(1, true),
+	stageFullyCleared: () =>
+		stageDisclosureFixture(allWalletLadders[WalletLadderType.SOFTWARE].stages.length, false),
 	nonSquare: () => allRatedWalletsBySlug.metamask,
 	software: () => allRatedWalletsBySlug.metamask,
 	credits: () => {
