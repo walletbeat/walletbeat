@@ -182,20 +182,16 @@ export const gemwallet: SoftwareWallet = {
 						'Gem can create and import wallets, show Ether and ERC-20 token balances, and send ERC-20 tokens using an Ethereum full node. Gem only accepts custom node addresses that start with https://.',
 					urls: [
 						{
-							label: 'Ether and token balances are read from the selected node',
+							label: 'Reading token balances from a full node',
 							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/balances.rs#L15-L23',
 						},
 						{
-							label: 'A token added by contract address is looked up on the selected node',
+							label: 'Looking up tokens by contract address on a full node',
 							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/assets/mod.rs#L206-L216',
 						},
 						{
-							label: 'An unreachable safety check returns no result',
-							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/scan/mod.rs#L23-L25',
-						},
-						{
-							label: 'A send with no safety-check result goes ahead',
-							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/confirm/rules.rs#L498-L501',
+							label: 'Sending transactions through a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L21-L26',
 						},
 						{
 							label: 'Custom node addresses must use HTTPS',
