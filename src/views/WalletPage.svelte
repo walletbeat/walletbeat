@@ -559,7 +559,13 @@
 
 	const pieRotation = $derived.by(() => {
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
-		const styles: string[] = []
+		const styles: string[] = [`
+			@container style(---pie-currentIndex: 0) {
+				#wallet-toc > .navigation-items > menu:first-of-type > li:first-child {
+					---navigation-snapAlign: start;
+				}
+			}
+		`]
 		const peerStyles: string[] = []
 		const turns: { animation: string; timeline: string }[] = []
 		const prefix = `wallet-pie-${wallet.metadata.id.replace(/[^a-z0-9-]/gi, '-')}`
@@ -1708,6 +1714,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				--scrollItem-inlineDetached-paddingEnd: 0px;
 			}
 			> #wallet-toc {
+				&:not(:hover) {
+					scroll-behavior: auto;
+				}
 				:global {
 					li:has(> details) {
 						display: grid;
@@ -1748,7 +1757,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 			block-size: calc(100cqb - var(---wallet-page-block-offset));
 
-			scroll-behavior: smooth;
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 

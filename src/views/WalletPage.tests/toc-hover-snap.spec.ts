@@ -386,23 +386,194 @@ for (const width of [1400, 690]) {
 		await expect.poll(async () => (await read()).mode).toBe('block mandatory')
 
 		if (enhanced) {
-			await page.locator('#l1-provider-independence').evaluate(target => {
-				const root = document.querySelector<HTMLElement>('#layout')!
+			for (const interrupt of [false, true]) {
+				const follow = await page.locator('#wallet-toc').evaluateHandle((nav, interrupt) => {
+					const root = document.querySelector<HTMLElement>('#layout')!
+					const owner = nav.closest('.page-navigation')!
+					const first = nav.querySelector<HTMLElement>('menu > li')!
+					const leaf = nav.querySelector<HTMLElement>(
+						'li[data-pressable-name="#l1-provider-independence"]',
+					)!
+					const number = (value: string) => Number.parseFloat(value) || 0
+					const pose = () => {
+						const style = getComputedStyle(nav)
+						const portStart = nav.getBoundingClientRect().top + nav.clientTop
+						const snapStart = portStart + number(style.scrollPaddingTop)
+						const snapEnd = portStart + nav.clientHeight - number(style.scrollPaddingBottom)
+						const maximum = nav.scrollHeight - nav.clientHeight
+						const geometry = (target: HTMLElement, center: boolean) => {
+							const box = target.getBoundingClientRect()
+							const targetStyle = getComputedStyle(target)
+							const start = box.top - number(targetStyle.scrollMarginTop)
+							const end = box.bottom + number(targetStyle.scrollMarginBottom)
+							const desired =
+								nav.scrollTop +
+								(center ? (start + end - snapStart - snapEnd) / 2 : start - snapStart)
 
-				root.style.scrollSnapType = 'none'
-				root.style.scrollBehavior = 'auto'
-				target.scrollIntoView({ block: 'start', behavior: 'instant' })
-			})
-			await expect.poll(async () => (await read()).index).toBeGreaterThan(0)
-			await expect.poll(async () => (await read()).align).toBe('none')
-			await page.locator('#layout').evaluate(root => (root.scrollTop = 0))
-			await expect.poll(async () => (await read()).index).toBe(0)
-			await expect.poll(async () => (await read()).align).toBe('start')
-			await info.attach('restored-snap-owner', {
-				body: JSON.stringify(await read()),
-				contentType: 'application/json',
-			})
-			await expect(firstLink).toBeInViewport()
+							const expected = Math.max(0, Math.min(maximum, desired))
+
+							return {
+								desired,
+								expected,
+								error: nav.scrollTop - expected,
+								areaStart: start,
+								areaEnd: end,
+							}
+						}
+
+						const initial = geometry(first, false)
+						const selected = geometry(leaf, true)
+
+						return {
+							index: Number(getComputedStyle(owner).getPropertyValue('---pie-currentIndex')),
+							inputOwners: [
+								owner,
+								nav,
+								first.closest('.navigation-items')!,
+								first.parentElement!,
+								first,
+							].map(element => ({
+								tag: element.tagName,
+								id: element.id,
+								className: element.getAttribute('class'),
+								index: getComputedStyle(element).getPropertyValue('---pie-currentIndex'),
+								snap: getComputedStyle(element).getPropertyValue('---navigation-snapAlign'),
+							})),
+							pseudoIndex: getComputedStyle(first, '::before').getPropertyValue(
+								'---pie-currentIndex',
+							),
+							initialError: initial.error,
+							selectedError: selected.error,
+							initial,
+							selected,
+							rootTop: root.scrollTop,
+							maximum,
+							snapStart,
+							snapEnd,
+							scrollendSupported: 'onscrollend' in nav,
+							initialAlign: getComputedStyle(first, '::before').scrollSnapAlign,
+							selectedAlign: getComputedStyle(leaf).scrollSnapAlign,
+							hovered: nav.matches(':hover'),
+							behavior: style.scrollBehavior,
+							top: nav.scrollTop,
+						}
+					}
+					const state = {
+						seekStarted: 0,
+						returnStarted: 0,
+						initialTop: nav.scrollTop,
+						ends: [] as { time: number; observedAt: number; pose: ReturnType<typeof pose> }[],
+						scrolls: [] as { time: number; observedAt: number; pose: ReturnType<typeof pose> }[],
+						pose,
+						seek: () => {
+							state.ends = []
+							state.scrolls = []
+							state.seekStarted = performance.now()
+							root.style.scrollSnapType = 'none'
+							root.style.scrollBehavior = 'auto'
+							document
+								.querySelector('#l1-provider-independence')!
+								.scrollIntoView({ block: 'start', behavior: 'instant' })
+						},
+						returnToTop: () => {
+							state.returnStarted = performance.now()
+							root.scrollTop = 0
+						},
+						dispose: () => {
+							nav.removeEventListener('scroll', onScroll)
+							nav.removeEventListener('scrollend', onEnd)
+						},
+					}
+					const onScroll = (event: Event) => {
+						state.scrolls.push({
+							time: event.timeStamp,
+							observedAt: performance.now(),
+							pose: pose(),
+						})
+
+						if (
+							interrupt &&
+							state.seekStarted &&
+							!state.returnStarted &&
+							pose().index > 0 &&
+							Math.abs(nav.scrollTop - state.initialTop) > 1
+						) {
+							state.returnToTop()
+						}
+					}
+					const onEnd = (event: Event) =>
+						state.ends.push({ time: event.timeStamp, observedAt: performance.now(), pose: pose() })
+
+					nav.addEventListener('scroll', onScroll)
+					nav.addEventListener('scrollend', onEnd)
+
+					return state
+				}, interrupt)
+
+				try {
+					expect(await follow.evaluate(state => state.pose().behavior)).toBe('auto')
+					await follow.evaluate(state => state.seek())
+
+					if (!interrupt) {
+						await expect
+							.poll(() =>
+								follow.evaluate(state =>
+									state.ends.some(
+										event =>
+											event.time >= state.seekStarted &&
+											event.pose.index > 0 &&
+											event.pose.selectedAlign === 'center' &&
+											Math.abs(event.pose.selectedError) <= 1,
+									),
+								),
+							)
+							.toBe(true)
+						await follow.evaluate(state => state.returnToTop())
+					}
+
+					await expect.poll(() => follow.evaluate(state => state.returnStarted)).toBeGreaterThan(0)
+					await expect
+						.poll(() =>
+							follow.evaluate(state =>
+								state.ends.some(
+									event =>
+										event.time >= state.returnStarted &&
+										event.pose.index === 0 &&
+										event.pose.initialAlign === 'start' &&
+										Math.abs(event.pose.initialError) <= 1,
+								),
+							),
+						)
+						.toBe(true)
+					const restored = await follow.evaluate(state => state.pose())
+
+					expect(restored).toMatchObject({
+						index: 0,
+						initialAlign: 'start',
+						hovered: false,
+						behavior: 'auto',
+					})
+					expect(Math.abs(restored.initialError)).toBeLessThanOrEqual(1)
+				} finally {
+					try {
+						await info.attach(`restored-snap-owner-${interrupt ? 'during-follow' : 'settled'}`, {
+							body: JSON.stringify(
+								await follow.evaluate(state => ({
+									seekStarted: state.seekStarted,
+									returnStarted: state.returnStarted,
+									ends: state.ends,
+									scrolls: state.scrolls,
+									restored: state.pose(),
+								})),
+							),
+							contentType: 'application/json',
+						})
+					} finally {
+						await follow.evaluate(state => state.dispose())
+						await follow.dispose()
+					}
+				}
+			}
 		}
 
 		await info.attach('initial-and-current-snap-owner', {
