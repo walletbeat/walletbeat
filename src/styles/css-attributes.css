@@ -4902,12 +4902,9 @@ details {
 			}
 		}
 	}
-}
-
-@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 	(color: if(style(---breadcrumb-wrap: 1): red)) {
-	@scope (:root) to (details:not([open]) > :not(summary)) {
 		@container style(--collapsible-markerMotion: clearance) {
 			@container style(---collapsible-markerSupported: 1) {
 				:is(details, [data-collapsible]) > summary:not(:has(
