@@ -182,7 +182,7 @@ Prerequisites: Section hierarchy in §1 and summary rows in §6.
 
 - **🔽 `StageAccordion`** Stage disclosure uses the established linked native accordion pattern while retaining the stage → criteria-group → criterion relationships.
 
-- **🔽 `StageDefault`** The next uncleared stage is initially open in the linked stage accordion.
+- **🔽 `StageDefault`** The first stage not confirmed cleared is initially open in the linked stage accordion, including when its status is unknown. If every stage is confirmed cleared, all stage disclosures are initially closed.
 
 - **🔽 `DisclosureTarget`** A deep link reveals its actual destination inside closed details.
 
@@ -514,6 +514,6 @@ Prerequisites: Applies to every preceding life cycle and interaction.
 
 ## Structural choices not settled by the sources
 
-- The next-uncleared-stage initial-open rule is settled. The separate default for a wholly cleared ladder, or a ladder whose next uncleared stage is unknown, is not settled.
+- Stage initial disclosure policy is settled: open the first stage not confirmed cleared, including unknown; close all when fully cleared.
 
 - Paragraph outro fading is requested; no separate numeric fade range is established. The defined ordinary-flow motion and exact container/stack boundaries still govern.
