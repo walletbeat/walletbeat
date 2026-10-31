@@ -995,7 +995,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		class="page-navigation"
 		data-scroll-item="inline-detached"
 		data-sticky-container
-		data-column="gap-0"
+		data-row="center align-start"
 	>
 		<header data-row="end">
 			<button
@@ -1048,7 +1048,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			aria-label="Table of contents"
 			popover="auto"
 			data-column
-			data-column-item="flexible"
+			data-row-item="flexible"
 			data-sticky-container
 		>
 			<NavigationItems
@@ -1709,6 +1709,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 
 		.page-navigation {
+			flex-flow: column nowrap;
+			gap: 0;
+
 			&[data-sticky-container] {
 				--scrollItem-inlineDetached-maxSize: inherit;
 				--scrollItem-inlineDetached-paddingStart: 0px;
@@ -1783,11 +1786,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 
 			@media (width <= 1024px) {
-				display: flex;
 				flex-flow: row wrap;
 				gap: 1rem;
-				align-items: start;
-				justify-content: center;
 				z-index: auto;
 				position: static;
 				background: none;
@@ -1973,7 +1973,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		row-gap: 2rem;
 
 		@media (width <= 1024px) {
-			---wallet-page-navigation-inline-size: 32rem;
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 				--sticky-marginInlineEnd: 0px;
@@ -2404,6 +2403,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				position: relative;
 				inset: auto;
 				align-self: center;
+				flex: 1 1 auto;
+				max-inline-size: 32rem;
 				inline-size: min(100%, var(---pie-size));
 
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
@@ -2677,7 +2678,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 
 	@property ---pie-sourceInlineOffset {
-		syntax: '<length>';
+		syntax: '<length-percentage>';
 		inherits: false;
 		initial-value: 0px;
 	}
@@ -2766,7 +2767,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			---pie-sourceInlineOffset: 100vw;
 		}
 		to {
-			---pie-sourceInlineOffset: calc(-1 * var(---pie-size));
+			---pie-sourceInlineOffset: -100%;
 		}
 	}
 
