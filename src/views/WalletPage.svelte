@@ -222,10 +222,7 @@
 				return [{ link, target, identity: target ? `#${target.id}` : url.hash }]
 			} catch { return [] }
 		})
-		const counts = new Map<string, number>()
-		for (const { identity } of links) counts.set(identity, (counts.get(identity) ?? 0) + 1)
 		type Destination = { identity: string; timeline: string }
-		const destinations = new Map<string, Destination>([...attributeDestinations, ...[...counts].filter(([identity, count]) => count > 1 && !attributeDestinations.has(identity)).map(([identity]) => [identity, { identity, timeline: `--wallet-discovered-${Array.from(identity, character => character.codePointAt(0)!.toString(16)).join('-')}` }] as const)])
 		const attributes = new Map<HTMLElement | SVGElement, Map<string, string | null>>()
 		const inputs = new Map<HTMLElement | SVGElement, Map<string, { value: string; priority: string }>>()
 		const attribute = (owner: HTMLElement | SVGElement, name: string, value: string | null) => {
@@ -248,14 +245,13 @@
 			attribute(owner, 'data-pressable-name', identity)
 			input(owner, '--link-current', destination?.timeline ?? 'none')
 		}
-		input(container, '--wallet-discovered-timelines', [...destinations.values()].filter(destination => !attributeDestinations.has(destination.identity)).map(destination => destination.timeline).join(', ') || '--wallet-links')
 		for (const { link, target, identity } of links) {
 			if (link.hasAttribute('data-pressable-name')) continue
-			const destination = destinations.get(identity)
+			const destination = attributeDestinations.get(identity)
 			const parent = target?.parentElement?.closest<HTMLElement>('.attribute-group, .security-news')
-			const parentDestination = parent ? destinations.get(`#${parent.id}`) : undefined
+			const parentDestination = parent ? attributeDestinations.get(`#${parent.id}`) : undefined
 			const ownDestination = destination ?? parentDestination
-			const sources = [...new Set([destination, parentDestination].filter((value): value is Destination => value !== undefined))]
+			const sources = [...new Set([destination, parentDestination].filter(value => value !== undefined))]
 			bind(link, identity, ownDestination)
 			input(link, '--link-current-sources', sources.map(source => source.timeline).join(', ') || 'none')
 			attribute(link, 'data-pressable-targets', [...new Set([identity, parent ? `#${parent.id}` : null].filter((value): value is string => value !== null))].join(' '))
@@ -494,12 +490,13 @@
 			parent: item === group ? undefined : group.href,
 		}] as const),
 	)))
-	function destinationState(href: string | undefined, link = false): Record<string, string> {
+	function destinationState(href: string | undefined, link = false, inheritCurrent = false): Record<string, string> {
 		const destination = href ? attributeDestinations.get(href) : undefined
 		if (!destination) return {}
 		const identities = [destination.identity, destination.parent].filter((id): id is string => id !== undefined)
 		return {
 			'data-pressable-name': destination.identity,
+			...(inheritCurrent ? { 'data-pressable-current': 'inherit' } : {}),
 			...(link ? { 'data-pressable-targets': identities.join(' ') } : {}),
 			style: `--link-current:${destination.timeline};${link ? `--link-current-sources:${identities.map(id => attributeDestinations.get(id)!.timeline).join(',')};` : ''}`,
 		}
@@ -836,7 +833,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	id="top"
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-approach-timelines={pieRotation.approachTimelines}
-	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).concat('var(--wallet-discovered-timelines, --wallet-links)').join(', ')}
+	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).join(', ') || '--wallet-links'}
 	style:---pie-rotation-states={pieRotation.animations}
 	data-sticky-breadcrumb="scope root"
 	style:---pie-radiusRatio={overallRatingPieMaxRadius / (overallRatingPieMaxRadius + overallRatingPiePadding)}
@@ -1152,7 +1149,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		<div data-sticky="block block-start backdrop-before backdrop-stuck">
 			<div data-row="start wrap" {...destinationState(`#${id}`)}>
 				<div data-sticky-breadcrumb="source" data-row-item="flexible">
-					<a data-row="start" data-sticky-breadcrumb="item" data-link="camouflaged" href={`#${id}`} {...destinationState(`#${id}`, true)} interestfor={id}>
+					<a data-row="start" data-sticky-breadcrumb="item" data-link="camouflaged" href={`#${id}`} {...destinationState(`#${id}`, true, true)} interestfor={id}>
 						<span aria-hidden="true" data-icon={`wbicons-${knownSingleVariantIcons[icon] ?? 'complex'} accent ${icon}`}></span>
 						<h2>{label}</h2>
 					</a>
@@ -1307,7 +1304,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 									data-row="start"
 									data-link="camouflaged"
 									href={`#${slugifyCamelCase(attribute.id)}`}
-								{...destinationState(`#${slugifyCamelCase(attribute.id)}`, true)}
+								{...destinationState(`#${slugifyCamelCase(attribute.id)}`, true, true)}
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
 									<span

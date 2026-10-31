@@ -463,9 +463,28 @@ declare global {
 		'data-pressable'?: 'to-containing' | boolean
 
 		/**
+		 * ## [data-pressable-current]
+		 * Current feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.
+		 *
+		 * ### Placement
+		 * On a named peer inside an ancestor publishing the same destination identity.
+		 *
+		 * ### Tokens
+		 * - `inherit`: inherit current and active feedback without creating a second current animation; native interaction remains local.
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-current]`
+		 */
+		'data-pressable-current'?: string | boolean
+
+		/**
 		 * ## [data-pressable-name]
 		 *
 		 * Canonical same-page destination identity consumed by destination-scope interaction publishers. Associated non-link paint owners share the identity without acquiring interactive semantics. Source links declare their own and ancestor destination membership separately with `[data-pressable-targets]`.
+		 *
+		 * ### Applied to
+		 * - Native `<a>` receives local inactive feedback defaults, independently of surrounding destinations.
+		 * - `[data-pressable-name]` opts into shared destination interaction and current feedback.
 		 *
 		 * ### CSS Variables
 		 * - `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.

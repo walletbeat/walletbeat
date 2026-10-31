@@ -348,8 +348,12 @@
 			]
 		},
 		{
+			"name": "data-pressable-current",
+			"description": "## [data-pressable-current]\nCurrent feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.\n\n### Placement\nOn a named peer inside an ancestor publishing the same destination identity.\n\n### Tokens\n- `inherit`: inherit current and active feedback without creating a second current animation; native interaction remains local.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-current]`"
+		},
+		{
 			"name": "data-pressable-name",
-			"description": "## [data-pressable-name]\n\nCanonical same-page destination identity consumed by destination-scope interaction publishers. Associated non-link paint owners share the identity without acquiring interactive semantics. Source links declare their own and ancestor destination membership separately with `[data-pressable-targets]`.\n\n### CSS Variables\n- `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.\n- `--link-timelines`: destination timeline names at their closest shared scope.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-name]`"
+			"description": "## [data-pressable-name]\n\nCanonical same-page destination identity consumed by destination-scope interaction publishers. Associated non-link paint owners share the identity without acquiring interactive semantics. Source links declare their own and ancestor destination membership separately with `[data-pressable-targets]`.\n\n### Applied to\n- Native `<a>` receives local inactive feedback defaults, independently of surrounding destinations.\n- `[data-pressable-name]` opts into shared destination interaction and current feedback.\n\n### CSS Variables\n- `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.\n- `--link-timelines`: destination timeline names at their closest shared scope.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-name]`"
 		},
 		{
 			"name": "data-pressable-state",

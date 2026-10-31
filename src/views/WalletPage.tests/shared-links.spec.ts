@@ -290,6 +290,200 @@ test('destination feedback keeps current, focus and hover independent across own
 				(await snapshot()).filter(link => link.hash === current).map(link => link.current),
 			)
 			.toEqual(Array((await snapshot()).filter(link => link.hash === current).length).fill('1'))
+
+		const headingCapability = await page.evaluate(
+			() =>
+				'ViewTimeline' in window &&
+				CSS.supports('width: anchor-size(--source inline)') &&
+				CSS.supports('animation-range: 0% 100%') &&
+				CSS.supports(
+					'color: if(style(--link-current: none): red; style(--link-current): green; else: blue)',
+				),
+		)
+
+		await info.attach('heading-current-capability', {
+			body: JSON.stringify({
+				supported: headingCapability,
+				coverage: headingCapability
+					? 'asserted below'
+					: 'unobserved: heading enhancement unavailable; interaction coverage continues',
+			}),
+			contentType: 'application/json',
+		})
+
+		if (headingCapability) {
+			const composition = await page.evaluate(expected => {
+				const root = document.querySelector('#top'),
+					owner = root?.querySelector('.page-navigation')
+
+				if (!root || !owner) {
+					throw Error('Native current owner is absent')
+				}
+
+				const own = (element: Element) => {
+					const names = new Set(
+						getComputedStyle(element)
+							.animationName.split(',')
+							.map(name => name.trim()),
+					)
+
+					return element
+						.getAnimations()
+						.filter(
+							(animation): animation is CSSAnimation =>
+								animation instanceof CSSAnimation &&
+								animation.effect instanceof KeyframeEffect &&
+								animation.effect.target === element &&
+								names.has(animation.animationName),
+						)
+				}
+				const isCurrent = (animation: CSSAnimation) => animation.animationName === 'link-current'
+				const sharesSourceAndTiming = (a: CSSAnimation, b: CSSAnimation) =>
+					a.timeline instanceof ViewTimeline &&
+					b.timeline instanceof ViewTimeline &&
+					a.timeline.source !== null &&
+					a.timeline.subject !== null &&
+					a.timeline.source === b.timeline.source &&
+					a.timeline.subject === b.timeline.subject &&
+					a.timeline.axis === b.timeline.axis &&
+					JSON.stringify(a.effect?.getTiming()) === JSON.stringify(b.effect?.getTiming())
+				const raw = getComputedStyle(owner).getPropertyValue('---pie-currentIndex').trim(),
+					index = Number(raw)
+
+				if (!raw || !Number.isInteger(index) || index <= 0) {
+					throw Error('Native current index is invalid')
+				}
+
+				const selected = own(owner).find(animation =>
+					animation.animationName.endsWith(`-${index}-current`),
+				)
+				const subject =
+					selected?.timeline instanceof ViewTimeline ? selected.timeline.subject : null
+				const leaf = subject instanceof Element ? subject.closest('section.attribute[id]') : null
+				const group = leaf?.closest('.attribute-group[id]')
+
+				if (!leaf || !group || `#${leaf.id}` !== expected) {
+					throw Error(
+						`Native current subject mismatch: ${JSON.stringify({ expected, index, selected: selected?.animationName, subject: subject instanceof Element ? { tag: subject.tagName, id: subject.id, owner: subject.closest('[data-sticky-breadcrumb~=scope]')?.id } : null, actors: own(owner).map(a => a.animationName) })}`,
+					)
+				}
+
+				const headings = [group, leaf].map(scope => {
+					const heading = scope.querySelector(
+						':scope > [data-sticky-breadcrumb~="position"] :is(h2,h3), :scope > details > [data-sticky-breadcrumb~="position"] :is(h2,h3)',
+					)
+					const anchor = heading?.closest('a') ?? heading?.querySelector('a'),
+						source = anchor?.closest('[data-sticky-breadcrumb~="source"]')
+					const row = source?.parentElement,
+						item = anchor?.closest('[data-sticky-breadcrumb~="item"]')
+
+					if (!anchor || !row || !item) {
+						throw Error('Heading composition is absent')
+					}
+
+					const reference = [
+						...root.querySelectorAll<HTMLAnchorElement>('.pie-navigation a[data-pressable-name]'),
+					].find(link => link.getAttribute('data-pressable-name') === `#${scope.id}`)
+
+					if (!reference) {
+						throw Error('Known destination has no pie reference')
+					}
+
+					const referenceActors = own(reference).filter(isCurrent)
+					const frames = own(item)
+						.filter(animation => !isCurrent(animation))
+						.flatMap(animation =>
+							animation.effect instanceof KeyframeEffect ? animation.effect.getKeyframes() : [],
+						)
+					let translation = frames.some(frame => Object.hasOwn(frame, 'translate'))
+					let scaling = frames.some(frame => Object.hasOwn(frame, 'scale'))
+
+					for (const frame of frames) {
+						if (typeof frame.transform !== 'string' || frame.transform === 'none') {
+							continue
+						}
+
+						const matrix = new DOMMatrixReadOnly(frame.transform)
+
+						if (![...matrix.toFloat64Array()].every(Number.isFinite)) {
+							throw Error('Native motion matrix is not finite')
+						}
+
+						translation ||= matrix.m41 !== 0 || matrix.m42 !== 0
+						scaling ||=
+							Math.abs(Math.hypot(matrix.m11, matrix.m12, matrix.m13) - 1) > 0.000001 ||
+							Math.abs(Math.hypot(matrix.m21, matrix.m22, matrix.m23) - 1) > 0.000001
+					}
+					const peers = [row, anchor].map(element => {
+						const style = getComputedStyle(element),
+							current = own(element).filter(isCurrent)
+
+						return {
+							identity: element.getAttribute('data-pressable-name'),
+							owner: element === row,
+							current: style.getPropertyValue('---link-current').trim(),
+							active: style.getPropertyValue('---link-active').trim(),
+							ownCurrentCount: current.length,
+							sharesSourceAndTiming:
+								current.length === 1 &&
+								referenceActors.length === 1 &&
+								sharesSourceAndTiming(current[0], referenceActors[0]),
+						}
+					})
+
+					return {
+						identity: `#${scope.id}`,
+						translation,
+						scaling,
+						referenceCurrent: getComputedStyle(reference)
+							.getPropertyValue('---link-current')
+							.trim(),
+						peers,
+					}
+				})
+				const empty = [...root.querySelectorAll('[data-pressable-name]')].filter(element =>
+					['', 'none'].includes(
+						getComputedStyle(element).getPropertyValue('--link-current').trim(),
+					),
+				)
+
+				return {
+					headings,
+					emptyCount: empty.length,
+					invalidEmpty: empty
+						.filter(
+							element =>
+								getComputedStyle(element).getPropertyValue('---link-current').trim() !== '0',
+						)
+						.map(element => element.getAttribute('data-pressable-name')),
+				}
+			}, current)
+
+			await info.attach('native-heading-current-composition', {
+				body: JSON.stringify(composition),
+				contentType: 'application/json',
+			})
+			expect(composition.headings).toHaveLength(2)
+			expect(composition.emptyCount).toBeGreaterThan(0)
+			expect(composition.invalidEmpty).toEqual([])
+
+			for (const heading of composition.headings) {
+				expect(heading.translation, `${heading.identity}: translation role`).toBe(true)
+				expect(heading.scaling, `${heading.identity}: scale role`).toBe(true)
+				expect(heading.referenceCurrent).toBe('1')
+
+				for (const peer of heading.peers) {
+					expect(peer.identity).toBe(heading.identity)
+					expect(peer.current).toBe('1')
+					expect(peer.active).toBe('1')
+					expect(peer.ownCurrentCount).toBe(peer.owner ? 1 : 0)
+
+					if (peer.owner) {
+						expect(peer.sharesSourceAndTiming).toBe(true)
+					}
+				}
+			}
+		}
 	}
 
 	await page.keyboard.press('Tab')
