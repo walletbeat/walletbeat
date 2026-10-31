@@ -128,7 +128,7 @@ for (const width of [390, 690, 1440]) {
 		}
 	})
 
-	test(`scrollIntoView targets clear occupied sticky rows and wheel snapping preserves the H1 endpoint at ${width}px`, async ({
+	test(`scrollIntoView targets clear occupied sticky rows at ${width}px`, async ({
 		page,
 	}, info) => {
 		await page.setViewportSize({ width, height: 900 })
@@ -460,163 +460,185 @@ for (const width of [390, 690, 1440]) {
 				}
 			}
 		}
-		const endpoint = page.locator(
-			'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
-		)
-
-		if (await endpoint.evaluate(element => getComputedStyle(element).display !== 'none')) {
-			const control = await page.addStyleTag({
-				content: '#layout { scroll-snap-type: none !important; }',
-			})
-			const boundary = await endpoint.evaluate(async element => {
-				const root = document.querySelector('#layout')!
-				const row = document.querySelector('.wallet-title-row')!
-				const move = async (top: number) => {
-					root.scrollTo({ top, behavior: 'instant' })
-					await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-				}
-
-				await move(0)
-				const animation = row
-					.getAnimations()
-					.find(
-						animation =>
-							animation instanceof CSSAnimation &&
-							animation.animationName === 'breadcrumb-item-motion',
-					)!
-				const seeks: { requested: number; actual: number; progress: number | null | undefined }[] =
-					[]
-				let low = 0
-				let high = Math.ceil(
-					document.querySelector('#top > header')!.getBoundingClientRect().height + 200,
-				)
-
-				await move(high)
-
-				if (animation.effect!.getComputedTiming().progress !== 1) {
-					throw new Error('Actual H1 endpoint must be bracketed')
-				}
-
-				while (low < high) {
-					const middle = Math.floor((low + high) / 2)
-
-					await move(middle)
-					seeks.push({
-						requested: middle,
-						actual: root.scrollTop,
-						progress: animation.effect?.getComputedTiming().progress,
-					})
-
-					if (animation.effect!.getComputedTiming().progress! >= 1) {
-						high = middle
-					} else {
-						low = middle + 1
-					}
-				}
-				await move(low)
-
-				return {
-					firstComplete: low,
-					actual: root.scrollTop,
-					seeks,
-					markerTop: element.getBoundingClientRect().top,
-					markerMargin: getComputedStyle(element).scrollMarginBlockStart,
-					marker:
-						element.getBoundingClientRect().top +
-						root.scrollTop -
-						root.getBoundingClientRect().top -
-						parseFloat(getComputedStyle(element).scrollMarginBlockStart),
-				}
-			})
-
-			await info.attach('h1-snap-boundary', {
-				body: JSON.stringify(boundary),
-				contentType: 'application/json',
-			})
-			expect(Math.abs(boundary.firstComplete - boundary.marker)).toBeLessThanOrEqual(1)
-			await control.evaluate(element => {
-				element.parentNode?.removeChild(element)
-			})
-			await page.locator('#layout').evaluate(root => root.scrollTo({ top: 0, behavior: 'instant' }))
-			let startSamples = 0
-			let previousStart = Number.NaN
-
-			await expect
-				.poll(
-					async () => {
-						const scroll = await page.locator('#layout').evaluate(root => root.scrollTop)
-
-						startSamples =
-							scroll <= 1 && Math.abs(scroll - previousStart) < 0.25 ? startSamples + 1 : 0
-						previousStart = scroll
-
-						return startSamples
-					},
-					{
-						message: 'Native snapping settles at the page start before wheel input',
-						intervals: [80],
-					},
-				)
-				.toBeGreaterThanOrEqual(4)
-			const wheelTarget = await page.locator('.wallet-title-row h1').boundingBox()
-
-			if (!wheelTarget) {
-				throw new Error('The natural H1 must provide a page wheel target')
-			}
-
-			const point = {
-				x: wheelTarget.x + wheelTarget.width / 2,
-				y: wheelTarget.y + wheelTarget.height / 2,
-			}
-
-			expect(
-				await page.evaluate(({ x, y }) => {
-					for (
-						let element = document.elementFromPoint(x, y);
-						element;
-						element = element.parentElement
-					) {
-						if (
-							/(auto|scroll)/.test(getComputedStyle(element).overflowY) &&
-							element.scrollHeight > element.clientHeight
-						) {
-							return element.id
-						}
-					}
-
-					return null
-				}, point),
-				'The native wheel targets the page rather than the nested TOC',
-			).toBe('layout')
-			await page.mouse.move(point.x, point.y)
-			const ended = page.locator('#layout').evaluate(
-				root =>
-					new Promise<number>((resolve, reject) => {
-						const timer = setTimeout(
-							() => reject(new Error('Native wheel must dispatch scrollend')),
-							5000,
-						)
-
-						root.addEventListener(
-							'scrollend',
-							() => {
-								clearTimeout(timer)
-								resolve(root.scrollTop)
-							},
-							{ once: true },
-						)
-					}),
-			)
-
-			await page.mouse.wheel(0, boundary.marker - 8)
-			expect(Math.abs((await ended) - boundary.marker)).toBeLessThanOrEqual(1)
-			evidence.push(boundary)
-		}
 
 		await info.attach('scroll-landing-and-endpoint-geometry', {
 			body: JSON.stringify(evidence),
 			contentType: 'application/json',
 		})
+	})
+	test(`wheel snapping preserves the H1 endpoint at ${width}px`, async ({ page }, info) => {
+		await page.setViewportSize({ width, height: 900 })
+		await page.goto('/__wallet-page/credits/')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		const endpoint = page.locator(
+			'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
+		)
+
+		test.skip(
+			await endpoint.evaluate(element => getComputedStyle(element).display === 'none'),
+			'This engine uses the ordinary-flow header without the enhanced H1 endpoint',
+		)
+		const control = await page.addStyleTag({
+			content: '#layout { scroll-snap-type: none !important; }',
+		})
+		const boundary = await endpoint.evaluate(async element => {
+			const root = document.querySelector('#layout')!
+			const row = document.querySelector('.wallet-title-row')!
+			const move = async (top: number) => {
+				root.scrollTo({ top, behavior: 'instant' })
+				await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+			}
+
+			await move(0)
+			const animation = row
+				.getAnimations()
+				.find(
+					animation =>
+						animation instanceof CSSAnimation &&
+						animation.animationName === 'breadcrumb-item-motion',
+				)!
+			const seeks: { requested: number; actual: number; progress: number | null | undefined }[] = []
+			let low = 0
+			let high = Math.ceil(
+				document.querySelector('#top > header')!.getBoundingClientRect().height + 200,
+			)
+
+			await move(high)
+
+			if (animation.effect!.getComputedTiming().progress !== 1) {
+				throw new Error('Actual H1 endpoint must be bracketed')
+			}
+
+			while (low < high) {
+				const middle = Math.floor((low + high) / 2)
+
+				await move(middle)
+				seeks.push({
+					requested: middle,
+					actual: root.scrollTop,
+					progress: animation.effect?.getComputedTiming().progress,
+				})
+
+				if (animation.effect!.getComputedTiming().progress! >= 1) {
+					high = middle
+				} else {
+					low = middle + 1
+				}
+			}
+			await move(low)
+
+			return {
+				firstComplete: low,
+				actual: root.scrollTop,
+				seeks,
+				markerTop: element.getBoundingClientRect().top,
+				markerMargin: getComputedStyle(element).scrollMarginBlockStart,
+				marker:
+					element.getBoundingClientRect().top +
+					root.scrollTop -
+					root.getBoundingClientRect().top -
+					parseFloat(getComputedStyle(element).scrollMarginBlockStart),
+			}
+		})
+
+		await info.attach('h1-snap-boundary', {
+			body: JSON.stringify(boundary),
+			contentType: 'application/json',
+		})
+		expect(Math.abs(boundary.firstComplete - boundary.marker)).toBeLessThanOrEqual(1)
+		await control.evaluate(element => {
+			element.parentNode?.removeChild(element)
+		})
+		await page.locator('#layout').evaluate(root => root.scrollTo({ top: 0, behavior: 'instant' }))
+		let startSamples = 0
+		let previousStart = Number.NaN
+
+		await expect
+			.poll(
+				async () => {
+					const scroll = await page.locator('#layout').evaluate(root => root.scrollTop)
+
+					startSamples =
+						scroll <= 1 && Math.abs(scroll - previousStart) < 0.25 ? startSamples + 1 : 0
+					previousStart = scroll
+
+					return startSamples
+				},
+				{
+					message: 'Native snapping settles at the page start before wheel input',
+					intervals: [80],
+				},
+			)
+			.toBeGreaterThanOrEqual(4)
+		const wheelTarget = await page.locator('.wallet-title-row h1').boundingBox()
+
+		if (!wheelTarget) {
+			throw new Error('The natural H1 must provide a page wheel target')
+		}
+
+		const point = {
+			x: wheelTarget.x + wheelTarget.width / 2,
+			y: wheelTarget.y + wheelTarget.height / 2,
+		}
+
+		expect(
+			await page.evaluate(({ x, y }) => {
+				for (
+					let element = document.elementFromPoint(x, y);
+					element;
+					element = element.parentElement
+				) {
+					if (
+						/(auto|scroll)/.test(getComputedStyle(element).overflowY) &&
+						element.scrollHeight > element.clientHeight
+					) {
+						return element.id
+					}
+				}
+
+				return null
+			}, point),
+			'The native wheel targets the page rather than the nested TOC',
+		).toBe('layout')
+		await page.mouse.move(point.x, point.y)
+		const ended = await page.locator('#layout').evaluateHandle(root => {
+			let scroll: number | null = null
+			const onEnd = () => {
+				scroll = root.scrollTop
+			}
+
+			root.addEventListener('scrollend', onEnd)
+
+			return {
+				read: () => scroll,
+				dispose: () => root.removeEventListener('scrollend', onEnd),
+			}
+		})
+
+		try {
+			await page.mouse.wheel(0, boundary.marker - 8)
+			await expect
+				.poll(() => ended.evaluate(state => state.read()), {
+					message: 'Native wheel must dispatch scrollend after its listener is armed',
+					timeout: 5000,
+				})
+				.not.toBeNull()
+			const settled = await ended.evaluate(state => state.read())
+
+			expect(Math.abs(settled! - boundary.marker)).toBeLessThanOrEqual(1)
+		} finally {
+			await info.attach('h1-wheel-state', {
+				body: JSON.stringify({
+					boundary,
+					eventScroll: await ended.evaluate(state => state.read()),
+					actualScroll: await page.locator('#layout').evaluate(root => root.scrollTop),
+				}),
+				contentType: 'application/json',
+			})
+			await ended.evaluate(state => state.dispose())
+			await ended.dispose()
+		}
 	})
 }
 
