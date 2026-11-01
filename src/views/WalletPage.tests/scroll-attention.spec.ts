@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import { expect, test as base } from '../../../tests/browser/verified-test'
 import { launchNativeAttentionBrowser } from './fixtures/native-attention-browser'
+import { wheelMainRoot } from './fixtures/root-wheel'
 
 type NativeAttention = Awaited<ReturnType<typeof launchNativeAttentionBrowser>>
 
@@ -215,29 +216,9 @@ for (const width of [390, 1440]) {
 				await expect(
 					page.locator('#nav-menu[data-closing], #wallet-toc[data-closing]'),
 				).toHaveCount(0)
-				await page.mouse.move(width > 1024 ? 500 : 200, 500)
-				const scrollEnd = page.evaluate(
-					() =>
-						new Promise<void>((resolve, reject) => {
-							const root = document.querySelector('#layout')!
-							const timeout = setTimeout(
-								() => reject(new Error('Native wheel scroll did not end')),
-								5000,
-							)
-
-							root.addEventListener(
-								'scrollend',
-								() => {
-									clearTimeout(timeout)
-									resolve()
-								},
-								{ once: true },
-							)
-						}),
+				await wheelMainRoot(page, (name, body) =>
+					info.attach(name, { body, contentType: 'application/json' }),
 				)
-
-				await page.mouse.wheel(0, 650)
-				await scrollEnd
 				await expect
 					.poll(() => page.locator('#layout').evaluate(element => element.scrollTop))
 					.toBeGreaterThan(0)
