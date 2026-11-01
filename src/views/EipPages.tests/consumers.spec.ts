@@ -250,7 +250,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
 					await expect(wallet).toBeFocused()
 					const newPageEvent = context.waitForEvent('page')
 
-					await wallet.click({ modifiers: ['Meta'] })
+					await wallet.click({ modifiers: ['ControlOrMeta'] })
 					const newPage = await newPageEvent
 
 					await newPage.waitForLoadState()
