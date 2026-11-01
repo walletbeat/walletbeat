@@ -2,13 +2,14 @@ import { execFile } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
+import { isRecord } from '@/types/utils/record'
 import { SortDirection } from '@/components/table-sort'
 import { walletSummaryHref, walletSummarySortChoices } from '@/views/wallet-table-navigation'
 import { stageQualificationChoices } from '@/views/wallet-table-stage'
 
 import { expect, test } from '../../../tests/browser/verified-test'
 
-let categoryPaths: string[] = []
+let categories: { path: string; names: string[] }[] = []
 
 test.beforeAll(async () => {
 	const { stdout } = await promisify(execFile)(
@@ -18,11 +19,22 @@ test.beforeAll(async () => {
 	)
 	const paths: unknown = JSON.parse(stdout)
 
-	if (!Array.isArray(paths) || !paths.every((path: unknown) => typeof path === 'string')) {
-		throw new Error('Category paths must be an array of strings')
+	if (!Array.isArray(paths)) {
+		throw new Error('Category projection must be an array')
 	}
 
-	categoryPaths = paths
+	categories = paths.map((category: unknown) => {
+		if (
+			!isRecord(category) ||
+			typeof category.path !== 'string' ||
+			!Array.isArray(category.names) ||
+			!category.names.every((name: unknown) => typeof name === 'string')
+		) {
+			throw new Error('Category projection needs a path and wallet names')
+		}
+
+		return { path: category.path, names: category.names }
+	})
 })
 
 for (const width of [1280, 390]) {
@@ -85,7 +97,7 @@ for (const width of [1280, 390]) {
 			test('category families retain attached content and the layout scroll owner', async ({
 				page,
 			}) => {
-				for (const path of categoryPaths) {
+				for (const { path, names } of categories) {
 					await page.goto(path)
 					const main = page.locator('main')
 					const island = main.locator('astro-island[component-url*="WalletTable"]')
@@ -97,6 +109,15 @@ for (const width of [1280, 390]) {
 					if (javaScriptEnabled) {
 						await expect(island).not.toHaveAttribute('ssr', '')
 					}
+
+					await expect
+						.poll(() =>
+							main
+								.locator('.wallet-table tbody tr h3')
+								.allTextContents()
+								.then(values => values.map(value => value.trim()).toSorted()),
+						)
+						.toEqual(names)
 
 					if (!path.endsWith('/summary/')) {
 						continue
