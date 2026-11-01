@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { interest, interestDelayMs } from './interest'
 
 class TestElement extends EventTarget {
+	id = 'details'
+	popoverTarget: string | null = null
 	hovered = false
 	focused = false
 	focusVisible = false
@@ -13,6 +15,10 @@ class TestElement extends EventTarget {
 	hoveredDescendants: TestElement[] = []
 	showPopover = vi.fn()
 	hidePopover = vi.fn()
+
+	getAttribute(name: string) {
+		return name === 'popovertarget' ? this.popoverTarget : null
+	}
 
 	querySelector() {
 		return this.invoker
@@ -49,6 +55,10 @@ class TestElement extends EventTarget {
 
 		return selector === ':focus-visible' ? this.focusVisible : this.hovered || this.focused
 	}
+}
+
+class TestLabel extends TestElement {
+	control: TestElement | null = null
 }
 
 class TestPointerEvent extends Event {
@@ -104,6 +114,7 @@ describe('interest fallback lifecycle', () => {
 		target = new TestElement()
 		vi.stubGlobal('Element', TestElement)
 		vi.stubGlobal('HTMLElement', TestElement)
+		vi.stubGlobal('HTMLLabelElement', TestLabel)
 		vi.stubGlobal('PointerEvent', TestPointerEvent)
 		vi.stubGlobal('FocusEvent', TestFocusEvent)
 		vi.stubGlobal('HTMLButtonElement', class extends TestElement {})
@@ -118,12 +129,22 @@ describe('interest fallback lifecycle', () => {
 	})
 
 	it.each(['disabled', 'ariaDisabled'] as const)(
-		'checks %s availability when delayed interest resolves for direct and descendant invokers',
+		'checks %s availability when delayed interest resolves for direct, descendant and label invokers',
 		state => {
-			for (const descendant of [false, true]) {
-				const invoker = descendant ? new TestElement() : node
+			for (const kind of ['direct', 'descendant', 'label']) {
+				const invoker = kind === 'direct' ? node : new TestElement()
 
-				node.invoker = descendant ? invoker : null
+				if (kind === 'label') {
+					cleanup?.destroy()
+					const label = new TestLabel()
+
+					label.control = invoker
+					invoker.popoverTarget = target.id
+					node = label
+					cleanup = interest(htmlElement(node), { id: target.id })
+				}
+
+				node.invoker = kind === 'descendant' ? invoker : null
 				node.dispatchEvent(new TestPointerEvent('pointerenter'))
 				invoker[state] = true
 				vi.advanceTimersByTime(interestDelayMs.start)

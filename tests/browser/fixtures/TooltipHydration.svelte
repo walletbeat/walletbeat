@@ -26,4 +26,24 @@
 			{/each}
 		</section>
 	{/each}
+	<section data-foreground-controls>
+		<h2>Foreground actions</h2>
+		<TooltipOrAccordion
+			id="foreground-disclosure"
+			isExpanded={false}
+			tooltipButtonTriggerPlacement="behind"
+		>
+			<span data-row="center gap-3 wrap">
+				<span data-foreground-summary>Foreground summary</span>
+				<a href="#foreground-destination">Foreground link</a>
+				<button type="button" popovertarget="foreground-independent-popover">Foreground command</button>
+				<label><input type="checkbox" /> Foreground option</label>
+			</span>
+			{#snippet ExpandedContent()}
+				<p>Foreground disclosure content.</p>
+			{/snippet}
+		</TooltipOrAccordion>
+		<div id="foreground-independent-popover" popover="auto">Independent native command.</div>
+		<p id="foreground-destination">Foreground destination.</p>
+	</section>
 </main>

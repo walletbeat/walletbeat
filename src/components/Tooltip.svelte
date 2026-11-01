@@ -74,6 +74,7 @@
 			id={popoverId}
 
 			style:--tooltip-positionArea={placement}
+			data-tooltip-position={placement}
 			style:--tooltip-anchor={anchorName}
 			style:--offset={`${offset}px`}
 
@@ -172,6 +173,14 @@
 	/* Overlay trigger must cover the stacked content without contributing size. */
 	[data-stack] {
 		position: relative;
+
+		&[data-tooltip-placement='behind'] {
+			isolation: isolate;
+
+			> [data-tooltip-trigger] {
+				z-index: -1;
+			}
+		}
 	}
 
 	[data-stack] > [data-tooltip-trigger] {
@@ -200,6 +209,11 @@
 		position-try-fallbacks: flip-block;
 		position-try-order: most-block-size;
 		position-visibility: anchors-visible;
+
+		&:where([data-tooltip-position='inline-start'], [data-tooltip-position='inline-end']) {
+			position-try-fallbacks: flip-inline;
+			position-try-order: most-inline-size;
+		}
 
 		margin: var(--offset);
 		width: max-content;

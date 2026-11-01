@@ -26,9 +26,12 @@
 			[
 				{
 					column: Column<_RowValue, _CellValue, _ColumnId>
+					controlId: string
 				},
 			]
 		>
+		/** The companion shares controlId; HeaderTitle gives its control an explicit accessible name. */
+		HeaderTitleHitArea?: Column<_RowValue, _CellValue, _ColumnId>['HeaderTitle']
 
 		HeaderExtra?: Snippet<
 			[
@@ -371,6 +374,7 @@
 
 		cellVerticalAlign,
 		Cell,
+		HeaderBelow,
 
 		...restProps
 	}: SvelteHTMLElements['div'] & {
@@ -395,6 +399,9 @@
 
 		expandHeaderCells?: boolean
 		transitionUpdate?: TableTransitionUpdate
+
+		/** One region after all heading rows, within the sticky table header. */
+		HeaderBelow?: Snippet
 
 		Cell?: Snippet<[{
 			row: _RowValue
@@ -502,6 +509,14 @@
 		>
 			{@render headerRows(table.columns, 0, undefined, true)}
 
+			{#if HeaderBelow}
+				<tr class="header-below">
+					<td colspan={Math.max(1, table.columns.reduce((sum, column) => sum + getColumnSpan(column), 0))}>
+						{@render HeaderBelow()}
+					</td>
+				</tr>
+			{/if}
+
 			{#snippet headerRows(columns: (_Column | undefined)[], level: number, inheritedClock: string | undefined, inheritedSupported: boolean)}
 				{@const stickyColumns = columns.filter(column => column?.isSticky)}
 				{@const sourceColumn = inheritedSupported && stickyColumns.length === 1 && columns[0]?.isSticky ? columns[0] : undefined}
@@ -548,6 +563,7 @@
 				{@const sortAction = nextSort === false ? undefined : sortNavigation?.action(column.id, nextSort)}
 				{@const sortButtonId = sortAction?.id ?? `${id}-sort-${level}-${index}`}
 				{@const expansionButtonId = `${id}-expand-${level}-${index}`}
+				{@const titleControlId = `${id}-title-${level}-${index}`}
 
 				<th
 					{colspan}
@@ -559,6 +575,7 @@
 					}
 					data-table-column={String(column.id)}
 					data-header-level={level}
+					data-title-hit-area={column.HeaderTitleHitArea ? '' : undefined}
 					data-sticky-size-source={isSizeSource ? '' : undefined}
 					aria-sort={table.sortState?.columnId === column.id ? (table.sortState.direction === SortDirection.Ascending ? 'ascending' : 'descending') : undefined}
 					data-sortable={isSortable ? '' : undefined}
@@ -578,8 +595,16 @@
 							<span
 								class="header-title"
 							>
+								{#if column.HeaderTitleHitArea}
+									{#if isSortable}
+										<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
+									{/if}
+									<span class="header-title-hit-area">
+										{@render column.HeaderTitleHitArea({ column, controlId: titleControlId })}
+									</span>
+								{/if}
 								{#if column.HeaderTitle}
-									{@render column.HeaderTitle({ column })}
+									{@render column.HeaderTitle({ column, controlId: titleControlId })}
 								{:else}
 									{column.name}
 								{/if}
@@ -589,7 +614,9 @@
 						<div data-sticky-container data-scroll-item="visible-center">
 							{#if isSortable}
 								<div class="sort-label" data-pressable="to-containing">
-									<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
+									{#if !column.HeaderTitleHitArea}
+										<label class="sort-hit-area" for={sortButtonId} aria-hidden="true"></label>
+									{/if}
 									<span data-sticky="backdrop-before backdrop-stuck">
 										{@render HeaderTitle()}
 
@@ -759,7 +786,6 @@
 			@container (width >= 48rem) {
 				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
 					overflow-x: clip;
-					overflow-y: visible;
 
 					> [data-sticky-container] {
 						--sticky-marginInlineStart: var(---table-sticky-size);
@@ -850,6 +876,11 @@
 		border-collapse: separate;
 		border-spacing: var(--table-innerBorderWidth);
 
+		&:has(th[data-title-hit-area]) {
+			/* A definite table minimum lets cell children resolve percentages after row sizing. */
+			block-size: 0;
+		}
+
 		:where(thead) {
 			font-size: 0.75em;
 			text-wrap: nowrap;
@@ -899,6 +930,45 @@
 						font-weight: 400;
 						font-size: 0.7em;
 						background-color: color-mix(in oklch, var(--table-backgroundColor), white 0.25%);
+					}
+
+					&[data-title-hit-area] {
+						block-size: min-content;
+					}
+
+					&[data-title-hit-area] > .header-cell-content {
+						min-block-size: 100%;
+						overflow: clip;
+
+						> [data-scroll-item] {
+							pointer-events: none;
+
+							> .sort-label > span[data-sticky] > .header-title,
+							> span[data-sticky] > .header-title {
+								position: relative;
+
+								> .header-title-hit-area {
+									display: contents;
+								}
+
+								> .sort-hit-area,
+								> .header-title-hit-area > :global(label) {
+									position: absolute;
+									inset: auto;
+									inset-block-start: calc(50% - 50vb);
+									inset-inline-end: 0;
+									block-size: 100vb;
+									inline-size: 100vi;
+									pointer-events: auto;
+									cursor: pointer;
+								}
+
+								> .sort-hit-area {
+									inset-inline-start: 100%;
+									inset-inline-end: auto;
+								}
+							}
+						}
 					}
 
 					> .header-cell-content {
