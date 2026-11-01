@@ -126,6 +126,14 @@ export enum HardwareWalletConnection {
 	 * connects through its companion app rather than directly to the software wallet.
 	 */
 	WALLET_CONNECT = 'WALLET_CONNECT',
+
+	/**
+	 * The hardware wallet is online, and the software wallet reaches it
+	 * through the manufacturer's pairing site.
+	 * The browser does not open a USB, HID, Bluetooth, or QR session.
+	 * GridPlus Lattice1 uses this through https://lattice.gridplus.io.
+	 */
+	vendorCloud = 'VENDOR_CLOUD',
 }
 
 /**
@@ -138,6 +146,7 @@ export const hardwareWalletConnectionEnum = new Enum<HardwareWalletConnection>({
 	[HardwareWalletConnection.webHID]: true,
 	[HardwareWalletConnection.bluetooth]: true,
 	[HardwareWalletConnection.WALLET_CONNECT]: true,
+	[HardwareWalletConnection.vendorCloud]: true,
 })
 
 /**
@@ -159,6 +168,8 @@ export function hardwareWalletConnectionToString(
 			return 'Bluetooth'
 		case HardwareWalletConnection.WALLET_CONNECT:
 			return 'WalletConnect'
+		case HardwareWalletConnection.vendorCloud:
+			return 'vendor cloud'
 	}
 }
 

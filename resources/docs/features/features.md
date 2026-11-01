@@ -2370,6 +2370,7 @@ Connection method between software and hardware wallet. To identify: connect the
 - `webHID` = `'WEBHID'`: HID through the browser's WebHID API. Similar to webUSB but uses the HID protocol instead. (e.g. Trezor uses WebHID in some browser integrations.)
 - `bluetooth` = `'BLUETOOTH'`: Wireless connection via Bluetooth.
 - `WALLET_CONNECT` = `'WALLET_CONNECT'`: Indirect connection via the WalletConnect protocol — the hardware wallet connects through its companion app rather than directly to the software wallet.
+- `vendorCloud` = `'VENDOR_CLOUD'`: The hardware wallet is online, and the software wallet reaches it through the manufacturer's pairing site. The browser does not open a USB, HID, Bluetooth, or QR session. GridPlus Lattice1 uses this through https://lattice.gridplus.io.
 
 ---
 
