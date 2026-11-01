@@ -261,13 +261,40 @@ const enhancedNavigation = () =>
 const settleFrames = () =>
 	new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
 
-const selectedDestinations = (links: Element[]) =>
-	links
-		.filter(
-			link =>
-				getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-		)
-		.map(link => new URL(link.getAttribute('href')!, document.baseURI).hash)
+const observeToc = (element: Element) => {
+	const rows = [...element.querySelectorAll('li')].map(item => {
+		const link = item.querySelector<HTMLAnchorElement>(':scope > a, :scope > details > summary > a')
+
+		if (!link) {
+			throw Error('Each TOC snap owner needs its destination link')
+		}
+
+		return {
+			link,
+			href: link.hash,
+			align: getComputedStyle(item, item.querySelector(':scope > details') ? '::before' : null)
+				.scrollSnapAlign,
+			current: Number.parseFloat(getComputedStyle(link).getPropertyValue('---link-current')),
+		}
+	})
+	const selected = rows.filter(row => row.align === 'center')
+	const target = selected[0]?.link.getBoundingClientRect()
+	const port = element.getBoundingClientRect()
+
+	return {
+		selected: selected.map(row => row.href),
+		areas: rows.filter(row => row.align !== 'none').map(row => row.href),
+		currentPaint: selected.map(({ href, current }) => ({ href, current })),
+		visible:
+			selected.length === 1 &&
+			target !== undefined &&
+			target.width > 0 &&
+			target.height > 0 &&
+			selected[0].link.checkVisibility() &&
+			target.top >= Math.max(0, port.top) &&
+			target.bottom <= Math.min(innerHeight, port.bottom),
+	}
+}
 
 test('local stage criterion clicks retain the wallet variant and native page identity', async ({
 	page,
@@ -1139,7 +1166,6 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			element.style.scrollSnapType = 'none'
 		})
 		const toc = page.locator('#wallet-toc')
-		const port = page.locator(width > 1024 ? '.page-navigation' : '#wallet-toc')
 
 		if (width === 390) {
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
@@ -1165,26 +1191,7 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 					behavior: 'instant',
 				})
 			}, id)
-		const currentVisible = async () =>
-			port.evaluate(element => {
-				const current = [
-					...document.querySelectorAll<HTMLAnchorElement>('#wallet-toc a[href]'),
-				].find(
-					link =>
-						getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-				)
-
-				if (!current) {
-					return false
-				}
-
-				const target = current.getBoundingClientRect(),
-					port = element.getBoundingClientRect()
-
-				return (
-					target.top >= Math.max(0, port.top) && target.bottom <= Math.min(innerHeight, port.bottom)
-				)
-			})
+		const currentVisible = async () => (await toc.evaluate(observeToc)).visible
 
 		await seek('private-transfers')
 
@@ -1193,7 +1200,7 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 		}
 
 		await expect
-			.poll(() => toc.locator('a[href]').evaluateAll(selectedDestinations))
+			.poll(async () => (await toc.evaluate(observeToc)).selected)
 			.toEqual(['#private-transfers'])
 		await expect.poll(currentVisible).toBe(true)
 
@@ -1201,8 +1208,8 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 		expect(box).not.toBeNull()
 		await page.mouse.move(box!.x + 20, Math.min(700, Math.max(80, box!.y + 50)))
-		await expect(port).toHaveCSS('scroll-snap-type', 'none')
-		const beforeWheel = await port.evaluate(element => ({
+		await expect(toc).toHaveCSS('scroll-snap-type', 'none')
+		const beforeWheel = await toc.evaluate(element => ({
 			top: element.scrollTop,
 			range: element.scrollHeight - element.clientHeight,
 		}))
@@ -1212,28 +1219,50 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			beforeWheel.top > beforeWheel.range / 2
 				? -Math.min(200, beforeWheel.top)
 				: Math.min(200, beforeWheel.range - beforeWheel.top)
-		const end = port.evaluate(
-			element =>
-				new Promise<void>((resolve, reject) => {
-					const timeout = setTimeout(
-						() => reject(new Error('Native TOC wheel scroll did not end')),
-						3500,
-					)
+		const end = await toc.evaluateHandle(element => {
+			let onEnd: () => void
+			let timeout: ReturnType<typeof setTimeout>
+			const finished = new Promise<void>((resolve, reject) => {
+				onEnd = () => {
+					clearTimeout(timeout)
+					resolve()
+				}
+				timeout = setTimeout(() => reject(new Error('Native TOC wheel scroll did not end')), 3500)
+				element.addEventListener('scrollend', onEnd, { once: true })
+			})
 
-					element.addEventListener(
-						'scrollend',
-						() => {
-							clearTimeout(timeout)
-							resolve()
-						},
-						{ once: true },
-					)
+			void finished.catch(() => {})
+
+			return {
+				finished,
+				cleanup: () => {
+					clearTimeout(timeout)
+					element.removeEventListener('scrollend', onEnd)
+				},
+			}
+		})
+
+		try {
+			await page.mouse.wheel(0, wheelDelta)
+			await end.evaluate(state => state.finished)
+		} finally {
+			await info.attach(`toc-wheel-${width}`, {
+				body: JSON.stringify({
+					before: beforeWheel,
+					delta: wheelDelta,
+					after: await toc.evaluate(element => ({
+						top: element.scrollTop,
+						range: element.scrollHeight - element.clientHeight,
+						hover: element.matches(':hover'),
+					})),
 				}),
-		)
+				contentType: 'application/json',
+			})
+			await end.evaluate(state => state.cleanup())
+			await end.dispose()
+		}
 
-		await page.mouse.wheel(0, wheelDelta)
-		await end
-		const hovering = await port.evaluate(element => element.scrollTop)
+		const hovering = await toc.evaluate(element => element.scrollTop)
 
 		expect(
 			Math.abs(hovering - beforeWheel.top),
@@ -1242,33 +1271,15 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 		await seek('address-resolution')
 		await expect
-			.poll(() => toc.locator('a[href]').evaluateAll(selectedDestinations))
+			.poll(async () => (await toc.evaluate(observeToc)).selected)
 			.toEqual(['#address-resolution'])
 		await page.evaluate(settleFrames)
-		expect(Math.abs((await port.evaluate(element => element.scrollTop)) - hovering)).toBeLessThan(1)
+		expect(Math.abs((await toc.evaluate(element => element.scrollTop)) - hovering)).toBeLessThan(1)
 
 		await page.mouse.move(0, 0)
-		await expect(port).toHaveCSS('scroll-snap-type', 'block mandatory')
+		await expect(toc).toHaveCSS('scroll-snap-type', 'block mandatory')
 		await expect.poll(currentVisible).toBe(true)
-		const areas = await toc
-			.locator('a')
-			.evaluateAll(links =>
-				links
-					.filter(link => getComputedStyle(link).scrollSnapAlign !== 'none')
-					.map(link => new URL(link.getAttribute('href')!, document.baseURI).hash),
-			)
-
-		const currentPaint = await toc.locator('a[href]').evaluateAll(links =>
-			links
-				.filter(
-					link =>
-						getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-				)
-				.map(link => ({
-					href: new URL(link.getAttribute('href')!, document.baseURI).hash,
-					current: Number.parseFloat(getComputedStyle(link).getPropertyValue('---link-current')),
-				})),
-		)
+		const { areas, currentPaint, selected } = await toc.evaluate(observeToc)
 
 		expect(currentPaint).toHaveLength(1)
 		expect(
@@ -1276,11 +1287,11 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			'The unique current snap destination retains shared current paint state',
 		).toBe(1)
 		expect(areas).toHaveLength(1)
-		expect(areas).toEqual(await toc.locator('a[href]').evaluateAll(selectedDestinations))
+		expect(areas).toEqual(selected)
 		observations.push({
 			width,
 			hovering,
-			resumed: await port.evaluate(element => element.scrollTop),
+			resumed: await toc.evaluate(element => element.scrollTop),
 			areas,
 		})
 	}
