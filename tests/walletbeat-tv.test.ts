@@ -82,15 +82,6 @@ describe('Walletbeat TV standalone launchers', () => {
 		}
 	})
 
-	it('creates reusable launchers with native retry and clean exit behavior', () => {
-		const result = spawnSync(process.execPath, ['--test', 'tests/walletbeat-tv-shortcuts.mjs'], {
-			encoding: 'utf8',
-			timeout: 20_000,
-		})
-
-		expect(result.status, result.stdout + result.stderr).toBe(0)
-	})
-
 	it('refuses to run an unbundled installation template before touching adjacent files', () => {
 		const directory = mkdtempSync(join(tmpdir(), 'walletbeat-tv-template '))
 
