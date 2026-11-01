@@ -115,16 +115,33 @@ for (const id of ['transparency', 'open-source']) {
 					)
 				const effect = effects[0]
 
-				if (effects.length !== 1 || !effect.timeline || effect.currentTime === null) {
+				if (
+					effects.length !== 1 ||
+					!(effect.timeline instanceof ViewTimeline) ||
+					!effect.timeline.subject ||
+					effect.timeline.source !== root ||
+					effect.currentTime === null
+				) {
 					throw new Error('One resolved native item arrival clock required')
 				}
+
+				const viewStart = effect.timeline.startOffset.to('px').value
+				const viewLength = effect.timeline.endOffset.to('px').value - viewStart
+				const subjectLength = effect.timeline.subject.getBoundingClientRect().height
+				const visibleLength = viewLength - subjectLength
+				const begin = viewStart + visibleLength
+				const end = viewStart + Math.max(subjectLength, visibleLength)
+				const progress =
+					end > begin
+						? Math.max(0, Math.min(1, (root.scrollTop - begin) / (end - begin)))
+						: Number(root.scrollTop >= begin)
 
 				return {
 					scroll: root.scrollTop,
 					sectionTop: section.getBoundingClientRect().top,
 					complex: glyph('::before'),
 					simple: glyph('::after'),
-					progress: effect.effect?.getComputedTiming().progress,
+					progress,
 				}
 			}
 
