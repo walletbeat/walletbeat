@@ -37,6 +37,7 @@ type ClassifiedFrame = {
 	decodedPose: number | null
 	referencePose: number | null
 	cyanReferencePose: number | null
+	contentPoseAgreement: boolean | null
 	classification: string
 	comparison: Comparison | null
 	unidentifiedNearTarget: boolean
@@ -911,7 +912,8 @@ export async function observeIconPaint({
 			let classification = 'instrument-rejected'
 			let comparison: Comparison | null = null
 
-			if (window && ref && cyanReference && ref.actual === cyanReference.actual) {
+			// The root ruler admits input; content-layer delivery is an output under test.
+			if (window && ref) {
 				comparison = compare(raster.at(ref.region), ref.paint)
 				classification = comparison.missing ? 'missing' : correct(comparison) ? 'correct' : 'wrong'
 			}
@@ -927,12 +929,10 @@ export async function observeIconPaint({
 				decodedPose,
 				referencePose: ref?.actual ?? null,
 				cyanReferencePose: cyanReference?.actual ?? null,
+				contentPoseAgreement: ref ? ref.actual === cyanReference?.actual : null,
 				classification,
 				comparison,
-				unidentifiedNearTarget:
-					natural &&
-					(ref !== undefined || cyanReference !== undefined) &&
-					(!ref || !cyanReference || ref.actual !== cyanReference.actual),
+				unidentifiedNearTarget: natural && decodedPose === null && cyanReference !== undefined,
 			})
 		}
 		const admitted = result.frames.filter(
@@ -962,19 +962,11 @@ export async function observeIconPaint({
 							frame => frame.phase === mode && frame.classification !== 'instrument-rejected',
 						)
 
-						return (
-							!result.frames.some(
+						return refs.every(reference =>
+							admitted.some(
 								frame =>
-									frame.phase === mode &&
-									frame.cyanReferencePose !== null &&
-									frame.referencePose !== frame.cyanReferencePose,
-							) &&
-							refs.every(reference =>
-								admitted.some(
-									frame =>
-										frame.referencePose === reference.actual && frame.classification !== 'correct',
-								),
-							)
+									frame.referencePose === reference.actual && frame.classification !== 'correct',
+							),
 						)
 					})
 		result.poseComparisons = refs.map(ref => {
@@ -997,6 +989,9 @@ export async function observeIconPaint({
 		})
 		result.admitted = admitted.length
 		result.firstAdmitted = admitted[0] ?? null
+		result.contentMismatchFrames = admitted
+			.filter(frame => frame.contentPoseAgreement === false)
+			.map(frame => frame.index)
 		result.staleFrames = admitted.filter(frame => frame.classification !== 'correct').length
 		result.staleEpisodes = result.poseComparisons
 			.filter(value => value.firstWrong !== null)
@@ -1010,10 +1005,7 @@ export async function observeIconPaint({
 		const inputStart = result.criticalStart
 		const inputAck = result.inputFinished
 		const targetFrames = naturalFrames.filter(
-			frame =>
-				frame.referencePose !== null &&
-				Math.abs(frame.referencePose - D) <= poseTolerance &&
-				frame.referencePose === frame.cyanReferencePose,
+			frame => frame.referencePose !== null && Math.abs(frame.referencePose - D) <= poseTolerance,
 		)
 		const arrival = (frame: ClassifiedFrame | undefined) =>
 			frame
@@ -1083,7 +1075,9 @@ export async function observeIconPaint({
 				? 'instrument-rejected'
 				: result.staleFrames
 					? 'observed-same-context-fast-slow-mismatch'
-					: 'observed-correct-at-admitted-poses'
+					: admitted.some(frame => frame.contentPoseAgreement === false)
+						? 'observed-content-paint-mismatch'
+						: 'observed-correct-at-admitted-poses'
 
 		if (result.pageErrors.length && result.status === 'observed-correct-at-admitted-poses') {
 			result.status = 'observed-page-error'
@@ -1094,7 +1088,12 @@ export async function observeIconPaint({
 		result.phase = 'complete'
 		result.complete = true
 
-		if (result.mode !== 'baseline' && result.controlsQualified) {
+		if (
+			result.mode !== 'baseline' &&
+			result.controlsQualified &&
+			result.status !== 'instrument-rejected' &&
+			result.pageErrors.length === 0
+		) {
 			result.status = 'negative-control-qualified'
 		}
 
