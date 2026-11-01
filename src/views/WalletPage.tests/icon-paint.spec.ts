@@ -9,10 +9,19 @@ const actors = {
 	attribute: '#scam-prevention > details > summary [data-icon]',
 }
 
+const modes = ['baseline', 'frozen-parent', 'frozen-pseudo'] as const
+const expectedStatus = (mode: IconPaintReport['mode']) =>
+	mode === 'baseline' ? 'observed-correct-at-admitted-poses' : 'negative-control-qualified'
+const reportFailed = (report: IconPaintReport) =>
+	report.errors.length > 0 || !report.browserClosed || report.status !== expectedStatus(report.mode)
+
 for (const width of [690, 1006]) {
 	for (const [name, selector] of Object.entries(actors)) {
 		for (const arrivalProgress of [0.35, 0.75] as const) {
-			test(`${name} icon fast-scroll paint matches its slow-scroll pose at ${width}px / arrival ${arrivalProgress}`, async ({
+			const workload =
+				width === 690 && name === 'attribute' && arrivalProgress === 0.75 ? 'reversal' : 'forward'
+
+			test(`${name} icon ${workload} fast-scroll paint matches its slow-scroll pose at ${width}px / arrival ${arrivalProgress}`, async ({
 				playwright,
 				browserName,
 				baseURL,
@@ -26,10 +35,10 @@ for (const width of [690, 1006]) {
 				}
 
 				const reports: IconPaintReport[] = []
-				let failed = true
+				let completed = false
 
 				try {
-					for (const mode of ['baseline', 'frozen-parent', 'frozen-pseudo'] as const) {
+					for (const mode of modes) {
 						const report = await observeIconPaint({
 							browserType: playwright.chromium,
 							launchOptions: {
@@ -44,22 +53,29 @@ for (const width of [690, 1006]) {
 							source,
 							mode,
 							arrivalProgress,
+							workload,
 						})
 
 						reports.push(report)
-						expect(report.errors, `${mode} must have no browser or instrument errors`).toEqual([])
-						expect(report.browserClosed, `${mode} must dispose its browser process`).toBe(true)
-						expect(report.status).toBe(
-							mode === 'baseline'
-								? 'observed-correct-at-admitted-poses'
-								: 'negative-control-qualified',
-						)
+						expect
+							.soft(report.errors, `${mode} must have no browser or instrument errors`)
+							.toEqual([])
+						expect.soft(report.browserClosed, `${mode} must dispose its browser process`).toBe(true)
+						expect.soft(report.status).toBe(expectedStatus(mode))
 					}
-					failed = false
+					expect.soft(reports).toHaveLength(modes.length)
+					completed = true
 				} finally {
+					const failedReports = reports.filter(reportFailed)
+					const failed = !completed || reports.length !== modes.length || failedReports.length > 0
+
 					await info.attach('icon-paint-summary', {
 						body: JSON.stringify({
 							source,
+							workload,
+							planned: modes,
+							attempted: reports.length,
+							failed: failedReports.length,
 							reports: reports.map(({ mode, status, browserVersion, admitted, staleFrames }) => ({
 								mode,
 								status,
