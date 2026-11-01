@@ -592,9 +592,102 @@
 	// Actions
 	import { flushSync, onMount, type ComponentProps } from 'svelte'
 	let interactive = $state(false)
+	let identityInterestAvailable = $state(false)
 	let transitionRoot: HTMLElement | undefined = $state()
 	type TransitionKind = 'sort' | 'columns' | 'filters' | 'disclosure'
-	onMount(() => { interactive = true })
+	onMount(() => {
+		interactive = true
+		identityInterestAvailable = 'popover' in HTMLElement.prototype
+	})
+
+	const walletIdentityId = (walletId: string) => viewTransitionName(viewId, 'wallet-identity', walletId)
+
+	function walletIdentityInterest(node: HTMLElement) {
+		if (!identityInterestAvailable) return
+		const sources = [node, ...node.querySelectorAll<HTMLElement>(':scope > .row-count, :scope > .wallet-icon, .name h3 a')]
+		const registrations = sources.map(source => interest(source, { id: node.id }))
+		const motion = livePopoverTransition(node)
+		const lifetime = new AbortController()
+		const listenerOptions = { signal: lifetime.signal }
+		const owner = node.closest('td')
+		const disclosure = node.closest<HTMLDetailsElement>('details.wallet-info-details')
+		const summary = disclosure?.querySelector('summary')
+		let redirect: ReturnType<typeof setTimeout> | undefined
+		let dismissed = false
+		let keyboardFocusNavigation = false
+		const cancelRedirect = () => {
+			clearTimeout(redirect)
+			redirect = undefined
+		}
+		const dismiss = () => {
+			cancelRedirect()
+			dismissed = true
+		}
+		const beginInterest = (event: Event) => {
+			cancelRedirect()
+			if (event instanceof FocusEvent && dismissed && !keyboardFocusNavigation) return
+			dismissed = false
+		}
+		const endInterest = () => {
+			cancelRedirect()
+			queueMicrotask(() => {
+				if (!node.matches(':hover, :focus-within')) dismissed = false
+			})
+		}
+		const keydown = (event: KeyboardEvent) => {
+			keyboardFocusNavigation = event.isTrusted && event.key === 'Tab'
+			if (event.key === 'Escape' && (node.matches(':hover, :focus-within, :popover-open')
+				|| disclosure?.querySelector(':scope > [popover]:popover-open'))) dismiss()
+		}
+		const keyup = (event: KeyboardEvent) => {
+			if (event.key === 'Tab') keyboardFocusNavigation = false
+		}
+		const activateDisclosure = (event: KeyboardEvent) => {
+			if (event.key === 'Enter' || event.key === ' ') dismiss()
+		}
+		const showIdentity = (event: ToggleEvent) => {
+			if (event.newState !== 'open') return
+			cancelRedirect()
+			if (dismissed || summary?.matches(':active') || disclosure?.open) {
+				event.preventDefault()
+				return
+			}
+			const compact = getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1'
+			if (compact && owner && event.source === owner) return
+			event.preventDefault()
+			const target = compact ? node : disclosure?.querySelector<HTMLElement>(':scope > [popover]')
+			const source = event.source instanceof HTMLElement ? event.source : node
+			// A popover's focus-navigation owner must be outside its own subtree.
+			const popupSource = compact ? owner : source
+			if (!target || !popupSource) return
+			// A separate task leaves the canceled native show operation before opening its replacement.
+			redirect = setTimeout(() => {
+				redirect = undefined
+				if (dismissed || !node.isConnected || !source.isConnected || !target.isConnected || !popupSource.isConnected
+					|| !node.contains(source) || !source.matches(':hover, :focus-within')
+					|| disclosure?.open || summary?.matches(':active')
+					|| (getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1') !== compact
+					|| target.matches(':popover-open')) return
+				target.showPopover({ source: popupSource })
+			}, 0)
+		}
+		node.addEventListener('beforetoggle', showIdentity, listenerOptions)
+		node.addEventListener('pointerenter', beginInterest, listenerOptions)
+		node.addEventListener('focusin', beginInterest, listenerOptions)
+		node.addEventListener('pointerleave', endInterest, listenerOptions)
+		node.addEventListener('focusout', endInterest, listenerOptions)
+		node.addEventListener('loseinterest', endInterest, listenerOptions)
+		node.ownerDocument.addEventListener('keydown', keydown, { ...listenerOptions, capture: true })
+		node.ownerDocument.addEventListener('keyup', keyup, { ...listenerOptions, capture: true })
+		summary?.addEventListener('click', dismiss, { ...listenerOptions, capture: true })
+		summary?.addEventListener('keydown', activateDisclosure, { ...listenerOptions, capture: true })
+		return () => {
+			cancelRedirect()
+			lifetime.abort()
+			registrations.forEach(registration => registration?.destroy())
+			motion.destroy()
+		}
+	}
 
 	const transitionUpdate = (update: () => void, kind: TransitionKind = 'disclosure') => {
 		if (!transitionRoot) {
@@ -814,57 +907,57 @@
 		{/if}
 	{/snippet}
 
-	<div
-		class="filters"
-		data-sticky="block block-start backdrop-after backdrop-stuck"
-		data-scroll-item="inline-detached padding-match-start"
-	>
-		{#each allFilterSlots as slot (slot.panelId)}
-			<div
-				class="filter-popover"
-				use:livePopoverTransition
-				popover="auto"
-				id={slot.panelId}
-				role="dialog"
-				aria-label={`${slot.kind === 'wallet' ? 'Wallet' : slot.kind === 'stage' ? 'Stage' : 'Attributes'} filters`}
-				style:--filter-anchor={slot.anchorName}
-				data-filter-kind={slot.kind}
-				data-card
-				onanimationstart={event => {
-					if (event.target === event.currentTarget && event.animationName === 'wallet-filters-inline')
-						event.currentTarget.hidePopover()
-				}}
-				onbeforetoggle={event => {
-					if (event.newState === 'open') openFilterPanelId = slot.panelId
-					else if (openFilterPanelId === slot.panelId) openFilterPanelId = undefined
-				}}
-			>
-				{#if slot.kind === 'attribute'}
-					<Filters
-						aria-label="Attribute filters"
-						items={allAttributes}
-						filterSets={slot.filterSets}
-						bind:activeChoices={attributeActiveChoices}
-						bind:toggleFilterById={toggleAttributeFilterById}
-						transitionUpdate={update => transitionUpdate(update, 'columns')}
-						closedAnchorPrefix={slot.clusterAnchorName}
-					/>
-				{:else}
-					<Filters
-						id={slot.kind === 'stage' && stageNavigationBase !== undefined ? `${viewId}-stage-sort` : undefined}
-						aria-label={slot.kind === 'stage' ? 'Stage filters' : 'Wallet filters'}
-						items={wallets}
-						filterSets={slot.filterSets}
-						contextFilterSets={walletFilterSets}
-						visibleSetIds={slot.kind === 'wallet' ? walletPanelSlot?.filterSets.map(set => set.id) : undefined}
-						bind:activeChoices
-						{transitionUpdate}
-						closedAnchorPrefix={slot.clusterAnchorName}
-					/>
-				{/if}
-			</div>
-		{/each}
-	</div>
+	{#snippet HeaderBelow()}
+		<div
+			class="filters"
+		>
+			{#each allFilterSlots as slot (slot.panelId)}
+				<div
+					class="filter-popover"
+					use:livePopoverTransition
+					popover="auto"
+					id={slot.panelId}
+					role="dialog"
+					aria-label={`${slot.kind === 'wallet' ? 'Wallet' : slot.kind === 'stage' ? 'Stage' : 'Attributes'} filters`}
+					style:--filter-anchor={slot.anchorName}
+					data-filter-kind={slot.kind}
+					data-card
+					onanimationstart={event => {
+						if (event.target === event.currentTarget && event.animationName === 'wallet-filters-inline')
+							event.currentTarget.hidePopover()
+					}}
+					onbeforetoggle={event => {
+						if (event.newState === 'open') openFilterPanelId = slot.panelId
+						else if (openFilterPanelId === slot.panelId) openFilterPanelId = undefined
+					}}
+				>
+					{#if slot.kind === 'attribute'}
+						<Filters
+							aria-label="Attribute filters"
+							items={allAttributes}
+							filterSets={slot.filterSets}
+							bind:activeChoices={attributeActiveChoices}
+							bind:toggleFilterById={toggleAttributeFilterById}
+							transitionUpdate={update => transitionUpdate(update, 'columns')}
+							closedAnchorPrefix={slot.clusterAnchorName}
+						/>
+					{:else}
+						<Filters
+							id={slot.kind === 'stage' && stageNavigationBase !== undefined ? `${viewId}-stage-sort` : undefined}
+							aria-label={slot.kind === 'stage' ? 'Stage filters' : 'Wallet filters'}
+							items={wallets}
+							filterSets={slot.filterSets}
+							contextFilterSets={walletFilterSets}
+							visibleSetIds={slot.kind === 'wallet' ? walletPanelSlot?.filterSets.map(set => set.id) : undefined}
+							bind:activeChoices
+							{transitionUpdate}
+							closedAnchorPrefix={slot.clusterAnchorName}
+						/>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/snippet}
 
 	<div
 		class="desktop-table-container"
@@ -883,6 +976,7 @@
 				},
 			}}
 			class="wallet-table"
+			{HeaderBelow}
 
 			rows={wallets}
 			rowId={wallet => wallet.metadata.id}
@@ -1094,6 +1188,7 @@
 					{@const displayName = wallet.metadata.displayName}
 
 					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+					{@const identityId = walletIdentityId(wallet.metadata.id)}
 
 					<TooltipOrAccordion
 						class="wallet-info-details"
@@ -1129,6 +1224,10 @@
 					>
 						<div
 							class="wallet-info"
+							id={identityId}
+							popover={identityInterestAvailable ? 'auto' : undefined}
+							data-card="popover"
+							{@attach walletIdentityInterest}
 							data-row="start"
 							data-view-transition="named"
 							style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
@@ -1148,7 +1247,12 @@
 								<div class="name" data-column="gap-1">
 									<div data-row="gap-3 start wrap">
 										<h3>
-											<a data-link="camouflaged" href={walletUrl}>{displayName}</a>
+											<a
+											data-link="camouflaged"
+											href={walletUrl}
+											data-view-transition="named"
+											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+										>{displayName}</a>
 										</h3>
 
 										{#if 'hardware' in wallet.variants}
@@ -1241,9 +1345,14 @@
 
 				{:else if column.id === 'displayName'}
 					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+					{@const identityId = walletIdentityId(wallet.metadata.id)}
 
 					<div
 						class="wallet-info"
+						id={identityId}
+						popover={identityInterestAvailable ? 'auto' : undefined}
+						data-card="popover"
+						{@attach walletIdentityInterest}
 						data-row="start"
 						data-view-transition="named"
 						style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
@@ -1263,7 +1372,12 @@
 							<div class="name" data-column="gap-1">
 								<div data-row="gap-3 start wrap">
 									<h3>
-										<a data-link="camouflaged" href={walletUrl}>{value}</a>
+										<a
+											data-link="camouflaged"
+											href={walletUrl}
+											data-view-transition="named"
+											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+										>{value}</a>
 									</h3>
 								</div>
 
@@ -1797,7 +1911,6 @@
 	}
 
 	section {
-		---filters-blockSize: 4rem;
 		--filter-cluster-size: 1.3rem;
 
 		&[data-sticky-container] {
@@ -1807,10 +1920,11 @@
 		}
 	}
 
-	/* Wide: filter groups are anchored to the header cell they filter.
-	 * Narrow: the same groups occupy a sticky layer outside the table heading. */
+	/* The same filter region follows the complete heading hierarchy. */
 	.filters {
 		display: contents;
+		font-size: 1rem;
+		text-wrap: wrap;
 	}
 
 	.filter-trigger {
@@ -1910,18 +2024,16 @@
 		to { opacity: 1; }
 	}
 	@container wallet-table (width < 42rem) {
-		.filters[data-sticky] {
+		.filters {
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
 			container-type: scroll-state inline-size;
 			inline-size: 100%;
-			block-size: var(---filters-blockSize);
 			overflow-x: auto;
 			overflow-y: clip;
 			scrollbar-width: none;
-			padding-inline: 0.5rem;
-			z-index: 2;
+			padding: 0.5rem;
 		}
 
 		.filter-popover {
@@ -1946,7 +2058,14 @@
 		}
 	}
 
+	section { ---wallet-identity-context: 1; }
+
 	.desktop-table-container {
+		---wallet-identity-compact: 0;
+		---wallet-identity-rankSize: 1.25em;
+		---wallet-identity-logoSize: 2.25em;
+		---wallet-identity-gap: 1em;
+		---wallet-identity-blockSize: 5rem;
 		z-index: 1;
 
 		:global(td[data-table-column="stage"]) {
@@ -2003,9 +2122,6 @@
 					gap: 0.25rem;
 				}
 
-				.desktop-table-container[data-sticky-container] & thead[data-sticky] {
-					inset-block-start: calc(var(--sticky-insetBlockStart) + var(---filters-blockSize));
-				}
 
 				thead th {
 					min-inline-size: 0;
@@ -2086,6 +2202,10 @@
 		}
 
 		.wallet-table {
+			.header-below {
+				--table-cell-padding: 0;
+			}
+
 			tr {
 				td {
 					&:not(:has(> details[open] > [popover]:not(:popover-open))) {
@@ -2137,13 +2257,15 @@
 	}
 
 	.wallet-info {
-		block-size: 5rem;
+		block-size: var(---wallet-identity-blockSize);
+
+		&[data-row] { gap: var(---wallet-identity-gap); }
 
 		text-align: start;
 
 		.row-count {
-			width: 1.25em;
-			height: 1.25em;
+			width: var(---wallet-identity-rankSize);
+			height: var(---wallet-identity-rankSize);
 
 			text-align: center;
 			font-weight: 600;
@@ -2159,7 +2281,7 @@
 		}
 
 		.wallet-icon {
-			--icon-size: 2.25em;
+			--icon-size: var(---wallet-identity-logoSize);
 		}
 
 		.name-and-tags {
@@ -2273,6 +2395,119 @@
 	@media (prefers-reduced-motion: reduce) {
 		:global(::view-transition-group(*.pie)) {
 			animation-duration: 0s;
+		}
+	}
+
+	@position-try --wallet-identity-dock {
+		inset-block: auto var(--tooltip-drawerMargin, 0.75rem);
+		inset-inline: var(--tooltip-drawerMargin, 0.75rem);
+		inline-size: auto;
+		max-inline-size: none;
+		max-block-size: var(--tooltip-drawerBlockSize, min(15rem, 50dvb));
+		align-self: auto;
+	}
+
+	:global {
+		.wallet-table {
+			anchor-scope: --wallet-identity-heading;
+			thead { anchor-name: --wallet-identity-heading; }
+			td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
+				anchor-name: --wallet-identity-cell;
+				anchor-scope: --wallet-identity-cell, --wallet-identity-logo;
+			}
+		}
+
+		.desktop-table-container .wallet-info {
+			.wallet-icon { anchor-name: --wallet-identity-logo; }
+
+			&[popover]:not(:popover-open) {
+				display: flex;
+				position: static;
+				inset: auto;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				inline-size: auto;
+				max-inline-size: none;
+				max-block-size: none;
+				overflow: visible;
+				background: transparent;
+				color: inherit;
+			}
+
+			&:popover-open {
+				display: flex;
+				&[data-row] { flex-direction: column; align-items: stretch; }
+				position: fixed;
+				position-anchor: --wallet-identity-cell;
+				inset-inline: anchor(--wallet-identity-cell end) auto;
+				inset-block: anchor(--wallet-identity-heading bottom) 0;
+				align-self: anchor-center;
+				position-try-fallbacks: flip-inline, --wallet-identity-dock;
+				position-visibility: anchors-visible;
+				margin-block: 0;
+				margin-inline: 0.5rem;
+				inline-size: max-content;
+				max-inline-size: min(20rem, calc(100dvi - 2rem));
+				block-size: auto;
+				overflow: auto;
+				color: inherit;
+				border: 1px solid var(--border-color);
+
+				:is(.row-count, .wallet-icon) {
+					position: fixed;
+					position-anchor: --wallet-identity-cell;
+					inset-block: anchor(--wallet-identity-heading bottom) 0;
+					align-self: anchor-center;
+					position-visibility: no-overflow;
+					margin: 0;
+				}
+				.row-count { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding)); }
+				.wallet-icon { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap)); }
+			}
+		}
+
+		@supports (anchor-scope: --wallet-identity-cell) and (container-type: scroll-state) and (position-visibility: no-overflow) {
+			@container style(---wallet-identity-context: 1) {
+				@media (hover: hover) and (pointer: fine) {
+					@container wallet-table (width >= 48rem) and scroll-state(scrollable: inline-start) {
+						.desktop-table-container:has(.wallet-info[popover]) { ---wallet-identity-compact: 1; }
+					}
+					@container wallet-table (width >= 48rem) {
+						.desktop-table-container:has(.wallet-info:popover-open) { ---wallet-identity-compact: 1; }
+					}
+				}
+			}
+
+			@container style(---wallet-identity-compact: 1) {
+				.wallet-table {
+					/* Positive native overflow keeps contraction from resetting its own trigger. */
+					--table-inlineSize: calc(var(--sticky-sizeInline) + 1px);
+					td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
+						inline-size: calc(var(---wallet-identity-rankSize) + var(---wallet-identity-gap) + var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding));
+						block-size: calc(var(---wallet-identity-blockSize) + 2 * var(--table-cell-padding));
+					}
+					.wallet-info-details summary { min-block-size: calc(var(---wallet-identity-blockSize) + 2 * var(--table-cell-padding)); }
+				}
+				.wallet-info[popover]:not(:popover-open) {
+					:is(.name-and-tags, .variants) {
+						position: absolute;
+						inline-size: max-content;
+						max-inline-size: 20rem;
+						visibility: hidden;
+						pointer-events: none;
+					}
+					.name h3 a {
+						position: absolute;
+						position-anchor: --wallet-identity-cell;
+						inset-inline: anchor(--wallet-identity-cell start) anchor(--wallet-identity-logo end);
+						inset-block: anchor(--wallet-identity-cell start) anchor(--wallet-identity-cell end);
+						color: transparent;
+						visibility: visible;
+						pointer-events: none;
+					}
+				}
+			}
 		}
 	}
 

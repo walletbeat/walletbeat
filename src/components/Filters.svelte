@@ -538,15 +538,6 @@
 			}
 		}
 
-		legend {
-			position: absolute;
-			inline-size: 1px;
-			block-size: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			white-space: nowrap;
-		}
-
 		[data-filter-choice] {
 			&[data-row] { justify-content: center; }
 			inline-size: 2.5rem;

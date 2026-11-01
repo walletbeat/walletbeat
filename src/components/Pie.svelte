@@ -136,6 +136,8 @@
 </script>
 
 {#snippet Slice(slice: ComputedSlice)}
+	{@const fill = sliceFill(slice)}
+	{@const labelBackground = sliceLabelBackground(slice)}
 	<svelte:element
 		this={slice.href ? 'a' : onSliceClick ? 'button' : 'div'}
 		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button', disabled: !interactive } : {}}
@@ -168,9 +170,9 @@
 		style:--slice-outerCornerRadius={slice.computed.outerCornerRadius}
 		style:--slice-innerCornerRadius={slice.computed.innerCornerRadius}
 		style:--slice-totalAngle={slice.computed.totalAngle}
-		style:--slice-opacity={slice.opacity ?? 1}
-		style:--slice-fill={sliceFill(slice)}
-		style:--slice-labelBackground={sliceLabelBackground(slice)}
+		style:--slice-opacity={slice.opacity === 1 ? undefined : slice.opacity}
+		style:--slice-fill={fill}
+		style:--slice-labelBackground={labelBackground === fill ? undefined : labelBackground}
 		style:--slice-labelSize={slice.computed.labelSize === labelSize ? undefined : slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
@@ -325,6 +327,8 @@
 			}
 
 			.slice {
+				--slice-opacity: 1;
+				--slice-labelBackground: var(--slice-fill);
 				--slice-scale: 1;
 				--slice-offset: 0;
 				--slice-labelSize: var(--pie-labelSize);
