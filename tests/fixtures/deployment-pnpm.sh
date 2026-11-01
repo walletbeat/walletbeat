@@ -5,9 +5,11 @@ if [[ "$1" == helios:wrap ]]; then
 fi
 case "$1 $2" in
 	'omnipin pack') printf 'bafyexpected\n' ;;
-	'omnipin ens')
+	'deploy:ens-update update')
 		echo write >> "$CALL_LOG"
 		touch "$WRITE_MARKER"
+		if [[ "$WRITE_RESULT" == submitted ]]; then exit 2; fi
+		if [[ "$WRITE_RESULT" == wrapper-failure ]]; then echo transaction-hash > "$ENS_TRANSACTION_STATE_FILE"; exit 1; fi
 		[[ "$WRITE_RESULT" == success ]]
 		;;
 	'deploy:ens-content-hash-check check')

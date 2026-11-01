@@ -2,7 +2,7 @@ import { cac } from 'cac'
 
 import { getErrorMessage } from '@/types/errors'
 
-import { ensPointsToCid, readEnsContentHashCid } from './ens-content-hash-checker-lib'
+import { readEnsContentHashCid } from './ens-content-hash-checker-lib'
 
 /**
  * CLI for checking whether an ENS domain already points at a given IPFS CID.
@@ -18,13 +18,13 @@ cli
 			const rpcUrl = options.rpcUrl ?? 'https://ethereum-rpc.publicnode.com'
 			const timeoutMs = Number(options.timeout ?? '60') * 1000
 
-			if (await ensPointsToCid(rpcUrl, domain, cid, timeoutMs)) {
+			const currentCid = await readEnsContentHashCid(rpcUrl, domain, timeoutMs)
+
+			if (currentCid === cid) {
 				process.stdout.write(`match\t${cid}\n`)
 
 				return
 			}
-
-			const currentCid = await readEnsContentHashCid(rpcUrl, domain, timeoutMs)
 
 			process.stdout.write(`no-match\t${currentCid ?? ''}\t${cid}\n`)
 		} catch (error) {

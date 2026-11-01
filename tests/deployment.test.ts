@@ -7,6 +7,8 @@ import { describe, expect, it } from 'vitest'
 
 describe.each(['true', 'false'])('ENS deployment (skip Helios: %s)', skipHelios => {
 	it.each([
+		{ before: 'mismatch', after: 'match', write: 'submitted', success: false, writes: 1 },
+		{ before: 'mismatch', after: 'match', write: 'wrapper-failure', success: false, writes: 1 },
 		{ before: 'match', after: 'error', write: 'failure', success: true, writes: 0 },
 		{ before: 'mismatch', after: 'match', write: 'success', success: true, writes: 1 },
 		{ before: 'error', after: 'match', write: 'success', success: true, writes: 1 },
@@ -45,7 +47,9 @@ describe.each(['true', 'false'])('ENS deployment (skip Helios: %s)', skipHelios 
 			})
 
 			expect(result.error).toBeUndefined()
-			expect(result.status, result.stderr).toBe(scenario.success ? 0 : 1)
+			expect(result.status, result.stderr).toBe(
+				scenario.success ? 0 : ['submitted', 'wrapper-failure'].includes(scenario.write) ? 2 : 1,
+			)
 			expect(
 				readFileSync(calls, 'utf8')
 					.split('\n')

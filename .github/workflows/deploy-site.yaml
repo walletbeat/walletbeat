@@ -1,16 +1,23 @@
-name: Deploy
+name: Deploy site
 
 on:
-  push:
-    branches:
-      - beta
+  workflow_call:
+    inputs:
+      ens_domain:
+        required: true
+        type: string
+    secrets:
+      updater_key:
+        required: true
+      pin_token:
+        required: true
 
 env:
-  ENS_DOMAIN: beta.walletbeat.eth
+  ENS_DOMAIN: ${{ inputs.ens_domain }}
 
-# Only one deployment may update the resolver at a time.
+# The deployment domains share a signing account; serialize their nonce usage.
 concurrency:
-  group: deploy-beta-ens
+  group: walletbeat-ens-deployment
   cancel-in-progress: false
 
 jobs:
@@ -108,19 +115,19 @@ jobs:
         run: ./deploy/check-existing-pin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          ACCESS_TOKEN_4EVERLAND: ${{ secrets.pin_token }}
       - name: Deploy on IPFS
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/deploy-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+          OMNIPIN_FILECOIN_TOKEN: ${{ secrets.updater_key }}
       - name: Pin on 4EVERLAND
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/pin-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.pin_token }}
   update-ens:
     name: Update ENS records
     runs-on: ubuntu-latest
@@ -153,11 +160,11 @@ jobs:
         run: ./deploy/check-ipfs-availability.sh
         env:
           DEPLOY_DIRECTORY: dist
-      - name: Update beta.walletbeat.eth ENS records
+      - name: Update ENS records
         run: ./deploy/update-ens.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+          OMNIPIN_PK: ${{ secrets.updater_key }}
           SKIP_HELIOS: 'false'
   # Pins are retained because their age does not prove that ENS names or
   # cached gateways no longer serve them. Removal requires an ownership audit.

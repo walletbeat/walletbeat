@@ -20,6 +20,12 @@ if [[ -z "${OMNIPIN_PK:-}" ]]; then
 	exit 1
 fi
 
+# Keep submission state outside the Helios process so wrapper failures cannot
+# turn an uncertain broadcast into another signed transaction.
+ENS_TRANSACTION_STATE_FILE="$(mktemp)"
+export ENS_TRANSACTION_STATE_FILE
+trap 'rm -f "$ENS_TRANSACTION_STATE_FILE"' EXIT
+
 RPC_URLS=(
 	'https://public.1rpc.io/eth'
 	'https://ethereum-rpc.publicnode.com'
@@ -61,14 +67,18 @@ echo "Updating ENS domain name record to CID: ${DIRECTORY_CID}" >&2
 
 while IFS= read -r RPC_URL; do
 	echo "Trying RPC URL: ${RPC_URL}..."
+	STATUS=0
 	if [[ "${SKIP_HELIOS:-false}" == true ]]; then
-		if pnpm omnipin ens --rpc-url "$RPC_URL" "$DIRECTORY_CID" "$ENS_DOMAIN"; then
-			break
-		fi
+		pnpm deploy:ens-update update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url "$RPC_URL" || STATUS=$?
 	else
-		if ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$RPC_URL" pnpm helios:wrap pnpm omnipin ens --rpc-url='$HELIOS_RPC_ENDPOINT' "$DIRECTORY_CID" "$ENS_DOMAIN"; then
-			break
-		fi
+		ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$RPC_URL" pnpm helios:wrap pnpm deploy:ens-update update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url='$HELIOS_RPC_ENDPOINT' --pending-rpc-url "$RPC_URL" || STATUS=$?
+	fi
+	if [[ "$STATUS" == 0 ]]; then
+		break
+	fi
+	if [[ -s "$ENS_TRANSACTION_STATE_FILE" || "$STATUS" != 1 ]]; then
+		echo 'ENS transaction requires reconciliation; stopping automatic retries.' >&2
+		exit 2
 	fi
 done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
 

@@ -1,22 +1,40 @@
-import { AbiFunction, Address, Bytes, Ens, Hex } from 'ox'
+import { AbiFunction, Address, Bytes, Ens, Hex, RpcTransport } from 'ox'
 
-import { getErrorMessage, prefixError } from '@/types/errors'
+import { prefixError } from '@/types/errors'
 
-/**
- * The canonical ENS registry contract on Ethereum mainnet.
- * The `resolver(bytes32)` function is used to look up the resolver
- * responsible for a name.
- */
-const ENS_REGISTRY_ADDRESS = Address.from('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
+/** Mainnet Universal Resolver; resolves both ENSv1 and ENSv2 names. */
+export const UNIVERSAL_RESOLVER_ADDRESS = Address.from('0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe')
 
-/** The `resolver(bytes32 node) returns (address)` view function on the ENS registry. */
-const resolverAbi = {
-	name: 'resolver',
+export const resolveAbi = {
+	name: 'resolve',
 	type: 'function',
-	inputs: [{ name: 'node', type: 'bytes32' }],
-	outputs: [{ name: '', type: 'address' }],
+	inputs: [
+		{ name: 'name', type: 'bytes' },
+		{ name: 'data', type: 'bytes' },
+	],
+	outputs: [
+		{ name: 'result', type: 'bytes' },
+		{ name: 'resolver', type: 'address' },
+	],
 	stateMutability: 'view',
 } as const
+
+/** Encode a normalized ENS name as DNS wire-format labels. */
+export function encodeEnsName(domain: string): Hex.Hex {
+	const labels = Ens.normalize(domain)
+		.split('.')
+		.map(label => {
+			const bytes = new TextEncoder().encode(label)
+
+			if (bytes.length === 0 || bytes.length > 63) {
+				throw new Error('ENS deployment requires DNS labels of 1–63 bytes.')
+			}
+
+			return Bytes.concat(Uint8Array.of(bytes.length), bytes)
+		})
+
+	return Hex.fromBytes(Bytes.concat(...labels, Uint8Array.of(0)))
+}
 
 /** The `contenthash(bytes32 node) returns (bytes)` view function on an ENS resolver. */
 const contenthashAbi = {
@@ -122,49 +140,26 @@ export function contentHashToCid(contentHash: Hex.Hex): string | null {
 	return `b${base32Encode(bytes.subarray(prefixLength))}`
 }
 
-/** Minimal JSON-RPC client used to make `eth_call` queries against an RPC URL. */
-
-const ETH_CALL_GAS = '0x100000' // 1_048_576
-
-async function ethCall(
-	rpcUrl: string,
-	to: Address.Address,
-	data: Hex.Hex,
-	timeoutMs: number,
-): Promise<Hex.Hex> {
-	const response = await fetch(rpcUrl, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			jsonrpc: '2.0',
-			method: 'eth_call',
-			params: [{ to, data, gas: ETH_CALL_GAS }, 'latest'],
-			id: 1,
-		}),
-		signal: AbortSignal.timeout(timeoutMs),
+/** Resolve through the universal entry point, including migrated and wildcard names. */
+export async function readEnsContentHash(
+	transport: RpcTransport.Http,
+	domain: string,
+): Promise<{ cid: string | null; resolver: Address.Address }> {
+	const data = AbiFunction.encodeData(resolveAbi, [
+		encodeEnsName(domain),
+		AbiFunction.encodeData(contenthashAbi, [Ens.namehash(Ens.normalize(domain))]),
+	])
+	const result = await transport.request({
+		method: 'eth_call',
+		params: [{ to: UNIVERSAL_RESOLVER_ADDRESS, data, gas: '0x100000' }, 'latest'],
 	})
+	const [encoded, resolver] = AbiFunction.decodeResult(resolveAbi, result)
 
-	if (!response.ok) {
-		throw new Error(`RPC request failed with HTTP status ${response.status}.`)
+	if (resolver === '0x0000000000000000000000000000000000000000') {
+		throw new Error('Universal resolution returned no resolver.')
 	}
 
-	const payload: unknown = await response.json()
-
-	if (typeof payload !== 'object' || payload === null) {
-		throw new Error('RPC returned an unexpected response.')
-	}
-
-	const { error, result } = payload as { error?: unknown; result?: unknown }
-
-	if (error !== undefined) {
-		throw new Error(`RPC returned an error: ${getErrorMessage(error)}`)
-	}
-
-	if (!Hex.validate(result)) {
-		throw new Error('RPC returned an unexpected response for eth_call.')
-	}
-
-	return result
+	return { cid: contentHashToCid(AbiFunction.decodeResult(contenthashAbi, encoded)), resolver }
 }
 
 /** Read the ENS content-hash currently set for `domain` through `rpcUrl`. */
@@ -173,50 +168,10 @@ export async function readEnsContentHashCid(
 	domain: string,
 	timeoutMs: number,
 ): Promise<string | null> {
-	const node = Ens.namehash(domain)
-	const resolverCalldata = AbiFunction.encodeData(resolverAbi, [node])
-
-	let resolverData: Hex.Hex
-
 	try {
-		resolverData = await ethCall(rpcUrl, ENS_REGISTRY_ADDRESS, resolverCalldata, timeoutMs)
+		return (await readEnsContentHash(RpcTransport.fromHttp(rpcUrl, { timeout: timeoutMs }), domain))
+			.cid
 	} catch (error) {
-		throw prefixError('Failed to query ENS resolver', error)
-	}
-
-	const resolverAddress = Address.from(AbiFunction.decodeResult(resolverAbi, resolverData))
-
-	if (resolverAddress === Address.from('0x0000000000000000000000000000000000000000')) {
-		return null
-	}
-
-	const contenthashCalldata = AbiFunction.encodeData(contenthashAbi, [node])
-
-	let contenthashData: Hex.Hex
-
-	try {
-		contenthashData = await ethCall(rpcUrl, resolverAddress, contenthashCalldata, timeoutMs)
-	} catch (error) {
-		throw prefixError('Failed to query ENS resolver content-hash', error)
-	}
-
-	const contentHash = AbiFunction.decodeResult(contenthashAbi, contenthashData)
-
-	return contentHashToCid(contentHash)
-}
-
-/** Determine whether `domain` already points at `expectedCid`. */
-export async function ensPointsToCid(
-	rpcUrl: string,
-	domain: string,
-	expectedCid: string,
-	timeoutMs: number,
-): Promise<boolean> {
-	try {
-		const currentCid = await readEnsContentHashCid(rpcUrl, domain, timeoutMs)
-
-		return currentCid === expectedCid
-	} catch (error) {
-		throw prefixError(`Could not determine whether ${domain} points at ${expectedCid}`, error)
+		throw prefixError('Failed to resolve ENS content-hash', error)
 	}
 }

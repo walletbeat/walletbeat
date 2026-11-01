@@ -1,0 +1,15 @@
+name: Deploy (beta)
+
+on:
+  push:
+    branches:
+      - beta
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-site.yaml
+    with:
+      ens_domain: beta.walletbeat.eth
+    secrets:
+      updater_key: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+      pin_token: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
