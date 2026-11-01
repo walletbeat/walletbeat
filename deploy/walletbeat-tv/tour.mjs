@@ -50,6 +50,7 @@ try {
 const context = browser.contexts()[0]
 context.setDefaultTimeout(5000)
 context.setDefaultNavigationTimeout(30000)
+const inactivityMs = 15_000
 let lastInputTime = 0
 let currentInputRevision = 0
 const recordInput = () => {
@@ -58,6 +59,7 @@ const recordInput = () => {
 }
 let page
 let running = true
+await context.exposeBinding('walletbeatTVIsPaused', () => Date.now() - lastInputTime < inactivityMs)
 await context.exposeBinding('walletbeatTVInput', source => {
 	page = source.page
 	recordInput()
@@ -107,20 +109,22 @@ await context.addInitScript(origin => {
 		}
 	}
 	let cancelScroll
+	let inputRevision = 0
+	let inputReported = Promise.resolve()
 	const interrupt = () => {
 		cancelScroll?.()
 		if (location.origin === origin) {
 			saveCursor()
 			window.walletbeatTVPaused = true
 			window.walletbeatTVExpectedMoves = []
-			sessionStorage.setItem('walletbeat-tv-last-input', String(Date.now()))
 			document.documentElement.removeAttribute('data-walletbeat-tv')
 			const cursor = document.getElementById('walletbeat-tv-cursor')
 			if (cursor) {
 				cursor.style.opacity = '0'
 			}
 		}
-		window.walletbeatTVInput()
+		inputRevision++
+		inputReported = window.walletbeatTVInput()
 	}
 	let wasAway = document.hidden
 	const activate = event => {
@@ -196,9 +200,9 @@ await context.addInitScript(origin => {
 			frameId = requestAnimationFrame(frame)
 		})
 	let renderCursor
-	const attach = () => {
-		window.walletbeatTVPaused =
-			Date.now() - Number(sessionStorage.getItem('walletbeat-tv-last-input') ?? 0) < 15_000
+	const attach = async () => {
+		const paused = await window.walletbeatTVIsPaused()
+		window.walletbeatTVPaused = !!window.walletbeatTVPaused || paused
 		const style = document.createElement('style')
 		style.textContent = 'html[data-walletbeat-tv] * { cursor: none !important }'
 		const playbackStyle = document.createElement('style')
@@ -246,6 +250,18 @@ await context.addInitScript(origin => {
 				return false
 			}
 			renderCursor(position, settled)
+			return true
+		}
+		window.walletbeatTVResume = async () => {
+			const revision = inputRevision
+			await inputReported
+			const paused = await window.walletbeatTVIsPaused()
+			if (paused || revision !== inputRevision) {
+				return false
+			}
+			window.walletbeatTVPaused = false
+			document.documentElement.setAttribute('data-walletbeat-tv', '')
+			cursor.style.opacity = '1'
 			return true
 		}
 		document.documentElement.append(cursor)
@@ -390,7 +406,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
 }
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 const interrupted = inputRevision =>
-	!running || currentInputRevision !== inputRevision || Date.now() - lastInputTime < 15_000
+	!running || currentInputRevision !== inputRevision || Date.now() - lastInputTime < inactivityMs
 async function waitUnlessInterrupted(ms, inputRevision) {
 	const deadline = performance.now() + ms
 	do {
@@ -647,6 +663,7 @@ async function validateNavigation() {
 async function waitForVisibleContent(inputRevision) {
 	await page.waitForFunction(
 		() =>
+			typeof window.walletbeatTVResume === 'function' &&
 			!document.documentElement.hasAttribute('data-astro-transition') &&
 			!!document.querySelector('main') &&
 			!Array.from(document.querySelectorAll('main astro-island[ssr]')).some(island =>
@@ -1202,7 +1219,7 @@ let failedAttempts = 0
 let recoveredNavigation = false
 while (running) {
 	try {
-		while (running && Date.now() - lastInputTime < 15_000) {
+		while (running && Date.now() - lastInputTime < inactivityMs) {
 			await delay(100)
 		}
 		if (!running) {
@@ -1236,23 +1253,12 @@ while (running) {
 			await delay(1000)
 			continue
 		}
-		const resumed = await page.evaluate(() => {
-			if (Date.now() - Number(sessionStorage.getItem('walletbeat-tv-last-input') ?? 0) < 15_000) {
-				return false
-			}
-			window.walletbeatTVPaused = false
-			document.documentElement.setAttribute('data-walletbeat-tv', '')
-			const cursor = document.getElementById('walletbeat-tv-cursor')
-			if (cursor) {
-				cursor.style.opacity = '1'
-			}
-			return true
-		})
+		await waitForVisibleContent(inputRevision)
+		const resumed = await page.evaluate(() => window.walletbeatTVResume())
 		if (!resumed) {
 			await delay(100)
 			continue
 		}
-		await waitForVisibleContent(inputRevision)
 		await validateNavigation()
 		// Reconcile from the live document after a visitor browses, rather than replaying a stale step.
 		const groups = await page.locator('.attribute-group[id]').evaluateAll(elements =>
@@ -1289,7 +1295,7 @@ while (running) {
 		if (!running) {
 			break
 		}
-		if (error.message === 'interrupted' || Date.now() - lastInputTime < 15_000) {
+		if (error.message === 'interrupted' || Date.now() - lastInputTime < inactivityMs) {
 			continue
 		}
 		console.error(error.message)

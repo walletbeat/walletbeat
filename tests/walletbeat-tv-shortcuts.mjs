@@ -1,3 +1,4 @@
+import './walletbeat-tv-activity.mjs'
 import './walletbeat-tv-installation.mjs'
 import './walletbeat-tv-uninstall.mjs'
 
