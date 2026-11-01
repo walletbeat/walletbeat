@@ -44,7 +44,7 @@ jobs:
     env:
       # Public address only: no signing key or deployment secrets are available.
       ENS_UPDATER: '0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86'
-      ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT: https://ethereum-rpc.publicnode.com
+      ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT: https://eth.drpc.org
     steps:
       - uses: actions/checkout@v6.0.3
       - uses: pnpm/action-setup@v6.0.9
