@@ -455,6 +455,22 @@
 		"hash": "f7633cc320119eb5dfe61606e7c1b378034e9c91b54c43f0ba6bddd6e2abf5cc",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-eth-send-review.png": {
+		"hash": "cc479b0f3cf736b311ab9eb101404f421a68c2a366e6eaec16ccf2b1a4f169ba",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-details.png": {
+		"hash": "df39b39b06fbd1fc139340e3713cbde254b1b733091d088a07bddc9ff2dc77ec",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-review.png": {
+		"hash": "45baf210ccc4704993cc26ab7d08ac41c6168a356c7481463cb50969c9a48bb2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-token-send-review.png": {
+		"hash": "9fc3dc114546f821df68e5fb19e42d78c90800424a146645e37105536f6cd5f8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
 		"hash": "15b963a47d182358a47c8f7fdaaee0b22ecf3f6a1280e21f8f225a101b7a6ac0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
