@@ -202,7 +202,13 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.ONCHAIN_APP_FEE]: true,
 							[FeeType.WALLET_FEE]: true,
 						},
-						shownAfterSingleAction: 'NO_ACTION_POSSIBLE',
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.AGGREGATED,
 							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
