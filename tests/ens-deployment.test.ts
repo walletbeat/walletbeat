@@ -77,6 +77,7 @@ function fixture(scenario: Scenario = {}) {
 				result = scenario.pending && params[1] === 'pending' ? '0x1' : '0x0'
 				break
 			case 'eth_estimateGas':
+				expect(params[1]).toBe('latest')
 				result = scenario.gasEstimate ?? '0xd736'
 				break
 			case 'eth_getBlockByNumber':

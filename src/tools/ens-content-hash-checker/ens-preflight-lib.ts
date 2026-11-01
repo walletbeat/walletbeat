@@ -89,7 +89,7 @@ export async function simulateEnsUpdate(
 		BigInt(
 			await transport.request({
 				method: 'eth_estimateGas',
-				params: [{ ...call, gas: Hex.fromNumber(MAX_GAS) }],
+				params: [{ ...call, gas: Hex.fromNumber(MAX_GAS) }, 'latest'],
 			}),
 		),
 	)
