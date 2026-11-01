@@ -38,43 +38,18 @@ RPC_URLS=(
 
 DIRECTORY_CID="$(pnpm omnipin pack --only-hash "$DEPLOY_DIRECTORY")"
 
-run_ens_check() {
-	local rpc_url="$1"
-	if [[ "${SKIP_HELIOS:-false}" == true ]]; then
-		pnpm deploy:ens-content-hash-check check "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url "$rpc_url"
-	else
-		ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$rpc_url" pnpm helios:wrap pnpm deploy:ens-content-hash-check check "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url='$HELIOS_RPC_ENDPOINT'
-	fi
-}
-
-# Before writing anything on-chain, check whether the ENS domain already points
-# at the current CID.
-while IFS= read -r RPC_URL; do
-	echo "Checking whether ${ENS_DOMAIN} already points at ${DIRECTORY_CID} (using RPC: ${RPC_URL})..." >&2
-	CHECK_OUTPUT="$(run_ens_check "$RPC_URL")" || continue
-	if [[ "$CHECK_OUTPUT" == "match"$'\t'"$DIRECTORY_CID" ]]; then
-		echo "ENS domain ${ENS_DOMAIN} already points at ${DIRECTORY_CID}; nothing to update." >&2
-		exit 0
-	fi
-	if [[ "$CHECK_OUTPUT" == "no-match"$'\t'* ]]; then
-		echo "ENS domain ${ENS_DOMAIN} points at a different content-hash; updating." >&2
-		break
-	fi
-	echo "Could not verify the ENS content-hash via ${RPC_URL}." >&2
-done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
-
 echo "Updating ENS domain name record to CID: ${DIRECTORY_CID}" >&2
 
 while IFS= read -r RPC_URL; do
 	echo "Trying RPC URL: ${RPC_URL}..."
 	STATUS=0
 	if [[ "${SKIP_HELIOS:-false}" == true ]]; then
-		pnpm deploy:ens-update update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url "$RPC_URL" || STATUS=$?
+		pnpm deploy:ens update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url "$RPC_URL" || STATUS=$?
 	else
-		ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$RPC_URL" pnpm helios:wrap pnpm deploy:ens-update update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url='$HELIOS_RPC_ENDPOINT' --pending-rpc-url "$RPC_URL" || STATUS=$?
+		ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$RPC_URL" pnpm helios:wrap pnpm deploy:ens update "$ENS_DOMAIN" "$DIRECTORY_CID" --rpc-url='$HELIOS_RPC_ENDPOINT' --pending-rpc-url "$RPC_URL" || STATUS=$?
 	fi
 	if [[ "$STATUS" == 0 ]]; then
-		break
+		exit 0
 	fi
 	if [[ -s "$ENS_TRANSACTION_STATE_FILE" || "$STATUS" != 1 ]]; then
 		echo 'ENS transaction requires reconciliation; stopping automatic retries.' >&2
@@ -82,16 +57,5 @@ while IFS= read -r RPC_URL; do
 	fi
 done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
 
-# A command may report success before the record is visible, or fail after its
-# transaction was submitted. Only the resolver determines deployment success.
-while IFS= read -r RPC_URL; do
-	echo "Verifying ${ENS_DOMAIN} points at ${DIRECTORY_CID} (using RPC: ${RPC_URL})..." >&2
-	CHECK_OUTPUT="$(run_ens_check "$RPC_URL")" || continue
-	if [[ "$CHECK_OUTPUT" == "match"$'\t'"$DIRECTORY_CID" ]]; then
-		echo "Verified ENS domain ${ENS_DOMAIN} points at ${DIRECTORY_CID}." >&2
-		exit 0
-	fi
-done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
-
-echo "Failed to verify ENS domain ${ENS_DOMAIN} points at ${DIRECTORY_CID} after exhausting RPC attempts." >&2
+echo "Failed to update and verify ENS domain ${ENS_DOMAIN} after exhausting RPC attempts." >&2
 exit 1

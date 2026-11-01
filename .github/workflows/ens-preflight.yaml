@@ -55,7 +55,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Simulate using direct RPC
         if: matrix.transport == 'direct'
-        run: pnpm deploy:ens-preflight check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url "$ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT"
+        run: pnpm deploy:ens check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url "$ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT"
       - name: Simulate through pinned Helios
         if: matrix.transport == 'helios'
-        run: pnpm helios:wrap pnpm deploy:ens-preflight check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url='$HELIOS_RPC_ENDPOINT'
+        run: pnpm helios:wrap pnpm deploy:ens check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url='$HELIOS_RPC_ENDPOINT'

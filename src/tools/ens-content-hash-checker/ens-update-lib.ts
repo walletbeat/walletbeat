@@ -1,4 +1,7 @@
-import { Address, Hash, Hex, RpcTransport, Secp256k1, TxEnvelopeEip1559 } from 'ox'
+import { Hex, RpcTransport } from 'ox'
+import { createWalletClient, custom, keccak256, publicActions } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { mainnet } from 'viem/chains'
 
 import { readEnsContentHash } from './ens-content-hash-checker-lib'
 import { simulateEnsUpdate } from './ens-preflight-lib'
@@ -15,7 +18,12 @@ export async function updateEnsContentHash(
 	onSubmission: (transactionHash: Hex.Hex) => void,
 	pendingTransport: RpcTransport.Http = transport,
 ): Promise<void> {
-	if (BigInt(await transport.request({ method: 'eth_chainId' })) !== 1n) {
+	const client = createWalletClient({
+		chain: mainnet,
+		transport: custom(transport, { retryCount: 0 }),
+	}).extend(publicActions)
+
+	if ((await client.getChainId()) !== mainnet.id) {
 		throw new Error('ENS deployment requires Ethereum mainnet.')
 	}
 
@@ -25,97 +33,76 @@ export async function updateEnsContentHash(
 		return
 	}
 
-	let from: Address.Address
+	let account: ReturnType<typeof privateKeyToAccount>
 
 	try {
-		from = Address.fromPublicKey(Secp256k1.getPublicKey({ privateKey }))
+		account = privateKeyToAccount(privateKey)
 	} catch {
 		throw new Error('Invalid ENS updater private key.')
 	}
 
-	const latestNonce = BigInt(
-		await transport.request({ method: 'eth_getTransactionCount', params: [from, 'latest'] }),
-	)
+	const nonce = await client.getTransactionCount({ address: account.address, blockTag: 'latest' })
 	const pendingNonce = BigInt(
 		await pendingTransport.request({
 			method: 'eth_getTransactionCount',
-			params: [from, 'pending'],
+			params: [account.address, 'pending'],
 		}),
 	)
 
-	if (pendingNonce !== latestNonce) {
+	if (pendingNonce !== BigInt(nonce)) {
 		throw new SubmissionError(
 			'Updater has a pending transaction; reconcile it before another deployment.',
 		)
 	}
 
-	const { call, gas } = await simulateEnsUpdate(transport, domain, cid, from, current.resolver)
-	const block = await transport.request({
-		method: 'eth_getBlockByNumber',
-		params: ['latest', false],
-	})
-
-	if (block === null || block.baseFeePerGas === undefined) {
-		throw new Error('RPC did not provide a mainnet base fee.')
-	}
-
-	const priority = BigInt(await transport.request({ method: 'eth_maxPriorityFeePerGas' }))
-	const transaction = TxEnvelopeEip1559.from({
-		chainId: 1,
+	const { call, gas } = await simulateEnsUpdate(
+		transport,
+		domain,
+		cid,
+		account.address,
+		current.resolver,
+	)
+	const request = await client.prepareTransactionRequest({
+		account,
 		to: call.to,
 		data: call.data,
-		nonce: latestNonce,
+		nonce,
 		gas,
-		maxPriorityFeePerGas: priority,
-		maxFeePerGas: BigInt(block.baseFeePerGas) * 2n + priority,
 		value: 0n,
+		type: 'eip1559',
+		parameters: ['fees', 'chainId'],
 	})
-	const signature = Secp256k1.sign({
-		payload: TxEnvelopeEip1559.getSignPayload(transaction),
-		privateKey,
-	})
-	const serialized = TxEnvelopeEip1559.serialize(transaction, { signature })
-	const transactionHash = Hash.keccak256(serialized)
+	const serialized = await client.signTransaction(request)
+	const transactionHash = keccak256(serialized)
 
 	process.stderr.write(`Submitting ENS transaction ${transactionHash} with gas limit ${gas}.\n`)
 	onSubmission(transactionHash)
 
 	try {
-		const returnedHash = await transport.request({
-			method: 'eth_sendRawTransaction',
-			params: [serialized],
-		})
+		const returnedHash = await client.sendRawTransaction({ serializedTransaction: serialized })
 
 		if (returnedHash.toLowerCase() !== transactionHash.toLowerCase()) {
 			throw new Error('RPC returned a different transaction hash.')
 		}
 
-		const deadline = Date.now() + 120_000
+		const receipt = await client.waitForTransactionReceipt({
+			hash: transactionHash,
+			timeout: 120_000,
+			pollingInterval: 2_000,
+			checkReplacement: false,
+			retryCount: 0,
+		})
 
-		while (Date.now() < deadline) {
-			const receipt = await transport.request({
-				method: 'eth_getTransactionReceipt',
-				params: [transactionHash],
-			})
-
-			if (receipt !== null) {
-				if (
-					receipt.status !== '0x1' ||
-					receipt.transactionHash.toLowerCase() !== transactionHash.toLowerCase()
-				) {
-					throw new Error('ENS transaction receipt did not confirm success.')
-				}
-
-				if ((await readEnsContentHash(transport, domain)).cid !== cid) {
-					throw new Error('Confirmed transaction did not resolve to the intended CID.')
-				}
-
-				return
-			}
-
-			await new Promise<void>(resolve => setTimeout(resolve, 2_000))
+		if (
+			receipt.status !== 'success' ||
+			receipt.transactionHash.toLowerCase() !== transactionHash.toLowerCase()
+		) {
+			throw new Error('ENS transaction receipt did not confirm success.')
 		}
-		throw new Error('Timed out waiting for the ENS transaction receipt.')
+
+		if ((await readEnsContentHash(transport, domain)).cid !== cid) {
+			throw new Error('Confirmed transaction did not resolve to the intended CID.')
+		}
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : 'RPC failure'
 

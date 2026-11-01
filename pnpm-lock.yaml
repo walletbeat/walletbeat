@@ -219,6 +219,9 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+      viem:
+        specifier: 2.46.3
+        version: 2.46.3(typescript@6.0.3)(zod@4.6.7)
       vitest:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@22.20.4)(vite@8.3.4(@types/node@22.20.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.1))

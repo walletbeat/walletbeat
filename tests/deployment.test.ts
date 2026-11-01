@@ -7,19 +7,12 @@ import { describe, expect, it } from 'vitest'
 
 describe.each(['true', 'false'])('ENS deployment (skip Helios: %s)', skipHelios => {
 	it.each([
-		{ before: 'mismatch', after: 'match', write: 'submitted', success: false, writes: 1 },
-		{ before: 'mismatch', after: 'match', write: 'wrapper-failure', success: false, writes: 1 },
-		{ before: 'match', after: 'error', write: 'failure', success: true, writes: 0 },
-		{ before: 'mismatch', after: 'match', write: 'success', success: true, writes: 1 },
-		{ before: 'error', after: 'match', write: 'success', success: true, writes: 1 },
-		{ before: 'mismatch', after: 'match', write: 'failure', success: true, writes: 7 },
-		{ before: 'mismatch', after: 'mismatch', write: 'failure', success: false, writes: 7 },
-		{ before: 'mismatch', after: 'mismatch', write: 'success', success: false, writes: 1 },
-		{ before: 'error', after: 'error', write: 'success', success: false, writes: 1 },
-		{ before: 'failed-match', after: 'failed-match', write: 'success', success: false, writes: 1 },
-		{ before: 'wrong', after: 'wrong', write: 'success', success: false, writes: 1 },
-		{ before: 'malformed', after: 'malformed', write: 'success', success: false, writes: 1 },
-	])('requires verified state: $before / $write / $after', scenario => {
+		{ write: 'success', status: 0, writes: 1 },
+		{ write: 'failure', status: 1, writes: 7 },
+		{ write: 'fallback', status: 0, writes: 2 },
+		{ write: 'submitted', status: 2, writes: 1 },
+		{ write: 'wrapper-failure', status: 2, writes: 1 },
+	])('contains retries: $write', scenario => {
 		const directory = mkdtempSync(join(tmpdir(), 'ens-deployment-'))
 		const calls = join(directory, 'calls')
 
@@ -39,17 +32,12 @@ describe.each(['true', 'false'])('ENS deployment (skip Helios: %s)', skipHelios 
 					SKIP_HELIOS: skipHelios,
 					DEBUG: '',
 					CALL_LOG: calls,
-					WRITE_MARKER: join(directory, 'written'),
-					BEFORE_RESULT: scenario.before,
-					AFTER_RESULT: scenario.after,
 					WRITE_RESULT: scenario.write,
 				},
 			})
 
 			expect(result.error).toBeUndefined()
-			expect(result.status, result.stderr).toBe(
-				scenario.success ? 0 : ['submitted', 'wrapper-failure'].includes(scenario.write) ? 2 : 1,
-			)
+			expect(result.status, result.stderr).toBe(scenario.status)
 			expect(
 				readFileSync(calls, 'utf8')
 					.split('\n')

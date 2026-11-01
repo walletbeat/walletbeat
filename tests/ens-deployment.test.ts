@@ -1,5 +1,5 @@
 import { z } from 'astro/zod'
-import { AbiFunction, Hash, Hex, RpcTransport, TxEnvelopeEip1559 } from 'ox'
+import { AbiFunction, Ens, Hash, Hex, RpcTransport, TxEnvelopeEip1559 } from 'ox'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -80,6 +80,9 @@ function fixture(scenario: Scenario = {}) {
 				expect(params[1]).toBe('latest')
 				result = scenario.gasEstimate ?? '0xd736'
 				break
+			case 'eth_blockNumber':
+				result = '0x1'
+				break
 			case 'eth_getBlockByNumber':
 				result = { baseFeePerGas: '0x3b9aca00' }
 				break
@@ -149,6 +152,8 @@ function fixture(scenario: Scenario = {}) {
 						? null
 						: {
 								status: scenario.receipt === 'failure' ? '0x0' : '0x1',
+								logs: [],
+								blockNumber: '0x1',
 								transactionHash: scenario.receipt === 'wrong-hash' ? '0x00' : transactionHash,
 							}
 				break
@@ -214,6 +219,33 @@ describe('universal ENS deployment', () => {
 
 			expect(transaction.gas).toBe(100_000n)
 			expect(transaction.chainId).toBe(1)
+			expect(transaction.nonce).toBe(0n)
+			expect(transaction.to?.toLowerCase()).toBe(RESOLVER.toLowerCase())
+			const setter = {
+				name: 'setContenthash',
+				type: 'function',
+				inputs: [{ type: version === 1 ? 'bytes32' : 'bytes' }, { type: 'bytes' }],
+				outputs: [],
+				stateMutability: 'nonpayable',
+			} as const
+
+			expect(AbiFunction.decodeData(setter, transaction.data ?? '0x')).toEqual([
+				version === 1 ? Ens.namehash('beta.walletbeat.eth') : encodeEnsName('beta.walletbeat.eth'),
+				cidToContentHash(NEW_CID),
+			])
+			const simulated = f.requests.findLast(
+				request =>
+					request.method === 'eth_call' &&
+					z.object({ to: z.string() }).parse(request.params[0]).to.toLowerCase() ===
+						RESOLVER.toLowerCase(),
+			)
+			const simulatedCall = z
+				.object({ data: z.custom<Hex.Hex>(Hex.validate), gas: z.custom<Hex.Hex>(Hex.validate) })
+				.parse(simulated?.params[0])
+
+			expect(transaction.data).toBe(simulatedCall.data)
+			expect(transaction.gas).toBe(BigInt(simulatedCall.gas))
+
 			expect(transaction.data?.startsWith(version === 1 ? '0x304e6ade' : '0xc5d7badd')).toBe(true)
 			expect(f.marker).toHaveBeenCalledWith(Hash.keccak256(raw))
 			expect(
@@ -285,7 +317,7 @@ describe('universal ENS deployment', () => {
 	it('bounds receipt waiting without submitting another transaction', async () => {
 		vi.useFakeTimers()
 		const f = fixture({ receipt: 'missing' })
-		const outcome = expect(f.update()).rejects.toThrow('Timed out')
+		const outcome = expect(f.update()).rejects.toThrow('Timed out while waiting for transaction')
 
 		await vi.runAllTimersAsync()
 		await outcome

@@ -54,8 +54,7 @@
 		"collect:snippets": "tsx src/tools/code-snippet-collector/code-snippet-collector.ts",
 		"deploy:4everland-pin-tool": "tsx src/4everland-pin-tool/4everland-pin-tool.ts",
 		"deploy:ens-content-hash-check": "node --import tsx src/tools/ens-content-hash-checker/ens-content-hash-checker.ts",
-		"deploy:ens-preflight": "node --import tsx src/tools/ens-content-hash-checker/ens-preflight.ts",
-		"deploy:ens-update": "node --import tsx src/tools/ens-content-hash-checker/ens-update.ts",
+		"deploy:ens": "node --import tsx src/tools/ens-content-hash-checker/ens.ts",
 		"deploy:ipfs-availability-check": "tsx src/tools/ipfs-availability-checker/ipfs-availability-checker.ts",
 		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:agent": "cross-env WALLETBEAT_ENV=AGENT tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
@@ -138,6 +137,7 @@
 		"ttf2woff": "3.0.0",
 		"ttf2woff2": "8.0.1",
 		"typescript": "^6.0.3",
+		"viem": "2.46.3",
 		"vitest": "^4.1.11"
 	},
 	"prettier": {
