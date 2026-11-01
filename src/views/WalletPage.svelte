@@ -2418,9 +2418,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					view-timeline-axis: block, inline;
 					view-timeline-inset: var(---pie-compactBlockStart) 0, 0;
 
-					&:is([data-wallet-toc-state="open"], [data-wallet-toc-state="closing"]) .pie-navigation-geometry,
-					&:is([data-wallet-toc-state="open"], [data-wallet-toc-state="closing"])::before {
-						animation-name: none;
+					&:is(:global([data-wallet-toc-state="open"]), :global([data-wallet-toc-state="closing"])) {
+						.pie-navigation-geometry,
+						&::before {
+							animation-name: none;
+						}
 					}
 
 					&::before {
