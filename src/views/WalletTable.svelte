@@ -171,7 +171,8 @@
 	// State
 	const canHoverDetails = (event: MouseEvent) => {
 		const details = event.currentTarget instanceof Element ? event.currentTarget.closest('details') : null
-		return details !== null && (details.open || hasVisiblePopoverInvoker(details))
+		const target = details?.querySelector<HTMLElement>(':scope > [popover]')
+		return details !== null && (details.open || (target != null && hasVisiblePopoverInvoker(details, target)))
 	}
 
 	let selectedAttribute: string | undefined = $state(
