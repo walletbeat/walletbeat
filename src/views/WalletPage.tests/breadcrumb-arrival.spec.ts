@@ -56,7 +56,10 @@ for (const { direction, width, requiresCurve } of [
 								animation.animationName === 'breadcrumb-arrival',
 						)
 
-					if (!animation?.effect || !(animation.timeline instanceof ViewTimeline)) {
+					if (
+						!(animation?.effect instanceof KeyframeEffect) ||
+						!(animation.timeline instanceof ViewTimeline)
+					) {
 						throw new Error('Resolved native rounded arrival required')
 					}
 
@@ -71,36 +74,31 @@ for (const { direction, width, requiresCurve } of [
 
 					const style = getComputedStyle(element)
 					const [x = 0, y = 0] = style.translate.split(' ').map(Number.parseFloat)
-					const time = animation.timeline.currentTime,
-						start = animation.startTime,
-						duration = animation.effect.getComputedTiming().duration
+					const viewStart = animation.timeline.startOffset.to('px').value
+					const viewLength = animation.timeline.endOffset.to('px').value - viewStart
+					const subjectLength = flow.getBoundingClientRect().height
+					const visibleLength = viewLength - subjectLength
+					const begin = viewStart + visibleLength
+					const end = viewStart + Math.max(subjectLength, visibleLength)
 
-					if (
-						!(time instanceof CSSUnitValue) ||
-						time.unit !== 'percent' ||
-						!(start instanceof CSSUnitValue) ||
-						start.unit !== 'percent' ||
-						!(duration instanceof CSSUnitValue) ||
-						duration.unit !== 'percent' ||
-						duration.value <= 0 ||
-						animation.playbackRate !== 1
-					) {
-						throw Error('Finite native percentage clock and duration required')
+					if (!(end > begin) || animation.playbackRate !== 1) {
+						throw Error('Observable physical arrival interval required')
 					}
+
+					const clock = (root.scrollTop - begin) / (end - begin)
 
 					return {
 						x,
 						y,
-						clock: (time.value - start.value) / duration.value,
-						phase: animation.effect.getComputedTiming().progress,
+						clock,
 						scroll: root.scrollTop,
 					}
 				}, scroll)
 			const start = await seek(natural - 500)
 			const end = await seek(natural + 500)
 
-			expect(start.phase).toBe(0)
-			expect(end.phase).toBe(1)
+			expect(start.clock).toBeLessThanOrEqual(0)
+			expect(end.clock).toBeGreaterThanOrEqual(1)
 			expect(Math.abs(end.y)).toBeGreaterThan(10)
 			const curved = Math.abs(end.x) > 20
 
@@ -119,8 +117,8 @@ for (const { direction, width, requiresCurve } of [
 				const row = await seek(start.scroll + (target - start.clock) / slope)
 
 				expect(Math.abs(row.clock - target)).toBeLessThanOrEqual(slope + 0.001)
-				expect(row.phase).toBeGreaterThan(0)
-				expect(row.phase).toBeLessThan(1)
+				expect(row.clock).toBeGreaterThan(0)
+				expect(row.clock).toBeLessThan(1)
 
 				if (!curved) {
 					expect(Math.abs(row.x)).toBeLessThan(0.5)
@@ -162,7 +160,7 @@ for (const { direction, width, requiresCurve } of [
 	})
 }
 
-test('reduced breadcrumb arrival has a single endpoint step', async ({ page }) => {
+test('reduced breadcrumb arrival has a single endpoint step', async ({ page }, info) => {
 	await page.setViewportSize({ width: 690, height: 900 })
 	await page.emulateMedia({ reducedMotion: 'reduce' })
 	await page.goto('/metamask/?variant=BROWSER')
@@ -175,10 +173,15 @@ test('reduced breadcrumb arrival has a single endpoint step', async ({ page }) =
 		)),
 		'Native breadcrumb arrival enhancement unavailable',
 	)
-	const motion = await page
+	await page.evaluate(() => document.fonts.ready)
+	const result = await page
 		.locator('#transaction-legibility [data-sticky-breadcrumb~="item"]')
 		.first()
-		.evaluate(element => {
+		.evaluate(async element => {
+			const root = document.querySelector<HTMLElement>('#layout')!
+
+			root.style.scrollSnapType = 'none'
+			root.style.scrollBehavior = 'auto'
 			const animation = element
 				.getAnimations()
 				.find(
@@ -187,17 +190,64 @@ test('reduced breadcrumb arrival has a single endpoint step', async ({ page }) =
 						animation.animationName === 'breadcrumb-arrival-step',
 				)
 
-			if (!(animation?.effect instanceof KeyframeEffect)) {
-				throw new Error('Native reduced arrival required')
+			if (
+				!(animation?.effect instanceof KeyframeEffect) ||
+				!(animation.timeline instanceof ViewTimeline)
+			) {
+				throw Error('Native reduced arrival required')
 			}
 
-			return animation.effect
-				.getKeyframes()
-				.map(frame => ({ offset: frame.offset, easing: frame.easing }))
+			const subject = animation.timeline.subject
+
+			if (!subject || animation.timeline.source !== root) {
+				throw Error('Arrival subject must belong to the page scroll root')
+			}
+
+			const viewStart = animation.timeline.startOffset.to('px').value
+			const viewLength = animation.timeline.endOffset.to('px').value - viewStart
+			const subjectLength = subject.getBoundingClientRect().height
+			const visibleLength = viewLength - subjectLength
+			const begin = viewStart + visibleLength
+			const end = viewStart + Math.max(subjectLength, visibleLength)
+
+			if (!(end > begin)) {
+				throw Error('Observable physical arrival interval required')
+			}
+
+			const positions = [
+				...[-0.25, 0, 0.25, 0.5, 0.75].map(fraction => begin + (end - begin) * fraction),
+				Math.floor(end) - 1,
+				Math.ceil(end) + 1,
+				Math.ceil(end) + Math.max(2, Math.ceil((end - begin) / 4)),
+			]
+			const rows = []
+
+			for (const scroll of [...positions, ...positions.toReversed()]) {
+				root.scrollTop = scroll
+				await new Promise<void>(resolve =>
+					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+				)
+				const translation = getComputedStyle(element).translate
+
+				rows.push({ scroll: root.scrollTop, translation })
+			}
+
+			return { samples: rows, begin, end }
 		})
 
-	expect(motion).toEqual([
-		{ offset: 0, easing: 'steps(1)' },
-		{ offset: 1, easing: 'steps(1)' },
-	])
+	await info.attach('reduced-arrival-poses', {
+		body: JSON.stringify(result),
+		contentType: 'application/json',
+	})
+	const { samples } = result
+	const forward = samples.slice(0, samples.length / 2)
+
+	expect(forward[5].scroll).toBeLessThan(result.end)
+	expect(forward[6].scroll).toBeGreaterThan(result.end)
+	expect(new Set(forward.slice(0, 6).map(sample => sample.translation)).size).toBe(1)
+	expect(new Set(forward.slice(6).map(sample => sample.translation)).size).toBe(1)
+	expect(forward[0].translation).not.toBe(forward.at(-1)!.translation)
+	expect(samples.slice(forward.length).map(sample => sample.translation)).toEqual(
+		forward.toReversed().map(sample => sample.translation),
+	)
 })
