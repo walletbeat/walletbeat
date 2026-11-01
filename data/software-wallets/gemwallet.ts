@@ -223,13 +223,13 @@ export const gemwallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation: "Gem shows the wallet's total value across all networks.",
-						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-total-value.png',
-						label: 'Gem home screen with the wallet total',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png',
+						label: 'Gem home screen with the wallet total and ETH on Ethereum and Base',
 					},
 					{
 						explanation:
 							'Gem lists ETH and USDC on each network as separate items but does not add them up across networks.',
-						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-per-network-balances.png',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png',
 						label: 'Gem asset list with ETH and USDC on each network',
 					},
 				],

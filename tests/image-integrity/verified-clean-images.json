@@ -471,12 +471,12 @@
 		"hash": "bc5e4571c229559bdad0987358813c3f41e1ccf0b8140d77fe9629c2050c7e22",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-per-network-balances.png": {
-		"hash": "524dcc25c7988653753e30222cfebe5a88f54815d69117089f11230278252a3b",
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png": {
+		"hash": "6b3fbfdcd5a6171a3ba5422a063524660dd25f9de06bee63c2049431f938f34a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-total-value.png": {
-		"hash": "81fd27596efb2142da76f6468ccf10e49921569b1d51b717c3c1284faa9f77fc",
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png": {
+		"hash": "3a7fdb7f5254bd21a844687ef193857aea0bcd23ee6f8172ff7d1f12eb73537d",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
