@@ -6,14 +6,18 @@ import { interestDelayMs } from '../interest'
 async function observeTrustedClick(button: Locator) {
 	await button.evaluate(element => {
 		element.setAttribute('data-trusted-clicks', '0')
-		element.addEventListener('click', event => {
-			if (event.isTrusted) {
-				element.setAttribute(
-					'data-trusted-clicks',
-					String(Number(element.getAttribute('data-trusted-clicks')) + 1),
-				)
-			}
-		}, { once: true })
+		element.addEventListener(
+			'click',
+			event => {
+				if (event.isTrusted) {
+					element.setAttribute(
+						'data-trusted-clicks',
+						String(Number(element.getAttribute('data-trusted-clicks')) + 1),
+					)
+				}
+			},
+			{ once: true },
+		)
 	})
 }
 
@@ -452,7 +456,10 @@ for (const javaScriptEnabled of [true, false]) {
 										2
 
 									const describeBox = (box: DOMRectReadOnly) => ({
-										left: box.left, right: box.right, top: box.top, bottom: box.bottom,
+										left: box.left,
+										right: box.right,
+										top: box.top,
+										bottom: box.bottom,
 									})
 									const style = getComputedStyle(clippingOwner)
 									const samples = [
@@ -464,25 +471,34 @@ for (const javaScriptEnabled of [true, false]) {
 										const hit = document.elementFromPoint(x, y)
 
 										return {
-										edge, x, y,
-										exercised:
-											x >= 0 &&
-											x < innerWidth &&
-											x >= area.left &&
-											x < area.right &&
-											y >= 0 &&
-											y < innerHeight &&
-											y >= area.top &&
-											y < area.bottom,
-										escaped: hit === element,
-										hit: hit ? { tag: hit.tagName, id: hit.id, class: hit.getAttribute('class') } : null,
+											edge,
+											x,
+											y,
+											exercised:
+												x >= 0 &&
+												x < innerWidth &&
+												x >= area.left &&
+												x < area.right &&
+												y >= 0 &&
+												y < innerHeight &&
+												y >= area.top &&
+												y < area.bottom,
+											escaped: hit === element,
+											hit: hit
+												? { tag: hit.tagName, id: hit.id, class: hit.getAttribute('class') }
+												: null,
 										}
 									})
 
 									return {
-										samples, area: describeBox(area), clip: describeBox(clip), viewport: describeBox(viewport),
-										overflowX: style.overflowX, overflowY: style.overflowY,
-										scrollLeft: viewportOwner.scrollLeft, scrollTop: viewportOwner.scrollTop,
+										samples,
+										area: describeBox(area),
+										clip: describeBox(clip),
+										viewport: describeBox(viewport),
+										overflowX: style.overflowX,
+										overflowY: style.overflowY,
+										scrollLeft: viewportOwner.scrollLeft,
+										scrollTop: viewportOwner.scrollTop,
 									}
 								})
 
@@ -559,14 +575,28 @@ test('opt-in sort planes and custom header actions remain independently usable',
 				await sortPlane.evaluate(element => {
 					for (const type of ['pointerdown', 'mousedown']) {
 						element.removeAttribute(`data-sort-${type}`)
-						document.addEventListener(type, event => {
-							const target = event.target
+						document.addEventListener(
+							type,
+							event => {
+								const target = event.target
 
-							element.setAttribute(`data-sort-${type}`, JSON.stringify({
-								trusted: event.isTrusted,
-								target: target instanceof Element ? { tag: target.tagName, id: target.id, class: target.getAttribute('class') } : null,
-							}))
-						}, { capture: true, once: true })
+								element.setAttribute(
+									`data-sort-${type}`,
+									JSON.stringify({
+										trusted: event.isTrusted,
+										target:
+											target instanceof Element
+												? {
+														tag: target.tagName,
+														id: target.id,
+														class: target.getAttribute('class'),
+													}
+												: null,
+									}),
+								)
+							},
+							{ capture: true, once: true },
+						)
 					}
 				})
 				const observePress = async (phase: string) => {
@@ -575,31 +605,38 @@ test('opt-in sort planes and custom header actions remain independently usable',
 						const viewport = element.closest('[data-header-controls]')
 						const hit = document.elementFromPoint(point.x, point.y)
 						const describeBox = (box: DOMRectReadOnly) => ({
-							left: box.left, right: box.right, top: box.top, bottom: box.bottom,
+							left: box.left,
+							right: box.right,
+							top: box.top,
+							bottom: box.bottom,
 						})
 
 						return {
 							point,
 							plane: describeBox(element.getBoundingClientRect()),
-							control: control ? {
-								id: control.id,
-								disabled: control.matches(':disabled, [aria-disabled="true"]'),
-								active: control.matches(':active'),
-								box: describeBox(control.getBoundingClientRect()),
-							} : null,
+							control: control
+								? {
+										id: control.id,
+										disabled: control.matches(':disabled, [aria-disabled="true"]'),
+										active: control.matches(':active'),
+										box: describeBox(control.getBoundingClientRect()),
+									}
+								: null,
 							hit: hit ? { tag: hit.tagName, id: hit.id, class: hit.getAttribute('class') } : null,
 							scrollLeft: viewport?.scrollLeft,
 							scrollTop: viewport?.scrollTop,
 							pointerdown: element.getAttribute('data-sort-pointerdown'),
 							mousedown: element.getAttribute('data-sort-mousedown'),
-							openPanels: [...document.querySelectorAll('.title-panel')].filter(node => node.matches(':popover-open')).map(node => node.id),
+							openPanels: [...document.querySelectorAll('.title-panel')]
+								.filter(node => node.matches(':popover-open'))
+								.map(node => node.id),
 						}
-						}, point)
+					}, point)
 
-						test.info().annotations.push({
-							type: 'sort-plane-press',
-							description: JSON.stringify({ width, route, direction, phase, ...state }),
-						})
+					test.info().annotations.push({
+						type: 'sort-plane-press',
+						description: JSON.stringify({ width, route, direction, phase, ...state }),
+					})
 				}
 
 				await observePress('before-move')

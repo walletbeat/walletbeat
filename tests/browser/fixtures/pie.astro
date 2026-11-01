@@ -84,13 +84,15 @@ const plainCases = [0, 0.2].flatMap(innerRadiusFraction =>
 				arcLabel: 'x',
 				ariaLabel: `Slice ${index + 1}`,
 			})),
-			levels: [{
-				outerRadiusFraction: 1,
-				innerRadiusFraction,
-				gap: 0,
-				outerCornerRadius: 0,
-				innerCornerRadius: 0,
-			}],
+			levels: [
+				{
+					outerRadiusFraction: 1,
+					innerRadiusFraction,
+					gap: 0,
+					outerCornerRadius: 0,
+					innerCornerRadius: 0,
+				},
+			],
 		}
 	}),
 )
@@ -110,11 +112,13 @@ const models = cases.map(candidate => {
 		id: candidate.id,
 		origin,
 		width: origin * 2,
-		plain: plainCases.some(plain => plain.id === candidate.id) ? {
-			count: candidate.slices.length,
-			innerR: radius * candidate.levels[0].innerRadiusFraction,
-			outerR: radius,
-		} : null,
+		plain: plainCases.some(plain => plain.id === candidate.id)
+			? {
+					count: candidate.slices.length,
+					innerR: radius * candidate.levels[0].innerRadiusFraction,
+					outerR: radius,
+				}
+			: null,
 		slices: flatten(computed).map(slice => ({
 			id: slice.id,
 			...slice.computed,

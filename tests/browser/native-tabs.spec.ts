@@ -5,6 +5,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 		test.use({ javaScriptEnabled: false, reducedMotion })
 		test('grouped panels retain native visibility, focus and responsive bounds', async ({
 			page,
+			browserName,
 		}) => {
 			for (const width of [1280, 390]) {
 				await page.setViewportSize({ width, height: 900 })
@@ -21,11 +22,25 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					const summary = selected.locator(':scope > summary')
 
 					await summary.click()
+					await summary.focus()
 					const panel = selected.locator(':scope > [data-tab-panel]')
 					const first = panel.locator('a').first()
 
-					await first.focus()
-					expect(await first.evaluate(element => document.activeElement === element)).toBe(true)
+					const last = panel.locator('a').last()
+					const forward = browserName === 'webkit' ? 'Alt+Tab' : 'Tab'
+					const backward = browserName === 'webkit' ? 'Alt+Shift+Tab' : 'Shift+Tab'
+					// Scrollable panels can themselves be native sequential focus stops.
+					const passPanel = async (key: string) => {
+						await page.keyboard.press(key)
+
+						if (await panel.evaluate(element => document.activeElement === element)) {
+							await page.keyboard.press(key)
+						}
+					}
+
+					await expect(summary).toBeFocused()
+					await passPanel(forward)
+					await expect(first).toBeFocused()
 					expect(
 						await group.locator(':scope > details:not([open])').evaluateAll(elements =>
 							elements.every(element => {
@@ -37,6 +52,18 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 							}),
 						),
 					).toBe(true)
+					await page.keyboard.press(forward)
+					await expect(last).toBeFocused()
+					await page.keyboard.press(forward)
+					expect(await selected.evaluate(element => element.contains(document.activeElement))).toBe(
+						false,
+					)
+					await page.keyboard.press(backward)
+					await expect(last).toBeFocused()
+					await page.keyboard.press(backward)
+					await expect(first).toBeFocused()
+					await passPanel(backward)
+					await expect(summary).toBeFocused()
 					const bounds = await panel.evaluate(element => {
 						const panel = element.getBoundingClientRect()
 						const group = element.closest('[data-tabs]')!.getBoundingClientRect()
@@ -51,12 +78,22 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					expect(bounds.width).toBeGreaterThan(150)
 					expect(bounds.left).toBeGreaterThanOrEqual(-1)
 					expect(bounds.right).toBeLessThanOrEqual(1)
-					await summary.focus()
 					await page.keyboard.press('Enter')
 					await expect(group.locator(':scope > details[open]')).toHaveCount(0)
+					const summaries = group.locator(':scope > details > summary')
+
+					for (let index = (await summaries.count()) - 2; index >= 0; index--) {
+						await page.keyboard.press(backward)
+						await expect(summaries.nth(index)).toBeFocused()
+					}
+
+					for (let index = 1; index < (await summaries.count()); index++) {
+						await page.keyboard.press(forward)
+						await expect(summaries.nth(index)).toBeFocused()
+					}
 					await page.keyboard.press('Enter')
-					await first.focus()
-					expect(await first.evaluate(element => document.activeElement === element)).toBe(true)
+					await passPanel(forward)
+					await expect(first).toBeFocused()
 				}
 			}
 		})

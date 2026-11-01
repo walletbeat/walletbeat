@@ -51,12 +51,22 @@ for (const width of [390, 1440]) {
 						path: string
 					}
 					type Plain = { count: number; innerR: number; outerR: number }
-					type Model = { id: string; origin: number; width: number; slices: Slice[]; plain: Plain | null }
+					type Model = {
+						id: string
+						origin: number
+						width: number
+						slices: Slice[]
+						plain: Plain | null
+					}
 					const isPlain = (plain: unknown): plain is Plain =>
-						typeof plain === 'object' && plain !== null &&
-						'count' in plain && typeof plain.count === 'number' &&
-						'innerR' in plain && typeof plain.innerR === 'number' &&
-						'outerR' in plain && typeof plain.outerR === 'number'
+						typeof plain === 'object' &&
+						plain !== null &&
+						'count' in plain &&
+						typeof plain.count === 'number' &&
+						'innerR' in plain &&
+						typeof plain.innerR === 'number' &&
+						'outerR' in plain &&
+						typeof plain.outerR === 'number'
 					const isSlice = (slice: unknown): slice is Slice =>
 						typeof slice === 'object' &&
 						slice !== null &&
@@ -82,7 +92,8 @@ for (const width of [390, 1440]) {
 						'slices' in model &&
 						Array.isArray(model.slices) &&
 						model.slices.every(isSlice) &&
-						'plain' in model && (model.plain === null || isPlain(model.plain))
+						'plain' in model &&
+						(model.plain === null || isPlain(model.plain))
 					const value: unknown = JSON.parse(
 						document.getElementById('pie-models')?.textContent ?? '[]',
 					)
@@ -126,13 +137,15 @@ for (const width of [390, 1440]) {
 								dy = y - model.origin,
 								radius = Math.hypot(dx, dy)
 
-							if (radius < model.plain.innerR || radius > model.plain.outerR) return null
+							if (radius < model.plain.innerR || radius > model.plain.outerR) {
+								return null
+							}
 
-							// Equal, ungapped sectors are classified from the declared inputs,
+							// Equal sectors without gaps are classified from the declared inputs,
 							// independently of either renderer's rounded-angle calculation.
-							const angle = Math.atan2(dx, -dy) * 180 / Math.PI
+							const angle = (Math.atan2(dx, -dy) * 180) / Math.PI
 							const step = 360 / model.plain.count
-							const index = Math.floor(((step / 2 - angle) % 360 + 360) % 360 / step)
+							const index = Math.floor(((((step / 2 - angle) % 360) + 360) % 360) / step)
 
 							return `${model.id}-${index}`
 						}
