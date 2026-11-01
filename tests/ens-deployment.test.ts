@@ -3,6 +3,7 @@ import { AbiFunction, Hash, Hex, RpcTransport, TxEnvelopeEip1559 } from 'ox'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+	base32Encode,
 	cidToContentHash,
 	encodeEnsName,
 	readEnsContentHash,
@@ -10,7 +11,10 @@ import {
 	UNIVERSAL_RESOLVER_ADDRESS,
 } from '@/tools/ens-content-hash-checker/ens-content-hash-checker-lib'
 import {
+	checkEnsReadiness,
 	deploymentGas,
+} from '@/tools/ens-content-hash-checker/ens-preflight-lib'
+import {
 	SubmissionError,
 	updateEnsContentHash,
 } from '@/tools/ens-content-hash-checker/ens-update-lib'
@@ -39,6 +43,8 @@ interface Scenario {
 	receipt?: 'success' | 'failure' | 'missing' | 'wrong-hash'
 	unchanged?: boolean
 	sendError?: boolean
+	emptyContent?: boolean
+	probeContent?: boolean
 	malformedResolution?: boolean
 }
 
@@ -98,7 +104,15 @@ function fixture(scenario: Scenario = {}) {
 							: AbiFunction.encodeResult(resolveAbi, [
 									AbiFunction.encodeResult(
 										contenthashAbi,
-										cidToContentHash(current ? NEW_CID : OLD_CID),
+										scenario.emptyContent === true
+											? '0x'
+											: cidToContentHash(
+													scenario.probeContent === true
+														? `b${base32Encode(Uint8Array.of(1, 0x70, 0x12, 0x20, ...new Uint8Array(32).fill(0x42)))}`
+														: current
+															? NEW_CID
+															: OLD_CID,
+												),
 									),
 									RESOLVER,
 								])
@@ -277,6 +291,59 @@ describe('universal ENS deployment', () => {
 		expect(f.requests.filter(request => request.method === 'eth_sendRawTransaction')).toHaveLength(
 			1,
 		)
+	})
+
+	it.each([1, 2] as const)(
+		'probes a different record with only read-only RPC calls for ENSv%i',
+		async version => {
+			const f = fixture({ version, alreadyCurrent: true })
+			const result = await checkEnsReadiness(f.transport, 'beta.walletbeat.eth', RESOLVER)
+
+			expect(result.probeCid).not.toBe(result.current.cid)
+			expect(result.gas).toBe(100_000n)
+			const setter = {
+				name: 'setContenthash',
+				type: 'function',
+				inputs: [{ type: version === 1 ? 'bytes32' : 'bytes' }, { type: 'bytes' }],
+				outputs: [],
+				stateMutability: 'nonpayable',
+			} as const
+			const simulatedCall = z
+				.object({ data: z.custom<Hex.Hex>(Hex.validate) })
+				.parse(f.requests.at(-1)?.params[0])
+
+			expect(f.requests.at(-1)?.method).toBe('eth_call')
+			const decoded = AbiFunction.decodeData(setter, simulatedCall.data)
+
+			expect(decoded[1]).toBe(cidToContentHash(result.probeCid))
+			expect(decoded[1]).not.toBe(cidToContentHash(NEW_CID))
+
+			expect(new Set(f.requests.map(request => request.method))).toEqual(
+				new Set(['eth_chainId', 'eth_call', 'eth_getCode', 'eth_estimateGas']),
+			)
+			expect(f.raw()).toBeNull()
+		},
+	)
+
+	it.each([{ emptyContent: true }, { probeContent: true }])(
+		'probes empty records and existing probe values: %j',
+		async scenario => {
+			const f = fixture(scenario)
+			const result = await checkEnsReadiness(f.transport, 'beta.walletbeat.eth', RESOLVER)
+
+			expect(result.probeCid).not.toBe(result.current.cid)
+			expect(result.gas).toBe(100_000n)
+			expect(f.raw()).toBeNull()
+		},
+	)
+
+	it('fails a read-only readiness check when the updater is unauthorized', async () => {
+		const f = fixture({ unauthorized: true })
+
+		await expect(checkEnsReadiness(f.transport, 'beta.walletbeat.eth', RESOLVER)).rejects.toThrow(
+			'Neither ENS setter',
+		)
+		expect(f.raw()).toBeNull()
 	})
 
 	it('enforces the gas budget after adding the margin', () => {

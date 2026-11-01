@@ -1,0 +1,61 @@
+name: ENS deployment readiness
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'deploy/**'
+      - 'src/tools/ens-content-hash-checker/**'
+      - 'tests/*deployment*'
+      - 'tests/fixtures/deployment-pnpm.sh'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'resources/docs/ens-deployment.md'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  workflows:
+    name: Validate workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - name: Validate GitHub Actions syntax and expressions
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            --output "$RUNNER_TEMP/actionlint.tar.gz"
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  $RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -shellcheck='' -pyflakes=''
+  readiness:
+    name: ENS readiness (${{ matrix.domain }}, ${{ matrix.transport }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        domain: [beta.walletbeat.eth, walletbeat.eth]
+        transport: [direct, helios]
+    env:
+      # Public address only: no signing key or deployment secrets are available.
+      ENS_UPDATER: '0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86'
+      ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT: https://ethereum-rpc.publicnode.com
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: pnpm/action-setup@v6.0.9
+      - uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Simulate using direct RPC
+        if: matrix.transport == 'direct'
+        run: pnpm deploy:ens-preflight check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url "$ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT"
+      - name: Simulate through pinned Helios
+        if: matrix.transport == 'helios'
+        run: pnpm helios:wrap pnpm deploy:ens-preflight check '${{ matrix.domain }}' --updater "$ENS_UPDATER" --rpc-url='$HELIOS_RPC_ENDPOINT'

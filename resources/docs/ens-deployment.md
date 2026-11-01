@@ -39,6 +39,35 @@ not available from Helios. Disagreement blocks the write rather than choosing an
 unverified nonce. Other users of the signing account must coordinate
 with deployments; GitHub concurrency cannot serialize transactions sent elsewhere.
 
+## Pre-merge readiness checks
+
+The ENS readiness workflow validates workflow syntax and checks both deployment
+names through direct RPC and the pinned Linux Helios wrapper. It runs on pull
+requests that change deployment code, dependencies, workflows, or this guide.
+The jobs receive only the documented public updater address, without deployment
+secrets. Keep that address aligned with the actual signer when rotating keys.
+
+The readiness command shares the deployment setter and gas simulation. It uses
+a valid synthetic content identifier different from the current record, so checking an
+unchanged value cannot hide storage-write costs or bypass authorization. It uses
+only reads, gas estimation, and `eth_call`; it never signs or broadcasts a
+transaction. The simulated content does not need to exist on IPFS.
+
+```sh
+pnpm deploy:ens-preflight check beta.walletbeat.eth \
+  --updater 0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86 \
+  --rpc-url https://ethereum-rpc.publicnode.com
+```
+
+These checks fail on an incompatible resolver, insufficient authorization, unsafe
+gas estimate, or unavailable RPC or Helios service. Beta's known resolver mismatch
+is a readiness failure until maintainers correct its configuration; it is not an
+expected-success exception. Logs identify the domain, resolver, current content,
+and public updater before simulation. Network failures still require diagnosis.
+A green check is an observation at that time, not a guarantee about state at a
+later deployment. Deployment repeats its checks before signing. Mocked tests
+separately cover failed receipts and uncertain broadcasts without live writes.
+
 ## Required ENS configuration
 
 Configuration changes below are maintainer operations. This repository change

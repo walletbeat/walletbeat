@@ -1,37 +1,10 @@
-import {
-	AbiFunction,
-	Address,
-	Ens,
-	Hash,
-	Hex,
-	RpcTransport,
-	Secp256k1,
-	TxEnvelopeEip1559,
-} from 'ox'
+import { Address, Hash, Hex, RpcTransport, Secp256k1, TxEnvelopeEip1559 } from 'ox'
 
-import { cidToContentHash, encodeEnsName, readEnsContentHash } from './ens-content-hash-checker-lib'
-
-const MAX_GAS = 1_000_000n
-const MIN_GAS = 100_000n
+import { readEnsContentHash } from './ens-content-hash-checker-lib'
+import { simulateEnsUpdate } from './ens-preflight-lib'
 
 /** A send may have reached the network; automatic retries could duplicate a transaction. */
 export class SubmissionError extends Error {}
-
-/** Reserve gas for nested calls and storage-write sentries, with a bounded transaction budget. */
-export function deploymentGas(estimate: bigint): bigint {
-	if (estimate <= 0n || estimate > MAX_GAS) {
-		throw new Error('ENS gas estimate is outside the deployment budget.')
-	}
-
-	const buffered = (estimate * 3n + 1n) / 2n
-	const gas = buffered < MIN_GAS ? MIN_GAS : buffered
-
-	if (gas > MAX_GAS) {
-		throw new Error('Buffered ENS gas exceeds the deployment budget.')
-	}
-
-	return gas
-}
 
 /** Submit one mainnet update; callers may retry only errors raised before submission. */
 export async function updateEnsContentHash(
@@ -50,13 +23,6 @@ export async function updateEnsContentHash(
 
 	if (current.cid === cid) {
 		return
-	}
-
-	if (
-		(await transport.request({ method: 'eth_getCode', params: [current.resolver, 'latest'] })) ===
-		'0x'
-	) {
-		throw new Error('ENS resolver has no contract code.')
 	}
 
 	let from: Address.Address
@@ -83,69 +49,7 @@ export async function updateEnsContentHash(
 		)
 	}
 
-	const hash = cidToContentHash(cid)
-	// Authorization is checked by simulating the actual setter. ENSv1 takes a
-	// namehash; ENSv2 takes DNS bytes. A failed simulation never sends a transaction.
-	const candidates = [
-		AbiFunction.encodeData(
-			{
-				name: 'setContenthash',
-				type: 'function',
-				inputs: [{ type: 'bytes' }, { type: 'bytes' }],
-				outputs: [],
-				stateMutability: 'nonpayable',
-			},
-			[encodeEnsName(domain), hash],
-		),
-		AbiFunction.encodeData(
-			{
-				name: 'setContenthash',
-				type: 'function',
-				inputs: [{ type: 'bytes32' }, { type: 'bytes' }],
-				outputs: [],
-				stateMutability: 'nonpayable',
-			},
-			[Ens.namehash(Ens.normalize(domain)), hash],
-		),
-	]
-	let data: Hex.Hex | null = null
-
-	for (const candidate of candidates) {
-		try {
-			await transport.request({
-				method: 'eth_call',
-				params: [
-					{ from, to: current.resolver, data: candidate, gas: Hex.fromNumber(MAX_GAS) },
-					'latest',
-				],
-			})
-			data = candidate
-			break
-		} catch {
-			// Only a successful simulation selects a resolver interface.
-		}
-	}
-
-	if (data === null) {
-		throw new Error(
-			'Neither ENS setter simulation succeeded; check resolver configuration, worker authorization, and RPC availability.',
-		)
-	}
-
-	const call = { from, to: current.resolver, data }
-	const gas = deploymentGas(
-		BigInt(
-			await transport.request({
-				method: 'eth_estimateGas',
-				params: [{ ...call, gas: Hex.fromNumber(MAX_GAS) }],
-			}),
-		),
-	)
-
-	await transport.request({
-		method: 'eth_call',
-		params: [{ ...call, gas: Hex.fromNumber(gas) }, 'latest'],
-	})
+	const { call, gas } = await simulateEnsUpdate(transport, domain, cid, from, current.resolver)
 	const block = await transport.request({
 		method: 'eth_getBlockByNumber',
 		params: ['latest', false],
@@ -158,8 +62,8 @@ export async function updateEnsContentHash(
 	const priority = BigInt(await transport.request({ method: 'eth_maxPriorityFeePerGas' }))
 	const transaction = TxEnvelopeEip1559.from({
 		chainId: 1,
-		to: current.resolver,
-		data,
+		to: call.to,
+		data: call.data,
 		nonce: latestNonce,
 		gas,
 		maxPriorityFeePerGas: priority,
