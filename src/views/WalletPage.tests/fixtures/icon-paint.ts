@@ -114,6 +114,51 @@ type Options = {
 	source: Awaited<ReturnType<typeof sourceSnapshot>>
 	mode: IconPaintMode
 	arrivalProgress: 0.35 | 0.75
+	workload?: 'forward' | 'reversal'
+}
+
+function qualifyReversal(
+	frames: ClassifiedFrame[],
+	target: number,
+	tolerance: number,
+	initialBracket: boolean,
+) {
+	const atTarget = (frame: ClassifiedFrame) =>
+		frame.referencePose !== null && Math.abs(frame.referencePose - target) <= tolerance
+	const overshoot = frames.filter(
+		frame => frame.phase === 'reversal-overshoot' && frame.decodedPose !== null,
+	)
+	const reverse = frames.filter(
+		frame => frame.phase === 'reversal-reverse' && frame.decodedPose !== null,
+	)
+	const returned = frames.find(frame => frame.phase === 'reversal-return' && atTarget(frame))
+	const predecessor = returned ? frames.findLast(frame => frame.index < returned.index) : undefined
+	const above = overshoot.some(
+		frame => frame.decodedPose !== null && frame.decodedPose > target + tolerance,
+	)
+	const below = reverse.some(
+		frame => frame.decodedPose !== null && frame.decodedPose < target - tolerance,
+	)
+	const returnBracket = Boolean(
+		returned &&
+		predecessor &&
+		predecessor.phase === 'reversal-return' &&
+		predecessor.decodedPose !== null &&
+		predecessor.decodedPose < target - tolerance &&
+		predecessor.timestamp < returned.timestamp,
+	)
+	const unresolved = frames.some(frame => frame.natural && frame.unidentifiedNearTarget)
+
+	return {
+		admitted: initialBracket && above && below && returnBracket && !unresolved,
+		initialBracket,
+		above,
+		below,
+		returnBracket,
+		unresolved,
+		returnFrame: returned?.index ?? null,
+		predecessorFrame: predecessor?.index ?? null,
+	}
 }
 
 /** Runs one observation in a dedicated browser process; closure owns all injected state. */
@@ -127,6 +172,7 @@ export async function observeIconPaint({
 	source,
 	mode,
 	arrivalProgress,
+	workload = 'forward',
 }: Options): Promise<IconPaintReport> {
 	assert.ok(['baseline', 'frozen-parent', 'frozen-pseudo'].includes(mode))
 	const { width: W, height: H } = viewport
@@ -137,7 +183,8 @@ export async function observeIconPaint({
 	const result: DetailedReport = {
 		status: 'instrument-rejected',
 		browserClosed: false,
-		probeRevision: 6,
+		probeRevision: 7,
+		workload,
 		mode,
 		phase: 'reference-admission',
 		pageErrors: [],
@@ -611,17 +658,62 @@ export async function observeIconPaint({
 		// Native-only tail precedes all post-window DOM observations and perturbations.
 		await delay(250)
 		result.naturalEnd = Date.now()
+		const firstEntryEnd = result.naturalEnd
+		const reversalWindows: {
+			mode: string
+			from: number
+			to: number
+			first: number
+			last: number
+			start: number
+			acknowledged: number
+			end: number
+		}[] = []
+
+		if (workload === 'reversal') {
+			const offset = Math.min(H / 4, D - 1, result.before.maximum - D - 1)
+
+			assert.ok(offset > 4, 'Reversal requires headroom on both sides of the calibrated target')
+
+			for (const leg of [
+				{ mode: 'reversal-overshoot', from: D, to: D + offset },
+				{ mode: 'reversal-reverse', from: D + offset, to: D - offset },
+				{ mode: 'reversal-return', from: D - offset, to: D },
+			]) {
+				const first = frames.length,
+					start = Date.now()
+
+				await cdp.send('Input.synthesizeScrollGesture', {
+					x: point.x,
+					y: point.y,
+					yDistance: leg.from - leg.to,
+					speed: 12000,
+					gestureSourceType: 'mouse',
+				})
+				const acknowledged = Date.now()
+
+				await delay(leg.mode === 'reversal-return' ? 3000 : 250)
+				reversalWindows.push({ ...leg, first, last: -1, start, acknowledged, end: Date.now() })
+			}
+			result.naturalEnd = Date.now()
+		}
+
 		result.after = await state.evaluate(observeActor)
 		result.afterGeometry = await state.evaluate(observeGeometry)
 		await cdp.send('Page.stopScreencast')
 		await Promise.all(acknowledgements.splice(0))
+
+		for (const window of reversalWindows) {
+			window.last = frames.length - 1
+		}
+		result.reversalWindows = reversalWindows
 		result.baselineNativeMetadata = frames.map(({ metadata }, index) => ({ index, metadata }))
 		await writeFile(new URL('result.json', out), json(result))
 		const windows: InputWindow[] = [
 			{
 				mode: 'first-entry-baseline',
 				start: result.criticalStart,
-				end: result.naturalEnd,
+				end: firstEntryEnd,
 				first: 0,
 				last: frames.length - 1,
 				before: result.before,
@@ -903,12 +995,12 @@ export async function observeIconPaint({
 					? undefined
 					: refs.find(value => Math.abs(value.actual - decodedPose) <= poseTolerance)
 			const cyanReference = cyanByPattern.get(JSON.stringify(raster.cyanMask))
-			const window = windows.find(
+			const window = [...windows, ...reversalWindows].find(
 				value =>
 					index >= value.first && index <= value.last && epoch >= value.start && epoch <= value.end,
 			)
 			const phase = window?.mode ?? 'outside-input-window'
-			const natural = phase === 'first-entry-baseline'
+			const natural = phase === 'first-entry-baseline' || phase.startsWith('reversal-')
 			let classification = 'instrument-rejected'
 			let comparison: Comparison | null = null
 
@@ -1005,7 +1097,10 @@ export async function observeIconPaint({
 		const inputStart = result.criticalStart
 		const inputAck = result.inputFinished
 		const targetFrames = naturalFrames.filter(
-			frame => frame.referencePose !== null && Math.abs(frame.referencePose - D) <= poseTolerance,
+			frame =>
+				frame.phase === 'first-entry-baseline' &&
+				frame.referencePose !== null &&
+				Math.abs(frame.referencePose - D) <= poseTolerance,
 		)
 		const arrival = (frame: ClassifiedFrame | undefined) =>
 			frame
@@ -1030,6 +1125,12 @@ export async function observeIconPaint({
 			predecessor.timestamp < firstTarget.timestamp,
 		)
 
+		const reversalAdmission =
+			workload === 'reversal'
+				? qualifyReversal(result.frames, D, poseTolerance, targetBracketAdmitted)
+				: { admitted: true }
+
+		result.reversalAdmission = reversalAdmission
 		result.targetBracketAdmitted = targetBracketAdmitted
 		result.targetArrival = {
 			targetScroll: D,
@@ -1070,6 +1171,7 @@ export async function observeIconPaint({
 			(result.mode !== 'baseline' && !result.controlsQualified) ||
 			admitted.length < 3 ||
 			!targetBracketAdmitted ||
+			!reversalAdmission.admitted ||
 			result.signedTravel <= 0.5 ||
 			result.frames.some(frame => frame.unidentifiedNearTarget)
 				? 'instrument-rejected'
