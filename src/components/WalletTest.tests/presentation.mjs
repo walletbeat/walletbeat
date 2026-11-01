@@ -726,19 +726,54 @@ export async function checkPresentation(page, baseURL, outputDir) {
 async function activateByKeyboard(page, control) {
 	await control.waitFor()
 	assert.equal(await control.isDisabled(), false)
-	const tab = page.context().browser().browserType().name() === 'webkit' ? 'Alt+Tab' : 'Tab'
+	const webkit = page.context().browser().browserType().name() === 'webkit'
+	/** @type {unknown[]} */
+	const trace = []
+	let direction = 0
 
-	for (let step = 0; step < 80; step++) {
-		if (await control.evaluate(el => el === document.activeElement)) {
-			await page.keyboard.press('Enter')
+	for (const key of webkit ? ['Alt+Tab', 'Alt+Shift+Tab'] : ['Tab', 'Shift+Tab']) {
+		// The budget bounds the probe; it does not establish a complete focus cycle.
+		const budget = direction++ === 0 ? 80 : 160
 
-			return
+		for (let step = 0; step <= budget; step++) {
+			const state = await control.evaluate(el => {
+				const active = document.activeElement
+				const parent = el.closest('dialog')
+
+				return {
+					exact: el === active,
+					hasFocus: document.hasFocus(),
+					modal: parent ? parent.matches(':modal') : null,
+					contained: parent ? parent.contains(active) : null,
+					tag: active?.tagName ?? null,
+					text: (active?.textContent ?? '').slice(0, 100),
+				}
+			})
+
+			trace.push({ key, step, ...state })
+
+			if (state.exact && state.hasFocus) {
+				if (state.modal !== null) {
+					assert.equal(state.modal, true)
+				}
+
+				await page.keyboard.press('Enter')
+
+				return
+			}
+
+			if (step < budget) {
+				await page.keyboard.press(key)
+				await page.evaluate(
+					() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+				)
+			}
 		}
-
-		await page.keyboard.press(tab)
 	}
 
-	throw new Error(`Keyboard navigation did not reach ${await control.textContent()}`)
+	throw new Error(
+		`Native keyboard admission exhausted for ${await control.textContent()}: ${JSON.stringify(trace)}`,
+	)
 }
 
 /**
