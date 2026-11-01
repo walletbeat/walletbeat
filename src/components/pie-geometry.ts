@@ -154,10 +154,10 @@ export const slicePathData = (
 	const innerCornerOffset = halfGap + innerCornerR
 	const outerCornerCenterR = outerR - outerCornerR
 	const innerCornerCenterR = innerR + innerCornerR
-	const outerAngleInset = Math.asin(outerCornerOffset / outerCornerCenterR)
-	const innerAngleInset = Math.asin(innerCornerOffset / innerCornerCenterR)
 	const outerSideR = Math.sqrt(outerCornerCenterR ** 2 - outerCornerOffset ** 2)
 	const innerSideR = Math.sqrt(innerCornerCenterR ** 2 - innerCornerOffset ** 2)
+	const outerAngleInset = Math.atan2(outerCornerOffset, outerSideR)
+	const innerAngleInset = Math.atan2(innerCornerOffset, innerSideR)
 	const largeArc = Math.abs(totalAngle) > 180 ? 1 : 0
 	const sidePoint = (sideR: number, side: 1 | -1) =>
 		point(side * (sinHalf * sideR - cosHalf * halfGap), -(cosHalf * sideR + sinHalf * halfGap))

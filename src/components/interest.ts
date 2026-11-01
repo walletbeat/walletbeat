@@ -10,9 +10,18 @@ const isInterestBoundary = (element: EventTarget) =>
 	(interestSources.has(element) || (sourcesByTarget.get(element)?.size ?? 0) > 0)
 
 const popoverInvoker = (node: HTMLElement) =>
-	node.querySelector<HTMLElement>('[popovertarget]') ?? node
+	(node instanceof HTMLLabelElement
+		? node.control
+		: node.querySelector<HTMLElement>('[popovertarget]')) ?? node
 
-export function hasVisiblePopoverInvoker(node: HTMLElement) {
+export function hasVisiblePopoverInvoker(node: HTMLElement, target: HTMLElement) {
+	if (
+		node instanceof HTMLLabelElement &&
+		(!node.control || node.control.getAttribute('popovertarget') !== target.id)
+	) {
+		return false
+	}
+
 	const invoker = popoverInvoker(node)
 
 	return (
@@ -25,7 +34,10 @@ export function interest(
 	node: HTMLElement,
 	{ id, hideDelay = interestDelayMs.end }: { id?: string; hideDelay?: number },
 ) {
-	if (!id) {
+	if (
+		!id ||
+		(node instanceof HTMLLabelElement && node.control?.getAttribute('popovertarget') !== id)
+	) {
 		return
 	}
 
@@ -45,7 +57,7 @@ export function interest(
 	// popovertarget button on touch. Capture the click so an interactive child
 	// cannot suppress the actual around trigger by stopping propagation.
 	const showOnClick = () => {
-		if (!target.matches(':popover-open') && hasVisiblePopoverInvoker(node)) {
+		if (!target.matches(':popover-open') && hasVisiblePopoverInvoker(node, target)) {
 			target.showPopover({ source: node })
 		}
 	}
@@ -77,10 +89,25 @@ export function interest(
 		node.matches(':hover') &&
 		!Array.from(node.querySelectorAll<HTMLElement>(':hover')).some(isInterestBoundary)
 
+	const keepCompanionInterest = (event: Event) => {
+		if (
+			node instanceof HTMLLabelElement &&
+			event.cancelable &&
+			event.target === target &&
+			hasPointerInterest() &&
+			hasVisiblePopoverInvoker(node, target)
+		) {
+			event.preventDefault()
+		}
+	}
+
 	const scheduleShow = (delay: number, source?: HTMLElement) => {
 		clearTimeout(timer)
 		timer = setTimeout(() => {
-			if ((source !== undefined || hasPointerInterest()) && hasVisiblePopoverInvoker(node)) {
+			if (
+				(source !== undefined || hasPointerInterest()) &&
+				hasVisiblePopoverInvoker(node, target)
+			) {
 				target.showPopover({ source: source ?? popoverInvoker(node) })
 			}
 		}, delay)
@@ -136,6 +163,7 @@ export function interest(
 	}
 
 	target.addEventListener('beforetoggle', keepOpen)
+	target.addEventListener('loseinterest', keepCompanionInterest)
 	node.addEventListener('pointerout', resumePointerInterest)
 
 	for (const element of [node, target]) {
@@ -156,6 +184,7 @@ export function interest(
 			interestSources.delete(node)
 			sources.delete(node)
 			target.removeEventListener('beforetoggle', keepOpen)
+			target.removeEventListener('loseinterest', keepCompanionInterest)
 			node.removeEventListener('pointerout', resumePointerInterest)
 
 			if (hasClickInvoker) {

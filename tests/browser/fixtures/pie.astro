@@ -70,6 +70,31 @@ cases.push({
 	})),
 	levels: overallRatingPieLevels(),
 })
+const plainCases = [0, 0.2].flatMap(innerRadiusFraction =>
+	[1, 2, 4].map(count => {
+		const id = `plain-${innerRadiusFraction === 0 ? 'disk' : 'annulus'}-${count}`
+
+		return {
+			id,
+			slices: Array.from({ length: count }, (_, index) => ({
+				id: `${id}-${index}`,
+				href: `#${id}`,
+				color: 'teal',
+				weight: 1,
+				arcLabel: 'x',
+				ariaLabel: `Slice ${index + 1}`,
+			})),
+			levels: [{
+				outerRadiusFraction: 1,
+				innerRadiusFraction,
+				gap: 0,
+				outerCornerRadius: 0,
+				innerCornerRadius: 0,
+			}],
+		}
+	}),
+)
+cases.push(...plainCases)
 const models = cases.map(candidate => {
 	const origin = pieMaxRadius(radius, candidate.levels) + padding
 	const computed = computePieSlices({
@@ -85,6 +110,11 @@ const models = cases.map(candidate => {
 		id: candidate.id,
 		origin,
 		width: origin * 2,
+		plain: plainCases.some(plain => plain.id === candidate.id) ? {
+			count: candidate.slices.length,
+			innerR: radius * candidate.levels[0].innerRadiusFraction,
+			outerR: radius,
+		} : null,
 		slices: flatten(computed).map(slice => ({
 			id: slice.id,
 			...slice.computed,
