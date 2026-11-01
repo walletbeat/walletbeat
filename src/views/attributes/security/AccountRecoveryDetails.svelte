@@ -53,7 +53,12 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 	{#if metadata.minimumGuardianPolicy !== null}
-		<h4>{wallet.metadata.displayName} account recovery implementation</h4>
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: `### ${wallet.metadata.displayName} account recovery implementation`,
+			}}
+		/>
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
@@ -68,7 +73,12 @@
 		/>
 	{/if}
 	{#if failedOutcomes.length > 0}
-		<h4>Account recovery failure scenarios</h4>
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: '### Account recovery failure scenarios',
+			}}
+		/>
 		<ul>
 			{#each failedOutcomes as outcome (`${guardianScenarioId(outcome.scenario)}_${outcome.outcomeId}`)}
 				<li>
@@ -105,7 +115,12 @@
 		</ul>
 	{/if}
 	{#if successfulOutcomes.length > 0}
-		<h4>Account recovery success scenarios</h4>
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: '### Account recovery success scenarios',
+			}}
+		/>
 		<ul>
 			{#each successfulOutcomes as outcome (`${guardianScenarioId(outcome.scenario)}_${outcome.outcomeId}`)}
 				<li>
@@ -144,7 +159,12 @@
 {/if}
 
 {#if metadata.drills !== null}
-	<h4>Account recovery drills</h4>
+	<Typography
+		content={{
+			contentType: ContentType.MARKDOWN,
+			markdown: '### Account recovery drills',
+		}}
+	/>
 	{#if metadata.drills.configured.length > 0}
 		<Typography
 			content={{

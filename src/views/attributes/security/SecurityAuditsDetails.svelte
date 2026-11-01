@@ -112,7 +112,7 @@
 				open
 			>
 				<summary>
-					<header data-row="wrap">
+					<header data-row="wrap wrap-first-last">
 						<div
 							data-row-item="flexible basis-1"
 							data-row="start wrap gap-2"
@@ -161,8 +161,7 @@
 							{/if}
 						</div>
 
-						<time data-row-item="wrap-end" data-row="gap-2" datetime={audit.auditDate}
-							style:--collapsible-markerInlineTimeline={`--collapsible-marker-audit-${securityAuditId(audit)}`}>
+						<time datetime={audit.auditDate}>
 							{
 								Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
 									.format(
@@ -211,7 +210,7 @@
 					{/if}
 
 					{#if audit.ref}
-						<ReferenceLinks headingLevel={5} references={toFullyQualified(audit.ref)} />
+						<ReferenceLinks references={toFullyQualified(audit.ref)} />
 					{/if}
 				</section>
 			</details>

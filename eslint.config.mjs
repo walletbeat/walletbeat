@@ -201,13 +201,6 @@ export default [
 		},
 	},
 	{
-		files: ['tests/browser/**/*.{ts,mjs}'],
-		rules: {
-			// Playwright fixtures declare an empty dependency set with an object parameter.
-			'no-empty-pattern': ['error', { allowObjectPatternsAsParameters: true }],
-		},
-	},
-	{
 		files: ['**/*.{js,mjs,cjs,ts}'],
 		plugins: { prettier: eslintPluginPrettier },
 		rules: {

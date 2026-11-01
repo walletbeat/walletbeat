@@ -11,12 +11,10 @@
 		stage,
 		ladderEvaluation,
 		size = 'medium',
-		href,
 	}: {
 		stage: WalletLadderEvaluation<_AttributeGroupId>['stage'] | null
 		ladderEvaluation: WalletLadderEvaluation<string> | null
 		size?: 'small' | 'medium' | 'large'
-		href?: string
 	} = $props()
 
 
@@ -51,7 +49,6 @@
 </script>
 
 
-{#snippet badge()}
 <data
 	data-badge={size}
 	value={stageValue === 'QUALIFIED_FOR_NO_STAGES' ? 'NO_STAGES' : stageValue === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : stageValue}
@@ -68,13 +65,6 @@
 		{stage.label}
 	{/if}
 </data>
-{/snippet}
-
-{#if href}
-	<a {href} data-link="camouflaged">{@render badge()}</a>
-{:else}
-	{@render badge()}
-{/if}
 
 
 <style>

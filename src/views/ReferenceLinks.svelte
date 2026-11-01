@@ -12,11 +12,9 @@
 	const {
 		references,
 		cardBackground = 'primary',
-		headingLevel = 4,
 	}: {
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
-		headingLevel?: 2 | 3 | 4 | 5 | 6
 	} = $props()
 
 
@@ -163,14 +161,14 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<svelte:element this={`h${headingLevel}`} class="sources-heading">
+		<h4>
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</svelte:element>
+		</h4>
 
-		<ul class="references-list" data-list="gap-2" data-scroll-item="snap-prose">
+		<ul class="references-list" data-list="gap-2">
 			{#each shownReferences as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
@@ -208,13 +206,13 @@
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
 
-						<div class="explanation">
+						<p class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
 								<br>
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</div>
+						</p>
 					{/if}
 
 					{#if linkUrls.length === 1}
@@ -377,7 +375,7 @@
 		line-height: 1.7;
 	}
 
-	.sources-heading {
+	h4 {
 		font-size: 1em;
 	}
 

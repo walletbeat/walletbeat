@@ -858,7 +858,7 @@ function evaluateKeysHandling(
 
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
-	icon: 'checklist',
+	icon: 'security_best_practices',
 	displayName: 'Security best practices',
 	wording: {
 		midSentenceName: null,
