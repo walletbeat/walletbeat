@@ -248,7 +248,7 @@ a {
 select,
 button,
 input,
-a[href][data-tag],
+:where(a[href][data-tag]),
 label:has(> input:is([type="checkbox"], [type="radio"])) {
 	cursor: pointer;
 

@@ -16,6 +16,7 @@ async function applySizing(page: Page, sizing: Sizing) {
 async function load(page: Page, hydrated: boolean, sizing: Sizing) {
 	await page.goto('/__tag-composition')
 	await applySizing(page, sizing)
+
 	if (hydrated) {
 		await expect(page.locator('astro-island[component-url*="TagComposition"]')).not.toHaveAttribute(
 			'ssr',
@@ -40,6 +41,7 @@ async function probe(target: Locator) {
 				: null
 		const bounds = (control: Element) => {
 			const rect = control.getBoundingClientRect()
+
 			return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
 		}
 		// These bounded native samples are evidence for review, not complete conformance proof.
@@ -47,9 +49,11 @@ async function probe(target: Locator) {
 		const size = 24
 		const square = (control: Element) => {
 			const rect = control.getBoundingClientRect()
+
 			if (rect.width < size || rect.height < size) {
 				return false
 			}
+
 			return points(rect.x + size / 2, rect.right - size / 2).some(x =>
 				points(rect.y + size / 2, rect.bottom - size / 2).some(y =>
 					[-11.99, -6, 0, 6, 11.99].every(dx =>
@@ -61,17 +65,22 @@ async function probe(target: Locator) {
 		const circleConflicts = []
 		let emptyCircleSamples = 0
 		let outsideViewportSamples = 0
+
 		for (let dx = -12; dx <= 12; dx++) {
 			for (let dy = -12; dy <= 12; dy++) {
 				if (dx * dx + dy * dy >= 144) {
 					continue
 				}
+
 				const x = center.x + dx,
 					y = center.y + dy
+
 				if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) {
 					outsideViewportSamples++
 				}
+
 				const hit = owner(x, y)
+
 				if (!hit) {
 					emptyCircleSamples++
 				} else if (hit !== element) {
@@ -84,7 +93,9 @@ async function probe(target: Locator) {
 				if (other === element || !other.getClientRects().length) {
 					return false
 				}
+
 				const rect = other.getBoundingClientRect()
+
 				return (
 					rect.right >= center.x - size &&
 					rect.x <= center.x + size &&
@@ -102,6 +113,7 @@ async function probe(target: Locator) {
 						owner: describe(owner(x, y)),
 					})),
 				)
+
 				return {
 					control: describe(other),
 					box: bounds(other),
@@ -130,9 +142,11 @@ async function probe(target: Locator) {
 				!other.keyboardBehind && !other.inactive && !other.hitSamples.some(sample => sample.owns),
 		)
 		let point: { x: number; y: number } | null = null
+
 		if (owner(center.x, center.y) === element) {
 			point = center
 		}
+
 		for (let x = Math.max(0, box.x) + 0.5; !point && x < Math.min(innerWidth, box.right); x++) {
 			for (let y = Math.max(0, box.y) + 0.5; !point && y < Math.min(innerHeight, box.bottom); y++) {
 				if (owner(x, y) === element) {
@@ -141,6 +155,7 @@ async function probe(target: Locator) {
 			}
 		}
 		const style = getComputedStyle(element)
+
 		return {
 			sampleTime: performance.now(),
 			fontStatus: document.fonts.status,
@@ -165,6 +180,7 @@ async function probe(target: Locator) {
 				competitors.some(other => Math.abs(other.centerDistance - size) <= 1),
 			scrollOwners: (() => {
 				const rows = []
+
 				for (let parent = element.parentElement; parent; parent = parent.parentElement) {
 					if (
 						parent.scrollHeight > parent.clientHeight ||
@@ -179,6 +195,7 @@ async function probe(target: Locator) {
 						})
 					}
 				}
+
 				return rows
 			})(),
 			method:
@@ -189,10 +206,13 @@ async function probe(target: Locator) {
 
 async function reachable(target: Locator) {
 	const result = await probe(target)
+
 	expect(result.point, 'The intended native control must receive real pointer input').not.toBeNull()
+
 	if (!result.point) {
 		throw new Error('Native control has no reachable hit region')
 	}
+
 	return result.point
 }
 
@@ -208,6 +228,7 @@ async function tabTo(page: Page, target: Locator) {
 						element.getClientRects().length,
 				).length,
 		)
+
 	if (
 		await target.evaluate(
 			element => document.activeElement === element && !element.matches(':focus-visible'),
@@ -215,10 +236,12 @@ async function tabTo(page: Page, target: Locator) {
 	) {
 		await page.keyboard.press('Shift+Tab')
 	}
+
 	for (let index = 0; index <= count; index++) {
 		if (await target.evaluate(element => document.activeElement === element)) {
 			break
 		}
+
 		await page.keyboard.press('Tab')
 	}
 	await expect(target).toBeFocused()
@@ -227,15 +250,18 @@ async function tabTo(page: Page, target: Locator) {
 
 async function popoverFor(page: Page, button: Locator) {
 	const id = await button.getAttribute('popovertarget')
+
 	if (!id) {
 		throw new Error('Missing native popover target')
 	}
+
 	return page.locator(`[id="${id}"]`)
 }
 
 async function tooltip(page: Page, kind: 'native' | 'wrapper') {
 	const section = page.locator(`[data-tag-case="${kind}"]`)
 	const button = section.locator('[popovertarget]')
+
 	return { section, button, target: await popoverFor(page, button) }
 }
 
@@ -244,6 +270,7 @@ async function outsidePoint(page: Page) {
 		for (let y = 8; y < innerHeight; y += 16) {
 			for (let x = 8; x < innerWidth; x += 16) {
 				const hit = document.elementFromPoint(x, y)
+
 				if (
 					hit &&
 					!hit.closest(
@@ -254,11 +281,14 @@ async function outsidePoint(page: Page) {
 				}
 			}
 		}
+
 		return null
 	})
+
 	if (!point) {
 		throw new Error('No reachable noninteractive outside region')
 	}
+
 	return point
 }
 
@@ -268,6 +298,7 @@ async function expectOpen(target: Locator) {
 			target.evaluate(element => {
 				const style = getComputedStyle(element)
 				const box = element.getBoundingClientRect()
+
 				return (
 					element.matches(':popover-open') &&
 					style.visibility !== 'hidden' &&
@@ -287,12 +318,14 @@ async function expectOpen(target: Locator) {
 
 async function keyboardShowAndDismiss(page: Page, button: Locator) {
 	const target = await popoverFor(page, button)
+
 	await tabTo(page, button)
 	await page.keyboard.press('Enter')
 	await expectOpen(target)
 	await page.keyboard.press('Enter')
 	await expectOpen(target)
 	const outside = await outsidePoint(page)
+
 	await page.mouse.click(outside.x, outside.y)
 	await expect.poll(() => target.evaluate(element => element.matches(':popover-open'))).toBe(false)
 }
@@ -300,6 +333,7 @@ async function keyboardShowAndDismiss(page: Page, button: Locator) {
 async function hoverAndKeyboard(page: Page, button: Locator, hover: Locator) {
 	const target = await popoverFor(page, button)
 	const point = await reachable(hover)
+
 	await page.mouse.move(0, 0)
 	await page.mouse.move(point.x, point.y)
 	await expectOpen(target)
@@ -312,6 +346,7 @@ async function recordConsumer(scope: Locator, info: TestInfo, name: string, sizi
 	const tags = await scope.locator('[data-tag]:visible').evaluateAll(elements =>
 		elements.map(element => {
 			const box = element.getBoundingClientRect()
+
 			return {
 				text: element.textContent,
 				tag: element.tagName,
@@ -326,6 +361,7 @@ async function recordConsumer(scope: Locator, info: TestInfo, name: string, sizi
 		'button[data-tag]:visible:not(:disabled), a[data-tag][href]:visible, button:has(> [data-tag]):visible:not(:disabled), a[href]:has(> [data-tag]):visible',
 	)
 	const targets = await Promise.all((await controls.all()).map(probe))
+
 	await info.attach(`${name}-target-neighbors`, {
 		body: JSON.stringify({
 			sizing,
@@ -340,6 +376,7 @@ async function recordConsumer(scope: Locator, info: TestInfo, name: string, sizi
 		body: await scope.page().screenshot(),
 		contentType: 'image/png',
 	})
+
 	return targets
 }
 
@@ -347,9 +384,11 @@ async function walletTrigger(page: Page, sizing: Sizing, hydrated = true) {
 	await page.goto('/metamask/')
 	await applySizing(page, sizing)
 	const overview = page.locator('.wallet-overview')
+
 	if (hydrated) {
 		await expect(page.locator('astro-island[ssr]:has(.wallet-overview)')).toHaveCount(0)
 	}
+
 	return {
 		overview,
 		trigger: overview
@@ -367,7 +406,9 @@ async function trustedTouch(page: Page, button: Locator, expectedOpen: boolean |
 				if (!(event instanceof PointerEvent)) {
 					throw new Error('Missing pointer input')
 				}
+
 				const target = document.getElementById(button.getAttribute('popovertarget') ?? '')
+
 				button.setAttribute(
 					'data-touch-down',
 					JSON.stringify({
@@ -381,6 +422,7 @@ async function trustedTouch(page: Page, button: Locator, expectedOpen: boolean |
 		),
 	)
 	const point = await reachable(button)
+
 	await page.touchscreen.tap(point.x, point.y)
 	await expect(button).toHaveAttribute(
 		'data-touch-down',
@@ -390,9 +432,11 @@ async function trustedTouch(page: Page, button: Locator, expectedOpen: boolean |
 
 async function touchShowAndDismiss(page: Page, button: Locator) {
 	const target = await popoverFor(page, button)
+
 	await trustedTouch(page, button, false)
 	await expectOpen(target)
 	const outside = await outsidePoint(page)
+
 	await page.touchscreen.tap(outside.x, outside.y)
 	await expect.poll(() => target.evaluate(element => element.matches(':popover-open'))).toBe(false)
 }
@@ -402,7 +446,9 @@ async function eipFilter(page: Page, sizing: Sizing) {
 	await applySizing(page, sizing)
 	await expect(page.locator('astro-island[ssr]:has([data-tag])')).toHaveCount(0)
 	const filter = page.locator('button[data-tag~="eoa"]:visible:not(:disabled)').first()
+
 	await filter.scrollIntoViewIfNeeded()
+
 	return { filter, state: page.locator('[data-filter-choice="accountType-eoa"] input').first() }
 }
 
@@ -421,7 +467,9 @@ for (const theme of ['light', 'dark'] as const) {
 						contentType: 'image/png',
 					})
 					const labels = page.locator('[data-tag-palette] [data-tag]')
+
 					expect(await labels.count()).toBe(7)
+
 					for (const label of await labels.all()) {
 						expect(
 							await label.evaluate(
@@ -434,19 +482,24 @@ for (const theme of ['light', 'dark'] as const) {
 						const geometry = await label.evaluate(element => {
 							const style = getComputedStyle(element)
 							const canvas = document.createElement('canvas')
+
 							canvas.width = canvas.height = 1
 							const context = canvas.getContext('2d')
+
 							if (!context) {
 								throw new Error('Missing canvas color reader')
 							}
+
 							const luminance = (color: string) => {
 								context.clearRect(0, 0, 1, 1)
 								context.fillStyle = color
 								context.fillRect(0, 0, 1, 1)
 								const rgba = context.getImageData(0, 0, 1, 1).data
+
 								if (rgba[3] !== 255) {
 									throw new Error('Fixture tag colors must be opaque')
 								}
+
 								return [...rgba]
 									.slice(0, 3)
 									.map(value => value / 255)
@@ -457,6 +510,7 @@ for (const theme of ['light', 'dark'] as const) {
 							}
 							const foreground = luminance(style.color)
 							const background = luminance(style.backgroundColor)
+
 							return {
 								contrast:
 									(Math.max(foreground, background) + 0.05) /
@@ -471,16 +525,19 @@ for (const theme of ['light', 'dark'] as const) {
 								].reduce((sum, value) => sum + Number.parseFloat(value), 0),
 							}
 						})
+
 						expect(geometry.height).toBeLessThanOrEqual(geometry.intrinsic + 1)
 						expect(geometry.contrast).toBeGreaterThanOrEqual(4.5)
 					}
 					const measurements = []
+
 					for (const control of await page
 						.locator(
 							'[data-tag-case="direct"] button, [data-tag-case="native"] [data-tooltip-trigger], [data-tag-case="wrapper"] button[data-tag], [data-input-reference], [data-tag-outside]',
 						)
 						.all()) {
 						const result = await probe(control)
+
 						measurements.push({
 							name: (await control.getAttribute('aria-label')) ?? (await control.innerText()),
 							...result,
@@ -490,6 +547,7 @@ for (const theme of ['light', 'dark'] as const) {
 						body: JSON.stringify(measurements),
 						contentType: 'application/json',
 					})
+
 					for (const result of measurements) {
 						expect(result.point, result.name).not.toBeNull()
 						expect(
@@ -504,6 +562,7 @@ for (const theme of ['light', 'dark'] as const) {
 					const measurements = await Promise.all(
 						(await page.locator('[data-tag-composition] button').all()).map(probe),
 					)
+
 					await info.attach('tag-minimum-comparison', {
 						body: JSON.stringify({
 							sizing,
@@ -519,6 +578,7 @@ for (const theme of ['light', 'dark'] as const) {
 					const button = page.locator('[data-tag-case="direct"] button')
 					const output = page.getByRole('status', { name: 'Direct filter count' })
 					const point = await reachable(button)
+
 					await page.mouse.click(point.x, point.y)
 					await expect(output).toHaveText('1')
 					await tabTo(page, button)
@@ -534,6 +594,7 @@ for (const theme of ['light', 'dark'] as const) {
 					}) => {
 						await load(page, true, sizing)
 						const { section, button } = await tooltip(page, kind)
+
 						await hoverAndKeyboard(
 							page,
 							button,
@@ -546,8 +607,10 @@ for (const theme of ['light', 'dark'] as const) {
 					page,
 				}, info) => {
 					const { overview, trigger } = await walletTrigger(page, sizing)
+
 					await recordConsumer(overview, info, 'wallet', sizing)
 					const result = await probe(trigger)
+
 					expect(result.point).not.toBeNull()
 					expect(
 						result.sampledSquare || result.sampledSpacing,
@@ -560,9 +623,11 @@ for (const theme of ['light', 'dark'] as const) {
 					page,
 				}, info) => {
 					const { filter, state } = await eipFilter(page, sizing)
+
 					await recordConsumer(page.locator('main'), info, 'eip-layout', sizing)
 					await expect(state).not.toBeChecked()
 					const point = await reachable(filter)
+
 					await page.mouse.click(point.x, point.y)
 					await expect(state).toBeChecked()
 					await tabTo(page, filter)
@@ -577,11 +642,14 @@ for (const theme of ['light', 'dark'] as const) {
 					}) => {
 						await load(page, true, sizing)
 						const native = await tooltip(page, 'native')
+
 						await touchShowAndDismiss(page, native.button)
 						const direct = page.locator('[data-tag-case="direct"] button')
+
 						await trustedTouch(page, direct, null)
 						await expect(page.getByRole('status', { name: 'Direct filter count' })).toHaveText('1')
 						const wrapper = await tooltip(page, 'wrapper')
+
 						await trustedTouch(page, wrapper.section.locator('button[data-tag]'), null)
 						await expect(page.getByRole('status', { name: 'Wrapper filter count' })).toHaveText('1')
 						await expect
@@ -592,9 +660,11 @@ for (const theme of ['light', 'dark'] as const) {
 						page,
 					}, info) => {
 						const { overview, trigger } = await walletTrigger(page, sizing)
+
 						await recordConsumer(overview, info, 'wallet-touch', sizing)
 						await touchShowAndDismiss(page, trigger)
 						const { filter, state } = await eipFilter(page, sizing)
+
 						await recordConsumer(page.locator('main'), info, 'eip-touch', sizing)
 						await expect(state).not.toBeChecked()
 						await trustedTouch(page, filter, null)
@@ -604,14 +674,17 @@ for (const theme of ['light', 'dark'] as const) {
 
 				test.describe('without scripts', () => {
 					test.use({ javaScriptEnabled: false })
+
 					for (const kind of ['native', 'wrapper'] as const) {
 						test(`${kind} keeps native show and dismissal`, async ({ page }) => {
 							await load(page, false, sizing)
 							const { button, target } = await tooltip(page, kind)
+
 							await tabTo(page, button)
 							await page.keyboard.press('Enter')
 							await expectOpen(target)
 							const outside = await reachable(page.locator('[data-tag-outside]'))
+
 							await page.mouse.click(outside.x, outside.y)
 							await expect
 								.poll(() => target.evaluate(element => element.matches(':popover-open')))
@@ -620,6 +693,7 @@ for (const theme of ['light', 'dark'] as const) {
 					}
 					test('actual wallet and EIP native fallback remains usable', async ({ page }, info) => {
 						const { overview, trigger } = await walletTrigger(page, sizing, false)
+
 						await recordConsumer(overview, info, 'wallet-no-script', sizing)
 						await keyboardShowAndDismiss(page, trigger)
 						await page.goto('/wallet/7702/')
@@ -627,6 +701,7 @@ for (const theme of ['light', 'dark'] as const) {
 						const source = page
 							.locator('button[data-tooltip-trigger]:visible:has(> [data-tag])')
 							.first()
+
 						await source.scrollIntoViewIfNeeded()
 						await recordConsumer(page.locator('main'), info, 'eip-no-script', sizing)
 						await keyboardShowAndDismiss(page, source)
