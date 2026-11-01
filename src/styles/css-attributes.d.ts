@@ -15,6 +15,7 @@ declare global {
 		 * - `--badge-backgroundColor`
 		 * - `--badge-borderColor`
 		 * - `--badge-textColor`
+		 * - `--badge-backdropFilter`: optional surface filter; defaults to `none` and is disabled for reduced transparency.
 		 *
 		 * ### Examples
 		 * - Default (inherited text size, no added padding):

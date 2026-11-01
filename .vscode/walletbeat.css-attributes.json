@@ -3,7 +3,7 @@
 	"globalAttributes": [
 		{
 			"name": "data-badge",
-			"description": "## [data-badge]\n\nCompact badge / chip surface with explicit size modifiers. Without a size token, text size is inherited and no badge padding is added.\n\n### Tokens\n- `small`, `medium`, `large`\n\n### CSS Variables\n- `--badge-borderWidth`: border width shared with intrinsic border-box measurement\n- `--badge-backgroundColor`\n- `--badge-borderColor`\n- `--badge-textColor`\n\n### Examples\n- Default (inherited text size, no added padding):\n  ```html\n  <span data-badge>Status</span>\n  ```\n- `small`:\n  ```html\n  <span data-badge=\"small\">Status</span>\n  ```\n- `large`:\n  ```html\n  <span data-badge=\"large\">Status</span>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-badge]`",
+			"description": "## [data-badge]\n\nCompact badge / chip surface with explicit size modifiers. Without a size token, text size is inherited and no badge padding is added.\n\n### Tokens\n- `small`, `medium`, `large`\n\n### CSS Variables\n- `--badge-borderWidth`: border width shared with intrinsic border-box measurement\n- `--badge-backgroundColor`\n- `--badge-borderColor`\n- `--badge-textColor`\n- `--badge-backdropFilter`: optional surface filter; defaults to `none` and is disabled for reduced transparency.\n\n### Examples\n- Default (inherited text size, no added padding):\n  ```html\n  <span data-badge>Status</span>\n  ```\n- `small`:\n  ```html\n  <span data-badge=\"small\">Status</span>\n  ```\n- `large`:\n  ```html\n  <span data-badge=\"large\">Status</span>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-badge]`",
 			"values": [
 				{
 					"name": "large",
