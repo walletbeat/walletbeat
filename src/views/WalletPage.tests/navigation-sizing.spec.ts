@@ -85,6 +85,11 @@ for (const width of [390, 690, 1024, 1025, 1400]) {
 
 				root.style.scrollSnapType = 'none'
 				const sections = [...document.querySelectorAll<HTMLElement>('.attribute-group[id]')]
+
+				if (sections.length === 0) {
+					throw new Error('Rendered attribute groups are required for rotation coverage')
+				}
+
 				const observations = []
 
 				for (const direction of ['ltr', 'rtl']) {
