@@ -171,7 +171,7 @@
 		style:--slice-opacity={slice.opacity ?? 1}
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-labelBackground={sliceLabelBackground(slice)}
-		style:--slice-labelSize={slice.computed.labelSize}
+		style:--slice-labelSize={slice.computed.labelSize === labelSize ? undefined : slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
 		data-view-transition={transitionsSlices ? 'named' : undefined}
