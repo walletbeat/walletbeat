@@ -79,6 +79,45 @@ for (const width of [390, 690, 1024, 1025, 1400]) {
 				expect(geometry.navigation.width).toBeLessThanOrEqual(Math.min(20 * geometry.rem, 320) + 1)
 				expect(geometry.article.right).toBeLessThanOrEqual(geometry.navigation.left + 1)
 			}
+
+			const rotations = await page.evaluate(async () => {
+				const root = document.querySelector<HTMLElement>('#layout')!
+
+				root.style.scrollSnapType = 'none'
+				const sections = [...document.querySelectorAll<HTMLElement>('.attribute-group[id]')]
+				const observations = []
+
+				for (const direction of ['ltr', 'rtl']) {
+					document.documentElement.dir = direction
+
+					for (const target of [null, ...sections, null]) {
+						root.scrollTo({
+							top: target ? root.scrollTop + target.getBoundingClientRect().top + 200 : 0,
+							behavior: 'instant',
+						})
+						await new Promise<void>(resolve =>
+							requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+						)
+						observations.push({
+							direction,
+							target: target?.id ?? 'top',
+							scroll: root.scrollTop,
+							overflow: root.scrollWidth - root.clientWidth,
+						})
+					}
+				}
+
+				return observations
+			})
+
+			await info.attach('rotated-navigation-overflow', {
+				body: JSON.stringify(rotations),
+				contentType: 'application/json',
+			})
+
+			for (const pose of rotations) {
+				expect(pose.overflow, JSON.stringify(pose)).toBeLessThanOrEqual(1)
+			}
 		} finally {
 			await info.attach('responsive-navigation-geometry', {
 				body: JSON.stringify({ width, geometry: geometry ?? (await read()) }),
