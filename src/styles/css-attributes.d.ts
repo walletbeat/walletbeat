@@ -257,12 +257,13 @@ declare global {
 		/**
 		 * ## [data-input]
 		 *
-		 * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
+		 * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, tagged links with `href`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
 		 *
 		 * ### Applied to
 		 * - `<button>`
 		 * - `<select>`
 		 * - `<input>`
+		 * - `<a href data-tag>`
 		 * - `<label>` wrapping checkbox or radio inputs
 		 *
 		 * ### Examples
@@ -989,7 +990,7 @@ declare global {
 		/**
 		 * ## [data-tag]
 		 *
-		 * Semantic labels with category colors derived against the current theme. Omit a category token for the accent palette. Native buttons and links retain interactive targets; passive labels keep compact padding.
+		 * Compact category labels using shared theme surfaces and text. Category tokens identify content; the theme roles and public overrides supply paint. Native buttons and tagged links use shared input typography and padding. Native wrappers retain their own interaction geometry.
 		 *
 		 * ### Tokens
 		 * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
@@ -1003,7 +1004,7 @@ declare global {
 		 * - `--tag-hover-borderColor`
 		 *
 		 * ### Examples
-		 * - Accent palette (omit category token):
+		 * - Default label (omit category token):
 		 *   ```html
 		 *   <span data-tag>Label</span>
 		 *   ```

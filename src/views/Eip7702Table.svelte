@@ -323,10 +323,6 @@
 		&:is(button) {
 			display: inline-flex;
 		}
-
-		&[data-tag~="eip"]:is(button) {
-			min-block-size: 0;
-		}
 	}
 
 	.muted-text {

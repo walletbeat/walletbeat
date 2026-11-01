@@ -216,12 +216,13 @@ a {
 }
 
 /**
- * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
+ * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, tagged links with `href`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
  *
  * ### Applied to
  * - `<button>`
  * - `<select>`
  * - `<input>`
+ * - `<a href data-tag>`
  * - `<label>` wrapping checkbox or radio inputs
  *
  * ### Examples
@@ -247,6 +248,7 @@ a {
 select,
 button,
 input,
+a[href][data-tag],
 label:has(> input:is([type="checkbox"], [type="radio"])) {
 	cursor: pointer;
 
@@ -1689,7 +1691,7 @@ summary:where(:not([data-column])) {
 }
 
 /**
- * Semantic labels with category colors derived against the current theme. Omit a category token for the accent palette. Native buttons and links retain interactive targets; passive labels keep compact padding.
+ * Compact category labels using shared theme surfaces and text. Category tokens identify content; the theme roles and public overrides supply paint. Native buttons and tagged links use shared input typography and padding. Native wrappers retain their own interaction geometry.
  *
  * ### Tokens
  * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
@@ -1703,7 +1705,7 @@ summary:where(:not([data-column])) {
  * - `--tag-hover-borderColor`
  *
  * ### Examples
- * - Accent palette (omit category token):
+ * - Default label (omit category token):
  *   ```html
  *   <span data-tag>Label</span>
  *   ```
@@ -1716,73 +1718,52 @@ summary:where(:not([data-column])) {
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`
  */
 [data-tag] {
-	---tag-color: var(--accent);
-	--tag-backgroundColor: color-mix(in oklch, var(---tag-color) 10%, var(--background-primary));
-	--tag-textColor: color-mix(in oklch, var(---tag-color) 35%, var(--text-primary));
-	--tag-borderColor: color-mix(in oklch, var(---tag-color) 25%, var(--background-primary));
-	--tag-hover-backgroundColor: color-mix(in oklch, var(---tag-color) 15%, var(--background-primary));
-	--tag-hover-textColor: var(--tag-textColor);
-	--tag-hover-borderColor: color-mix(in oklch, var(---tag-color) 40%, var(--background-primary));
+	--tag-backgroundColor: var(--background-tertiary);
+	--tag-textColor: var(--text-primary);
+	--tag-borderColor: var(--border-color);
+	--tag-hover-backgroundColor: var(--accent-backgroundColor);
+	--tag-hover-textColor: var(--text-primary);
+	--tag-hover-borderColor: var(--accent);
 
-	font-size: 0.66em;
+	font-size: smaller;
 
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0.4em 0.66em;
-	border-radius: 9999px;
+	max-inline-size: 100%;
+	border-radius: 999em;
 
 	background-color: var(--tag-backgroundColor);
 	color: var(--tag-textColor);
 	border: 1px solid var(--tag-borderColor);
 	font-weight: 500;
 	line-height: 1;
+	white-space: normal;
+	overflow-wrap: anywhere;
 
-	transition-property: background-color, border-color, color, transform, box-shadow;
-
-	&:is(button, a[href]),
-	:is(button, a[href]):has(> &) {
-		min-inline-size: 24px;
-		min-block-size: 24px;
-	}
-
-	&:is(button, a[href]) {
-		padding-block: 0.66em;
-
-		&:hover {
-			background-color: var(--tag-hover-backgroundColor);
-			color: var(--tag-hover-textColor);
-			border-color: var(--tag-hover-borderColor);
-			transform: translateY(-1px);
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-		}
-
-		&:active {
-			transform: translateY(0);
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-		}
-	}
-
+	transition-property: background-color, border-color, color;
 
 	&[data-tag~="wallet-type"] {
-		---tag-color: var(--text-secondary);
+		--tag-textColor: var(--text-secondary);
 	}
 
 	&[data-tag~="account-type"],
-	&[data-tag~="eoa"] {
-		---tag-color: oklch(0.65 0.15 145);
-	}
-
-	&[data-tag~="eip"] {
-		---tag-color: oklch(0.65 0.15 300);
-	}
-
-	&[data-tag~="eip-status"] {
-		---tag-color: oklch(0.65 0.15 250);
-	}
-
+	&[data-tag~="eoa"],
+	&[data-tag~="eip"],
+	&[data-tag~="eip-status"],
 	&[data-tag~="manufacture-type"] {
-		---tag-color: oklch(0.65 0.15 290);
+		--tag-backgroundColor: var(--accent-backgroundColor);
+	}
+
+	&:not(button, a[href]) {
+		padding: 0.4em 0.66em;
+	}
+
+	&:is(button:enabled, a[href]):is(:hover, :focus-visible),
+	:is(button:enabled, a[href]):is(:hover, :focus-visible) > & {
+		background-color: var(--tag-hover-backgroundColor);
+		color: var(--tag-hover-textColor);
+		border-color: var(--tag-hover-borderColor);
 	}
 }
 

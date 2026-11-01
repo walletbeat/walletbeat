@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__tag-composition',
+				entrypoint: './tests/browser/fixtures/tag-composition.astro',
+			})
+			injectRoute({
 				pattern: '/__modal-lifecycle',
 				entrypoint: './tests/browser/fixtures/modal-lifecycle.astro',
 			})
