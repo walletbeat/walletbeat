@@ -1221,6 +1221,7 @@ summary:where(:not([data-column])) {
  * - `--badge-backgroundColor`
  * - `--badge-borderColor`
  * - `--badge-textColor`
+ * - `--badge-backdropFilter`: optional surface filter; defaults to `none` and is disabled for reduced transparency.
  *
  * ### Examples
  * - Default (inherited text size, no added padding):
@@ -1255,10 +1256,10 @@ summary:where(:not([data-column])) {
 	border-radius: 0.375em;
 	background-color: var(--badge-backgroundColor);
 	border: var(--badge-borderWidth) solid var(--badge-borderColor);
-	backdrop-filter: none;
+	backdrop-filter: var(--badge-backdropFilter);
 
-	@media (prefers-reduced-transparency: no-preference) {
-		backdrop-filter: var(--badge-backdropFilter);
+	@media (prefers-reduced-transparency: reduce) {
+		backdrop-filter: none;
 	}
 
 	color: var(--badge-textColor);
@@ -4326,16 +4327,16 @@ ol {
 			/* Inputs */
 			--sticky-backgroundColor: light-dark(#f8edff3c, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
-			---sticky-background: linear-gradient(
-					var(--sticky-backgroundColor),
-					var(--sticky-backgroundColor)
-				)
-				var(--background-primary);
-			---sticky-backdropFilter: none;
+			---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
+			---sticky-backdropFilter: var(--sticky-backdropFilter);
 
-			@media (prefers-reduced-transparency: no-preference) {
-				---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
-				---sticky-backdropFilter: var(--sticky-backdropFilter);
+			@media (prefers-reduced-transparency: reduce) {
+				---sticky-background: linear-gradient(
+						var(--sticky-backgroundColor),
+						var(--sticky-backgroundColor)
+					)
+					var(--background-primary);
+				---sticky-backdropFilter: none;
 			}
 
 			&[data-card] {

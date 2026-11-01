@@ -999,49 +999,78 @@ test('native TOC overlay animates from flow and compact states and survives reop
 						animation.timeline instanceof DocumentTimeline &&
 						Number.isFinite(animation.effect?.getComputedTiming().endTime),
 				)
+		const listeners = new AbortController()
+		let timer = 0
 		const finishedPromise = (async () => {
-			const deadline = performance.now() + 10000
+			await new Promise<void>((resolve, reject) => {
+				panel.addEventListener(
+					'toggle',
+					event => {
+						if (event.newState !== 'closed') {
+							return
+						}
 
-			while (performance.now() < deadline) {
-				await frame()
-				const opacity = Number(getComputedStyle(panel).opacity)
-				const closing = finiteEffects().filter(animation => animation.playState === 'running')
+						listeners.abort()
+						clearTimeout(timer)
+						resolve()
+					},
+					{ signal: listeners.signal },
+				)
+				timer = window.setTimeout(() => reject(Error('Native TOC closing event required')), 10000)
+			})
+			const closing = finiteEffects().filter(animation => animation.playState === 'running')
 
-				if (
-					!panel.matches(':popover-open') &&
-					panel.inert &&
-					panel.hasAttribute('data-closing') &&
-					opacity > 0 &&
-					opacity < 0.999 &&
-					closing.length
-				) {
-					const interrupted = { opacity, effects: closing.length }
-					const finished = closing.map(animation => animation.finished)
-					const button = document.querySelector('button[popovertarget="wallet-toc"]')
-
-					if (!(button instanceof HTMLButtonElement)) {
-						return null
-					}
-
-					button.click()
-					await Promise.allSettled(finished)
-					await frame()
-					await Promise.allSettled(finiteEffects().map(animation => animation.finished))
-					await frame()
-
-					return {
-						interrupted,
-						open: panel.matches(':popover-open'),
-						inert: panel.inert,
-						closing: panel.hasAttribute('data-closing'),
-					}
-				}
+			if (
+				panel.matches(':popover-open') ||
+				!panel.inert ||
+				!panel.hasAttribute('data-closing') ||
+				!closing.length
+			) {
+				throw Error('Native close must retain its inert exit state and active effects')
 			}
 
-			return null
+			for (const animation of closing) {
+				animation.pause()
+				const timing = animation.effect!.getComputedTiming()
+
+				animation.currentTime = Number(timing.delay) + Number(timing.activeDuration) / 2
+			}
+			const opacity = Number(getComputedStyle(panel).opacity)
+			const button = document.querySelector('button[popovertarget="wallet-toc"]')
+
+			if (!(button instanceof HTMLButtonElement) || !(opacity > 0 && opacity < 0.999)) {
+				throw Error('An actual intermediate closing pose and native invoker are required')
+			}
+
+			const interrupted = { opacity, effects: closing.length, controlledPhase: 0.5 }
+			const finished = closing.map(animation => animation.finished)
+
+			for (const animation of closing) {
+				animation.play()
+			}
+			button.click()
+			await Promise.allSettled(finished)
+			await frame()
+			await Promise.allSettled(finiteEffects().map(animation => animation.finished))
+			await frame()
+
+			return {
+				interrupted,
+				open: panel.matches(':popover-open'),
+				inert: panel.inert,
+				closing: panel.hasAttribute('data-closing'),
+			}
 		})()
 
-		return { finishedPromise }
+		void finishedPromise.catch(() => {})
+
+		return {
+			finishedPromise,
+			dispose() {
+				listeners.abort()
+				clearTimeout(timer)
+			},
+		}
 	})
 	let reopening
 
@@ -1049,11 +1078,11 @@ test('native TOC overlay animates from flow and compact states and survives reop
 		await page.keyboard.press('Escape')
 		reopening = await armed.evaluate(async state => state.finishedPromise)
 	} finally {
-		await armed.dispose()
-	}
-
-	if (reopening === null) {
-		throw new Error('No native in-progress closing effect was observed before reopening')
+		try {
+			await armed.evaluate(state => state.dispose())
+		} finally {
+			await armed.dispose()
+		}
 	}
 
 	expect(await idlePaint()).toEqual({ blur: 'none', opacity: '0', hit: true })
@@ -1128,7 +1157,7 @@ test('native TOC overlay animates from flow and compact states and survives reop
 		body: JSON.stringify(
 			{
 				limits:
-					'Computed phase samples verify native transitions, not compositor eligibility or frame pacing.',
+					'Computed phase samples and event-bound interruption at half the native exit duration verify transition and reopening behavior, not default-duration response, compositor eligibility or frame pacing.',
 				reopening,
 				observations,
 			},

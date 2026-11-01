@@ -1848,15 +1848,20 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							transition-property: backdrop-filter;
 						}
 					}
-					@media not (prefers-reduced-transparency: reduce) {
-						&:popover-open :global(> .navigation-items::after) {
-							transition-property: none;
-							animation: wallet-toc-blur var(---wallet-toc-entryDuration, 0.25s)
-								var(--transition-easeOutExpo);
+					&:popover-open :global(> .navigation-items::after) {
+						transition-property: none;
+						animation: wallet-toc-blur var(---wallet-toc-entryDuration, 0.25s)
+							var(--transition-easeOutExpo);
+						@media (prefers-reduced-transparency: reduce) {
+							animation: none;
 						}
-						&[data-closing] :global(> .navigation-items::after) {
-							opacity: 1;
-							backdrop-filter: blur(0.375rem);
+					}
+					&[data-closing] :global(> .navigation-items::after) {
+						opacity: 1;
+						backdrop-filter: blur(0.375rem);
+						@media (prefers-reduced-transparency: reduce) {
+							opacity: 0;
+							backdrop-filter: none;
 						}
 					}
 					&:not(:popover-open) {
