@@ -655,6 +655,7 @@
 						from, to { ---pie-currentIndex: ${index}; }
 					}
 					@container style(---pie-currentIndex: ${index}) {
+						${(item === group ? [group] : [group, item]).map(related => `#top .page-navigation [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
 						.pie-navigation-geometry { ---pie-hasRelevant: 1; }
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
 						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] { --pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline}; }
@@ -2092,14 +2093,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	@supports (animation-timeline: scroll()) and (timeline-scope: --link) and (color: if(style(---link-active: 1): red)) {
 		@scope (:root) to (details:not([open]) > :not(summary)) {
 			.pie-navigation :global(:is(li, details)[data-pressable-name]) {
-				animation: link-current auto linear both, wallet-pie-contact auto steps(1, start);
+				animation: var(---link-currentAnimationName) auto linear both, wallet-pie-contact auto steps(1, start);
 				animation-timeline: var(--link-current, none), var(--pie-contactTimeline);
 			}
 			.pie-navigation {
 				:global(.navigation-items summary > a),
 				:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 					animation:
-						link-current auto linear both,
+						var(---link-currentAnimationName) auto linear both,
 						if(style(---pie-turn-timeline: none): none; else: var(---pie-opacityAnimation, none)) auto var(--transition-easeInOutExpo),
 						if(style(---pie-interacting: 1): none; else: wallet-pie-scale) auto var(--transition-easeInOutExpo);
 					animation-timeline: var(--link-current, none), var(---pie-turn-timeline, none), var(---pie-turn-timeline, none);
@@ -2198,6 +2199,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 	}
 	.page-navigation {
+		:global([data-pressable-name]) {
+			---link-currentAnimationName: none;
+		}
 		@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 			animation: var(---pie-rotation-states);
 			animation-timeline: var(---pie-rotation-timelines);
