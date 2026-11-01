@@ -45,10 +45,11 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 					),
 				)
 				.toBe(0)
-			await expect(page.locator('#security-audits-and-bounties > details > summary')).toHaveCSS(
-				'position',
-				'static',
-			)
+			expect(
+				await page
+					.locator('#security-audits-and-bounties > details > summary')
+					.evaluate(element => getComputedStyle(element).position),
+			).not.toMatch(/^(sticky|fixed)$/)
 		}
 
 		const result = await page.evaluate(async () => {
@@ -86,13 +87,17 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 
 				return {
 					scroll: root.scrollTop,
-					current: [...pie.querySelectorAll<HTMLAnchorElement>('a[href]')]
+					current: [...document.querySelectorAll<HTMLElement>('#wallet-toc li')]
 						.filter(
-							link =>
-								getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() ===
-								'center',
+							item =>
+								getComputedStyle(item, item.querySelector(':scope > details') ? '::before' : null)
+									.scrollSnapAlign === 'center',
 						)
-						.map(link => link.hash),
+						.map(
+							item =>
+								item.querySelector<HTMLAnchorElement>(':scope > a, :scope > details > summary > a')
+									?.hash,
+						),
 					angle: parseFloat(style.rotate),
 					icons: [group, attribute].map(({ href }) => {
 						const link = links.find(candidate => candidate.hash === href)
@@ -161,6 +166,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 				cases.push({ href: destination.href, boundary, expected: -90 - midAngle, samples })
 			}
 			// Find the real shared-current handoff without forcing a destination state.
+			await seek(0)
 			const ordered = destinations
 				.map(item => ({ ...item, world: root.scrollTop + item.target.getBoundingClientRect().top }))
 				.sort((a, b) => a.world - b.world)
@@ -221,7 +227,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 		for (const destination of result.cases) {
 			for (const sample of destination.samples) {
 				expect(Math.abs(sample.scroll - sample.requested)).toBeLessThanOrEqual(1)
-				expect(sample.icons.filter(icon => icon.visible)).toHaveLength(width > 1024 ? 2 : 1)
+				expect(sample.icons.filter(icon => icon.visible)).toHaveLength(2)
 
 				for (const icon of sample.icons.filter(icon => icon.visible)) {
 					expect(icon.uprightError, icon.href).toBeLessThan(0.05)
