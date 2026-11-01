@@ -7,7 +7,7 @@ if [[ -n "${DEBUG:-}" ]]; then
 	set -x
 fi
 
-if [[ -z "$ENS_DOMAIN" ]]; then
+if [[ -z "${ENS_DOMAIN:-}" ]]; then
 	echo 'Missing ENS_DOMAIN' >&2
 	exit 1
 fi
@@ -45,12 +45,12 @@ run_ens_check() {
 # at the current CID.
 while IFS= read -r RPC_URL; do
 	echo "Checking whether ${ENS_DOMAIN} already points at ${DIRECTORY_CID} (using RPC: ${RPC_URL})..." >&2
-	CHECK_OUTPUT="$(run_ens_check "$RPC_URL" || true)"
-	if [[ "$CHECK_OUTPUT" == match* ]]; then
+	CHECK_OUTPUT="$(run_ens_check "$RPC_URL")" || continue
+	if [[ "$CHECK_OUTPUT" == "match"$'\t'"$DIRECTORY_CID" ]]; then
 		echo "ENS domain ${ENS_DOMAIN} already points at ${DIRECTORY_CID}; nothing to update." >&2
 		exit 0
 	fi
-	if [[ "$CHECK_OUTPUT" == no-match* ]]; then
+	if [[ "$CHECK_OUTPUT" == "no-match"$'\t'* ]]; then
 		echo "ENS domain ${ENS_DOMAIN} points at a different content-hash; updating." >&2
 		break
 	fi
@@ -63,11 +63,25 @@ while IFS= read -r RPC_URL; do
 	echo "Trying RPC URL: ${RPC_URL}..."
 	if [[ "${SKIP_HELIOS:-false}" == true ]]; then
 		if pnpm omnipin ens --rpc-url "$RPC_URL" "$DIRECTORY_CID" "$ENS_DOMAIN"; then
-			exit 0
+			break
 		fi
 	else
 		if ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="$RPC_URL" pnpm helios:wrap pnpm omnipin ens --rpc-url='$HELIOS_RPC_ENDPOINT' "$DIRECTORY_CID" "$ENS_DOMAIN"; then
-			exit 0
+			break
 		fi
 	fi
 done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
+
+# A command may report success before the record is visible, or fail after its
+# transaction was submitted. Only the resolver determines deployment success.
+while IFS= read -r RPC_URL; do
+	echo "Verifying ${ENS_DOMAIN} points at ${DIRECTORY_CID} (using RPC: ${RPC_URL})..." >&2
+	CHECK_OUTPUT="$(run_ens_check "$RPC_URL")" || continue
+	if [[ "$CHECK_OUTPUT" == "match"$'\t'"$DIRECTORY_CID" ]]; then
+		echo "Verified ENS domain ${ENS_DOMAIN} points at ${DIRECTORY_CID}." >&2
+		exit 0
+	fi
+done < <(echo "${RPC_URLS[@]}" | fmt -1 | shuf)
+
+echo "Failed to verify ENS domain ${ENS_DOMAIN} points at ${DIRECTORY_CID} after exhausting RPC attempts." >&2
+exit 1
