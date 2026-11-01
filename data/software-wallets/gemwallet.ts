@@ -173,19 +173,18 @@ export const gemwallet: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: [
 						{
-							explanation: 'Gem can bridge ETH from Ethereum to Base from its swap screen.',
+							explanation: 'Gem allows you to bridge tokens between networks.',
 							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png',
 							label: 'Gem swap from ETH on Ethereum to ETH on Base',
 						},
 						{
 							explanation:
-								"The review screen shows the network fee but not Gem's fee or the bridge provider's fee, and gives no warning about bridge risks.",
+								"When bridging, the review screen shows the network fee but doesn't show Gem's fee or the bridge provider's fee, and gives no warnings about bridge risks.",
 							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png',
 							label: 'Gem review screen for a bridge from Ethereum to Base',
 						},
 						{
-							explanation:
-								'Opening the details shows the rate and price impact but no fee breakdown.',
+							explanation: "When bridging, the details screen doesn't break out bridge fees.",
 							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png',
 							label: 'Gem details sheet for a bridge from Ethereum to Base',
 						},
@@ -214,23 +213,22 @@ export const gemwallet: SoftwareWallet = {
 				suggestedBridging: notSupportedWithRef({
 					ref: {
 						explanation:
-							'Gem does not offer to bridge when a network has too little ETH for a send, even with ETH on another network.',
+							'When sending transactions you must have sufficient funds on the chain you are transacting on. Gem will not pull funds from other chains.',
 						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png',
-						label: 'Gem send screen for ETH on Base with no balance on Base',
+						label: 'Gem send screen showing an insufficient balance error',
 					},
 				}),
 			},
 			crossChainBalances: {
 				ref: [
 					{
-						explanation:
-							"Gem shows the wallet's total value across all networks, but not its value on a single network.",
+						explanation: "Gem shows the wallet's total value across all networks.",
 						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-total-value.png',
 						label: 'Gem home screen with the wallet total',
 					},
 					{
 						explanation:
-							'Gem lists ETH and USDC on each network as separate items and does not add them up across networks.',
+							'Gem lists ETH and USDC on each network as separate items but does not add them up across networks.',
 						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-per-network-balances.png',
 						label: 'Gem asset list with ETH and USDC on each network',
 					},
