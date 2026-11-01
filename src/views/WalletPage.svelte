@@ -2410,6 +2410,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					--sticky-background: var(--sticky-backgroundColor);
 					z-index: auto;
 					container-type: inline-size;
 					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear both;
@@ -2430,7 +2431,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						clip-path: circle(calc(var(---pie-size) / 2));
 						block-size: var(---pie-size);
 						---pie-backdropAnimation: breadcrumb-backdrop auto var(--transition-easeInOutExpo) both;
-						z-index: 2;
+						z-index: 3;
 						pointer-events: none;
 					}
 					.pie-navigation-geometry {
