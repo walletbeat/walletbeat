@@ -2260,13 +2260,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				}
 
 				position: relative;
+				overflow: clip;
 				inline-size: var(---pie-size);
 				block-size: var(---pie-size);
 				margin-inline: auto;
 			}
 
 			:global(.navigation-items) {
-				overflow: clip;
 				position: absolute;
 				inset: 50% auto auto 50%;
 				inline-size: calc(var(---pie-diameter) * 1px);
