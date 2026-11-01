@@ -182,7 +182,7 @@
 		undefined
 	)
 
-	let expandedRowIds = $state(
+	let expandedDisclosureIds = $state(
 		new SvelteSet<string>()
 	)
 
@@ -353,16 +353,7 @@
 
 	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
 
-	const toggleRowExpanded = (id: string) => {
-		if (expandedRowIds.has(id))
-			expandedRowIds.delete(id)
-		else
-			expandedRowIds.add(id)
-	}
-
-	const isRowExpanded = (walletId: string) => (
-		expandedRowIds.has(walletId)
-	)
+	const disclosureId = (walletId: string, columnId: unknown) => JSON.stringify([walletId, columnId])
 
 
 	// Components
@@ -845,12 +836,13 @@
 				column,
 				value,
 			})}
-				{@const isExpanded = isRowExpanded(wallet.metadata.id)}
+					{@const cellDisclosureId = disclosureId(wallet.metadata.id, column.id)}
+					{@const isExpanded = expandedDisclosureIds.has(cellDisclosureId)}
 				{@const setIsExpanded = (open: boolean) => {
 					if (open)
-						expandedRowIds.add(wallet.metadata.id)
+							expandedDisclosureIds.add(cellDisclosureId)
 					else
-						expandedRowIds.delete(wallet.metadata.id)
+							expandedDisclosureIds.delete(cellDisclosureId)
 				}}
 
 				{#if column.id === 'stage'}
