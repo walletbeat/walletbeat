@@ -140,10 +140,16 @@
 	text-size-adjust: 100%;
 
 	color-scheme: light dark;
+	---theme-dark: 0;
+	@media (prefers-color-scheme: dark) {
+		---theme-dark: 1;
+	}
 	&:has(#theme-toggle:checked) {
 		color-scheme: dark;
+		---theme-dark: 1;
 		@media (prefers-color-scheme: dark) {
 			color-scheme: light;
+			---theme-dark: 0;
 		}
 	}
 	color: var(--text-primary);
