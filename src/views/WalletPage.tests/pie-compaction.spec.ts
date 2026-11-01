@@ -238,3 +238,80 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 		await original?.dispose()
 	})
 }
+
+for (const width of [390, 1024]) {
+	for (const direction of ['ltr', 'rtl'] as const) {
+		test(`TOC runtime state compacts and restores the same pie at ${width}px (${direction})`, async ({
+			page,
+		}, info) => {
+			await page.setViewportSize({ width, height: 900 })
+			await page.goto('/phantom/?variant=MOBILE#top')
+			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+			await page.evaluate(direction => {
+				document.documentElement.dir = direction
+			}, direction)
+			await page.evaluate(() => document.fonts.ready)
+			const supported = await page.evaluate(
+				() =>
+					CSS.supports('clip-path: shape(from 0 0, line to 1px 1px, close)') &&
+					CSS.supports('animation-timeline: scroll()') &&
+					CSS.supports('animation-range: 0% 100%') &&
+					CSS.supports('width: anchor-size(--source inline)') &&
+					CSS.supports('timeline-scope: --source') &&
+					CSS.supports('color: if(style(--a: 1): red)'),
+			)
+
+			test.skip(
+				!supported,
+				'Native pie compaction unavailable; fallback navigation is tested separately',
+			)
+			const source = page.locator('.page-navigation > .pie-navigation')
+			const geometry = source.locator('.pie-navigation-geometry')
+			const flower = geometry.locator(':scope > .navigation-items')
+			const original = await flower.elementHandle()
+			const read = () =>
+				flower.evaluate(element => {
+					const box = element.getBoundingClientRect()
+
+					return {
+						left: box.left,
+						right: box.right,
+						top: box.top,
+						width: box.width,
+						height: box.height,
+					}
+				})
+			const before = await read()
+
+			expect(before.width).toBeGreaterThan(208)
+			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
+			await expect(source).toHaveAttribute('data-wallet-toc-state', 'open')
+			await expect.poll(async () => Math.abs((await read()).width - 128)).toBeLessThanOrEqual(1)
+			const opened = await read()
+
+			expect(
+				Math.abs(direction === 'rtl' ? opened.left - 8 : width - opened.right - 8),
+			).toBeLessThanOrEqual(1)
+			expect(Math.abs(opened.height - 128)).toBeLessThanOrEqual(1)
+			await expect
+				.poll(() => geometry.evaluate(element => getComputedStyle(element).animationName))
+				.toBe('none')
+			await expect
+				.poll(() => source.evaluate(element => getComputedStyle(element, '::before').animationName))
+				.toBe('none')
+			await expect(page.locator('#wallet-toc')).toBeVisible()
+			await page.keyboard.press('Escape')
+			await expect(source).toHaveAttribute('data-wallet-toc-state', 'closed')
+			await expect
+				.poll(async () => Math.abs((await read()).width - before.width))
+				.toBeLessThanOrEqual(1)
+			expect(await flower.evaluate((element, original) => element === original, original)).toBe(
+				true,
+			)
+			await info.attach('pie-native-overlay-cycle', {
+				body: JSON.stringify({ width, direction, before, opened, returned: await read() }),
+				contentType: 'application/json',
+			})
+		})
+	}
+}
