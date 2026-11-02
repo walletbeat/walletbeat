@@ -841,7 +841,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-approach-timelines={pieRotation.approachTimelines}
 	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).join(', ') || '--wallet-links'}
-	style:---pie-rotation-states={pieRotation.animations}
 	data-sticky-breadcrumb="scope root"
 	style:---pie-radiusRatio={overallRatingPieMaxRadius / (overallRatingPieMaxRadius + overallRatingPiePadding)}
 	style:--stickyBreadcrumb-itemInlineTimeline="--wallet-item-inline"
@@ -992,6 +991,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	<aside
 		class="page-navigation"
+		style:---pie-rotation-states={pieRotation.animations}
 		data-scroll-item="inline-detached"
 		data-sticky-container
 		data-row="center align-start"
