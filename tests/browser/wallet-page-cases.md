@@ -22,7 +22,7 @@ assets. No dependency reinstall or additional server is part of this command.
 
 Use the supplied requirements contract for expected behavior. These procedures describe observations, not substitute requirements or passing results. Execute them against the same source revision and record evidence per requirement in the generated report. A procedure that has not run remains unverified.
 
-Sample widths of 390, 864, 1024, 1025, and 1440 pixels and each observed wrapping threshold; use software, hardware, embedded, multi-type, long-name and non-square-asset examples where relevant. Exercise `LTR`/`RTL`, light/dark, native keyboard/pointer/touch, details open/closed and supported engine/preferences as specified by each procedure. Record actual fixture URLs and settings; absent fixtures are explicit coverage gaps.
+Sample widths of 390, 864, 1344, 1345, and 1440 pixels and each observed wrapping threshold; use software, hardware, embedded, multi-type, long-name and non-square-asset examples where relevant. Exercise `LTR`/`RTL`, light/dark, native keyboard/pointer/touch, details open/closed and supported engine/preferences as specified by each procedure. Record actual fixture URLs and settings; absent fixtures are explicit coverage gaps.
 
 For motion, capture natural source and scope boxes before enhancement, actual scroll position and real-node boxes at dense contact/entry/rest/exit samples in both directions. Derive expected boundaries from the contract and measured owners, never from the animation formula being tested. Visual checks require inspecting the produced frames, not merely collecting screenshots. Performance procedures stay deferred until the first-pass gate is verified.
 
@@ -35,7 +35,7 @@ For motion, capture natural source and scope boxes before enhancement, actual sc
 | 🏗️ `Outline`        | Walk the semantic heading tree for wallets representing software, hardware, embedded, and news-bearing cases; compare levels with actual parent sections, including nested Sources.                                                               |
 | 🏗️ `RealHeadings`   | Record heading node identity and accessible heading counts at flow, entry, compact, and exit; inspect for visual clones or duplicate text.                                                                                                        |
 | 🏗️ `Destinations`   | Verify unique stable targets for all local in-page links. Compare pie/TOC membership only with real attribute groups and attributes; Stage and news anchors remain valid without pie/TOC entries. Reload the same wallet/variant and compare IDs. |
-| 🏗️ `SourceOrder`    | Inspect document order of the single aside and Stage Progress, then cross 1024/1025 without remounting or duplicating either tree.                                                                                                                |
+| 🏗️ `SourceOrder`    | Inspect document order of the single aside and Stage Progress, then cross 1344/1345 without remounting or duplicating either tree.                                                                                                                |
 | 🏗️ `LadderPresence` | Open wallets with an applicable ladder, unknown criteria and no applicable ladder; compare section presence with the ladder data after resolution.                                                                                                |
 | 🏗️ `Landmarks`      | Query the accessibility tree for navigation named Table of contents, at closed/open mobile and desktop states.                                                                                                                                    |
 | 🏗️ `RegionNames`    | Inspect accessible region names and heading relationships for every attribute group; compare with individual attribute names.                                                                                                                     |
@@ -48,7 +48,7 @@ For motion, capture natural source and scope boxes before enhancement, actual sc
 | 🖼️ `Skiplink`           | Reload, press Tab, capture the focused skip link box/icon/gap, activate Enter and inspect `activeElement` and #content visibility.                       |
 | 🖼️ `ScrollRoot`         | Wheel over main and footer; record all ancestor `scrollTop` values and overflow styles to identify the actual shared scroll owner.                       |
 | 🖼️ `NestedStacks`       | Scroll an actual nested scroll region with sticky children while holding outer scroll fixed, then scroll the parent; compare both sticky origins.        |
-| 🖼️ `RailBreakpoint`     | Measure content/aside allocation at 1024 and 1025 pixels and after crossing both directions; compare reserved inline width rather than visibility alone. |
+| 🖼️ `RailBreakpoint`     | Measure content/aside allocation at 1344 and 1345 pixels and after crossing both directions; compare reserved inline width rather than visibility alone. |
 | 🖼️ `RailIsolation`      | Measure main/rail boxes with the longest TOC labels and wide local content; detect overlaps or rail expansion.                                           |
 | 🖼️ `HorizontalOverflow` | Compare `scrollWidth`/`clientWidth` at document and every scroll owner; wheel horizontally over genuinely wide local content.                            |
 | 🖼️ `Footer`             | Scroll through footer arrival and end; inspect footer position and inline bounds relative to the content column.                                         |
@@ -289,7 +289,7 @@ For motion, capture natural source and scope boxes before enhancement, actual sc
 | ☰ `SearchEntry`   | Capture menu/search entry frames and compare search translation/delay with established reference.                  |
 | ☰ `ClosedMenu`    | Close menu then click/tab/scroll underlying content across the former overlay area.                                |
 | ☰ `HeaderSurface` | Inspect mobile site-header backdrop/border/shadow with menu closed at top and scrolled states.                     |
-| ☰ `MenuResize`    | Open mobile menu, resize above 1024 pixels, operate the retained control and verify a usable closed wide state.    |
+| ☰ `MenuResize`    | Open mobile menu, resize above 1344 pixels, operate the retained control and verify a usable closed wide state.    |
 | ☰ `MenuBlur`      | Record computed/rendered blur from entry zero through rest and closing, including reduced-transparency preference. |
 | ☰ `MenuSurfaces`  | Scroll navigation items into current/stuck/idle states and compare surfaces without permanent idle paint.          |
 

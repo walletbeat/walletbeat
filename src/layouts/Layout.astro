@@ -181,7 +181,8 @@ import Footer from '@/views/Footer.astro'
 			--sticky-paddingInlineEnd: var(--safeArea-insetRight);
 		}
 
-		@media (width > 1024px) {
+		/* Two 20rem rails leave 40rem of content and 4rem of inline padding. */
+		@media (width > 84rem) {
 			grid-template:
 				'Nav Content' minmax(0, 1fr)
 				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
@@ -192,7 +193,7 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			grid-template:
 				'Nav' var(--navigation-mobile-blockSize)
 				'Content' minmax(0, 1fr)
@@ -229,7 +230,7 @@ import Footer from '@/views/Footer.astro'
 			min-block-size: 0;
 			min-inline-size: 0;
 
-			@media (width <= 1024px) and (prefers-reduced-motion: no-preference) {
+			@media (width <= 84rem) and (prefers-reduced-motion: no-preference) {
 				&:not(:has([data-sticky-breadcrumb~="root"])) {
 					transform-style: preserve-3d;
 					transform: translateZ(0);
@@ -326,7 +327,7 @@ import Footer from '@/views/Footer.astro'
 			---breadcrumb-naturalItemHeight: calc(100vw * (1 / var(---breadcrumb-itemBlock) - 1));
 			---breadcrumb-itemHeight: round(nearest, var(---breadcrumb-naturalItemHeight), 0.0625px);
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			#layout:has([data-sticky-breadcrumb~="root"]) {
 				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
 				---navigation-entryEasing: linear(

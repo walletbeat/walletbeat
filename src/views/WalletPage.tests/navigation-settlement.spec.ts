@@ -8,7 +8,7 @@ import {
 import { expect, test } from '../../../tests/browser/verified-test'
 
 // Every route exercises the same original nodes; no surrogate anchor or layout is introduced.
-for (const width of [390, 864, 1024, 1025, 1440]) {
+for (const width of [390, 864, 1344, 1345, 1440]) {
 	test(`native fragment settlement, disclosure and history at ${width}px`, async ({
 		page,
 		browserName,
@@ -125,7 +125,7 @@ for (const width of [390, 864, 1024, 1025, 1440]) {
 		await page.goForward()
 		const forward = await settle(detailId, 'history-forward')
 
-		await page.setViewportSize({ width: width <= 1024 ? 1440 : 390, height: 900 })
+		await page.setViewportSize({ width: width <= 1344 ? 1440 : 390, height: 900 })
 		await settle(detailId, 'responsive-crossing')
 		await page.setViewportSize({ width, height: 900 })
 		const returned = await settle(detailId, 'responsive-return')
@@ -159,7 +159,7 @@ for (const width of [390, 864, 1024, 1025, 1440]) {
 				},
 			)
 			.toBeGreaterThanOrEqual(3)
-		await page.setViewportSize({ width: width <= 1024 ? 1440 : 390, height: 900 })
+		await page.setViewportSize({ width: width <= 1344 ? 1440 : 390, height: 900 })
 		await page.evaluate(() => document.fonts.ready)
 		let previousResizeScroll = (await sample()).scroll
 		let canceledLandingSamples = 0
