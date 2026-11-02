@@ -13,6 +13,12 @@ export enum EthereumL1LightClient {
 
 	/** Helios-Mobi: a mobile-optimized port of Helios. */
 	heliosMobi = 'heliosMobi',
+
+	/**
+	 * Colibri Stateless: a stateless light client that verifies RPC responses
+	 * against Merkle proofs and zero-knowledge proofs of the sync committee.
+	 */
+	colibri = 'colibri',
 }
 
 /**
@@ -24,6 +30,8 @@ export function ethereumL1LightClientName(l1LightClient: EthereumL1LightClient):
 			return 'Helios'
 		case EthereumL1LightClient.heliosMobi:
 			return 'Helios-Mobi'
+		case EthereumL1LightClient.colibri:
+			return 'Colibri Stateless'
 	}
 }
 
@@ -42,7 +50,32 @@ export function ethereumL1LightClientUrl(l1LightClient: EthereumL1LightClient): 
 				url: 'https://github.com/hsyodyssey/helios-mobi',
 				label: ethereumL1LightClientName(l1LightClient),
 			}
+		case EthereumL1LightClient.colibri:
+			return {
+				url: 'https://github.com/corpus-core/colibri-stateless',
+				label: ethereumL1LightClientName(l1LightClient),
+			}
 	}
 }
 
-export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
+/**
+ * How much of the chain data the wallet relies on is verified by its
+ * light client(s).
+ */
+export interface EthereumL1LightClientCoverage {
+	/**
+	 * Whether light client verification is active without the user having to
+	 * opt into it (e.g. by toggling a setting).
+	 */
+	enabledByDefault: boolean
+
+	/**
+	 * Whether the chain state used to simulate transactions before signing is
+	 * verified by the light client, as opposed to only some other data such as
+	 * displayed balances.
+	 */
+	verifiesTransactionSimulation: boolean
+}
+
+export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient> &
+	EthereumL1LightClientCoverage
