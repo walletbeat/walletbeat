@@ -1277,12 +1277,13 @@
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
 									<div data-row="gap-3 start wrap">
-										<h3>
+										<h3
+											data-view-transition="named"
+											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+										>
 											<a
 											data-link="camouflaged"
 											href={walletUrl}
-											data-view-transition="named"
-											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
 										>{displayName}</a>
 										</h3>
 
@@ -1403,12 +1404,13 @@
 						<div class="name-and-tags" data-column="gap-2">
 							<div class="name" data-column="gap-1">
 								<div data-row="gap-3 start wrap">
-									<h3>
+									<h3
+										data-view-transition="named"
+										style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+									>
 										<a
 											data-link="camouflaged"
 											href={walletUrl}
-											data-view-transition="named"
-											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
 										>{value}</a>
 									</h3>
 								</div>
@@ -2551,12 +2553,15 @@
 							.wallet-info:not(:popover-open) {
 								:is(.name-and-tags, .variants) { visibility: hidden; }
 
+								.name h3 {
+									position: relative;
+									inset-inline-start: calc(var(--table-stickyLeaf-inlineSize) - var(--wallet-identity-retainedInlineSize));
+								}
+
 								.name h3 a {
 									color: transparent;
 									visibility: visible;
 									pointer-events: none;
-									position: relative;
-									inset-inline-start: calc(var(--table-stickyLeaf-inlineSize) - var(--wallet-identity-retainedInlineSize));
 									outline: none;
 								}
 
