@@ -140,7 +140,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 									<p>{news.summary}</p>
 
 									<div data-card='secondary padding-4 radius-4' data-column='gap-3'>
-										<h4>Impact</h4>
+										<h3>Impact</h3>
 										<ul>
 											<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
 											<li>Category: {impactCategories[news.impact.category].label}</li>
@@ -151,7 +151,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
 									{refs(news).length > 0 && (
 										<footer data-column='gap-3'>
-											<h4>Sources</h4>
+											<h3>Sources</h3>
 											<ul>
 												{refs(news).map(ref =>
 													ref.urls.map(url => (
@@ -217,6 +217,10 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
 		.article-content {
 			line-height: 1.75;
+
+			h3 {
+				font-size: 1em;
+			}
 		}
 
 		dl.metadata {
