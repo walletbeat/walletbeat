@@ -901,6 +901,13 @@ span svg {
 
 	[data-column~="span-start"] {
 		anchor-scope: --column-firstRow;
+		> [data-row],
+		> :is(header, [data-sticky]) > [data-row] {
+			anchor-name: --column-firstRow;
+		}
+	}
+
+	[data-column~="span-start"]:not([data-sticky-breadcrumb~="position"]) {
 		timeline-scope: var(---column-sizeTimelines);
 		animation:
 			column-inline-size auto linear both,
@@ -916,31 +923,24 @@ span svg {
 			1
 		);
 
-		> [data-row],
-		> :is(header, [data-sticky]) > [data-row] {
-			anchor-name: --column-firstRow;
+		&::before,
+		&::after {
+			content: '';
+			position: fixed;
+			inset: 0 auto auto 0;
+			block-size: 1px;
+			visibility: hidden;
+			pointer-events: none;
+			view-timeline-axis: inline;
+			view-timeline-inset: 0;
 		}
-
-		&:not([data-sticky-breadcrumb~="position"]) {
-			&::before,
-			&::after {
-				content: '';
-				position: fixed;
-				inset: 0 auto auto 0;
-				block-size: 1px;
-				visibility: hidden;
-				pointer-events: none;
-				view-timeline-axis: inline;
-				view-timeline-inset: 0;
-			}
-			&::before {
-				inline-size: anchor-size(--column-firstRow inline);
-				view-timeline-name: var(---column-inlineTimeline);
-			}
-			&::after {
-				inline-size: anchor-size(--column-firstRow block);
-				view-timeline-name: var(---column-blockTimeline);
-			}
+		&::before {
+			inline-size: anchor-size(--column-firstRow inline);
+			view-timeline-name: var(---column-inlineTimeline);
+		}
+		&::after {
+			inline-size: anchor-size(--column-firstRow block);
+			view-timeline-name: var(---column-blockTimeline);
 		}
 	}
 }

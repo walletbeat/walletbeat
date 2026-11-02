@@ -1714,6 +1714,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			gap: 0;
 
 			&[data-sticky-container] {
+				--sticky-position: sticky;
 				--scrollItem-inlineDetached-maxSize: inherit;
 				--scrollItem-inlineDetached-paddingStart: 0px;
 				--scrollItem-inlineDetached-paddingEnd: 0px;
