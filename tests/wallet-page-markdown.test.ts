@@ -64,6 +64,10 @@ describe('walletPageMarkdown', () => {
 				expect(md).not.toContain('[object Object]')
 			})
 
+			it('has no EIP magic URLs', () => {
+				expect(md).not.toContain('#wb-format=')
+			})
+
 			it('contains the lastUpdated date', () => {
 				expect(md).toContain(wallet.metadata.lastUpdated)
 			})
