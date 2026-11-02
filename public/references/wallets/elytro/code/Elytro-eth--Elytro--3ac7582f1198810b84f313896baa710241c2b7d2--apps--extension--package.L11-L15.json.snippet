@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 11,
+	"highlightLastLine": 15,
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				"  \"scripts\": {",
+				"    \"dev\": \"cross-env APP_ENV=development vite\",",
+				"    \"test\": \"echo jest\",",
+				"    \"build\": \"pnpm build:release\",",
+				"    \"build:dev\": \"tsc -b && cross-env VERSION_BUMP=false APP_ENV=development vite build\",",
+				"    \"build:test\": \"tsc -b && cross-env VERSION_BUMP=true APP_ENV=test vite build\",",
+				"    \"build:release\": \"tsc -b && cross-env VERSION_BUMP=true APP_ENV=production vite build\",",
+				"    \"build:patch\": \"tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=patch APP_ENV=production vite build\",",
+				"    \"build:minor\": \"tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=minor APP_ENV=production vite build\",",
+				"    \"build:major\": \"tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=major APP_ENV=production vite build\",",
+				"    \"lint\": \"eslint .\"",
+				"  },",
+				"  \"dependencies\": {",
+				"    \"@apollo/client\": \"^3.11.8\","
+			],
+			"startLine": 6
+		}
+	]
+}
