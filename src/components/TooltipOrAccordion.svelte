@@ -14,6 +14,7 @@
 		tooltipButtonTriggerPlacement = 'around',
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ESLint incorrectly infers `ComponentProps<...>['...']` as `any`
 		tooltipHoverTriggerPlacement = 'around',
+		tooltipAriaLabel,
 
 		children,
 		ExpandedContent: ExpandedContent,
@@ -26,6 +27,7 @@
 	tooltipMaxWidth?: string
 	tooltipButtonTriggerPlacement?: ComponentProps<typeof Tooltip>['buttonTriggerPlacement']
 	tooltipHoverTriggerPlacement?: ComponentProps<typeof Tooltip>['hoverTriggerPlacement']
+	tooltipAriaLabel?: string
 
 		children: Snippet
 		ExpandedContent: Snippet<[{ isInTooltip?: boolean }]>
@@ -55,6 +57,7 @@
 			isEnabled={!isExpanded}
 			buttonTriggerPlacement={tooltipButtonTriggerPlacement}
 			hoverTriggerPlacement={tooltipHoverTriggerPlacement}
+			ariaLabel={tooltipAriaLabel}
 			style="
 				--popover-padding: 0;
 				--popover-backgroundColor: transparent;
