@@ -22,7 +22,7 @@ import {
 	exampleWalletDevelopmentCompany,
 } from '@/data/entities/example'
 import type { SoftwareWallet } from '@/data/software-wallets'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
@@ -262,10 +262,9 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				},
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 			safe: notSupported,
 		},
@@ -559,6 +558,7 @@ export const completedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				alternateRecovery: notSupported,
 				drills: supported({
 					entries: [
 						{

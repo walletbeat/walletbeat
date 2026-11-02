@@ -1,7 +1,7 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { SoftwareWallet } from '@/data/software-wallets'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { appConnectionNotSupported } from '@/schema/features/privacy/app-isolation'
 import {
@@ -78,10 +78,9 @@ export const daimo: SoftwareWallet = {
 				},
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 			safe: notSupported,
 		},
