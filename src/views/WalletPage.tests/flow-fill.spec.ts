@@ -222,7 +222,7 @@ for (const width of [390, 690, 1440]) {
 				expect(
 					samples[0].configured,
 					'Mobile clearance stays enabled; desktop stays in ordinary flow',
-				).toBe(width <= 1024)
+				).toBe(width <= 1344)
 
 				if (!samples[0].configured) {
 					for (const sample of samples) {
