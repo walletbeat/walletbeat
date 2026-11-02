@@ -874,7 +874,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			<div
 				class="wallet-title-row"
 				data-sticky-breadcrumb="item"
-				data-row="start gap-2"
+				data-row="start gap-2 wrap"
 				style="--select-compactTimeline: var(--stickyBreadcrumb-entryTimeline); --select-compactScale: var(--stickyBreadcrumb-scale, 1); --select-compactRange: var(--stickyBreadcrumb-entryRange); --select-compactEasing: var(---breadcrumb-inlineEasing)"
 			>
 			<h1>
@@ -901,7 +901,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						<Select
 							bind:value={selectedVariant}
 							aria-label="Wallet version"
-							style="--select-natural-anchor: --wallet-version-natural; --select-visual-anchor: --wallet-version-visual"
 							options={[
 								{
 									value: undefined,
@@ -921,7 +920,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							<Select
 								bind:value={selectedModel}
 								aria-label="Wallet model"
-								style="--select-natural-anchor: --wallet-model-natural; --select-visual-anchor: --wallet-model-visual"
 								options={[
 									{ value: undefined, label: 'All models' },
 									...brandModels.map(m => ({
@@ -1668,7 +1666,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		---pie-compactSize: 128px;
 		---pie-compactInset: 8px;
 		---pie-compactCenterInline: calc(100vw - var(---pie-compactInset) - var(---pie-compactSize) / 2);
-		---pie-compactBlockStart: calc(var(--safeArea-insetTop, 0px) + 20px);
+		---pie-compactBlockInset: 20px;
+		/* Tall compact headers own vertical clearance; ordinary rows retain the inset. */
+		---pie-compactBlockStart: calc(var(--safeArea-insetTop, 0px) + var(---pie-compactBlockInset) + sign(var(--navigation-mobile-blockSize) - var(--navigation-mobile-minBlockSize)) * (var(--navigation-mobile-blockSize) - var(---pie-compactBlockInset)));
 		---pie-compactCenterBlock: calc(var(---pie-compactBlockStart) + var(---pie-compactSize) / 2);
 		---pie-clearanceSize: calc(var(---pie-compactSize) + var(--stickyBreadcrumb-gap, 1rem) / 2);
 		---wallet-compact-h3: 1rem;
@@ -2541,9 +2541,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			flex-basis: max-content;
 			min-inline-size: 0;
 			h1 {
+				anchor-name: --wallet-name-visual;
 				min-inline-size: 0;
 			}
 			> .wallet-device-controls {
+				/* Natural flex allocations persist; only the last control's tail changes the row's painted extent. */
+				--select-natural-anchor: --wallet-control-natural;
+				--select-visual-anchor: --wallet-control-visual;
 				min-inline-size: min-content;
 				font-size: 1rem;
 				:global(select) {
@@ -2976,20 +2980,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					align-self: start;
 					anchor-name: --breadcrumb-source, --column-firstRow;
 					&::before {
-						inline-size: calc(
-							(
-									round(up, anchor-size(--breadcrumb-source inline), 0.0625px) +
-										var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection)) -
-										(
-											anchor-size(--wallet-version-natural inline, 0px) -
-												anchor-size(--wallet-version-visual inline, 0px) +
-												anchor-size(--wallet-model-natural inline, 0px) -
-												anchor-size(--wallet-model-visual inline, 0px)
-										) *
-										round(up, anchor-size(--breadcrumb-source inline), 0.0625px) / anchor-size(--wallet-title-visual inline)
-								) *
-								var(--stickyBreadcrumb-scale)
-						);
+						---wallet-title-sourceWidth: round(up, anchor-size(--breadcrumb-source inline), 0.0625px);
+						---wallet-title-naturalScale: calc(var(---wallet-title-sourceWidth) / anchor-size(--wallet-title-visual inline));
+						inline-size: calc((max(
+							var(---wallet-title-sourceWidth) - (
+								anchor-size(--wallet-control-natural inline, 0px) - anchor-size(--wallet-control-visual inline, 0px)
+							) * var(---wallet-title-naturalScale),
+							anchor-size(--wallet-name-visual inline) * var(---wallet-title-naturalScale)
+						) + var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection))) * var(--stickyBreadcrumb-scale));
 					}
 				}
 				[data-sticky-breadcrumb~="source"] {
