@@ -8,6 +8,15 @@ import {
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
 import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
@@ -39,7 +48,7 @@ export const bitget: SoftwareWallet = {
 		coinspectId: 'bitget',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://web3.bitget.com/en/docs'],
 			extensions: [
@@ -168,7 +177,7 @@ export const bitget: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://web3.bitget.com/resource/policy.html',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -203,8 +212,87 @@ export const bitget: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
-			duressResistance: null,
-			hardwareWalletSupport: null,
+			duressResistance: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'The app asks for a 6-digit PIN to open the wallet and sign transactions, and face or fingerprint unlock is optional. The "Unlock required" option can be turned off, so the app then opens without the PIN or biometrics.',
+								urls: [
+									{
+										label: 'Bitget Wallet guide to PIN codes',
+										url: 'https://web3.bitget.com/en/academy/pincode',
+									},
+									{
+										label: 'Privacy policy, section 10',
+										url: 'https://web3.bitget.com/resource/policy.html',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
+			},
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'The browser extension supports Ledger hardware wallets connected by USB cable.',
+							urls: [
+								{
+									label: 'Getting started with Ledger',
+									url: 'https://web3.bitget.com/helpCenter/769',
+								},
+								{
+									label: 'Connect your Ledger',
+									url: 'https://web3.bitget.com/helpCenter/767',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation: 'The app adds a Keystone hardware wallet by scanning its QR code.',
+							urls: [
+								{
+									label: 'Keystone: Bitget Wallet (Mobile)',
+									url: 'https://guide.keyst.one/docs/bitget',
+								},
+								{
+									label: 'Bitget Wallet: Keystone import tutorial',
+									url: 'https://web3.bitget.com/en/academy/bitget-wallet-adds-support-for-hardware-wallet-keystone-newbie-import-tutorial',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+					},
+				},
+			},
 			keysHandling: {
 				ref: [
 					{
