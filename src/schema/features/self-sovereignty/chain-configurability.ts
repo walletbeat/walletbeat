@@ -1,3 +1,5 @@
+import type { WithRef } from '@/schema/reference'
+
 import type { Support } from '../support'
 
 /**
@@ -125,3 +127,16 @@ export interface ChainConfigurability {
 	 */
 	customChainRpcEndpoint: Support
 }
+
+/**
+ * Does the wallet offer at least one public Ethereum testnet (e.g. Sepolia)
+ * that the user can switch to without entering chain details?
+ * Turning on a "show testnets" setting counts as built in.
+ * Adding a testnet as a custom chain is covered by
+ * `ChainConfigurability.customChainRpcEndpoint` instead.
+ *
+ * To test: open the wallet's network selector and settings, and check
+ * whether a public Ethereum testnet can be selected without typing in a
+ * chain ID or RPC URL.
+ */
+export type TestnetSupport = WithRef<Support>

@@ -341,6 +341,7 @@ export const zeus: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({

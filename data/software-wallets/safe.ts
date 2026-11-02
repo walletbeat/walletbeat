@@ -292,6 +292,7 @@ export const safe: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
