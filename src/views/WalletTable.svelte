@@ -1267,6 +1267,7 @@
 
 											{#if brandModels.length > 1}
 												<Select
+													aria-label={`${displayName} wallet model`}
 													disabled={!interactive}
 													bind:value={
 														() => selectedModels.get(wallet.metadata.id),
