@@ -162,7 +162,8 @@ import Footer from '@/views/Footer.astro'
 
 		/* Constants */
 		--navigation-desktop-inlineSize: min(20rem, 320px);
-		--navigation-mobile-blockSize: 4.16rem;
+		--navigation-mobile-minBlockSize: 4.16rem;
+		--navigation-mobile-blockSize: var(--navigation-mobile-minBlockSize);
 		--navigation-controlInsetInline: 0.75rem;
 
 		/* Rules */
@@ -354,7 +355,7 @@ import Footer from '@/views/Footer.astro'
 					1
 				);
 				--navigation-mobile-blockSize: max(
-					4.16rem,
+					var(--navigation-mobile-minBlockSize),
 					calc(
 						var(---breadcrumb-naturalItemHeight) * var(---wallet-compact-h1) /
 							var(---wallet-name-flow-font-size) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)

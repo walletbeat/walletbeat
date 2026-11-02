@@ -2,300 +2,343 @@ import { qualifyNativeBreadcrumbClock } from '../../../tests/browser/sticky-obse
 import { expect, test } from '../../../tests/browser/verified-test'
 
 for (const width of [390, 1440]) {
-	test(`real header composition and native input at ${width}px`, async ({ page }, info) => {
-		await page.setViewportSize({ width, height: 900 })
+	for (const fixture of ['software', 'longName', 'multipleTypes']) {
+		test(`real header composition and native input at ${width}px: ${fixture}`, async ({
+			page,
+		}, info) => {
+			await page.setViewportSize({ width, height: 900 })
+			await page.goto(`/__wallet-page/${fixture}/`)
+			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+			await page.evaluate(() => document.fonts.ready)
+			await expect
+				.poll(() => page.evaluate(qualifyNativeBreadcrumbClock))
+				.toMatchObject({ resolved: true })
+			await page
+				.locator('#layout')
+				.evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }))
+			await expect
+				.poll(() => page.locator('#layout').evaluate(element => element.scrollTop))
+				.toBeLessThanOrEqual(2)
+			const identity = await page.locator('#top h1').elementHandle()
 
-		for (const fixture of ['software', 'longName', 'multipleTypes']) {
-			await test.step(fixture, async () => {
-				await page.goto(`/__wallet-page/${fixture}/`)
-				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-				await page.evaluate(() => document.fonts.ready)
-				await expect
-					.poll(() => page.evaluate(qualifyNativeBreadcrumbClock))
-					.toMatchObject({ resolved: true })
-				await page
-					.locator('#layout')
-					.evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }))
-				await expect
-					.poll(() => page.locator('#layout').evaluate(element => element.scrollTop))
-					.toBeLessThanOrEqual(2)
-				const identity = await page.locator('#top h1').elementHandle()
+			if (!identity) {
+				throw new Error('Missing real wallet H1')
+			}
 
-				if (!identity) {
-					throw new Error('Missing real wallet H1')
-				}
+			const observe = () =>
+				page.locator('#top').evaluate(root => {
+					const rectData = ({
+						x,
+						y,
+						width,
+						height,
+						top,
+						right,
+						bottom,
+						left,
+					}: DOMRectReadOnly) => ({ x, y, width, height, top, right, bottom, left })
 
-				const observe = () =>
-					page.locator('#top').evaluate(root => {
-						const rectData = ({
-							x,
-							y,
-							width,
-							height,
-							top,
-							right,
-							bottom,
-							left,
-						}: DOMRectReadOnly) => ({ x, y, width, height, top, right, bottom, left })
+					const title = root.querySelector('h1 > a')!
+					const label = title.querySelector('span')!
+					const range = document.createRange()
 
-						const title = root.querySelector('h1 > a')!
-						const label = title.querySelector('span')!
-						const range = document.createRange()
+					range.selectNodeContents(label)
+					const main = document.querySelector('main')!.getBoundingClientRect()
+					const aside = root.querySelector(':scope > aside')!.getBoundingClientRect()
+					let left = main.left,
+						right = main.right
 
-						range.selectNodeContents(label)
-						const main = document.querySelector('main')!.getBoundingClientRect()
-						const aside = root.querySelector(':scope > aside')!.getBoundingClientRect()
-						let left = main.left,
-							right = main.right
+					if (innerWidth > 1344) {
+						if (aside.x + aside.width / 2 > main.x + main.width / 2) {
+							right = aside.left
+						} else {
+							left = aside.right
+						}
+					}
 
-						if (innerWidth > 1344) {
-							if (aside.x + aside.width / 2 > main.x + main.width / 2) {
-								right = aside.left
-							} else {
-								left = aside.right
+					const labels = [...range.getClientRects()]
+						.filter(box => box.width > 0 && box.height > 0)
+						.map(box => {
+							const x = box.x + box.width / 2,
+								y = box.y + box.height / 2
+
+							return {
+								...rectData(box),
+								hit: document.elementFromPoint(x, y)?.closest('a') === title,
+								obstruction: document.elementFromPoint(x, y)?.outerHTML.slice(0, 300),
 							}
+						})
+					const badges = [
+						...root.querySelectorAll(
+							':scope > header [data-badge], :scope > .wallet-header-flow [data-badge]',
+						),
+					].map(badge => {
+						const box = badge.getBoundingClientRect()
+						const walker = document.createTreeWalker(badge, NodeFilter.SHOW_TEXT)
+						const text: ReturnType<typeof rectData>[] = []
+
+						for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+							if (!node.textContent?.trim()) {
+								continue
+							}
+
+							const range = document.createRange()
+
+							range.selectNodeContents(node)
+							text.push(...[...range.getClientRects()].map(rect => rectData(rect)))
 						}
 
-						const labels = [...range.getClientRects()]
-							.filter(box => box.width > 0 && box.height > 0)
-							.map(box => {
-								const x = box.x + box.width / 2,
-									y = box.y + box.height / 2
+						return {
+							text: badge.textContent?.trim(),
+							box: rectData(box),
+							linesOverlap:
+								text.length > 0 &&
+								Math.max(...text.map(rect => rect.top)) <
+									Math.min(...text.map(rect => rect.bottom)),
+						}
+					})
+					const titleRow = title.closest('.wallet-title-row')!
+					const identityBox = title.getBoundingClientRect()
+					const compositionBox = title.closest('h1')!.getBoundingClientRect()
+					const iconBox = title.querySelector('img')!.getBoundingClientRect()
+					const visibleIdentity = {
+						left: Math.min(iconBox.left, ...labels.map(line => line.left)),
+						right: Math.max(iconBox.right, ...labels.map(line => line.right)),
+						top: Math.min(iconBox.top, ...labels.map(line => line.top)),
+						bottom: Math.max(iconBox.bottom, ...labels.map(line => line.bottom)),
+					}
+					const controls = [...titleRow.querySelectorAll<HTMLSelectElement>('select')].map(
+						select => {
+							const box = select.getBoundingClientRect()
+							const hits: { x: number; y: number }[] = []
 
-								return {
-									...rectData(box),
-									hit: document.elementFromPoint(x, y)?.closest('a') === title,
-									obstruction: document.elementFromPoint(x, y)?.outerHTML.slice(0, 300),
-								}
-							})
-						const badges = [
-							...root.querySelectorAll(
-								':scope > header [data-badge], :scope > .wallet-header-flow [data-badge]',
-							),
-						].map(badge => {
-							const box = badge.getBoundingClientRect()
-							const walker = document.createTreeWalker(badge, NodeFilter.SHOW_TEXT)
-							const text: ReturnType<typeof rectData>[] = []
+							for (const fraction of [0.25, 0.5, 0.75]) {
+								const y = box.top + box.height * fraction
 
-							for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-								if (!node.textContent?.trim()) {
+								if (y < 0 || y >= innerHeight) {
 									continue
 								}
 
-								const range = document.createRange()
+								for (
+									let x = Math.max(0, box.left);
+									x <= Math.min(innerWidth - 1, box.right);
+									x += 2
+								) {
+									const hit = document.elementFromPoint(x, y)
 
-								range.selectNodeContents(node)
-								text.push(...[...range.getClientRects()].map(rect => rectData(rect)))
+									if (hit === select || hit?.closest('select') === select) {
+										hits.push({ x, y })
+									}
+								}
 							}
 
 							return {
-								text: badge.textContent?.trim(),
+								name: select.getAttribute('aria-label'),
 								box: rectData(box),
-								linesOverlap:
-									text.length > 0 &&
-									Math.max(...text.map(rect => rect.top)) <
-										Math.min(...text.map(rect => rect.bottom)),
+								hits,
+								clip: getComputedStyle(select).clipPath,
+								sameRow: select.closest('.wallet-title-row') === titleRow,
 							}
+						},
+					)
+					const layout = document.getElementById('layout')!
+					const offenders = [...document.querySelectorAll<HTMLElement>('main *')]
+						.filter(element => {
+							if (
+								!element.checkVisibility({ checkVisibilityCSS: true }) ||
+								element.closest('[aria-hidden="true"], .pie-navigation')
+							) {
+								return false
+							}
+
+							const box = element.getBoundingClientRect()
+
+							return box.width > 0 && (box.left < -1 || box.right > innerWidth + 1)
 						})
-						const titleRow = title.closest('.wallet-title-row')!
-						const identityBox = title.getBoundingClientRect()
-						const compositionBox = title.closest('h1')!.getBoundingClientRect()
-						const iconBox = title.querySelector('img')!.getBoundingClientRect()
-						const visibleIdentity = {
-							left: Math.min(iconBox.left, ...labels.map(line => line.left)),
-							right: Math.max(iconBox.right, ...labels.map(line => line.right)),
-							top: Math.min(iconBox.top, ...labels.map(line => line.top)),
-							bottom: Math.max(iconBox.bottom, ...labels.map(line => line.bottom)),
-						}
-						const controls = [...titleRow.querySelectorAll<HTMLSelectElement>('select')].map(
-							select => {
-								const box = select.getBoundingClientRect()
-								const hits: { x: number; y: number }[] = []
+						.slice(0, 20)
+						.map(element => ({
+							tag: element.tagName,
+							id: element.id,
+							class: element.className,
+							text: element.textContent?.trim().slice(0, 80),
+							box: rectData(element.getBoundingClientRect()),
+						}))
 
-								for (const fraction of [0.25, 0.5, 0.75]) {
-									const y = box.top + box.height * fraction
-
-									if (y < 0 || y >= innerHeight) {
-										continue
-									}
-
-									for (
-										let x = Math.max(0, box.left);
-										x <= Math.min(innerWidth - 1, box.right);
-										x += 2
-									) {
-										const hit = document.elementFromPoint(x, y)
-
-										if (hit === select || hit?.closest('select') === select) {
-											hits.push({ x, y })
-										}
-									}
-								}
-
-								return {
-									name: select.getAttribute('aria-label'),
-									box: rectData(box),
-									hits,
-									clip: getComputedStyle(select).clipPath,
-									sameRow: select.closest('.wallet-title-row') === titleRow,
-								}
-							},
-						)
-						const layout = document.getElementById('layout')!
-						const offenders = [...document.querySelectorAll<HTMLElement>('main *')]
-							.filter(element => {
-								if (
-									!element.checkVisibility({ checkVisibilityCSS: true }) ||
-									element.closest('[aria-hidden="true"], .pie-navigation')
-								) {
-									return false
-								}
-
-								const box = element.getBoundingClientRect()
-
-								return box.width > 0 && (box.left < -1 || box.right > innerWidth + 1)
-							})
-							.slice(0, 20)
-							.map(element => ({
-								tag: element.tagName,
-								id: element.id,
-								class: element.className,
-								text: element.textContent?.trim().slice(0, 80),
-								box: rectData(element.getBoundingClientRect()),
-							}))
-
-						return {
-							labels,
-							visibleIdentity,
-							title: rectData(identityBox),
-							compositionBox: rectData(compositionBox),
-							bounds: { left, right },
-							badges,
-							controls,
-							rowGap: Number.parseFloat(getComputedStyle(titleRow).columnGap) || 0,
-							direction: getComputedStyle(titleRow).direction,
-							overflow: {
-								document:
-									document.documentElement.scrollWidth - document.documentElement.clientWidth,
-								root: layout.scrollWidth - layout.clientWidth,
-								offenders,
-							},
-							h1Count: document.querySelectorAll('h1').length,
-						}
-					})
-				const checkTitle = (state: Awaited<ReturnType<typeof observe>>) => {
-					expect(state.h1Count).toBe(1)
-					expect(state.overflow.document, JSON.stringify(state.overflow)).toBeLessThanOrEqual(1)
-					expect(state.overflow.root, JSON.stringify(state.overflow)).toBeLessThanOrEqual(1)
-
-					for (const control of state.controls) {
-						expect(control.sameRow, control.name ?? 'native selector').toBe(true)
-						expect(
-							control.hits.length,
-							`${control.name}: actual native select hit region must remain visible; ${JSON.stringify(control)}`,
-						).toBeGreaterThan(0)
-						expect(
-							Math.min(control.box.bottom, state.visibleIdentity.bottom) -
-								Math.max(control.box.top, state.visibleIdentity.top),
-							'H1 and device selector remain on the same visible row',
-						).toBeGreaterThan(0)
+					return {
+						labels,
+						visibleIdentity,
+						title: rectData(identityBox),
+						compositionBox: rectData(compositionBox),
+						bounds: { left, right },
+						badges,
+						controls,
+						rowGap: Number.parseFloat(getComputedStyle(titleRow).columnGap) || 0,
+						direction: getComputedStyle(titleRow).direction,
+						pie: rectData(root.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()),
+						reservedCompactInlineSize: Number.parseFloat(
+							getComputedStyle(root).getPropertyValue('---breadcrumb-itemWidth'),
+						),
+						overflow: {
+							document: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+							root: layout.scrollWidth - layout.clientWidth,
+							offenders,
+						},
+						h1Count: document.querySelectorAll('h1').length,
 					}
-					const adjacent = state.controls[0]
-
-					if (adjacent) {
-						const visibleEdge =
-							state.direction === 'rtl'
-								? Math.max(...adjacent.hits.map(point => point.x))
-								: Math.min(...adjacent.hits.map(point => point.x))
-						const titleEdge =
-							state.direction === 'rtl' ? state.compositionBox.left : state.compositionBox.right
-						const gap = (visibleEdge - titleEdge) * (state.direction === 'rtl' ? -1 : 1)
-
-						expect(
-							gap,
-							JSON.stringify({
-								compositionBox: state.compositionBox,
-								paintedIdentity: state.visibleIdentity,
-								adjacent,
-								gap,
-							}),
-						).toBeGreaterThanOrEqual(-3)
-						expect(
-							gap,
-							'Device selector stays adjacent to H1 instead of moving to an unrelated page edge',
-						).toBeLessThanOrEqual(Math.max(16, state.rowGap + 3))
-					}
-
-					expect(state.labels.length).toBeGreaterThan(0)
-
-					for (const label of state.labels) {
-						expect(label.left).toBeGreaterThanOrEqual(state.bounds.left - 1)
-						expect(label.right).toBeLessThanOrEqual(state.bounds.right + 1)
-						expect(
-							label.hit,
-							'Every real title line remains an unobstructed native link target',
-						).toBe(true)
-					}
-				}
-				const flow = await observe()
-
-				await info.attach(`${fixture}-initial-geometry`, {
-					body: JSON.stringify(flow),
-					contentType: 'application/json',
 				})
-				checkTitle(flow)
+			const checkTitle = (state: Awaited<ReturnType<typeof observe>>) => {
+				expect(state.h1Count).toBe(1)
+				expect(state.overflow.document, JSON.stringify(state.overflow)).toBeLessThanOrEqual(1)
+				expect(state.overflow.root, JSON.stringify(state.overflow)).toBeLessThanOrEqual(1)
 
-				for (const badge of flow.badges) {
-					expect(badge.linesOverlap, badge.text).toBe(true)
-				}
-				const root = page.locator('#layout')
-				const wheel = async (delta: number, state: typeof flow) => {
-					const point = state.labels.find(label => label.top >= 0 && label.bottom <= 900)
+				for (const control of state.controls) {
+					expect(control.sameRow, control.name ?? 'native selector').toBe(true)
+					expect(
+						control.hits.length,
+						`${control.name}: actual native select hit region must remain visible; ${JSON.stringify(control)}`,
+					).toBeGreaterThan(0)
+					const sharesLine =
+						control.box.top < state.visibleIdentity.bottom &&
+						control.box.bottom > state.visibleIdentity.top
 
-					if (!point) {
-						throw new Error('The real header has no visible wheel-input point')
+					if (!sharesLine) {
+						expect(
+							control.box.top,
+							'Wrapped selectors follow the title without overlapping it',
+						).toBeGreaterThanOrEqual(state.visibleIdentity.bottom)
 					}
-
-					await page.mouse.move(point.x + point.width / 2, point.y + point.height / 2)
-					const before = await root.evaluate(element => {
-						element.setAttribute('data-test-scrollend', 'pending')
-						element.addEventListener(
-							'scrollend',
-							() => element.setAttribute('data-test-scrollend', 'complete'),
-							{ once: true },
-						)
-
-						return element.scrollTop
-					})
-
-					await page.mouse.wheel(0, delta)
-
-					if (delta > 0) {
-						await expect
-							.poll(() => root.evaluate(element => element.scrollTop))
-							.toBeGreaterThan(before)
-					} else {
-						await expect
-							.poll(() => root.evaluate(element => element.scrollTop))
-							.toBeLessThan(before)
-					}
-
-					await expect(root).toHaveAttribute('data-test-scrollend', 'complete')
 				}
 
-				await wheel(600, flow)
-				const compact = await observe()
+				if (
+					width <= 1344 &&
+					state.controls.some(control => control.box.top >= state.visibleIdentity.bottom)
+				) {
+					expect(
+						state.pie.top,
+						'The pie clears the entire wrapped compact header',
+					).toBeGreaterThanOrEqual(
+						Math.max(
+							state.visibleIdentity.bottom,
+							...state.controls.map(control => control.box.bottom),
+						) - 1,
+					)
+				}
 
-				checkTitle(compact)
-				await wheel(-600, compact)
-				const reversed = await observe()
+				const adjacent = state.controls[0]
 
-				await info.attach(`header-reversed-${fixture}-${width}`, {
-					body: JSON.stringify(reversed),
-					contentType: 'application/json',
+				if (adjacent && adjacent.box.top < state.visibleIdentity.bottom) {
+					const visibleEdge =
+						state.direction === 'rtl'
+							? Math.max(...adjacent.hits.map(point => point.x))
+							: Math.min(...adjacent.hits.map(point => point.x))
+					const titleEdge =
+						state.direction === 'rtl' ? state.compositionBox.left : state.compositionBox.right
+					const gap = (visibleEdge - titleEdge) * (state.direction === 'rtl' ? -1 : 1)
+
+					expect(
+						gap,
+						JSON.stringify({
+							compositionBox: state.compositionBox,
+							paintedIdentity: state.visibleIdentity,
+							adjacent,
+							gap,
+						}),
+					).toBeGreaterThanOrEqual(-3)
+					expect(
+						gap,
+						'Device selector stays adjacent to H1 instead of moving to an unrelated page edge',
+					).toBeLessThanOrEqual(Math.max(16, state.rowGap + 3))
+				}
+
+				expect(state.labels.length).toBeGreaterThan(0)
+
+				for (const label of state.labels) {
+					expect(label.left).toBeGreaterThanOrEqual(state.bounds.left - 1)
+					expect(label.right).toBeLessThanOrEqual(state.bounds.right + 1)
+					expect(
+						label.hit,
+						'Every real title line remains an unobstructed native link target',
+					).toBe(true)
+				}
+			}
+			const flow = await observe()
+
+			expect(flow.controls).toHaveLength(fixture === 'multipleTypes' ? 2 : 1)
+
+			await info.attach(`${fixture}-initial-geometry`, {
+				body: JSON.stringify(flow),
+				contentType: 'application/json',
+			})
+			checkTitle(flow)
+
+			for (const badge of flow.badges) {
+				expect(badge.linesOverlap, badge.text).toBe(true)
+			}
+			const root = page.locator('#layout')
+			const wheel = async (delta: number, state: typeof flow) => {
+				const point = state.labels.find(label => label.top >= 0 && label.bottom <= 900)
+
+				if (!point) {
+					throw new Error('The real header has no visible wheel-input point')
+				}
+
+				await page.mouse.move(point.x + point.width / 2, point.y + point.height / 2)
+				const before = await root.evaluate(element => {
+					element.setAttribute('data-test-scrollend', 'pending')
+					element.addEventListener(
+						'scrollend',
+						() => element.setAttribute('data-test-scrollend', 'complete'),
+						{ once: true },
+					)
+
+					return element.scrollTop
 				})
-				checkTitle(reversed)
-				const picker = page.locator('#top > header select').first()
+
+				await page.mouse.wheel(0, delta)
+
+				if (delta > 0) {
+					await expect
+						.poll(() => root.evaluate(element => element.scrollTop))
+						.toBeGreaterThan(before)
+				} else {
+					await expect.poll(() => root.evaluate(element => element.scrollTop)).toBeLessThan(before)
+				}
+
+				await expect(root).toHaveAttribute('data-test-scrollend', 'complete')
+			}
+
+			await wheel(600, flow)
+			const compact = await observe()
+
+			checkTitle(compact)
+			const compactEdges = [
+				compact.visibleIdentity,
+				...compact.controls.flatMap(control =>
+					control.hits.map(point => ({ left: point.x, right: point.x })),
+				),
+			]
+			const occupiedCompactWidth =
+				Math.max(...compactEdges.map(edge => edge.right)) -
+				Math.min(...compactEdges.map(edge => edge.left))
+
+			expect(
+				compact.reservedCompactInlineSize,
+				'The compact reservation covers actual title paint and every native control hit region',
+			).toBeGreaterThanOrEqual(occupiedCompactWidth - 1)
+			await wheel(-600, compact)
+			const reversed = await observe()
+
+			await info.attach(`header-reversed-${fixture}-${width}`, {
+				body: JSON.stringify(reversed),
+				contentType: 'application/json',
+			})
+			checkTitle(reversed)
+
+			for (const [name, parameter] of [
+				['Wallet version', 'variant'],
+				['Wallet model', 'model'],
+			] as const) {
+				const picker = page.getByRole('combobox', { name, exact: true })
 
 				if (await picker.count()) {
 					const desired = await picker
@@ -313,24 +356,25 @@ for (const width of [390, 1440]) {
 					await picker.focus()
 					await page.keyboard.press(desired.key)
 					await page.keyboard.press('Enter')
+					await page.keyboard.press('Escape')
 					await expect.poll(() => picker.inputValue()).toBe(desired.value)
 					await expect
-						.poll(() => new URL(page.url()).searchParams.get('variant'))
+						.poll(() => new URL(page.url()).searchParams.get(parameter))
 						.toBe(await picker.inputValue())
 				}
+			}
 
-				expect(
-					await identity.evaluate(
-						element => element.isConnected && element.closest('#top > header') !== null,
-					),
-				).toBe(true)
-				await info.attach(`${fixture}-header-geometry`, {
-					body: JSON.stringify({ flow, compact, reversed }),
-					contentType: 'application/json',
-				})
+			expect(
+				await identity.evaluate(
+					element => element.isConnected && element.closest('#top > header') !== null,
+				),
+			).toBe(true)
+			await info.attach(`${fixture}-header-geometry`, {
+				body: JSON.stringify({ flow, compact, reversed }),
+				contentType: 'application/json',
 			})
-		}
-	})
+		})
+	}
 }
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
