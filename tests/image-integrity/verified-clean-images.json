@@ -1675,6 +1675,18 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
+		"hash": "4c5dba25da216e8258202e358bf35c259052506c4d4c015e3a7f34aba1df1450",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg": {
+		"hash": "ffe42a78e281a8a5615cd1c7e56fe47a84dfa02745a895ed21bbcf2306e19d34",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/walletbeat_mission.png": {
+		"hash": "94075e76caa8c5b0bc8548a104d6d57e0a6b045982f82344d7851e9a7306930e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/apoorv_walletchan.png": {
 		"hash": "006a8e5e4c41856f5e06be3adf4653ba847072f063a22d8ec9faa2adad86d25a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
