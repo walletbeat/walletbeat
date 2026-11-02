@@ -17,9 +17,7 @@ export const sonicLabs: CorporateEntity & ChainDataProvider = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/sonic-labs-2d3f',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Cayman Islands',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy:

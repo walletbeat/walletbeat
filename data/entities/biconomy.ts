@@ -17,11 +17,7 @@ export const biconomy: CorporateEntity & TransactionBroadcastProvider = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/biconomy',
 	farcaster: 'https://warpcast.com/biconomy',
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'UNKNOWN',
 	linkedin: 'https://www.linkedin.com/company/biconomy/',
 	privacyPolicy: 'https://biconomy.zendesk.com/hc/en-us/articles/360036040012-Privacy-policy',
