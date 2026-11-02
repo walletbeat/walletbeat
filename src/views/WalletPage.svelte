@@ -403,9 +403,9 @@
 	let selectedModel = $state<string>()
 	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
 
-	onMount(() => {
+	function restoreQuerySelection() {
 		const params = new SvelteURLSearchParams(globalThis.location.search)
-		const variant = params.get('variant') as Variant | null
+		const variant = Object.values(Variant).find(value => value === params.get('variant'))
 
 		selectedVariant =
 			variant && variant in wallet.variants && !hasSingleVariant(wallet.variants)
@@ -413,6 +413,11 @@
 				: undefined
 		selectedModel = params.get('model') ?? undefined
 		queryParams = params
+	}
+
+	onMount(() => {
+		restoreQuerySelection()
+		globalThis.addEventListener('popstate', restoreQuerySelection)
 		const root = document.querySelector('#top')!
 		const panel = root.querySelector('#wallet-toc')
 		tocStateOwners = [root.closest('#layout'), root.querySelector('.page-navigation'), root.querySelector('.pie-navigation')].filter((owner): owner is Element => owner !== null)
@@ -427,6 +432,7 @@
 		}
 		root.addEventListener('toggle', revealClosedDisclosure, true)
 		return () => {
+			globalThis.removeEventListener('popstate', restoreQuerySelection)
 			root.removeEventListener('toggle', revealClosedDisclosure, true)
 			tocClosing = null
 			for (const owner of tocStateOwners) owner.removeAttribute('data-wallet-toc-state')
