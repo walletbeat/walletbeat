@@ -4018,6 +4018,8 @@ This enum uses camelCase-style values because it is used as object key in the wa
 - `VENTURE_CAPITAL` = `'ventureCapital'`: Funded by venture capital firms in exchange for equity or tokens.
 - `TRANSPARENT_CONVENIENCE_FEES` = `'transparentConvenienceFees'`: Earns revenue through fees on swaps, bridges, or other services that are disclosed to the user.
 - `HIDDEN_CONVENIENCE_FEES` = `'hiddenConvenienceFees'`: Earns revenue through undisclosed markups or routing fees hidden from the user.
+- `TRANSPARENT_REFERRAL_CODES` = `'transparentReferralCodes'`: Earns referral rewards from third-party services (e.g. trading platforms) by attaching its own referral code to the user's account, where the user is clearly informed before the code is applied.
+- `HIDDEN_REFERRAL_CODES` = `'hiddenReferralCodes'`: Earns referral rewards from third-party services (e.g. trading platforms) by silently attaching its own referral code to the user's account, without informing the user.
 - `GOVERNANCE_TOKEN_LOW_FLOAT` = `'governanceTokenLowFloat'`: Has a governance token where most supply is held not by the community.
 - `GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED` = `'governanceTokenMostlyDistributed'`: Has a governance token where most supply is distributed to the community.
 

@@ -491,9 +491,11 @@ export const zerion: SoftwareWallet = {
 				governanceTokenLowFloat: false, // No governance token: DNA is a membership NFT, and the ZERO Network L2 has no token
 				governanceTokenMostlyDistributed: false, // No governance token
 				hiddenConvenienceFees: false, // The swap and bridge fee is documented and shown in-app, and the perpetuals fee separates Zerion's share from the venue's
+				hiddenReferralCodes: null,
 				publicOffering: false, // No token sale or public equity offering; every round was private
 				selfFunded: false, // Venture-backed from the 2019 seed round onward
 				transparentConvenienceFees: true, // 0.67% service fee on swaps and bridges, documented publicly and shown in the swap quote details panel
+				transparentReferralCodes: null,
 				ventureCapital: true, // $22.5M across seed, Series A and Series B
 			},
 		},
