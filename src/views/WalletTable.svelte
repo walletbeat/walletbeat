@@ -651,6 +651,11 @@
 		const activateDisclosure = (event: KeyboardEvent) => {
 			if (event.key === 'Enter' || event.key === ' ') dismiss()
 		}
+		const toggleDisclosure = (event: Event) => {
+			if (event.target !== disclosure || !disclosure?.open) return
+			dismiss()
+			if (node.matches(':popover-open')) node.hidePopover()
+		}
 		const focusSummary = (event: FocusEvent) => {
 			if (event.target !== summary || !summary?.matches(':focus-visible') || !identitySource
 				|| disclosure?.open
@@ -698,6 +703,7 @@
 		node.addEventListener('loseinterest', endInterest, listenerOptions)
 		node.ownerDocument.addEventListener('keydown', keydown, { ...listenerOptions, capture: true })
 		node.ownerDocument.addEventListener('keyup', keyup, { ...listenerOptions, capture: true })
+		disclosure?.addEventListener('toggle', toggleDisclosure, listenerOptions)
 		summary?.addEventListener('focus', focusSummary, listenerOptions)
 		summary?.addEventListener('click', dismiss, { ...listenerOptions, capture: true })
 		summary?.addEventListener('keydown', activateDisclosure, { ...listenerOptions, capture: true })
