@@ -50,7 +50,7 @@ test.skip(
 	'Native OS focus testing requires headed Chromium on macOS',
 )
 
-for (const width of [390, 1440]) {
+for (const width of [390, 1344, 1345, 1440]) {
 	for (const colorScheme of ['light', 'dark'] as const) {
 		for (const reducedMotion of ['reduce', 'no-preference'] as const) {
 			test(`scroll attention ${width} ${colorScheme} ${reducedMotion}`, async ({
@@ -65,6 +65,8 @@ for (const width of [390, 1440]) {
 				})
 				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 				await page.evaluate(() => document.fonts.ready)
+				const compact = await page.evaluate(() => matchMedia('(width <= 84rem)').matches)
+
 				await nativeAttention.focus(true)
 				await page.bringToFront()
 				await page.mouse.click(1, 1)
@@ -122,7 +124,7 @@ for (const width of [390, 1440]) {
 				await expect.poll(geometry).toEqual(initialGeometry)
 				await hoverContent()
 
-				if (width < 1024) {
+				if (compact) {
 					await page.getByRole('button', { name: 'Open navigation menu' }).click()
 				}
 
@@ -138,7 +140,7 @@ for (const width of [390, 1440]) {
 				await expect.poll(contentFilter).toBe('grayscale(1)')
 				await page.getByRole('searchbox', { name: 'Search navigation' }).click()
 
-				if (width > 1024) {
+				if (!compact) {
 					await hoverContent()
 					await page.keyboard.press('Shift')
 					await expect.poll(contentFilter).toBe('none')
@@ -147,7 +149,7 @@ for (const width of [390, 1440]) {
 				await page.keyboard.press('Tab')
 				await expect.poll(contentFilter).toBe('grayscale(1)')
 
-				if (width > 1024) {
+				if (!compact) {
 					await page.mouse.wheel(0, 1)
 					await expect.poll(contentFilter).toBe('none')
 					await expect.poll(logoFilter).toBe('grayscale(1)')
@@ -177,14 +179,14 @@ for (const width of [390, 1440]) {
 				await page.mouse.click(1, 1)
 				await expect.poll(() => page.evaluate(() => document.hasFocus())).toBe(true)
 
-				if (width < 1024) {
+				if (compact) {
 					await page.keyboard.press('Escape')
 				}
 
 				await page.locator('#top h1').click()
 				await hoverContent()
 
-				if (width < 1024) {
+				if (compact) {
 					await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 					await expect(toc).toBeVisible()
 					await expect.poll(tocFilter).toBe('none')
@@ -231,7 +233,7 @@ for (const width of [390, 1440]) {
 					await page.locator('#layout').boundingBox(),
 				)
 
-				if (width < 1024) {
+				if (compact) {
 					await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 					await expect
 						.poll(() => toc.evaluate(element => element.matches(':popover-open')))
