@@ -51,6 +51,37 @@ At the November 1, 2026 investigation:
   setter simulation succeeds. No additional permission grant was indicated;
   the observed transaction failed from insufficient gas.
 
+## Beta repair and rollout
+
+Use the existing production resolver for beta. Each name has its own content
+record. Both names share the resolver administrator and the worker's existing
+content-hash permission. The repair needs two Ethereum mainnet transactions
+with zero Ether value, in order:
+
+1. Read beta's current records again. On the shared resolver, call
+   `setContenthash(bytes,bytes)` with the DNS-encoded beta name and its current
+   content hash. Before changing the pointer, check the successful receipt,
+   read the record back, verify beta and production have distinct record IDs,
+   and confirm production's content hash is unchanged.
+2. On the beta registry identified above, call `setResolver(uint256,address)`
+   with the current beta token ID and the shared resolver address. Verify the
+   receipt and resolve beta through the Universal Resolver. It must still
+   serve the same content as before the switch.
+
+The indexed history of the legacy resolver contained only content-hash changes for
+beta. Its public key and DNS zone hash were empty. The shared resolver does not
+provide those two legacy profiles. Check for additional records before signing.
+Both calls simulated successfully from the documented worker and the resolver
+administrator, `0xF719aA02D048a591b11A2dF2BEfb311F0B6d035E`. Confirm the
+signing route with the custodian and repeat simulations at execution time.
+The worker already has the required resolver permission.
+
+After both beta readiness checks pass, merge the deployment fix into beta first.
+Compare the content identifier from the resulting build with both the ENS content hash and
+the public gateway's IPFS root. Promote that verified revision into master,
+build for the production domain, and repeat the comparison using the content identifier from
+the master run. Verify the served assets and retention of the rollback build.
+
 ## Read-only pre-merge checks
 
 The readiness workflow validates workflows and simulates both names through direct
