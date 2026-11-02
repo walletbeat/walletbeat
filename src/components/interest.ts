@@ -9,10 +9,12 @@ const isInterestBoundary = (element: EventTarget) =>
 	element instanceof HTMLElement &&
 	(interestSources.has(element) || (sourcesByTarget.get(element)?.size ?? 0) > 0)
 
-const popoverInvoker = (node: HTMLElement) =>
+const popoverInvoker = (node: HTMLElement, target: HTMLElement) =>
 	(node instanceof HTMLLabelElement
 		? node.control
-		: node.querySelector<HTMLElement>('[popovertarget]')) ?? node
+		: [...node.querySelectorAll<HTMLElement>('[popovertarget]')].find(
+				invoker => invoker.getAttribute('popovertarget') === target.id,
+			)) ?? node
 
 export function hasVisiblePopoverInvoker(node: HTMLElement, target: HTMLElement) {
 	if (
@@ -22,7 +24,7 @@ export function hasVisiblePopoverInvoker(node: HTMLElement, target: HTMLElement)
 		return false
 	}
 
-	const invoker = popoverInvoker(node)
+	const invoker = popoverInvoker(node, target)
 
 	return (
 		!invoker.matches(':disabled, [aria-disabled="true"]') &&
@@ -108,7 +110,7 @@ export function interest(
 				(source !== undefined || hasPointerInterest()) &&
 				hasVisiblePopoverInvoker(node, target)
 			) {
-				target.showPopover({ source: source ?? popoverInvoker(node) })
+				target.showPopover({ source: source ?? popoverInvoker(node, target) })
 			}
 		}, delay)
 	}

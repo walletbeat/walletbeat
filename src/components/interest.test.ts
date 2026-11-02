@@ -24,7 +24,11 @@ class TestElement extends EventTarget {
 		return this.invoker
 	}
 
-	querySelectorAll() {
+	querySelectorAll(selector: string) {
+		if (selector === '[popovertarget]') {
+			return this.invoker ? [this.invoker] : []
+		}
+
 		return this.hoveredDescendants.filter(element => element.hovered)
 	}
 
@@ -134,12 +138,13 @@ describe('interest fallback lifecycle', () => {
 			for (const kind of ['direct', 'descendant', 'label']) {
 				const invoker = kind === 'direct' ? node : new TestElement()
 
+				invoker.popoverTarget = target.id
+
 				if (kind === 'label') {
 					cleanup?.destroy()
 					const label = new TestLabel()
 
 					label.control = invoker
-					invoker.popoverTarget = target.id
 					node = label
 					cleanup = interest(htmlElement(node), { id: target.id })
 				}
@@ -160,6 +165,7 @@ describe('interest fallback lifecycle', () => {
 
 	it('requires sustained pointer interest rather than opening during a scroll crossing', () => {
 		node.invoker = new TestElement()
+		node.invoker.popoverTarget = target.id
 		node.hovered = true
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(interestDelayMs.start - 1)
@@ -337,8 +343,62 @@ describe('interest fallback lifecycle', () => {
 		},
 	)
 
+	it.each(['visible', 'disabled', 'ariaDisabled'] as const)(
+		'keeps wrapper interest independent from an unrelated descendant invoker state: %s',
+		state => {
+			node.invoker = new TestElement()
+			node.invoker.popoverTarget = 'unrelated-details'
+
+			if (state === 'visible') {
+				node.invoker.visible = false
+			} else {
+				node.invoker[state] = true
+			}
+
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+			vi.advanceTimersByTime(interestDelayMs.start)
+
+			expect(target.showPopover).toHaveBeenCalledWith({ source: node })
+		},
+	)
+
+	it.each(['visible', 'disabled', 'ariaDisabled'] as const)(
+		'uses the matching descendant after an unrelated invoker and rechecks its %s state',
+		state => {
+			const unrelated = new TestElement()
+
+			unrelated.popoverTarget = 'unrelated-details'
+			const matching = new TestElement()
+
+			matching.popoverTarget = target.id
+			vi.spyOn(node, 'querySelectorAll').mockReturnValue([unrelated, matching])
+
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+
+			if (state === 'visible') {
+				matching.visible = false
+			} else {
+				matching[state] = true
+			}
+
+			vi.advanceTimersByTime(interestDelayMs.start)
+			expect(target.showPopover).not.toHaveBeenCalled()
+
+			if (state === 'visible') {
+				matching.visible = true
+			} else {
+				matching[state] = false
+			}
+
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+			vi.advanceTimersByTime(interestDelayMs.start)
+			expect(target.showPopover).toHaveBeenCalledOnce()
+		},
+	)
+
 	it('does not open a wrapper tooltip while CSS hides its native invoker', () => {
 		node.invoker = new TestElement()
+		node.invoker.popoverTarget = target.id
 		node.invoker.visible = false
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(interestDelayMs.start)
