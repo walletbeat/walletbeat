@@ -370,6 +370,7 @@
 		),
 
 		expandHeaderCells = true,
+		stickyLeafInlineSize,
 		transitionUpdate = directTransitionUpdate,
 
 		cellVerticalAlign,
@@ -398,6 +399,8 @@
 		expandedColumnIds?: SvelteSet<_ColumnId>
 
 		expandHeaderCells?: boolean
+		/** Retained inline extent of the leading sticky leaf; enables its shared width measurement. */
+		stickyLeafInlineSize?: string
 		transitionUpdate?: TableTransitionUpdate
 
 		/** One region after all heading rows, within the sticky table header. */
@@ -473,6 +476,38 @@
 				)
 	)
 
+	const headerRows = $derived.by(() => {
+		const rows: {
+			columns: (_Column | undefined)[]
+			level: number
+			sourceColumn: _Column | undefined
+			sizeClock: string | undefined
+			sizeSupported: boolean
+		}[] = []
+		let columns: (_Column | undefined)[] = table.columns
+		let inheritedClock: string | undefined
+		let inheritedSupported = true
+		do {
+			const level = rows.length
+			const stickyColumns = columns.filter(column => column?.isSticky)
+			const sourceColumn: _Column | undefined = inheritedSupported && stickyColumns.length === 1 && columns[0]?.isSticky ? columns[0] : undefined
+			const sizeClock = sourceColumn ? stickySizeClock(level) : stickyColumns.length ? undefined : inheritedClock
+			const sizeSupported: boolean = !!sourceColumn || (!stickyColumns.length && inheritedSupported)
+			rows.push({ columns, level, sourceColumn, sizeClock, sizeSupported })
+			columns = columns.flatMap(column => (
+				!column ? [undefined]
+					: column.subcolumns?.length && table.isColumnExpanded(column.id) ? column.subcolumns
+						: Array.from({ length: getColumnSpan(column) }, () => undefined)
+			))
+			inheritedClock = sizeClock
+			inheritedSupported = sizeSupported
+		} while (columns.some(column => column))
+		return rows
+	})
+	const stickyLeafSource = $derived(
+		stickyLeafInlineSize ? headerRows.find(row => row.sourceColumn === table.columnsVisible[0] && row.sourceColumn?.isSticky) : undefined
+	)
+
 	const toggleColumnSort = (columnId: _ColumnId) => {
 		transitionUpdate(() => {
 			flushSync(() => table.toggleColumnSort(columnId))
@@ -488,7 +523,12 @@
 	id={tableId}
 	class="container {'class' in restProps ? restProps.class : ''}"
 >
-	<table>
+	<table
+		data-sticky-leaf={stickyLeafSource ? '' : undefined}
+		style:--table-sticky-size-clocks={Array.from({ length: table.maxHeaderLevel }, (_, level) => stickySizeClock(level)).join(', ')}
+		style:--table-sticky-leaf-clock={stickyLeafSource?.sizeClock}
+		style:--table-stickyLeaf-retainedInlineSize={stickyLeafSource ? stickyLeafInlineSize : undefined}
+	>
 		<colgroup>
 			{#each table.columnsVisible as column (column.id)}
 				{@const columnSpan = getColumnSpan(column)}
@@ -503,11 +543,10 @@
 			{/each}
 		</colgroup>
 
-		<thead
-			data-sticky="block backdrop-before backdrop-stuck"
-			style:--table-sticky-size-clocks={Array.from({ length: table.maxHeaderLevel }, (_, level) => stickySizeClock(level)).join(', ')}
-		>
-			{@render headerRows(table.columns, 0, undefined, true)}
+		<thead data-sticky="block backdrop-before backdrop-stuck">
+			{#each headerRows as { columns, level, sourceColumn, sizeClock, sizeSupported } (level)}
+				{@render headerRow(columns, level, sourceColumn, sizeClock, sizeSupported)}
+			{/each}
 
 			{#if HeaderBelow}
 				<tr class="header-below">
@@ -517,25 +556,10 @@
 				</tr>
 			{/if}
 
-			{#snippet headerRows(columns: (_Column | undefined)[], level: number, inheritedClock: string | undefined, inheritedSupported: boolean)}
-				{@const stickyColumns = columns.filter(column => column?.isSticky)}
-				{@const sourceColumn = inheritedSupported && stickyColumns.length === 1 && columns[0]?.isSticky ? columns[0] : undefined}
-				{@const sizeClock = sourceColumn ? stickySizeClock(level) : stickyColumns.length ? undefined : inheritedClock}
-				{@const sizeSupported = !!sourceColumn || (!stickyColumns.length && inheritedSupported)}
-				{@const nextLevelColumns = (
-					columns
-						.flatMap(column => (
-							!column ?
-								[undefined]
-							: column.subcolumns?.length && table.isColumnExpanded(column.id) ?
-								column.subcolumns
-							:
-								Array.from({ length: getColumnSpan(column) }, () => undefined)
-						))
-				)}
-
+			{#snippet headerRow(columns: (_Column | undefined)[], level: number, sourceColumn: _Column | undefined, sizeClock: string | undefined, sizeSupported: boolean)}
 				<tr
 					data-sticky-size={sizeClock ? '' : undefined}
+					data-sticky-leaf={stickyLeafSource && sizeClock === stickyLeafSource.sizeClock ? '' : undefined}
 					data-visible-center={sizeSupported ? '' : undefined}
 					style:--table-sticky-size-clock={sizeClock}
 				>
@@ -548,9 +572,6 @@
 					{/each}
 				</tr>
 
-				{#if nextLevelColumns.some(column => column)}
-					{@render headerRows(nextLevelColumns, level + 1, sizeClock, sizeSupported)}
-				{/if}
 			{/snippet}
 
 			{#snippet headerCell(column: _Column, level: number, index: number, isSizeSource: boolean)}
@@ -577,6 +598,7 @@
 					data-header-level={level}
 					data-title-hit-area={column.HeaderTitleHitArea ? '' : undefined}
 					data-sticky-size-source={isSizeSource ? '' : undefined}
+					data-sticky-leaf={column === stickyLeafSource?.sourceColumn ? '' : undefined}
 					aria-sort={table.sortState?.columnId === column.id ? (table.sortState.direction === SortDirection.Ascending ? 'ascending' : 'descending') : undefined}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
@@ -724,6 +746,7 @@
 							colspan={columnSpan}
 							data-table-column={String(column.id)}
 							data-table-column-name={column.name}
+							data-sticky-leaf={column === stickyLeafSource?.sourceColumn ? '' : undefined}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 							data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -771,6 +794,11 @@
 		inherits: true;
 		initial-value: 0px;
 	}
+	@property --table-stickyLeaf-inlineSize {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
 	@keyframes table-sticky-size {
 		from { ---table-sticky-size-fraction: 0; }
 		to { ---table-sticky-size-fraction: 1; }
@@ -781,9 +809,24 @@
 		--scrollItem-visibleCenter-animation: none;
 	}
 
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
-			@container (width >= 48rem) {
+	@supports (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
+		@container (width >= 48rem) {
+			table { timeline-scope: var(--table-sticky-size-clocks); }
+			tr[data-sticky-size], table[data-sticky-leaf] {
+				/* A local viewport S with subject S + V yields P = S / (2S + V).
+				   Its CSS-pixel precision reserves less than one extra inline pixel. */
+				---table-sticky-size-resolved: round(nearest, max(0px, calc(100vh * var(---table-sticky-size-fraction) / max(0.000001, 1 - 2 * var(---table-sticky-size-fraction)))), 1px);
+			}
+			table[data-sticky-leaf] {
+				animation: table-sticky-size auto linear both;
+				animation-timeline: var(--table-sticky-leaf-clock);
+				--table-stickyLeaf-inlineSize: var(---table-sticky-size-resolved);
+				.sticky-size-probe { display: block; }
+				:is(th, td)[data-sticky-leaf] {
+					inset-inline-start: calc(var(--sticky-insetInlineStart) - (var(--table-stickyLeaf-inlineSize) - var(--table-stickyLeaf-retainedInlineSize)));
+				}
+			}
+			@media (prefers-reduced-motion: no-preference) {
 				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
 					overflow-x: clip;
 
@@ -799,19 +842,23 @@
 						max-inline-size: none;
 					}
 				}
-		thead { timeline-scope: var(--table-sticky-size-clocks); }
-		tr[data-sticky-size] {
-			animation: table-sticky-size auto linear both;
-			animation-timeline: var(--table-sticky-size-clock);
-			/* A local viewport S with subject S + V yields P = S / (2S + V).
-			   Its CSS-pixel precision reserves less than one extra inline pixel. */
-			---table-sticky-size: round(nearest, max(0px, calc(100vh * var(---table-sticky-size-fraction) / max(0.000001, 1 - 2 * var(---table-sticky-size-fraction)))), 1px);
-		}
+
+				tr[data-sticky-leaf] > th:not([data-sticky]) > .header-cell-content:dir(ltr) > [data-sticky-container] {
+					--sticky-marginInlineStart: var(--table-stickyLeaf-retainedInlineSize);
+				}
+
+				tr[data-sticky-size] {
+					animation: table-sticky-size auto linear both;
+					animation-timeline: var(--table-sticky-size-clock);
+					---table-sticky-size: var(---table-sticky-size-resolved);
+				}
+				.sticky-size-probe { display: block; }
+			}
+
 		th[data-sticky-size-source] {
 			anchor-name: var(--table-sticky-size-clock);
 		}
 		.sticky-size-probe {
-			display: block;
 			position: fixed;
 			position-anchor: var(--table-sticky-size-clock);
 			left: 0;
@@ -834,9 +881,9 @@
 			view-timeline: var(--table-sticky-size-clock) block;
 			view-timeline-inset: 0;
 		}
+		}
 	}
-	}
-	}
+
 	.container {
 		---table-sticky-size: 0px;
 		inline-size: var(--table-inlineSize, max-content);
