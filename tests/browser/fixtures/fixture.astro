@@ -1,5 +1,6 @@
 ---
 import { imageMetadata } from 'astro/assets/utils'
+import { fixtureImageDimensions } from './fixture-image-dimensions'
 import wideIconSource from './wide-wallet.svg?raw'
 import wideIconUrl from './wide-wallet.svg?url'
 import { getWalletIcon } from '@/utils/wallet-og-image'
@@ -23,6 +24,7 @@ if (!fixture || !isWalletFixture(fixture)) {
 }
 
 const wallet = walletFixtures[fixture]()
+const imageDimensions = await fixtureImageDimensions(wallet)
 const walletIcon =
 	fixture === 'nonSquare'
 		? { src: wideIconUrl, ...(await imageMetadata(Buffer.from(wideIconSource), wideIconUrl)) }
@@ -36,6 +38,6 @@ const codeSnippets = rawEntry ? codeSnippetsForWallet(rawEntry[0], rawEntry[1]) 
 <Layout metadata={{ title: `WalletPage fixture: ${fixture}` }} preloadComplexIcons>
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 	<main data-column-item='flexible'>
-		<WalletFixture {walletIcon} name={fixture} {codeSnippets} client:idle />
+		<WalletFixture {imageDimensions} {walletIcon} name={fixture} {codeSnippets} client:idle />
 	</main>
 </Layout>
