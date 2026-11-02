@@ -1224,7 +1224,7 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 		await seek('private-transfers')
 
-		if (width <= 1024 && !(await toc.evaluate(element => element.matches(':popover-open')))) {
+		if (width <= 1344 && !(await toc.evaluate(element => element.matches(':popover-open')))) {
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 		}
 

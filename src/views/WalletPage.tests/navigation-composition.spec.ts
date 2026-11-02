@@ -14,7 +14,7 @@ test('native TOC composition across the complete responsive and direction matrix
 	page,
 	browserName,
 }, info) => {
-	for (const width of [390, 864, 1024, 1025, 1440]) {
+	for (const width of [390, 864, 1344, 1345, 1440]) {
 		for (const direction of ['ltr', 'rtl']) {
 			await page.setViewportSize({ width, height: 900 })
 			await page.goto('/__wallet-page/software/')
@@ -25,7 +25,7 @@ test('native TOC composition across the complete responsive and direction matrix
 				await document.fonts.ready
 			}, direction)
 
-			if (width <= 1024) {
+			if (width <= 1344) {
 				await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 			}
 
@@ -300,7 +300,7 @@ test('native shared feedback and parent current state across responsive directio
 }, info) => {
 	const observations = []
 
-	for (const width of [390, 864, 1024, 1025, 1440]) {
+	for (const width of [390, 864, 1344, 1345, 1440]) {
 		for (const direction of ['ltr', 'rtl']) {
 			await page.setViewportSize({ width, height: 900 })
 			await page.goto('/__wallet-page/software/')
@@ -312,7 +312,7 @@ test('native shared feedback and parent current state across responsive directio
 			}, direction)
 			const openTOC = async () => {
 				if (
-					width <= 1024 &&
+					width <= 1344 &&
 					!(await page.getByRole('navigation', { name: 'Table of contents', exact: true }).count())
 				) {
 					await page.getByRole('button', { name: 'Table of contents', exact: true }).click()

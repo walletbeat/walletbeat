@@ -55,7 +55,7 @@ for (const width of [390, 1440]) {
 				throw new Error('Missing rendered pie geometry')
 			}
 
-			if (width > 1024 || compact) {
+			if (width > 1344 || compact) {
 				if (direction === 'ltr') {
 					expect(geometry.x + geometry.width / 2).toBeGreaterThan(width / 2)
 				} else {

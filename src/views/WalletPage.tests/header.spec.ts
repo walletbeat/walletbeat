@@ -48,7 +48,7 @@ for (const width of [390, 1440]) {
 						let left = main.left,
 							right = main.right
 
-						if (innerWidth > 1024) {
+						if (innerWidth > 1344) {
 							if (aside.x + aside.width / 2 > main.x + main.width / 2) {
 								right = aside.left
 							} else {
@@ -768,7 +768,7 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 	)
 	const observations = []
 
-	for (const width of [390, 933, 1024, 1025, 1440, 390]) {
+	for (const width of [390, 933, 1344, 1345, 1440, 390]) {
 		await page.setViewportSize({ width, height: 1203 })
 		const read = () =>
 			page.evaluate(() => {

@@ -1,6 +1,6 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
-for (const width of [390, 1024, 1025, 1440]) {
+for (const width of [390, 1344, 1345, 1440]) {
 	test(`native navigation and root ownership at ${width}px`, async ({ page }) => {
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/__wallet-page/software/')
@@ -35,7 +35,7 @@ for (const width of [390, 1024, 1025, 1440]) {
 			expect(!/(auto|scroll)/.test(main.overflow) || main.scroll <= main.height).toBe(true)
 		})
 		await test.step('🗂️ HiddenNavigation / PopoverControl / IndependentPie: native reachability cycle', async () => {
-			if (width > 1024) {
+			if (width > 1344) {
 				return
 			}
 

@@ -40,7 +40,7 @@ Prerequisites: §1.
 
 - **🖼️ `NestedStacks`** Nested scroll areas start their own internal sticky stack while their outer boxes still participate in the parent layout.
 
-- **🖼️ `RailBreakpoint`** At widths ≤`1024px`, content reserves no desktop TOC rail; at widths ≥`1025px`, the right-hand desktop rail reservation returns.
+- **🖼️ `RailBreakpoint`** At widths ≤`84rem`, content reserves no desktop TOC rail; above `84rem`, the right-hand desktop rail reservation returns with at least `44rem` for the content column. With the default initial font size, the boundary samples are `1344px` and `1345px`.
 
 - **🖼️ `RailIsolation`** Desktop rail/pie width does not overlap or widen main content; navigation and local overflow do not widen the sticky rail.
 

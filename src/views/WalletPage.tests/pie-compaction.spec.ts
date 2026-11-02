@@ -239,7 +239,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 	})
 }
 
-for (const width of [390, 1024]) {
+for (const width of [390, 1344]) {
 	for (const direction of ['ltr', 'rtl'] as const) {
 		test(`TOC runtime state compacts and restores the same pie at ${width}px (${direction})`, async ({
 			page,

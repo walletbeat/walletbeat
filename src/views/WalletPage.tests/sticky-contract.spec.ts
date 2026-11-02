@@ -8,7 +8,7 @@ import {
 } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
-const widths = [390, 864, 1024, 1025, 1440]
+const widths = [390, 864, 1344, 1345, 1440]
 
 for (const width of widths) {
 	test(`native sticky contact, prose travel and current disclosure extent at ${width}px`, async ({

@@ -896,7 +896,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</a>
 			</h1>
 			{#if Object.keys(wallet.variants).length > 1 || (Variant.HARDWARE in wallet.variants && brandModels.length > 1)}
-				<div class="wallet-device-controls" data-row="gap-2" inert={!queryParams}>
+				<div class="wallet-device-controls" data-row="gap-2 wrap" inert={!queryParams}>
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
@@ -1786,7 +1786,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				color: inherit;
 			}
 
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				flex-flow: row wrap;
 				gap: 1rem;
 				z-index: auto;
@@ -1954,7 +1954,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			&[data-sticky-container] {
 				isolation: auto;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				> #wallet-toc:not(:popover-open):not([data-closing]) {
 							flex: 0 1 22rem;
 							display: flex;
@@ -1978,7 +1978,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		row-gap: 2rem;
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 				--sticky-marginInlineEnd: 0px;
@@ -2005,7 +2005,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			scroll-behavior: auto;
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
 	}
@@ -2050,7 +2050,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		&[data-sticky] {
 			z-index: 3;
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			grid-area: Content;
 		}
 	}
@@ -2058,7 +2058,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		margin-inline: var(--navigation-controlInsetInline);
 		margin-block-start: var(--icon-size, 2rem);
 		align-self: end;
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			align-self: start;
 		}
 	}
@@ -2229,7 +2229,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			---pie-scale: tan(atan2(var(---pie-size), calc(var(---pie-diameter) * 1px)));
 			--sticky-insetBlockStart: 0px;
 
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				&::before {
 					display: none;
 				}
@@ -2403,7 +2403,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			pointer-events: none;
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			.container .page-navigation {
 				padding-block-start: 0;
 			}
@@ -2507,7 +2507,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		timeline-scope:
 			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
 			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
-		@media (width > 1024px) {
+		@media (width > 84rem) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
 				var(--stickyBreadcrumb-entryTimeline),
@@ -2544,8 +2544,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				min-inline-size: 0;
 			}
 			> .wallet-device-controls {
-				flex-shrink: 0;
+				min-inline-size: min-content;
 				font-size: 1rem;
+				:global(select) {
+					flex-shrink: 0;
+				}
 			}
 			min-block-size: max(
 				var(--wallet-icon-size),
@@ -2797,7 +2800,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				timeline-scope: none;
 			}
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			[data-sticky-breadcrumb~="root"] {
 				--stickyBreadcrumb-clearance: circle;
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);
@@ -2937,7 +2940,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				block-size: auto;
 				inset-block-end: 0;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				grid-template: "Header" "Nav" "Content" / minmax(0, 1fr);
 			}
 			& > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
@@ -2952,13 +2955,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			--stickyBreadcrumb-scale: calc(var(---wallet-compactFontSize) / var(---wallet-name-flow-font-size));
 			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
 			--stickyBreadcrumb-minBlockSize: var(---wallet-compact-icon-size);
-			@media (width > 1024px) {
+			@media (width > 84rem) {
 				--stickyBreadcrumb-minBlockSize: max(
 					var(---wallet-compact-icon-size),
 					calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem))
 				);
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				--stickyBreadcrumb-exitAnimation: none;
 			}
 			> [data-sticky-breadcrumb~="position"] {
@@ -3032,19 +3035,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			> header {
 				--stickyBreadcrumb-sourcePaddingInline: 0px;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				--stickyBreadcrumb-forceRow: 1;
 			}
 		}
 		:global([data-sticky-breadcrumb~="scope"]:has(> [data-sticky-breadcrumb~="position"] :is(h3[data-sticky-breadcrumb~="source"], h3[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > h3), > details > [data-sticky-breadcrumb~="position"] :is(h3[data-sticky-breadcrumb~="source"], h3[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > h3))) {
 			---wallet-compactFontSize: var(---wallet-compact-h3);
 			--stickyBreadcrumb-scale: calc(var(---wallet-compactFontSize) / var(---wallet-attribute-heading-font-size));
-		}
-		.wallet-device-controls {
-			display: grid;
-
-			grid-auto-flow: column;
-			grid-auto-columns: max-content;
 		}
 		.wallet-title-row {
 			anchor-name: --wallet-title-visual;

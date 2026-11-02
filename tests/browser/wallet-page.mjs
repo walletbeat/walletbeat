@@ -586,7 +586,7 @@ async function settleDocumentAnimations(details) {
 	})
 }
 
-const requiredWidths = [390, 864, 1024, 1025, 1440]
+const requiredWidths = [390, 864, 1344, 1345, 1440]
 const sampledWidths = process.env.WALLET_PAGE_WIDTHS?.split(',').map(Number) ?? requiredWidths
 
 if (
@@ -726,7 +726,7 @@ try {
 		initial.pieLinkCount = await page.locator('.pie-navigation a[href^="#"]').count()
 		initial.tocCycle = null
 
-		if (width <= 1024) {
+		if (width <= 1344) {
 			const panel = page.locator('#wallet-toc')
 
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
@@ -956,7 +956,7 @@ try {
 
 		observation.footerFlow = await page.evaluate(observeFooterFlow)
 
-		if (width <= 1024 && (await page.locator('#menu-toggle').isVisible())) {
+		if (width <= 1344 && (await page.locator('#menu-toggle').isVisible())) {
 			await scrollRoot.evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }))
 			const menuState = observeMenuState
 
@@ -1220,7 +1220,7 @@ const checks = {
 				o.initial.tocTriggerCount === 1 &&
 				o.initial.pieOutsidePopover &&
 				o.initial.pieLinkCount > 0 &&
-				(o.width > 1024 || o.initial.tocCycle?.nativeOpen),
+				(o.width > 1344 || o.initial.tocCycle?.nativeOpen),
 		),
 		'A distinct named native button opens the actual TOC popover on each mobile width; individual pie links remain outside that popover and outside its toggle.',
 	],
@@ -1282,7 +1282,7 @@ const checks = {
 	MobileChrome: [
 		all(
 			o =>
-				o.width > 1024 ||
+				o.width > 1344 ||
 				o.initial.direction !== 'ltr' ||
 				(o.initial.chrome.theme &&
 					o.initial.chrome.theme.x + o.initial.chrome.theme.width / 2 < o.width / 2),
@@ -1326,7 +1326,7 @@ const checks = {
 		all(
 			o =>
 				o.initial.tocDefinitionNames === 1 &&
-				(o.width > 1024
+				(o.width > 1344
 					? o.initial.tocNames === 1
 					: o.initial.tocNames === 0 &&
 						o.initial.tocCycle?.opened === 1 &&
