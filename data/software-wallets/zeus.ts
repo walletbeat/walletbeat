@@ -452,6 +452,7 @@ export const zeus: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: null,
 	},
