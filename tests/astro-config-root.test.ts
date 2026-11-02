@@ -19,8 +19,8 @@ const require = createRequire(import.meta.url)
 /** Absolute path to the repository root, derived from this test file's location. */
 const REPO_ROOT = getRepositoryRoot()
 
-/** Absolute path to the `tsx` CLI entrypoint. */
-const TSX_CLI = require.resolve('tsx/cli')
+/** Absolute path to the TypeScript loader module. */
+const TSX_IMPORT = require.resolve('tsx')
 
 /** Absolute path to the `src/utils/codebase.astro.ts` module. */
 function resolveAstroUtilModulePath(): string {
@@ -28,7 +28,7 @@ function resolveAstroUtilModulePath(): string {
 }
 
 /**
- * Run `getAstroBuildTimeRepositoryRoot()` in a `tsx` subprocess with the given
+ * Run `getAstroBuildTimeRepositoryRoot()` in a Node subprocess with the given
  * working directory, returning the resolved repository root.
  */
 async function getAstroBuildTimeRootFromCwd(cwd: string): Promise<string> {
@@ -36,7 +36,11 @@ async function getAstroBuildTimeRootFromCwd(cwd: string): Promise<string> {
 import { getAstroBuildTimeRepositoryRoot } from ${JSON.stringify(resolveAstroUtilModulePath())};
 process.stdout.write(getAstroBuildTimeRepositoryRoot());
 `
-	const result = await execFileAsync(process.execPath, [TSX_CLI, '--eval', script], { cwd })
+	const result = await execFileAsync(
+		process.execPath,
+		['--import', TSX_IMPORT, '--input-type=module', '--eval', script],
+		{ cwd },
+	)
 
 	return result.stdout.trim()
 }
