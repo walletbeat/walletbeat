@@ -4,8 +4,8 @@ import { dirname } from 'node:path'
 
 import sharp from 'sharp'
 
-import { semanticOutline } from '../../../tests/browser/semantic-outline.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
+import { semanticOutline } from './fixtures/semantic-outline.mjs'
 
 const contractHash = createHash('sha256')
 	.update(

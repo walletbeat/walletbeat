@@ -7,6 +7,7 @@ import { chromium, firefox, webkit } from '@playwright/test'
 import { wbIconEmojiSequences } from '@/styles/wbicons'
 import { getWalletStageAndLadder } from '@/utils/stage'
 
+import { semanticOutline } from '../../src/views/WalletPage.tests/fixtures/semantic-outline.mjs'
 import { parseProcedures, parseRequirements } from './contract-evidence.mjs'
 import { sourceSnapshot, verifyServerSource } from './fixtures/source-snapshot.mjs'
 import {
@@ -15,7 +16,6 @@ import {
 	walletFixtures,
 } from './fixtures/wallet-fixtures'
 import { presentationStyles } from './presentation-styles.mjs'
-import { semanticOutline } from './semantic-outline.mjs'
 
 /**
  * @typedef {Pick<DOMRectReadOnly, 'x'|'y'|'top'|'bottom'|'left'|'right'|'width'|'height'>} CaptureBox
