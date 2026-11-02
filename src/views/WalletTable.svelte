@@ -540,6 +540,7 @@
 		isWalletExpanded ?
 			visibleWalletFilterSets.map(set => ({
 				kind: 'wallet' as const,
+				label: set.label,
 				columnId: `facet-${set.id}`,
 				panelId: `${viewId}-wallet-filters`,
 				anchorName: `--${viewId}-${set.id}-filters`,
@@ -550,6 +551,7 @@
 			visibleWalletFilterSets.length ?
 				[{
 					kind: 'wallet' as const,
+					label: 'Wallet',
 					columnId: 'wallet',
 					panelId: `${viewId}-wallet-filters`,
 					anchorName: `--${viewId}-wallet-filters`,
@@ -564,6 +566,7 @@
 
 		return [{
 			kind: 'attribute' as const,
+			label: hasMultipleAttributeGroups ? 'Attributes' : attributeGroupList[0].displayName,
 			columnId: attributeRootColumnId,
 			panelId: `${viewId}-attribute-filters`,
 			anchorName: `--${viewId}-attribute-filters`,
@@ -573,6 +576,7 @@
 	})
 	const stageFilterSlots = stageStatusFilterSets.length ? [{
 		kind: 'stage' as const,
+		label: 'Stage',
 		columnId: 'stage',
 		panelId: `${viewId}-stage-filters`,
 		anchorName: `--${viewId}-stage-filters`,
@@ -937,6 +941,7 @@
 							aria-label="Attribute filters"
 							items={allAttributes}
 							filterSets={slot.filterSets}
+							filterGroups={[slot]}
 							bind:activeChoices={attributeActiveChoices}
 							bind:toggleFilterById={toggleAttributeFilterById}
 							transitionUpdate={update => transitionUpdate(update, 'columns')}
@@ -948,6 +953,7 @@
 							aria-label={slot.kind === 'stage' ? 'Stage filters' : 'Wallet filters'}
 							items={wallets}
 							filterSets={slot.filterSets}
+							filterGroups={slot.kind === 'wallet' ? walletFilterSlots : [slot]}
 							contextFilterSets={walletFilterSets}
 							visibleSetIds={slot.kind === 'wallet' ? walletPanelSlot?.filterSets.map(set => set.id) : undefined}
 							bind:activeChoices
