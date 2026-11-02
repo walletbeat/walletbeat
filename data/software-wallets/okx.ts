@@ -249,6 +249,7 @@ export const okx: SoftwareWallet = {
 			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
