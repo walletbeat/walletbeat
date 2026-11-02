@@ -100,10 +100,38 @@ for (const javaScriptEnabled of [true, false]) {
 																	return false
 																}
 
+																const nested = [
+																	...cell.querySelectorAll<HTMLElement>('[data-sticky]'),
+																]
+																const baselineNested = [
+																	...baseline.querySelectorAll<HTMLElement>('[data-sticky]'),
+																]
+
+																if (
+																	nested.length !== baselineNested.length ||
+																	nested.some((element, index) => {
+																		const actualStyle = getComputedStyle(element)
+																		const baselineStyle = getComputedStyle(baselineNested[index])
+
+																		return (
+																			actualStyle.insetInlineStart !==
+																				baselineStyle.insetInlineStart ||
+																			actualStyle.insetBlockStart !==
+																				baselineStyle.insetBlockStart ||
+																			actualStyle.getPropertyValue('--sticky-offset') !==
+																				baselineStyle.getPropertyValue('--sticky-offset')
+																		)
+																	})
+																) {
+																	return false
+																}
+
 																if (!active) {
 																	return (
 																		style.insetInlineStart ===
-																		getComputedStyle(baseline).insetInlineStart
+																			getComputedStyle(baseline).insetInlineStart &&
+																		style.insetInlineEnd ===
+																			getComputedStyle(baseline).insetInlineEnd
 																	)
 																}
 
@@ -112,6 +140,27 @@ for (const javaScriptEnabled of [true, false]) {
 																	Number.parseFloat(
 																		getComputedStyle(document.documentElement).fontSize,
 																	)
+
+																if (
+																	requestedScroll >=
+																	viewport.scrollWidth - viewport.clientWidth
+																) {
+																	const rect = cell.getBoundingClientRect()
+																	const baselineRect = baseline.getBoundingClientRect()
+																	const frame = viewport.getBoundingClientRect()
+																	const baselineFrame = reference.getBoundingClientRect()
+																	const rtl = viewport.getAttribute('dir') === 'rtl'
+																	const extent = rtl
+																		? frame.right - rect.left
+																		: rect.right - frame.left
+																	const start = rtl
+																		? baselineFrame.right - baselineRect.right
+																		: baselineRect.left - baselineFrame.left
+
+																	if (Math.abs(extent - start - retained) > 1) {
+																		return false
+																	}
+																}
 
 																return (
 																	Math.abs(

@@ -44,7 +44,11 @@
 {#each leafCases as fixture (fixture.name)}
 	{#each [false, true] as enabled (enabled)}
 		<div class="viewport" data-leaf-fixture={fixture.name} data-measure-leaf={enabled} data-scroll-container>
-			<Table rows={rows} columns={fixture.columns} stickyLeafInlineSize={enabled ? '6rem' : undefined} />
+			<Table rows={rows} columns={fixture.columns} stickyLeafInlineSize={enabled ? '6rem' : undefined}>
+				{#snippet Cell({ value })}
+					<span><span data-sticky="inline inline-start backdrop-none">{value}</span></span>
+				{/snippet}
+			</Table>
 		</div>
 	{/each}
 {/each}
