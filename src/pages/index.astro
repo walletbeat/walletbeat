@@ -7,6 +7,7 @@ import { GITHUB_REPO_URL, githubBlobUrl } from '@/constants/github'
 import Layout from '../layouts/Layout.astro'
 
 // Components
+import { Font } from 'astro:assets'
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 ---
@@ -16,6 +17,7 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 		title: 'Walletbeat - Who watches the wallets?',
 	}}
 >
+	<Font cssVariable='--fontFamily-spMonorium' preload />
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
@@ -76,10 +78,21 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 
 		> header {
 			font-size: max(1rem, 16px);
+			padding-block: clamp(2rem, 0.06 * var(--scrollContainer-sizeInline), 5rem);
+			background:
+				linear-gradient(to right, var(--background-primary), transparent 150%),
+				url('/images/background/ascii-flower-block.svg') right 8% top 12% /
+					clamp(8rem, 20cqi, 18rem) auto no-repeat,
+				url('/images/background/ascii-symbol-clusters.svg') right -4% bottom -2rem /
+					clamp(12rem, 32cqi, 28rem) auto no-repeat,
+				url('/images/background/ascii-dot-field.svg') center / 34rem auto repeat,
+				light-dark(#f0dafa, #4b1e70);
 
 			h1 {
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
-				font-weight: 800;
+				font-family: var(--fontFamily-spMonorium);
+				font-weight: 400;
+				text-transform: uppercase;
 				line-height: 1.1;
 				text-shadow:
 					0 0 1em var(--accent-backgroundColor),
