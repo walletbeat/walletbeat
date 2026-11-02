@@ -411,7 +411,7 @@
 			variant && variant in wallet.variants && !hasSingleVariant(wallet.variants)
 				? variant
 				: undefined
-		selectedModel = params.get('model') ?? undefined
+		selectedModel = brandModels.find(model => model.modelId === params.get('model'))?.modelId
 		queryParams = params
 	}
 

@@ -2,8 +2,8 @@ import { execFile } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
-import { isRecord } from '@/types/utils/record'
 import { SortDirection } from '@/components/table-sort'
+import { isRecord } from '@/types/utils/record'
 import { walletSummaryHref, walletSummarySortChoices } from '@/views/wallet-table-navigation'
 import { stageQualificationChoices } from '@/views/wallet-table-stage'
 

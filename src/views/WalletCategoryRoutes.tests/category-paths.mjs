@@ -4,10 +4,16 @@ import { ratedSoftwareWallets } from '../../../data/software-wallets.ts'
 import { displayedAttributeIdsForWalletType } from '../../schema/wallet-navigation.ts'
 import { WalletType, walletTypes, walletTypeToUrlSlug } from '../../schema/wallet-types.ts'
 
-const walletsByType = {
-	[WalletType.SOFTWARE]: ratedSoftwareWallets,
-	[WalletType.HARDWARE]: ratedHardwareWallets,
-	[WalletType.EMBEDDED]: ratedEmbeddedWallets,
+const namesByType = {
+	[WalletType.SOFTWARE]: Object.values(ratedSoftwareWallets).map(
+		wallet => wallet.metadata.displayName,
+	),
+	[WalletType.HARDWARE]: Object.values(ratedHardwareWallets).map(
+		wallet => wallet.metadata.displayName,
+	),
+	[WalletType.EMBEDDED]: Object.values(ratedEmbeddedWallets).map(
+		wallet => wallet.metadata.displayName,
+	),
 }
 
 process.stdout.write(
@@ -15,9 +21,7 @@ process.stdout.write(
 		walletTypes.items.flatMap(walletType =>
 			['summary', ...displayedAttributeIdsForWalletType(walletType)].map(group => ({
 				path: `/${walletTypeToUrlSlug(walletType)}/${group}/`,
-				names: Object.values(walletsByType[walletType])
-					.map(wallet => wallet.metadata.displayName)
-					.toSorted(),
+				names: namesByType[walletType].toSorted(),
 			})),
 		),
 	),
