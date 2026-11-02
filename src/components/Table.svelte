@@ -818,14 +818,19 @@
 				---table-sticky-size-resolved: round(nearest, max(0px, calc(100vh * var(---table-sticky-size-fraction) / max(0.000001, 1 - 2 * var(---table-sticky-size-fraction)))), 1px);
 			}
 			table[data-sticky-leaf] {
+				---table-sticky-leaf-content-offset: var(--sticky-offset);
 				animation: table-sticky-size auto linear both;
 				animation-timeline: var(--table-sticky-leaf-clock);
 				--table-stickyLeaf-inlineSize: var(---table-sticky-size-resolved);
 				.sticky-size-probe { display: block; }
 				:is(th, td)[data-sticky-leaf] {
-					inset-inline-start: calc(var(--sticky-insetInlineStart) - (var(--table-stickyLeaf-inlineSize) - var(--table-stickyLeaf-retainedInlineSize)));
+					--sticky-offset: calc(var(--sticky-insetInlineStart) - (var(--table-stickyLeaf-inlineSize) - var(--table-stickyLeaf-retainedInlineSize)));
 				}
 			}
+			:where(table[data-sticky-leaf] :is(th, td)[data-sticky-leaf]) > :global(*) {
+				--sticky-offset: var(---table-sticky-leaf-content-offset);
+			}
+
 			@media (prefers-reduced-motion: no-preference) {
 				tr[data-visible-center] > th:not([data-sticky]) > .header-cell-content:dir(ltr) {
 					overflow-x: clip;
