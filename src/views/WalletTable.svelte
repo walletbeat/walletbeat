@@ -876,6 +876,8 @@
 					{#if canFilter}
 					<button
 							data-tag={tag}
+							data-view-transition="named"
+							style:--view-transition-name={viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id)}
 							disabled={!interactive}
 						aria-label="Filter by {tagLabel ?? label}"
 						onclick={event => {
@@ -886,7 +888,11 @@
 						{tagLabel ?? label}
 					</button>
 					{:else}
-						<span data-tag={tag}>{tagLabel ?? label}</span>
+						<span
+							data-tag={tag}
+							data-view-transition="named"
+							style:--view-transition-name={viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id)}
+						>{tagLabel ?? label}</span>
 					{/if}
 					{/snippet}
 					{#if eip}
@@ -910,7 +916,12 @@
 		)}
 
 		{#if allSupportedVariants.length > 1}
-			<div class="variants" data-row="gap-1">
+			<div
+				class="variants"
+				data-row="gap-1"
+				data-view-transition="named"
+				style:--view-transition-name={viewTransitionName(viewId, 'wallet-variants', wallet.metadata.id)}
+			>
 				{#each supportedVariants as variant}
 					<button
 						data-selected={variant === selectedVariant ? '' : undefined}
@@ -1471,6 +1482,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
@@ -1687,6 +1700,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1869,6 +1884,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
