@@ -1955,22 +1955,25 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				isolation: auto;
 			}
 			@media (width <= 84rem) {
+				> #wallet-toc:not(:popover-open):not([data-closing]),
+				&::after {
+					flex: 0 1 22rem;
+					max-inline-size: 100%;
+					block-size: var(---pie-size, var(---wallet-page-navigation-inline-size));
+				}
+				&:has(> #wallet-toc:is(:popover-open, [data-closing]))::after {
+					content: '';
+					pointer-events: none;
+				}
 				> #wallet-toc:not(:popover-open):not([data-closing]) {
-							flex: 0 1 22rem;
-							display: flex;
-							overflow-y: auto;
-
-							inline-size: max-content;
-							max-inline-size: 100%;
-							block-size: var(---pie-size);
-
-							position: relative;
-							inset: auto;
-
-							background: none;
-							opacity: 1;
-							clip-path: none;
-
+					display: flex;
+					overflow-y: auto;
+					inline-size: max-content;
+					position: relative;
+					inset: auto;
+					background: none;
+					opacity: 1;
+					clip-path: none;
 					translate: none;
 				}
 			}
