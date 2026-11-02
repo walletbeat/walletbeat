@@ -657,7 +657,13 @@
 				return
 			}
 			const compact = getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1'
-			if (compact && owner && event.source === owner) return
+			if (compact && owner && event.source === owner) {
+				const bounds = owner.getBoundingClientRect()
+
+				owner.style.setProperty('--wallet-identity-flowInlineSize', `${bounds.width}px`)
+				owner.style.setProperty('--wallet-identity-flowBlockSize', `${bounds.height}px`)
+				return
+			}
 			event.preventDefault()
 			const target = compact ? node : disclosure?.querySelector<HTMLElement>(':scope > [popover]')
 			const source = event.source instanceof HTMLElement ? event.source : node
@@ -690,6 +696,8 @@
 			lifetime.abort()
 			registration?.destroy()
 			motion.destroy()
+			owner?.style.removeProperty('--wallet-identity-flowInlineSize')
+			owner?.style.removeProperty('--wallet-identity-flowBlockSize')
 		}
 	}
 
@@ -982,6 +990,7 @@
 				},
 			}}
 			class="wallet-table"
+			stickyLeafInlineSize={identityInterestAvailable ? 'var(--wallet-identity-retainedInlineSize, var(--table-stickyLeaf-inlineSize))' : undefined}
 			{HeaderBelow}
 
 			rows={wallets}
@@ -2469,49 +2478,75 @@
 					position-visibility: no-overflow;
 					margin: 0;
 				}
-				.row-count { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding)); }
-				.wallet-icon { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap)); }
+				.row-count { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding))); }
+				.wallet-icon { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap))); }
 			}
 		}
 
-		@supports (anchor-scope: --wallet-identity-cell) and (container-type: scroll-state) and (position-visibility: no-overflow) {
+		@supports (anchor-scope: --wallet-identity-cell) and (container-type: scroll-state) and (position-visibility: no-overflow) and (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
 			@container style(---wallet-identity-context: 1) {
 				@media (hover: hover) and (pointer: fine) {
-					@container wallet-table (width >= 48rem) and scroll-state(scrollable: inline-start) {
-						.desktop-table-container:has(.wallet-info[popover]) { ---wallet-identity-compact: 1; }
-					}
 					@container wallet-table (width >= 48rem) {
-						.desktop-table-container:has(.wallet-info:popover-open) { ---wallet-identity-compact: 1; }
-					}
-				}
-			}
+						.wallet-table:has(.wallet-info[popover]) {
+							--wallet-identity-retainedInlineSize: 6.25rem;
 
-			@container style(---wallet-identity-compact: 1) {
-				.wallet-table {
-					/* Positive native overflow keeps contraction from resetting its own trigger. */
-					--table-inlineSize: calc(var(--sticky-sizeInline) + 1px);
-					td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
-						inline-size: calc(var(---wallet-identity-rankSize) + var(---wallet-identity-gap) + var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding));
-						block-size: calc(var(---wallet-identity-blockSize) + 2 * var(--table-cell-padding));
-					}
-					.wallet-info-details summary { min-block-size: calc(var(---wallet-identity-blockSize) + 2 * var(--table-cell-padding)); }
-				}
-				.wallet-info[popover]:not(:popover-open) {
-					:is(.name-and-tags, .variants) {
-						position: absolute;
-						inline-size: max-content;
-						max-inline-size: 20rem;
-						visibility: hidden;
-						pointer-events: none;
-					}
-					.name h3 a {
-						position: absolute;
-						position-anchor: --wallet-identity-cell;
-						inset-inline: anchor(--wallet-identity-cell start) anchor(--wallet-identity-logo end);
-						inset-block: anchor(--wallet-identity-cell start) anchor(--wallet-identity-cell end);
-						color: transparent;
-						visibility: visible;
-						pointer-events: none;
+							&:has(td[data-table-column="wallet"]) { --wallet-identity-retainedInlineSize: 8rem; }
+
+							td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
+								container-name: wallet-identity-cell;
+
+								&:has(.wallet-info:popover-open) {
+									min-inline-size: var(--wallet-identity-flowInlineSize);
+									block-size: var(--wallet-identity-flowBlockSize);
+								}
+							}
+
+							.wallet-info:not(:popover-open) {
+								> :is(.row-count, .wallet-icon) {
+									position: sticky;
+									inset-inline-start: calc(var(--sticky-insetInlineStart) + var(--table-cell-padding));
+									z-index: 2;
+								}
+
+								> .wallet-icon {
+									inset-inline-start: calc(var(--sticky-insetInlineStart) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap));
+									z-index: 3;
+								}
+
+								> .row-count::after {
+									content: '';
+									position: absolute;
+									inset-block: calc((100% - var(---wallet-identity-blockSize)) / 2);
+									inset-inline-start: calc(-1 * var(--table-cell-padding));
+									inline-size: calc(var(---wallet-identity-rankSize) + var(---wallet-identity-gap) + var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding));
+									background: var(--table-backgroundColor);
+									z-index: -1;
+								}
+							}
+
+							tr:nth-of-type(odd) .wallet-info:not(:popover-open) > .row-count::after {
+								background: linear-gradient(var(--table-row-backgroundColor), var(--table-row-backgroundColor)), var(--table-backgroundColor);
+							}
+						}
+
+						@container wallet-identity-cell scroll-state(stuck: inline-start) {
+							.wallet-info { ---wallet-identity-compact: 1; }
+
+							.wallet-info:not(:popover-open) {
+								:is(.name-and-tags, .variants) { visibility: hidden; }
+
+								.name h3 a {
+									color: transparent;
+									visibility: visible;
+									pointer-events: none;
+									position: relative;
+									inset-inline-start: calc(var(--table-stickyLeaf-inlineSize) - var(--wallet-identity-retainedInlineSize));
+									outline: none;
+								}
+
+								&:has(.name h3 a:focus-visible) > .wallet-icon { outline: auto; }
+							}
+						}
 					}
 				}
 			}
