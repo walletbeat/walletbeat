@@ -118,6 +118,7 @@ export const family: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {

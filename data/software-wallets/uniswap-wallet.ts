@@ -1193,6 +1193,7 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegationRevocation: null,
 			permissionsManagement: {
 				ref: [
 					{
