@@ -231,6 +231,11 @@ export const completedTemplate: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: {
+			ref: refTodo,
+			privateKey: supported({ beforeAccountCreation: true }),
+			seedPhrase: featureSupported,
+		},
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupported,
