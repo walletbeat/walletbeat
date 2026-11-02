@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
+import type { Page } from '@playwright/test'
+
 import { expect, test } from '../../../tests/browser/verified-test'
 import { wbIconEmojiSequences } from '../../styles/wbicons'
 
@@ -294,45 +296,69 @@ test('explicit icon modes preserve semantic identity and native decorative roles
 	})
 })
 
-test('native shared feedback and parent current state across responsive directions', async ({
-	page,
-	browserName,
-}, info) => {
-	const observations = []
+const currentRequirements = [
+	'🎯 SharedStates',
+	'🎯 GroupCurrent',
+	'🎯 StateLegibility',
+	'🎯 CurrentInteraction',
+]
 
-	for (const width of [390, 864, 1344, 1345, 1440]) {
-		for (const direction of ['ltr', 'rtl']) {
-			await page.setViewportSize({ width, height: 900 })
-			await page.goto('/__wallet-page/software/')
-			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-			await page.evaluate(async direction => {
-				document.documentElement.dir = direction
-				document.body.dir = direction
-				await document.fonts.ready
-			}, direction)
-			const openTOC = async () => {
-				if (
-					width <= 1344 &&
-					!(await page.getByRole('navigation', { name: 'Table of contents', exact: true }).count())
-				) {
-					await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
-				}
-			}
+const nativeCurrentCapabilities = () => ({
+	scrollTimeline: CSS.supports('animation-timeline: scroll()'),
+	scope: CSS.supports('timeline-scope: --link'),
+	styleIf: CSS.supports('color: if(style(---link-active: 1): red; else: blue)'),
+})
 
-			await openTOC()
-			const target = page.locator('#wallet-toc menu[data-navigation-depth="1"] > li > a').first()
-			const href = (await target.getAttribute('href'))!
-			const parentHref = (await target.evaluate(link =>
-				link
-					.closest('menu')!
-					.parentElement!.querySelector<HTMLAnchorElement>(':scope > summary > a')!
-					.getAttribute('href'),
-			))!
-			const states = (destination: string) =>
-				page.locator(`#top a[href="${destination}"][data-link~="shared"]`).evaluateAll(links =>
+async function navigationFeedback(page: Page, width: number, direction: string) {
+	await page.setViewportSize({ width, height: 900 })
+	await page.goto('/__wallet-page/software/')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await page.evaluate(async direction => {
+		document.documentElement.dir = direction
+		document.body.dir = direction
+		await document.fonts.ready
+	}, direction)
+	const openTOC = async () => {
+		if (width <= 1344 && !(await page.locator('#wallet-toc:popover-open').count())) {
+			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
+			await expect(page.locator('#wallet-toc:popover-open')).toBeVisible()
+		}
+	}
+
+	await openTOC()
+	const target = page.locator('#wallet-toc menu[data-navigation-depth="1"] > li > a').first()
+	const href = (await target.getAttribute('href'))!
+	const parentHref = (await target.evaluate(link =>
+		link
+			.closest('menu')!
+			.parentElement!.querySelector<HTMLAnchorElement>(':scope > summary > a')!
+			.getAttribute('href'),
+	))!
+	const states = async (destination: string) => {
+		const identity = JSON.stringify(destination)
+		const rows = await page
+			.locator(
+				[
+					`#top .pie-navigation a[data-pressable-name=${identity}]`,
+					`#wallet-toc a[data-pressable-name=${identity}]`,
+					`#top [data-sticky-breadcrumb~="source"] a[data-pressable-name=${identity}]`,
+				].join(', '),
+			)
+			.evaluateAll(
+				(links, destination) =>
 					links.map(link => {
 						if (!(link instanceof HTMLAnchorElement)) {
 							throw new Error('Shared navigation link must be a native anchor')
+						}
+
+						if (
+							link.hash !== destination ||
+							link.origin !== location.origin ||
+							link.pathname !== location.pathname ||
+							link.search !== location.search ||
+							link.getAttribute('data-pressable-name') !== destination
+						) {
+							throw new Error('Canonical peer must resolve to the exact same-page destination')
 						}
 
 						const style = getComputedStyle(link)
@@ -351,18 +377,37 @@ test('native shared feedback and parent current state across responsive directio
 							href: link.href,
 						}
 					}),
-				)
-			const all = async (
-				destination: string,
-				state: 'interacting' | 'current',
-				expected: string,
-			) => {
-				await expect
-					.poll(async () => (await states(destination)).map(row => row[state]), {
-						message: `${width}/${direction}: actual shared ${state} for ${destination}`,
-					})
-					.toEqual([expected, expected, expected])
-			}
+				destination,
+			)
+
+		expect(rows.map(row => row.representation).sort()).toEqual(['heading', 'pie', 'toc'])
+		expect(rows.every(row => row.current !== '')).toBe(true)
+
+		return rows
+	}
+	const all = async (destination: string, state: 'interacting' | 'current', expected: string) => {
+		await expect
+			.poll(async () => (await states(destination)).map(row => row[state]), {
+				message: `${width}/${direction}: actual shared ${state} for ${destination}`,
+			})
+			.toEqual([expected, expected, expected])
+	}
+
+	return { openTOC, target, href, parentHref, states, all }
+}
+
+for (const width of [390, 864, 1344, 1345, 1440]) {
+	for (const direction of ['ltr', 'rtl']) {
+		test(`native shared interaction and keyboard navigation at ${width}px ${direction}`, async ({
+			page,
+			browserName,
+		}, info) => {
+			const capabilities = await page.evaluate(nativeCurrentCapabilities)
+			const { openTOC, target, href, states, all } = await navigationFeedback(
+				page,
+				width,
+				direction,
+			)
 
 			await target.scrollIntoViewIfNeeded()
 			await page.mouse.move(0, 0)
@@ -376,14 +421,108 @@ test('native shared feedback and parent current state across responsive directio
 			await page.mouse.move(0, 0)
 			await all(href, 'interacting', '0')
 			await target.focus()
-			await page.keyboard.press('Tab')
-			await page.keyboard.press('Shift+Tab')
+			await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab')
+			await page.keyboard.press(browserName === 'webkit' ? 'Alt+Shift+Tab' : 'Shift+Tab')
 			await expect(target).toBeFocused()
 			await all(href, 'interacting', '1')
 			const focused = await states(href)
 
 			await page.keyboard.press('Enter')
 			await expect.poll(() => new URL(page.url()).hash).toBe(href)
+			await openTOC()
+			const other = page
+				.locator('#wallet-toc menu[data-navigation-depth="1"] > li > a')
+				.filter({ hasNotText: await target.innerText() })
+				.last()
+			const otherHref = (await other.getAttribute('href'))!
+
+			expect(otherHref).not.toBe(href)
+			await page.locator('#wallet-toc').hover()
+			await expect(page.locator('#wallet-toc:hover')).toHaveCount(1)
+			await other.scrollIntoViewIfNeeded()
+			await other.focus()
+			await other.hover()
+			await all(otherHref, 'interacting', '1')
+			const separatelyHovered = await states(otherHref)
+
+			expect(separatelyHovered.every(row => row.active === '1')).toBe(true)
+			await page.mouse.move(0, 0)
+			await target.scrollIntoViewIfNeeded()
+			await target.focus()
+			await page.keyboard.press('Enter')
+			await expect.poll(() => new URL(page.url()).hash).toBe(href)
+			await openTOC()
+			await info.attach(`shared-interaction-${width}-${direction}`, {
+				body: JSON.stringify({
+					width,
+					direction,
+					href,
+					resting,
+					hovered,
+					focused,
+					otherHref,
+					separatelyHovered,
+					capabilities,
+				}),
+				contentType: 'application/json',
+			})
+			await info.attach('contract-evidence', {
+				body: JSON.stringify({
+					contractHash,
+					engine: browserName,
+					results: [
+						{
+							id: '🎯 SharedStates',
+							status: 'pass',
+							complete: false,
+							widths: [width],
+							directions: [direction],
+							observation:
+								'Canonical heading/pie/TOC peers share native hover and focus feedback and retain repeated keyboard anchor activation. This independent interaction observation does not establish scroll-current feedback.',
+						},
+						...(Object.values(capabilities).every(Boolean)
+							? []
+							: currentRequirements.map(id => ({
+									id,
+									status: 'unsupported',
+									complete: false,
+									widths: [width],
+									directions: [direction],
+									capabilities,
+									observation:
+										'The native current-state prerequisite conjunction is unavailable. Independent interaction/native navigation passed; current, parent-current and simultaneous current/interaction acceptance remain unverified in this engine.',
+								}))),
+					],
+				}),
+				contentType: 'application/json',
+			})
+		})
+
+		test(`native parent current and independent interaction at ${width}px ${direction}`, async ({
+			page,
+			browserName,
+		}, info) => {
+			const capabilities = await page.evaluate(nativeCurrentCapabilities)
+
+			await info.attach('current-timeline-capability', {
+				body: JSON.stringify(capabilities),
+				contentType: 'application/json',
+			})
+			test.skip(
+				!Object.values(capabilities).every(Boolean),
+				'Native current-state enhancement unavailable; independent interaction and native-navigation coverage is separate',
+			)
+			const { openTOC, target, href, parentHref, states, all } = await navigationFeedback(
+				page,
+				width,
+				direction,
+			)
+
+			await target.scrollIntoViewIfNeeded()
+			await target.focus()
+			await page.keyboard.press('Enter')
+			await expect.poll(() => new URL(page.url()).hash).toBe(href)
+
 			await openTOC()
 			await page.mouse.move(0, 0)
 			await all(href, 'current', '1')
@@ -397,6 +536,8 @@ test('native shared feedback and parent current state across responsive directio
 			const otherHref = (await other.getAttribute('href'))!
 
 			expect(otherHref).not.toBe(href)
+			await page.locator('#wallet-toc').hover()
+			await expect(page.locator('#wallet-toc:hover')).toHaveCount(1)
 			await other.scrollIntoViewIfNeeded()
 			await other.focus()
 			await other.hover()
@@ -407,13 +548,14 @@ test('native shared feedback and parent current state across responsive directio
 
 			expect(separatelyHovered.every(row => row.active === '1')).toBe(true)
 			expect((await states(href)).every(row => row.active === '1')).toBe(true)
-			const currentPie = (await states(href)).find(row => row.representation === 'pie')!
-			const hoveredPie = separatelyHovered.find(row => row.representation === 'pie')!
+			await all(href, 'interacting', '0')
+			const currentTOC = (await states(href)).find(row => row.representation === 'toc')!
 
-			expect(
-				currentPie.opacity,
-				'Current and independently hovered pie destinations retain distinct visible treatment',
-			).not.toBe(hoveredPie.opacity)
+			await expect
+				.poll(
+					async () => (await states(otherHref)).find(row => row.representation === 'toc')!.color,
+				)
+				.not.toBe(currentTOC.color)
 			await page.mouse.move(0, 0)
 			await target.scrollIntoViewIfNeeded()
 			await target.focus()
@@ -421,42 +563,36 @@ test('native shared feedback and parent current state across responsive directio
 			await expect.poll(() => new URL(page.url()).hash).toBe(href)
 			await openTOC()
 			await all(href, 'current', '1')
-			observations.push({
-				width,
-				direction,
-				href,
-				parentHref,
-				resting,
-				hovered,
-				focused,
-				current,
-				parentCurrent,
-				otherHref,
-				separatelyHovered,
-			})
-			await info.attach(`shared-feedback-${width}-${direction}`, {
-				body: JSON.stringify(observations.at(-1)),
+			await info.attach(`shared-current-${width}-${direction}`, {
+				body: JSON.stringify({
+					width,
+					direction,
+					href,
+					parentHref,
+					capabilities,
+					current,
+					parentCurrent,
+					otherHref,
+					separatelyHovered,
+				}),
 				contentType: 'application/json',
 			})
-		}
+			await info.attach('contract-evidence', {
+				body: JSON.stringify({
+					contractHash,
+					engine: browserName,
+					results: currentRequirements.map(id => ({
+						id,
+						status: 'pass',
+						complete: false,
+						widths: [width],
+						directions: [direction],
+						observation:
+							'Native current feedback across canonical peers, parent current, simultaneous independently hovered/current distinction and repeated current-link activation in this width and direction. One destination pair does not certify every destination or full history/resize convergence.',
+					})),
+				}),
+				contentType: 'application/json',
+			})
+		})
 	}
-	await info.attach('contract-evidence', {
-		body: JSON.stringify({
-			contractHash,
-			engine: browserName,
-			results: [
-				'🎯 SharedStates',
-				'🎯 GroupCurrent',
-				'🎯 StateLegibility',
-				'🎯 CurrentInteraction',
-			].map(id => ({
-				id,
-				status: 'pass',
-				complete: false,
-				observation:
-					'Native hover/focus/current propagation across three real representations, parent current, independently hovered/current distinction and repeated native current-link activation at all five widths and both directions. One child/independent destination pair per layout does not certify every destination or full history/resize convergence.',
-			})),
-		}),
-		contentType: 'application/json',
-	})
-})
+}

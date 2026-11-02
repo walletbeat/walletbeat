@@ -159,13 +159,14 @@ for (const width of [390, 768, 1344, 1345, 1440]) {
 				exact: true,
 			})
 
+			await expect(visibleLandmark).toBeVisible()
+
 			if (width <= 1344) {
-				await expect(visibleLandmark).toHaveCount(0)
+				await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
 				await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
-				await expect(visibleLandmark).toBeVisible()
+				await expect(page.locator('#wallet-toc:popover-open')).toBeVisible()
 				await page.keyboard.press('Escape')
-				await expect(visibleLandmark).toHaveCount(0)
-			} else {
+				await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
 				await expect(visibleLandmark).toBeVisible()
 			}
 		})

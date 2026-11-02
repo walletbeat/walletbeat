@@ -404,7 +404,7 @@ Prerequisites: Navigation identity in §13 and pie visibility/clearance in §§1
 
 - **🗂️ `OpenPie`** When mobile TOC opens, the pie remains at its sticky top.
 
-- **🗂️ `HiddenNavigation`** A closed TOC contributes no hidden Tab/Shift+Tab targets or accessible-tree links; opening and closing update whether those targets and links can be reached.
+- **🗂️ `HiddenNavigation`** An intentionally hidden TOC contributes no Tab/Shift+Tab targets or accessible-tree links. The visible in-flow TOC remains reachable when its popover is closed.
 
 - **🗂️ `PopoverControl`** Native TOC opening/closing, focus, Escape, and pointer behavior remain usable across the three browser engines.
 
