@@ -616,6 +616,7 @@
 		const owner = node.closest('td')
 		const disclosure = node.closest<HTMLDetailsElement>('details.wallet-info-details')
 		const summary = disclosure?.querySelector('summary')
+		const identitySource = summary ?? owner
 		let redirect: ReturnType<typeof setTimeout> | undefined
 		let dismissed = false
 		let keyboardFocusNavigation = false
@@ -629,8 +630,9 @@
 		}
 		const beginInterest = (event: Event) => {
 			cancelRedirect()
-			if (event instanceof FocusEvent && dismissed && !keyboardFocusNavigation) return
+			if (event instanceof FocusEvent && dismissed && !keyboardFocusNavigation) return false
 			dismissed = false
+			return true
 		}
 		const endInterest = () => {
 			cancelRedirect()
@@ -649,6 +651,13 @@
 		const activateDisclosure = (event: KeyboardEvent) => {
 			if (event.key === 'Enter' || event.key === ' ') dismiss()
 		}
+		const focusSummary = (event: FocusEvent) => {
+			if (event.target !== summary || !summary?.matches(':focus-visible') || !identitySource
+				|| disclosure?.open
+				|| getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() !== '1'
+				|| !beginInterest(event)) return
+			node.showPopover({ source: identitySource })
+		}
 		const showIdentity = (event: ToggleEvent) => {
 			if (event.newState !== 'open') return
 			cancelRedirect()
@@ -657,7 +666,7 @@
 				return
 			}
 			const compact = getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1'
-			if (compact && owner && event.source === owner) {
+			if (compact && owner && event.source === identitySource) {
 				const bounds = owner.getBoundingClientRect()
 
 				owner.style.setProperty('--wallet-identity-flowInlineSize', `${bounds.width}px`)
@@ -668,7 +677,7 @@
 			const target = compact ? node : disclosure?.querySelector<HTMLElement>(':scope > [popover]')
 			const source = event.source instanceof HTMLElement ? event.source : node
 			// A popover's focus-navigation owner must be outside its own subtree.
-			const popupSource = compact ? owner : source
+			const popupSource = compact ? identitySource : source
 			if (!target || !popupSource) return
 			// A separate task leaves the canceled native show operation before opening its replacement.
 			redirect = setTimeout(() => {
@@ -689,6 +698,7 @@
 		node.addEventListener('loseinterest', endInterest, listenerOptions)
 		node.ownerDocument.addEventListener('keydown', keydown, { ...listenerOptions, capture: true })
 		node.ownerDocument.addEventListener('keyup', keyup, { ...listenerOptions, capture: true })
+		summary?.addEventListener('focus', focusSummary, listenerOptions)
 		summary?.addEventListener('click', dismiss, { ...listenerOptions, capture: true })
 		summary?.addEventListener('keydown', activateDisclosure, { ...listenerOptions, capture: true })
 		return () => {
