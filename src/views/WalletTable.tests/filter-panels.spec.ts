@@ -106,7 +106,7 @@ for (const viewport of [
 							.toBeLessThanOrEqual(1)
 					}
 
-					const reset = bar.locator('button[data-reset="all"]').last()
+					const reset = bar.locator('button[data-reset="inline"]').last()
 
 					await expectWithinViewport(reset, page)
 					const [resetBox, barBox] = await Promise.all([reset.boundingBox(), bar.boundingBox()])
@@ -220,3 +220,96 @@ for (const viewport of [
 		})
 	}
 }
+
+test.describe('filter ownership across responsive table topology', () => {
+	test.use({ viewport: { width: 900, height: 900 }, javaScriptEnabled: true })
+
+	test('retains choices below headers and resets only the owning group', async ({ page }) => {
+		await page.goto('/wallet/summary/')
+		await expect(page.getByRole('button', { name: 'Sort by Wallet', exact: true })).toHaveAttribute(
+			'type',
+			'button',
+		)
+		const region = page.locator('.filters')
+		const retained = await region.locator('[data-filter-choice]').elementHandles()
+
+		expect(retained.length).toBeGreaterThan(0)
+
+		await page
+			.locator('thead th[data-table-column="wallet"]')
+			.getByRole('button', { name: 'Expand', exact: true })
+			.click()
+		await expect(
+			page.locator('[data-layout-transition], [data-view-transition-active]'),
+		).toHaveCount(0)
+		await page.setViewportSize({ width: 390, height: 844 })
+		await expect(region).toHaveCSS('display', 'flex')
+		const belowHeaders = await region.evaluate(region => {
+			const row = region.closest('tr')
+			const headings = region.closest('thead')
+
+			if (!row || !headings) {
+				return false
+			}
+
+			const headingRows = [...headings.querySelectorAll(':scope > tr')].filter(
+				candidate => candidate !== row,
+			)
+
+			return (
+				headingRows.length > 0 &&
+				headingRows.every(
+					heading =>
+						Boolean(heading.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+						heading.getBoundingClientRect().bottom <= region.getBoundingClientRect().top + 1,
+				)
+			)
+		})
+
+		expect(belowHeaders).toBe(true)
+
+		const form = region.locator('form[aria-label="Wallet filters"]')
+		const sets = form.locator('fieldset')
+
+		expect(await sets.count()).toBeGreaterThan(1)
+		const first = sets.nth(0)
+		const second = sets.nth(1)
+		const firstChoice = first.locator('input:not([value=""])').first()
+		const secondChoice = second.locator('input:not([value=""])').first()
+
+		await firstChoice.locator('..').click()
+		await secondChoice.locator('..').click()
+		await expect(firstChoice).toBeChecked()
+		await expect(secondChoice).toBeChecked()
+		await first.getByRole('button', { name: /Reset .+ filters/ }).click()
+		await expect(firstChoice).not.toBeChecked()
+		await expect(secondChoice).toBeChecked()
+
+		await firstChoice.locator('..').click()
+		await expect(firstChoice).toBeChecked()
+
+		const secondId = await second.getAttribute('data-filter-set')
+
+		if (!secondId) {
+			throw new Error('A filter set must retain its semantic identity')
+		}
+
+		await page.setViewportSize({ width: 900, height: 900 })
+		await page.locator(`thead th[data-table-column="facet-${secondId}"] .filter-trigger`).click()
+		await form
+			.getByRole('button', { name: 'Reset filters', exact: true })
+			.filter({ visible: true })
+			.click()
+		await expect(firstChoice).toBeChecked()
+		await expect(secondChoice).not.toBeChecked()
+
+		for (const choice of retained) {
+			expect(
+				await choice.evaluate(
+					node =>
+						node instanceof Element && node.isConnected && Boolean(node.closest('thead .filters')),
+				),
+			).toBe(true)
+		}
+	})
+})

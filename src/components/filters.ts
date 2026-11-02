@@ -29,6 +29,11 @@ export type FilterSet<Item, ChoiceId extends string = string> = FilterSetBase<It
 		  }
 	)
 
+export type FilterGroup<Item> = {
+	label: string
+	filterSets: FilterSet<Item>[]
+}
+
 /**
  * Apply independent filter sets. An untouched set is neutral. A selected choice
  * without a predicate is the exclusive “All” sentinel and is neutral too.
