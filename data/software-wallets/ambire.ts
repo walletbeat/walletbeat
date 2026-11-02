@@ -436,6 +436,7 @@ export const ambire: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: {
 				duringEOACreation: 'NO',
 				duringEOAImport: 'NO',

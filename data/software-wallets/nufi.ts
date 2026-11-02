@@ -77,6 +77,7 @@ export const nufi: SoftwareWallet = {
 		chainAbstraction: null,
 		chainConfigurability: null,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: {
 				duringEOACreation: 'NO',
 				duringEOAImport: 'NO',

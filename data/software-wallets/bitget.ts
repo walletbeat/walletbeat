@@ -118,6 +118,7 @@ export const bitget: SoftwareWallet = {
 		},
 		chainConfigurability: notSupported,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
 		integration: {
