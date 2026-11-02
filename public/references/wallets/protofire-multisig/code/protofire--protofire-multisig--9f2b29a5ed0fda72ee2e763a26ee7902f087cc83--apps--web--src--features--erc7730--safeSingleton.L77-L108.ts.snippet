@@ -1,0 +1,63 @@
+{
+	"highlightRanges": [
+		{
+			"first": 77,
+			"last": 108
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"const withDeployment = (descriptor: Descriptor, chainId: number, address: string): Descriptor => {"
+			],
+			"startLine": 66
+		},
+		{
+			"lines": [
+				"  return {"
+			],
+			"startLine": 68
+		},
+		{
+			"lines": [
+				"    },",
+				"  }",
+				"}",
+				"",
+				"export const withSafeSingletonAlias = async (",
+				"  resolver: DescriptorResolver,",
+				"  chainId: number,",
+				"  to: string,",
+				"  getSingleton: SingletonGetter = getSafeSingleton,",
+				"): Promise<ClearSigningResolvers> => {",
+				"  const unchanged = { attestation: resolver, format: resolver }",
+				"  const { calldataIndex } = resolver.index",
+				"  const proxyKey = toIndexKey(chainId, to)",
+				"  if (calldataIndex[proxyKey]) {",
+				"    return unchanged",
+				"  }",
+				"",
+				"  const singleton = await getSingleton(chainId, to).catch(() => undefined)",
+				"  const path = singleton && calldataIndex[toIndexKey(chainId, singleton)]",
+				"  if (!path) {",
+				"    return unchanged",
+				"  }",
+				"",
+				"  const attestation = {",
+				"    ...resolver,",
+				"    index: { ...resolver.index, calldataIndex: { ...calldataIndex, [proxyKey]: path } },",
+				"  }",
+				"  const format = {",
+				"    ...attestation,",
+				"    fetchDescriptor: async (descriptorPath: string) => {",
+				"      const descriptor = await resolver.fetchDescriptor(descriptorPath)",
+				"      return descriptorPath === path ? withDeployment(descriptor, chainId, to) : descriptor",
+				"    },",
+				"  }",
+				"  return { attestation, format }",
+				"}"
+			],
+			"startLine": 73
+		}
+	]
+}

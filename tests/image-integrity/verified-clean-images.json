@@ -135,6 +135,10 @@
 		"hash": "6d9ba8b0abf96cc67c267f0a38cfe26035baae6ae37f3a60082832d5ad5c5341",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/images/entities/protofire.svg": {
+		"hash": "c47d1a44d998966ade21e67d37ac446f56c0c24ce8a60593395364c9e9e97cd9",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/rainbow.png": {
 		"hash": "0a7a84dbd45b5ca049612cceae644271d22fcded25064e845760f7a87a1727ba",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -281,6 +285,10 @@
 	},
 	"public/images/wallets/pillarx.svg": {
 		"hash": "2009bbf3972a28beccefcf1efaa1299d26487a51dbeb1d717bd2de17e341103e",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/protofire-multisig.svg": {
+		"hash": "38c68bf9ee24fe46101b853bd9e7925fe2e216d37e1b5d05e9409fe9c0b33549",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/rabby.svg": {
@@ -645,6 +653,26 @@
 	},
 	"public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-eip712-struct.png": {
 		"hash": "5734c8f473a7fab3c8bbd0a4f85d625f5227b61e222a942e784ca38eca8e97ec",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/protofire-multisig/screenshots/2026-10-29-protofire-multisig-erc7730-aave-supply.png": {
+		"hash": "71af4aa248d6653fbba5a294b4c644d55e6d4b9ff498c1530fd1a2a64d1ee546",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/protofire-multisig/screenshots/2026-10-29-protofire-multisig-erc7730-batch-approve-supply.png": {
+		"hash": "ded3b71c2ff490b1b6951f40e8774e929617640ac53f2adebdd71eab365d770c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/protofire-multisig/screenshots/2026-10-29-protofire-multisig-erc7730-safe-aave-supply.png": {
+		"hash": "d419aca2e024df79d9c47ec65f538014d2dcc3831ef1f28ae506eb2969e61cce",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/protofire-multisig/screenshots/2026-10-29-protofire-multisig-erc7730-safe-batch-approve-supply.gif": {
+		"hash": "12d711af2aab6109695cf48b1f920680e369bcae95b45a9481cb76e291ddba93",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/protofire-multisig/screenshots/2026-10-29-protofire-multisig-erc7730-usdc-approval.png": {
+		"hash": "bae63cff2e2684aec3023041602626574fbcb63ec82d797189a23cc92a8a8fae",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_1.png": {
