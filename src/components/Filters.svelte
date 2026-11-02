@@ -17,12 +17,14 @@
 		changeFilterChoice,
 		resetFilterSets,
 		type FilterChoice,
+		type FilterGroup,
 		type FilterSet,
 	} from './filters'
 
 	let {
 		items,
 		filterSets,
+		filterGroups,
 		contextFilterSets = filterSets,
 		visibleSetIds,
 		activeChoices = $bindable(new SvelteSet<FilterChoice<Item>>()),
@@ -35,6 +37,7 @@
 	}: SvelteHTMLElements['form'] & {
 		items: Item[]
 		filterSets: FilterSet<Item>[]
+		filterGroups?: FilterGroup<Item>[]
 		contextFilterSets?: FilterSet<Item>[]
 		visibleSetIds?: string[]
 		activeChoices?: Set<FilterChoice<Item>>
@@ -68,6 +71,11 @@
 		? set.choices
 		: set.choices.filter(choice => activeChoices.has(choice) || !choice.matches || filtered(new Set([choice])).length > 0)
 
+	const groups = $derived(filterGroups ?? [{ label: restProps['aria-label'] ?? 'Filters', filterSets }])
+	const visibleSets = $derived(filterSets.map(set => ({ set, choices: visibleChoices(set) })).filter(({ choices }) => (
+		choices.some(choice => choice.id && activeChoices.has(choice)) || choices.filter(choice => choice.id).length > 1
+	)))
+
 	const choiceCount = (set: FilterSet<Item>, choice: FilterChoice<Item>) => {
 		const setChoices = new Set(set.choices)
 		return filtered(activeChoices.difference(setChoices).union(new Set([choice]))).length
@@ -92,11 +100,10 @@
 	}}
 	{...restProps}
 >
-	{#each filterSets as set (set.id)}
-		{@const choices = visibleChoices(set)}
+	{#each visibleSets as { set, choices } (set.id)}
+		{@const group = groups.find(group => group.filterSets.includes(set))}
 		{@const activeInSet = choices.filter(choice => activeChoices.has(choice) && choice.id !== '')}
 
-		{#if activeInSet.length > 0 || choices.filter(choice => choice.id).length > 1}
 			{@const closedAnchor = closedAnchorPrefix ? `${closedAnchorPrefix}-${set.id}` : undefined}
 			<fieldset
 				data-filter-set={set.id}
@@ -109,7 +116,7 @@
 				style:--closed-block-timeline={closedAnchor ? `${closedAnchor}-block` : undefined}
 				style:--active-count={activeInSet.length}
 			>
-				<legend>{set.label}</legend>
+				<legend>{#if group && group.label !== set.label}<span class="filter-group-label">{group.label} / </span>{/if}{set.label}</legend>
 
 				<div class="choices" data-column="gap-1">
 					{#each choices as choice (choice.id)}
@@ -163,12 +170,13 @@
 						</svelte:element>
 					{/each}
 				</div>
+				{#if group && visibleSets.findLast(entry => group.filterSets.includes(entry.set))?.set === set}
+					<button type="button" data-reset="inline" disabled={!interactive} aria-label={`Reset ${group.label} filters`} onclick={() => reset(group.filterSets)}>Reset filters</button>
+				{/if}
 			</fieldset>
-		{/if}
 	{/each}
 
 	<button type="reset" data-reset="group" disabled={!interactive}>Reset filters</button>
-	<button type="button" data-reset="all" disabled={!interactive} aria-label={`Reset ${restProps['aria-label'] ?? 'filters'}`} onclick={() => reset(filterSets)}>Reset filters</button>
 </form>
 
 <style>
@@ -208,7 +216,8 @@
 		from { ---filter-closedBlockFraction: 0; }
 		to { ---filter-closedBlockFraction: 1; }
 	}
-	[data-reset="all"] { display: none; }
+	[data-reset="inline"],
+	.filter-group-label { display: none; }
 
 	fieldset {
 		&[data-column] { ---column-gap: 0.33em; }
@@ -518,7 +527,7 @@
 
 	@container wallet-table (width < 42rem) {
 		fieldset,
-		[data-reset="all"] {
+		[data-reset="inline"] {
 			flex-shrink: 0;
 		}
 
@@ -584,8 +593,9 @@
 			block-size: 1.4rem;
 		}
 
+		.filter-group-label { display: inline; }
 		[data-reset="group"] { display: none; }
-		[data-reset="all"] {
+		[data-reset="inline"] {
 			display: inline-grid;
 			inline-size: 2.5rem;
 			block-size: 2.5rem;
