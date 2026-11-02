@@ -609,8 +609,7 @@
 
 	function walletIdentityInterest(node: HTMLElement) {
 		if (!identityInterestAvailable) return
-		const sources = [node, ...node.querySelectorAll<HTMLElement>(':scope > .row-count, :scope > .wallet-icon, .name h3 a')]
-		const registrations = sources.map(source => interest(source, { id: node.id }))
+		const registration = interest(node, { id: node.id })
 		const motion = livePopoverTransition(node)
 		const lifetime = new AbortController()
 		const listenerOptions = { signal: lifetime.signal }
@@ -689,7 +688,7 @@
 		return () => {
 			cancelRedirect()
 			lifetime.abort()
-			registrations.forEach(registration => registration?.destroy())
+			registration?.destroy()
 			motion.destroy()
 		}
 	}
