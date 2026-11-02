@@ -116,7 +116,7 @@
 				style:--closed-block-timeline={closedAnchor ? `${closedAnchor}-block` : undefined}
 				style:--active-count={activeInSet.length}
 			>
-				<legend>{#if group && group.label !== set.label}<span class="filter-group-label">{group.label} / </span>{/if}{set.label}</legend>
+				<legend>{#if group && group.label !== set.label}<span data-visually-hidden>{group.label} / </span>{/if}{set.label}</legend>
 
 				<div class="choices" data-column="gap-1">
 					{#each choices as choice (choice.id)}
@@ -216,8 +216,7 @@
 		from { ---filter-closedBlockFraction: 0; }
 		to { ---filter-closedBlockFraction: 1; }
 	}
-	[data-reset="inline"],
-	.filter-group-label { display: none; }
+	[data-reset="inline"] { display: none; }
 
 	fieldset {
 		&[data-column] { ---column-gap: 0.33em; }
@@ -593,7 +592,6 @@
 			block-size: 1.4rem;
 		}
 
-		.filter-group-label { display: inline; }
 		[data-reset="group"] { display: none; }
 		[data-reset="inline"] {
 			display: inline-grid;
