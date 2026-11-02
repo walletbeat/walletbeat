@@ -9,6 +9,7 @@ import { ambire } from './software-wallets/ambire'
 import { anonWallet } from './software-wallets/anon-wallet'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
+import { cloaked } from './software-wallets/cloaked'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
@@ -71,6 +72,7 @@ export const softwareWallets = {
 	anonWallet,
 	baseApp,
 	bitget,
+	cloaked,
 	daimo,
 	elytro,
 	family,
