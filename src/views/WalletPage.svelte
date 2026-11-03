@@ -2917,7 +2917,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					--stickyBreadcrumb-clearanceCenterBlock: var(---pie-compactCenterBlock);
 					> :global(*) {
 					--stickyBreadcrumb-clearanceRadius: calc(var(---pie-compactSize) / 2 * var(---pie-radiusRatio));
-					--stickyBreadcrumb-clearanceInlineOffset: calc(-1 * var(---pie-compactSize) / 2 + var(---breadcrumb-sourceRowWidth) + var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace));
+					--stickyBreadcrumb-clearanceInlineOffset: calc(-1 * var(---pie-compactSize) / 2 + var(---breadcrumb-sourceRowWidth) - var(---pie-inlineSpace));
 				}
 				}
 

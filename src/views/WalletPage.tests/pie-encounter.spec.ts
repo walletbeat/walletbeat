@@ -795,3 +795,105 @@ for (const [width, direction] of [
 		}
 	})
 }
+
+for (const input of [
+	{ width: 690, padding: 24, direction: 'ltr', wrapped: false },
+	{ width: 690, padding: 40.375, direction: 'ltr', wrapped: false },
+	{ width: 390, padding: 40, direction: 'ltr', wrapped: true },
+] as const) {
+	test(`native circle coordinates follow row geometry: ${input.width}/${input.padding}/${input.direction}`, async ({
+		page,
+	}, info) => {
+		await page.setViewportSize({ width: input.width, height: 900 })
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		const end = page.locator('#scam-prevention .attribute-summary-companions')
+
+		await expect(end).toHaveCount(1)
+		const capable = await end.evaluate(
+			element =>
+				getComputedStyle(element).getPropertyValue('---breadcrumb-clearance-supported').trim() ===
+				'1',
+		)
+
+		test.skip(!capable, 'The complete native circle-clearance capability is unavailable')
+		await end.evaluate((element, input) => {
+			document.documentElement.dir = input.direction
+			const root = document.querySelector<HTMLElement>('#layout')!
+
+			root.style.scrollSnapType = 'none'
+			root.style.scrollBehavior = 'auto'
+			const scope = element.closest<HTMLElement>('[data-sticky-breadcrumb~="scope"]')!
+
+			scope.style.setProperty('--stickyBreadcrumb-sourcePaddingInline', `${input.padding}px`)
+			element.closest('details')!.open = true
+			scope.scrollIntoView({ block: 'start', behavior: 'instant' })
+		}, input)
+		const samples = await end.evaluate(async element => {
+			if (!(element instanceof HTMLElement)) {
+				throw new Error('Native HTML end owner required')
+			}
+
+			const end = element
+			const samples = []
+
+			for (let frame = 0; frame < 8; frame++) {
+				await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+				const value = end.style.getPropertyValue('scroll-margin-inline-start')
+				const priority = end.style.getPropertyPriority('scroll-margin-inline-start')
+
+				try {
+					end.style.setProperty(
+						'scroll-margin-inline-start',
+						'var(--stickyBreadcrumb-clearanceInlineOffset)',
+						'important',
+					)
+					const style = getComputedStyle(end)
+					const box = end.getBoundingClientRect()
+					const row = end.parentElement!.getBoundingClientRect()
+					const pie = document.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+					const direction = style.direction === 'rtl' ? -1 : 1
+					const edge = direction === 1 ? box.right : box.left
+
+					samples.push({
+						frame,
+						published: Number.parseFloat(style.scrollMarginInlineStart),
+						physical: direction * (edge - (pie.left + pie.width / 2)),
+						endEdge: edge,
+						rowEdge: direction === 1 ? row.right : row.left,
+						rowWidth: row.width,
+						pieWidth: pie.width,
+						pieHeight: pie.height,
+						wrapped: style.getPropertyValue('---breadcrumb-sourceEndWrap').trim() === '1',
+					})
+				} finally {
+					if (value) {
+						end.style.setProperty('scroll-margin-inline-start', value, priority)
+					} else {
+						end.style.removeProperty('scroll-margin-inline-start')
+					}
+				}
+			}
+
+			return samples
+		})
+
+		await info.attach('native-circle-coordinate-samples', {
+			body: JSON.stringify({
+				input,
+				samples,
+				limits: 'Eight bounded geometry frames; no paint or latency acceptance.',
+			}),
+			contentType: 'application/json',
+		})
+		const settled = samples.at(-1)!
+
+		expect(settled.rowWidth).toBeGreaterThan(0)
+		expect(Math.min(settled.pieWidth, settled.pieHeight)).toBeGreaterThan(0)
+		expect(settled.wrapped).toBe(input.wrapped)
+		expect(Math.abs(settled.endEdge - settled.rowEdge)).toBeLessThanOrEqual(0.25)
+		expect(Number.isFinite(settled.published)).toBe(true)
+		expect(Math.abs(settled.published - settled.physical)).toBeLessThanOrEqual(0.25)
+	})
+}
