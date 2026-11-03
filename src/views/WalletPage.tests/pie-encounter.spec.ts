@@ -15,8 +15,10 @@ type Frame = {
 			bottom: number
 			left: number
 		}
+		source: { top: number; bottom: number } | null
 		clearance: number
 		target: boolean
+		witness: boolean
 		literalMarker: boolean
 		tag: string
 		text: string | undefined
@@ -27,303 +29,425 @@ type Frame = {
 declare global {
 	interface Window {
 		__walletPieEncounter?: { active: boolean; frames: Frame[] }
+		__walletPieSources?: Map<Element, { scope: Element; offset: number; height: number }>
+		__walletPieWitness?: Element
 	}
 }
 
 for (const open of [true, false]) {
-	test(`real pie end content clears the silhouette in both directions with details ${open ? 'open' : 'closed'}`, async ({
-		page,
-	}, info) => {
-		await page.setViewportSize({ width: 390, height: 900 })
-		await page.goto('/__wallet-page/software/')
-		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-		await page.evaluate(() => document.fonts.ready)
-		await page.locator('#layout').evaluate(element => {
-			if (!(element instanceof HTMLElement)) {
-				throw new Error('Native scroll root required')
-			}
-
-			element.style.scrollSnapType = 'none'
-		})
-		const owner = open
-			? page.locator('article .attribute-group').first()
-			: page.locator('article section:has(> details[name="wallet-stages"])').first()
-		const details = open
-			? owner.locator('section.attribute > details').first()
-			: owner.locator(':scope > details')
-
-		await details.evaluate((element, desired) => {
-			if (!(element instanceof HTMLDetailsElement)) {
-				throw new Error('Disclosure owner must be a native details element')
-			}
-
-			element.open = desired
-		}, open)
-
-		if (open) {
-			const ownership = await details.evaluate(element => {
-				const end = element.querySelector(':scope > summary [data-sticky-breadcrumb~="end"]')
-
-				if (!end) {
-					throw new Error('Actual attribute END owner required')
+	for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+		test(`real pie end content clears the silhouette in both directions with details ${open ? 'open' : 'closed'} and motion ${reducedMotion}`, async ({
+			page,
+		}, info) => {
+			await page.emulateMedia({ reducedMotion })
+			await page.setViewportSize({ width: 390, height: 900 })
+			await page.goto('/__wallet-page/software/')
+			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+			await page.evaluate(() => document.fonts.ready)
+			await page.locator('#layout').evaluate(element => {
+				if (!(element instanceof HTMLElement)) {
+					throw new Error('Native scroll root required')
 				}
 
-				const marker = end.querySelector(':scope > [data-collapsible-marker]')
-				const effects = end.getAnimations({ subtree: true })
+				element.style.scrollSnapType = 'none'
+			})
+			const owner = open
+				? page.locator('article .attribute-group').first()
+				: page.locator('article section:has(> details[name="wallet-stages"])').first()
+			const details = open
+				? owner.locator('section.attribute > details').first()
+				: owner.locator(':scope > details')
 
-				return {
-					capable:
-						getComputedStyle(end).getPropertyValue('---breadcrumb-clearance-supported').trim() ===
-						'1',
-					literal: Boolean(marker),
-					own: effects
-						.filter(
-							animation =>
-								animation.effect instanceof KeyframeEffect && animation.effect.target === end,
-						)
-						.map(animation => ({
-							class: animation.constructor.name,
-							name: animation instanceof CSSAnimation ? animation.animationName : animation.id,
-						})),
-					pseudoContent: getComputedStyle(end, '::after').content,
-					markerEffects: effects.flatMap(animation =>
-						animation instanceof CSSAnimation &&
-						animation.effect instanceof KeyframeEffect &&
-						animation.effect.target === marker
-							? [animation.animationName]
-							: [],
-					),
+			await details.evaluate((element, desired) => {
+				if (!(element instanceof HTMLDetailsElement)) {
+					throw new Error('Disclosure owner must be a native details element')
 				}
-			})
 
-			await info.attach('open-marker-motion-ownership', {
-				body: JSON.stringify(ownership),
-				contentType: 'application/json',
-			})
+				element.open = desired
+			}, open)
 
-			if (ownership.capable) {
-				expect(ownership.literal).toBe(true)
-				expect(ownership.own, 'Open END and its pseudo retain no animation effects').toEqual([])
-				expect(ownership.pseudoContent).toBe('none')
-				expect(ownership.markerEffects).toEqual(
-					expect.arrayContaining(['breadcrumb-clearance-inline', 'breadcrumb-clearance-block']),
-				)
+			if (open) {
+				const ownership = await details.evaluate(element => {
+					const end = element.querySelector(':scope > summary [data-sticky-breadcrumb~="end"]')
+
+					if (!end) {
+						throw new Error('Actual attribute END owner required')
+					}
+
+					const marker = end.querySelector(':scope > [data-collapsible-marker]')
+					const effects = end.getAnimations({ subtree: true })
+
+					return {
+						capable:
+							getComputedStyle(end).getPropertyValue('---breadcrumb-clearance-supported').trim() ===
+							'1',
+						literal: Boolean(marker),
+						own: effects
+							.filter(
+								animation =>
+									animation.effect instanceof KeyframeEffect && animation.effect.target === end,
+							)
+							.map(animation => ({
+								class: animation.constructor.name,
+								name: animation instanceof CSSAnimation ? animation.animationName : animation.id,
+							})),
+						pseudoContent: getComputedStyle(end, '::after').content,
+						markerEffects: effects.flatMap(animation =>
+							animation instanceof CSSAnimation &&
+							animation.effect instanceof KeyframeEffect &&
+							animation.effect.target === marker
+								? [animation.animationName]
+								: [],
+						),
+					}
+				})
+
+				await info.attach('open-marker-motion-ownership', {
+					body: JSON.stringify(ownership),
+					contentType: 'application/json',
+				})
+
+				if (ownership.capable) {
+					expect(ownership.literal).toBe(true)
+					expect(ownership.own, 'Open END and its pseudo retain no animation effects').toEqual([])
+					expect(ownership.pseudoContent).toBe('none')
+					expect(ownership.markerEffects).toEqual(
+						expect.arrayContaining(['breadcrumb-clearance-inline', 'breadcrumb-clearance-block']),
+					)
+				}
 			}
-		}
 
-		const targetId = await owner.getAttribute('id')
+			const targetId = await owner.getAttribute('id')
 
-		expect(targetId).toBeTruthy()
-		const target = open
-			? owner.locator(':scope > [data-sticky-breadcrumb~="position"]')
-			: details.locator(':scope > summary')
+			expect(targetId).toBeTruthy()
+			const target = open
+				? owner.locator(':scope > [data-sticky-breadcrumb~="position"]')
+				: details.locator(':scope > summary')
 
-		await target.evaluate(element =>
-			element.scrollIntoView({ block: 'center', behavior: 'instant' }),
-		)
-		await page.evaluate(
-			() =>
-				new Promise<void>(resolve =>
+			const natural = await owner.evaluate(async (owner, open) => {
+				await new Promise<void>(resolve =>
 					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-				),
-		)
-		await target.evaluate(element => {
-			const end = element.querySelector('[data-sticky-breadcrumb~="end"]')
-			const control = end
+				)
+				const root = document.querySelector('#layout')!
 
-			if (!control) {
-				throw new Error('The actual heading or summary has no end content')
-			}
+				if (Math.abs(root.scrollTop) > 2) {
+					throw new Error('Natural source capture requires the initial scroll position')
+				}
 
-			const pie = document.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+				const sources = new Map<Element, { scope: Element; offset: number; height: number }>()
+				const ends = [...owner.querySelectorAll('[data-sticky-breadcrumb~="end"]')]
+				const controls = ends.flatMap(end =>
+					end.matches('[data-sticky-breadcrumb~="contents"]') ? [...end.children] : [end],
+				)
 
-			document.querySelector('#layout')!.scrollBy({
-				top: control.getBoundingClientRect().top - pie.bottom - 96,
-				behavior: 'instant',
-			})
-		})
-		const start = await page.locator('#layout').evaluate(element => element.scrollTop)
+				for (const element of controls) {
+					if (!element.checkVisibility({ visibilityProperty: true })) {
+						continue
+					}
 
-		const evidence: { direction: number; frames: Frame[] }[] = []
+					const scope = element.closest('[data-sticky-breadcrumb~="scope"]')!
+					const scopeBox = scope.getBoundingClientRect()
 
-		try {
-			for (const direction of [1, -1]) {
-				await page.evaluate(
-					({ direction, targetId }) => {
-						const root = document.querySelector('#layout')!
-						const capture: { active: boolean; frames: Frame[] } = { active: true, frames: [] }
+					if (scopeBox.top <= 0) {
+						throw new Error('Natural source scope must precede sticky engagement')
+					}
 
-						window.__walletPieEncounter = capture
-						const frame = () => {
-							const pie = document.querySelector('.pie-navigation')!
-							const geometry = pie
-								.querySelector('.pie-navigation-geometry')!
-								.getBoundingClientRect()
-							const style = getComputedStyle(pie)
-							const maximum = parseFloat(style.getPropertyValue('--pie-maxR'))
-							const padding = parseFloat(style.getPropertyValue('--pie-padding'))
-							const radius =
-								((Math.min(geometry.width, geometry.height) / 2) * maximum) / (maximum + padding)
-							const circle = {
-								x: geometry.left + geometry.width / 2,
-								y: geometry.top + geometry.height / 2,
-								radius,
-								valid:
-									Number.isFinite(maximum) &&
-									maximum > 0 &&
-									Number.isFinite(padding) &&
-									padding >= 0 &&
-									Number.isFinite(radius) &&
-									radius > 0,
-							}
-							const controls = [
-								...document.querySelectorAll('article [data-sticky-breadcrumb~="end"]'),
-							]
-								.flatMap(element =>
-									element.matches('[data-sticky-breadcrumb~="contents"]')
-										? [...element.children]
-										: [element],
-								)
-								.filter(element =>
-									element.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
-								)
-								.map(element => {
-									const box = element.getBoundingClientRect()
-									const nearestX = Math.max(box.left, Math.min(circle.x, box.right))
-									const nearestY = Math.max(box.top, Math.min(circle.y, box.bottom))
+					for (let node: Element | null = element; node; node = node.parentElement) {
+						const style = getComputedStyle(node)
 
-									return {
-										box: {
-											x: box.x,
-											y: box.y,
-											width: box.width,
-											height: box.height,
-											top: box.top,
-											right: box.right,
-											bottom: box.bottom,
-											left: box.left,
-										},
-										clearance: Math.hypot(nearestX - circle.x, nearestY - circle.y) - circle.radius,
-										tag: element.tagName,
-										literalMarker: element.matches('[data-collapsible-marker]'),
-										target:
-											document
-												.getElementById(targetId!)
-												?.querySelector(
-													':scope > [data-sticky-breadcrumb~="position"], :scope > details > summary',
-												)
-												?.contains(element) === true,
-										text: element.textContent?.trim(),
-										open: element.closest('details')?.open,
-									}
-								})
-								.filter(
-									control =>
-										control.box.width > 0 &&
-										control.box.height > 0 &&
-										control.box.bottom > 0 &&
-										control.box.top < innerHeight &&
-										control.box.right > 0 &&
-										control.box.left < innerWidth,
-								)
-
-							capture.frames.push({ direction, scroll: root.scrollTop, circle, controls })
-
-							if (capture.active && capture.frames.length < 600) {
-								requestAnimationFrame(frame)
-							}
+						if (
+							(style.transform !== 'none' && !new DOMMatrixReadOnly(style.transform).isIdentity) ||
+							(style.translate !== 'none' &&
+								style.translate.split(/\s+/).some(value => Number.parseFloat(value) !== 0)) ||
+							(style.scale !== 'none' &&
+								style.scale.split(/\s+/).some(value => Number.parseFloat(value) !== 1))
+						) {
+							throw new Error(
+								'Natural source capture requires undisturbed clearance and ancestor geometry',
+							)
 						}
 
-						frame()
-					},
-					{ direction, targetId },
-				)
-				await page.mouse.move(20, 700)
+						if (node === scope) {
+							break
+						}
+					}
+					const box = element.getBoundingClientRect()
 
-				for (let step = 0; step < 32; step++) {
-					await page.mouse.wheel(0, direction * 48)
+					if (box.width > 0 && box.height > 0) {
+						sources.set(element, { scope, offset: box.top - scopeBox.top, height: box.height })
+					}
+				}
+				window.__walletPieSources = sources
+
+				return {
+					controls: sources.size,
+					markers: [...sources.keys()].filter(element =>
+						element.matches('[data-collapsible-marker]'),
+					).length,
+					open,
+				}
+			}, open)
+
+			expect(natural.controls, 'Actual natural source controls were captured').toBeGreaterThan(0)
+
+			if (open) {
+				expect(
+					natural.markers,
+					'The descendant H3 literal marker has its own natural scope',
+				).toBeGreaterThan(0)
+			}
+
+			await target.evaluate(element =>
+				element.scrollIntoView({ block: 'center', behavior: 'instant' }),
+			)
+			await page.evaluate(
+				() =>
+					new Promise<void>(resolve =>
+						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+					),
+			)
+			const evidence: {
+				window: string
+				direction: number
+				span: number
+				steps: number
+				start: number
+				end: number
+				frames: Frame[]
+			}[] = []
+
+			try {
+				for (const encounter of open ? ['target', 'marker'] : ['target']) {
+					const placement = await owner.evaluate((owner, encounter) => {
+						const target = owner.querySelector(
+							':scope > [data-sticky-breadcrumb~="position"], :scope > details > summary',
+						)!
+						const entry = [...(window.__walletPieSources ?? [])].find(([element]) =>
+							encounter === 'marker'
+								? element.matches('[data-collapsible-marker]')
+								: target.contains(element),
+						)
+
+						if (!entry) {
+							throw new Error(`Missing independent natural ${encounter} source`)
+						}
+
+						const [element, source] = entry
+
+						window.__walletPieWitness = element
+						const root = document.querySelector('#layout')!
+						const pie = document.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+						const sourceTop =
+							root.scrollTop + source.scope.getBoundingClientRect().top + source.offset
+						const span = pie.height + source.height + 2 * 96
+						const start = sourceTop - pie.bottom - 96
+
+						if (start < 0 || start + span > root.scrollHeight - root.clientHeight) {
+							throw new Error('Natural source window must fit the scroll range')
+						}
+
+						root.scrollTo({ top: start, behavior: 'instant' })
+
+						return { span, steps: Math.ceil(span / 48) + 1 }
+					}, encounter)
+
 					await page.evaluate(
 						() =>
 							new Promise<void>(resolve =>
 								requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 							),
 					)
-				}
-				const frames = await page.evaluate(() => {
-					const capture = window.__walletPieEncounter
 
-					if (!capture) {
-						throw new Error('Native encounter capture was not initialized')
+					for (const direction of [1, -1]) {
+						await page.evaluate(
+							({ direction, targetId }) => {
+								const root = document.querySelector('#layout')!
+								const capture: { active: boolean; frames: Frame[] } = { active: true, frames: [] }
+
+								window.__walletPieEncounter = capture
+								const frame = () => {
+									const pie = document.querySelector('.pie-navigation')!
+									const geometry = pie
+										.querySelector('.pie-navigation-geometry')!
+										.getBoundingClientRect()
+									const style = getComputedStyle(pie)
+									const maximum = parseFloat(style.getPropertyValue('--pie-maxR'))
+									const padding = parseFloat(style.getPropertyValue('--pie-padding'))
+									const radius =
+										((Math.min(geometry.width, geometry.height) / 2) * maximum) /
+										(maximum + padding)
+									const circle = {
+										x: geometry.left + geometry.width / 2,
+										y: geometry.top + geometry.height / 2,
+										radius,
+										valid:
+											Number.isFinite(maximum) &&
+											maximum > 0 &&
+											Number.isFinite(padding) &&
+											padding >= 0 &&
+											Number.isFinite(radius) &&
+											radius > 0,
+									}
+									const controls = [
+										...document.querySelectorAll('article [data-sticky-breadcrumb~="end"]'),
+									]
+										.flatMap(element =>
+											element.matches('[data-sticky-breadcrumb~="contents"]')
+												? [...element.children]
+												: [element],
+										)
+										.filter(element =>
+											element.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
+										)
+										.map(element => {
+											const box = element.getBoundingClientRect()
+											const native = window.__walletPieSources?.get(element)
+											const sourceTop = native
+												? native.scope.getBoundingClientRect().top + native.offset
+												: null
+											const nearestX = Math.max(box.left, Math.min(circle.x, box.right))
+											const nearestY = Math.max(box.top, Math.min(circle.y, box.bottom))
+
+											return {
+												source:
+													native && sourceTop !== null
+														? { top: sourceTop, bottom: sourceTop + native.height }
+														: null,
+												box: {
+													x: box.x,
+													y: box.y,
+													width: box.width,
+													height: box.height,
+													top: box.top,
+													right: box.right,
+													bottom: box.bottom,
+													left: box.left,
+												},
+												witness: element === window.__walletPieWitness,
+												clearance:
+													Math.hypot(nearestX - circle.x, nearestY - circle.y) - circle.radius,
+												tag: element.tagName,
+												literalMarker: element.matches('[data-collapsible-marker]'),
+												target:
+													document
+														.getElementById(targetId!)
+														?.querySelector(
+															':scope > [data-sticky-breadcrumb~="position"], :scope > details > summary',
+														)
+														?.contains(element) === true,
+												text: element.textContent?.trim(),
+												open: element.closest('details')?.open,
+											}
+										})
+										.filter(
+											control =>
+												control.box.width > 0 &&
+												control.box.height > 0 &&
+												control.box.bottom > 0 &&
+												control.box.top < innerHeight &&
+												control.box.right > 0 &&
+												control.box.left < innerWidth,
+										)
+
+									capture.frames.push({ direction, scroll: root.scrollTop, circle, controls })
+
+									if (capture.active && capture.frames.length < 600) {
+										requestAnimationFrame(frame)
+									}
+								}
+
+								frame()
+							},
+							{ direction, targetId },
+						)
+						await page.mouse.move(20, 700)
+
+						for (let step = 0; step < placement.steps; step++) {
+							await page.mouse.wheel(0, direction * 48)
+							await page.evaluate(
+								() =>
+									new Promise<void>(resolve =>
+										requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+									),
+							)
+						}
+						const frames = await page.evaluate(() => {
+							const capture = window.__walletPieEncounter
+
+							if (!capture) {
+								throw new Error('Native encounter capture was not initialized')
+							}
+
+							capture.active = false
+
+							return capture.frames
+						})
+
+						evidence.push({
+							window: encounter,
+							direction,
+							...placement,
+							start: frames[0].scroll,
+							end: frames.at(-1)!.scroll,
+							frames,
+						})
+						await info.attach(`pie-encounter-${open}-${encounter}-${direction}`, {
+							body: JSON.stringify(frames),
+							contentType: 'application/json',
+						})
 					}
+				}
 
-					capture.active = false
+				for (const { window: encounter, direction, frames } of evidence) {
+					expect(frames.length).toBeGreaterThan(1)
+					expect(
+						frames.every(frame => frame.circle.valid),
+						'Actual rendered radius metadata must be finite and positive',
+					).toBe(true)
+					const movement = frames.at(-1)!.scroll - frames[0].scroll
 
-					return capture.frames
-				})
+					expect(
+						movement * direction,
+						'Native input traverses the requested direction',
+					).toBeGreaterThan(0)
+					const encounters = frames.flatMap(frame =>
+						frame.controls.filter(
+							control =>
+								control.source !== null &&
+								control.source.top < frame.circle.y + frame.circle.radius &&
+								control.source.bottom > frame.circle.y - frame.circle.radius,
+						),
+					)
 
-				evidence.push({ direction, frames })
-				await info.attach(`pie-encounter-${open}-${direction}`, {
-					body: JSON.stringify(frames),
+					expect(
+						encounters.filter(control => control.witness).length,
+						`The independent natural ${encounter} source crosses the pie band in direction ${direction}`,
+					).toBeGreaterThan(0)
+
+					for (const control of frames.flatMap(frame => frame.controls)) {
+						expect(control.clearance, JSON.stringify(control)).toBeGreaterThanOrEqual(-1)
+					}
+				}
+			} finally {
+				await info.attach('pie-encounter-all-evidence', {
+					body: JSON.stringify({
+						open,
+						evidence,
+						limits:
+							'Native wheel geometry with root scroll snapping disabled; no native snap acceptance.',
+					}),
 					contentType: 'application/json',
 				})
+				await page.evaluate(() => {
+					const capture = window.__walletPieEncounter
+
+					if (capture) {
+						capture.active = false
+					}
+				})
 			}
-
-			for (const { direction, frames } of evidence) {
-				expect(frames.length).toBeGreaterThan(1)
-				expect(
-					frames.every(frame => frame.circle.valid),
-					'Actual rendered radius metadata must be finite and positive',
-				).toBe(true)
-				const movement = frames.at(-1)!.scroll - frames[0].scroll
-
-				expect(
-					movement * direction,
-					'Native input traverses the requested direction',
-				).toBeGreaterThan(0)
-				const encounters = frames.flatMap(frame =>
-					frame.controls.filter(
-						control =>
-							control.box.top < frame.circle.y + frame.circle.radius &&
-							control.box.bottom > frame.circle.y - frame.circle.radius,
-					),
-				)
-
-				expect(
-					encounters.filter(control => control.target).length,
-					'The actual control must enter the pie encounter band; absent coverage is inconclusive',
-				).toBeGreaterThan(0)
-
-				if (open) {
-					expect(
-						encounters.filter(control => control.literalMarker).length,
-						'The literal marker must enter the encounter band in each direction; absent coverage is inconclusive',
-					).toBeGreaterThan(0)
-				}
-
-				for (const control of encounters) {
-					expect(control.clearance, JSON.stringify(control)).toBeGreaterThanOrEqual(-1)
-				}
-			}
-		} finally {
-			await info.attach('pie-encounter-all-evidence', {
-				body: JSON.stringify({
-					start,
-					open,
-					evidence,
-					limits:
-						'Native wheel geometry with root scroll snapping disabled; no native snap acceptance.',
-				}),
-				contentType: 'application/json',
-			})
-			await page.evaluate(() => {
-				const capture = window.__walletPieEncounter
-
-				if (capture) {
-					capture.active = false
-				}
-			})
-		}
-	})
+		})
+	}
 }
 
 // CDP exposes native pseudo geometry without reconstructing its CSS motion.

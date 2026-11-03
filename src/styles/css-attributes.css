@@ -2080,18 +2080,6 @@ ol {
 			0 100%
 		));
 	}
-	@function --breadcrumb-clearance-pre(--angle <angle>) {
-		--y: max(
-			calc(var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-view-size)),
-			calc(
-				var(---breadcrumb-clearance-arc-centerY) + --breadcrumb-clearance-distance(var(--angle))
-			)
-		);
-		result: --breadcrumb-clearance-stop(
-			var(--y),
-			calc(var(---breadcrumb-clearance-native-a) - var(--y))
-		);
-	}
 	@function --breadcrumb-clearance-post(--t <number>) {
 		--v: calc(
 			var(---breadcrumb-clearance-view-size) +
@@ -2105,7 +2093,7 @@ ol {
 				) +
 				var(---breadcrumb-clearance-arc-deltaY) * --breadcrumb-ease-distance(var(--t))
 		);
-		result: --breadcrumb-clearance-stop(var(--y), var(--v));
+		result: --breadcrumb-rounded-clearance(var(--y), var(---breadcrumb-clearance-arc-height), var(---breadcrumb-clearance-arc-centerY), var(---breadcrumb-clearance-arc-radius), var(---breadcrumb-clearance-inlineOffset), var(---breadcrumb-clearance-arc-inlineRadius), var(--stickyBreadcrumb-clearanceGap, 0px)) calc(--breadcrumb-ease-time(var(--t)) * 100%);
 	}
 	@function --breadcrumb-clearance-final() returns <number> {
 		--y: calc(
@@ -2211,6 +2199,13 @@ ol {
 		to {
 			transform: translateX(calc(-1 * var(---inlineDirection) * 1px));
 		}
+	}
+	@keyframes breadcrumb-clearance-post-inline {
+		from { transform: translateX(0px); }
+		to { transform: translateX(calc(-1 * var(---inlineDirection) * 1px)); }
+	}
+	@keyframes breadcrumb-clearance-post-step {
+		to { transform: translateX(var(---breadcrumb-clearance-finalInline)); }
 	}
 	@keyframes breadcrumb-clearance-block {
 		from {
@@ -3442,144 +3437,90 @@ ol {
 						---breadcrumb-clearance-contact: --breadcrumb-clearance-contact();
 						---breadcrumb-clearance-joinBlock: --breadcrumb-clearance-join(0, var(--stickyBreadcrumb-clearanceGap, 0px));
 						---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(--stickyBreadcrumb-clearanceGap, 0px));
-						---breadcrumb-clearance-preStops:
-							0
-								--breadcrumb-cover-position(
-									min(
-										var(---breadcrumb-clearance-view-size),
-										calc(
-											var(---breadcrumb-clearance-native-a) -
-												var(---breadcrumb-clearance-arc-centerY) - var(---breadcrumb-clearance-contact) - var(--stickyBreadcrumb-clearanceGap, 0px)
-										)
-									)
-								),
-							--breadcrumb-clearance-pre(2.8125deg), --breadcrumb-clearance-pre(5.625deg),
-							--breadcrumb-clearance-pre(8.4375deg), --breadcrumb-clearance-pre(11.25deg),
-							--breadcrumb-clearance-pre(14.0625deg), --breadcrumb-clearance-pre(16.875deg),
-							--breadcrumb-clearance-pre(19.6875deg), --breadcrumb-clearance-pre(22.5deg),
-							--breadcrumb-clearance-pre(25.3125deg), --breadcrumb-clearance-pre(28.125deg),
-							--breadcrumb-clearance-pre(30.9375deg), --breadcrumb-clearance-pre(33.75deg),
-							--breadcrumb-clearance-pre(36.5625deg), --breadcrumb-clearance-pre(39.375deg),
-							--breadcrumb-clearance-pre(42.1875deg), --breadcrumb-clearance-pre(45deg),
-							--breadcrumb-clearance-pre(47.8125deg), --breadcrumb-clearance-pre(50.625deg),
-							--breadcrumb-clearance-pre(53.4375deg), --breadcrumb-clearance-pre(56.25deg),
-							--breadcrumb-clearance-pre(59.0625deg), --breadcrumb-clearance-pre(61.875deg),
-							--breadcrumb-clearance-pre(64.6875deg), --breadcrumb-clearance-pre(67.5deg),
-							--breadcrumb-clearance-pre(70.3125deg), --breadcrumb-clearance-pre(73.125deg),
-							--breadcrumb-clearance-pre(75.9375deg), --breadcrumb-clearance-pre(78.75deg),
-							--breadcrumb-clearance-pre(81.5625deg), --breadcrumb-clearance-pre(84.375deg),
-							--breadcrumb-clearance-pre(87.1875deg), --breadcrumb-clearance-pre(90deg);
-						---breadcrumb-endPaintEasing: var(--transition-easeInOutExpo);
-						---breadcrumb-clearance-full-x-easing: linear(
-							0 0%,
-							var(---breadcrumb-clearance-preStops),
-							--breadcrumb-clearance-post(0),
-							--breadcrumb-clearance-post(0.015625),
-							--breadcrumb-clearance-post(0.03125),
-							--breadcrumb-clearance-post(0.046875),
-							--breadcrumb-clearance-post(0.0625),
-							--breadcrumb-clearance-post(0.078125),
-							--breadcrumb-clearance-post(0.09375),
-							--breadcrumb-clearance-post(0.109375),
-							--breadcrumb-clearance-post(0.125),
-							--breadcrumb-clearance-post(0.140625),
-							--breadcrumb-clearance-post(0.15625),
-							--breadcrumb-clearance-post(0.171875),
-							--breadcrumb-clearance-post(0.1875),
-							--breadcrumb-clearance-post(0.203125),
-							--breadcrumb-clearance-post(0.21875),
-							--breadcrumb-clearance-post(0.234375),
-							--breadcrumb-clearance-post(0.25),
-							--breadcrumb-clearance-post(0.265625),
-							--breadcrumb-clearance-post(0.28125),
-							--breadcrumb-clearance-post(0.296875),
-							--breadcrumb-clearance-post(0.3125),
-							--breadcrumb-clearance-post(0.328125),
-							--breadcrumb-clearance-post(0.34375),
-							--breadcrumb-clearance-post(0.359375),
-							--breadcrumb-clearance-post(0.375),
-							--breadcrumb-clearance-post(0.390625),
-							--breadcrumb-clearance-post(0.40625),
-							--breadcrumb-clearance-post(0.421875),
-							--breadcrumb-clearance-post(0.4375),
-							--breadcrumb-clearance-post(0.453125),
-							--breadcrumb-clearance-post(0.46875),
-							--breadcrumb-clearance-post(0.484375),
-							--breadcrumb-clearance-post(0.5),
-							--breadcrumb-clearance-post(0.515625),
-							--breadcrumb-clearance-post(0.53125),
-							--breadcrumb-clearance-post(0.546875),
-							--breadcrumb-clearance-post(0.5625),
-							--breadcrumb-clearance-post(0.578125),
-							--breadcrumb-clearance-post(0.59375),
-							--breadcrumb-clearance-post(0.609375),
-							--breadcrumb-clearance-post(0.625),
-							--breadcrumb-clearance-post(0.640625),
-							--breadcrumb-clearance-post(0.65625),
-							--breadcrumb-clearance-post(0.671875),
-							--breadcrumb-clearance-post(0.6875),
-							--breadcrumb-clearance-post(0.703125),
-							--breadcrumb-clearance-post(0.71875),
-							--breadcrumb-clearance-post(0.734375),
-							--breadcrumb-clearance-post(0.75),
-							--breadcrumb-clearance-post(0.765625),
-							--breadcrumb-clearance-post(0.78125),
-							--breadcrumb-clearance-post(0.796875),
-							--breadcrumb-clearance-post(0.8125),
-							--breadcrumb-clearance-post(0.828125),
-							--breadcrumb-clearance-post(0.84375),
-							--breadcrumb-clearance-post(0.859375),
-							--breadcrumb-clearance-post(0.875),
-							--breadcrumb-clearance-post(0.890625),
-							--breadcrumb-clearance-post(0.90625),
-							--breadcrumb-clearance-post(0.921875),
-							--breadcrumb-clearance-post(0.9375),
-							--breadcrumb-clearance-post(0.953125),
-							--breadcrumb-clearance-post(0.96875),
-							--breadcrumb-clearance-post(0.984375),
-							--breadcrumb-clearance-post(1),
-							--breadcrumb-clearance-final() 100%
-						);
-
-						@media (prefers-reduced-motion: reduce) {
-							---breadcrumb-endPaintEasing: steps(1, end);
-							---breadcrumb-clearance-full-x-easing: linear(
-								0 0%,
-								var(---breadcrumb-clearance-preStops),
-								--breadcrumb-clearance-stop(
-									max(
-										var(---breadcrumb-clearance-arc-baseY),
-										calc(
-											var(---breadcrumb-clearance-native-a) -
-												var(---breadcrumb-clearance-arrival-end)
-										)
-									),
-									var(---breadcrumb-clearance-arrival-end)
-								),
-								--breadcrumb-clearance-final()
-									--breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),
-								--breadcrumb-clearance-final() 100%
+						@media (prefers-reduced-motion: no-preference) {
+							---breadcrumb-endPaintEasing: var(--transition-easeInOutExpo);
+							---breadcrumb-clearance-postEasing: linear(
+								--breadcrumb-clearance-post(0),
+								--breadcrumb-clearance-post(0.015625),
+								--breadcrumb-clearance-post(0.03125),
+								--breadcrumb-clearance-post(0.046875),
+								--breadcrumb-clearance-post(0.0625),
+								--breadcrumb-clearance-post(0.078125),
+								--breadcrumb-clearance-post(0.09375),
+								--breadcrumb-clearance-post(0.109375),
+								--breadcrumb-clearance-post(0.125),
+								--breadcrumb-clearance-post(0.140625),
+								--breadcrumb-clearance-post(0.15625),
+								--breadcrumb-clearance-post(0.171875),
+								--breadcrumb-clearance-post(0.1875),
+								--breadcrumb-clearance-post(0.203125),
+								--breadcrumb-clearance-post(0.21875),
+								--breadcrumb-clearance-post(0.234375),
+								--breadcrumb-clearance-post(0.25),
+								--breadcrumb-clearance-post(0.265625),
+								--breadcrumb-clearance-post(0.28125),
+								--breadcrumb-clearance-post(0.296875),
+								--breadcrumb-clearance-post(0.3125),
+								--breadcrumb-clearance-post(0.328125),
+								--breadcrumb-clearance-post(0.34375),
+								--breadcrumb-clearance-post(0.359375),
+								--breadcrumb-clearance-post(0.375),
+								--breadcrumb-clearance-post(0.390625),
+								--breadcrumb-clearance-post(0.40625),
+								--breadcrumb-clearance-post(0.421875),
+								--breadcrumb-clearance-post(0.4375),
+								--breadcrumb-clearance-post(0.453125),
+								--breadcrumb-clearance-post(0.46875),
+								--breadcrumb-clearance-post(0.484375),
+								--breadcrumb-clearance-post(0.5),
+								--breadcrumb-clearance-post(0.515625),
+								--breadcrumb-clearance-post(0.53125),
+								--breadcrumb-clearance-post(0.546875),
+								--breadcrumb-clearance-post(0.5625),
+								--breadcrumb-clearance-post(0.578125),
+								--breadcrumb-clearance-post(0.59375),
+								--breadcrumb-clearance-post(0.609375),
+								--breadcrumb-clearance-post(0.625),
+								--breadcrumb-clearance-post(0.640625),
+								--breadcrumb-clearance-post(0.65625),
+								--breadcrumb-clearance-post(0.671875),
+								--breadcrumb-clearance-post(0.6875),
+								--breadcrumb-clearance-post(0.703125),
+								--breadcrumb-clearance-post(0.71875),
+								--breadcrumb-clearance-post(0.734375),
+								--breadcrumb-clearance-post(0.75),
+								--breadcrumb-clearance-post(0.765625),
+								--breadcrumb-clearance-post(0.78125),
+								--breadcrumb-clearance-post(0.796875),
+								--breadcrumb-clearance-post(0.8125),
+								--breadcrumb-clearance-post(0.828125),
+								--breadcrumb-clearance-post(0.84375),
+								--breadcrumb-clearance-post(0.859375),
+								--breadcrumb-clearance-post(0.875),
+								--breadcrumb-clearance-post(0.890625),
+								--breadcrumb-clearance-post(0.90625),
+								--breadcrumb-clearance-post(0.921875),
+								--breadcrumb-clearance-post(0.9375),
+								--breadcrumb-clearance-post(0.953125),
+								--breadcrumb-clearance-post(0.96875),
+								--breadcrumb-clearance-post(0.984375),
+								--breadcrumb-clearance-post(1)
 							);
+							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-inline auto var(---breadcrumb-clearance-postEasing) forwards;
 						}
-
-						animation: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-full-x-easing)
-							both;
-						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-						animation-range: cover -100% cover 100%;
-						--stickyBreadcrumb-endPaintAnimation: breadcrumb-clearance-block auto
-							var(---breadcrumb-endPaintEasing) both;
-						--stickyBreadcrumb-endPaintRange: var(--stickyBreadcrumb-entryRange);
+						@media (prefers-reduced-motion: reduce) {
+							---breadcrumb-clearance-finalInline: calc(-1 * var(---inlineDirection) * --breadcrumb-clearance-final() * 1px);
+							---breadcrumb-endPaintEasing: steps(1, end);
+							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-step auto steps(1, end) forwards;
+						}
+						--stickyBreadcrumb-endPaintAnimation:
+							breadcrumb-clearance-inline auto --breadcrumb-clearance-flow-easing() both,
+							var(---breadcrumb-clearance-postAnimation),
+							breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both;
+						--stickyBreadcrumb-endPaintTimeline: var(--stickyBreadcrumb-entryTimeline);
+						--stickyBreadcrumb-endPaintRange: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange), var(--stickyBreadcrumb-entryRange);
 						&[data-sticky-breadcrumb~="contents"] {
 							animation: none;
-							--stickyBreadcrumb-endPaintRange: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange);
-							--stickyBreadcrumb-endPaintAnimation:
-								breadcrumb-clearance-inline auto var(---breadcrumb-clearance-full-x-easing) both,
-								breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both;
-						}
-						&:not([data-sticky-breadcrumb~="contents"]) {
-							animation-name: breadcrumb-clearance-inline, breadcrumb-clearance-block;
-							animation-range: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange);
-							animation-timing-function: var(---breadcrumb-clearance-full-x-easing), var(---breadcrumb-endPaintEasing);
 						}
 						> *,
 						&::after {
