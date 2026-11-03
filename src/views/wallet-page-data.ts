@@ -8,8 +8,8 @@ import type { RatedWallet, ResolvedWallet } from '@/schema/wallet'
 import { nonEmptyRemap } from '@/types/utils/non-empty'
 import { remap } from '@/types/utils/remap'
 
-type PageEvaluations = Record<string, Record<string, Evaluation<OutcomeMetadata>>>
-type PageVariant = Omit<ResolvedWallet<string>, 'attributes'> & { attributes: PageEvaluations }
+type PageEvaluations = Record<string, Record<string, number>>
+type PageVariant = Pick<ResolvedWallet<string>, 'features'> & { attributes: PageEvaluations }
 type PageStage = Pick<WalletStage<string>, 'id'>
 type PageLadder = {
 	stage: Exclude<WalletLadderEvaluation<string>['stage'], WalletStage<string>> | PageStage
@@ -18,24 +18,47 @@ type PageLadder = {
 
 /** Evaluated facts; executable definitions remain owned by the schema. */
 export type WalletPageData = Omit<RatedWallet<string>, 'overall' | 'variants' | 'ladders'> & {
+	evaluations: Evaluation<OutcomeMetadata>[]
 	overall: PageEvaluations
 	variants: AtLeastOneVariant<PageVariant>
 	ladders: Partial<Record<WalletLadderType, PageLadder>>
 }
 
 export function walletPageData(wallet: RatedWallet<string>): WalletPageData {
+	const pool: Evaluation<OutcomeMetadata>[] = []
+	const indices = new Map<Evaluation<OutcomeMetadata>, number>()
+	const intern = (evaluation: Evaluation<OutcomeMetadata>): number => {
+		const existing = indices.get(evaluation)
+
+		if (existing !== undefined) {
+			return existing
+		}
+
+		const index = pool.length
+
+		indices.set(evaluation, index)
+		pool.push(evaluation)
+
+		return index
+	}
 	const evaluations = (tree: EvaluationTree<string>): PageEvaluations =>
 		remap(tree, (_group: string, entries: EvaluationTree<string>[string]) =>
-			remap(entries, (_id: string, entry: EvaluatedAttribute<OutcomeMetadata>) => entry.evaluation),
+			remap(entries, (_id: string, entry: EvaluatedAttribute<OutcomeMetadata>) =>
+				intern(entry.evaluation),
+			),
 		)
 
 	return {
-		...wallet,
+		metadata: wallet.metadata,
+		types: wallet.types,
+		variantSpecificity: wallet.variantSpecificity,
+		overrides: wallet.overrides,
+		evaluations: pool,
 		overall: evaluations(wallet.overall),
 		variants: nonEmptyRemap(
 			wallet.variants,
 			(_variant: Variant, resolved: ResolvedWallet<string>) => ({
-				...resolved,
+				features: resolved.features,
 				attributes: evaluations(resolved.attributes),
 			}),
 		),
@@ -81,7 +104,13 @@ export function restoreWalletPageData(data: WalletPageData): RatedWallet<string>
 	const tree = walletPageAttributeTree(data)
 	const evaluations = (values: PageEvaluations): EvaluationTree<string> =>
 		remap(values, (groupId: string, entries: PageEvaluations[string]) =>
-			remap(entries, (id: string, evaluation: Evaluation<OutcomeMetadata>) => {
+			remap(entries, (id: string, index: number) => {
+				const evaluation = data.evaluations[index]
+
+				if (!evaluation) {
+					throw new Error(`Unknown evaluation: ${index}`)
+				}
+
 				const attribute = tree[groupId].attributes.find(
 					entry => entry.attribute.id === id,
 				)?.attribute
@@ -94,11 +123,15 @@ export function restoreWalletPageData(data: WalletPageData): RatedWallet<string>
 			}),
 		)
 
+	const { evaluations: _evaluations, ...facts } = data
+
 	return {
-		...data,
+		...facts,
 		overall: evaluations(data.overall),
-		variants: nonEmptyRemap(data.variants, (_variant: Variant, resolved: PageVariant) => ({
-			...resolved,
+		variants: nonEmptyRemap(data.variants, (variant: Variant, resolved: PageVariant) => ({
+			metadata: data.metadata,
+			variant,
+			features: resolved.features,
 			attributes: evaluations(resolved.attributes),
 		})),
 		ladders: Object.fromEntries(
