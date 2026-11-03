@@ -2708,7 +2708,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	@property ---pie-inlineSpace {
 		syntax: '<length>';
-		inherits: true;
+		inherits: false;
 		initial-value: 0px;
 	}
 	@property ---pie-blockProgress {
@@ -2841,6 +2841,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					animation-direction: var(---breadcrumb-sizeDirections), var(---pie-inlineDirection);
 					animation-timeline: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
 					> :global(*) {
+						---pie-inlineSpace: inherit;
 						--stickyBreadcrumb-availableInlineSize: calc(var(---pie-inlineSpace) - var(--stickyBreadcrumb-gap, 1rem) / 2);
 					}
 					&[data-sticky-breadcrumb~="size"] {
@@ -2880,8 +2881,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						0px,
 						calc(
 							var(---breadcrumb-sourceRowWidth) +
-								var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace) +
-							var(--stickyBreadcrumb-gap, 1rem) / 2
+								var(--stickyBreadcrumb-sourcePaddingInline) - var(--stickyBreadcrumb-availableInlineSize)
 						),
 						var(---pie-clearanceSize)
 					);
