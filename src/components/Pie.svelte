@@ -182,7 +182,7 @@
 			: undefined}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
-		<span class="slice-shape">
+		<span class="slice-shape" data-pressable={slice.href || onSliceClick ? 'paint' : undefined}>
 			{#if slice.arcIconId}
 				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
@@ -378,12 +378,38 @@
 					outline: none;
 				}
 
-				.slice-shape {
-					background: var(--slice-fill);
+				&:is(button:not(:disabled), a[href])::before {
+					content: '';
+					position: absolute;
+					inset: 0;
+					pointer-events: auto;
+				}
 
-					transform-origin: var(--pie-originX) var(--pie-originY);
-					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
-						scale(var(--slice-scale)) translateY(calc(var(--slice-offset) * -1px));
+				/* A common center lets the paint-only press scale compose with the slice rotation. */
+				.slice-shape,
+				&::before {
+					transform-origin: 50% 50%;
+					transform:
+						translate(calc(var(--pie-originX) - 50%), calc(var(--pie-originY) - 50%))
+						rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
+						scale(var(--slice-scale)) translateY(calc(var(--slice-offset) * -1px))
+						translate(calc(50% - var(--pie-originX)), calc(50% - var(--pie-originY)));
+				}
+
+				&:is(a)[data-pressable-state~='pressed'] {
+					---pressable-opacity: var(--pressable-pressed-opacity);
+				}
+
+				&:is(button:not(:disabled), a[href]):not([aria-disabled='true']):has(> .slice-shape[data-pressable~='paint']) {
+					opacity: var(---pressable-opacity, 1);
+				}
+
+				.slice-shape,
+				&:is(button:not(:disabled), a[href]):not([aria-disabled='true']):has(> .slice-shape[data-pressable~='paint']) > .slice-shape {
+					position: static;
+					display: block;
+					outline: none;
+					background: var(--slice-fill);
 
 					opacity: var(--slice-opacity);
 
@@ -391,6 +417,8 @@
 
 					&:hover,
 					&:focus-within,
+					.slice:hover &,
+					.slice:focus-within &,
 					.slice.highlighted & {
 						opacity: 1;
 					}
