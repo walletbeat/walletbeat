@@ -172,9 +172,9 @@
 	}
 
 	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
-	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
-	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
-	const transitionsCenter = $derived(!!transitionNamePrefix && transitionedElements.has('center'))
+	const transitionsPie = $derived(interactive && !!transitionNamePrefix && transitionedElements.has('pie'))
+	const transitionsSlices = $derived(interactive && !!transitionNamePrefix && transitionedElements.has('slices'))
+	const transitionsCenter = $derived(interactive && !!transitionNamePrefix && transitionedElements.has('center'))
 
 	const pieMetrics = $derived.by(() => {
 		const maxRadius = pieMaxRadius(radius, levels)
