@@ -73,8 +73,17 @@ export function interest(
 		'interestForElement' in HTMLButtonElement.prototype &&
 		node.matches('button[interestfor], a[interestfor]')
 	) {
+		const keepHoveredPress = (event: Event) => {
+			if (event.cancelable && event.target === target && target.matches(':hover:active')) {
+				event.preventDefault()
+			}
+		}
+
+		target.addEventListener('loseinterest', keepHoveredPress)
+
 		return {
 			destroy() {
+				target.removeEventListener('loseinterest', keepHoveredPress)
 				interestSources.delete(node)
 				sources.delete(node)
 

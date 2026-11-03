@@ -6,6 +6,8 @@ class TestElement extends EventTarget {
 	id = 'details'
 	popoverTarget: string | null = null
 	hovered = false
+	active = false
+	nativeInterestInvoker = false
 	focused = false
 	focusVisible = false
 	visible = true
@@ -53,6 +55,14 @@ class TestElement extends EventTarget {
 	}
 
 	matches(selector: string) {
+		if (selector === ':hover:active') {
+			return this.hovered && this.active
+		}
+
+		if (selector === 'button[interestfor], a[interestfor]') {
+			return this.nativeInterestInvoker
+		}
+
 		if (selector === ':disabled, [aria-disabled="true"]') {
 			return this.disabled || this.ariaDisabled
 		}
@@ -539,6 +549,58 @@ describe('interest fallback lifecycle', () => {
 		cleanup = undefined
 		node.dispatchEvent(new Event('click'))
 		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
+	it.each([
+		{ active: true, hovered: true, cancelable: true, prevented: true },
+		{ active: false, hovered: true, cancelable: true, prevented: false },
+		{ active: true, hovered: false, cancelable: true, prevented: false },
+		{ active: false, hovered: false, cancelable: true, prevented: false },
+		{ active: true, hovered: true, cancelable: false, prevented: false },
+	])('guards only cancelable native loss during a hovered press: %j', state => {
+		cleanup?.destroy()
+		Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+		node.nativeInterestInvoker = true
+		cleanup = interest(htmlElement(node), { id: target.id })
+		target.active = state.active
+		target.hovered = state.hovered
+		const event = new Event('loseinterest', { cancelable: state.cancelable })
+
+		target.dispatchEvent(event)
+		expect(event.defaultPrevented).toBe(state.prevented)
+		expect(vi.getTimerCount()).toBe(0)
+		expect(target.showPopover).not.toHaveBeenCalled()
+		expect(target.hidePopover).not.toHaveBeenCalled()
+	})
+
+	it('leaves unowned native loss and loss after destruction uncancelled', () => {
+		cleanup?.destroy()
+		Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+		node.nativeInterestInvoker = true
+		cleanup = interest(htmlElement(node), { id: target.id })
+		target.active = true
+		target.hovered = true
+		const foreign = new TestElement()
+
+		class UnownedInterestEvent extends Event {
+			override get target() {
+				return foreign
+			}
+		}
+		const unowned = new UnownedInterestEvent('loseinterest', { cancelable: true })
+
+		target.dispatchEvent(unowned)
+		expect(unowned.defaultPrevented).toBe(false)
+		const owned = new Event('loseinterest', { cancelable: true })
+
+		target.dispatchEvent(owned)
+		expect(owned.defaultPrevented).toBe(true)
+		cleanup?.destroy()
+		cleanup = undefined
+		const destroyed = new Event('loseinterest', { cancelable: true })
+
+		target.dispatchEvent(destroyed)
+		expect(destroyed.defaultPrevented).toBe(false)
 	})
 
 	it('cancels pending entry when the action is destroyed', () => {
