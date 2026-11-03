@@ -874,12 +874,12 @@ span svg {
 	(width: anchor-size(--column-firstRow inline)) and (timeline-scope: --column-size) {
 	@property ---column-inlineFraction {
 		syntax: '<number>';
-		inherits: true;
+		inherits: false;
 		initial-value: 1;
 	}
 	@property ---column-blockFraction {
 		syntax: '<number>';
-		inherits: true;
+		inherits: false;
 		initial-value: 1;
 	}
 	@keyframes column-inline-size {
