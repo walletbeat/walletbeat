@@ -1677,9 +1677,12 @@
 
 						{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
 
-						{@const _currentAttribute = (
-							hasActiveAttribute && activeEntityId?.attributeId !== undefined ?
-								evalGroup[activeEntityId.attributeId]
+						{@const currentAttribute = (
+							hasActiveAttribute ?
+								activeEntityId?.attributeId !== undefined ?
+									evalGroup[activeEntityId.attributeId]
+								:
+									undefined
 							: selectedAttribute ?
 								evalGroup[selectedAttribute]
 							:
@@ -1761,7 +1764,9 @@
 										}
 									)
 								}
-								{highlightedSliceId}
+								highlightedSliceId={currentAttribute
+									? `attrGroup_${attrGroup.id}__attr_${currentAttribute.attribute.id}`
+									: undefined}
 								onSliceClick={sliceId => {
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
@@ -1825,23 +1830,11 @@
 							</Pie>
 
 							{#snippet ExpandedContent({ isInTooltip }: { isInTooltip?: boolean })}
-								{@const displayedAttribute =
-									activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id ?
-										activeEntityId.attributeId !== undefined ?
-											evalGroup[activeEntityId.attributeId]
-										:
-											undefined
-									: selectedAttribute ?
-										evalGroup[selectedAttribute]
-									:
-										undefined
-								}
-
-								{#if displayedAttribute}
+								{#if currentAttribute}
 									<WalletAttributeSummary
 										{wallet}
 										{ladders}
-										attribute={displayedAttribute}
+										attribute={currentAttribute}
 										variant={selectedVariant}
 										summaryType={WalletAttributeSummaryType.Rating}
 										{isInTooltip}
