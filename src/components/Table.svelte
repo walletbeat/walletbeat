@@ -587,6 +587,7 @@
 				{@const titleControlId = `${id}-title-${level}-${index}`}
 
 				<th
+					aria-label={column.name}
 					{colspan}
 					rowspan={
 						expandHeaderCells && (!isExpandable || !isExpanded) ?
