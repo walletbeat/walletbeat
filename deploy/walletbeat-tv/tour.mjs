@@ -976,18 +976,30 @@ async function filterChoices(panel) {
 	const choices = await panel.locator('fieldset label:has(input[type="checkbox"])').all()
 	return Promise.all(
 		choices.map(async choice => {
-			const { group, label } = await choice.evaluate(element => ({
-				group: element.closest('fieldset').querySelector('legend').textContent.trim(),
-				label: element.querySelector('.label').textContent.trim(),
-			}))
-			const control = panel
-				.getByRole('group', { name: group, exact: true, includeHidden: true })
-				.locator('label')
-				.filter({ has: page.getByText(label, { exact: true }) })
+			const { legend, label, name, value } = await choice.evaluate(element => {
+				const input = element.querySelector('input')
+				return {
+					legend: element.closest('fieldset').querySelector('legend').textContent.trim(),
+					label: element.querySelector('.label').textContent.trim(),
+					name: input.getAttribute('name'),
+					value: input.getAttribute('value'),
+				}
+			})
+			const control =
+				name !== null && value !== null
+					? panel
+							.locator(
+								`input[type="checkbox"][name=${JSON.stringify(name)}][value=${JSON.stringify(value)}]`,
+							)
+							.locator('xpath=ancestor::label[1]')
+					: panel
+							.getByRole('group', { name: legend, exact: true, includeHidden: true })
+							.locator('label')
+							.filter({ has: page.getByText(label, { exact: true }) })
 			if ((await control.count()) !== 1) {
-				throw new Error('Filter choice is ambiguous')
+				throw new Error(`Filter choice resolves to ${await control.count()} labels`)
 			}
-			return { control, group }
+			return { control, group: name ?? legend }
 		}),
 	)
 }
