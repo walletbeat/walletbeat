@@ -969,37 +969,100 @@ async function explorePage(inputRevision) {
 		await readingPause(inputRevision)
 	}
 }
+async function filterPanels() {
+	return page.locator('main .filters form:has(fieldset input[type="checkbox"])').all()
+}
+async function filterChoices(panel) {
+	const choices = await panel.locator('fieldset label:has(input[type="checkbox"])').all()
+	return Promise.all(
+		choices.map(async choice => {
+			const { group, label } = await choice.evaluate(element => ({
+				group: element.closest('fieldset').querySelector('legend').textContent.trim(),
+				label: element.querySelector('.label').textContent.trim(),
+			}))
+			const control = panel
+				.getByRole('group', { name: group, exact: true, includeHidden: true })
+				.locator('label')
+				.filter({ has: page.getByText(label, { exact: true }) })
+			if ((await control.count()) !== 1) {
+				throw new Error('Filter choice is ambiguous')
+			}
+			return { control, group }
+		}),
+	)
+}
+function filterPopover(form) {
+	return form.locator('xpath=ancestor-or-self::*[@popover][1]')
+}
 async function filterTriggers(panel) {
-	const id = await panel.getAttribute('id')
+	const popover = filterPopover(panel)
+	const id = (await popover.count()) ? await popover.getAttribute('id') : null
+	if (!id) {
+		return []
+	}
 	const triggers = []
-	for (const trigger of await visibleElements('main .filter-trigger[aria-controls]', false)) {
-		if ((await trigger.getAttribute('aria-controls')) === id) {
+	for (const trigger of await page
+		.locator(
+			`main [aria-controls=${JSON.stringify(id)}], main [popovertarget=${JSON.stringify(id)}]`,
+		)
+		.all()) {
+		if (await trigger.isVisible()) {
 			triggers.push(trigger)
 		}
 	}
 	return triggers
 }
-async function showFilters(kind, inputRevision, owner = null) {
-	const panel = page.locator(`main .filters [data-filter-kind=${JSON.stringify(kind)}]`).first()
-	if (!(await panel.count())) {
-		return null
+async function showFilters(panel, inputRevision, owner = null) {
+	const popover = filterPopover(panel)
+	if (!(await popover.count())) {
+		return
 	}
-	const triggers = owner ? [owner] : await filterTriggers(panel)
-	for (const trigger of triggers) {
-		if ((await trigger.getAttribute('aria-controls')) !== (await panel.getAttribute('id'))) {
-			continue
+	if (await popover.evaluate(element => element.matches(':popover-open'))) {
+		if (!owner || (await owner.getAttribute('aria-expanded')) === 'true') {
+			return
 		}
+		await dismissFilters(panel, inputRevision)
+	}
+	for (const trigger of owner ? [owner] : await filterTriggers(panel)) {
 		if ((await scrollIntoView(trigger, inputRevision)) && (await click(trigger, inputRevision))) {
 			await waitUnlessInterrupted(350, inputRevision)
+			if (await popover.evaluate(element => element.matches(':popover-open'))) {
+				return
+			}
 		}
-		break
 	}
-	return panel
+	throw new Error('Filter menu did not open')
 }
 async function dismissFilters(panel, inputRevision) {
-	if (panel && (await panel.evaluate(element => element.matches(':popover-open')))) {
-		await click(page.locator('main h2').first(), inputRevision)
+	const popover = filterPopover(panel)
+	if (
+		(await popover.count()) &&
+		(await popover.evaluate(element => element.matches(':popover-open')))
+	) {
+		if (!(await click(page.locator('main h2').first(), inputRevision))) {
+			throw new Error('Filter menu dismissal is not reachable')
+		}
+		await waitUnlessInterrupted(150, inputRevision)
+		if (await popover.evaluate(element => element.matches(':popover-open'))) {
+			throw new Error('Filter menu did not close')
+		}
 	}
+}
+async function setFilter(control, checked, inputRevision) {
+	const input = control.locator('input[type="checkbox"]')
+	if ((await input.isChecked()) === checked) {
+		return
+	}
+	if (!(await scrollIntoView(control, inputRevision)) || !(await click(control, inputRevision))) {
+		throw new Error('Filter choice is not reachable')
+	}
+	for (let attempt = 0; attempt < 5; attempt++) {
+		if ((await input.isChecked()) === checked) {
+			return
+		}
+		await waitUnlessInterrupted(50, inputRevision)
+	}
+	throw new Error('Filter choice did not change')
 }
 async function exploreTable(inputRevision) {
 	const sortedHeader = page.locator('main th[data-sort]').first()
@@ -1015,48 +1078,52 @@ async function exploreTable(inputRevision) {
 		await scrollIntoView(firstFilter, inputRevision, 'start')
 	}
 
-	const panel = page.locator('main .filters [data-filter-kind="wallet"]').first()
-	if (await panel.count()) {
+	let demonstratedFilters = false
+	for (const panel of await filterPanels()) {
 		const triggers = await filterTriggers(panel)
 		const selected = []
 		const groups = new Set()
-		for (const owner of triggers.length ? triggers : [null]) {
-			await showFilters('wallet', inputRevision, owner)
-			const controls = await visibleElements(
-				'main .filters [data-filter-set] label:has(input[type="checkbox"]:enabled)',
-				false,
-			)
-			for (const control of controls) {
-				const group = await control.evaluate(element =>
-					element.closest('[data-filter-set]').getAttribute('data-filter-set'),
-				)
-				if (groups.has(group) || !(await control.locator('input').isEnabled())) {
-					continue
+		try {
+			for (const owner of triggers.length ? triggers : [null]) {
+				await showFilters(panel, inputRevision, owner)
+				for (const { control, group } of await filterChoices(panel)) {
+					if (
+						groups.has(group) ||
+						!(await control.isVisible()) ||
+						!(await control.locator('input').isEnabled())
+					) {
+						continue
+					}
+					const checked = await control.locator('input').isChecked()
+					selected.push({ control, owner, checked })
+					await setFilter(control, !checked, inputRevision)
+					groups.add(group)
+					await waitUnlessInterrupted(450, inputRevision)
+					if (selected.length === 2) {
+						break
+					}
 				}
-				if (
-					!(await scrollIntoView(control, inputRevision)) ||
-					!(await click(control, inputRevision))
-				) {
-					continue
-				}
-				groups.add(group)
-				selected.push({ control, owner })
-				await waitUnlessInterrupted(450, inputRevision)
+				await dismissFilters(panel, inputRevision)
 				if (selected.length === 2) {
 					break
 				}
 			}
-			await dismissFilters(panel, inputRevision)
-			if (selected.length === 2) {
-				break
+		} finally {
+			if (!interrupted(inputRevision)) {
+				for (const { control, owner, checked } of selected.reverse()) {
+					await showFilters(panel, inputRevision, owner)
+					await setFilter(control, checked, inputRevision)
+					await dismissFilters(panel, inputRevision)
+				}
 			}
 		}
-		for (const { control, owner } of selected.reverse()) {
-			await showFilters('wallet', inputRevision, owner)
-			await scrollIntoView(control, inputRevision)
-			await click(control, inputRevision)
-			await dismissFilters(panel, inputRevision)
+		if (selected.length) {
+			demonstratedFilters = true
+			break
 		}
+	}
+	if (!demonstratedFilters) {
+		throw new Error('No interactive filter choices available')
 	}
 	await readingPause(inputRevision)
 	if (originalSort?.name) {
@@ -1097,22 +1164,26 @@ async function inspectWallet(inputRevision) {
 	const selector = 'main tr:not([data-disabled]) h3 a[href^="/"]'
 	let wallets = await visibleElements(selector, false)
 	if (!wallets.length) {
-		for (const kind of ['wallet', 'stage']) {
-			const panel = page.locator(`main .filters [data-filter-kind=${JSON.stringify(kind)}]`).first()
-			if (!(await panel.count())) {
-				continue
-			}
+		for (const panel of await filterPanels()) {
 			const triggers = await filterTriggers(panel)
 			for (const owner of triggers.length ? triggers : [null]) {
-				await showFilters(kind, inputRevision, owner)
-				const reset = panel.locator('button[data-reset]:visible').first()
-				if (
-					(await reset.isVisible()) &&
-					(await scrollIntoView(reset, inputRevision)) &&
-					(await click(reset, inputRevision))
-				) {
-					await readingPause(inputRevision)
+				await showFilters(panel, inputRevision, owner)
+				const reset = panel.locator('button[type="reset"]:visible').first()
+				if (await reset.count()) {
+					if (
+						!(await scrollIntoView(reset, inputRevision)) ||
+						!(await click(reset, inputRevision))
+					) {
+						throw new Error('Filter reset is not reachable')
+					}
+				} else {
+					for (const { control } of await filterChoices(panel)) {
+						if (await control.locator('input').isChecked()) {
+							await setFilter(control, false, inputRevision)
+						}
+					}
 				}
+				await readingPause(inputRevision)
 				await dismissFilters(panel, inputRevision)
 			}
 		}
