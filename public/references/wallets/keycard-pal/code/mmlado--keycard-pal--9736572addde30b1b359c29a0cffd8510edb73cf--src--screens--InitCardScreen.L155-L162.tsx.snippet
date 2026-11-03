@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 155,
+	"highlightLastLine": 162,
+	"segments": [
+		{
+			"lines": [
+				"export default function InitCardScreen({ navigation }: InitCardScreenProps) {"
+			],
+			"startLine": 26
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>",
+				"      {entering && activePinSetup && (",
+				"        <PinPad"
+			],
+			"startLine": 140
+		},
+		{
+			"lines": [
+				"          onType={activePinSetup.clearError}",
+				"        />",
+				"      )}",
+				"",
+				"      {entering && screenStep === 'duress_question' && (",
+				"        <ConfirmPrompt",
+				"          title=\"Add a duress PIN?\"",
+				"          description=\"A duress PIN unlocks the card but shows a decoy account. Use it if you are ever forced to access your wallet under pressure.\"",
+				"          yesLabel=\"Yes, add duress PIN\"",
+				"          noLabel=\"No, skip\"",
+				"          onYes={handleDuressYes}",
+				"          onNo={handleDuressNo}",
+				"        />",
+				"      )}",
+				"",
+				"      {showPuk && ("
+			],
+			"startLine": 151
+		}
+	]
+}

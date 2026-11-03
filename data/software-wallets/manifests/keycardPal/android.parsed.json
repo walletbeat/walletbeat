@@ -1,0 +1,1 @@
+{ "usesPermissions": ["android.permission.NFC", "android.permission.CAMERA"] }

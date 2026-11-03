@@ -1,0 +1,63 @@
+{
+	"highlightFirstLine": 85,
+	"highlightLastLine": 115,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <>"
+			],
+			"startLine": 50
+		},
+		{
+			"lines": [
+				"      )}",
+				"",
+				"      {tx?.to &&",
+				"        (!tx.decodedCall || tx.decodedCall.kind === 'contract-call') && (",
+				"          <View style={styles.row}>",
+				"            <AddressInfoRow label=\"To\" value={tx.to} />",
+				"          </View>",
+				"        )}",
+				"",
+				"      {request.chainId !== undefined && (",
+				"        <View style={styles.row}>",
+				"          <InfoRow label=\"Chain\" value={getChainName(request.chainId)} />",
+				"        </View>",
+				"      )}",
+				"",
+				"      {tx?.value !== undefined && (tx.value !== '0' || !tx.decodedCall) && (",
+				"        <View style={styles.row}>",
+				"          <InfoRow label=\"Amount\" value={tx.value} />",
+				"        </View>",
+				"      )}",
+				"",
+				"      {tx?.fees.kind === 'legacy' && (",
+				"        <View style={styles.row}>",
+				"          <InfoRow label=\"Gas price\" value={tx.fees.gasPrice} />",
+				"          <InfoRow label=\"Gas limit\" value={tx.fees.gasLimit} />",
+				"        </View>",
+				"      )}",
+				"",
+				"      {tx?.fees.kind === 'eip1559' && (",
+				"        <View style={styles.row}>",
+				"          <InfoRow label=\"Max fee\" value={tx.fees.maxFeePerGas} />",
+				"          <InfoRow label=\"Priority fee\" value={tx.fees.maxPriorityFeePerGas} />",
+				"          <InfoRow label=\"Gas limit\" value={tx.fees.gasLimit} />",
+				"        </View>",
+				"      )}",
+				"",
+				"      {eip712 ? (",
+				"        <Eip712JsonPanel",
+				"          request={request}"
+			],
+			"startLine": 81
+		}
+	]
+}

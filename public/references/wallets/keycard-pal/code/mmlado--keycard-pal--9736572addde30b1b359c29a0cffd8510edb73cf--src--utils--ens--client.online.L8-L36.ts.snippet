@@ -1,0 +1,48 @@
+{
+	"highlightFirstLine": 8,
+	"highlightLastLine": 36,
+	"segments": [
+		{
+			"lines": [
+				"export type ResolveEnsNameResult =",
+				"  | { name: string }",
+				"  | { name: null; reason: 'not-found' | 'mismatch' | 'rpc-error' };",
+				"",
+				"export async function resolveEnsName(",
+				"  address: string,",
+				"  rpcUrl: string,",
+				"): Promise<ResolveEnsNameResult> {",
+				"  try {",
+				"    const checksummedAddress = getAddress(address);",
+				"",
+				"    const client = createPublicClient({",
+				"      chain: mainnet,",
+				"      transport: http(rpcUrl),",
+				"    });",
+				"    const name = await client.getEnsName({ address: checksummedAddress });",
+				"    if (!name) {",
+				"      return { name: null, reason: 'not-found' };",
+				"    }",
+				"",
+				"    const resolvedAddress = await client.getEnsAddress({ name });",
+				"    if (",
+				"      !resolvedAddress ||",
+				"      getAddress(resolvedAddress) !== checksummedAddress",
+				"    ) {",
+				"      return { name: null, reason: 'mismatch' };",
+				"    }",
+				"",
+				"    return { name };",
+				"  } catch {",
+				"    return { name: null, reason: 'rpc-error' };",
+				"  }",
+				"}",
+				"",
+				"export async function validateRpcUrl(",
+				"  url: string,",
+				"): Promise<'ok' | 'non-mainnet' | 'timeout' | 'unreachable'> {"
+			],
+			"startLine": 4
+		}
+	]
+}

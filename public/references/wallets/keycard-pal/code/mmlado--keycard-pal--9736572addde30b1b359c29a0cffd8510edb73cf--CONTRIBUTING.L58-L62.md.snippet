@@ -1,0 +1,24 @@
+{
+	"highlightFirstLine": 58,
+	"highlightLastLine": 62,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"**Every network-touching feature is opt-in**, disabled until the user turns it on in Settings.",
+				"See [`docs/adr/0003-network-features-are-opt-in.md`](docs/adr/0003-network-features-are-opt-in.md).",
+				"",
+				"**Release APKs are byte-identical wherever they are built.** That is what lets the F-Droid",
+				"build be verified against ours. Anything that bakes a path, a hostname, a timestamp or a",
+				"machine address into the output breaks it. See",
+				"[ADR 0015](docs/adr/0015-reproducible-release-builds.md) and",
+				"`android/reproducible-builds.gradle`.",
+				"",
+				"**Dependencies are not free.** WalletConnect is pinned to its last Apache-2.0 releases and",
+				"must not be bumped; a test reads every installed `@reown/*` and `@walletconnect/*` package and",
+				"fails on any other licence. A new dependency also needs its licence entry in"
+			],
+			"startLine": 54
+		}
+	]
+}
