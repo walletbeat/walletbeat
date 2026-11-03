@@ -25,6 +25,13 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 							values: { id: string; angle: number; target: number; durations: string[] }[]
 						}[]
 					>(resolve => {
+						// PieMotion assigns security four of five weight units after the update.
+						// Half pies reserve one 5-degree gap; full pies also reserve the end gap.
+						const targets = new Map([
+							['TopHalf', ((180 - 5) * 4) / 5],
+							['FullLeft', ((360 - 5 - 5) * 4) / 5],
+							['FullTop', (-(360 - 5 - 5) * 4) / 5],
+						])
 						const elements = [
 							...document.querySelectorAll<HTMLElement>(
 								'[data-pie-case] [data-slice-id="security"]',
@@ -57,12 +64,18 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 												throw new Error('Missing pie surface')
 											}
 
+											const target = targets.get(pie.getAttribute('data-layout') ?? '')
+
+											if (target === undefined) {
+												throw new Error('Unexpected PieMotion layout')
+											}
+
 											return {
 												id: container.getAttribute('data-pie-case') ?? '',
 												angle: Number(
 													getComputedStyle(slice).getPropertyValue('--slice-totalAngle'),
 												),
-												target: Number(slice.style.getPropertyValue('--slice-totalAngle')),
+												target,
 												durations: [pie, slice, shape, label].map(
 													element => getComputedStyle(element).transitionDuration,
 												),

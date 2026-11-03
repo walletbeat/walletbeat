@@ -115,6 +115,62 @@
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
+	const geometryProperties = [
+		'midAngle', 'offset', 'gap', 'outerR', 'innerR', 'outerCornerRadius',
+		'innerCornerRadius', 'totalAngle', 'labelR', 'labelSize',
+	] as const
+	type GeometryProperty = (typeof geometryProperties)[number]
+
+	const geometryDefaults = $derived.by(() => {
+		const rendered: ComputedSlice[] = []
+		const visit = (entries: ComputedSlice[]) => {
+			for (const slice of entries) {
+				rendered.push(slice)
+
+				if (slice.children?.length) visit(slice.children)
+			}
+		}
+
+		visit(computedSlices)
+
+		const defaults: Partial<Record<GeometryProperty, number>> = {}
+
+		for (const property of geometryProperties) {
+			if (property === 'labelSize' && rendered.some(slice => slice.computed.labelSize === labelSize)) continue
+
+			if (rendered.some(slice => !Number.isFinite(slice.computed[property]))) continue
+
+			const counts = new Map<string, { value: number; count: number }>()
+
+			for (const slice of rendered) {
+				const value = slice.computed[property]
+				const serialized = String(value)
+				const entry = counts.get(serialized)
+
+				if (entry) entry.count += 1
+				else counts.set(serialized, { value, count: 1 })
+			}
+
+			let largestCount = 0
+
+			for (const { value, count } of counts.values()) {
+				if (count > largestCount) {
+					largestCount = count
+					defaults[property] = value
+				}
+			}
+		}
+
+		return defaults
+	})
+
+	const geometryOverride = (slice: ComputedSlice, property: GeometryProperty) => {
+		const value = slice.computed[property]
+		const base = geometryDefaults[property]
+
+		return base !== undefined && String(value) === String(base) ? undefined : value
+	}
+
 	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
 	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
 	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
@@ -162,19 +218,19 @@
 				onSliceClick?.(slice.id)
 			},
 		}}
-		style:--slice-midAngle={slice.computed.midAngle}
-		style:--slice-offset={slice.computed.offset}
-		style:--slice-gap={slice.computed.gap}
-		style:--slice-outerR={slice.computed.outerR}
-		style:--slice-innerR={slice.computed.innerR}
-		style:--slice-outerCornerRadius={slice.computed.outerCornerRadius}
-		style:--slice-innerCornerRadius={slice.computed.innerCornerRadius}
-		style:--slice-totalAngle={slice.computed.totalAngle}
+		style:--slice-midAngle={geometryOverride(slice, 'midAngle')}
+		style:--slice-offset={geometryOverride(slice, 'offset')}
+		style:--slice-gap={geometryOverride(slice, 'gap')}
+		style:--slice-outerR={geometryOverride(slice, 'outerR')}
+		style:--slice-innerR={geometryOverride(slice, 'innerR')}
+		style:--slice-outerCornerRadius={geometryOverride(slice, 'outerCornerRadius')}
+		style:--slice-innerCornerRadius={geometryOverride(slice, 'innerCornerRadius')}
+		style:--slice-totalAngle={geometryOverride(slice, 'totalAngle')}
 		style:--slice-opacity={slice.opacity === 1 ? undefined : slice.opacity}
 		style:--slice-fill={fill}
 		style:--slice-labelBackground={labelBackground === fill ? undefined : labelBackground}
-		style:--slice-labelSize={slice.computed.labelSize === labelSize ? undefined : slice.computed.labelSize}
-		style:--slice-labelR={slice.computed.labelR}
+		style:--slice-labelSize={slice.computed.labelSize === labelSize ? undefined : geometryOverride(slice, 'labelSize')}
+		style:--slice-labelR={geometryOverride(slice, 'labelR')}
 		data-slice-id={slice.id}
 		data-view-transition={transitionsSlices ? 'named' : undefined}
 		style:--view-transition-name={transitionsSlices ?
@@ -206,6 +262,16 @@
 	style:--pie-padding={padding}
 	style:--pie-labelSize={labelSize}
 	style:--pie-maxR={pieMetrics.maxRadius}
+	style:---pg0={geometryDefaults.midAngle}
+	style:---pg1={geometryDefaults.offset}
+	style:---pg2={geometryDefaults.gap}
+	style:---pg3={geometryDefaults.outerR}
+	style:---pg4={geometryDefaults.innerR}
+	style:---pg5={geometryDefaults.outerCornerRadius}
+	style:---pg6={geometryDefaults.innerCornerRadius}
+	style:---pg7={geometryDefaults.totalAngle}
+	style:---pg8={geometryDefaults.labelR}
+	style:---pg9={geometryDefaults.labelSize}
 >
 	<div
 		class="pie"
@@ -306,6 +372,17 @@
 	}
 
 	.pie-container {
+		---pg0: initial;
+		---pg1: initial;
+		---pg2: initial;
+		---pg3: initial;
+		---pg4: initial;
+		---pg5: initial;
+		---pg6: initial;
+		---pg7: initial;
+		---pg8: initial;
+		---pg9: initial;
+
 		overflow: clip;
 		&:has(:global([data-layout-transition])) {
 			overflow: visible;
@@ -341,8 +418,16 @@
 				--slice-opacity: 1;
 				--slice-labelBackground: var(--slice-fill);
 				--slice-scale: 1;
-				--slice-offset: 0;
-				--slice-labelSize: var(--pie-labelSize);
+				--slice-midAngle: var(---pg0, inherit);
+				--slice-offset: var(---pg1, 0);
+				--slice-gap: var(---pg2, inherit);
+				--slice-outerR: var(---pg3, inherit);
+				--slice-innerR: var(---pg4, inherit);
+				--slice-outerCornerRadius: var(---pg5, inherit);
+				--slice-innerCornerRadius: var(---pg6, inherit);
+				--slice-totalAngle: var(---pg7, inherit);
+				--slice-labelR: var(---pg8, inherit);
+				--slice-labelSize: var(---pg9, var(--pie-labelSize));
 
 				display: grid;
 				transition-property:
