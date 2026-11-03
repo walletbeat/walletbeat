@@ -15,31 +15,40 @@ const inputProperties = [
 ] as const
 
 const cancelInputTransitions = (items: Iterable<HTMLElement>, layoutAnimations?: Animation[]) => {
+	const owners = new Set(items)
+
+	if (owners.size === 0) {
+		return
+	}
+
 	const transitions: Animation[] = []
 
-	for (const item of items) {
-		for (const animation of item.getAnimations()) {
-			if (
-				layoutAnimations &&
-				animation instanceof CSSAnimation &&
-				animation.animationName === 'layout-transition' &&
-				animation.effect instanceof KeyframeEffect &&
-				animation.effect.target === item &&
-				animation.effect.pseudoElement === null
-			) {
-				layoutAnimations.push(animation)
-			}
+	for (const animation of document.getAnimations()) {
+		const effect = animation.effect
 
-			if (
-				animation instanceof CSSTransition &&
-				(animation.transitionProperty === 'translate' ||
-					inputProperties.some(property => property === animation.transitionProperty)) &&
-				animation.effect instanceof KeyframeEffect &&
-				animation.effect.target === item &&
-				animation.effect.pseudoElement === null
-			) {
-				transitions.push(animation)
-			}
+		if (
+			!(effect instanceof KeyframeEffect) ||
+			!(effect.target instanceof HTMLElement) ||
+			!owners.has(effect.target) ||
+			effect.pseudoElement !== null
+		) {
+			continue
+		}
+
+		if (
+			layoutAnimations &&
+			animation instanceof CSSAnimation &&
+			animation.animationName === 'layout-transition'
+		) {
+			layoutAnimations.push(animation)
+		}
+
+		if (
+			animation instanceof CSSTransition &&
+			(animation.transitionProperty === 'translate' ||
+				inputProperties.some(property => property === animation.transitionProperty))
+		) {
+			transitions.push(animation)
 		}
 	}
 

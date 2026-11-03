@@ -50,9 +50,9 @@ class TestItemEffect {
 	pseudoElement: string | null = null
 }
 
+const documentMotions = new Set<TestItemMotion>()
+
 class TestItemMotion {
-	transitionProperty = ''
-	animationName = 'layout-transition'
 	playState: AnimationPlayState = 'paused'
 	startTime: Animation['startTime'] = null
 	effect = new TestItemEffect()
@@ -60,24 +60,46 @@ class TestItemMotion {
 	finished = new Promise<void>(resolve => {
 		this.finish = resolve
 	})
-	cancel = vi.fn(() => this.finish())
+	constructor() {
+		documentMotions.add(this)
+	}
+	cancel = vi.fn(() => {
+		this.playState = 'idle'
+		this.finish()
+	})
+}
+
+class TestCSSAnimation extends TestItemMotion {
+	animationName = 'layout-transition'
+}
+
+class TestCSSTransition extends TestItemMotion {
+	transitionProperty = ''
 }
 
 class TestLayoutItem extends TestScope {
 	x = 0
 	y = 0
 	name: string | undefined
-	motion = new TestItemMotion()
-	extraMotions: TestItemMotion[] = []
+	#motion = new TestCSSAnimation()
+	get motion() {
+		return this.#motion
+	}
+	set motion(motion: TestCSSAnimation) {
+		motion.effect.target = this
+		this.#motion = motion
+	}
 	style = { setProperty: vi.fn(), removeProperty: vi.fn() }
 	matches = () => this.name !== undefined
 	setAttribute = (name: string) => this.attributes.add(name)
 	getBoundingClientRect = () => ({ x: this.x, y: this.y })
-	getAnimations = () => {
+	constructor() {
+		super()
 		this.motion.effect.target = this
-
-		return [this.motion, ...this.extraMotions]
 	}
+	getAnimations = vi.fn(() => {
+		throw new Error('Unexpected per-item animation query')
+	})
 }
 
 const layoutStyle = (item: TestScope) => ({
@@ -109,11 +131,13 @@ function htmlElement(node: TestScope) {
 const installEnvironment = ({ reducedMotion = false } = {}) => {
 	const documentTransition = transition()
 
+	documentMotions.clear()
 	vi.stubGlobal('CSS', { supports: () => true })
 	vi.stubGlobal('matchMedia', () => ({ matches: reducedMotion }))
 	vi.stubGlobal('HTMLElement', TestScope)
 	vi.stubGlobal('KeyframeEffect', TestItemEffect)
-	vi.stubGlobal('CSSAnimation', TestItemMotion)
+	vi.stubGlobal('CSSAnimation', TestCSSAnimation)
+	vi.stubGlobal('CSSTransition', TestCSSTransition)
 	vi.stubGlobal('getComputedStyle', layoutStyle)
 	vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
 		queueMicrotask(() => callback(0))
@@ -123,6 +147,7 @@ const installEnvironment = ({ reducedMotion = false } = {}) => {
 	vi.stubGlobal('cancelAnimationFrame', vi.fn())
 	vi.stubGlobal('document', {
 		timeline: { currentTime: 0 },
+		getAnimations: vi.fn(() => [...documentMotions].filter(motion => motion.playState !== 'idle')),
 		startViewTransition: vi.fn((update: () => void) => {
 			update()
 
@@ -140,9 +165,7 @@ afterEach(() => {
 describe('live layout cleanup', () => {
 	it('releases every item before reading transitions and reads every transition before cancellation', async () => {
 		installEnvironment()
-		class InputTransition extends TestItemMotion {
-			animationName = ''
-		}
+		class InputTransition extends TestCSSTransition {}
 
 		vi.stubGlobal('CSSTransition', InputTransition)
 		const scope = new TestScope()
@@ -164,7 +187,6 @@ describe('live layout cleanup', () => {
 
 				input.finish()
 			})
-			item.extraMotions.push(input)
 			item.removeAttribute.mockImplementation(name => {
 				if (cleaning && name === 'data-layout-transition') {
 					events.push(`write ${index}`)
@@ -172,16 +194,21 @@ describe('live layout cleanup', () => {
 
 				return item.attributes.delete(name)
 			})
-			const getAnimations = item.getAnimations.bind(item)
-
-			item.getAnimations = () => {
-				if (cleaning) {
-					events.push(`read ${index}`)
-				}
-
-				return getAnimations()
-			}
 		}
+		const animationQuery = vi.spyOn(document, 'getAnimations')
+		const readAnimations = animationQuery.getMockImplementation()
+
+		if (!readAnimations) {
+			throw new Error('Missing document animation registry')
+		}
+
+		animationQuery.mockImplementation(() => {
+			if (cleaning) {
+				events.push('read document')
+			}
+
+			return readAnimations()
+		})
 		const controller = prepareItemReorder(
 			htmlElement(scope),
 			() => {
@@ -198,9 +225,7 @@ describe('live layout cleanup', () => {
 			'write 0',
 			'write 1',
 			'write 2',
-			'read 0',
-			'read 1',
-			'read 2',
+			'read document',
 			'cancel 0',
 			'cancel 1',
 			'cancel 2',
@@ -210,7 +235,6 @@ describe('live layout cleanup', () => {
 
 	it('preserves a nested scope owner when the outer generation is cancelled', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const outer = new TestScope(),
 			inner = new TestScope()
 		const shared = new TestLayoutItem(),
@@ -246,7 +270,6 @@ describe('live layout cleanup', () => {
 describe('startScopedViewTransition', () => {
 	it('composes nested replacement peers with one CSS-configured native clock', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const root = new TestScope()
 		const parent = new TestLayoutItem()
 
@@ -265,12 +288,11 @@ describe('startScopedViewTransition', () => {
 		leaf.y = 35
 		leaf.parentElement = child
 		const oldChild = child
-		const unrelated = new TestItemMotion()
+		const unrelated = new TestCSSTransition()
 
 		unrelated.transitionProperty = 'translate'
 		unrelated.effect.target = parent
 		unrelated.effect.pseudoElement = '::before'
-		parent.extraMotions.push(unrelated)
 		Object.assign(root, { querySelectorAll: () => [parent, child, leaf] })
 
 		startScopedViewTransition(
@@ -314,11 +336,53 @@ describe('startScopedViewTransition', () => {
 
 	it('starts the prepared native clocks without a second animation query or marker phase', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const root = new TestScope()
 		const item = new TestLayoutItem()
-		const read = vi.spyOn(item, 'getAnimations')
+		const read = vi.spyOn(document, 'getAnimations')
 		const mark = vi.spyOn(item, 'setAttribute')
+		const foreign = new TestLayoutItem()
+		const foreignTransition = new TestCSSTransition()
+
+		foreignTransition.transitionProperty = 'translate'
+		foreignTransition.effect.target = foreign
+		const pseudoAnimation = new TestCSSAnimation()
+
+		pseudoAnimation.effect.target = item
+		pseudoAnimation.effect.pseudoElement = '::before'
+		const pseudoTransition = new TestCSSTransition()
+
+		pseudoTransition.transitionProperty = 'translate'
+		pseudoTransition.effect.target = item
+		pseudoTransition.effect.pseudoElement = '::after'
+		const unrelatedTransition = new TestCSSTransition()
+
+		unrelatedTransition.transitionProperty = 'opacity'
+		unrelatedTransition.effect.target = item
+		const unrelatedAnimation = new TestCSSAnimation()
+
+		unrelatedAnimation.animationName = 'other-animation'
+		unrelatedAnimation.effect.target = item
+		const nonKeyframeAnimation = new TestCSSAnimation()
+
+		Object.assign(nonKeyframeAnimation, { effect: { target: item, pseudoElement: null } })
+		const nonKeyframeTransition = new TestCSSTransition()
+
+		nonKeyframeTransition.transitionProperty = 'translate'
+		Object.assign(nonKeyframeTransition, { effect: { target: item, pseudoElement: null } })
+		const inputTransition = new TestCSSTransition()
+
+		inputTransition.transitionProperty = '--layoutTransition-beforeX'
+		inputTransition.effect.target = item
+		const excluded = [
+			foreign.motion,
+			foreignTransition,
+			pseudoAnimation,
+			pseudoTransition,
+			unrelatedTransition,
+			unrelatedAnimation,
+			nonKeyframeAnimation,
+			nonKeyframeTransition,
+		]
 
 		Object.assign(root, { querySelectorAll: () => [item] })
 		startScopedViewTransition(
@@ -334,14 +398,24 @@ describe('startScopedViewTransition', () => {
 		await Promise.resolve()
 		expect(item.motion.startTime).toBe(0)
 		expect(read).toHaveBeenCalledOnce()
+		expect(inputTransition.cancel).toHaveBeenCalledOnce()
+		expect(item.getAnimations).not.toHaveBeenCalled()
+
+		for (const animation of excluded) {
+			expect(animation.startTime).toBeNull()
+			expect(animation.cancel).not.toHaveBeenCalled()
+		}
 		expect(mark).toHaveBeenCalledExactlyOnceWith('data-layout-transition', '')
 		item.motion.finish()
 		await vi.waitFor(() => expect(item.attributes).not.toContain('data-layout-transition'))
+
+		for (const animation of excluded) {
+			expect(animation.cancel).not.toHaveBeenCalled()
+		}
 	})
 
 	it('does not restart or await a prepared clock cancelled before activation', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		let activate!: FrameRequestCallback
 
 		vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
@@ -369,7 +443,6 @@ describe('startScopedViewTransition', () => {
 
 	it('excludes ambiguous named peers and non-HTML nodes without losing retained items', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const root = new TestScope()
 		const retained = new TestLayoutItem()
 		const first = new TestLayoutItem()
@@ -404,7 +477,6 @@ describe('startScopedViewTransition', () => {
 
 	it('cancels pending frame activation without losing either update', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		let activate!: FrameRequestCallback
 		const cancelFrame = vi.fn()
 
@@ -438,7 +510,6 @@ describe('startScopedViewTransition', () => {
 
 	it('preserves live item motion during a direct update', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const root = new TestScope()
 		const item = new TestLayoutItem()
 		const reorder = vi.fn(() => {
@@ -459,7 +530,6 @@ describe('startScopedViewTransition', () => {
 
 	it('keeps a replacement live generation when an old completion arrives', async () => {
 		installEnvironment()
-		vi.stubGlobal('CSSTransition', TestItemMotion)
 		const root = new TestScope()
 		const item = new TestLayoutItem()
 		const oldMotion = item.motion
@@ -476,7 +546,7 @@ describe('startScopedViewTransition', () => {
 			htmlElement(root),
 			() => {
 				item.y = 200
-				item.motion = new TestItemMotion()
+				item.motion = new TestCSSAnimation()
 			},
 			'live',
 		)
