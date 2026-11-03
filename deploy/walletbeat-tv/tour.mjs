@@ -589,9 +589,7 @@ async function click(locator, inputRevision) {
 	if (!active) {
 		throw new Error('interrupted')
 	}
-	await page.mouse.click(Math.round(target.x), Math.round(target.y), {
-		delay: randomBetween(65, 120),
-	})
+	await page.mouse.click(Math.round(target.x), Math.round(target.y))
 	await waitUnlessInterrupted(0, inputRevision)
 	await waitUnlessInterrupted(randomBetween(120, 180), inputRevision)
 	return true
