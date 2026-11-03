@@ -97,6 +97,14 @@ for (const family of families) {
 								}
 
 								const measured = getComputedStyle(parent)
+								const parentRow = parent.querySelector(
+									':scope > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"], :scope > details > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"]',
+								)?.parentElement
+
+								if (!parentRow) {
+									throw new Error('The ancestor row owner is missing')
+								}
+
 								const scopes = Array.from(document.querySelectorAll(family.scopes)).filter(scope =>
 									scope.checkVisibility(),
 								)
@@ -188,6 +196,7 @@ for (const family of families) {
 									}
 
 									const rowStyle = getComputedStyle(rowOwner)
+									const rowFill = scope.matches('[data-sticky-breadcrumb~="row-fill"]')
 
 									for (const axis of ['width', 'height'] as const) {
 										const edges =
@@ -217,7 +226,9 @@ for (const family of families) {
 												? '---breadcrumb-sourceRowWidth'
 												: '---breadcrumb-sourceRowHeight'
 										const measured = Number.parseFloat(
-											getComputedStyle(scope).getPropertyValue(property),
+											getComputedStyle(axis === 'width' ? rowOwner : scope).getPropertyValue(
+												property,
+											),
 										)
 
 										if (
@@ -235,8 +246,13 @@ for (const family of families) {
 										['column-inline-size', 'column-block-size'].includes(clock.animationName),
 									)
 
-									if (rowClocks.length !== 2) {
-										throw new Error(`Missing two own row clocks: ${scope.id}`)
+									if (
+										rowClocks.length !== (rowFill ? 1 : 2) ||
+										(rowFill &&
+											rowClocks.some(clock => clock.animationName === 'column-inline-size')) ||
+										(rowFill && getComputedStyle(rowHelper, '::before').viewTimelineName !== 'none')
+									) {
+										throw new Error(`Wrong own row measurement membership: ${scope.id}`)
 									}
 
 									for (const clock of rowClocks) {
@@ -312,7 +328,7 @@ for (const family of families) {
 											}
 										}
 									}
-									const expected = 2 + (closed ? 0 : 2) + (hasEnd ? 2 : 0)
+									const expected = (rowFill ? 1 : 2) + (closed ? 0 : 2) + (hasEnd ? 2 : 0)
 
 									if (clocks.length !== expected) {
 										throw new Error(`Wrong clock membership: ${scope.id}`)
@@ -358,7 +374,14 @@ for (const family of families) {
 									'---breadcrumb-itemHeight',
 									'---breadcrumb-sourceRowWidth',
 									'---breadcrumb-sourceRowHeight',
-								].map(property => Number.parseFloat(measured.getPropertyValue(property)))
+								].map(property =>
+									Number.parseFloat(
+										(property === '---breadcrumb-sourceRowWidth'
+											? getComputedStyle(parentRow)
+											: measured
+										).getPropertyValue(property),
+									),
+								)
 							}, family),
 						)
 					}
@@ -607,6 +630,7 @@ test('generic column clocks measure their own row through resize and native disc
 
 							const style = getComputedStyle(row),
 								published = getComputedStyle(scope)
+							const rowFill = scope.matches('[data-sticky-breadcrumb~="row-fill"]')
 							const dimensions = []
 
 							for (const axis of ['width', 'height'] as const) {
@@ -623,7 +647,7 @@ test('generic column clocks measure their own row through resize and native disc
 												0,
 											))
 								const measured = Number.parseFloat(
-									published.getPropertyValue(
+									(axis === 'width' ? style : published).getPropertyValue(
 										axis === 'width'
 											? '---breadcrumb-sourceRowWidth'
 											: '---breadcrumb-sourceRowHeight',
@@ -640,8 +664,17 @@ test('generic column clocks measure their own row through resize and native disc
 										['column-inline-size', 'column-block-size'].includes(animation.animationName),
 								)
 
-							if (clocks.length !== 2) {
-								throw new Error(`Legacy row lost its two clocks: ${scope.id}`)
+							const inlineProbe = scope.querySelector(
+								':scope > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]',
+							)
+
+							if (
+								clocks.length !== (rowFill ? 1 : 2) ||
+								(rowFill && clocks.some(clock => clock.animationName === 'column-inline-size')) ||
+								(rowFill &&
+									(!inlineProbe || getComputedStyle(inlineProbe).viewTimelineName !== 'none'))
+							) {
+								throw new Error(`Wrong legacy row measurement membership: ${scope.id}`)
 							}
 
 							for (const clock of clocks) {

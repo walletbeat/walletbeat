@@ -796,6 +796,7 @@ declare global {
 		 * ### Tokens
 		 * - `scope`: natural section and animation-start fragment target containing a position and its following content
 		 * - `clearance`: combines with `scope` to measure and route an end cluster around a circular obstacle; arrival currently requires zero inline displacement
+		 * - `row-fill`: on a non-root `scope`, declares that its first row fills the scope content inline size after source padding, sharing the scope inline axis. Width derives from that container; height retains its native clock. Omit for intrinsic, independently sized or differently oriented rows.
 		 * - `root`: starts a breadcrumb hierarchy
 		 * - `position`: native heading/focus container coordinating its sticky foreground and natural measurements
 		 * - `source`: untransformed intrinsic reservation for the item

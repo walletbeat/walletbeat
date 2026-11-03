@@ -1078,7 +1078,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 			<section
 				id="stages"
-				data-sticky-breadcrumb="scope size"
+				data-sticky-breadcrumb="scope row-fill size"
 				data-sticky-container
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
@@ -1205,7 +1205,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		aria-label={`${attrGroup.displayName} attributes`}
 		data-score={scoreLevel}
 		style:--accent={scoreColor}
-		data-sticky-breadcrumb="scope clearance size"
+		data-sticky-breadcrumb="scope row-fill clearance size"
 		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 		style:--stickyBreadcrumb-approachTimeline={`--${groupTargetId(attrGroup)}-approach`}
@@ -1285,7 +1285,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	<section
 		class="attribute"
 		data-card="radius-8 padding-6 border-accent"
-		data-sticky-breadcrumb="scope clearance size"
+		data-sticky-breadcrumb="scope row-fill clearance size"
 		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
 		style:--stickyBreadcrumb-approachTimeline={`--${slugifyCamelCase(attribute.id)}-approach`}

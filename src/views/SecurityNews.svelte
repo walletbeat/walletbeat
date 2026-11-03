@@ -30,7 +30,7 @@
 	style:--accent="#e564bc"
 	data-scroll-item="inline-detached padding-match-end flow"
 	data-sticky-container
-	data-sticky-breadcrumb="scope clearance size"
+	data-sticky-breadcrumb="scope row-fill clearance size"
 	style:--stickyBreadcrumb-entryTimeline="--security-news-entry"
 >
 	{#snippet description()}<p>{allNewsResolved ? 'Past security incidents (all resolved)' : 'Recent security updates and incidents'}</p>{/snippet}
@@ -45,7 +45,7 @@
 				{@const newsRefs = extractRefs(newsItem)}
 				<article data-card="padding-5 secondary radius-4" data-column="gap-0"
 					id={`security-news-${newsItem.slug}`}
-					data-sticky-container data-sticky-breadcrumb="scope clearance"
+					data-sticky-container data-sticky-breadcrumb="scope row-fill clearance"
 					style:--stickyBreadcrumb-entryTimeline={`--security-news-${newsItem.slug}-entry`}>
 					<details data-column="gap-0">
 					<summary data-row="gap-2" data-sticky-breadcrumb="position" data-sticky="block block-start backdrop-before backdrop-stuck">

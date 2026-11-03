@@ -1635,6 +1635,7 @@ ol {
  * ### Tokens
  * - `scope`: natural section and animation-start fragment target containing a position and its following content
  * - `clearance`: combines with `scope` to measure and route an end cluster around a circular obstacle; arrival currently requires zero inline displacement
+ * - `row-fill`: on a non-root `scope`, declares that its first row fills the scope content inline size after source padding, sharing the scope inline axis. Width derives from that container; height retains its native clock. Omit for intrinsic, independently sized or differently oriented rows.
  * - `root`: starts a breadcrumb hierarchy
  * - `position`: native heading/focus container coordinating its sticky foreground and natural measurements
  * - `source`: untransformed intrinsic reservation for the item
@@ -2676,11 +2677,53 @@ ol {
 			inline-size: anchor-size(--column-firstRow inline, 0px);
 			view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 		}
+		[data-sticky-breadcrumb~="scope"]:where(
+			[data-sticky-breadcrumb~="row-fill"],
+			:not(
+				details:not([open]), details:not([open]) *,
+				[data-sticky-breadcrumb~="scope"]:has(> details:not([open])),
+				[data-sticky-breadcrumb~="scope"]:has(> details:not([open])) *
+			)
+		) {
+			container-type: inline-size;
+		}
+		:is(
+			[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="row-fill"][data-card] > :where(details:not([open])) > :where(summary),
+			[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="row-fill"][data-card]:where(details:not([open])) > :where(summary)
+		) {
+			--stickyBreadcrumb-sourcePaddingBlock: var(--card-padding);
+			--stickyBreadcrumb-sourcePaddingInline: var(--card-padding);
+		}
 		[data-sticky-breadcrumb~="scope"] {
 			---breadcrumb-hasEnd: 0;
-			---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
 			---breadcrumb-rowBlockTimeline: --breadcrumb-row-block;
-			---breadcrumb-sourceRowWidth: round(up, calc(100vw * (1 / var(---column-inlineFraction, 1) - 1)), 0.0625px);
+			---breadcrumb-rowMetricDirection: normal;
+			---breadcrumb-rowMetricNames: column-inline-size, column-block-size;
+			---breadcrumb-rowMetricTimelines: var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			---breadcrumb-rowMetricRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%;
+			---breadcrumb-rowMetricDirections: var(---breadcrumb-rowMetricDirection), var(---breadcrumb-rowMetricDirection);
+			&[data-sticky-breadcrumb~="size"] {
+				---breadcrumb-rowMetricDirection: reverse;
+			}
+			&:not([data-sticky-breadcrumb~="row-fill"]) {
+				---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
+				---breadcrumb-sourceRowWidth: round(up, calc(100vw * (1 / var(---column-inlineFraction, 1) - 1)), 0.0625px);
+			}
+			&[data-sticky-breadcrumb~="row-fill"] {
+				---breadcrumb-rowMetricNames: column-block-size;
+				---breadcrumb-rowMetricTimelines: var(---breadcrumb-rowBlockTimeline);
+				---breadcrumb-rowMetricRanges: exit-crossing 0% exit-crossing 100%;
+				---breadcrumb-rowMetricDirections: var(---breadcrumb-rowMetricDirection);
+				> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
+					inline-size: 0px;
+					view-timeline-name: none;
+				}
+				&:not(:has(> details:not([open])), details:not([open])) > *,
+				> details:not([open]) > summary,
+				&:is(details:not([open])) > summary {
+					---breadcrumb-sourceRowWidth: round(up, calc(100cqi - 2 * var(--stickyBreadcrumb-sourcePaddingInline)), 0.0625px);
+				}
+			}
 			---breadcrumb-sourceRowHeight: round(nearest, calc(100vw * (1 / var(---column-blockFraction, 1) - 1)), 0.0625px);
 			&:has(
 				> [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="end"],
@@ -2694,13 +2737,15 @@ ol {
 			---breadcrumb-endAnimationNames:
 				if(style(---breadcrumb-hasEnd: 0): none; else: breadcrumb-end-inline),
 				if(style(---breadcrumb-hasEnd: 0): none; else: breadcrumb-end-block);
-			---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size;
-			---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
-			---breadcrumb-sizeDirections: normal, normal, normal, normal;
+			---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), var(---breadcrumb-rowMetricNames);
+			---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowMetricTimelines);
+			---breadcrumb-sizeDirections: normal, normal, var(---breadcrumb-rowMetricDirections);
 			timeline-scope: var(---breadcrumb-sizeTimelines);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				timeline-scope: none;
-				---breadcrumb-rowInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-inline");
+				&:not([data-sticky-breadcrumb~="row-fill"]) {
+					---breadcrumb-rowInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-inline");
+				}
 				---breadcrumb-rowBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-block");
 				--stickyBreadcrumb-endInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-inline");
 				--stickyBreadcrumb-endBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-block");
@@ -2716,10 +2761,10 @@ ol {
 				---breadcrumb-endFlowTimeline: --breadcrumb-end-flow;
 				---breadcrumb-endFlowSupported: --breadcrumb-clearance-supported();
 				---breadcrumb-sizeAnimationNames:
-					var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
+					var(---breadcrumb-endAnimationNames), var(---breadcrumb-rowMetricNames),
 					if(style(---breadcrumb-hasEnd: 1) and style(---breadcrumb-endFlowSupported: 1) and style(--collapsible-markerMotion: clearance): clearance-inline-measure; else: none);
-				---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-endPositionTimeline);
-				---breadcrumb-sizeDirections: normal, normal, normal, normal, normal;
+				---breadcrumb-sizeTimelines: var(---breadcrumb-endTimelines), var(---breadcrumb-rowMetricTimelines), var(---breadcrumb-endPositionTimeline);
+				---breadcrumb-sizeDirections: normal, normal, var(---breadcrumb-rowMetricDirections), normal;
 				timeline-scope: var(---breadcrumb-sizeTimelines), var(---breadcrumb-endFlowTimeline);
 				@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 					timeline-scope: none;
@@ -2731,11 +2776,11 @@ ol {
 						(0.5 + var(---inlineDirection) * (0.5 - var(---clearance-inlineFraction)))
 				);
 				&[data-sticky-breadcrumb~="size"] {
-					---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
+					---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), var(---breadcrumb-rowMetricNames),
 						if(style(---breadcrumb-hasEnd: 1) and style(---breadcrumb-endFlowSupported: 1) and style(--collapsible-markerMotion: clearance): clearance-inline-measure; else: none);
-					---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, cover 0% cover 100%;
-					---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-endPositionTimeline);
-					---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse, normal;
+					---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), var(---breadcrumb-rowMetricRanges), cover 0% cover 100%;
+					---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowMetricTimelines), var(---breadcrumb-endPositionTimeline);
+					---breadcrumb-sizeDirections: reverse, reverse, var(---breadcrumb-rowMetricDirections), normal;
 				}
 			}
 			--stickyBreadcrumb-minBlockSize: 0px;
@@ -2809,11 +2854,11 @@ ol {
 			}
 			&[data-sticky-breadcrumb~="size"] {
 				---breadcrumb-endSizeRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%;
-				---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size;
-				---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%;
-				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+				---breadcrumb-sizeAnimationNames: var(---breadcrumb-endAnimationNames), var(---breadcrumb-rowMetricNames);
+				---breadcrumb-sizeRanges: var(---breadcrumb-endSizeRanges), var(---breadcrumb-rowMetricRanges);
+				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline), var(---breadcrumb-rowMetricTimelines);
 				animation-range: var(---breadcrumb-sizeRanges);
-				---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse;
+				---breadcrumb-sizeDirections: reverse, reverse, var(---breadcrumb-rowMetricDirections);
 			}
 
 		}
@@ -2876,8 +2921,7 @@ ol {
 			---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
 			---breadcrumb-sizeTimelines:
 				var(---breadcrumb-itemTimelines), var(---breadcrumb-endTimelines),
-				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-clearance-sizeTimeline);
-			container-type: inline-size;
+				var(---breadcrumb-rowMetricTimelines), var(---breadcrumb-clearance-sizeTimeline);
 			timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				--stickyBreadcrumb-itemInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-inline");
@@ -2885,13 +2929,13 @@ ol {
 				---breadcrumb-exitTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-exit");
 				timeline-scope: none;
 			}
-			---breadcrumb-sizeDirections: normal, normal, normal, normal, normal, normal, normal;
+			---breadcrumb-sizeDirections: normal, normal, normal, normal, var(---breadcrumb-rowMetricDirections), normal;
 			view-timeline: var(---breadcrumb-exitTimeline) block;
 			view-timeline-inset: 0;
 			---breadcrumb-sizeAnimationNames:
 				breadcrumb-item-inline, breadcrumb-item-block,
 				var(---breadcrumb-endAnimationNames),
-				column-inline-size, column-block-size,
+				var(---breadcrumb-rowMetricNames),
 				if(
 					style(--stickyBreadcrumb-clearance: circle) and
 						style(---breadcrumb-clearance-supported: 1): breadcrumb-clearance-measure; else: none
@@ -3531,11 +3575,11 @@ ol {
 			}
 			&[data-sticky-breadcrumb~="size"] {
 				---breadcrumb-sizeTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
-					var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), var(---breadcrumb-clearance-sizeTimeline);
-				---breadcrumb-sizeAnimationNames: breadcrumb-item-inline, breadcrumb-item-block, var(---breadcrumb-endAnimationNames), column-inline-size, column-block-size,
+					var(---breadcrumb-rowMetricTimelines), var(---breadcrumb-clearance-sizeTimeline);
+				---breadcrumb-sizeAnimationNames: breadcrumb-item-inline, breadcrumb-item-block, var(---breadcrumb-endAnimationNames), var(---breadcrumb-rowMetricNames),
 					if(style(--stickyBreadcrumb-clearance: circle) and style(---breadcrumb-clearance-supported: 1): breadcrumb-clearance-measure; else: none);
-				---breadcrumb-sizeRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, var(---breadcrumb-endSizeRanges), exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, cover 0% cover 100%;
-				---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse, reverse, reverse, normal;
+				---breadcrumb-sizeRanges: exit-crossing 0% exit-crossing 100%, exit-crossing 0% exit-crossing 100%, var(---breadcrumb-endSizeRanges), var(---breadcrumb-rowMetricRanges), cover 0% cover 100%;
+				---breadcrumb-sizeDirections: reverse, reverse, reverse, reverse, var(---breadcrumb-rowMetricDirections), normal;
 			}
 		}
 
@@ -3755,7 +3799,11 @@ ol {
 	@scope (:root) to (details:not([open])>:not(summary)) {
 		@scope ([data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="size"]) to ([data-sticky-breadcrumb~="scope"]) {
 			[data-sticky-breadcrumb~="size-row"]::before {
-				view-timeline-name: var(---breadcrumb-rowInlineTimeline)
+				view-timeline-name: var(---breadcrumb-rowInlineTimeline);
+			}
+			:scope[data-sticky-breadcrumb~="row-fill"] [data-sticky-breadcrumb~="size-row"]::before {
+				content: none;
+				view-timeline-name: none;
 			}
 			[data-sticky-breadcrumb~="size-row"]::after {
 				view-timeline-name: var(---breadcrumb-rowBlockTimeline)

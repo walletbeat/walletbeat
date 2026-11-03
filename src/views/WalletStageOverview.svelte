@@ -126,7 +126,7 @@
 					style:--stage-background={isCurrent
 						? 'color-mix(in srgb, var(--accent) 10%, var(--background-primary))'
 						: 'color-mix(in srgb, var(--accent) 5%, var(--background-primary))'}
-					data-sticky-breadcrumb="scope clearance size"
+					data-sticky-breadcrumb="scope row-fill clearance size"
 					data-sticky-container
 					style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-entry`}
 				>
