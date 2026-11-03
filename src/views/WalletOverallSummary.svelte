@@ -63,6 +63,7 @@
 		<h2 data-row="gap-2">
 			<img
 				src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+				alt=""
 			/>
 			{wallet.metadata.displayName}
 		</h2>
