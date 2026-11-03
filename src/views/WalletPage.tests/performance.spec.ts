@@ -12,10 +12,10 @@ import {
 } from '../../../tests/browser/performance-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
-test.describe('constrained mobile performance observations after structural acceptance', () => {
+test.describe('constrained mobile performance observations', () => {
 	test.skip(
-		!process.env.WALLET_PAGE_FIRST_PASS,
-		'Performance work requires an explicitly supplied, current-source structural first-pass report',
+		!process.env.WALLET_PAGE_FIRST_PASS && process.env.WALLET_PAGE_REAL_CHROME_PERFORMANCE !== '1',
+		'Provide structural acceptance or explicitly opt in to diagnostic performance capture',
 	)
 	test.skip(
 		({ browserName }) => browserName !== 'chromium',
@@ -34,35 +34,42 @@ test.describe('constrained mobile performance observations after structural acce
 		browser,
 		source,
 	}, info) => {
-		const firstPass: unknown = JSON.parse(
-			await readFile(process.env.WALLET_PAGE_FIRST_PASS!, 'utf8'),
-		)
-
-		if (
-			!firstPass ||
-			typeof firstPass !== 'object' ||
-			!('source' in firstPass) ||
-			!('firstPassComplete' in firstPass) ||
-			!('contractHash' in firstPass)
-		) {
-			throw new Error('Structural acceptance must contain source, completion and contract identity')
-		}
-
-		expect(firstPass.source, 'Structural acceptance must belong to this exact source').toEqual(
-			source,
-		)
-		expect(
-			firstPass.firstPassComplete,
-			'All structural obligations must precede performance profiling',
-		).toBe(true)
 		const contract = await readFile(
 			new URL('../../../tests/browser/wallet-page-requirements.md', import.meta.url),
 			'utf8',
 		)
+		const firstPassPath = process.env.WALLET_PAGE_FIRST_PASS
 
-		expect(firstPass.contractHash).toBe(createHash('sha256').update(contract).digest('hex'))
+		if (firstPassPath) {
+			const firstPass: unknown = JSON.parse(await readFile(firstPassPath, 'utf8'))
+
+			if (
+				!firstPass ||
+				typeof firstPass !== 'object' ||
+				!('source' in firstPass) ||
+				!('firstPassComplete' in firstPass) ||
+				!('contractHash' in firstPass)
+			) {
+				throw new Error(
+					'Structural acceptance must contain source, completion and contract identity',
+				)
+			}
+
+			expect(firstPass.source, 'Structural acceptance must belong to this exact source').toEqual(
+				source,
+			)
+			expect(
+				firstPass.firstPassComplete,
+				'Structural coverage is required for final performance acceptance',
+			).toBe(true)
+			expect(firstPass.contractHash).toBe(createHash('sha256').update(contract).digest('hex'))
+		}
+
+		const startupCpuSlowdown = firstPassPath ? 6 : 1
 		const browserSession = await browser.newBrowserCDPSession()
 		const captureMetadata: Record<string, unknown> = {
+			structuralAcceptance: Boolean(firstPassPath),
+			diagnosticOnly: !firstPassPath,
 			requestedRealChromeHeaded: info.project.name === 'performance-chrome-headed',
 			project: info.project.name,
 			channel: info.project.use.channel ?? 'playwright-default',
@@ -70,6 +77,7 @@ test.describe('constrained mobile performance observations after structural acce
 			platform: process.platform,
 			architecture: process.arch,
 			cpuSlowdown: 6,
+			startupCpuSlowdown,
 			emulatedMobile: true,
 		}
 
@@ -100,9 +108,9 @@ test.describe('constrained mobile performance observations after structural acce
 		await page.addInitScript(installPerformanceObservation)
 		const cdp = await context.newCDPSession(page)
 
-		await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
+		await cdp.send('Emulation.setCPUThrottlingRate', { rate: startupCpuSlowdown })
 		await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 })
-		const tracePath = info.outputPath('chrome-performance-trace.json')
+		const tracePath = info.outputPath('chrome-performance-trace.json.gz')
 		const tracingComplete = new Promise<{ stream?: string }>(resolve =>
 			cdp.once('Tracing.tracingComplete', resolve),
 		)
@@ -119,9 +127,33 @@ test.describe('constrained mobile performance observations after structural acce
 			const before = await page
 				.locator('#layout')
 				.evaluate(element => ({ top: element.scrollTop, clock: performance.now() }))
-			const x = 150
 			const start = up ? 660 : 220
 			const end = up ? 220 : 660
+
+			const point = await page.locator('#layout').evaluate((root, y) => {
+				const x = root.getBoundingClientRect().left + 8
+
+				for (
+					let element = document.elementFromPoint(x, y);
+					element;
+					element = element.parentElement
+				) {
+					if (
+						/(auto|scroll)/.test(getComputedStyle(element).overflowY) &&
+						element.scrollHeight > element.clientHeight
+					) {
+						return { x, y, scrollOwner: element.id }
+					}
+				}
+
+				return { x, y, scrollOwner: null }
+			}, start)
+
+			expect(
+				point.scrollOwner,
+				'Native touch input must target the page rather than the nested TOC',
+			).toBe('layout')
+			const x = point.x
 
 			await cdp.send('Input.dispatchTouchEvent', {
 				type: 'touchStart',
@@ -155,14 +187,18 @@ test.describe('constrained mobile performance observations after structural acce
 				after,
 				commandedDurationMs: 192,
 				nativeInput: 'CDP Input.dispatchTouchEvent',
+				point,
 				programmaticScroll: false,
 			})
 		}
+
+		const errors: unknown[] = []
 
 		try {
 			await page.goto('/__wallet-page/software/')
 			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 			await page.evaluate(() => document.fonts.ready)
+			await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
 			// Warmup uses the same native input path and remains identifiable in the trace.
 			await swipe(true)
 			await swipe(false)
@@ -190,6 +226,8 @@ test.describe('constrained mobile performance observations after structural acce
 			await info.attach('native-mobile-observations', {
 				body: JSON.stringify({
 					status: 'unverified',
+					structuralAcceptance: Boolean(firstPassPath),
+					diagnosticOnly: !firstPassPath,
 					profile: {
 						engine: 'chromium',
 						browserVersion: browser.version(),
@@ -226,36 +264,55 @@ test.describe('constrained mobile performance observations after structural acce
 				}),
 				contentType: 'application/json',
 			})
-		} finally {
-			try {
-				try {
-					if (touchActive) {
-						await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] })
-					}
-				} finally {
-					const trace = await finishChromeTrace(cdp, tracingComplete)
+		} catch (error) {
+			errors.push(error)
+		}
 
-					await writeFile(tracePath, trace)
-					await info.attach('native-chrome-performance-trace', {
-						path: tracePath,
-						contentType: 'application/json',
-					})
-					await info.attach('native-chrome-rendering-reasons', {
-						body: JSON.stringify({
-							...summarizeChromeTrace(JSON.parse(trace.toString())),
-							captureScope:
-								'Load, warmup and measured interactions; wallet-page-performance-profile marks the measured interaction boundary.',
-						}),
-						contentType: 'application/json',
-					})
+		try {
+			try {
+				if (touchActive) {
+					await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] })
 				}
 			} finally {
-				try {
-					await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
-				} finally {
-					await cdp.detach()
-				}
+				const trace = await finishChromeTrace(cdp, tracingComplete)
+
+				await writeFile(tracePath, gzipSync(trace))
+				await info.attach('native-chrome-performance-trace', {
+					path: tracePath,
+					contentType: 'application/gzip',
+				})
+				await info.attach('native-chrome-rendering-reasons', {
+					body: JSON.stringify({
+						...summarizeChromeTrace(JSON.parse(trace.toString())),
+						captureScope: `${startupCpuSlowdown}x CPU load, then 6x CPU warmup and measured touch interactions; wallet-page-performance-profile marks the measured interaction boundary.`,
+					}),
+					contentType: 'application/json',
+				})
 			}
+		} catch (error) {
+			errors.push(error)
+		}
+
+		try {
+			await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+		} catch (error) {
+			errors.push(error)
+		}
+
+		try {
+			await cdp.detach()
+		} catch (error) {
+			errors.push(error)
+		}
+
+		if (errors.length === 1) {
+			throw errors[0]
+		}
+
+		if (errors.length > 1) {
+			throw new AggregateError(errors, 'Native performance capture failed', {
+				cause: errors[0],
+			})
 		}
 	})
 })

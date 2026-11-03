@@ -39,7 +39,12 @@ export default defineConfig({
 					{
 						name: 'performance-chrome-headed',
 						testMatch: '**/performance.spec.ts',
-						use: { browserName: 'chromium' as const, channel: 'chrome', headless: false },
+						use: {
+							browserName: 'chromium' as const,
+							channel: 'chrome',
+							headless: false,
+							launchOptions: launchOptions('chromium'),
+						},
 					},
 				]
 			: []),
