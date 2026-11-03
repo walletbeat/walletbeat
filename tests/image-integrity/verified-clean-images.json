@@ -1599,6 +1599,102 @@
 		"hash": "2179a16f6cf9e2d0bb81348617afccb0222ae9d8e4d41e307225d3a8f88c6c6f",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/account-recovery.png": {
+		"hash": "1236188645511ec94c3363a03b8ed1d892a19aafee21eadf6c06f0814d99e2df",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/address-resolution.png": {
+		"hash": "146cb8c87f988cc0d78b8a31e2dbbf3695c43612b5d77259302c56974d50ab48",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/app-isolation.png": {
+		"hash": "49a9d1b86d625e219cb600c54cbbd1d49dc32a03bfad722420341c172c531cb2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/chain-abstraction.png": {
+		"hash": "d863965fe15a6e6ef7c8c587724c7c23bfb485410618bea636f6b18e25896598",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/chain-verification.png": {
+		"hash": "3ed2937b821febe573a947b0e8be5597ca1539f93376b381780d3834e324c144",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/ecosystem-alignment.jpg": {
+		"hash": "384b134ba6d416d6dd13cce1f645ce5d0b6f2e4ea08bb314d8d248b8a25283eb",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/l1-provider-independence.png": {
+		"hash": "45d7f34536a3d48ba6fddfda129d8d0f8fd276da3eb12f8438827235d6f7f98f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/multi-address-privacy.png": {
+		"hash": "b30e5d5200e03d3f80d5e3853ce79db1b4855a441986604f219bbaa0280dd70f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/orderflow-transparency.png": {
+		"hash": "594dbad1f8ba7a5ab1f0f67a96e190552e0ad1142fa7f22df9adae6a2080fec0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/permissions-management.png": {
+		"hash": "21369e8ab1447ac43f586814d7dc738a666c8330d42e0a630e25334ae9659edb",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/privacy-hygiene.png": {
+		"hash": "451997acb010fa44cdfc329d670ca0fec991910d4607184ffb5305b7456df3b0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/privacy.jpg": {
+		"hash": "67b631748a6bcb7bfb7ca865d072e30ac6a19d067330f796152af4ab6af5ad4d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/private-token-transfers.png": {
+		"hash": "c998ee896f05c37fc9d1a18f283252846e35a7d73abcab33008582305b8e0538",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/release-process.png": {
+		"hash": "774a96881e8426dbf5418e94bac01a982c846b848823853d763e79c2f26dad21",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/scam-prevention.png": {
+		"hash": "95a8b60d5e9a1c874f7a2e18e6ba2bd88295724254a1b1940cf5b09463b414d5",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/security-audits-bug-bounties.png": {
+		"hash": "2b63916bd1e1010775fc66aacbb90b75b9a1f1355ef5c218be75150af5567c3f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/security-best-practices.png": {
+		"hash": "95cd4cf3249a83d58bf6d08b42eb2ae977d76861a58beb5a4f290e6f8104460b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/security.jpg": {
+		"hash": "d4cc9ad94d221942822c27a36c703497404d6d0da6f22418e803abc52807002a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/self-sovereignty.jpg": {
+		"hash": "3d04868723aa1344d41514b4a51337347da7bd03b1850d794aabf9201e277098",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/transaction-inclusion.png": {
+		"hash": "7512f73535b32d07baa6913df5bdc916623f05ccf762606f74871a96bd6d51df",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/transaction-legibility-1.png": {
+		"hash": "3a59735222f276372a24ab90b4682a999b2d1a615a8f49f00c1c7516c4863ed4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/transaction-legibility-2.png": {
+		"hash": "eca4ebac0a3b292811992927ca99b48f633f289358d104066da4c4033c2a5e08",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/transparency.jpg": {
+		"hash": "e5eb1e816b7344c82cf16b9e3d1f2be061993414561e5bb7a98ee978e88d76dc",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Ambire Official Breakdown/wallet-address-privacy.png": {
+		"hash": "3945f1f945c93ab998446b9f5bce835cda20d0fda7004ce21a971b98a00a8978",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-09-17 - Minimal Data Collection Meme/minimal-data-collection.png": {
 		"hash": "140f949d356383e75d9ee4589a42aa8e235a739ec3d6731d10ac15473d836569",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
