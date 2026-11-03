@@ -180,7 +180,6 @@
 		style:--view-transition-name={transitionsSlices ?
 			viewTransitionName(transitionNamePrefix ?? '', 'slice', slice.id)
 			: undefined}
-		style:--view-transition-class={transitionsSlices ? 'pie-slice' : undefined}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
 		<span class="slice-shape">
@@ -217,7 +216,6 @@
 		style:--view-transition-name={transitionsPie ?
 			viewTransitionName(transitionNamePrefix ?? '', 'pie')
 			: undefined}
-		style:--view-transition-class={transitionsPie ? 'pie' : undefined}
 		data-stack
 	>
 		<div class="slices" data-stack>
@@ -232,7 +230,6 @@
 			style:--view-transition-name={transitionsCenter ?
 				viewTransitionName(transitionNamePrefix ?? '', 'center')
 				: undefined}
-			style:--view-transition-class={transitionsCenter ? 'pie-center' : undefined}
 		>
 			{#if centerContentSnippet}
 				{@render centerContentSnippet()}
@@ -310,6 +307,9 @@
 
 	.pie-container {
 		overflow: clip;
+		&:has(:global([data-layout-transition])) {
+			overflow: visible;
+		}
 
 		display: grid;
 		justify-content: center;
@@ -317,6 +317,10 @@
 		transition-duration: 0.4s;
 
 		.pie {
+			&[data-view-transition~="named"] {
+				--view-transition-class: pie;
+			}
+
 			position: relative;
 			display: grid;
 			max-width: 100%;
@@ -324,9 +328,16 @@
 			> .slices {
 				contain: content;
 				pointer-events: none;
+				&:has(> :global([data-layout-transition])) {
+					contain: layout style;
+				}
 			}
 
 			.slice {
+				&[data-view-transition~="named"] {
+					--view-transition-class: pie-slice;
+				}
+
 				--slice-opacity: 1;
 				--slice-labelBackground: var(--slice-fill);
 				--slice-scale: 1;
@@ -403,6 +414,10 @@
 			}
 
 			> .center {
+				&[data-view-transition~="named"] {
+					--view-transition-class: pie-center;
+				}
+
 				position: absolute;
 				inset: 0;
 				display: grid;
