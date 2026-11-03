@@ -297,6 +297,14 @@ import Footer from '@/views/Footer.astro'
 </style>
 
 <style is:global>
+	#layout > .attention-backdrop {
+		transition-property: backdrop-filter;
+	}
+
+	:where(#nav) :is([data-icon], .logo) {
+		transition-property: filter;
+	}
+
 	/* Native hover propagation stops at top-layer scroll regions. */
 	:root[data-window-active] {
 		&[data-keyboard-input]:has(#nav :focus-visible),

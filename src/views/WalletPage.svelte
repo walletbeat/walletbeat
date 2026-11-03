@@ -1830,7 +1830,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					background: var(--background-primary);
 					opacity: 1;
 
-					transition-property: opacity, translate, display, overlay;
+					transition-property: opacity, translate, display, overlay, filter;
 					translate: 0 0 0;
 					:global(> .navigation-items) {
 						position: relative;
@@ -1873,10 +1873,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						translate: 0 -0.75rem 1.25rem;
 					}
 					&:not(:popover-open):not([data-closing]) {
-						transition-property: none;
+						transition-property: filter;
 					}
 					&:popover-open {
-						transition-property: none;
+						transition-property: filter;
 						animation: wallet-toc-entry var(---wallet-toc-entryDuration, 0.25s)
 							var(--transition-easeOutExpo);
 					}
