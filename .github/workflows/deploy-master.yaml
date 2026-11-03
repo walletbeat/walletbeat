@@ -7,6 +7,7 @@ on:
 
 env:
   ENS_DOMAIN: walletbeat.eth
+  SKIP_HELIOS: 'true' # Temp for devcon 2026
 
 jobs:
   check:
@@ -153,7 +154,6 @@ jobs:
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_PK: ${{ secrets.WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
-          SKIP_HELIOS: 'false'
   unpin-old-ipfs-pins:
     name: Unpin old IPFS pins
     runs-on: ubuntu-latest
