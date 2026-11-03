@@ -871,8 +871,8 @@
 					{#if canFilter}
 					<button
 							data-tag={tag}
-							data-view-transition="named"
-							style:--view-transition-name={viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id)}
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
 							disabled={!interactive}
 						aria-label="Filter by {tagLabel ?? label}"
 						onclick={event => {
@@ -885,8 +885,8 @@
 					{:else}
 						<span
 							data-tag={tag}
-							data-view-transition="named"
-							style:--view-transition-name={viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id)}
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
 						>{tagLabel ?? label}</span>
 					{/if}
 					{/snippet}
@@ -914,8 +914,8 @@
 			<div
 				class="variants"
 				data-row="gap-1"
-				data-view-transition="named"
-				style:--view-transition-name={viewTransitionName(viewId, 'wallet-variants', wallet.metadata.id)}
+				data-view-transition={interactive ? 'named' : undefined}
+				style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-variants', wallet.metadata.id) : undefined}
 			>
 				{#each supportedVariants as variant}
 					<button
@@ -1266,8 +1266,8 @@
 							data-card="popover"
 							{@attach walletIdentityInterest}
 							data-row="start"
-							data-view-transition="named"
-							style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
 						>
 							<span class="row-count" data-row="center"></span>
 
@@ -1284,8 +1284,8 @@
 								<div class="name" data-column="gap-1">
 									<div data-row="gap-3 start wrap">
 										<h3
-											data-view-transition="named"
-											style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+											data-view-transition={interactive ? 'named' : undefined}
+											style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
 										>
 											<a
 											data-link="camouflaged"
@@ -1393,8 +1393,8 @@
 						data-card="popover"
 						{@attach walletIdentityInterest}
 						data-row="start"
-						data-view-transition="named"
-						style:--view-transition-name={viewTransitionName(viewId, 'wallet', wallet.metadata.id)}
+						data-view-transition={interactive ? 'named' : undefined}
+						style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
 					>
 						<span class="row-count" data-row="center"></span>
 
@@ -1411,8 +1411,8 @@
 							<div class="name" data-column="gap-1">
 								<div data-row="gap-3 start wrap">
 									<h3
-										data-view-transition="named"
-										style:--view-transition-name={viewTransitionName(viewId, 'wallet-name', wallet.metadata.id)}
+										data-view-transition={interactive ? 'named' : undefined}
+										style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
 									>
 										<a
 											data-link="camouflaged"
