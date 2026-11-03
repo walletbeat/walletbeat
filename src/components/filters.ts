@@ -82,6 +82,29 @@ export const applyFilterSets = <Item>(
 	})
 }
 
+/** A sole represented choice can still exclude items with unknown or uncovered values. */
+export const filterSetIsAvailable = <Item>(
+	items: Item[],
+	set: FilterSet<Item>,
+	activeChoices: ReadonlySet<FilterChoice<Item>>,
+): boolean => {
+	const concreteChoices = set.choices.filter(choice => choice.id !== '')
+
+	if (concreteChoices.length === 0) {
+		return false
+	}
+
+	if (set.alwaysShowChoices || concreteChoices.some(choice => activeChoices.has(choice))) {
+		return true
+	}
+
+	const matchingCounts = concreteChoices
+		.map(choice => (choice.matches ? items.filter(choice.matches).length : items.length))
+		.filter(count => count > 0)
+
+	return matchingCounts.length > 1 || matchingCounts.some(count => count < items.length)
+}
+
 export const changeFilterChoice = <Item>(
 	sets: FilterSet<Item>[],
 	activeChoices: Set<FilterChoice<Item>>,
