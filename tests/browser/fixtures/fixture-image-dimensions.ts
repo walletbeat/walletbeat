@@ -7,7 +7,9 @@ import { referenceImageDimensions } from '@/utils/reference-image-metadata'
 export function fixtureImageDimensions(wallet: RatedWallet<string>) {
 	const evaluations = [
 		wallet.overall,
-		...Object.values(wallet.variants).map(variant => variant.attributes),
+		...Object.values(wallet.variants)
+			.filter((variant): variant is NonNullable<typeof variant> => variant != null)
+			.map(variant => variant.attributes),
 	]
 
 	return referenceImageDimensions([
