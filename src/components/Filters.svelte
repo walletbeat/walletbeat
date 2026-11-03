@@ -15,6 +15,7 @@
 	import {
 		applyFilterSets,
 		changeFilterChoice,
+		filterSetIsAvailable,
 		resetFilterSets,
 		type FilterChoice,
 		type FilterGroup,
@@ -72,8 +73,8 @@
 		: set.choices.filter(choice => activeChoices.has(choice) || !choice.matches || filtered(new Set([choice])).length > 0)
 
 	const groups = $derived(filterGroups ?? [{ label: restProps['aria-label'] ?? 'Filters', filterSets }])
-	const visibleSets = $derived(filterSets.map(set => ({ set, choices: visibleChoices(set) })).filter(({ choices }) => (
-		choices.some(choice => choice.id && activeChoices.has(choice)) || choices.filter(choice => choice.id).length > 1
+	const visibleSets = $derived(filterSets.map(set => ({ set, choices: visibleChoices(set) })).filter(({ set }) => (
+		filterSetIsAvailable(items, set, activeChoices)
 	)))
 
 	const choiceCount = (set: FilterSet<Item>, choice: FilterChoice<Item>) => {

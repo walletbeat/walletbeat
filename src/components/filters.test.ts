@@ -5,6 +5,7 @@ import {
 	changeFilterChoice,
 	type FilterChoice,
 	type FilterSet,
+	filterSetIsAvailable,
 	resetFilterSets,
 } from './filters'
 
@@ -155,5 +156,78 @@ describe('filter-set selection semantics', () => {
 		const selectedConcrete = changeFilterChoice([exclusive], selectedAll, mobile)
 
 		expect(selectedConcrete).toEqual(new Set([mobile]))
+	})
+})
+
+describe('filter-set availability', () => {
+	const known: Item = { id: 'known', tags: ['browser', 'mobile'] }
+	const unclassified: Item = { id: 'unclassified', tags: [] }
+	const records = [known, unclassified]
+	const soleExclusive: FilterSet<Item> = { ...exclusive, choices: [all, browser] }
+	const singleChoiceSets: FilterSet<Item>[] = [
+		soleExclusive,
+		{
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'union',
+			choices: [browser],
+		},
+		{
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser],
+		},
+	]
+
+	it.each(singleChoiceSets)(
+		'retains a useful sole choice with $cardinality/$match selection',
+		set => {
+			const neutral = new Set<FilterChoice<Item>>()
+
+			expect(applyFilterSets(records, [set], neutral)).toContain(unclassified)
+			expect(applyFilterSets(records, [set], new Set([browser]))).not.toContain(unclassified)
+			expect(filterSetIsAvailable(records, set, neutral)).toBe(true)
+			expect(filterSetIsAvailable([known], set, neutral)).toBe(false)
+		},
+	)
+
+	it('keeps an active choice reachable when no items match it', () => {
+		expect(filterSetIsAvailable([unclassified], soleExclusive, new Set([browser]))).toBe(true)
+		expect(filterSetIsAvailable([unclassified], soleExclusive, new Set())).toBe(false)
+	})
+
+	it('preserves an authored stable vocabulary independently from current matches', () => {
+		const stable = { ...soleExclusive, alwaysShowChoices: true }
+
+		expect(filterSetIsAvailable([unclassified], stable, new Set())).toBe(true)
+		expect(filterSetIsAvailable([], stable, new Set())).toBe(true)
+	})
+
+	it('preserves multiple represented alternatives even when their matching items coincide', () => {
+		const set: FilterSet<Item> = {
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser, mobile],
+		}
+
+		expect(filterSetIsAvailable([known], set, new Set())).toBe(true)
+	})
+
+	it('omits a set with no concrete choices', () => {
+		expect(filterSetIsAvailable(records, { ...exclusive, choices: [all] }, new Set([all]))).toBe(
+			false,
+		)
+		expect(
+			filterSetIsAvailable(
+				records,
+				{ ...exclusive, choices: [], alwaysShowChoices: true },
+				new Set(),
+			),
+		).toBe(false)
 	})
 })

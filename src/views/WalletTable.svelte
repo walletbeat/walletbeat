@@ -15,7 +15,7 @@
 ">
 	import { defaultStageQualification, stageQualificationChoices, type StageQualificationId } from './wallet-table-stage'
 	// Types/constants
-	import { applyFilterSets, changeFilterChoice, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
+	import { applyFilterSets, changeFilterChoice, filterSetIsAvailable, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
 	import { hasVisiblePopoverInvoker, interest, interestDelayMs } from '@/components/interest'
 	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import type { Column } from '@/components/Table.svelte'
@@ -525,15 +525,10 @@
 	const isWalletExpanded = $derived(
 		expandedColumnIds.has('wallet')
 	)
-	const isWalletFilterSetVisible = (set: FilterSet<RatedWallet<_AttributeGroupId>>) => (
-		set.choices.filter(choice => (
-			choice.id
-			&& applyFilterSets(wallets, walletFacetFilterSets, new Set([choice])).length > 0
-		)).length > 1
-	)
+
 
 	const visibleWalletFilterSets = $derived(
-		walletFacetFilterSets.filter(isWalletFilterSetVisible)
+		walletFacetFilterSets.filter(set => filterSetIsAvailable(wallets, set, activeChoices))
 	)
 
 	const walletFilterSlots = $derived(
