@@ -69,11 +69,12 @@ const hasHorizontalScroll = (scope: HTMLElement) => {
 
 /** Build a deterministic, valid custom-ident without allowing part-boundary collisions. */
 export const viewTransitionName = (...parts: (number | string)[]) =>
-	`vt-${parts
-		.map(part =>
-			Array.from(String(part), character => character.codePointAt(0)?.toString(16) ?? '').join('_'),
+	`vt${parts
+		.map(
+			part =>
+				`-${String(part).replace(/[^a-zA-Z0-9]/g, character => `_${character.charCodeAt(0).toString(16)}_`)}`,
 		)
-		.join('--')}`
+		.join('')}`
 
 /**
  * Run a synchronous UI update inside an element-scoped View Transition when

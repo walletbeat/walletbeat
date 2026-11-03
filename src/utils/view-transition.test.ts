@@ -814,9 +814,57 @@ describe('startScopedViewTransition', () => {
 describe('viewTransitionName', () => {
 	it('returns stable custom identifiers without separator collisions', () => {
 		expect(viewTransitionName('wallet', 'slice', 'security.one')).toBe(
-			'vt-77_61_6c_6c_65_74--73_6c_69_63_65--73_65_63_75_72_69_74_79_2e_6f_6e_65',
+			'vt-wallet-slice-security_2e_one',
 		)
 		expect(viewTransitionName('a-b', 'c')).not.toBe(viewTransitionName('a', 'b-c'))
 		expect(viewTransitionName('a_b')).not.toBe(viewTransitionName('a', 'b'))
+	})
+
+	it('preserves empty parts, escapes and Unicode in distinct identifiers', () => {
+		const values = [
+			'',
+			'-',
+			'--',
+			'_',
+			'_2d_',
+			'a-b',
+			'a_b',
+			'A0',
+			'é',
+			'😀',
+			'\ud800',
+			'\udfff',
+			'\0',
+		]
+		const parts = [
+			[],
+			['', '', ''],
+			...values.map(value => [value]),
+			...values.flatMap(a => values.map(b => [a, b])),
+		]
+		const names = parts.map(parts => viewTransitionName(...parts))
+
+		for (const value of [1, -0, NaN, Infinity, -Infinity, 1e21]) {
+			expect(viewTransitionName(value)).toBe(viewTransitionName(String(value)))
+		}
+
+		expect(new Set(names).size).toBe(parts.length)
+
+		for (const [index, name] of names.entries()) {
+			expect(name).toMatch(/^[a-zA-Z][a-zA-Z0-9_-]*$/)
+			const decoded =
+				name === 'vt'
+					? []
+					: name
+							.slice(3)
+							.split('-')
+							.map(part =>
+								part.replace(/_([0-9a-f]+)_/g, (_, hex: string) =>
+									String.fromCharCode(Number.parseInt(hex, 16)),
+								),
+							)
+
+			expect(decoded).toEqual(parts[index])
+		}
 	})
 })
