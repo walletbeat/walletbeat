@@ -15,20 +15,42 @@ that dependency step. See [Playwright's platform requirements](https://playwrigh
 
 ## First setup
 
-The release assets are `walletbeat-tv.sh` for macOS/Linux and `walletbeat-tv.ps1`
-for Windows. After publishing the Walletbeat TV release, run one command:
+The ready-to-run installers are checked in under `deploy/walletbeat-tv/downloads`.
+They embed the tour and installer; they do not download source files or require a
+checkout. CI verifies these files against the generator and runs these same files
+on each supported platform.
+
+To try the unmerged PR, paste one command. It downloads the current PR version;
+no GitHub login or developer tools are needed. Downloading completes before the
+installer starts, so terminal input remains available for setup prompts.
 
 macOS or Linux, in Terminal:
 
 ```sh
-(if command -v curl >/dev/null 2>&1; then curl -fsSL https://github.com/walletbeat/walletbeat/releases/download/walletbeat-tv/walletbeat-tv.sh; else wget -qO- https://github.com/walletbeat/walletbeat/releases/download/walletbeat-tv/walletbeat-tv.sh; fi) | sh
+(
+  set -eu
+  installer=$(mktemp)
+  trap 'rm -f "$installer"' EXIT
+  url=https://raw.githubusercontent.com/walletbeat/walletbeat/refs/pull/1698/head/deploy/walletbeat-tv/downloads/walletbeat-tv.sh
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$installer"
+  else
+    wget -qO "$installer" "$url"
+  fi
+  sh "$installer"
+)
 ```
 
 Windows, in PowerShell:
 
 ```powershell
-& ([ScriptBlock]::Create((Invoke-WebRequest -UseBasicParsing 'https://github.com/walletbeat/walletbeat/releases/download/walletbeat-tv/walletbeat-tv.ps1').Content))
+& ([ScriptBlock]::Create((Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/walletbeat/walletbeat/refs/pull/1698/head/deploy/walletbeat-tv/downloads/walletbeat-tv.ps1').Content))
 ```
+
+For an exact version, replace `refs/pull/1698/head` in either URL with the full
+commit ID supplied with that version. The downloaded file contains the complete
+installer for that commit. Reopening the saved launcher keeps that version;
+running setup from a newer commit updates it.
 
 ## Open, close, reopen
 
@@ -154,7 +176,7 @@ Other Linux distributions, ChromeOS, browser-only guest sessions, and managed
 accounts that forbid downloaded programs are outside this installation contract.
 
 Pass a compatible Walletbeat deployment URL to use another site. The default is
-`https://beta.walletbeat.eth.limo`.
+`https://walletbeat.eth.limo`.
 
 ```sh
 sh ~/Downloads/walletbeat-tv.sh https://beta.walletbeat.eth.limo
@@ -173,11 +195,11 @@ libraries, that device cannot complete setup. `--with-deps` installs them upfron
 To build the standalone launchers and uninstallers from this checkout:
 
 ```sh
-pnpm walletbeat-tv:build-launchers /tmp/walletbeat-tv
+pnpm walletbeat-tv:build-launchers deploy/walletbeat-tv/downloads/walletbeat-tv
 ```
 
-Upload `walletbeat-tv.sh`, `walletbeat-tv.ps1`, `uninstall-walletbeat-tv.sh`, and
-`uninstall-walletbeat-tv.ps1` to the `walletbeat-tv` GitHub release.
+Commit the four generated files with their source changes. They can also be
+uploaded unchanged to a release; a release is not required for PR installation.
 The launchers embed the current tour and derive the Playwright version from the project's
 package manifest. The installer does not fetch moving source files at runtime.
 The installation workflow is configured to check the native launcher on macOS,

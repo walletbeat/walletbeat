@@ -51,7 +51,7 @@ const siteUrls = arguments_.filter(
 if (siteUrls.length > 1) {
 	throw new Error('Pass one Walletbeat URL, optionally with --with-deps on Linux.')
 }
-const siteUrl = new URL(siteUrls[0] || 'https://beta.walletbeat.eth.limo')
+const siteUrl = new URL(siteUrls[0] || 'https://walletbeat.eth.limo')
 if (!['http:', 'https:'].includes(siteUrl.protocol)) {
 	throw new Error('Use an HTTP or HTTPS Walletbeat URL.')
 }

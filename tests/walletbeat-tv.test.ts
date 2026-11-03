@@ -23,6 +23,18 @@ describe('Walletbeat TV standalone launchers', () => {
 			)
 
 			expect(build.status, build.stderr).toBe(0)
+
+			for (const name of [
+				'walletbeat-tv.sh',
+				'walletbeat-tv.ps1',
+				'uninstall-walletbeat-tv.sh',
+				'uninstall-walletbeat-tv.ps1',
+			]) {
+				expect(
+					readFileSync(join(directory, name)),
+					`Regenerate deploy/walletbeat-tv/downloads/${name}`,
+				).toEqual(readFileSync(join('deploy/walletbeat-tv/downloads', name)))
+			}
 			const shell = readFileSync(`${prefix}.sh`, 'utf8')
 			const powershell = readFileSync(`${prefix}.ps1`, 'utf8')
 			const shellInstallationScript = shell.match(
@@ -81,6 +93,51 @@ describe('Walletbeat TV standalone launchers', () => {
 			rmSync(directory, { recursive: true, force: true })
 		}
 	})
+
+	it.skipIf(process.platform === 'win32')(
+		'downloads completely before running setup and preserves terminal input',
+		() => {
+			const directory = mkdtempSync(join(tmpdir(), 'walletbeat-tv-download '))
+
+			try {
+				const readme = readFileSync('deploy/walletbeat-tv/README.md', 'utf8')
+				const command = readme.match(/```sh\n([\s\S]*?)\n```/)?.[1]
+
+				if (!command) {
+					throw new Error('Missing setup command')
+				}
+
+				writeFileSync(
+					join(directory, 'curl'),
+					`#!/bin/sh
+[ "$1" = -fsSL ] && [ "$3" = -o ] || exit 2
+[ "$WALLETBEAT_TV_TEST_DOWNLOAD_FAIL" != 1 ] || exit 22
+printf '%s\\n' 'read -r answer' 'printf "%s" "$answer"' > "$4"
+`,
+					{ mode: 0o755 },
+				)
+				const environment = { ...process.env, PATH: `${directory}:${process.env.PATH ?? ''}` }
+				const success = spawnSync('sh', ['-c', command], {
+					encoding: 'utf8',
+					input: 'ready\n',
+					env: environment,
+				})
+
+				expect(success.status, success.stderr).toBe(0)
+				expect(success.stdout).toBe('ready')
+				const failure = spawnSync('sh', ['-c', command], {
+					encoding: 'utf8',
+					input: 'ready\n',
+					env: { ...environment, WALLETBEAT_TV_TEST_DOWNLOAD_FAIL: '1' },
+				})
+
+				expect(failure.status).toBe(22)
+				expect(failure.stdout).toBe('')
+			} finally {
+				rmSync(directory, { recursive: true, force: true })
+			}
+		},
+	)
 
 	it('refuses to run an unbundled installation template before touching adjacent files', () => {
 		const directory = mkdtempSync(join(tmpdir(), 'walletbeat-tv-template '))

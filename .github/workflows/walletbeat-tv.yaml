@@ -38,7 +38,13 @@ jobs:
         with:
           node-version: 24
       - run: node --test tests/walletbeat-tv-shortcuts.mjs
-      - run: node deploy/walletbeat-tv/build-launchers.mjs "${{ runner.temp }}/walletbeat-tv"
+      - name: Verify downloadable installers
+        shell: bash
+        run: |
+          node deploy/walletbeat-tv/build-launchers.mjs "${{ runner.temp }}/walletbeat-tv"
+          for asset in walletbeat-tv.sh walletbeat-tv.ps1 uninstall-walletbeat-tv.sh uninstall-walletbeat-tv.ps1; do
+            cmp "deploy/walletbeat-tv/downloads/$asset" "${{ runner.temp }}/$asset"
+          done
       - name: Check macOS without installed Node, then offline in full screen
         if: runner.os == 'macOS'
         shell: bash

@@ -19,6 +19,7 @@
 *.otf binary
 *.pdf binary
 *.png binary
+*.ps1 text eol=lf
 *.py text diff=python
 *.scss text diff=css
 *.sh text eol=lf

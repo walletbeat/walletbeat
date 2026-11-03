@@ -826,6 +826,7 @@
 		"data/entities/domains/entity-domains.json",
 		"data/*-wallets/collection/*/*.json",
 		"dist/**",
+		"deploy/walletbeat-tv/downloads/**",
 		"node_modules/**",
 		"pnpm-lock.yaml",
 		"public/**/*.svg",
