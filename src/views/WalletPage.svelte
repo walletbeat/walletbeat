@@ -109,12 +109,6 @@
 				publishTocState(panel.matches(':popover-open') ? 'open' : previousClosing ? 'closing' : 'closed')
 			}
 		})
-		if (event.newState === 'open') {
-			event.currentTarget.style.setProperty(
-				'---wallet-toc-entryDuration',
-				getComputedStyle(event.currentTarget).transitionDuration.split(',')[0],
-			)
-		}
 	}
 
 	async function finishTocTransition(event: ToggleEvent & { currentTarget: HTMLElement }) {
@@ -1851,7 +1845,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					}
 					&:popover-open :global(> .navigation-items::after) {
 						transition-property: none;
-						animation: wallet-toc-blur var(---wallet-toc-entryDuration, 0.25s)
+						animation: wallet-toc-blur var(--transition-duration)
 							var(--transition-easeOutExpo);
 						@media (prefers-reduced-transparency: reduce) {
 							animation: none;
@@ -1877,21 +1871,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					}
 					&:popover-open {
 						transition-property: none;
-						animation: wallet-toc-entry var(---wallet-toc-entryDuration, 0.25s)
+						animation: wallet-toc-entry var(--transition-duration)
 							var(--transition-easeOutExpo);
 					}
 					&[data-closing] {
 						display: flex;
 					}
 					@media (prefers-reduced-motion: reduce) {
-						transition-duration: 0s;
-						&:popover-open {
-							animation-duration: 0s;
-						}
-						:global(> .navigation-items::after) {
-							transition-duration: 0s;
-							animation-duration: 0s;
-						}
+						--transition-duration: 0s;
 					}
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and

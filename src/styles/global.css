@@ -1,4 +1,5 @@
 :root {
+	--transition-duration: 0.25s;
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
 	--transition-easeOutExpo-x1: 0.16;
 	--transition-easeOutExpo-x2: 0.3;
@@ -227,7 +228,7 @@ label:has(> input) {
 ::before,
 ::after,
 [popover] {
-	transition-duration: 0.25s;
+	transition-duration: var(--transition-duration);
 	transition-timing-function: var(--transition-easeOutExpo);
 }
 
@@ -236,17 +237,17 @@ label:has(> input) {
 }
 
 ::details-content {
-	transition-duration: 0.25s;
+	transition-duration: var(--transition-duration);
 	transition-timing-function: var(--transition-easeOutExpo);
 	transition-behavior: allow-discrete;
 }
 ::picker(select) {
-	transition-duration: 0.25s;
+	transition-duration: var(--transition-duration);
 	transition-timing-function: var(--transition-easeOutExpo);
 	transition-behavior: allow-discrete;
 }
 ::scroll-marker {
-	transition-duration: 0.25s;
+	transition-duration: var(--transition-duration);
 	transition-timing-function: var(--transition-easeOutExpo);
 	transition-behavior: allow-discrete;
 }
