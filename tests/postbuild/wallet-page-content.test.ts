@@ -78,7 +78,9 @@ describe('canonical navigation inputs', () => {
 					}
 				}
 
-				if (node.type === 'root' || node.type === 'element') node.children.forEach(visit)
+				if (node.type === 'root' || node.type === 'element') {
+					node.children.forEach(visit)
+				}
 			}
 
 			visit(htmlToHast(body))
@@ -114,7 +116,9 @@ describe('canonical navigation inputs', () => {
 				}
 			}
 
-			if (node.type === 'root' || node.type === 'element') node.children.forEach(visit)
+			if (node.type === 'root' || node.type === 'element') {
+				node.children.forEach(visit)
+			}
 		}
 
 		visit(htmlToHast(readFileSync(join(getRepositoryRoot(), 'dist/index.html'), 'utf8')))
