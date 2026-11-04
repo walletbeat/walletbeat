@@ -7,6 +7,7 @@ import { GITHUB_REPO_URL, githubBlobUrl } from '@/constants/github'
 import Layout from '../layouts/Layout.astro'
 
 // Components
+import { Font } from 'astro:assets'
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 ---
@@ -16,22 +17,26 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 		title: 'Walletbeat - Who watches the wallets?',
 	}}
 >
+	<Font cssVariable='--fontFamily-spMonorium' preload />
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
-		<header data-scroll-item='inline-detached padding-match-start padding-match-end'>
+		<header
+			data-scroll-item='inline-detached padding-match-start padding-match-end'
+			data-column='gap-4'
+		>
 			<h1>Who watches the wallets?</h1>
 
 			<p>
-				Walletbeat aims to provide a comprehensive list of wallets, their functionality, practices,
-				and support for certain standards. We welcome contributions.
+				This website is still in beta. It aims to provide a comprehensive list of wallets, their
+				functionality, practices, and support for certain standards. We welcome contributions.
 			</p>
 
-			<nav class='hero-actions' aria-label='Contribute' data-row='start gap-3 wrap'>
-				<a class='hero-action-primary' href={GITHUB_REPO_URL} target='_blank' rel='noreferrer'>
+			<nav aria-label='Contribute' data-row='start gap-3 wrap'>
+				<a data-input href={GITHUB_REPO_URL} target='_blank' rel='noreferrer'>
 					GitHub repository
 				</a>
-				<a href={githubBlobUrl('/CONTRIBUTING.md')} target='_blank' rel='noreferrer'>
+				<a data-input href={githubBlobUrl('/CONTRIBUTING.md')} target='_blank' rel='noreferrer'>
 					How to contribute →
 				</a>
 			</nav>
@@ -62,108 +67,39 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 		padding-block-end: 3rem;
 
 		> header {
-			--hero-backgroundColor: light-dark(#f8e6ff, #3f165e);
-			--hero-glowColor: light-dark(#f0c6ff, var(--hero-backgroundColor));
-			--hero-highlightColor: light-dark(#d62f88, #ff4fb8);
-			--hero-rimColor: light-dark(#ffffff, #f8edff);
-			--hero-textColor: light-dark(#2d123d, #f5f2f7);
-			--hero-textSecondaryColor: color-mix(in oklch, var(--hero-textColor) 78%, transparent);
-
-			padding-block-end: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem);
-
-			/* The band fades into the page instead of ending on a hard edge; content sits above it, unmasked. */
-			&::before {
-				content: '';
-				position: absolute;
-				inset: 0;
-				mask-image: linear-gradient(to bottom, black calc(100% - 6rem), transparent);
-
-				background:
-					linear-gradient(
-						to right,
-						color-mix(in oklch, var(--hero-backgroundColor) 100%, transparent) 34cqi,
-						color-mix(in oklch, var(--hero-backgroundColor) 80%, transparent) 72cqi,
-						color-mix(in oklch, var(--hero-backgroundColor) 34%, transparent)
-					),
-					radial-gradient(
-						circle at 90% 12%,
-						color-mix(in oklch, var(--hero-rimColor) 34%, transparent) 0,
-						transparent 21cqi
-					),
-					radial-gradient(
-						circle at 82% 88%,
-						color-mix(in oklch, var(--hero-highlightColor) 24%, transparent) 0,
-						transparent 26cqi
-					),
-					var(--hero-backgroundColor);
-			}
-
-			> * {
-				position: relative;
-				z-index: 1;
-			}
-
-			.hero-status {
-				--accent: var(--hero-highlightColor);
-
-				margin-block-end: 1rem;
-				letter-spacing: 0.06em;
-				text-transform: uppercase;
-				color: var(--hero-textColor);
-			}
+			font-size: max(1rem, 16px);
+			padding-block: clamp(2rem, 0.06 * var(--scrollContainer-sizeInline), 5rem);
+			background:
+				linear-gradient(to right, var(--background-primary), transparent 150%),
+				url('/images/background/ascii-flower-block.svg') right 8% top 12% /
+					clamp(8rem, 20cqi, 18rem) auto no-repeat,
+				url('/images/background/ascii-symbol-clusters.svg') right -4% bottom -2rem /
+					clamp(12rem, 32cqi, 28rem) auto no-repeat,
+				url('/images/background/ascii-dot-field.svg') center / 34rem auto repeat,
+				light-dark(#f0dafa, #4b1e70);
 
 			h1 {
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
-				font-weight: 800;
-				margin: 0 0 1rem 0;
-				color: var(--hero-textColor);
+				font-family: var(--fontFamily-spMonorium);
+				font-weight: 400;
+				text-transform: uppercase;
 				line-height: 1.1;
 				text-shadow:
-					0 0 1em var(--hero-glowColor),
-					0 0 2em var(--hero-glowColor);
+					0 0 1em var(--accent-backgroundColor),
+					0 0 2em var(--accent-backgroundColor);
 			}
 
 			p {
-				font-size: 1.125rem;
 				line-height: 1.6;
-				margin: 0;
 				text-wrap: pretty;
 				max-inline-size: 36rem;
-				color: var(--hero-textSecondaryColor);
+				color: var(--text-secondary);
 			}
 
-			.hero-actions {
-				margin-block-start: 1.75rem;
-
-				a {
-					display: inline-flex;
-					align-items: center;
-					padding: 0.7em 1.15em;
-					border: 1px solid color-mix(in oklch, var(--hero-textColor) 25%, transparent);
-					border-radius: 999em;
-					color: var(--hero-textColor);
-					font-weight: 600;
-					text-decoration: none;
-
-					transition-property: background-color, border-color, color;
-
-					&:hover {
-						border-color: var(--hero-textColor);
-					}
-				}
-
-				.hero-action-primary {
-					border-color: transparent;
-					background-color: var(--hero-textColor);
-					color: var(--hero-backgroundColor);
-
-					&:hover {
-						background-color: color-mix(
-							in oklch,
-							var(--hero-textColor) 85%,
-							var(--hero-highlightColor)
-						);
-					}
+			a {
+				&[data-input] {
+					font-size: inherit;
+					min-block-size: 2.75em;
 				}
 			}
 		}
