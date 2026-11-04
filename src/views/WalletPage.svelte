@@ -47,13 +47,14 @@
 	// Functions
 	import { variants, variantToName, variantToRunsOn } from '@/constants/variants'
 	import type { NavigationItem } from '@/constants/navigation'
-	import { allHardwareModels } from '@/data/hardware-wallets'
+	import type { allHardwareModels } from '@/data/hardware-wallets'
 	import {
 		type AttributeGroup,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
 	import { mergeRefs, toFullyQualified } from '@/schema/reference'
+	import { supportedHardwareWalletTypes } from '@/utils/supported-hardware-wallets'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { setItems } from '@/types/utils/non-empty'
@@ -74,6 +75,8 @@
 		ladders,
 		attributeTree,
 		walletIcon,
+		hardwareModels,
+		walletNews,
 		wallet,
 		showStage = true,
 		showScores = false,
@@ -81,6 +84,8 @@
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
 		walletIcon: ImageMetadata
+		hardwareModels: typeof allHardwareModels
+		walletNews: WalletSecurityNews[]
 		wallet: RatedWallet<_AttributeGroupId>
 		showStage?: boolean
 		showScores?: boolean
@@ -91,9 +96,8 @@
 	import '@/styles/wallet-toc-fallback.css'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { getUrl } from '@/schema/url'
-	import { IncidentStatus } from '@/types/content/news'
+	import { IncidentStatus, type WalletSecurityNews } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
-	import { getNewsForWallet } from '@/data/news'
 
 	let tocClosing = $state<symbol | null>(null)
 
@@ -374,7 +378,6 @@
 	})
 
 	// (Derived)
-	const walletNews = $derived.by(() => getNewsForWallet(wallet.metadata.id))
 
 	// News section behavior: determine prominence based on recency and resolution status
 	const allNewsResolved = $derived(
@@ -407,7 +410,7 @@
 	})
 
 	let selectedModel = $state<string>()
-	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
+	const brandModels = $derived(hardwareModels.filter(m => m.brandId === wallet.metadata.id))
 
 	onMount(() => {
 		const params = new SvelteURLSearchParams(globalThis.location.search)
@@ -1262,6 +1265,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
+	{@const supportedBrands = supportedHardwareWalletTypes('metadata' in evalAttr.evaluation.outcome ? evalAttr.evaluation.outcome.metadata : null)}
 
 	{@const howToImprove =
 		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove}
@@ -1510,11 +1514,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					/>
 				{/if}
 
-				{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
-					{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
+				{#if attribute.id === 'hardwareWalletSupport' && supportedBrands.length > 0}
 
-					{@const supportedModels = allHardwareModels.filter(m =>
-						supportedBrands.includes(m.brandId.toUpperCase()),
+					{@const supportedModels = hardwareModels.filter(m =>
+						supportedBrands.some(brand => brand === m.brandId.toUpperCase()),
 					)}
 
 					<div class="supported-hardware-wallets" data-card="secondary padding-6">

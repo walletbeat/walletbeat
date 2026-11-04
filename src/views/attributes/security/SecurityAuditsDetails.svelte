@@ -106,7 +106,7 @@
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
+			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
@@ -174,7 +174,7 @@
 						<time data-row-item="wrap-end" data-row="gap-2" datetime={audit.auditDate}
 							style:--collapsible-markerInlineTimeline={`--collapsible-marker-audit-${securityAuditId(audit)}`}>
 							{
-								Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
+								Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' })
 									.format(
 										new Date(audit.auditDate),
 									)

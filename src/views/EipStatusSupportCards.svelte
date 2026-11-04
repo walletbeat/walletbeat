@@ -9,6 +9,7 @@
 	import { variantLabel } from '@/schema/variants'
 	import { childHeadingLevel } from '@/types/heading'
 	import type { CalendarDate } from '@/types/date'
+	import { type ReferenceImageDimensions, setReferenceImageContext } from '@/utils/reference-image-context'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
 
 	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
@@ -34,12 +35,14 @@
 		cards,
 		codeSnippets = {},
 		headingLevel = 2,
+		imageDimensions = {},
 	}: {
 		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
 		id?: string
 		title?: string
 		headingLevel?: 1 | 2 | 3
 		cards: EipStatusSupportCard[]
+		imageDimensions?: ReferenceImageDimensions,
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
 	} = $props()
@@ -48,6 +51,7 @@
 	const walletHeadingLevel = $derived(childHeadingLevel[statusHeadingLevel])
 
 	setCodeSnippetContext(() => codeSnippets)
+	setReferenceImageContext(() => imageDimensions)
 
 
 	// Functions

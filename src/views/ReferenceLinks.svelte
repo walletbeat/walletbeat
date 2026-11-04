@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { getReferenceImageDimensions } from '@/utils/reference-image-context'
+	const imageDimensions = getReferenceImageDimensions()
+
 	// Types/constants
 	import { childHeadingLevel, type ParentHeadingLevel } from '@/types/heading'
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
@@ -254,6 +257,7 @@
 					{/each}
 
 					{#if inlineImage !== undefined}
+						{@const dimensions = imageDimensions(inlineImage.url)}
 						<figure class="inline-image" data-column="start gap-1">
 							<a
 								href={inlineImage.url}
@@ -265,6 +269,10 @@
 							>
 								<img
 									src={inlineImage.url}
+									{...dimensions}
+									style:--referenceImage-width={`${dimensions.width}px`}
+									style:--referenceImage-ratio={dimensions.width / dimensions.height}
+									decoding="async"
 									alt={inlineImage.label}
 									loading="lazy"
 								/>
@@ -330,8 +338,7 @@
 										<img
 											src={image.url}
 											alt={image.label}
-											width="128"
-											height="96"
+											{...imageDimensions(image.url)}
 											loading="lazy"
 											decoding="async"
 										/>
@@ -401,8 +408,10 @@
 
 		img {
 			display: block;
-			max-inline-size: 100%;
-			max-block-size: 20em;
+			box-sizing: content-box;
+			inline-size: calc(min(var(--referenceImage-width), 20em * var(--referenceImage-ratio)) - 2px);
+			block-size: auto;
+			max-inline-size: calc(100% - 2px);
 
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
@@ -516,12 +525,10 @@
 
 		img {
 			display: block;
-			/* Every thumbnail occupies the same fixed box regardless of
-			   the underlying image's aspect ratio. */
-			inline-size: 8em;
-			block-size: 6em;
+			box-sizing: content-box;
+			inline-size: calc(8em - 2px);
+			block-size: auto;
 
-			object-fit: cover;
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
 		}

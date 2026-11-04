@@ -14,6 +14,8 @@ import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { eipStatusSupportCards } from '@/utils/eip-support-cards'
 import { childHeadingLevel } from '@/types/heading'
 
+import { referenceImageDimensions } from '@/utils/reference-image-metadata'
+
 // Components
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
@@ -89,6 +91,9 @@ const embeddedCards = eipStatusSupportCards(eip.number, Object.values(ratedEmbed
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
 					codeSnippets={cardCodeSnippets(softwareCards)}
+					imageDimensions={await referenceImageDimensions(
+						softwareCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)
@@ -101,6 +106,9 @@ const embeddedCards = eipStatusSupportCards(eip.number, Object.values(ratedEmbed
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
 					codeSnippets={cardCodeSnippets(hardwareCards)}
+					imageDimensions={await referenceImageDimensions(
+						hardwareCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)
@@ -113,6 +121,9 @@ const embeddedCards = eipStatusSupportCards(eip.number, Object.values(ratedEmbed
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
 					codeSnippets={cardCodeSnippets(embeddedCards)}
+					imageDimensions={await referenceImageDimensions(
+						embeddedCards.flatMap(card => card.references),
+					)}
 					client:visible
 				/>
 			)

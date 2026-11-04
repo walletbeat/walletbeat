@@ -5,8 +5,10 @@ import { describe, expect, it } from 'vitest'
 import { coinspectDataSource } from '@/schema/data-sources'
 import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
 import { assertCalendarDate } from '@/types/date'
+import { referenceImageDimensions } from '@/utils/reference-image-metadata'
 
 import ReferenceLinks from '../ReferenceLinks.svelte'
+import WithImageDimensions from './WithImageDimensions.svelte'
 
 describe('static reference evidence', () => {
 	it.each([1, 2, 3, 4, 5] as const)('derives Sources from parent level %i', parentHeadingLevel => {
@@ -55,19 +57,33 @@ describe('static reference evidence', () => {
 		).toBe(false)
 	})
 
-	it.each([1, 2])('embeds only local images with %i local image sources', count => {
+	it.each([1, 2])('embeds only local images with %i local image sources', async count => {
+		const localImages = [
+			'/references/wallets/ambire/screenshots/2026-09-26-ambire-seed-phrase-export.png',
+			'/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png',
+		].slice(0, count)
 		const references: FullyQualifiedReference[] = [
 			{ urls: [{ url: 'https://example.com/remote.png', label: 'Remote image' }] },
-			...Array.from({ length: count }, (_, index): FullyQualifiedReference => ({
-				urls: [{ url: `/references/local-${index}.png`, label: `Local image ${index}` }],
+			...localImages.map((url, index): FullyQualifiedReference => ({
+				urls: [{ url, label: `Local image ${index}` }],
 			})),
 		]
-		const { body } = render(ReferenceLinks, { props: { references, parentHeadingLevel: 3 } })
+		const imageDimensions = await referenceImageDimensions(references)
+		const { body } = render(WithImageDimensions, {
+			props: { references, parentHeadingLevel: 3, imageDimensions },
+		})
 		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
 
 		expect(
 			Array.from(document.getElementsByTagName('img')).map(image => image.getAttribute('src')),
-		).toEqual(Array.from({ length: count }, (_, index) => `/references/local-${index}.png`))
+		).toEqual(localImages)
+
+		for (const image of Array.from(document.getElementsByTagName('img'))) {
+			const dimensions = imageDimensions[image.getAttribute('src') ?? '']
+
+			expect(Number(image.getAttribute('width'))).toBe(dimensions.width)
+			expect(Number(image.getAttribute('height'))).toBe(dimensions.height)
+		}
 		expect(
 			Array.from(document.getElementsByTagName('a')).some(
 				link => link.getAttribute('href') === 'https://example.com/remote.png',
