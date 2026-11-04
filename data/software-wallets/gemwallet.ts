@@ -1,5 +1,6 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -90,9 +91,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman, minimalsm],
+		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-11-04',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -626,7 +627,19 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'The Android and iOS apps have no dependency isolation configured.',
+							label: 'Android app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/android/gradle/libs.versions.toml#not-line-specific',
+						},
+						{
+							label: 'iOS app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/.gitmodules#not-line-specific',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
