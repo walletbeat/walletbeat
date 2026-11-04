@@ -120,7 +120,17 @@ for (const javaScriptEnabled of [false, true]) {
 				}
 				releaseImages()
 
-				for (const image of await images.all()) {
+				const pendingImageIndices = () =>
+					images.evaluateAll(elements =>
+						elements.flatMap((element, index) =>
+							element instanceof HTMLImageElement && element.naturalWidth === 0 ? [index] : [],
+						),
+					)
+				let pending = await pendingImageIndices()
+
+				while (pending.length > 0) {
+					const image = images.nth(pending[0])
+
 					await image.scrollIntoViewIfNeeded()
 					await expect
 						.poll(() =>
@@ -129,6 +139,7 @@ for (const javaScriptEnabled of [false, true]) {
 							),
 						)
 						.toBe(true)
+					pending = await pendingImageIndices()
 				}
 				const after = await images.evaluateAll(elements =>
 					elements.map(element => {
