@@ -218,9 +218,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
 
 					const card = page.locator('main .wallet-card details').first()
 
-					await card.scrollIntoViewIfNeeded()
-
 					await card.locator('summary').focus()
+					await expect(card.locator('summary')).toBeInViewport()
 					await page.keyboard.press('Enter')
 					await expect(card).toHaveAttribute('open', '')
 					const relationship = await card.evaluate(details => {
