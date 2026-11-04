@@ -271,7 +271,7 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		[popover]:not(:global(details[open]) > *) {
-			transition-duration: 0s;
+			transition-property: filter;
 		}
 	}
 
