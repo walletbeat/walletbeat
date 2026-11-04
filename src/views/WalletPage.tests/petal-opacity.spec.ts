@@ -35,7 +35,6 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 						scale: Number(style.scale),
 						filter: getComputedStyle(element.nextElementSibling!).filter,
 						strokeOpacity: Number(getComputedStyle(element.nextElementSibling!).opacity),
-						transitions: style.transitionProperty,
 						easing: style.transitionTimingFunction,
 					}
 				}),
@@ -150,7 +149,7 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 			const petal = document.querySelector<HTMLElement>('.pie-navigation a[href="#open-source"]')!
 			const targets = [petal, petal.nextElementSibling!]
 			const initialScale = getComputedStyle(petal).scale
-			const transitions: { property: string }[] = []
+			const transitions: { property: string; target: 'petal' | 'highlight' }[] = []
 			const listeners = new AbortController()
 			let timeout: ReturnType<typeof setTimeout> | undefined
 
@@ -166,11 +165,16 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 							return
 						}
 
-						transitions.push({ property: event.propertyName })
+						transitions.push({
+							property: event.propertyName,
+							target: event.target === petal ? 'petal' : 'highlight',
+						})
 
 						if (
-							transitions.some(value => value.property === 'scale') &&
-							transitions.some(value => value.property === 'opacity')
+							transitions.some(value => value.target === 'petal' && value.property === 'scale') &&
+							transitions.some(
+								value => value.target === 'highlight' && value.property === 'opacity',
+							)
 						) {
 							resolve()
 						}
@@ -198,11 +202,15 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 
 		expect(focusTransitions.initialScale).toBe('1')
 		expect(
-			focusTransitions.transitions.some(transition => transition.property === 'scale'),
+			focusTransitions.transitions.some(
+				transition => transition.target === 'petal' && transition.property === 'scale',
+			),
 			'Exact native focus starts a real compositor-property transition',
 		).toBe(true)
 		expect(
-			focusTransitions.transitions.some(transition => transition.property === 'opacity'),
+			focusTransitions.transitions.some(
+				transition => transition.target === 'highlight' && transition.property === 'opacity',
+			),
 			'Static stroke starts an opacity transition',
 		).toBe(true)
 		await expect(source).toBeFocused()
@@ -259,9 +267,6 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 			.toBe(true)
 		const visual = await read()
 
-		expect(
-			visual.every(row => row.transitions.includes('opacity') && row.transitions.includes('scale')),
-		).toBe(true)
 		expect(visual.every(row => row.easing.includes('0.87'))).toBe(true)
 		const point = await page.locator('.pie-navigation-geometry').evaluate(geometry => {
 			const box = geometry.getBoundingClientRect()

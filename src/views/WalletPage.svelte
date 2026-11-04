@@ -2083,14 +2083,19 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 	}
 	@keyframes wallet-pie-contact {
-		from, to { ---pie-contact: 1; }
+		from { ---pie-contact: 0; }
+		to { ---pie-contact: 1; }
 	}
 
 	@supports (animation-timeline: scroll()) and (timeline-scope: --link) and (color: if(style(---link-active: 1): red)) {
 		@scope (:root) to (details:not([open]) > :not(summary)) {
 			.pie-navigation :global(:is(li, details)[data-pressable-name]) {
-				animation: var(---link-currentAnimationName) auto linear both, wallet-pie-contact auto steps(1, start);
-				animation-timeline: var(--link-current, none), var(--pie-contactTimeline);
+				animation:
+					var(---link-currentAnimationName) auto linear both,
+					wallet-pie-contact auto linear forwards,
+					wallet-pie-contact auto linear reverse forwards;
+				animation-timeline: var(--link-current, none), var(--pie-contactTimeline), var(--pie-contactTimeline);
+				animation-range: normal, cover 0% cover 0%, cover 100% cover 100%;
 			}
 			.pie-navigation {
 				:global(.navigation-items summary > a),
