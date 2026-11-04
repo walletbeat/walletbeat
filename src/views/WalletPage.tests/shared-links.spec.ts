@@ -689,6 +689,17 @@ for (const width of [690, 1440]) {
 				peer.evaluate(link => {
 					const owner = link.closest('summary') ?? link
 					const style = getComputedStyle(owner)
+					const icon = link.querySelector('[data-icon]')
+
+					if (!icon) {
+						throw new Error('Shared navigation peer has no icon')
+					}
+
+					const filterOwners = [icon, ...icon.querySelectorAll('img, svg')]
+
+					for (let ancestor = icon.parentElement; ancestor; ancestor = ancestor.parentElement) {
+						filterOwners.push(ancestor)
+					}
 
 					return {
 						state: link.getAttribute('data-pressable-state'),
@@ -697,7 +708,7 @@ for (const width of [690, 1440]) {
 						color: style.color,
 						opacity: getComputedStyle(link).opacity,
 						scale: getComputedStyle(link).scale,
-						grayscale: style.getPropertyValue('--icon-grayscale-filter').trim(),
+						filters: filterOwners.map(element => getComputedStyle(element).filter),
 					}
 				})
 
@@ -728,7 +739,9 @@ for (const width of [690, 1440]) {
 				.toBe(false)
 			await expect.poll(async () => (await paint()).state).toContain('interacting')
 			await expect.poll(async () => (await paint()).background).not.toBe(baseline.background)
-			await expect.poll(async () => (await paint()).grayscale).toBe('none')
+			await expect
+				.poll(async () => (await paint()).filters)
+				.not.toEqual(expect.arrayContaining([expect.stringMatching(/grayscale\(/)]))
 			// Isolate transient press feedback from the independently tested fragment navigation.
 			await source.evaluate(link =>
 				link.addEventListener('click', event => event.preventDefault(), { once: true }),
@@ -755,6 +768,9 @@ for (const width of [690, 1440]) {
 			await source.focus()
 			await expect.poll(async () => (await paint()).state).toContain('interacting')
 			await expect.poll(async () => (await paint()).background).not.toBe(baseline.background)
+			await expect
+				.poll(async () => (await paint()).filters)
+				.not.toEqual(expect.arrayContaining([expect.stringMatching(/grayscale\(/)]))
 			await info.attach('shared-peer-paint', {
 				body: JSON.stringify({ hit, baseline, focused: await paint() }),
 				contentType: 'application/json',

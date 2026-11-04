@@ -121,7 +121,11 @@
 		const closing = tocClosing
 		if (closing === null) return
 		const panel = event.currentTarget
-		await finishPopoverExit(panel)
+		// The overlay exit transition owns top-layer retention independently of attention filtering.
+		if (getComputedStyle(panel).transitionProperty.split(',').some(property =>
+			['all', 'overlay'].includes(property.trim()))) {
+			await finishPopoverExit(panel)
+		}
 		if (tocClosing === closing && !panel.matches(':popover-open')) {
 			tocClosing = null
 			publishTocState('closed')
@@ -1830,7 +1834,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					background: var(--background-primary);
 					opacity: 1;
 
-					transition-property: opacity, translate, display, overlay;
+					transition-property: opacity, translate, display, overlay, filter;
 					translate: 0 0 0;
 					:global(> .navigation-items) {
 						position: relative;
@@ -1873,10 +1877,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						translate: 0 -0.75rem 1.25rem;
 					}
 					&:not(:popover-open):not([data-closing]) {
-						transition-property: none;
+						transition-property: filter;
 					}
 					&:popover-open {
-						transition-property: none;
+						transition-property: filter;
 						animation: wallet-toc-entry var(---wallet-toc-entryDuration, 0.25s)
 							var(--transition-easeOutExpo);
 					}
@@ -1884,7 +1888,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						display: flex;
 					}
 					@media (prefers-reduced-motion: reduce) {
-						transition-duration: 0s;
+						transition-property: filter;
 						&:popover-open {
 							animation-duration: 0s;
 						}

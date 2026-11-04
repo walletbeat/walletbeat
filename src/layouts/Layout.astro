@@ -46,6 +46,38 @@ import Footer from '@/views/Footer.astro'
 		<Font cssVariable='--fontFamily-avenir' preload />
 
 		<ClientRouter />
+		<script>
+			let keyboardInput = false
+			const setKeyboardInput = (value: boolean) => {
+				if (keyboardInput === value) {
+					return
+				}
+				keyboardInput = value
+				document.documentElement.toggleAttribute('data-keyboard-input', value)
+			}
+			const updateWindowActivity = () => {
+				document.documentElement.toggleAttribute('data-keyboard-input', keyboardInput)
+				document.documentElement.toggleAttribute(
+					'data-window-active',
+					document.hasFocus() && document.visibilityState === 'visible',
+				)
+			}
+			// Text inputs retain visible focus after pointer movement; the latest input chooses attention.
+			document.addEventListener('keydown', event => {
+				if (!['Alt', 'Control', 'Meta', 'Shift'].includes(event.key)) {
+					setKeyboardInput(true)
+				}
+			})
+			for (const event of ['pointermove', 'pointerdown', 'wheel']) {
+				document.addEventListener(event, () => setKeyboardInput(false), { passive: true })
+			}
+			window.addEventListener('focus', updateWindowActivity)
+			window.addEventListener('blur', updateWindowActivity)
+			document.addEventListener('visibilitychange', updateWindowActivity)
+			document.addEventListener('astro:after-swap', updateWindowActivity)
+			window.addEventListener('pageshow', updateWindowActivity)
+			updateWindowActivity()
+		</script>
 		<script is:inline>
 			;(() => {
 				const systemDark = matchMedia('(prefers-color-scheme: dark)')
@@ -149,6 +181,7 @@ import Footer from '@/views/Footer.astro'
 				<slot />
 				<Footer />
 			</div>
+			<div class='attention-backdrop' aria-hidden='true'></div>
 		</div>
 	</body>
 </html>
@@ -213,6 +246,16 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
+		> .attention-backdrop {
+			grid-area: 1 / 1 / -1 / -1;
+			position: sticky;
+			inset-block-start: 0;
+			inline-size: 100%;
+			block-size: 100%;
+			z-index: 3;
+			pointer-events: none;
+		}
+
 		> .skip-link {
 			position: fixed;
 			z-index: 3;
@@ -227,7 +270,7 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
-		> nav {
+		> :global(nav) {
 			grid-area: Nav;
 			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
 		}
@@ -254,6 +297,40 @@ import Footer from '@/views/Footer.astro'
 </style>
 
 <style is:global>
+	#layout > .attention-backdrop {
+		transition-property: backdrop-filter;
+	}
+
+	:where(#nav) :is([data-icon], .logo) {
+		transition-property: filter;
+	}
+
+	/* Native hover propagation stops at top-layer scroll regions. */
+	:root[data-window-active] {
+		&[data-keyboard-input]:has(#nav :focus-visible),
+		&:not([data-keyboard-input]):has(#nav:hover, #nav [data-scroll-container]:hover) {
+			#layout > .attention-backdrop {
+				backdrop-filter: grayscale(1);
+			}
+			#nav[data-sticky] {
+				--sticky-zIndex: 4;
+			}
+			#content [popover]:is(:popover-open, [data-closing]) {
+				filter: grayscale(1);
+			}
+		}
+		&[data-keyboard-input]:has(#layout[data-scroll-container] #top):has(#content:focus-visible),
+		&[data-keyboard-input]:has(#layout[data-scroll-container] #top :focus-visible),
+		&:not([data-keyboard-input]):has(
+				#layout[data-scroll-container] #top:hover,
+				#layout[data-scroll-container] #top [data-scroll-container]:hover
+			):not(:has(#nav:hover, #nav [data-scroll-container]:hover)) {
+			#nav :is([data-icon], .logo) {
+				filter: grayscale(1);
+			}
+		}
+	}
+
 	@property --navigation-mobile-blockSize {
 		syntax: '<length>';
 		inherits: true;
