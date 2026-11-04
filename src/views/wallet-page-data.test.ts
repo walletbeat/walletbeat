@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { unratedEmbeddedWallet } from '@/data/embedded-wallets'
-import { allRatedWalletsBySlug, attributeTreeForWallet } from '@/data/wallets'
+import { unratedEmbeddedTemplate } from '@/data/embedded-wallets/unrated.tmpl'
+import { allRatedWalletsBySlug, allWallets, attributeTreeForWallet } from '@/data/wallets'
 import { allWalletLadders } from '@/schema/ladders'
 import { evaluateWalletOnLadder } from '@/schema/stages'
 import { variantEnum } from '@/schema/variants'
@@ -12,7 +13,15 @@ import { restoreWalletPageData, walletPageAttributeTree, walletPageData } from '
 describe('wallet page facts', () => {
 	for (const wallet of [...Object.values(allRatedWalletsBySlug), unratedEmbeddedWallet]) {
 		it(`preserves the native consumer data for ${wallet.metadata.id}`, () => {
-			const data = structuredClone(walletPageData(wallet))
+			const source = [...Object.values(allWallets), unratedEmbeddedTemplate].find(
+				entry => entry.metadata.id === wallet.metadata.id,
+			)
+
+			if (!source) {
+				throw new Error(`Missing wallet source: ${wallet.metadata.id}`)
+			}
+
+			const data = structuredClone(walletPageData(wallet, source))
 			const restored = restoreWalletPageData(data)
 
 			expect(restored).toEqual(wallet)
