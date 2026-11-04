@@ -529,7 +529,6 @@ describe('codebase integrity', () => {
 			'[walletName]',
 			'[...slug]',
 			'[...path].[ext].ts',
-			'_about.md',
 			'APPEND_SYSTEM.md',
 		])
 

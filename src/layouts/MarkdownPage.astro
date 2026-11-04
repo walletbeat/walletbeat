@@ -18,14 +18,14 @@ import { defaultNavigationItems } from '@/constants/navigation'
 <Layout metadata={metadata}>
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-8'>
+	<main data-content-page data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-4'>
 				<h1>{metadata.title}</h1>
 			</hgroup>
 		</header>
 
-		<div data-scroll-item='inline-detached padding-match-end'>
+		<div data-prose data-scroll-item='inline-detached padding-match-end'>
 			<slot />
 		</div>
 	</main>
@@ -33,31 +33,8 @@ import { defaultNavigationItems } from '@/constants/navigation'
 
 <style>
 	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
-
 		p {
 			font-family: var(--fontFamily-avenir);
-		}
-
-		div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
 		}
 
 		div :global(hr) {
