@@ -554,6 +554,7 @@
 	const pieRotation = $derived.by(() => {
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
 		const styles: string[] = [`
+			${[...attributeDestinations.keys()].map(href => `#top [data-pressable-name="${href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: none; }
 			@container style(---pie-currentIndex: 0) {
 				#wallet-toc > .navigation-items > menu:first-of-type > li:first-child {
 					---navigation-snapAlign: start;
@@ -649,7 +650,7 @@
 						from, to { ---pie-currentIndex: ${index}; }
 					}
 					@container style(---pie-currentIndex: ${index}) {
-						${(item === group ? [group] : [group, item]).map(related => `#top .page-navigation [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
+						${(item === group ? [group] : [group, item]).map(related => `#top [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
 						.pie-navigation-geometry { ---pie-hasRelevant: 1; }
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
 						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] { --pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline}; }
@@ -676,6 +677,7 @@
 			approachRanges: turns.map(() => 'exit-crossing -100% exit-crossing 0%').join(', ') || 'normal',
 			approachTimelines: turns.map(turn => turn.timeline).join(', ') || undefined,
 			animations: states.map(state => state.animation).join(', ') || 'none',
+			ranges: states.map(() => 'exit-crossing -1px exit-crossing -1px').join(', ') || 'normal',
 			styles: styles.join('\n'),
 			peerStyles: peerStyles.join('\n'),
 			timelines: states.map(state => state.timeline).join(', ') || undefined,
@@ -832,6 +834,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 <div
 	id="top"
+	style:---pie-rotation-states={pieRotation.animations}
+	style:---pie-rotation-ranges={pieRotation.ranges}
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-approach-timelines={pieRotation.approachTimelines}
 	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).join(', ') || '--wallet-links'}
@@ -985,7 +989,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	<aside
 		class="page-navigation"
-		style:---pie-rotation-states={pieRotation.animations}
 		data-scroll-item="inline-detached"
 		data-sticky-container
 		data-row="center align-start"
@@ -2199,17 +2202,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 		}
 	}
-	.page-navigation {
-		:global([data-pressable-name]) {
-			---link-currentAnimationName: none;
-		}
-		@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
-			animation: var(---pie-rotation-states);
-			animation-timeline: var(---pie-rotation-timelines);
-			animation-range: exit-crossing -1px entry-crossing 100%;
-		}
-	}
-
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 		.container .page-navigation {
 			---pie-size: var(---wallet-page-navigation-inline-size);
@@ -2489,7 +2481,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	}
 
 
-	[data-sticky-breadcrumb~="root"] {
+	[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="root"] {
+		@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
+			animation: var(---breadcrumb-sizeAnimationNames, none) auto linear reverse both, var(---pie-rotation-states);
+			animation-timeline: var(---breadcrumb-sizeTimelines, none), var(---pie-rotation-timelines);
+			animation-range: exit-crossing 0% exit-crossing 100%, var(---pie-rotation-ranges);
+		}
 		@media (scripting: none) {
 			.wallet-device-controls,
 			> article > button,
@@ -2500,14 +2497,19 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		& > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
 			display: none;
 		}
-		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
-			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
-		@media (width > 84rem) {
+		@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+			(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+			(color: if(style(---breadcrumb-wrap: 1): red)) and
+			(timeline-scope: all) and (view-timeline-name: ident("a" "b"))) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
-				var(--stickyBreadcrumb-entryTimeline),
 				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			@media (width > 84rem) {
+				timeline-scope:
+					var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
+					var(--stickyBreadcrumb-entryTimeline),
+					var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			}
 		}
 	}
 

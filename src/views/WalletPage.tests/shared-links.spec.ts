@@ -314,7 +314,7 @@ test('destination feedback keeps current, focus and hover independent across own
 		if (headingCapability) {
 			const composition = await page.evaluate(expected => {
 				const root = document.querySelector('#top'),
-					owner = root?.querySelector('.page-navigation')
+					owner = root
 
 				if (!root || !owner) {
 					throw Error('Native current owner is absent')

@@ -18,10 +18,7 @@ const currentIndex = (owner: Element) => {
 
 const selectedDestinations = (links: Element[]) =>
 	links
-		.filter(
-			link =>
-				getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-		)
+		.filter(link => getComputedStyle(link.closest('li')!).scrollSnapAlign === 'center')
 		.map(link => new URL(link.getAttribute('href')!, document.baseURI).hash)
 
 test('stage current state selects only criterion-related attribute pie slices and reverses', async ({
@@ -250,7 +247,7 @@ test('stage current state selects only criterion-related attribute pie slices an
 		.poll(() => page.locator('.page-navigation').evaluate(currentIndex))
 		.toBeGreaterThan(0)
 	await expect
-		.poll(() => page.locator('.pie-navigation a[href]').evaluateAll(selectedDestinations))
+		.poll(() => page.locator('#wallet-toc a[href]').evaluateAll(selectedDestinations))
 		.toEqual([`#${attributeId}`])
 	await expect
 		.poll(() =>
