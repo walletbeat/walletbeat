@@ -4,6 +4,7 @@ import { eips } from '@/data/eips'
 import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { allRatedWallets } from '@/data/wallets'
 import { EipSupportStatus, ratedWalletEipSupportByStatus } from '@/schema/eip-support'
+import type { RatedWallet } from '@/schema/wallet'
 import { eipStatusSupportCards } from '@/utils/eip-support-cards'
 
 describe('EIP wallet card ordering', () => {
@@ -26,7 +27,7 @@ describe('EIP wallet card ordering', () => {
 	})
 
 	it('preserves every wallet/status group, platform sequence and citation across the EIP inventory', () => {
-		const wallets = Object.values(allRatedWallets)
+		const wallets: Array<RatedWallet<string>> = Object.values(allRatedWallets)
 
 		for (const eip of Object.values(eips)) {
 			const cards = eipStatusSupportCards(eip.number, wallets)
