@@ -96,6 +96,7 @@
 				<header data-scroll-item='inline-detached'>
 					<svelte:element this={`h${statusHeadingLevel}`}
 						id={id === undefined ? undefined : eipSupportStatusGroupId(id, status)}
+						tabindex={id === undefined ? undefined : -1}
 						data-support-status={status}
 						style:--accent={headingColor[status]}
 					>{label}</svelte:element>
