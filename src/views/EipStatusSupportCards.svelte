@@ -6,7 +6,8 @@
 		eipSupportStatusColor as statusColor,
 		eipSupportStatusGroupId,
 	} from '@/schema/eip-support'
-	import { Variant } from '@/schema/variants'
+	import { variantLabel } from '@/schema/variants'
+	import { childHeadingLevel } from '@/types/heading'
 	import type { CalendarDate } from '@/types/date'
 	import { type ReferenceImageDimensions, setReferenceImageContext } from '@/utils/reference-image-context'
 	import { type CodeSnippetIndex, setCodeSnippetContext } from '@/utils/code-snippet-index'
@@ -27,39 +28,27 @@
 	]
 
 
-	// Fixed display order and label, independent of the order variants were
-	// collected in.
-	const platformNames: Array<[Variant, string]> = [
-		[Variant.BROWSER, 'Browser Extension'],
-		[Variant.MOBILE, 'Mobile App'],
-		[Variant.DESKTOP, 'Desktop App'],
-		[Variant.HARDWARE, 'Hardware Wallet'],
-		[Variant.EMBEDDED, 'Embedded Wallet'],
-	]
-
-	const platformLabel = (variants: Variant[]): string =>
-		platformNames
-			.filter(([variant]) => variants.includes(variant))
-			.map(([, name]) => name)
-			.join(' & ')
-
-
 	// Props
 	let {
 		id,
 		title,
 		cards,
 		codeSnippets = {},
+		headingLevel = 2,
 		imageDimensions = {},
 	}: {
 		// Prefix of the status group IDs (see `eipSupportStatusGroupId`).
 		id?: string
 		title?: string
+		headingLevel?: 1 | 2 | 3
 		cards: EipStatusSupportCard[]
 		imageDimensions?: ReferenceImageDimensions,
 		// The stored code snippets these cards reference (see `codeSnippetsForReferences`).
 		codeSnippets?: CodeSnippetIndex
 	} = $props()
+
+	const statusHeadingLevel = $derived(title ? childHeadingLevel[headingLevel] : headingLevel)
+	const walletHeadingLevel = $derived(childHeadingLevel[statusHeadingLevel])
 
 	setCodeSnippetContext(() => codeSnippets)
 	setReferenceImageContext(() => imageDimensions)
@@ -68,9 +57,6 @@
 	// Functions
 	const cardsForStatus = (status: EipSupportStatus): EipStatusSupportCard[] =>
 		cards.filter(card => card.status === status)
-
-	const labelForStatus = (status: EipSupportStatus): string =>
-		statusLabel.find(entry => entry.status === status)?.label ?? status
 
 	// The most recent date among the card's references, i.e. when this status
 	// was last verified.
@@ -102,7 +88,7 @@
 			data-row="wrap"
 			data-scroll-item='inline-detached padding-match-start'
 		>
-			<h2>{title}</h2>
+			<svelte:element this={`h${headingLevel}`}>{title}</svelte:element>
 		</header>
 	{/if}
 
@@ -112,19 +98,19 @@
 		{#if statusCards.length > 0}
 			<div data-column="gap-4">
 				<header data-scroll-item='inline-detached'>
-					<h3
+					<svelte:element this={`h${statusHeadingLevel}`}
 						id={id === undefined ? undefined : eipSupportStatusGroupId(id, status)}
+						tabindex={id === undefined ? undefined : -1}
 						data-support-status={status}
 						style:--accent={headingColor[status]}
-					>{label}</h3>
+					>{label}</svelte:element>
 				</header>
 
-				<div data-scroll-item="inline-attached underflow-center overflow-start">
-					<div class="wallet-card-list" data-column="gap-5">
+				<div data-scroll-item="inline-detached" data-column="gap-5">
 						{#each statusCards as card (card.id)}
 							{@const hasReferences = card.references.length > 0}
 
-							{#snippet WalletCardHeader(isSummary: boolean)}
+							{#snippet WalletCardHeader()}
 								<span class="wallet-icon" data-icon="shadow">
 									<img
 										src={`/images/wallets/${card.id}.${card.iconExtension}`}
@@ -134,26 +120,11 @@
 									/>
 								</span>
 
-								<div class="wallet-heading" data-row-item="flexible" data-row="start gap-2">
-									<h4>
-										<!-- Links can't nest in the summary toggle; the expanded card links to the wallet page. -->
-										{#if isSummary}
-											{card.displayName}
-										{:else}
-											<a data-link="camouflaged" href={card.url}>
-												{card.displayName}
-											</a>
-										{/if}
-									</h4>
+								<svelte:element this={`h${walletHeadingLevel}`} class="wallet-heading" data-row-item="flexible">
+									<a data-link="camouflaged" href={card.url}>{card.displayName}</a>
+								</svelte:element>
 
-									<span
-										class="status-tag"
-										data-badge="small"
-										style:--accent={headingColor[card.status]}
-									>{labelForStatus(card.status)}</span>
-								</div>
-
-								<span class="platform-label">{platformLabel(card.variants)}</span>
+								<span class="platform-label">{card.variants.map(variantLabel).join(', ')}</span>
 							{/snippet}
 
 							<div
@@ -164,12 +135,12 @@
 									{@const lastVerified = cardLastVerified(card)}
 
 									<details data-card="radius-4 padding-4 border-accent" data-column="gap-0">
-										<summary data-row="center gap-3">
-											{@render WalletCardHeader(true)}
+										<summary data-row="start wrap gap-3">
+											{@render WalletCardHeader()}
 										</summary>
 
 										<div class="wallet-card-content" data-column="gap-3">
-											<ReferenceLinks parentHeadingLevel={4} references={card.references} cardBackground="secondary" />
+											<ReferenceLinks parentHeadingLevel={walletHeadingLevel} references={card.references} cardBackground="secondary" />
 
 											<div class="card-meta" data-row="wrap gap-3">
 												{#if lastVerified}
@@ -186,15 +157,14 @@
 									</details>
 								{:else}
 									<div class="wallet-card-static" data-card="radius-4 padding-4 border-accent">
-										<div data-row="center gap-3">
-											{@render WalletCardHeader(false)}
-											<span class="chevron-spacer" aria-hidden="true"></span>
+										<div data-row="start wrap gap-3">
+											{@render WalletCardHeader()}
+
 										</div>
 									</div>
 								{/if}
 							</div>
 						{/each}
-					</div>
 				</div>
 			</div>
 		{/if}
@@ -211,18 +181,7 @@
 		}
 	}
 
-	/*
-	 * Fixed width so every card in the list is the same size from the start,
-	 * instead of `max-content` sizing to whichever card happens to be widest
-	 * (which made the whole column visibly jump wider only once a card was
-	 * expanded).
-	 */
-	.wallet-card-list {
-		width: 56rem;
-		max-width: 100%;
-	}
-
-	h3 {
+	[data-support-status] {
 		font-size: 1.2rem;
 		font-weight: 700;
 		margin: 0;
@@ -230,10 +189,6 @@
 	}
 
 	.wallet-card {
-		:global(details) {
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-		}
-
 		:global(summary) {
 			min-inline-size: 0;
 		}
@@ -244,39 +199,9 @@
 		flex-shrink: 0;
 	}
 
-	/* Matches the chevron's own box (see `details > summary::after` in
-	   css-attributes.css) so a non-expandable card's label lines up with the
-	   expandable ones instead of drifting to the right edge. */
-	.chevron-spacer {
-		flex-shrink: 0;
-		width: 0.75em;
-		height: 1lh;
-	}
-
 	.wallet-heading {
-		min-inline-size: 0;
-
-		h4 {
-			flex-shrink: 1;
-			font-size: 0.9rem;
-			font-weight: 600;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-	}
-
-	.status-tag {
-		--badge-backgroundColor: color-mix(in srgb, var(--accent) 14%, transparent);
-		--badge-borderColor: color-mix(in srgb, var(--accent) 20%, transparent);
-		/* Small text on the tinted card needs a darker shade than the heading. */
-		--badge-textColor: light-dark(oklch(from var(--accent) min(l, 0.48) c h), var(--accent));
-
-		flex-shrink: 0;
-		font-size: 0.65em;
+		font-size: 0.9rem;
 		font-weight: 600;
-		letter-spacing: 0.03em;
-		text-transform: uppercase;
 	}
 
 	/* Matches the "Updated <date>" secondary text on the wallet security news
@@ -303,7 +228,4 @@
 		color: var(--text-secondary);
 	}
 
-	.wallet-page-link {
-		white-space: nowrap;
-	}
 </style>

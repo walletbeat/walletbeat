@@ -1,4 +1,5 @@
 ---
+import { withBasePath } from '@/base-url'
 // Types/constants
 import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
 import { allHardwareModels } from '@/data/hardware-wallets'
@@ -73,7 +74,7 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 		description: `How does ${wallet.metadata.displayName} stack up as an Ethereum wallet?`,
 		icons: [
 			{
-				url: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+				url: withBasePath(`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`),
 			},
 		],
 		keywordsBefore: [
