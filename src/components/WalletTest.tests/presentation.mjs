@@ -376,6 +376,9 @@ async function checkModalLifecycle(
 
 			return {
 				exact: el === document.activeElement,
+				focused: document.hasFocus(),
+				connected: el.isConnected,
+				eligible: !el.matches(':disabled') && !el.closest('[inert]'),
 				inParent: Boolean(parent?.matches(':modal') && parent.contains(document.activeElement)),
 				tag: document.activeElement?.tagName ?? null,
 				text: (document.activeElement?.textContent ?? '').slice(0, 160),
@@ -384,7 +387,7 @@ async function checkModalLifecycle(
 	)
 
 	assert.ok(
-		focus.exact,
+		focus.exact && focus.focused && focus.connected && focus.eligible,
 		JSON.stringify({
 			focus,
 			restoredEventually,
