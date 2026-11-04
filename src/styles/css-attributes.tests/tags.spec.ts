@@ -307,7 +307,11 @@ async function reachable(target: Locator) {
 	return result.point
 }
 
-async function tabTo(page: Page, target: Locator) {
+async function tabTo(
+	page: Page,
+	target: Locator,
+	{ afterScroll = false }: { afterScroll?: boolean } = {},
+) {
 	const webkit = page.context().browser()?.browserType().name() === 'webkit'
 	const forward = webkit ? 'Alt+Tab' : 'Tab'
 	const backward = webkit ? 'Alt+Shift+Tab' : 'Shift+Tab'
@@ -319,10 +323,15 @@ async function tabTo(page: Page, target: Locator) {
 				elements.filter(element => element instanceof HTMLElement && element.tabIndex >= 0).length,
 		)
 
+	// Prepared controls can lie before the native traversal starting point.
 	if (
-		await target.evaluate(
-			element => document.activeElement === element && !element.matches(':focus-visible'),
-		)
+		afterScroll
+			? !(await target.evaluate(
+					element => document.activeElement === element && element.matches(':focus-visible'),
+				))
+			: await target.evaluate(
+					element => document.activeElement === element && !element.matches(':focus-visible'),
+				)
 	) {
 		await page.keyboard.press(backward)
 	}
@@ -486,7 +495,7 @@ async function expectOpen(target: Locator) {
 async function keyboardShowAndDismiss(page: Page, button: Locator) {
 	const target = await popoverFor(page, button)
 
-	await tabTo(page, button)
+	await tabTo(page, button, { afterScroll: true })
 	await page.keyboard.press('Enter')
 	await expectOpen(target)
 	await page.keyboard.press('Enter')
@@ -703,7 +712,7 @@ for (const theme of ['light', 'dark'] as const) {
 
 					await page.mouse.click(point.x, point.y)
 					await expect(output).toHaveText('1')
-					await tabTo(page, button)
+					await tabTo(page, button, { afterScroll: true })
 					await page.keyboard.press('Space')
 					await expect(output).toHaveText('2')
 					await page.keyboard.press('Enter')
@@ -752,7 +761,7 @@ for (const theme of ['light', 'dark'] as const) {
 
 					await page.mouse.click(point.x, point.y)
 					await expect(state).toBeChecked()
-					await tabTo(page, filter)
+					await tabTo(page, filter, { afterScroll: true })
 					await page.keyboard.press('Space')
 					await expect(state).not.toBeChecked()
 				})
@@ -875,7 +884,7 @@ for (const theme of ['light', 'dark'] as const) {
 								await page.mouse.move(point.x, point.y)
 							} else if (state === 'focus') {
 								await page.mouse.move(0, 0)
-								await tabTo(page, link)
+								await tabTo(page, link, { afterScroll: true })
 							}
 
 							const normal = state === 'normal'
