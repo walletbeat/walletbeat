@@ -2,7 +2,7 @@ import { type AttributeTree, calculateOverallScore } from '@/schema/attribute-gr
 import { type EipStatusSupportCard, EipSupportStatus } from '@/schema/eip-support'
 import type { RatedWallet } from '@/schema/wallet'
 import type { CalendarDate } from '@/types/date'
-import { getWalletStageAndLadder, type RatedWalletStageSlice } from '@/utils/stage'
+import { walletStageIndex } from '@/utils/stage'
 
 /** The values EIP support cards are ordered by. */
 export interface EipSupportCardSortKey {
@@ -36,21 +36,6 @@ export function earliestSupportEvidence(
 		.filter((date): date is CalendarDate => date !== undefined)
 
 	return dates.toSorted().at(0) ?? null
-}
-
-/**
- * Index of the stage a wallet cleared on its primary ladder, matching the
- * homepage table's ordering: -1 for wallets that cleared no stage (or have no
- * applicable ladder), then 0, 1, 2... for Stage 0, 1, 2...
- */
-export function walletStageIndex(wallet: RatedWalletStageSlice): number {
-	const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-
-	if (stage === null || typeof stage === 'string' || ladderEvaluation === null) {
-		return -1
-	}
-
-	return ladderEvaluation.ladder.stages.findIndex(({ id }) => id === stage.id)
 }
 
 /**
@@ -99,7 +84,7 @@ export function sortEipSupportCards<_AttributeGroupId extends string>(
 			card,
 			key: {
 				earliestSupportEvidence: earliestSupportEvidence(card),
-				stageIndex: walletStageIndex(wallet),
+				stageIndex: walletStageIndex(wallet) ?? -1,
 				score: calculateOverallScore(attributeTree, wallet.overall, () => true)?.score ?? null,
 			},
 		}))

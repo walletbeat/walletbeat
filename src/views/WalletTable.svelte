@@ -262,7 +262,7 @@
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
-	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletStageAndLadder, walletStageIndex } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
@@ -279,16 +279,7 @@
 		walletA: RatedWallet<_AttributeGroupId>,
 		walletB: RatedWallet<_AttributeGroupId>,
 	): number => {
-		// Returns -1 for wallets that cleared no stage (or N/A);
-		// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
-		const stageIndex = (wallet: RatedWallet<_AttributeGroupId>): number => {
-			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-			if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
-			if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
-			const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-			return idx >= 0 ? idx : -1
-		}
-		const stageDiff = stageIndex(walletA) - stageIndex(walletB)
+		const stageDiff = (walletStageIndex(walletA) ?? -1) - (walletStageIndex(walletB) ?? -1)
 		if (stageDiff !== 0) return stageDiff
 		const scoreA = getWalletScore(walletA)
 		const scoreB = getWalletScore(walletB)
@@ -1111,13 +1102,7 @@
 							id: 'stage',
 							name: 'Stage',
 							HeaderTitle: FilterHeaderTitle,
-							value: wallet => {
-								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
-								if (typeof stage === 'string') return null
-								const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-								return stageIndex >= 0 ? stageIndex : null
-							},
+							value: walletStageIndex,
 
 							sort: {
 								defaultDirection: SortDirection.Descending,
