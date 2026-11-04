@@ -336,6 +336,83 @@ async function tabTo(page: Page, target: Locator) {
 	expect(await target.evaluate(element => element.matches(':focus-visible'))).toBe(true)
 }
 
+async function heldLinkRelease(page: Page, link: Locator, browserName: string, scripts: boolean) {
+	const edge = await link.evaluate(element => {
+		const box = element.getBoundingClientRect()
+		const y = box.top + box.height / 2
+		const inside = { x: box.left + 2, y }
+		const outside = [1.5, 2.5, 3.5, 4.5, 6.5, 8.5]
+			.map(offset => ({ x: box.left - offset, y }))
+			.find(
+				point =>
+					point.x >= 0 &&
+					document.elementFromPoint(point.x, point.y)?.closest('a[href]') !== element,
+			)
+
+		if (!outside) {
+			throw new Error('No measured point outside the native link edge')
+		}
+
+		return {
+			inside,
+			outside,
+			ownsInside: document.elementFromPoint(inside.x, inside.y)?.closest('a[href]') === element,
+			ownsOutside: document.elementFromPoint(outside.x, outside.y)?.closest('a[href]') === element,
+		}
+	})
+
+	expect(edge.ownsInside).toBe(true)
+	expect(edge.ownsOutside).toBe(false)
+	// Protocol input keeps script-disabled Chromium gestures independent of page timers.
+	const protocol =
+		browserName === 'chromium' && !scripts ? await page.context().newCDPSession(page) : null
+
+	await page.mouse.move(edge.inside.x, edge.inside.y)
+
+	try {
+		if (protocol) {
+			await protocol.send('Input.dispatchMouseEvent', {
+				type: 'mousePressed',
+				...edge.inside,
+				button: 'left',
+				buttons: 1,
+				clickCount: 1,
+			})
+		} else {
+			await page.mouse.down()
+		}
+
+		expect(await link.evaluate(element => element.matches(':active'))).toBe(true)
+		await expect(page).not.toHaveURL(/#tag-destination$/)
+
+		if (protocol) {
+			await protocol.send('Input.dispatchMouseEvent', {
+				type: 'mouseMoved',
+				...edge.outside,
+				button: 'left',
+				buttons: 1,
+			})
+			await protocol.send('Input.dispatchMouseEvent', {
+				type: 'mouseReleased',
+				...edge.outside,
+				button: 'left',
+				buttons: 0,
+				clickCount: 1,
+			})
+		} else {
+			await page.mouse.move(edge.outside.x, edge.outside.y)
+			await page.mouse.up()
+		}
+	} finally {
+		await protocol?.detach()
+	}
+
+	await page.mouse.move(edge.outside.x, edge.outside.y)
+	await expect(page).not.toHaveURL(/#tag-destination$/)
+
+	return { method: protocol ? 'Chromium native protocol' : 'Playwright mouse', ...edge }
+}
+
 async function popoverFor(page: Page, button: Locator) {
 	const id = await button.getAttribute('popovertarget')
 
@@ -774,6 +851,7 @@ for (const theme of ['light', 'dark'] as const) {
 
 				test('paint, focus, wrapping and native activation compose with public overrides', async ({
 					page,
+					browserName,
 				}, info) => {
 					await load(page, scripts, 'current')
 					const reference = await tagAppearance(page.locator('[data-tag-link-reference]'))
@@ -852,17 +930,9 @@ for (const theme of ['light', 'dark'] as const) {
 						await page.keyboard.press('Space')
 						await expect(page).not.toHaveURL(/#tag-destination$/)
 						await link.scrollIntoViewIfNeeded()
-						const point = await reachable(link)
+						const held = await heldLinkRelease(page, link, browserName, scripts)
 
-						await page.mouse.move(point.x, point.y)
-						await page.mouse.down()
-						expect(await link.evaluate(element => element.matches(':active'))).toBe(true)
-						await expect(page).not.toHaveURL(/#tag-destination$/)
-						const outside = await outsidePoint(page)
-
-						await page.mouse.move(outside.x, outside.y)
-						await page.mouse.up()
-						await expect(page).not.toHaveURL(/#tag-destination$/)
+						observations.push({ variant, state: 'held-release-outside', held })
 						await link.scrollIntoViewIfNeeded()
 						const edge = await link.evaluate(element => {
 							const box = element.getBoundingClientRect()
