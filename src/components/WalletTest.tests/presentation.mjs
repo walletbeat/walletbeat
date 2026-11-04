@@ -234,6 +234,7 @@ export function installProviders() {
  * @param {number} position
  * @param {'escape'|'light'|'close'|'cancel'} [dismiss]
  * @param {number} [remaining]
+ * @param {boolean} [nativeOrigin]
  */
 async function checkModalLifecycle(
 	page,
@@ -242,6 +243,7 @@ async function checkModalLifecycle(
 	position,
 	dismiss = 'escape',
 	remaining = 0,
+	nativeOrigin = false,
 ) {
 	const dialog = page.getByRole('dialog', { name, exact: true })
 	const scroll = page.locator('#layout')
@@ -253,7 +255,17 @@ async function checkModalLifecycle(
 		connected: el.isConnected,
 		active: el === document.activeElement,
 	}))
-	const invokerElement = await invoker.elementHandle()
+	const originHandle = nativeOrigin
+		? await dialog.evaluateHandle(el => {
+				const origin = /** @type {unknown} */ (Reflect.get(el, '__playgroundFocusOrigin'))
+
+				return origin instanceof Element ? origin : null
+			})
+		: null
+	const invokerElement =
+		/** @type {import('@playwright/test').ElementHandle<Element>|null|undefined} */ (
+			nativeOrigin ? originHandle?.asElement() : await invoker.elementHandle()
+		)
 	const element = await dialog.elementHandle()
 
 	if (!element || !invokerElement) {
@@ -296,7 +308,30 @@ async function checkModalLifecycle(
 						() => document.activeElement === document.body && !document.hasFocus(),
 					),
 				)
-				await page.keyboard.press(key)
+				let returned = false
+
+				for (let returnStep = 0; returnStep < 4; returnStep++) {
+					await page.keyboard.press(key)
+					const state = await dialog.evaluate(el => ({
+						contained: el.contains(document.activeElement),
+						activeTag: document.activeElement?.tagName,
+						activeText: (document.activeElement?.textContent ?? '').slice(0, 120),
+						body: document.activeElement === document.body,
+						focused: document.hasFocus(),
+						modal: el.matches(':modal'),
+					}))
+
+					assert.ok(state.modal)
+
+					if (state.contained && state.focused) {
+						returned = true
+						break
+					}
+
+					assert.ok(state.body, JSON.stringify(state))
+				}
+
+				assert.ok(returned, 'Native traversal did not return focus inside the modal')
 				assert.ok(await dialog.evaluate(el => el.contains(document.activeElement)))
 			}
 		}
@@ -335,16 +370,18 @@ async function checkModalLifecycle(
 			() => false,
 		)
 
-	const focus = await invoker.evaluate(el => {
-		const parent = el.closest('dialog')
+	const focus = await invokerElement.evaluate(
+		/** @param {Element} el */ el => {
+			const parent = el.closest('dialog')
 
-		return {
-			exact: el === document.activeElement,
-			inParent: Boolean(parent?.matches(':modal') && parent.contains(document.activeElement)),
-			tag: document.activeElement?.tagName ?? null,
-			text: (document.activeElement?.textContent ?? '').slice(0, 160),
-		}
-	})
+			return {
+				exact: el === document.activeElement,
+				inParent: Boolean(parent?.matches(':modal') && parent.contains(document.activeElement)),
+				tag: document.activeElement?.tagName ?? null,
+				text: (document.activeElement?.textContent ?? '').slice(0, 160),
+			}
+		},
+	)
 
 	assert.ok(
 		focus.exact,
@@ -443,6 +480,10 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 		}
 
 		HTMLDialogElement.prototype.showModal = function () {
+			Object.defineProperty(this, '__playgroundFocusOrigin', {
+				value: document.activeElement,
+				configurable: true,
+			})
 			record('before-showModal', this)
 			Reflect.apply(showModal, this, [])
 			record('after-showModal', this)
@@ -649,9 +690,15 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 			await page
 				.getByRole('button', { name: 'Connect wallet', exact: true })
 				.scrollIntoViewIfNeeded()
-			const connectorPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+			let connectorPosition = 0
 
-			await page.getByRole('button', { name: 'Connect wallet', exact: true }).click()
+			await activateByKeyboard(
+				page,
+				page.getByRole('button', { name: 'Connect wallet', exact: true }),
+				async () => {
+					connectorPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+				},
+			)
 			await checkModalLifecycle(
 				page,
 				'Select a wallet',
@@ -675,16 +722,18 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 			})
 
 			await sendInvoker.scrollIntoViewIfNeeded()
-			const parentOrigin = await page.locator('#layout').evaluate(el => el.scrollTop)
+			let parentOrigin = 0
 
-			await sendInvoker.click()
+			await activateByKeyboard(page, sendInvoker, async () => {
+				parentOrigin = await page.locator('#layout').evaluate(el => el.scrollTop)
+			})
 			const parent = page.getByRole('dialog', { name: 'Switch to Ethereum Mainnet', exact: true })
 			const switchInvoker = parent.getByRole('button', { name: 'Switch to Mainnet', exact: true })
 
 			await parent.waitFor()
 
 			for (const dismiss of ['escape', 'close']) {
-				await switchInvoker.click()
+				await activateByKeyboard(page, switchInvoker)
 				const error = page.getByRole('dialog', { name: 'Error', exact: true })
 
 				await error.waitFor()
@@ -750,9 +799,16 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 					)
 
 					await action.scrollIntoViewIfNeeded()
-					const before = await page.locator('#layout').evaluate(el => el.scrollTop)
+					let before = 0
 
-					await action.click()
+					if (label.startsWith('Send')) {
+						await activateByKeyboard(page, action, async () => {
+							before = await page.locator('#layout').evaluate(el => el.scrollTop)
+						})
+					} else {
+						before = await page.locator('#layout').evaluate(el => el.scrollTop)
+						await action.click()
+					}
 
 					if (label.startsWith('Send')) {
 						await checkModalLifecycle(page, 'Switch to Ethereum Mainnet', action, before)
@@ -768,12 +824,12 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 								`Mock provider does not support ${method}`,
 							),
 						)
-						await checkModalLifecycle(page, 'Error', action, before)
+						await checkModalLifecycle(page, 'Error', action, before, 'escape', 0, true)
 						await action.click()
 						await page.getByRole('alert').waitFor()
-						await checkModalLifecycle(page, 'Error', action, before, 'light')
+						await checkModalLifecycle(page, 'Error', action, before, 'light', 0, true)
 						await action.click()
-						await checkModalLifecycle(page, 'Error', action, before, 'close')
+						await checkModalLifecycle(page, 'Error', action, before, 'close', 0, true)
 					} else if (label.startsWith('Compute')) {
 						await main.locator('.hash-value').first().waitFor()
 						assert.ok((await main.locator('.hash-value').first().textContent()).startsWith('0x'))
