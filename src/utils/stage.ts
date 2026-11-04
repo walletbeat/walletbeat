@@ -150,3 +150,19 @@ export function walletQualifiesForStageZero(wallet: RatedWalletStageSlice): bool
 
 	return ladderEvaluation !== null && ladderEvaluation.highestClearedStage !== null
 }
+
+/**
+ * Sortable ordinal of the reported stage: -1 for states without a stage, then 0, 1, ...
+ * for successive ladder stages. Without an applicable ladder there is no value.
+ */
+export function walletStageIndex(wallet: RatedWalletStageSlice): number | undefined {
+	const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+	if (stage === null || stage === 'NOT_APPLICABLE' || ladderEvaluation === null) {
+		return undefined
+	}
+
+	return typeof stage === 'string'
+		? -1
+		: ladderEvaluation.ladder.stages.findIndex(({ id }) => id === stage.id)
+}
