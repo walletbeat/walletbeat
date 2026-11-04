@@ -199,11 +199,13 @@ for (const colorScheme of ['light', 'dark'] as const) {
 						await page.keyboard.press('Enter')
 						await page.waitForURL(url => url.hash === href)
 						await expect(page.locator(href)).toBeInViewport()
+						await expect(page.locator(href)).toBeFocused()
 						await page.goto('/wallet/eip/5792/')
 						// The label is painted within the slice; the anchor's bounding-box center is the donut hole.
 						await slice.locator('.label').click()
 						await page.waitForURL(url => url.hash === href)
 						await expect(page.locator(href)).toBeInViewport()
+						await expect(page.locator(href)).toBeFocused()
 					}
 
 					if (javaScriptEnabled) {
