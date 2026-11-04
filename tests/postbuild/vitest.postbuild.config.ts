@@ -4,6 +4,7 @@ export default getViteConfig({
 	cacheDir: '.cache', // Vitest will append `/vitest` to this path already.
 	test: {
 		environment: 'node',
+		env: { BASE_URL: process.env.BASE_URL ?? '/' },
 		testTimeout: 60000, // 60s
 		typecheck: {
 			enabled: true,

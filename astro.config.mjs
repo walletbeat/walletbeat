@@ -63,6 +63,11 @@ export default defineConfig({
 				],
 	),
 	vite: {
+		define: {
+			'import.meta.env.WALLETBEAT_RATING_DATE': JSON.stringify(
+				new Date().toISOString().slice(0, 10),
+			),
+		},
 		cacheDir: process.env.WALLETBEAT_DEV === 'true' ? '.astro/vite-dev' : '.astro/vite',
 		build: {
 			// Both bundled CSS compressors currently drop valid named-range keyframes or

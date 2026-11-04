@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import { childHeadingLevel } from '@/types/heading'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
@@ -46,17 +47,23 @@
 	// Props
 	const {
 		wallet,
+		parentHeadingLevel,
 		metadata,
+		references,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
 		bugBountyDetails,
 	}: {
+		parentHeadingLevel: 1 | 2 | 3 | 4
 		wallet: { metadata: WalletMetadata }
 		metadata: SecurityAuditsMetadata
+		references: FullyQualifiedReference[]
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 		bugBountyDetails?: string
 	} = $props()
+
+	const headingLevel = $derived(childHeadingLevel[parentHeadingLevel])
 
 	const securityAudits = $derived(
 		metadata
@@ -66,6 +73,9 @@
 			))
 	)
 
+	const auditReferences = $derived(securityAudits.flatMap(audit => toFullyQualified(audit.ref)))
+	const remainingReferences = $derived(references.filter(reference => !auditReferences.some(auditReference => isRefEqual(reference, auditReference))))
+
 	const mostRecentAudit = $derived(
 		securityAudits[0]
 	)
@@ -73,7 +83,7 @@
 
 	// Functions
 	import { securityAuditId, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
-	import { toFullyQualified } from '@/schema/reference'
+	import { isRefEqual, toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
 	import { isUrl } from '@/schema/url'
 
 
@@ -96,7 +106,7 @@
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
+			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
@@ -117,7 +127,7 @@
 							data-row-item="flexible basis-1"
 							data-row="start wrap gap-2"
 						>
-							<h4>
+							<svelte:element this={`h${headingLevel}`}>
 								Audit by
 								<cite>
 									{#if isUrl(audit.auditor.url)}
@@ -134,7 +144,7 @@
 										{audit.auditor.name}
 									{/if}
 								</cite>
-							</h4>
+							</svelte:element>
 
 							{#if hasFlaws && flawGroups}
 								<div data-row="gap-1 wrap">
@@ -164,7 +174,7 @@
 						<time data-row-item="wrap-end" data-row="gap-2" datetime={audit.auditDate}
 							style:--collapsible-markerInlineTimeline={`--collapsible-marker-audit-${securityAuditId(audit)}`}>
 							{
-								Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
+								Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' })
 									.format(
 										new Date(audit.auditDate),
 									)
@@ -211,7 +221,7 @@
 					{/if}
 
 					{#if audit.ref}
-						<ReferenceLinks headingLevel={5} references={toFullyQualified(audit.ref)} />
+						<ReferenceLinks parentHeadingLevel={headingLevel} references={toFullyQualified(audit.ref)} />
 					{/if}
 				</section>
 			</details>
@@ -221,7 +231,7 @@
 
 {#if bugBountyDetails}
 	<section data-column="gap-2">
-		<h4>Bug bounty program</h4>
+		<svelte:element this={`h${headingLevel}`}>Bug bounty program</svelte:element>
 
 		<Typography
 			content={{
@@ -233,6 +243,8 @@
 	</section>
 {/if}
 
+
+<ReferenceLinks {parentHeadingLevel} references={remainingReferences} />
 
 <style>
 	.fixed-flaw {

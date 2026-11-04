@@ -1,387 +1,84 @@
 <script lang="ts">
 	import { lucideNavigationIcons } from '@/icons/lucide-navigation-icons'
-	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
+	import { eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
+	import { variantLabel } from '@/schema/variants'
+	import { childHeadingLevel, type ParentHeadingLevel } from '@/types/heading'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
 	import type { EipDirectoryEntry } from '@/utils/eip-directory'
 	import { getEipTrackerUrl } from '@/utils/urls'
 
-	type Props = {
-		eips: EipDirectoryEntry[]
-	}
-
-	let { eips }: Props = $props()
-
-	// Filter state
-	type FilterPrefix = EipPrefix | 'ALL'
-	let activeFilter = $state<FilterPrefix>('ALL')
-
-	const filters: { value: FilterPrefix; label: string }[] = [
-		{ value: 'ALL', label: 'All' },
-		{ value: EipPrefix.EIP, label: 'EIPs' },
-		{ value: EipPrefix.ERC, label: 'ERCs' },
-	]
-
-	const filtered = $derived(
-		activeFilter === 'ALL' ? eips : eips.filter((e) => e.prefix === activeFilter),
-	)
-
-	// Accordion open state per EIP
-	let openStates = $state<Record<string, boolean>>(
-		Object.fromEntries(eips.map((e) => [e.number, false])),
-	)
+	let { eips, headingLevel = 2 }: { eips: EipDirectoryEntry[]; headingLevel?: ParentHeadingLevel } = $props()
+	const sectionHeadingLevel = $derived(childHeadingLevel[headingLevel])
 </script>
 
-<!-- Filter pills -->
-<nav class="filter-nav" aria-label="Filter EIPs">
-	{#each filters as f (f.value)}
-		<button
-			class="filter-pill"
-			class:active={activeFilter === f.value}
-			onclick={() => (activeFilter = f.value)}
-		>
-			{f.label}
-		</button>
-	{/each}
-	<span class="filter-count">{filtered.length} standard{filtered.length === 1 ? '' : 's'}</span>
-</nav>
-
-<!-- EIP list -->
-<div class="eip-list">
-	{#each filtered as eip (eip.number)}
-		<div class="eip-item">
-			<details
-				bind:open={openStates[eip.number]}
-				data-card="secondary padding-4 radius-4"
-				class:open={openStates[eip.number]}
-			>
-				<summary>
-					<div class="eip-row">
-						<span class="eip-icon" aria-hidden="true">
-							{#if eip.icon in lucideNavigationIcons}
-								{@html (lucideNavigationIcons as Record<string, string>)[eip.icon]}
-							{:else}
-								<span data-icon="wbicons-simple {eip.icon}"></span>
-							{/if}
-						</span>
-						<span class="eip-label">{eipShortLabel(eip)}</span>
-						<span class="eip-name">{eip.friendlyName}</span>
-						<span class="eip-status" data-status={eip.status}>
-							{eipStatusLabel[eip.status]}
-						</span>
-					</div>
-				</summary>
-
-				<div class="eip-detail">
-					<section class="eip-detail__section">
-						<h4>Summary</h4>
-						<Typography content={markdown(eip.summaryMarkdown)} />
-					</section>
-
-					<section class="eip-detail__section">
-						<h4>Why it matters for wallets</h4>
-						<Typography content={markdown(eip.whyItMattersMarkdown)} />
-					</section>
-
-					{#if eip.noteMarkdown}
-						<section class="eip-detail__section">
-							<h4>Notes</h4>
-							<Typography content={markdown(eip.noteMarkdown)} />
-						</section>
+<div class="directory" data-column="gap-4">
+	<fieldset data-row="start wrap">
+		<legend>Filter standards</legend>
+		<label><input type="radio" name="eip-prefix" value="all" checked /> All</label>
+		<label><input type="radio" name="eip-prefix" value="EIP" /> EIPs</label>
+		<label><input type="radio" name="eip-prefix" value="ERC" /> ERCs</label>
+	</fieldset>
+	<p>{eips.length} tracked standards</p>
+	{#each eips as eip (eip.number)}
+		<details data-prefix={eip.prefix} data-card="secondary padding-4 radius-4">
+			<summary data-row="start gap-4">
+				<span data-icon aria-hidden="true">
+					{#if eip.icon in lucideNavigationIcons}
+						{@html (lucideNavigationIcons as Record<string, string>)[eip.icon]}
+					{:else}
+						<span data-icon="wbicons-simple {eip.icon}"></span>
 					{/if}
-
-					<section class="eip-detail__section">
-						<h4>Implemented by</h4>
-						{#if eip.implementers.length > 0}
-							<ul class="eip-implementers" data-list="unstyled">
-								{#each eip.implementers as wallet (wallet.id)}
-									<li>
-										<a class="eip-implementer" href={wallet.url}>
-											<img
-												src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`}
-												alt=""
-												width="20"
-												height="20"
-												loading="lazy"
-											/>
-											{wallet.displayName}
-										</a>
-									</li>
-								{/each}
-							</ul>
-						{:else}
-							<p>No rated wallet implements {eipShortLabel(eip)} yet.</p>
-						{/if}
+				</span>
+				<svelte:element this={`h${headingLevel}`} data-row-item="flexible">{eipShortLabel(eip)}: {eip.friendlyName}</svelte:element>
+				<span data-tag="eip-status">{eipStatusLabel[eip.status]}</span>
+			</summary>
+			<div data-column="gap-6">
+				<section data-column="gap-2">
+					<svelte:element this={`h${sectionHeadingLevel}`}>Summary</svelte:element>
+					<Typography content={markdown(eip.summaryMarkdown)} />
+				</section>
+				<section data-column="gap-2">
+					<svelte:element this={`h${sectionHeadingLevel}`}>Why it matters for wallets</svelte:element>
+					<Typography content={markdown(eip.whyItMattersMarkdown)} />
+				</section>
+				{#if eip.noteMarkdown}
+					<section data-column="gap-2">
+						<svelte:element this={`h${sectionHeadingLevel}`}>Notes</svelte:element>
+						<Typography content={markdown(eip.noteMarkdown)} />
 					</section>
-
-					<div class="eip-detail__links">
-						<a class="eip-detail__spec-link" href={getEipTrackerUrl(eip)}>
-							Wallet support tracker →
-						</a>
-
-						<a
-							class="eip-detail__spec-link"
-							href={eipEthereumDotOrgUrl(eip)}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Read full spec ↗
-						</a>
-					</div>
-				</div>
-			</details>
-		</div>
+				{/if}
+				<section data-column="gap-2">
+					<svelte:element this={`h${sectionHeadingLevel}`}>Verified support</svelte:element>
+					{#if eip.implementers.length > 0}
+						<ul data-list="unstyled" data-column="gap-2">
+							{#each eip.implementers as wallet (wallet.id)}
+								<li><a href={wallet.url}>{wallet.displayName}</a>: {wallet.variants.map(variantLabel).join(', ')}</li>
+							{/each}
+						</ul>
+					{:else}
+						<p>Walletbeat has no verified support for {eipShortLabel(eip)}. Support may be unknown; see the tracker for each platform's status.</p>
+					{/if}
+				</section>
+				<footer data-row="start wrap">
+					<a href={getEipTrackerUrl(eip)}>Wallet support tracker →</a>
+					<a href={eipEthereumDotOrgUrl(eip)} target="_blank" rel="noopener noreferrer">Read full specification →</a>
+				</footer>
+			</div>
+		</details>
 	{/each}
 </div>
 
-{#if filtered.length === 0}
-	<p class="empty">No standards match the current filter.</p>
-{/if}
-
 <style>
-	/* Filter nav  */
-	.filter-nav {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-bottom: 1.5rem;
+	input {
+		appearance: auto;
+		padding: 0;
 	}
 
-	.filter-pill {
-		font-size: 0.82rem;
-		font-weight: 500;
-		padding: 0.35em 0.9em;
-		border: 1px solid var(--border-color);
-		border-radius: 99px;
-		background: transparent;
-		color: var(--text-secondary);
-		cursor: pointer;
-		transition:
-			border-color 0.15s ease,
-			color 0.15s ease,
-			background 0.15s ease;
-
-		&:hover {
-			border-color: var(--accent);
-			color: var(--accent);
+	.directory {
+		&:has(input[value="EIP"]:checked) > details[data-prefix="ERC"],
+		&:has(input[value="ERC"]:checked) > details[data-prefix="EIP"] {
+			display: none;
 		}
-
-		&.active {
-			border-color: var(--accent);
-			background: color-mix(in srgb, var(--accent) 12%, transparent);
-			color: var(--accent);
-		}
-	}
-
-	.filter-count {
-		margin-left: auto;
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-		opacity: 0.7;
-	}
-
-	/* EIP list */
-	.eip-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.eip-item {
-		details {
-			overflow: hidden;
-			transition: border-color 0.15s ease;
-			border: 1px solid transparent;
-
-			&.open {
-				border-color: var(--accent);
-			}
-
-			summary {
-				list-style: none;
-				cursor: pointer;
-				user-select: none;
-
-				&::-webkit-details-marker {
-					display: none;
-				}
-
-				&::after {
-					content: '›';
-					font-size: 1.1rem;
-					color: var(--text-secondary);
-					opacity: 0.5;
-					transition: transform 0.2s ease;
-					flex-shrink: 0;
-				}
-			}
-
-			&.open summary::after {
-				transform: rotate(90deg);
-			}
-		}
-	}
-
-	/* Row (summary line) */
-	.eip-row {
-		display: flex;
-		align-items: center;
-		gap: 1.5rem;
-		width: 100%;
-
-		@media (width <= 40rem) {
-			gap: 0.875rem;
-		}
-	}
-
-	.eip-icon {
-		display: inline-grid;
-		place-items: center;
-		width: 1.25rem;
-		height: 1.25rem;
-		flex-shrink: 0;
-		color: var(--accent);
-
-		:global(svg) {
-			width: 100%;
-			height: 100%;
-		}
-	}
-
-	.eip-label {
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--accent);
-		min-width: 5.5rem;
-		flex-shrink: 0;
-	}
-
-	.eip-name {
-		flex: 1;
-		font-size: 0.95rem;
-		color: var(--text-primary);
-	}
-
-	.eip-status {
-		font-size: 0.7rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding: 0.2em 0.6em;
-		border-radius: 99px;
-		flex-shrink: 0;
-
-		&[data-status='FINAL'] {
-			background: color-mix(in srgb, #4ade80 15%, transparent);
-			color: light-dark(oklch(from #4ade80 0.48 c h), #4ade80);
-		}
-
-		&[data-status='DRAFT'] {
-			background: color-mix(in srgb, var(--text-secondary) 12%, transparent);
-			color: var(--text-secondary);
-		}
-
-		&[data-status='REVIEW'] {
-			background: color-mix(in srgb, #a78bfa 15%, transparent);
-			color: light-dark(oklch(from #a78bfa 0.48 c h), #a78bfa);
-		}
-
-		&[data-status='LIVING'] {
-			background: color-mix(in srgb, #38bdf8 15%, transparent);
-			color: light-dark(oklch(from #38bdf8 0.48 c h), #38bdf8);
-		}
-
-		&[data-status='LAST_CALL'] {
-			background: color-mix(in srgb, #facc15 15%, transparent);
-			color: light-dark(oklch(from #facc15 0.48 c h), #facc15);
-		}
-	}
-
-	/* Expanded detail */
-	details[data-card] > .eip-detail {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--border-color);
-		margin-top: 0.875rem;
-	}
-
-	.eip-detail__section {
-		h4 {
-			font-size: 0.75rem;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.07em;
-			color: var(--accent);
-			margin: 0 0 0.375rem;
-		}
-
-		:global(p) {
-			margin: 0;
-			font-size: 0.9rem;
-			color: var(--text-secondary);
-			line-height: 1.65;
-		}
-	}
-
-	.eip-implementers {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin: 0;
-	}
-
-	.eip-implementer {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4em;
-		padding: 0.25em 0.6em 0.25em 0.3em;
-		border: 1px solid var(--border-color);
-		border-radius: 99px;
-		font-size: 0.82rem;
-		font-weight: 500;
-		color: var(--text-primary);
-		text-decoration: none;
-
-		&:hover {
-			border-color: var(--accent);
-			color: var(--accent);
-			text-decoration: none;
-		}
-
-		img {
-			width: 1.25rem;
-			height: 1.25rem;
-			border-radius: 0.3rem;
-			object-fit: contain;
-		}
-	}
-
-	.eip-detail__links {
-		display: flex;
-		gap: 1.25rem;
-	}
-
-	.eip-detail__spec-link {
-		align-self: flex-start;
-		font-size: 0.82rem;
-		color: var(--text-secondary);
-		text-decoration: none;
-		opacity: 0.7;
-
-		&:hover {
-			opacity: 1;
-		}
-	}
-
-	/* Empty state */
-	.empty {
-		font-size: 0.9rem;
-		color: var(--text-secondary);
-		opacity: 0.7;
-		padding: 2rem 0;
-		text-align: center;
 	}
 </style>

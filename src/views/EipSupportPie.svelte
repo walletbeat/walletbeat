@@ -1,18 +1,8 @@
 <script lang="ts">
 	// Types/constants
 	import { PieLayout } from '@/components/pie-geometry'
-	import {
-		type EipStatusSupportCard,
-		EipSupportStatus,
-		eipSupportStatusColor,
-		eipSupportStatusGroupId,
-	} from '@/schema/eip-support'
-
-	const statusSlices: Array<{ status: EipSupportStatus; description: string }> = [
-		{ status: EipSupportStatus.SUPPORTED, description: 'supported' },
-		{ status: EipSupportStatus.NOT_SUPPORTED, description: 'not supported' },
-		{ status: EipSupportStatus.UNKNOWN, description: 'unknown' },
-	]
+	import type { EipStatusSupportCard } from '@/schema/eip-support'
+	import { eipSupportPie } from '@/components/eip-support-pie'
 
 
 	// Props
@@ -33,32 +23,7 @@
 
 
 	// State
-	const walletCount = $derived(new Set(cards.map(card => card.id)).size)
-
-	const supportedWalletCount = $derived(
-		new Set(
-			cards.filter(card => card.status === EipSupportStatus.SUPPORTED).map(card => card.id),
-		).size,
-	)
-
-	const slices = $derived(
-		statusSlices.flatMap(({ status, description }) => {
-			const count = cards.filter(card => card.status === status).length
-
-			return count === 0
-				? []
-				: [
-						{
-							id: status,
-							color: eipSupportStatusColor[status],
-							weight: count,
-							arcLabel: String(count),
-							ariaLabel: `${count} ${description}`,
-							href: `#${eipSupportStatusGroupId(listId, status)}`,
-						},
-					]
-		}),
-	)
+	const summary = $derived(eipSupportPie(cards, listId))
 
 
 	// Components
@@ -73,25 +38,17 @@
 		padding={4}
 		radius={64}
 		labelSize={14}
-		levels={[
-			{
-				outerRadiusFraction: 1,
-				innerRadiusFraction: 0.58,
-				gap: 0,
-				angleGap: slices.length > 1 ? 4 : 0,
-				outerCornerRadius: 6,
-				innerCornerRadius: 4,
-			},
-		]}
-		{slices}
+		levels={summary.levels}
+		slices={summary.slices}
 	>
 		{#snippet centerContentSnippet()}
-			<span><strong class="center-count">{supportedWalletCount}/{walletCount}</strong></span>
+			<span><strong class="center-count">{summary.supportedWalletCount}/{summary.walletCount}</strong></span>
 		{/snippet}
 	</Pie>
 
 	<figcaption>
-		{supportedWalletCount} of {walletCount} {walletTypeLabel} support {eipLabel}
+		{summary.supportedWalletCount} of {summary.walletCount} distinct {walletTypeLabel} support {eipLabel} on at least one platform.
+		Slices count platform-qualified status entries. A wallet can appear in more than one status.
 	</figcaption>
 </figure>
 
