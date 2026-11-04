@@ -27,7 +27,7 @@
 			chainId: number | null
 			batchId: string | null
 		}
-		onRunStep: () => void
+		onRunStep: (event: MouseEvent) => void
 		onReset: () => void
 		onSelectProvider: (providerId: string) => void
 	} = $props()

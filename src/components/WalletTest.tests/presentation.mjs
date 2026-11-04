@@ -352,6 +352,7 @@ async function checkModalLifecycle(
 			focus,
 			restoredEventually,
 			invokerAtAdmission,
+			probe: await page.locator('html').getAttribute('data-playground-focus-probe'),
 			chronology: await page.locator('html').getAttribute('data-focus-chronology'),
 		}),
 	)
@@ -381,10 +382,72 @@ async function acceptScamConsent(page) {
  * @param {import('@playwright/test').Page} page
  * @param {string} baseURL
  * @param {string} outputDir
+ * @param {'keyboard'|'pointer'} [resultAdmission]
  */
-export async function checkPresentation(page, baseURL, outputDir) {
+export async function checkPresentation(page, baseURL, outputDir, resultAdmission = 'keyboard') {
 	page.setDefaultTimeout(15000)
 	await page.addInitScript(installProviders)
+	await page.addInitScript(() => {
+		/** @type {unknown[]} */
+		const events = []
+		/** @param {EventTarget|null} el */
+		const describe = el =>
+			el instanceof Element
+				? {
+						tag: el.tagName,
+						text: (el.textContent ?? '').slice(0, 100),
+						focusVisible: el.matches(':focus-visible'),
+						disabled: el.matches(':disabled'),
+						connected: el.isConnected,
+						outline: getComputedStyle(el).outline,
+					}
+				: null
+		/** @param {string} kind @param {EventTarget|null} target */
+		const record = (kind, target) => {
+			events.push({
+				kind,
+				target: describe(target),
+				active: describe(document.activeElement),
+				hasFocus: document.hasFocus(),
+			})
+
+			if (events.length > 100) {
+				events.shift()
+			}
+
+			document.documentElement.dataset.playgroundFocusProbe = JSON.stringify(events)
+		}
+
+		document.addEventListener('pointerdown', event => record('pointerdown', event.target), true)
+		document.addEventListener('click', event => record('click', event.target), true)
+		document.addEventListener('focusout', event => record('focusout', event.target), true)
+		document.addEventListener('focusin', event => record('focusin', event.target), true)
+		document.addEventListener('close', event => record('close', event.target), true)
+		new MutationObserver(mutations => {
+			for (const mutation of mutations) {
+				if (mutation.target instanceof HTMLButtonElement) {
+					record(`disabled-change:old=${mutation.oldValue ?? 'absent'}`, mutation.target)
+				}
+			}
+		}).observe(document, {
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['disabled'],
+			attributeOldValue: true,
+		})
+		const descriptor = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal')
+		const showModal = /** @type {unknown} */ (descriptor?.value)
+
+		if (typeof showModal !== 'function') {
+			throw new Error('Native showModal unavailable')
+		}
+
+		HTMLDialogElement.prototype.showModal = function () {
+			record('before-showModal', this)
+			Reflect.apply(showModal, this, [])
+			record('after-showModal', this)
+		}
+	})
 	const reports = []
 
 	for (const width of [1440, 390]) {
@@ -482,9 +545,20 @@ export async function checkPresentation(page, baseURL, outputDir) {
 						await page
 							.getByRole('button', { name: 'Run Step', exact: true })
 							.scrollIntoViewIfNeeded()
-						const resultPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+						let resultPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
 
-						await page.getByRole('button', { name: 'Run Step', exact: true }).click()
+						if (resultAdmission === 'pointer') {
+							await page.getByRole('button', { name: 'Run Step', exact: true }).click()
+						} else {
+							await activateByKeyboard(
+								page,
+								page.getByRole('button', { name: 'Run Step', exact: true }),
+								async () => {
+									resultPosition = await page.locator('#layout').evaluate(el => el.scrollTop)
+								},
+							)
+						}
+
 						actions.push({
 							category: categoryName,
 							case: (await item.locator('strong').textContent()).trim(),
@@ -535,8 +609,28 @@ export async function checkPresentation(page, baseURL, outputDir) {
 			await page.getByText('1 account(s) exposed', { exact: true }).waitFor()
 			const signature = categories.getByRole('button', { name: 'Signatures', exact: true })
 
-			await signature.focus()
-			await page.keyboard.press('Enter')
+			const focusBefore = await signature.evaluate(el => ({
+				active: document.activeElement?.tagName,
+				exact: el === document.activeElement,
+				visible: el.matches(':focus-visible'),
+				outline: getComputedStyle(el).outline,
+			}))
+
+			await activateByKeyboard(page, signature)
+			const focusAfter = await signature.evaluate(el => ({
+				active: document.activeElement?.tagName,
+				exact: el === document.activeElement,
+				visible: el.matches(':focus-visible'),
+				outline: getComputedStyle(el).outline,
+			}))
+
+			const signatureFocusProbe = JSON.stringify({ focusBefore, focusAfter })
+
+			assert.ok(
+				await signature.evaluate(
+					el => el === document.activeElement && el.matches(':focus-visible'),
+				),
+			)
 			assert.equal(await signature.getAttribute('aria-pressed'), 'true')
 			assert.ok(
 				await signature.evaluate(el => {
@@ -712,7 +806,16 @@ export async function checkPresentation(page, baseURL, outputDir) {
 			assert.equal(JSON.stringify(observed), JSON.stringify(required))
 			await page.locator('h1').scrollIntoViewIfNeeded()
 			await page.screenshot({ path: `${outputDir}/${width}-${colorScheme}.png` })
-			reports.push({ width, colorScheme, labels, panes, actions })
+			reports.push({
+				width,
+				colorScheme,
+				labels,
+				panes,
+				actions,
+				resultAdmission,
+				signatureFocusProbe,
+				focusProbe: await page.locator('html').getAttribute('data-playground-focus-probe'),
+			})
 		}
 	}
 
@@ -722,8 +825,9 @@ export async function checkPresentation(page, baseURL, outputDir) {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator} control
+ * @param {() => Promise<void>} [beforeActivate]
  */
-async function activateByKeyboard(page, control) {
+async function activateByKeyboard(page, control, beforeActivate = async () => {}) {
 	await control.waitFor()
 	assert.equal(await control.isDisabled(), false)
 	const webkit = page.context().browser().browserType().name() === 'webkit'
@@ -757,6 +861,7 @@ async function activateByKeyboard(page, control) {
 					assert.equal(state.modal, true)
 				}
 
+				await beforeActivate()
 				await page.keyboard.press('Enter')
 
 				return
