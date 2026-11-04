@@ -1,12 +1,18 @@
 ---
 // Types/constants
 import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
+import { allHardwareModels } from '@/data/hardware-wallets'
+import { getNewsForWallet } from '@/data/news'
+import type { Variant } from '@/schema/variants'
+import type { ResolvedWallet } from '@/schema/wallet'
+import { nonEmptyValues } from '@/types/utils/non-empty'
+import { supportedHardwareWalletTypes } from '@/utils/supported-hardware-wallets'
+import { walletPageData } from '@/views/wallet-page-data'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
 
-import { getNewsForWallet } from '@/data/news'
-import { collectWalletRefs, refs } from '@/schema/reference'
+import { refs, toFullyQualified } from '@/schema/reference'
 import { referenceImageDimensions } from '@/utils/reference-image-metadata'
 
 // Routes
@@ -25,6 +31,21 @@ if (walletName === undefined || !isValidWalletSlug(walletName)) {
 
 // Data
 const wallet = allRatedWalletsBySlug[walletName]
+const walletNews = getNewsForWallet(wallet.metadata.id)
+const evaluations = [
+	wallet.overall,
+	...nonEmptyValues<Variant, ResolvedWallet<string>>(wallet.variants).map(
+		variant => variant.attributes,
+	),
+].flatMap(tree => Object.values(tree).flatMap(group => Object.values(group)))
+const supportedBrands = new Set<string>(
+	evaluations.flatMap(({ evaluation: { outcome } }) =>
+		supportedHardwareWalletTypes('metadata' in outcome ? outcome.metadata : null),
+	),
+)
+const hardwareModels = allHardwareModels.filter(
+	model => model.brandId === wallet.metadata.id || supportedBrands.has(model.brandId.toUpperCase()),
+)
 const walletIcon = await getWalletIcon(wallet.metadata)
 const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
 
@@ -32,12 +53,14 @@ if (walletEntry === undefined) {
 	throw new Error(`no wallet data for slug "${walletName}"`)
 }
 
-const [walletDataName, walletData] = walletEntry
-const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
-const imageDimensions = await referenceImageDimensions([
-	...collectWalletRefs(walletDataName, walletData).flatMap(ref => ref.fullyQualifiedRefs),
-	...getNewsForWallet(walletName).flatMap(refs),
-])
+const [, walletData] = walletEntry
+const data = walletPageData(wallet, walletData)
+const pageReferences = [
+	...evaluations.flatMap(({ evaluation }) => toFullyQualified(evaluation.references)),
+	...walletNews.flatMap(refs),
+]
+const codeSnippets = codeSnippetsForReferences(wallet.metadata.id, pageReferences)
+const imageDimensions = await referenceImageDimensions(pageReferences)
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -70,7 +93,9 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	<main data-column-item='flexible'>
 		<WalletPageContext
 			{walletIcon}
-			walletId={wallet.metadata.id}
+			{data}
+			{hardwareModels}
+			{walletNews}
 			codeSnippets={codeSnippets}
 			{imageDimensions}
 			client:idle
