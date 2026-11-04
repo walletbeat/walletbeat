@@ -3768,7 +3768,7 @@ ol {
 			rotate: none;
 			&::before,&::after {
 				---breadcrumb-measuredSize: 100cqi;
-				content: '';
+				content: none;
 				position: absolute;
 				inset: 0 auto auto calc(-1 * var(---breadcrumb-measuredSize));
 				block-size: 1px;
@@ -3789,9 +3789,11 @@ ol {
 	@scope (:root) to (details:not([open]),[data-sticky-breadcrumb~="scope"]:has(>details:not([open]))) {
 		@scope ([data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="size"]) to ([data-sticky-breadcrumb~="scope"]) {
 			[data-sticky-breadcrumb~="size-source"]::before {
+				content: '';
 				view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline)
 			}
 			[data-sticky-breadcrumb~="size-source"]::after {
+				content: '';
 				view-timeline-name: var(--stickyBreadcrumb-itemBlockTimeline)
 			}
 		}
@@ -3799,6 +3801,7 @@ ol {
 	@scope (:root) to (details:not([open])>:not(summary)) {
 		@scope ([data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="size"]) to ([data-sticky-breadcrumb~="scope"]) {
 			[data-sticky-breadcrumb~="size-row"]::before {
+				content: '';
 				view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 			}
 			:scope[data-sticky-breadcrumb~="row-fill"] [data-sticky-breadcrumb~="size-row"]::before {
@@ -3806,12 +3809,15 @@ ol {
 				view-timeline-name: none;
 			}
 			[data-sticky-breadcrumb~="size-row"]::after {
+				content: '';
 				view-timeline-name: var(---breadcrumb-rowBlockTimeline)
 			}
 			[data-sticky-breadcrumb~="size-end"]::before {
+				content: '';
 				view-timeline-name: var(--stickyBreadcrumb-endInlineTimeline)
 			}
 			[data-sticky-breadcrumb~="size-end"]::after {
+				content: '';
 				view-timeline-name: var(--stickyBreadcrumb-endBlockTimeline)
 			}
 		}
