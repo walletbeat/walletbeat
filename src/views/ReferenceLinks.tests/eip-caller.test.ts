@@ -33,10 +33,12 @@ describe('EIP reference caller composition', () => {
 			expect(details).toHaveLength(cards.length)
 
 			for (const [index, detail] of details.entries()) {
-				expect(detail.getElementsByTagName('h4')[0]?.textContent).toContain(
-					cards[index].displayName,
-				)
-				expect(detail.getElementsByTagName('h5')[0]?.textContent?.trim()).toBe('Source')
+				expect(
+					detail.getElementsByTagName(title === undefined ? 'h3' : 'h4')[0]?.textContent,
+				).toContain(cards[index].displayName)
+				expect(
+					detail.getElementsByTagName(title === undefined ? 'h4' : 'h5')[0]?.textContent?.trim(),
+				).toBe('Source')
 				const links = Array.from(detail.getElementsByTagName('a'))
 
 				expect(
