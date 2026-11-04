@@ -58,9 +58,19 @@
 	// Unsupported hint values become manual popovers, losing native dismissal.
 	// Start with auto for SSR, then enhance only when the browser reflects hint.
 	function enhancePopover(node: HTMLElement) {
-		node.popover = 'hint'
+		const enhance = () => {
+			if (node.matches(':popover-open')) return
 
-		if (node.popover !== 'hint') node.popover = 'auto'
+			node.removeEventListener('toggle', enhance)
+			node.popover = 'hint'
+
+			if (node.popover !== 'hint') node.popover = 'auto'
+		}
+
+		node.addEventListener('toggle', enhance)
+		enhance()
+
+		return { destroy: () => node.removeEventListener('toggle', enhance) }
 	}
 
 </script>
