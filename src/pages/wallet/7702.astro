@@ -1,4 +1,6 @@
 ---
+import { eips } from '@/data/eips'
+import { eipOgImage } from '@/utils/eip-og-image'
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
@@ -111,6 +113,7 @@ const softwareRows = eip7702Rows(Object.values(ratedSoftwareWallets))
 
 <Layout
 	metadata={{
+		image: eipOgImage(eips['7702']),
 		title: 'Walletbeat - EIP-7702 wallet adoption',
 		description:
 			'Which wallets implement EIP-7702? Track the adoption of EIP-7702 across the Ethereum wallet ecosystem.',

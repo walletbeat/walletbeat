@@ -514,7 +514,7 @@ export function popRefs<T>(withRef: WithRef<T>): {
 }
 
 /** Check if two fully-qualified references are deeply equal. */
-function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boolean {
+export function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boolean {
 	if (a.explanation !== b.explanation || a.lastRetrieved !== b.lastRetrieved) {
 		return false
 	}

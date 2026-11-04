@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { getReferenceImageDimensions } from '@/utils/reference-image-context'
+	const imageDimensions = getReferenceImageDimensions()
+
 	// Types/constants
+	import { childHeadingLevel, type ParentHeadingLevel } from '@/types/heading'
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
@@ -12,26 +16,19 @@
 	const {
 		references,
 		cardBackground = 'primary',
-		headingLevel = 4,
+		parentHeadingLevel,
 	}: {
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
-		headingLevel?: 2 | 3 | 4 | 5 | 6
+		parentHeadingLevel: ParentHeadingLevel
 	} = $props()
 
 
 	// Internal state
 	let lightbox = $state<{ open: (url: string) => void }>()
 
-	// Long lists show their first few references until expanded. A list is only
-	// cut when that hides at least two references, so "show all" is never for one.
-	const collapsedCount = 2
-	let showAll = $state(false)
-
 	// (Derived)
-	const isCollapsible = $derived(references.length > collapsedCount + 1)
-	const isCollapsed = $derived(isCollapsible && !showAll)
-	const shownReferences = $derived(isCollapsed ? references.slice(0, collapsedCount) : references)
+	const headingLevel = $derived(childHeadingLevel[parentHeadingLevel])
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -171,7 +168,7 @@
 		</svelte:element>
 
 		<ul class="references-list" data-list="gap-2" data-scroll-item="snap-prose">
-			{#each shownReferences as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
+			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
 				{@const refSnippets = codeSnippetEntries(ref.urls)}
@@ -243,7 +240,7 @@
 									<cite>{url.label}</cite>
 									{#if sourceLocation !== url.label}
 										<br>
-										<span class="source-location">{sourceLocation}</span>
+										<code class="source-location">{sourceLocation}</code>
 									{/if}
 									<span>{@html CodeIcon}</span>
 								</a>
@@ -260,6 +257,7 @@
 					{/each}
 
 					{#if inlineImage !== undefined}
+						{@const dimensions = imageDimensions(inlineImage.url)}
 						<figure class="inline-image" data-column="start gap-1">
 							<a
 								href={inlineImage.url}
@@ -271,6 +269,10 @@
 							>
 								<img
 									src={inlineImage.url}
+									{...dimensions}
+									style:--referenceImage-width={`${dimensions.width}px`}
+									style:--referenceImage-ratio={dimensions.width / dimensions.height}
+									decoding="async"
 									alt={inlineImage.label}
 									loading="lazy"
 								/>
@@ -336,8 +338,7 @@
 										<img
 											src={image.url}
 											alt={image.label}
-											width="128"
-											height="96"
+											{...imageDimensions(image.url)}
 											loading="lazy"
 											decoding="async"
 										/>
@@ -351,17 +352,6 @@
 				</li>
 			{/each}
 		</ul>
-
-		{#if isCollapsible}
-			<button
-				class="references-toggle"
-				type="button"
-				aria-expanded={showAll}
-				onclick={() => { showAll = !showAll }}
-			>
-				{showAll ? 'Show fewer sources' : `Show all ${totalUrls} sources`}
-			</button>
-		{/if}
 
 		<ImageLightbox
 			bind:this={lightbox}
@@ -418,8 +408,10 @@
 
 		img {
 			display: block;
-			max-inline-size: 100%;
-			max-block-size: 20em;
+			box-sizing: content-box;
+			inline-size: calc(min(var(--referenceImage-width), 20em * var(--referenceImage-ratio)) - 2px);
+			block-size: auto;
+			max-inline-size: calc(100% - 2px);
 
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
@@ -438,8 +430,7 @@
 			inline-size: 100%;
 			max-inline-size: 100%;
 			min-inline-size: 0;
-			/* About 12 lines; the box scrolls itself to the highlighted lines when first shown. */
-			max-block-size: 20em;
+			max-block-size: 32em;
 			overflow: auto;
 
 			padding: 0.75em 1em;
@@ -481,7 +472,7 @@
 			}
 		}
 
-		code {
+		pre > code {
 			display: block;
 			inline-size: max-content;
 			min-inline-size: 100%;
@@ -528,26 +519,16 @@
 		}
 	}
 
-	.references-toggle {
-		align-self: start;
-		margin-block-start: 0.75em;
-		padding-inline: 1em;
-		border-radius: 999em;
-		font-weight: 600;
-	}
-
 	.thumbnail {
 		display: block;
 		flex-shrink: 0;
 
 		img {
 			display: block;
-			/* Every thumbnail occupies the same fixed box regardless of
-			   the underlying image's aspect ratio. */
-			inline-size: 8em;
-			block-size: 6em;
+			box-sizing: content-box;
+			inline-size: calc(8em - 2px);
+			block-size: auto;
 
-			object-fit: cover;
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
 		}
