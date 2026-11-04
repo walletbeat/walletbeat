@@ -6,9 +6,12 @@ type Sizing = 'current' | 'unclamped'
 
 async function applySizing(page: Page, sizing: Sizing) {
 	if (sizing === 'unclamped') {
-		await page.addStyleTag({
-			content:
-				'[data-tag]:is(button, a[href]), :is(button, a[href]):has(> [data-tag]) { min-inline-size: 0 !important; min-block-size: 0 !important; }',
+		await page.evaluate(() => {
+			const style = document.createElement('style')
+
+			style.textContent =
+				'[data-tag]:is(button, a[href]), :is(button, a[href]):has(> [data-tag]) { min-inline-size: 0 !important; min-block-size: 0 !important; }'
+			document.head.append(style)
 		})
 	}
 }
@@ -305,6 +308,11 @@ async function reachable(target: Locator) {
 }
 
 async function tabTo(page: Page, target: Locator) {
+	const webkit =
+		page.context().browser()?.browserType().name() === 'webkit' &&
+		(await target.evaluate(element => element.matches('a[href]')))
+	const forward = webkit ? 'Alt+Tab' : 'Tab'
+	const backward = webkit ? 'Alt+Shift+Tab' : 'Shift+Tab'
 	const count = await page
 		.locator('a[href], button, input, select, textarea, [tabindex]')
 		.evaluateAll(
@@ -322,7 +330,7 @@ async function tabTo(page: Page, target: Locator) {
 			element => document.activeElement === element && !element.matches(':focus-visible'),
 		)
 	) {
-		await page.keyboard.press('Shift+Tab')
+		await page.keyboard.press(backward)
 	}
 
 	for (let index = 0; index <= count; index++) {
@@ -330,7 +338,7 @@ async function tabTo(page: Page, target: Locator) {
 			break
 		}
 
-		await page.keyboard.press('Tab')
+		await page.keyboard.press(forward)
 	}
 	await expect(target).toBeFocused()
 	expect(await target.evaluate(element => element.matches(':focus-visible'))).toBe(true)
