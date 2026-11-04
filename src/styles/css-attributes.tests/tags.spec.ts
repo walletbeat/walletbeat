@@ -24,6 +24,94 @@ async function load(page: Page, hydrated: boolean, sizing: Sizing) {
 	}
 }
 
+async function tagAppearance(target: Locator) {
+	return target.evaluate(element => {
+		const style = getComputedStyle(element)
+		const canvas = document.createElement('canvas')
+
+		canvas.width = canvas.height = 1
+		const context = canvas.getContext('2d')
+
+		if (!context) {
+			throw new Error('Missing canvas color reader')
+		}
+
+		const luminance = (color: string) => {
+			context.clearRect(0, 0, 1, 1)
+			context.fillStyle = color
+			context.fillRect(0, 0, 1, 1)
+			const rgba = context.getImageData(0, 0, 1, 1).data
+
+			if (rgba[3] !== 255) {
+				throw new Error('Fixture tag colors must be opaque')
+			}
+
+			return [...rgba]
+				.slice(0, 3)
+				.map(value => value / 255)
+				.map(value => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4))
+				.reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0)
+		}
+		const roleProbe = document.createElement('span')
+
+		roleProbe.hidden = true
+		document.body.append(roleProbe)
+		const resolveRole = (role: string) => {
+			roleProbe.style.color = `var(--${role})`
+
+			return getComputedStyle(roleProbe).color
+		}
+		const roles = {
+			'text-primary': resolveRole('text-primary'),
+			'background-primary': resolveRole('background-primary'),
+			accent: resolveRole('accent'),
+		}
+
+		roleProbe.remove()
+		const foreground = luminance(style.color)
+		const background = luminance(style.backgroundColor)
+
+		return {
+			roles,
+			color: style.color,
+			background: style.backgroundColor,
+			border: style.borderTopColor,
+			radius: style.borderTopLeftRadius,
+			font: style.fontSize,
+			weight: style.fontWeight,
+			padding: style.padding,
+			outlineStyle: style.outlineStyle,
+			outlineWidth: Number.parseFloat(style.outlineWidth),
+			opacity: style.opacity,
+			contrast:
+				(Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05),
+			height: element.getBoundingClientRect().height,
+			intrinsic: [
+				style.lineHeight,
+				style.paddingTop,
+				style.paddingBottom,
+				style.borderTopWidth,
+				style.borderBottomWidth,
+			].reduce((sum, value) => sum + Number.parseFloat(value), 0),
+		}
+	})
+}
+
+async function tagBounds(target: Locator) {
+	return target.evaluate(element => {
+		const box = element.getBoundingClientRect()
+		const parent = element.parentElement!.getBoundingClientRect()
+
+		return {
+			fits: box.left >= parent.left - 1 && box.right <= parent.right + 1,
+			overflow: element.scrollWidth - element.clientWidth,
+			width: box.width,
+			text: element.textContent,
+			direction: getComputedStyle(element).direction,
+		}
+	})
+}
+
 async function probe(target: Locator) {
 	return target.evaluate(element => {
 		const selector = 'button, a[href], summary, input, select, textarea, [role="button"]'
@@ -479,52 +567,7 @@ for (const theme of ['light', 'dark'] as const) {
 						expect(await label.evaluate(element => getComputedStyle(element).cursor)).not.toBe(
 							'pointer',
 						)
-						const geometry = await label.evaluate(element => {
-							const style = getComputedStyle(element)
-							const canvas = document.createElement('canvas')
-
-							canvas.width = canvas.height = 1
-							const context = canvas.getContext('2d')
-
-							if (!context) {
-								throw new Error('Missing canvas color reader')
-							}
-
-							const luminance = (color: string) => {
-								context.clearRect(0, 0, 1, 1)
-								context.fillStyle = color
-								context.fillRect(0, 0, 1, 1)
-								const rgba = context.getImageData(0, 0, 1, 1).data
-
-								if (rgba[3] !== 255) {
-									throw new Error('Fixture tag colors must be opaque')
-								}
-
-								return [...rgba]
-									.slice(0, 3)
-									.map(value => value / 255)
-									.map(value =>
-										value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
-									)
-									.reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0)
-							}
-							const foreground = luminance(style.color)
-							const background = luminance(style.backgroundColor)
-
-							return {
-								contrast:
-									(Math.max(foreground, background) + 0.05) /
-									(Math.min(foreground, background) + 0.05),
-								height: element.getBoundingClientRect().height,
-								intrinsic: [
-									style.lineHeight,
-									style.paddingTop,
-									style.paddingBottom,
-									style.borderTopWidth,
-									style.borderBottomWidth,
-								].reduce((sum, value) => sum + Number.parseFloat(value), 0),
-							}
-						})
+						const geometry = await tagAppearance(label)
 
 						expect(geometry.height).toBeLessThanOrEqual(geometry.intrinsic + 1)
 						expect(geometry.contrast).toBeGreaterThanOrEqual(4.5)
@@ -655,6 +698,13 @@ for (const theme of ['light', 'dark'] as const) {
 						await expect
 							.poll(() => wrapper.target.evaluate(element => element.matches(':popover-open')))
 							.toBe(false)
+						const link = page.locator('[data-tag-link="default"]')
+
+						await link.scrollIntoViewIfNeeded()
+						const point = await reachable(link)
+
+						await page.touchscreen.tap(point.x, point.y)
+						await expect(page).toHaveURL(/#tag-destination$/)
 					})
 					test('actual wallet and compact EIP layout keep native touch actions', async ({
 						page,
@@ -705,6 +755,185 @@ for (const theme of ['light', 'dark'] as const) {
 						await source.scrollIntoViewIfNeeded()
 						await recordConsumer(page.locator('main'), info, 'eip-no-script', sizing)
 						await keyboardShowAndDismiss(page, source)
+					})
+				})
+			})
+		}
+	}
+}
+
+for (const theme of ['light', 'dark'] as const) {
+	for (const width of [320, 375, 1440]) {
+		for (const scripts of [true, false]) {
+			test.describe(`native tagged links: ${theme}, ${width}, scripts ${scripts}`, () => {
+				test.use({
+					colorScheme: theme,
+					viewport: { width, height: 900 },
+					javaScriptEnabled: scripts,
+				})
+
+				test('paint, focus, wrapping and native activation compose with public overrides', async ({
+					page,
+				}, info) => {
+					await load(page, scripts, 'current')
+					const reference = await tagAppearance(page.locator('[data-tag-link-reference]'))
+					const inputReference = await tagAppearance(page.locator('[data-input-reference]'))
+					const observations = []
+
+					for (const variant of ['default', 'override'] as const) {
+						const link = page.locator(`[data-tag-link="${variant}"]`)
+
+						await expect(link).toHaveAttribute('href', '#tag-destination')
+						await expect(link).not.toHaveAttribute('role', 'button')
+						await link.scrollIntoViewIfNeeded()
+						await page.mouse.move(0, 0)
+
+						for (const state of ['normal', 'hover', 'focus'] as const) {
+							if (state === 'hover') {
+								const point = await reachable(link)
+
+								await page.mouse.move(point.x, point.y)
+							} else if (state === 'focus') {
+								await page.mouse.move(0, 0)
+								await tabTo(page, link)
+							}
+
+							const normal = state === 'normal'
+							const expected =
+								variant === 'override'
+									? {
+											color: reference.roles[normal ? 'background-primary' : 'text-primary'],
+											background: reference.roles[normal ? 'text-primary' : 'background-primary'],
+											border: reference.roles['text-primary'],
+										}
+									: {
+											color: reference.color,
+											background: reference.background,
+											border: normal ? reference.border : reference.roles.accent,
+										}
+
+							await expect
+								.poll(async () => {
+									const { color, background, border } = await tagAppearance(link)
+
+									return { color, background, border }
+								})
+								.toEqual(expected)
+							const appearance = await tagAppearance(link)
+							const geometry = await probe(link)
+							const clipping = await tagBounds(link)
+
+							observations.push({ variant, state, appearance, geometry, clipping })
+							expect(appearance.contrast).toBeGreaterThanOrEqual(4.5)
+							expect(appearance.radius).toBe(reference.radius)
+							expect(appearance.font).toBe(reference.font)
+							expect(appearance.weight).toBe(reference.weight)
+							expect(appearance.padding).toBe(inputReference.padding)
+
+							if (variant === 'override') {
+								expect(appearance.height).toBeLessThanOrEqual(appearance.intrinsic + 1)
+							}
+
+							expect(appearance.opacity).toBe('1')
+							expect(geometry.point).not.toBeNull()
+							expect(clipping.fits).toBe(true)
+							expect(clipping.overflow).toBeLessThanOrEqual(1)
+
+							if (state === 'focus') {
+								expect(appearance.outlineStyle).not.toBe('none')
+								expect(appearance.outlineWidth).toBeGreaterThan(0)
+								await info.attach(`${variant}-visible-focus`, {
+									body: await page.screenshot(),
+									contentType: 'image/png',
+								})
+							}
+						}
+
+						await page.keyboard.press('Space')
+						await expect(page).not.toHaveURL(/#tag-destination$/)
+						await link.scrollIntoViewIfNeeded()
+						const point = await reachable(link)
+
+						await page.mouse.move(point.x, point.y)
+						await page.mouse.down()
+						expect(await link.evaluate(element => element.matches(':active'))).toBe(true)
+						await expect(page).not.toHaveURL(/#tag-destination$/)
+						const outside = await outsidePoint(page)
+
+						await page.mouse.move(outside.x, outside.y)
+						await page.mouse.up()
+						await expect(page).not.toHaveURL(/#tag-destination$/)
+						await link.scrollIntoViewIfNeeded()
+						const edge = await link.evaluate(element => {
+							const box = element.getBoundingClientRect()
+							const x = box.left + Math.min(3, box.width / 4),
+								y = box.top + box.height / 2
+
+							return { x, y, owns: document.elementFromPoint(x, y)?.closest('a[href]') === element }
+						})
+
+						expect(edge.owns).toBe(true)
+						await page.mouse.click(edge.x, edge.y)
+						await expect(page).toHaveURL(/#tag-destination$/)
+						await load(page, scripts, 'current')
+						await tabTo(page, link)
+						await page.keyboard.press('Enter')
+						await expect(page).toHaveURL(/#tag-destination$/)
+						await load(page, scripts, 'current')
+					}
+
+					const density = page.locator('[data-tag-case="density"]')
+
+					await density.scrollIntoViewIfNeeded()
+					const labels = []
+
+					for (const label of await density.locator('[data-tag]').all()) {
+						const appearance = await tagAppearance(label)
+						const geometry = await tagBounds(label)
+
+						expect(appearance.contrast).toBeGreaterThanOrEqual(4.5)
+						expect(geometry.fits).toBe(true)
+						expect(geometry.overflow).toBeLessThanOrEqual(1)
+						labels.push({ appearance, geometry })
+					}
+
+					if (scripts) {
+						const button = page.locator('[data-tag-dense-action]')
+						const point = await reachable(button)
+						const output = page.getByRole('status', { name: 'Dense action count' })
+
+						await page.mouse.move(point.x, point.y)
+						await page.mouse.down()
+						await expect(output).toHaveText('0')
+						const outside = await outsidePoint(page)
+
+						await page.mouse.move(outside.x, outside.y)
+						await page.mouse.up()
+						await expect(output).toHaveText('0')
+						await page.mouse.click(point.x, point.y)
+						await expect(output).toHaveText('1')
+					}
+
+					const targets = await Promise.all(
+						(await density.locator('button, a[href]').all()).map(probe),
+					)
+
+					await info.attach('direct-link-and-composition-evidence', {
+						body: JSON.stringify({
+							theme,
+							width,
+							scripts,
+							observations,
+							labels,
+							targets,
+							limits:
+								'Fixture-only opaque color and bounded geometry observations. Actual consumer parity, visual readability, native zoom and raw hit-region review remain separate obligations.',
+						}),
+						contentType: 'application/json',
+					})
+					await info.attach('dense-nested-rtl-composition', {
+						body: await page.screenshot(),
+						contentType: 'image/png',
 					})
 				})
 			})
