@@ -110,6 +110,7 @@
 
 	.background-blob {
 		---blob-weight: calc(var(--blob-light-theme-weight) * (1 - var(---theme-dark)) + var(--blob-dark-theme-weight) * var(---theme-dark));
+		opacity: var(---blob-weight);
 		position: absolute;
 		top: -50vh;
 		left: -50vw;
@@ -142,10 +143,10 @@
 	}
 	@keyframes blob-opacity {
 		from {
-			opacity: calc(var(--opacity-from) * var(---blob-weight));
+			opacity: var(--opacity-from);
 		}
 		to {
-			opacity: calc(var(--opacity-to) * var(---blob-weight));
+			opacity: var(--opacity-to);
 		}
 	}
 
