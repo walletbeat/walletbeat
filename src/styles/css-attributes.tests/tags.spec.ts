@@ -308,21 +308,15 @@ async function reachable(target: Locator) {
 }
 
 async function tabTo(page: Page, target: Locator) {
-	const webkit =
-		page.context().browser()?.browserType().name() === 'webkit' &&
-		(await target.evaluate(element => element.matches('a[href]')))
+	const webkit = page.context().browser()?.browserType().name() === 'webkit'
 	const forward = webkit ? 'Alt+Tab' : 'Tab'
 	const backward = webkit ? 'Alt+Shift+Tab' : 'Shift+Tab'
+	// Focus can expose hidden popover links during native traversal.
 	const count = await page
 		.locator('a[href], button, input, select, textarea, [tabindex]')
 		.evaluateAll(
 			elements =>
-				elements.filter(
-					element =>
-						element instanceof HTMLElement &&
-						element.tabIndex >= 0 &&
-						element.getClientRects().length,
-				).length,
+				elements.filter(element => element instanceof HTMLElement && element.tabIndex >= 0).length,
 		)
 
 	if (
