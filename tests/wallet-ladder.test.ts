@@ -5,6 +5,7 @@ import {
 	softwareWalletAttributeTree,
 	unratedSoftwareWallet,
 } from '@/data/software-wallets'
+import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
 import {
 	evaluateWalletOnLadder,
 	StageCriterionRating,
@@ -14,7 +15,11 @@ import {
 import { WalletType } from '@/schema/wallet-types'
 import { sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
+import {
+	getWalletStageAndLadder,
+	walletQualifiesForStageZero,
+	walletStageIndex,
+} from '@/utils/stage'
 import { allCriteriaInStage, computeCountsAndStatus } from '@/utils/stage-attributes'
 import { ratedWalletJsonExport } from '@/utils/wallet-json-export'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
@@ -215,5 +220,51 @@ describe('stage selection by assigned wallet type', () => {
 	it('retains the ladder when its criteria are unknown and omits absent ladders', () => {
 		expect(getWalletStageAndLadder(walletFixtures.unknown()).ladderEvaluation).not.toBeNull()
 		expect(getWalletStageAndLadder(walletFixtures.embedded()).ladderEvaluation).toBeNull()
+	})
+})
+
+describe('reported stage ordering', () => {
+	it.each([
+		['ascending', 1],
+		['descending', -1],
+	] as const)('orders states without a stage and every ladder stage %s', (_direction, sign) => {
+		const softwareLadder = allWalletLadders[WalletLadderType.SOFTWARE]
+		const ranked = softwareLadder.stages.map(stage => ({
+			...walletFixtures.software(),
+			ladders: {
+				[WalletLadderType.SOFTWARE]: {
+					ladder: softwareLadder,
+					stage,
+					highestClearedStage: stage,
+				},
+			},
+		}))
+		const withoutStage = [
+			walletFixtures.stageNoneCleared(),
+			walletFixtures.stageUnknown(),
+			walletFixtures.stageUnknownAfterClear(),
+		]
+		const mixed = [...ranked, ...withoutStage].toReversed()
+		const ordered = mixed.toSorted(
+			(a, b) => sign * ((walletStageIndex(a) ?? -1) - (walletStageIndex(b) ?? -1)),
+		)
+		const expected = [
+			...withoutStage.map(() => -1),
+			...softwareLadder.stages.map((_, index) => index),
+		]
+
+		expect(ordered.map(walletStageIndex)).toEqual(sign === 1 ? expected : expected.toReversed())
+		expect(withoutStage.map(wallet => getWalletStageAndLadder(wallet).stage)).toEqual([
+			'QUALIFIED_FOR_NO_STAGES',
+			'UNRATED',
+			'UNRATED',
+		])
+		expect(withoutStage.map(walletQualifiesForStageZero)).toEqual([false, false, true])
+	})
+
+	it('omits an absent ladder without treating unknown evidence as absent', () => {
+		expect(walletStageIndex(walletFixtures.embedded())).toBeUndefined()
+		expect(walletStageIndex(walletFixtures.stageUnknown())).toBe(-1)
+		expect(walletStageIndex(walletFixtures.stageNoneCleared())).toBe(-1)
 	})
 })
