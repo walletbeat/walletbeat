@@ -4,21 +4,14 @@ import { eipOgImage } from '@/utils/eip-og-image'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
 import { eips } from '@/data/eips'
-import { embeddedWalletAttributeTree, ratedEmbeddedWallets } from '@/data/embedded-wallets'
-import { hardwareWalletAttributeTree, ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
-import type { AttributeTree } from '@/schema/attribute-groups'
-import {
-	EipSupportStatus,
-	ratedWalletEipSupportByStatus,
-	type EipStatusSupportCard,
-} from '@/schema/eip-support'
+import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
+import type { EipStatusSupportCard } from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
-import type { RatedWallet } from '@/schema/wallet'
 import { type CodeSnippetIndex } from '@/utils/code-snippet-index'
 import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
-import { sortEipSupportCards } from '@/utils/eip-support-sort'
-import { getWalletUrl } from '@/utils/urls'
+import { eipStatusSupportCards } from '@/utils/eip-support-cards'
 import { childHeadingLevel } from '@/types/heading'
 
 // Components
@@ -42,39 +35,6 @@ type Props = { eip: Eip }
 
 const { eip }: Props = Astro.props
 
-/** Group each wallet's platform-qualified status entries for the tracker. */
-function eipStatusSupportCards<_AttributeGroupId extends string>(
-	attributeTree: AttributeTree<_AttributeGroupId>,
-	wallets: Array<RatedWallet<_AttributeGroupId>>,
-): EipStatusSupportCard[] {
-	const entries = wallets.flatMap(wallet => {
-		const byStatus = ratedWalletEipSupportByStatus(wallet, eip.number)
-
-		return Object.values(EipSupportStatus).flatMap(status => {
-			const entry = byStatus[status]
-
-			return entry === undefined
-				? []
-				: [
-						{
-							wallet,
-							card: {
-								id: wallet.metadata.id,
-								displayName: wallet.metadata.displayName,
-								iconExtension: wallet.metadata.iconExtension,
-								url: getWalletUrl(wallet),
-								status,
-								variants: entry.variants,
-								references: entry.references,
-							},
-						},
-					]
-		})
-	})
-
-	return sortEipSupportCards(attributeTree, entries)
-}
-
 /** The stored code snippets referenced by `cards`. */
 function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
 	return Object.fromEntries(
@@ -85,18 +45,9 @@ function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
 const pageHeadingLevel = 1 as const
 const supportHeadingLevel = childHeadingLevel[pageHeadingLevel]
 
-const softwareCards = eipStatusSupportCards(
-	softwareWalletAttributeTree,
-	Object.values(ratedSoftwareWallets),
-)
-const hardwareCards = eipStatusSupportCards(
-	hardwareWalletAttributeTree,
-	Object.values(ratedHardwareWallets),
-)
-const embeddedCards = eipStatusSupportCards(
-	embeddedWalletAttributeTree,
-	Object.values(ratedEmbeddedWallets),
-)
+const softwareCards = eipStatusSupportCards(eip.number, Object.values(ratedSoftwareWallets))
+const hardwareCards = eipStatusSupportCards(eip.number, Object.values(ratedHardwareWallets))
+const embeddedCards = eipStatusSupportCards(eip.number, Object.values(ratedEmbeddedWallets))
 ---
 
 <Layout

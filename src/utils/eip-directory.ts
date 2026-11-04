@@ -5,6 +5,7 @@ import type { Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import { remap } from '@/types/utils/remap'
 import { getWalletUrl } from '@/utils/urls'
+import { compareWalletNames } from '@/utils/wallet-name'
 
 /** A wallet that implements an EIP, as shown in the EIP directory. */
 export interface EipImplementer {
@@ -50,7 +51,7 @@ export function eipImplementers(
 						},
 					]
 		})
-		.sort((a, b) => a.displayName.localeCompare(b.displayName))
+		.sort(compareWalletNames)
 }
 
 /** Annotate EIPs with the rated wallets that implement them. */
