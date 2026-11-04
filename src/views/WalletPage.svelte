@@ -121,7 +121,11 @@
 		const closing = tocClosing
 		if (closing === null) return
 		const panel = event.currentTarget
-		await finishPopoverExit(panel)
+		// The overlay exit transition owns top-layer retention independently of attention filtering.
+		if (getComputedStyle(panel).transitionProperty.split(',').some(property =>
+			['all', 'overlay'].includes(property.trim()))) {
+			await finishPopoverExit(panel)
+		}
 		if (tocClosing === closing && !panel.matches(':popover-open')) {
 			tocClosing = null
 			publishTocState('closed')
@@ -1884,7 +1888,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						display: flex;
 					}
 					@media (prefers-reduced-motion: reduce) {
-						transition-duration: 0s;
+						transition-property: filter;
 						&:popover-open {
 							animation-duration: 0s;
 						}
