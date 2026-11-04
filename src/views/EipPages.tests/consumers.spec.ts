@@ -60,9 +60,13 @@ for (const colorScheme of ['light', 'dark'] as const) {
 					await page.keyboard.press('Enter')
 					await expect(firstStandard).toHaveAttribute('open', '')
 					await expect(firstStandard.locator('summary h2')).toHaveCount(1)
-					await expect(
-						firstStandard.getByRole('heading', { name: 'Verified support', exact: true }),
-					).toHaveJSProperty('tagName', 'H3')
+					const verifiedSupportHeading = firstStandard.getByRole('heading', {
+						name: 'Verified support',
+						exact: true,
+					})
+
+					await expect(verifiedSupportHeading).toHaveCount(1)
+					await expect(verifiedSupportHeading.and(firstStandard.locator('h3'))).toHaveCount(1)
 
 					for (const prefix of ['EIP', 'ERC']) {
 						await page.getByRole('radio', { name: `${prefix}s`, exact: true }).check()
@@ -214,6 +218,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
 
 					const card = page.locator('main .wallet-card details').first()
 
+					await card.scrollIntoViewIfNeeded()
+
 					await card.locator('summary').focus()
 					await page.keyboard.press('Enter')
 					await expect(card).toHaveAttribute('open', '')
@@ -247,13 +253,20 @@ for (const colorScheme of ['light', 'dark'] as const) {
 					const original = page.url()
 
 					expect(destination).toMatch(/^\/[^/?#]+\/$/)
-					await card.locator('summary').focus()
-					await page.keyboard.press('Tab')
-					await expect(wallet).toBeFocused()
-					const newPageEvent = context.waitForEvent('page')
+					// macOS WebKit includes links in native focus traversal with Option-Tab.
+					const nextLinkKey =
+						process.platform === 'darwin' && browser.browserType().name() === 'webkit'
+							? 'Alt+Tab'
+							: 'Tab'
 
-					await wallet.click({ modifiers: ['ControlOrMeta'] })
-					const newPage = await newPageEvent
+					await card.locator('summary').focus()
+					await page.keyboard.press(nextLinkKey)
+					await expect(wallet).toBeFocused()
+					await expect(wallet).toBeInViewport()
+					const [newPage] = await Promise.all([
+						context.waitForEvent('page'),
+						wallet.click({ modifiers: ['ControlOrMeta'] }),
+					])
 
 					await newPage.waitForLoadState()
 					expect(new URL(newPage.url()).pathname).toBe(destination)
