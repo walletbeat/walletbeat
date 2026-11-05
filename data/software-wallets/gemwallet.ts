@@ -98,7 +98,7 @@ export const gemwallet: SoftwareWallet = {
 		coinspectId: 'gem',
 		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-11-01',
+		lastUpdated: '2026-11-04',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -629,7 +629,14 @@ export const gemwallet: SoftwareWallet = {
 					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								"Gem's review screen shows network fees but doesn't show the swap provider fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png',
+							label: 'Gem review screen for a Uniswap swap from USDC to ETH',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -637,12 +644,15 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.WALLET_FEE]: false,
 						},
 						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
