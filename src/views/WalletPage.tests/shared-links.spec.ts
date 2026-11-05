@@ -397,25 +397,8 @@ test('destination feedback keeps current, focus and hover independent across own
 						.flatMap(animation =>
 							animation.effect instanceof KeyframeEffect ? animation.effect.getKeyframes() : [],
 						)
-					let translation = frames.some(frame => Object.hasOwn(frame, 'translate'))
-					let scaling = frames.some(frame => Object.hasOwn(frame, 'scale'))
-
-					for (const frame of frames) {
-						if (typeof frame.transform !== 'string' || frame.transform === 'none') {
-							continue
-						}
-
-						const matrix = new DOMMatrixReadOnly(frame.transform)
-
-						if (![...matrix.toFloat64Array()].every(Number.isFinite)) {
-							throw Error('Native motion matrix is not finite')
-						}
-
-						translation ||= matrix.m41 !== 0 || matrix.m42 !== 0
-						scaling ||=
-							Math.abs(Math.hypot(matrix.m11, matrix.m12, matrix.m13) - 1) > 0.000001 ||
-							Math.abs(Math.hypot(matrix.m21, matrix.m22, matrix.m23) - 1) > 0.000001
-					}
+					const translation = frames.some(frame => Object.hasOwn(frame, 'translate'))
+					const transform = frames.some(frame => Object.hasOwn(frame, 'transform'))
 					const boundary = own(owner).find(
 						animation =>
 							animation.animationName.endsWith('-current') &&
@@ -441,7 +424,7 @@ test('destination feedback keeps current, focus and hover independent across own
 					return {
 						identity: `#${scope.id}`,
 						translation,
-						scaling,
+						transform,
 						referenceCurrent: getComputedStyle(reference)
 							.getPropertyValue('---link-current')
 							.trim(),
@@ -476,7 +459,7 @@ test('destination feedback keeps current, focus and hover independent across own
 
 			for (const heading of composition.headings) {
 				expect(heading.translation, `${heading.identity}: translation role`).toBe(true)
-				expect(heading.scaling, `${heading.identity}: scale role`).toBe(true)
+				expect(heading.transform, `${heading.identity}: transform effect is retained`).toBe(true)
 				expect(heading.referenceCurrent).toBe('1')
 
 				for (const peer of heading.peers) {

@@ -906,6 +906,14 @@ for (const width of [390, 1440]) {
 
 						const afterProbe = rect(item.getBoundingClientRect())
 						const style = getComputedStyle(item)
+						const itemMatrix = new DOMMatrixReadOnly(
+							style.transform === 'none' ? undefined : style.transform,
+						)
+						const itemScale = {
+							expected: Number(style.getPropertyValue('--stickyBreadcrumb-scale')),
+							inline: Math.hypot(itemMatrix.m11, itemMatrix.m12, itemMatrix.m13),
+							block: Math.hypot(itemMatrix.m21, itemMatrix.m22, itemMatrix.m23),
+						}
 						const blockStart = parseFloat(style.getPropertyValue('---breadcrumb-blockStart'))
 						const blockEnd = parseFloat(style.getPropertyValue('---breadcrumb-blockEnd'))
 						const rowHeight = blockEnd - blockStart - 2 * padding
@@ -1030,6 +1038,7 @@ for (const width of [390, 1440]) {
 							beforeProbe,
 							afterProbe,
 							item: itemBox,
+							itemScale,
 							end: endBox,
 							endPaint,
 							physicalOwner: {
@@ -1088,6 +1097,17 @@ for (const width of [390, 1440]) {
 				).toBeLessThanOrEqual(0.1)
 			}
 			expect(observation.qualified, `${label}: ${observation.reasons.join('; ')}`).toBe(true)
+			expect(observation.itemScale.expected, `${label}: compact scale is positive`).toBeGreaterThan(
+				0,
+			)
+			expect(observation.itemScale.expected, `${label}: compact identity shrinks`).toBeLessThan(1)
+
+			for (const axis of ['inline', 'block'] as const) {
+				expect(
+					observation.itemScale[axis],
+					`${label}: used ${axis} scale matches compact input`,
+				).toBeCloseTo(observation.itemScale.expected, 4)
+			}
 
 			if (observation.headingLevel === 'H2') {
 				expect(
