@@ -93,7 +93,9 @@ test('Chromium exposes accelerated glyph layers at native heading arrival phases
 								!style
 									.getPropertyValue('animation-range-end')
 									.split(',')
-									.every(value => /^contain(?: 100%)?$/.test(value.trim()))
+									.every(value =>
+										/^contain(?: 100%| calc\(100% \+ [\d.]+px\))?$/.test(value.trim()),
+									)
 							) {
 								throw new Error(
 									'The native range requires a different phase derivation: ' +
@@ -137,6 +139,8 @@ test('Chromium exposes accelerated glyph layers at native heading arrival phases
 								throw new Error('Compaction must have a positive native range')
 							}
 
+							const rangeEnd = style.getPropertyValue('animation-range-end').split(',')[0].trim()
+							const tail = Number(/calc\(100% \+ ([\d.]+)px\)/.exec(rangeEnd)?.[1] ?? 0)
 							const requested = arrivalStart + (arrivalEnd - arrivalStart) * fraction
 
 							root.scrollTo({
@@ -152,6 +156,10 @@ test('Chromium exposes accelerated glyph layers at native heading arrival phases
 								requested,
 								scroll: root.scrollTop,
 								deliveredFraction: (root.scrollTop - arrivalStart) / (arrivalEnd - arrivalStart),
+								progressTolerance:
+									(0.02 * (arrivalEnd - arrivalStart)) / (arrivalEnd + tail - arrivalStart),
+								expectedProgress:
+									(root.scrollTop - arrivalStart) / (arrivalEnd + tail - arrivalStart),
 								animations: icon
 									.getAnimations({ subtree: true })
 									.filter(
@@ -191,7 +199,9 @@ test('Chromium exposes accelerated glyph layers at native heading arrival phases
 					).toBeLessThanOrEqual(1)
 
 					for (const animation of pose.animations) {
-						expect(Math.abs((animation.progress ?? 0) - pose.deliveredFraction)).toBeLessThan(0.02)
+						expect(Math.abs((animation.progress ?? 0) - pose.expectedProgress)).toBeLessThan(
+							pose.progressTolerance,
+						)
 					}
 					// A paint flush delivers the layer inventory; this is eligibility evidence, not a frame-rate measurement.
 					await page.screenshot()
@@ -211,7 +221,13 @@ test('Chromium exposes accelerated glyph layers at native heading arrival phases
 					expect(afterPaint.progress).toHaveLength(2)
 
 					for (const progress of afterPaint.progress) {
-						expect(Math.abs((progress ?? 0) - pose.deliveredFraction)).toBeLessThan(0.02)
+						expect(
+							typeof progress === 'number' && progress > 0 && progress < 1,
+							`${id}: glyph motion remains active after paint`,
+						).toBe(true)
+						expect(Math.abs((progress ?? 0) - pose.expectedProgress)).toBeLessThan(
+							pose.progressTolerance,
+						)
 					}
 					expect(
 						layers.length,
