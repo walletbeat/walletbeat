@@ -49,6 +49,13 @@ const intentionalPropagationDifferences = new Set([
 		outcomeId: 'standard_eoa_exportable',
 		path: 'accountSupport.eip7702.ref',
 	}),
+	// Fee transparency cites only the operations with the least comprehensive fee display.
+	// Zeus's is cross-chain bridging, so its built-in swap row is not cited.
+	propagationDifferenceKey({
+		attributeId: 'feeTransparency',
+		outcomeId: 'some_non_comprehensive_fees',
+		path: 'transparency.operationFees.builtInErc20Swap.ref',
+	}),
 	// Multi-address correlation cites only data collection rows that collect the account
 	// address by default. Ambire's native swap row (LI.FI) collects only the IP address.
 	propagationDifferenceKey({
