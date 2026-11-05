@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
+
 	// Types/constants
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
@@ -141,10 +143,6 @@
 							<img
 								src={`/images/wallets/${row.id}.${row.iconExtension}`}
 								alt=""
-								onerror={event => {
-									if (event.currentTarget instanceof HTMLImageElement)
-										event.currentTarget.src = '/images/wallets/default.svg'
-								}}
 							/>
 						</span>
 

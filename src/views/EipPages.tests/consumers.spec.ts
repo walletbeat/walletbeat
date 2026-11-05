@@ -282,96 +282,136 @@ for (const colorScheme of ['light', 'dark'] as const) {
 	}
 }
 
-test('EIP-7702 retains its richer hydrated contract inventory', async ({ page }) => {
-	await page.goto('/wallet/7702/')
-	await expect(
-		page.getByRole('heading', { name: 'EIP-7702 Adoption Tracker', exact: true }),
-	).toBeVisible()
-	await expectHydrated(page, 'main table')
-	const table = page.locator('main table')
+for (const javaScriptEnabled of [false, true]) {
+	for (const width of [390, 1280]) {
+		test.describe(`EIP-7702 ${width}px JavaScript ${javaScriptEnabled}`, () => {
+			test.use({ javaScriptEnabled, viewport: { width, height: 900 } })
+			test('retains its complete richer contract inventory and canonical icons', async ({
+				page,
+			}) => {
+				const hydrationIssues: string[] = []
 
-	for (const name of ['Wallet', 'Type', 'Contract', 'Batching']) {
-		await expect(table.getByRole('columnheader', { name, exact: true })).toHaveCount(1)
-	}
-	const props: unknown = JSON.parse(
-		(await table.locator('xpath=ancestor::astro-island').getAttribute('props')) ?? '{}',
-	)
+				page.on('console', message => {
+					if (message.type() === 'warning' && message.text().includes('/hydration_')) {
+						hydrationIssues.push(message.text())
+					}
+				})
+				await page.goto('/wallet/7702/')
+				await expect(
+					page.getByRole('heading', { name: 'EIP-7702 Adoption Tracker', exact: true }),
+				).toBeVisible()
 
-	if (!isRecord(props)) {
-		throw new Error('Expected table island props')
-	}
-
-	const rows = serializedPayload(props.rows)
-
-	if (!Array.isArray(rows) || rows.length === 0) {
-		throw new Error('Expected nonempty canonical table rows')
-	}
-
-	await expect(table.locator('tbody tr')).toHaveCount(rows.length)
-
-	for (const encodedRow of rows) {
-		const row = serializedPayload(encodedRow)
-
-		if (!isRecord(row)) {
-			throw new Error('Expected a table row')
-		}
-
-		const name = serializedPayload(row.displayName)
-		const url = serializedPayload(row.url)
-
-		if (typeof name !== 'string' || typeof url !== 'string') {
-			throw new Error('Expected wallet name and URL')
-		}
-
-		const renderedRow = table
-			.locator('tbody tr')
-			.filter({ has: page.locator(`h3 a[href="${url}"]`) })
-
-		await expect(renderedRow).toHaveCount(1)
-		await expect(renderedRow.locator('h3 a')).toHaveText(name)
-		const contract = serializedPayload(row.contract)
-
-		if (isRecord(contract)) {
-			const contractName = serializedPayload(contract.name)
-			const address = serializedPayload(contract.address)
-			const sourceAvailable = serializedPayload(contract.sourceAvailable)
-
-			if (typeof contractName !== 'string' || typeof address !== 'string') {
-				throw new Error('Expected a named contract and address')
-			}
-
-			expect(address).toMatch(/^0x[0-9a-fA-F]{40}$/)
-			await expect(renderedRow.locator('.contract-info strong > a')).toHaveText(contractName)
-			await expect(renderedRow.locator('.contract-info strong > a')).toHaveAttribute(
-				'href',
-				`https://etherscan.io/address/${address}`,
-			)
-			await expect(renderedRow.locator('.contract-info strong > a')).toHaveAttribute(
-				'target',
-				'_blank',
-			)
-
-			if (sourceAvailable === true) {
-				const sourceUrl = serializedPayload(contract.sourceUrl)
-
-				if (typeof sourceUrl !== 'string') {
-					throw new Error('Expected available contract source URL')
+				if (javaScriptEnabled) {
+					await expectHydrated(page, 'main table')
+					expect(hydrationIssues).toEqual([])
 				}
 
-				await expect(renderedRow.locator('.source-link')).toHaveText('Source code')
-				await expect(renderedRow.locator('.source-link')).toHaveAttribute('href', sourceUrl)
-			} else {
-				await expect(renderedRow).toContainText('Source unavailable')
-			}
-		} else {
-			await expect(renderedRow.locator('.contract-info')).toHaveCount(0)
+				const table = page.locator('main table')
 
-			if (contract === 'UNKNOWN') {
-				await expect(renderedRow).toContainText('Unknown')
-			}
-		}
+				for (const name of ['Wallet', 'Type', 'Contract', 'Batching']) {
+					await expect(table.getByRole('columnheader', { name, exact: true })).toHaveCount(1)
+				}
+				const props: unknown = JSON.parse(
+					(await table.locator('xpath=ancestor::astro-island').getAttribute('props')) ?? '{}',
+				)
+
+				if (!isRecord(props)) {
+					throw new Error('Expected table island props')
+				}
+
+				const rows = serializedPayload(props.rows)
+
+				if (!Array.isArray(rows) || rows.length === 0) {
+					throw new Error('Expected nonempty canonical table rows')
+				}
+
+				await expect(table.locator('tbody tr')).toHaveCount(rows.length)
+
+				for (const encodedRow of rows) {
+					const row = serializedPayload(encodedRow)
+
+					if (!isRecord(row)) {
+						throw new Error('Expected a table row')
+					}
+
+					const id = serializedPayload(row.id)
+					const iconExtension = serializedPayload(row.iconExtension)
+					const name = serializedPayload(row.displayName)
+					const url = serializedPayload(row.url)
+
+					if (
+						typeof id !== 'string' ||
+						typeof iconExtension !== 'string' ||
+						typeof name !== 'string' ||
+						typeof url !== 'string'
+					) {
+						throw new Error('Expected wallet name and URL')
+					}
+
+					const renderedRow = table
+						.locator('tbody tr')
+						.filter({ has: page.locator(`h3 a[href="${url}"]`) })
+
+					await expect(renderedRow).toHaveCount(1)
+					await expect(renderedRow.locator('h3 a')).toHaveText(name)
+					const icon = renderedRow.locator('.wallet-icon img')
+
+					await expect(icon).toHaveAttribute('src', `/images/wallets/${id}.${iconExtension}`)
+					await expect(icon).toHaveAttribute('alt', '')
+					await expect
+						.poll(() =>
+							icon.evaluate(
+								image =>
+									image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0,
+							),
+						)
+						.toBe(true)
+					const contract = serializedPayload(row.contract)
+
+					if (isRecord(contract)) {
+						const contractName = serializedPayload(contract.name)
+						const address = serializedPayload(contract.address)
+						const sourceAvailable = serializedPayload(contract.sourceAvailable)
+
+						if (typeof contractName !== 'string' || typeof address !== 'string') {
+							throw new Error('Expected a named contract and address')
+						}
+
+						expect(address).toMatch(/^0x[0-9a-fA-F]{40}$/)
+						await expect(renderedRow.locator('.contract-info strong > a')).toHaveText(contractName)
+						await expect(renderedRow.locator('.contract-info strong > a')).toHaveAttribute(
+							'href',
+							`https://etherscan.io/address/${address}`,
+						)
+						await expect(renderedRow.locator('.contract-info strong > a')).toHaveAttribute(
+							'target',
+							'_blank',
+						)
+
+						if (sourceAvailable === true) {
+							const sourceUrl = serializedPayload(contract.sourceUrl)
+
+							if (typeof sourceUrl !== 'string') {
+								throw new Error('Expected available contract source URL')
+							}
+
+							await expect(renderedRow.locator('.source-link')).toHaveText('Source code')
+							await expect(renderedRow.locator('.source-link')).toHaveAttribute('href', sourceUrl)
+						} else {
+							await expect(renderedRow).toContainText('Source unavailable')
+						}
+					} else {
+						await expect(renderedRow.locator('.contract-info')).toHaveCount(0)
+
+						if (contract === 'UNKNOWN') {
+							await expect(renderedRow).toContainText('Unknown')
+						}
+					}
+				}
+			})
+		})
 	}
-})
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object' && !Array.isArray(value)
