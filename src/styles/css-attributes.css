@@ -2657,6 +2657,14 @@ ol {
 
 	/* Visible destinations retain their clocks independently of sticky participation. */
 	@scope (:root) to (details:not([open]) > :not(summary)) {
+		@scope ([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="size"])) to ([data-sticky-breadcrumb~="scope"]) {
+			:scope > [data-sticky-breadcrumb~="position"],
+			:scope > details > [data-sticky-breadcrumb~="position"] {
+				[data-sticky-breadcrumb~="end"] {
+					anchor-name: --breadcrumb-end;
+				}
+			}
+		}
 		/* Measure both dimensions horizontally so vertical scrolling cannot tick size clocks. */
 		:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::before,
 		:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::after,
@@ -2831,9 +2839,6 @@ ol {
 				}
 				[data-sticky-breadcrumb~="source"] {
 					anchor-name: --breadcrumb-source;
-				}
-				[data-sticky-breadcrumb~="end"] {
-					anchor-name: --breadcrumb-end;
 				}
 			}
 			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
