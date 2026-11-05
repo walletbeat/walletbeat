@@ -148,6 +148,7 @@ export const trezorWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

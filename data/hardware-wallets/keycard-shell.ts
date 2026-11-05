@@ -173,6 +173,7 @@ export const keycardShell: HardwareWallet = {
 					},
 				}),
 			},
+			erc7730MetadataSources: null,
 			// Firmware: open source MIT, reproducible builds, manual updates with hash verification
 			firmware: {
 				type: FirmwareType.PASS,

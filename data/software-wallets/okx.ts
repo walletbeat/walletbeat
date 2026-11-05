@@ -194,6 +194,7 @@ export const okx: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: {
 					ref: [

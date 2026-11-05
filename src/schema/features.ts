@@ -20,6 +20,7 @@ import type { WalletProfile } from './features/profile'
 import type { AccountRecovery } from './features/security/account-recovery'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { DuressResistance } from './features/security/duress-resistance'
+import type { Erc7730MetadataSource } from './features/security/erc7730-metadata'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -102,6 +103,13 @@ export interface WalletBaseFeatures {
 
 	/** Security features. */
 	security: {
+		/**
+		 * ERC-7730 metadata sources used by the wallet, independent of decoding support.
+		 * Use null for unknown sources and an empty array only for confirmed absence.
+		 * Each source needs evidence of use by this wallet and variant.
+		 */
+		erc7730MetadataSources: VariantFeature<Erc7730MetadataSource[]>
+
 		/**
 		 * Public security audits the wallet has gone through.
 		 * If never audited, this should be an empty array, as 'null' represents
@@ -392,6 +400,7 @@ export interface ResolvedFeatures {
 
 	security: {
 		scamAlerts: ResolvedFeature<ScamAlerts>
+		erc7730MetadataSources: ResolvedFeature<Erc7730MetadataSource[]>
 		publicSecurityAudits: SecurityAudit[] | null
 		lightClient: {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
@@ -545,6 +554,10 @@ export function resolveFeatures(
 			transactionLegibility: baseFeat(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
+			),
+			erc7730MetadataSources: baseFeat(
+				'security.erc7730MetadataSources',
+				features => features.security.erc7730MetadataSources,
 			),
 			passkeyVerification:
 				embeddedFeat(

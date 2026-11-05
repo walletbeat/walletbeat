@@ -327,6 +327,7 @@ export const phantom: SoftwareWallet = {
 					duressMode: notSupported,
 				},
 			},
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation: 'Phantom supports importing a Ledger hardware wallet via WebUSB.',

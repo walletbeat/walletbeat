@@ -119,6 +119,7 @@ export const imkeyWallet: HardwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,

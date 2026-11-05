@@ -136,6 +136,7 @@ export const onekeyWallet: HardwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: {
 				type: FirmwareType.FAIL,
 				customFirmware: FirmwareType.FAIL,

@@ -140,6 +140,7 @@ export const cypherockWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,

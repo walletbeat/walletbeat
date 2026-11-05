@@ -1401,6 +1401,7 @@ export const rainbow: SoftwareWallet = {
 					duressMode: notSupported,
 				},
 			},
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: {
 					ref: [

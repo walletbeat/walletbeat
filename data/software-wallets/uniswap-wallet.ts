@@ -823,6 +823,7 @@ export const uniswapWallet: SoftwareWallet = {
 					duressMode: notSupported,
 				},
 			},
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation:

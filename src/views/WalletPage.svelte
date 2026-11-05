@@ -9,6 +9,7 @@
 	import { knownSingleVariantIcons, type WBIconID } from '@/styles/wbicons'
 	import '../components/pie-shape.css'
 	import { finishPopoverExit } from './popover-transition'
+	import Erc7730MetadataSources from './Erc7730MetadataSources.svelte'
 	import publishPeerState from './wallet-page-peer-state.js'
 	import peerStateSource from './wallet-page-peer-state.js?raw'
 	import { attributeGroupFlowerGradient, sliceFill, sliceLabelBackground } from '@/components/pie-fill'
@@ -28,7 +29,7 @@
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, Variant } from '@/schema/variants'
-	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
+	import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
@@ -55,7 +56,7 @@
 	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
-	import { setItems } from '@/types/utils/non-empty'
+	import { nonEmptyEntries, setItems } from '@/types/utils/non-empty'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
@@ -744,7 +745,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	const overallScore = $derived(calculateOverallScore(attributeTree, wallet.overall, () => true))
 	const allPageReferences = $derived(mergeRefs(...evaluatedAttributeGroups.flatMap(({ attributes }) =>
 		attributes.flatMap(({ evalAttr }) => toFullyQualified(evalAttr.evaluation.references)),
-	)))
+	), ...nonEmptyEntries<Variant, ResolvedWallet<_AttributeGroupId>>(wallet.variants)
+		.filter(([variant]) => selectedVariant === undefined || selectedVariant === variant)
+		.flatMap(([, resolved]) => (resolved.features.security.erc7730MetadataSources ?? [])
+			.flatMap(source => toFullyQualified(source.ref)))))
 
 	// Components
 	import { ListTree, ListCollapse } from 'lucide-static'
@@ -1097,6 +1101,19 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/if}
+
+		<section id="erc7730-metadata-sources" data-scroll-item="inline-detached padding-match-end" data-column="gap-3">
+			<h2>ERC-7730 metadata sources</h2>
+			<p>Metadata sources are documented separately from decoding support and do not change the rating.</p>
+			{#each nonEmptyEntries<Variant, ResolvedWallet<_AttributeGroupId>>(wallet.variants) as [variant, resolved] (variant)}
+				{#if selectedVariant === undefined || selectedVariant === variant}
+					<div data-card="secondary padding-5 radius-4" data-column="gap-3">
+						<h3>{variantToName(variant, true)}</h3>
+						<Erc7730MetadataSources sources={resolved.features.security.erc7730MetadataSources} />
+					</div>
+				{/if}
+			{/each}
+		</section>
 
 		{#each evaluatedAttributeGroups as group (group.attrGroup.id)}
 			{@render attributeGroupSnippet(group)}
@@ -1487,6 +1504,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						{variantSpecificCaption}
 					</div>
 				{/if}
+
 
 				{#if evalAttr.evaluation.impact}
 					<div class="impact" data-column="gap-6" data-scroll-item="snap-prose">

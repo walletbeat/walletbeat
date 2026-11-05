@@ -230,6 +230,7 @@ export const zeus: SoftwareWallet = {
 			}),
 			bugBountyProgram: notSupported,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				ref: [

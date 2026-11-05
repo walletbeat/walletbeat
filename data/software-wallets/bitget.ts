@@ -204,6 +204,7 @@ export const bitget: SoftwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				ref: [

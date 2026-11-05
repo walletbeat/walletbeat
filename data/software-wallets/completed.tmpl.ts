@@ -656,6 +656,7 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 			},
+			erc7730MetadataSources: [],
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
