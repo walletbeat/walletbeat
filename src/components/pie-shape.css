@@ -25,7 +25,8 @@
 	.pie-navigation .pie-navigation-highlight > span,
 	.pie-navigation .navigation-items summary > a,
 	.pie-navigation .navigation-items menu[data-navigation-depth="1"] > li > a
-) {
+),
+:where(.pie-container .slice:is(button:not(:disabled), a[href]))::before {
 	---slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 	---slice-halfGap: calc(var(--slice-gap) / 2);
 	---slice-outerCornerOffset: calc(var(---slice-halfGap) + var(--slice-outerCornerRadius));

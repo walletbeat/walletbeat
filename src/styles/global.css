@@ -134,7 +134,6 @@
 	overflow: hidden;
 
 	font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
-	font-size: min(3.2vw, 16px);
 	/* Disable iOS Safari text autosizing, which inflates some code snippets but not others */
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;

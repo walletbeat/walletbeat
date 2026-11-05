@@ -14,7 +14,7 @@
 
 	// Props
 	let {
-		items,
+		items = [],
 		groups,
 		currentHref,
 		defaultOpen = false,
@@ -25,7 +25,7 @@
 		showLabels = true,
 		destinationState,
 	}: {
-		items: NavigationItem[]
+		items?: NavigationItem[]
 		groups?: NavigationGroup[]
 		currentHref?: string
 		defaultOpen?: boolean
@@ -65,7 +65,7 @@
 		const flatten = (items: NavigationItem[]): NavigationItem[] => (
 			items.flatMap(item => [item, ...flatten(item.children ?? [])])
 		)
-		const allItems = (groups ?? [{ items }]).flatMap(group => flatten(group.items))
+		const allItems = navigationGroups.flatMap(group => flatten(group.items))
 
 		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
 			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)

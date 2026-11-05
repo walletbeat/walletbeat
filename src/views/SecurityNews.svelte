@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
+	import { childHeadingLevel } from '@/types/heading'
 	import type { WBIconID } from '@/styles/wbicons'
 	import type { WalletSecurityNews } from '@/types/content/news'
 	import {
@@ -14,12 +15,15 @@
 	const {
 		news,
 		heading,
+		parentHeadingLevel,
 		allNewsResolved = false,
 	}: {
+		parentHeadingLevel: 1 | 2 | 3 | 4
 		news: WalletSecurityNews[]
 		heading: Snippet<[string, string, WBIconID, Snippet?, Snippet?]>
 		allNewsResolved?: boolean
 	} = $props()
+	const incidentHeadingLevel = $derived(childHeadingLevel[parentHeadingLevel])
 </script>
 
 
@@ -52,7 +56,7 @@
 						<div data-column="span-start" data-row-item="flexible"
 							style:--column-sizeTimelinePrefix="var(--stickyBreadcrumb-entryTimeline)">
 							<div data-row="start" data-sticky="block block-start backdrop-self backdrop-always">
-							<h3 data-sticky-breadcrumb="source"><a data-sticky-breadcrumb="item" data-link="camouflaged" href={`#security-news-${newsItem.slug}`}>{newsItem.title}</a></h3>
+							<svelte:element this={`h${incidentHeadingLevel}`} data-sticky-breadcrumb="source"><a data-sticky-breadcrumb="item" data-link="camouflaged" href={`#security-news-${newsItem.slug}`}>{newsItem.title}</a></svelte:element>
 							<div class="news-meta" data-row="end gap-2 wrap" data-row-item="wrap-end" data-sticky-breadcrumb="end contents">
 								<span
 									class="news-badge news-type"
@@ -109,6 +113,7 @@
 
 							{#if newsRefs.length > 0}
 								<ReferenceLinks
+									parentHeadingLevel={incidentHeadingLevel}
 									references={newsRefs}
 								/>
 							{/if}

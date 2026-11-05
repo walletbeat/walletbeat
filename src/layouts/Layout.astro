@@ -133,7 +133,7 @@ import Footer from '@/views/Footer.astro'
 			}}
 		/>
 		<div id='layout' data-scroll-container data-sticky-container>
-			<a class='skip-link' href='#content' data-astro-reload data-badge='large' data-row>
+			<a class='skip-link' href='#content' data-badge='large' data-row>
 				<span data-icon={String.fromCodePoint(0x21b5)}></span>
 				<span>Skip to main content</span>
 			</a>
@@ -299,7 +299,11 @@ import Footer from '@/views/Footer.astro'
 				calc(-1 * var(---wallet-chainWrap) * var(--navigation-mobile-blockSize));
 		}
 	}
-	#layout:has([data-sticky-breadcrumb~="root"]) {
+	#layout:has(
+		[data-sticky-breadcrumb~="root"]
+			> :where([data-sticky-breadcrumb~="flow"])
+			> :where([data-sticky-breadcrumb~="item-size"])
+	) {
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-compact-h1: 1.5rem;
 		--stickyBreadcrumb-markerSize: 1.25rem;
@@ -309,7 +313,11 @@ import Footer from '@/views/Footer.astro'
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
-		#layout:has([data-sticky-breadcrumb~="root"]) {
+		#layout:has(
+			[data-sticky-breadcrumb~="root"]
+				> :where([data-sticky-breadcrumb~="flow"])
+				> :where([data-sticky-breadcrumb~="item-size"])
+		) {
 			timeline-scope:
 				--wallet-end-inline, --wallet-end-block, --wallet-item-inline, --wallet-item-block;
 			@supports (timeline-scope: all) and (view-timeline-name: ident('a' 'b')) {
@@ -329,7 +337,11 @@ import Footer from '@/views/Footer.astro'
 			---breadcrumb-itemHeight: round(nearest, var(---breadcrumb-naturalItemHeight), 0.0625px);
 		}
 		@media (width <= 84rem) {
-			#layout:has([data-sticky-breadcrumb~="root"]) {
+			#layout:has(
+				[data-sticky-breadcrumb~="root"]
+					> :where([data-sticky-breadcrumb~="flow"])
+					> :where([data-sticky-breadcrumb~="item-size"])
+			) {
 				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
 				---navigation-entryEasing: linear(
 					0,
@@ -368,8 +380,16 @@ import Footer from '@/views/Footer.astro'
 					timeline-scope: --wallet-entry;
 				}
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])::before,
-			#layout:has([data-sticky-breadcrumb~="root"])::after {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)::before,
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)::after {
 				content: '';
 				position: fixed;
 				inset: 0 auto auto 0;
@@ -379,15 +399,27 @@ import Footer from '@/views/Footer.astro'
 				view-timeline-axis: inline;
 				view-timeline-inset: 0;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])::before {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)::before {
 				inline-size: anchor-size(--navigation-logo inline);
 				view-timeline-name: --navigation-logo-inline;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])::after {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)::after {
 				inline-size: anchor-size(--navigation-controls inline);
 				view-timeline-name: --navigation-controls-inline;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				[data-sticky-breadcrumb~="source"] {
@@ -396,33 +428,64 @@ import Footer from '@/views/Footer.astro'
 					navigation-controls-size auto linear both;
 				animation-timeline: --navigation-logo-inline, --navigation-controls-inline;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > menu {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
+				#nav
+				> header
+				> menu {
 				anchor-name: --navigation-controls;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"][data-sticky-breadcrumb~="scope"] {
 				--stickyBreadcrumb-insetBlockStart: 0px;
 				---breadcrumb-parentBlockEnd: var(--navigation-mobile-blockSize);
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"] {
 				--sticky-insetBlockStart: var(--navigation-mobile-blockSize);
 				--stickyBreadcrumb-inlineEasing: var(---navigation-entryEasing);
 			}
 			/* The navigation owns the surface shared by the mobile identity row. */
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]::after {
 				display: none;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"] > * {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
+				[data-sticky-breadcrumb~="root"]
+				> * {
 				---breadcrumb-blockStart: var(--stickyBreadcrumb-insetBlockStart);
 				---breadcrumb-blockEnd: var(--navigation-mobile-blockSize);
 				---breadcrumb-width: var(---breadcrumb-itemWidth);
 				---breadcrumb-height: var(---breadcrumb-compactItemHeight);
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
+				#nav
+				> header {
 				animation:
 					navigation-logo-size auto linear both,
 					navigation-controls-size auto linear both,
@@ -436,8 +499,18 @@ import Footer from '@/views/Footer.astro'
 					0.0625px
 				);
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header,
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
+				#nav
+				> header,
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				[data-sticky-breadcrumb~="source"] {
@@ -460,10 +533,19 @@ import Footer from '@/views/Footer.astro'
 					1
 				);
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) #nav {
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
+				#nav {
 				--sticky-zIndex: 2;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) {
+			#layout:has(
+				[data-sticky-breadcrumb~="root"]
+					> :where([data-sticky-breadcrumb~="flow"])
+					> :where([data-sticky-breadcrumb~="item-size"])
+			) {
 				#nav > header > .logo {
 					anchor-name: --navigation-logo;
 					animation: wallet-scroll-entry auto var(---navigation-entryEasing) both;
@@ -485,7 +567,11 @@ import Footer from '@/views/Footer.astro'
 						calc(0% - var(--safeArea-insetTop));
 				}
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				[data-sticky-breadcrumb~="item"] {
@@ -531,7 +617,11 @@ import Footer from '@/views/Footer.astro'
 				}
 			}
 
-			#layout:has([data-sticky-breadcrumb~="root"])
+			#layout:has(
+					[data-sticky-breadcrumb~="root"]
+						> :where([data-sticky-breadcrumb~="flow"])
+						> :where([data-sticky-breadcrumb~="item-size"])
+				)
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				.wallet-name {

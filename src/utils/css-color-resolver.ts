@@ -45,14 +45,31 @@ const substituteCustomProperties = (value: string): string =>
 export function resolveCssColor(color: string): string {
 	const { code } = transform({
 		filename: 'color.css',
-		code: new TextEncoder().encode(`a{color:${substituteCustomProperties(color)}}`),
+		code: new TextEncoder().encode(
+			`a{color:color(from ${substituteCustomProperties(color)} srgb r g b / alpha)}`,
+		),
 		minify: true,
-		// Lightning CSS emits an sRGB fallback first for browsers that predate
-		// CSS Color 4.
+		// Emit channel-clipped sRGB for the raster surface, preserving the source alpha.
 		targets: { chrome: 60 << 16 },
 		visitor: {
-			Color: cssColor =>
-				typeof cssColor === 'object' && cssColor.type === 'light-dark' ? cssColor.light : cssColor,
+			Color: cssColor => {
+				const value =
+					typeof cssColor === 'object' && cssColor.type === 'light-dark' ? cssColor.light : cssColor
+
+				if (typeof value !== 'object' || value.type !== 'srgb') {
+					return value
+				}
+
+				const toByte = (channel: number) => Math.round(Math.max(0, Math.min(1, channel)) * 255)
+
+				return {
+					type: 'rgb',
+					r: toByte(value.r),
+					g: toByte(value.g),
+					b: toByte(value.b),
+					alpha: value.alpha,
+				}
+			},
 		},
 	})
 	const resolved = /^a\{color:([^;}]+)/.exec(new TextDecoder().decode(code))?.[1]
