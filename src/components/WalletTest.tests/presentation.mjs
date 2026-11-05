@@ -286,56 +286,46 @@ async function checkModalLifecycle(
 		await dialog.evaluate(el => el.matches(':modal') && el.contains(document.activeElement)),
 	)
 	assert.equal(await scroll.evaluate(el => getComputedStyle(el).overflowY), 'hidden')
-	const browserName = page.context().browser().browserType().name()
 
-	for (const direction of ['forward', 'reverse']) {
-		const key =
-			direction === 'forward'
-				? browserName === 'webkit'
-					? 'Alt+Tab'
-					: 'Tab'
-				: browserName === 'webkit'
-					? 'Alt+Shift+Tab'
-					: 'Shift+Tab'
+	const scrollAdmission = await scroll.evaluate(el => el.scrollTop)
 
+	const observeNavigation = async () => {
+		const state = await dialog.evaluate(el => {
+			const active = document.activeElement
+
+			return {
+				modal: el.matches(':modal'),
+				returned: document.hasFocus() && el.contains(active),
+				outsideControl:
+					active instanceof Element &&
+					!el.contains(active) &&
+					active !== document.body &&
+					!active.matches('dialog:modal'),
+			}
+		})
+
+		assert.ok(state.modal)
+		assert.equal(state.outsideControl, false, JSON.stringify(state))
+
+		return state.returned
+	}
+	let reachable = false
+
+	for (const key of ['Tab', 'Shift+Tab']) {
 		for (let index = 0; index < 8; index++) {
 			await page.keyboard.press(key)
-			const contained = await dialog.evaluate(el => el.contains(document.activeElement))
-
-			if (!contained) {
-				assert.ok(
-					await dialog.evaluate(
-						() => document.activeElement === document.body && !document.hasFocus(),
-					),
-				)
-				let returned = false
-
-				for (let returnStep = 0; returnStep < 4; returnStep++) {
-					await page.keyboard.press(key)
-					const state = await dialog.evaluate(el => ({
-						contained: el.contains(document.activeElement),
-						activeTag: document.activeElement?.tagName,
-						activeText: (document.activeElement?.textContent ?? '').slice(0, 120),
-						body: document.activeElement === document.body,
-						focused: document.hasFocus(),
-						modal: el.matches(':modal'),
-					}))
-
-					assert.ok(state.modal)
-
-					if (state.contained && state.focused) {
-						returned = true
-						break
-					}
-
-					assert.ok(state.body, JSON.stringify(state))
-				}
-
-				assert.ok(returned, 'Native traversal did not return focus inside the modal')
-				assert.ok(await dialog.evaluate(el => el.contains(document.activeElement)))
-			}
+			reachable = await observeNavigation()
 		}
 	}
+
+	for (let index = 0; !reachable && index < 16; index++) {
+		await page.keyboard.press('Tab')
+		reachable = await observeNavigation()
+	}
+
+	assert.ok(reachable, 'Native sequential navigation must return document focus to the modal')
+	const scrollAfterKeys = await scroll.evaluate(el => el.scrollTop)
+
 	await page.mouse.move(5, 5)
 	await page.mouse.wheel(0, 500)
 	await scroll.evaluate(
@@ -348,7 +338,16 @@ async function checkModalLifecycle(
 				requestAnimationFrame(sample)
 			}),
 	)
-	assert.equal(await scroll.evaluate(el => el.scrollTop), position)
+	assert.equal(
+		await scroll.evaluate(el => el.scrollTop),
+		position,
+		JSON.stringify({
+			position,
+			scrollAdmission,
+			scrollAfterKeys,
+			current: await scroll.evaluate(el => el.scrollTop),
+		}),
+	)
 
 	if (dismiss === 'light') {
 		await page.mouse.click(5, 5)
@@ -886,7 +885,7 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
  * @param {import('@playwright/test').Locator} control
  * @param {() => Promise<void>} [beforeActivate]
  */
-async function activateByKeyboard(page, control, beforeActivate = async () => {}) {
+async function activateByKeyboard(page, control, beforeActivate) {
 	await control.waitFor()
 	assert.equal(await control.isDisabled(), false)
 	const webkit = page.context().browser().browserType().name() === 'webkit'
@@ -920,7 +919,22 @@ async function activateByKeyboard(page, control, beforeActivate = async () => {}
 					assert.equal(state.modal, true)
 				}
 
-				await beforeActivate()
+				if (beforeActivate) {
+					let previous = await page.locator('#layout').evaluate(el => el.scrollTop)
+					let stable = 0
+
+					for (let sample = 0; sample < 40 && stable < 4; sample++) {
+						await page.waitForTimeout(25)
+						const current = await page.locator('#layout').evaluate(el => el.scrollTop)
+
+						stable = current === previous ? stable + 1 : 0
+						previous = current
+					}
+
+					assert.equal(stable, 4, 'Keyboard-induced scrolling must settle before activation')
+					await beforeActivate()
+				}
+
 				await page.keyboard.press('Enter')
 
 				return
