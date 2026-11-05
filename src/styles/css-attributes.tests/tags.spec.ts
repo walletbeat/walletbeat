@@ -67,6 +67,8 @@ async function tagAppearance(target: Locator) {
 		const roles = {
 			'text-primary': resolveRole('text-primary'),
 			'background-primary': resolveRole('background-primary'),
+			'background-tertiary': resolveRole('background-tertiary'),
+			'accent-backgroundColor': resolveRole('accent-backgroundColor'),
 			accent: resolveRole('accent'),
 		}
 
@@ -657,6 +659,8 @@ for (const theme of ['light', 'dark'] as const) {
 						)
 						const geometry = await tagAppearance(label)
 
+						expect(geometry.color).toBe(geometry.roles['text-primary'])
+						expect(geometry.background).toBe(geometry.roles['background-tertiary'])
 						expect(geometry.height).toBeLessThanOrEqual(geometry.intrinsic + 1)
 						expect(geometry.contrast).toBeGreaterThanOrEqual(4.5)
 					}
@@ -897,7 +901,9 @@ for (const theme of ['light', 'dark'] as const) {
 										}
 									: {
 											color: reference.color,
-											background: reference.background,
+											background: normal
+												? reference.background
+												: reference.roles['accent-backgroundColor'],
 											border: normal ? reference.border : reference.roles.accent,
 										}
 

@@ -1743,18 +1743,6 @@ summary:where(:not([data-column])) {
 
 	transition-property: background-color, border-color, color;
 
-	&[data-tag~="wallet-type"] {
-		--tag-textColor: var(--text-secondary);
-	}
-
-	&[data-tag~="account-type"],
-	&[data-tag~="eoa"],
-	&[data-tag~="eip"],
-	&[data-tag~="eip-status"],
-	&[data-tag~="manufacture-type"] {
-		--tag-backgroundColor: var(--accent-backgroundColor);
-	}
-
 	&:not(button, a[href]) {
 		padding: 0.4em 0.66em;
 	}
