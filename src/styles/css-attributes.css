@@ -2877,6 +2877,24 @@ ol {
 
 	/* Native disclosure state bounds sticky participation, including its visible summary. */
 	@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
+		@scope ([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="size"])) to ([data-sticky-breadcrumb~="scope"]) {
+			:scope > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"],
+			:scope > details > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"] {
+				/* Resolve compact width here, where the source line metrics are owned. */
+				&::before {
+					content: '';
+					position: absolute;
+					inset: 0 auto auto 0;
+					visibility: hidden;
+					pointer-events: none;
+					anchor-name: --breadcrumb-compact;
+					inline-size: calc(
+						(anchor-size(--breadcrumb-source inline) + var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection))) *
+							var(--stickyBreadcrumb-scale)
+					);
+				}
+			}
+		}
 		[data-sticky-breadcrumb~="position"]
 			:is(a[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > a:first-child, [data-sticky-breadcrumb~="item"] > h1 > a:first-child) {
 			---breadcrumb-markerWrap: var(---breadcrumb-wrap);
@@ -3228,19 +3246,6 @@ ol {
 					flex: 0 1 auto;
 					min-inline-size: 0;
 					max-inline-size: 100%;
-					/* Resolve compact width here, where the source line metrics are owned. */
-					&::before {
-						content: '';
-						position: absolute;
-						inset: 0 auto auto 0;
-						visibility: hidden;
-						pointer-events: none;
-						anchor-name: --breadcrumb-compact;
-						inline-size: calc(
-							(anchor-size(--breadcrumb-source inline) + var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection))) *
-								var(--stickyBreadcrumb-scale)
-						);
-					}
 				}
 				[data-sticky-breadcrumb~="item"] {
 					min-inline-size: 0;
@@ -3742,11 +3747,6 @@ ol {
 		}
 		:scope>[data-sticky-breadcrumb~="flow"]>[data-sticky-breadcrumb~="measure"] {
 			inline-size: 0;
-			view-timeline-name: none
-		}
-		:scope > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"]::before,
-		:scope > details > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"]::before {
-			content: none;
 			view-timeline-name: none
 		}
 		:has(> [data-sticky-breadcrumb~="size-export"]) {
