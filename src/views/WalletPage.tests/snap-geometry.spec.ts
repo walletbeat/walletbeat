@@ -1,4 +1,7 @@
-import { observeStickyChain } from '../../../tests/browser/sticky-observation.mjs'
+import {
+	observeStickyChain,
+	qualifyNativeBreadcrumbClock,
+} from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
 for (const width of [390, 934, 1440]) {
@@ -476,9 +479,10 @@ for (const width of [390, 690, 1440]) {
 		)
 
 		test.skip(
-			await endpoint.evaluate(element => getComputedStyle(element).display === 'none'),
+			!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
 			'This engine uses the ordinary-flow header without the enhanced H1 endpoint',
 		)
+		await expect(endpoint).toHaveCSS('display', 'block')
 		const control = await page.addStyleTag({
 			content: '#layout { scroll-snap-type: none !important; }',
 		})

@@ -2516,9 +2516,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				display: none;
 			}
 		}
-		& > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
-			display: none;
-		}
 		@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
 			(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 			(color: if(style(---breadcrumb-wrap: 1): red)) and
