@@ -15,11 +15,24 @@
 
 	--separator-width: 1px;
 
-	/* Main canvas + default cards (dark: deep purple) */
-	--background-primary: light-dark(#F8EDFF, #110c1f);
+	/* Canvas and default card surface. */
+	--background-canvas: light-dark(#F8EDFF, #110c1f);
+	--background-primary: var(--background-canvas);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
+	---secondary-reference: var(--background-secondary);
+	---tertiary-reference: var(--background-tertiary);
+
+	/* Reference lightness, tint opacity and readable backing derived from the canonical palette. */
+	---canvas-lightness: calc(0.959937196985989 * (1 - var(---theme-dark)) + 0.172231382499291 * var(---theme-dark));
+	---surface-retention: 0.25;
+	---surface-text-lightness: calc(0.371 * (1 - var(---theme-dark)) + 0.935 * var(---theme-dark));
+	---canvas-neutral-lightness: calc(0.957356850092721 * (1 - var(---theme-dark)) + 0.168808680165482 * var(---theme-dark));
+	---nested-primary-opacity: calc(0.032893763531636 * (1 - var(---theme-dark)) + 0.370551368639883 * var(---theme-dark));
+	---secondary-opacity: calc(0.500175653181821 * (1 - var(---theme-dark)) + 0.049827336929801 * var(---theme-dark));
+	---tertiary-opacity: calc(0.007539024439729 * (1 - var(---theme-dark)) + 0.087781381205573 * var(---theme-dark));
+	---surface-foundation: calc(0.5 * (1 - var(---theme-dark)) + 0.65 * var(---theme-dark));
 	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
@@ -47,6 +60,12 @@
 	--rating-partial-text: light-dark(oklch(from var(--rating-partial-base) 0.52 c h), var(--rating-partial-base));
 	--rating-fail-text: light-dark(oklch(from var(--rating-fail-base) 0.52 c h), var(--rating-fail-base));
 	--rating-neutral-text: light-dark(oklch(from var(--rating-neutral-base) 0.52 c h), var(--rating-neutral-base));
+
+	---rating-pass-text-reference: var(--rating-pass-text);
+	---rating-partial-text-reference: var(--rating-partial-text);
+	---rating-fail-text-reference: var(--rating-fail-text);
+	---rating-neutral-text-reference: var(--rating-neutral-text);
+	---text-secondary-reference: var(--text-secondary);
 
 	--rating-unrated: light-dark(oklch(0.75 0.02 244.87 / 0.45), oklch(0.72 0.015 264.61 / 0.35));
 	--rating-unrated-backdropFilter: blur(6px);

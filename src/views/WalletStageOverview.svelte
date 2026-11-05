@@ -298,6 +298,20 @@
 		--card-backgroundColor: var(--stage-background, var(--background-primary));
 	}
 
+	@supports (background-color: oklch(from red sign(l) calc(c * 0.25) h / abs(alpha))) {
+		@media not ((max-width: 600px) and (pointer: coarse)) {
+			:global(:where(:root:has(.background-blobs > [id^="logo-"]))) :is(details, [data-sticky-breadcrumb~="scope"])[data-card]:not(:global(:where(dialog, [popover], dialog *, [popover] *))) {
+				/* The 5% parent and 3% child mixes require a base opacity above 0.58763. */
+				--card-primaryOpacity: 0.6;
+			}
+			@scope (:where(:root:has(.background-blobs > [id^="logo-"])) :is(details, [data-sticky-breadcrumb~="scope"])[data-card]) to (:scope [data-card] > *) {
+				:scope :global([data-card]:not(:where(dialog, [popover], dialog *, [popover] *))) {
+					--background-primary: inherit;
+				}
+			}
+		}
+	}
+
 	summary[data-column~="span-start"] {
 		--column-supportLineHeight: calc(1rem * var(---wallet-line-height, 1.6));
 		--column-iconGap: var(---wallet-section-icon-gap, 0.875rem);
