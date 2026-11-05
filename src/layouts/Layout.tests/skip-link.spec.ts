@@ -25,7 +25,7 @@ for (const javaScriptEnabled of [true, false]) {
 				}
 
 				await expect(skip).toHaveAttribute('href', '#content')
-				await expect(skip).toHaveAttribute('data-astro-reload', '')
+				await expect(skip).not.toHaveAttribute('data-astro-reload', '')
 				await page.keyboard.press('Tab')
 				await expect(skip).toBeFocused()
 				// Synchronous observations also work when page callbacks are disabled.
@@ -65,6 +65,23 @@ for (const javaScriptEnabled of [true, false]) {
 				await expect(page.locator('#content')).toBeFocused()
 				expect(await originalSkip.evaluate(element => element.isConnected)).toBe(true)
 				expect(await originalContent.evaluate(element => element.isConnected)).toBe(true)
+
+				if (javaScriptEnabled) {
+					const returnURL = page.url()
+					const routerCompleted = () =>
+						page.evaluate(
+							() =>
+								new Promise<void>(resolve => {
+									document.addEventListener('astro:page-load', () => resolve(), { once: true })
+								}),
+						)
+
+					await Promise.all([routerCompleted(), page.locator('#nav .logo').click()])
+					await expect(page).toHaveURL('/')
+					await Promise.all([routerCompleted(), page.goBack()])
+					await expect(page).toHaveURL(returnURL)
+					await expect(page.locator('#top')).toHaveCount(1)
+				}
 			})
 		})
 	}
