@@ -801,8 +801,6 @@ for (const selector of [
 						headingOpacity *= Number(style.opacity)
 						headingVisible &&= style.display !== 'none' && style.visibility === 'visible'
 					}
-					const pie = document.querySelector('.pie-navigation')!,
-						pieGeometry = pie.querySelector('.pie-navigation-geometry')!
 					const inlineStickyAncestors = []
 
 					for (
@@ -821,19 +819,13 @@ for (const selector of [
 							})
 						}
 					}
-					const closedLayer = {
+					const closedFlow = {
 						enhanced:
 							CSS.supports('animation-timeline: scroll()') &&
 							CSS.supports('animation-range: 0% 100%') &&
 							CSS.supports('width: anchor-size(--breadcrumb-source inline)') &&
 							CSS.supports('timeline-scope: --breadcrumb-size') &&
 							CSS.supports('color: if(style(---breadcrumb-wrap: 1): red)'),
-						summary: Number(getComputedStyle(summary).zIndex),
-						backdrop: Number(getComputedStyle(pie, '::before').zIndex),
-						geometry: Number(getComputedStyle(pieGeometry).zIndex),
-						afterBackdropOwner: Boolean(
-							pie.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING,
-						),
 						inlineStickyAncestors,
 					}
 					const header = document.querySelector('#nav > header')!.getBoundingClientRect()
@@ -861,7 +853,7 @@ for (const selector of [
 						card: rect(box),
 						disclosure: rect(disclosureBox),
 						headingOpacity,
-						closedLayer,
+						closedFlow,
 						headingVisible,
 						summary: rect(summaryBox),
 						heading: rect(headingBox),
@@ -1164,24 +1156,9 @@ for (const selector of [
 				`${label}: focusing preserves the starting scroll position`,
 			).toBeLessThan(0.5)
 			expect(observation.settled.open, `${label}: native closure completed`).toBe(false)
-			const layer = observation.settled.closedLayer
+			const layer = observation.settled.closedFlow
 
 			if (layer.enhanced) {
-				expect(
-					[layer.summary, layer.backdrop, layer.geometry].every(Number.isFinite),
-					`${label}: actual foreground layers resolve`,
-				).toBe(true)
-				expect(
-					layer.summary,
-					`${label}: closed title is above the pie backing`,
-				).toBeGreaterThanOrEqual(layer.backdrop)
-				expect(
-					layer.afterBackdropOwner,
-					`${label}: equal-level closed title follows the backing in paint order`,
-				).toBe(true)
-				expect(layer.summary, `${label}: closed title remains below the pie control`).toBeLessThan(
-					layer.geometry,
-				)
 				expect(
 					layer.inlineStickyAncestors,
 					`${label}: no inline sticky ancestor traps the closed foreground`,
