@@ -880,6 +880,24 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 	return reports
 }
 
+/** @param {import('@playwright/test').Page} page */
+async function settledScrollPosition(page) {
+	let previous = await page.locator('#layout').evaluate(el => el.scrollTop)
+	let stable = 0
+
+	for (let sample = 0; sample < 40 && stable < 4; sample++) {
+		await page.waitForTimeout(25)
+		const current = await page.locator('#layout').evaluate(el => el.scrollTop)
+
+		stable = current === previous ? stable + 1 : 0
+		previous = current
+	}
+
+	assert.equal(stable, 4, 'Keyboard-induced scrolling must settle before capturing its position')
+
+	return previous
+}
+
 /**
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator} control
@@ -920,18 +938,7 @@ async function activateByKeyboard(page, control, beforeActivate) {
 				}
 
 				if (beforeActivate) {
-					let previous = await page.locator('#layout').evaluate(el => el.scrollTop)
-					let stable = 0
-
-					for (let sample = 0; sample < 40 && stable < 4; sample++) {
-						await page.waitForTimeout(25)
-						const current = await page.locator('#layout').evaluate(el => el.scrollTop)
-
-						stable = current === previous ? stable + 1 : 0
-						previous = current
-					}
-
-					assert.equal(stable, 4, 'Keyboard-induced scrolling must settle before activation')
+					await settledScrollPosition(page)
 					await beforeActivate()
 				}
 
@@ -1274,7 +1281,7 @@ async function checkCurrentSwitchCompletions(page, baseURL) {
 			() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
 		)
 		assert.equal(await page.locator('html').getAttribute('data-switch-count'), '1')
-		const origin = await page.locator('#layout').evaluate(el => el.scrollTop)
+		const origin = await settledScrollPosition(page)
 		let index = 0
 		/** @type {unknown[]} */
 		const focusEvents = []
