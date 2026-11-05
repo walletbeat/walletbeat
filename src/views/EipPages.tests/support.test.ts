@@ -4,13 +4,19 @@ import { describe, expect, it } from 'vitest'
 
 import WalletEipList from '@/components/WalletEipList.svelte'
 import { eips } from '@/data/eips'
-import { unratedSoftwareWallet } from '@/data/software-wallets'
-import { EipSupportStatus, ratedWalletEipSupportByStatus } from '@/schema/eip-support'
+import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wallets'
+import {
+	type Eip7702Row,
+	EipSupportStatus,
+	ratedWalletEipSupportByStatus,
+	WalletTypeFor7702,
+} from '@/schema/eip-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { getVariantResolvedWallet } from '@/schema/wallet'
 import { eipImplementers } from '@/utils/eip-directory'
+import Eip7702Table from '@/views/Eip7702Table.svelte'
 import EipDetails from '@/views/EipDetails.svelte'
 import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import EipSupportPie from '@/views/EipSupportPie.svelte'
@@ -48,6 +54,43 @@ const mixedWallet: typeof unratedSoftwareWallet = {
 }
 
 describe('EIP support presentation', () => {
+	it('server-renders the complete richer table with canonical mixed-format decorative icons', () => {
+		const rows: Eip7702Row[] = Object.values(ratedSoftwareWallets).map((wallet, index) => ({
+			id: wallet.metadata.id,
+			displayName: wallet.metadata.displayName,
+			iconExtension: wallet.metadata.iconExtension,
+			url: `/${wallet.metadata.id}/`,
+			type: Object.values(WalletTypeFor7702)[index % Object.values(WalletTypeFor7702).length],
+			contract: undefined,
+			batching: undefined,
+		}))
+
+		expect(new Set(rows.map(row => row.iconExtension)).size).toBeGreaterThan(1)
+		const { body } = render(Eip7702Table, { props: { rows } })
+		const document = new DOMParser().parseFromString(`<html>${body}</html>`, 'text/html')
+
+		expect(document.getElementsByTagName('td')).toHaveLength(rows.length * 4)
+		const icons = Array.from(document.getElementsByTagName('img'))
+
+		expect(icons).toHaveLength(rows.length)
+		expect(icons.map(icon => icon.getAttribute('src')).sort()).toEqual(
+			rows.map(row => `/images/wallets/${row.id}.${row.iconExtension}`).sort(),
+		)
+
+		for (const icon of icons) {
+			expect(icon.getAttribute('alt')).toBe('')
+		}
+		const links = Array.from(document.getElementsByTagName('a'))
+
+		for (const row of rows) {
+			expect(
+				links.some(
+					link => link.getAttribute('href') === row.url && link.textContent === row.displayName,
+				),
+			).toBe(true)
+		}
+	})
+
 	it('qualifies directory support without losing the other platform statuses', () => {
 		const groups = ratedWalletEipSupportByStatus(mixedWallet, '5792')
 
