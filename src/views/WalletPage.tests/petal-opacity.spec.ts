@@ -275,7 +275,16 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 				for (let x = Math.max(0, box.left) + 2; x < Math.min(innerWidth, box.right); x += 4) {
 					const hit = document.elementFromPoint(x, y)
 
-					if (hit && geometry.contains(hit) && hit.closest('a')) {
+					if (
+						hit &&
+						geometry.contains(hit) &&
+						hit.closest('a') &&
+						[-8, 0, 8].every(dx =>
+							[-8, 0, 8].every(
+								dy => document.elementFromPoint(x + dx, y + dy)?.closest('a') === hit.closest('a'),
+							),
+						)
+					) {
 						return { x, y }
 					}
 				}
@@ -284,6 +293,11 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 		})
 
 		await page.mouse.move(point.x, point.y)
+		await expect
+			.poll(() =>
+				page.locator('.pie-navigation-geometry').evaluate(geometry => geometry.matches(':hover')),
+			)
+			.toBe(true)
 		await expect
 			.poll(async () => (await read()).every(row => Math.abs(row.opacity - 1) < 0.01))
 			.toBe(true)
