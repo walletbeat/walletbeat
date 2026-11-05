@@ -667,18 +667,18 @@
 			event.preventDefault()
 			const target = compact ? node : disclosure?.querySelector<HTMLElement>(':scope > [popover]')
 			const source = event.source instanceof HTMLElement ? event.source : node
-			// A popover's focus-navigation owner must be outside its own subtree.
-			const popupSource = compact ? identitySource : source
-			if (!target || !popupSource) return
+			// Promoted identity content uses an external invoker; the overview follows DOM order.
+			const popupSource = compact ? identitySource : undefined
+			if (!target || (compact && !popupSource)) return
 			// A separate task leaves the canceled native show operation before opening its replacement.
 			redirect = setTimeout(() => {
 				redirect = undefined
-				if (dismissed || !node.isConnected || !source.isConnected || !target.isConnected || !popupSource.isConnected
+				if (dismissed || !node.isConnected || !source.isConnected || !target.isConnected || (popupSource && !popupSource.isConnected)
 					|| !node.contains(source) || !source.matches(':hover, :focus-within')
 					|| disclosure?.open || summary?.matches(':active')
 					|| (getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1') !== compact
 					|| target.matches(':popover-open')) return
-				target.showPopover({ source: popupSource })
+				target.showPopover(popupSource ? { source: popupSource } : undefined)
 			}, 0)
 		}
 		node.addEventListener('beforetoggle', showIdentity, listenerOptions)
