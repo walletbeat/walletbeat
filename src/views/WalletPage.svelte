@@ -966,7 +966,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		</div>
 
 	<section class="wallet-overview" data-sticky-breadcrumb="support" data-row="wrap align-start">
-		<div data-row-item="flexible" data-row="start gap-1 wrap">
+		<div data-row="start gap-1 wrap">
 			<WalletTags {wallet} {selectedVariant} />
 		</div>
 		<nav data-row="gap-2 start wrap" data-row-item="wrap-end">

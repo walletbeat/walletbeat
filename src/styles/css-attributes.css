@@ -1736,6 +1736,7 @@ summary:where(:not([data-column])) {
 	border: 1px solid var(--tag-borderColor);
 	font-weight: 500;
 	line-height: 1;
+	overflow-wrap: normal;
 
 	cursor: pointer;
 	transition-property: background-color, border-color, color, transform, box-shadow;
@@ -3074,6 +3075,10 @@ ol {
 			view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 		}
 		[data-sticky-breadcrumb~="scope"] {
+			&:dir(rtl) {
+				direction: ltr;
+				> :dir(rtl) { direction: rtl; }
+			}
 			---breadcrumb-hasEnd: 0;
 			---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
 			---breadcrumb-rowBlockTimeline: --breadcrumb-row-block;
@@ -3332,54 +3337,56 @@ ol {
 				---breadcrumb-parentInlineEnd: 0px;
 				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
-				---breadcrumb-sizeAnimationNames: column-inline-size;
-				---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline);
-				---breadcrumb-sizeDirections: reverse;
-				animation-range: exit-crossing 0% exit-crossing 100%;
-				---breadcrumb-itemWidth: inherit;
-				---breadcrumb-itemHeight: inherit;
-				---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
 				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
+				&:has(> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="item-size"]) {
+					---breadcrumb-sizeAnimationNames: column-inline-size;
+					---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline);
+					---breadcrumb-sizeDirections: reverse;
+					animation-range: exit-crossing 0% exit-crossing 100%;
+					---breadcrumb-itemWidth: inherit;
+					---breadcrumb-itemHeight: inherit;
+					---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
 
-				&::before,
-				&::after,
-				> [data-sticky-breadcrumb~="flow"]::before {
-					content: none;
-					view-timeline-name: none;
-				}
-				> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
-					/* Exit-crossing at local zero reads native dimensions independently of rounded scrollport bounds. */
-					direction: ltr;
-					writing-mode: horizontal-tb;
-					overflow: hidden;
-					view-timeline-name: none;
 					&::before,
-					&::after {
-						box-sizing: content-box;
-						position: absolute;
-						inset: 0 auto auto 0;
-						padding: 0;
-						border: 0;
-						margin: 0;
+					&::after,
+					> [data-sticky-breadcrumb~="flow"]::before {
+						content: none;
+						view-timeline-name: none;
 					}
-					&::before {
-						content: '';
-						inset-inline-start: -100%;
-						inline-size: calc(100% + 100vw);
-						view-timeline-name: var(---breadcrumb-rowInlineTimeline);
-					}
-					&[data-sticky-breadcrumb~="item-size"] {
-						inline-size: anchor-size(--breadcrumb-compact inline, 0px);
-						block-size: anchor-size(--breadcrumb-source block, 0px);
-						&::before {
-							view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
-						}
+					> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
+						/* Exit-crossing at local zero reads native dimensions independently of rounded scrollport bounds. */
+						direction: ltr;
+						writing-mode: horizontal-tb;
+						overflow: hidden;
+						view-timeline-name: none;
+						&::before,
 						&::after {
+							box-sizing: content-box;
+							position: absolute;
+							inset: 0 auto auto 0;
+							padding: 0;
+							border: 0;
+							margin: 0;
+						}
+						&::before {
 							content: '';
-							inline-size: 1px;
-							inset-block-start: -100%;
-							block-size: calc(100% + 100vw);
-							view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
+							inset-inline-start: -100%;
+							inline-size: calc(100% + 100vw);
+							view-timeline-name: var(---breadcrumb-rowInlineTimeline);
+						}
+						&[data-sticky-breadcrumb~="item-size"] {
+							inline-size: anchor-size(--breadcrumb-compact inline, 0px);
+							block-size: anchor-size(--breadcrumb-source block, 0px);
+							&::before {
+								view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
+							}
+							&::after {
+								content: '';
+								inline-size: 1px;
+								inset-block-start: -100%;
+								block-size: calc(100% + 100vw);
+								view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
+							}
 						}
 					}
 				}
