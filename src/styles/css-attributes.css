@@ -106,17 +106,24 @@ a {
  * ### CSS Variables
  * - `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.
  * - `--link-timelines`: destination timeline names at their closest shared scope.
+ * - `--link-current-animations`, `--link-current-timelines`, `--link-current-ranges`: composed current-state effects and their matching timeline/range lists.
  *
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-name]`
  */
 :where(a),
 [data-pressable-name] {
-	---link-active: 0;
+	---link-active: var(---link-current);
 	---link-interacting: 0;
 	---link-current: 0;
 }
 [data-pressable-name] {
+	--link-current-animations: initial;
+	--link-current-timelines: initial;
+	--link-current-ranges: initial;
+	---link-currentAnimations: var(--link-current-animations, auto linear both var(---link-currentAnimationName, none));
+	---link-currentTimelines: var(--link-current-timelines, var(--link-current, none));
+	---link-currentRanges: var(--link-current-ranges, normal);
 	/**
 	 * ## [data-pressable-current]
 	 * Current feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.
@@ -134,6 +141,9 @@ a {
 		---link-active: inherit;
 		---link-current: inherit;
 		---link-currentAnimationName: none;
+		---link-currentAnimations: none;
+		---link-currentTimelines: none;
+		---link-currentRanges: normal;
 	}
 	&:is(a):is(:hover, :focus-visible, :active),
 	&[data-pressable-state~="interacting"] {
@@ -176,8 +186,9 @@ a {
 			@supports (color: if(style(--link-current: none): red; style(--link-current): green; else: blue)) {
 				---link-currentAnimationName: if(style(--link-current: none): none; style(--link-current): link-current; else: none);
 			}
-			animation: auto linear both var(---link-currentAnimationName);
-			animation-timeline: var(--link-current, none);
+			animation: var(---link-currentAnimations);
+			animation-timeline: var(---link-currentTimelines);
+			animation-range: var(---link-currentRanges);
 		}
 	}
 	/**
@@ -3206,11 +3217,11 @@ ol {
 				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
 					animation:
-						auto linear both var(---link-currentAnimationName, none),
+						var(---link-currentAnimations, none),
 						var(--stickyBreadcrumb-exitAnimation);
 					animation-timeline:
-						var(--link-current, none), var(---breadcrumb-exitTimeline), var(---breadcrumb-exitTimeline);
-					animation-range: normal, var(---breadcrumb-exitRange), var(---breadcrumb-exitRange);
+						var(---link-currentTimelines, none), var(---breadcrumb-exitTimeline), var(---breadcrumb-exitTimeline);
+					animation-range: var(---link-currentRanges, normal), var(---breadcrumb-exitRange), var(---breadcrumb-exitRange);
 				}
 				[data-sticky-breadcrumb~="source"] {
 					display: flex;

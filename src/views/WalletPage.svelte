@@ -554,7 +554,7 @@
 	const pieRotation = $derived.by(() => {
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
 		const styles: string[] = [`
-			${[...attributeDestinations.keys()].map(href => `#top [data-pressable-name="${href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: none; }
+			${[...attributeDestinations.keys()].map(href => `#top .page-navigation [data-pressable-name="${href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: none; }
 			@container style(---pie-currentIndex: 0) {
 				#wallet-toc > .navigation-items > menu:first-of-type > li:first-child {
 					---navigation-snapAlign: start;
@@ -650,7 +650,7 @@
 						from, to { ---pie-currentIndex: ${index}; }
 					}
 					@container style(---pie-currentIndex: ${index}) {
-						${(item === group ? [group] : [group, item]).map(related => `#top [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
+						${(item === group ? [group] : [group, item]).map(related => `#top .page-navigation [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
 						.pie-navigation-geometry { ---pie-hasRelevant: 1; }
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
 						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] { --pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline}; }
@@ -668,6 +668,22 @@
 				previousAngle = angle
 				previousGroup = group
 				previousItem = item
+			}
+		}
+
+
+		styles.push('@keyframes wallet-current-on { from, to { ---link-current: 1; } } @keyframes wallet-current-off { from, to { ---link-current: 0; } }')
+		for (const group of pieNavigationItems) {
+			for (const item of [group, ...(group.children ?? [])]) {
+				const members = new Set([item, ...(item.children ?? [])].map(value => value.href!.slice(1)))
+				const first = states.findIndex(state => state.id === item.href!.slice(1))
+				if (first < 0) continue
+				const boundaries = states.slice(first)
+				styles.push(`#top > article [data-pressable-name="${item.href}"]:not([data-pressable-current="inherit"]) {
+					--link-current-animations: ${boundaries.map(state => `wallet-current-${members.has(state.id) ? 'on' : 'off'} auto steps(1,end) forwards`).join(',')};
+					--link-current-timelines: ${boundaries.map(state => state.timeline).join(',')};
+					--link-current-ranges: ${boundaries.map(() => 'exit-crossing -1px exit-crossing -1px').join(',')};
+				}`)
 			}
 		}
 
@@ -1707,6 +1723,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 
 		.page-navigation {
+			@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
+				animation: var(---pie-rotation-states);
+				animation-timeline: var(---pie-rotation-timelines);
+				animation-range: var(---pie-rotation-ranges);
+			}
 			flex-flow: column nowrap;
 			gap: 0;
 
@@ -2483,9 +2504,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="root"] {
 		@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
-			animation: var(---breadcrumb-sizeAnimationNames, none) auto linear reverse both, var(---pie-rotation-states);
-			animation-timeline: var(---breadcrumb-sizeTimelines, none), var(---pie-rotation-timelines);
-			animation-range: exit-crossing 0% exit-crossing 100%, var(---pie-rotation-ranges);
+			animation: var(---breadcrumb-sizeAnimationNames, none) auto linear reverse both;
+			animation-timeline: var(---breadcrumb-sizeTimelines, none);
+			animation-range: exit-crossing 0% exit-crossing 100%;
 		}
 		@media (scripting: none) {
 			.wallet-device-controls,

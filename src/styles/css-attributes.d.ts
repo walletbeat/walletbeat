@@ -490,6 +490,7 @@ declare global {
 		 * ### CSS Variables
 		 * - `--link-current`, `--link-current-sources`: current destination timeline and own or ancestor destinations.
 		 * - `--link-timelines`: destination timeline names at their closest shared scope.
+		 * - `--link-current-animations`, `--link-current-timelines`, `--link-current-ranges`: composed current-state effects and their matching timeline/range lists.
 		 *
 		 * ### Source
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-name]`

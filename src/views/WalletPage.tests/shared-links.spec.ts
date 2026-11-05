@@ -314,7 +314,7 @@ test('destination feedback keeps current, focus and hover independent across own
 		if (headingCapability) {
 			const composition = await page.evaluate(expected => {
 				const root = document.querySelector('#top'),
-					owner = root
+					owner = root?.querySelector('.page-navigation')
 
 				if (!root || !owner) {
 					throw Error('Native current owner is absent')
@@ -337,7 +337,10 @@ test('destination feedback keeps current, focus and hover independent across own
 								names.has(animation.animationName),
 						)
 				}
-				const isCurrent = (animation: CSSAnimation) => animation.animationName === 'link-current'
+				const isCurrent = (animation: CSSAnimation) =>
+					['link-current', 'wallet-current-on', 'wallet-current-off'].includes(
+						animation.animationName,
+					)
 				const sharesSourceAndTiming = (a: CSSAnimation, b: CSSAnimation) =>
 					a.timeline instanceof ViewTimeline &&
 					b.timeline instanceof ViewTimeline &&
@@ -389,7 +392,6 @@ test('destination feedback keeps current, focus and hover independent across own
 						throw Error('Known destination has no pie reference')
 					}
 
-					const referenceActors = own(reference).filter(isCurrent)
 					const frames = own(item)
 						.filter(animation => !isCurrent(animation))
 						.flatMap(animation =>
@@ -425,9 +427,8 @@ test('destination feedback keeps current, focus and hover independent across own
 							active: style.getPropertyValue('---link-active').trim(),
 							ownCurrentCount: current.length,
 							sharesSourceAndTiming:
-								current.length === 1 &&
-								referenceActors.length === 1 &&
-								sharesSourceAndTiming(current[0], referenceActors[0]),
+								selected !== undefined &&
+								current.some(animation => sharesSourceAndTiming(animation, selected)),
 						}
 					})
 
@@ -476,7 +477,7 @@ test('destination feedback keeps current, focus and hover independent across own
 					expect(peer.identity).toBe(heading.identity)
 					expect(peer.current).toBe('1')
 					expect(peer.active).toBe('1')
-					expect(peer.ownCurrentCount).toBe(peer.owner ? 1 : 0)
+					expect(peer.ownCurrentCount > 0).toBe(peer.owner)
 
 					if (peer.owner) {
 						expect(peer.sharesSourceAndTiming).toBe(true)
