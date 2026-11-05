@@ -74,9 +74,13 @@ test('only EIP tags share canonical EIP details while table tags retain filterin
 			const eoa = row.getByRole('button', { name: 'Filter by EOA', exact: true })
 
 			await eoa.click()
-			await expect(page.locator('[data-filter="accountType-eoa"] input').first()).toBeChecked()
+			await expect(
+				page.locator('[data-filter-choice="accountType-eoa"] input').first(),
+			).toBeChecked()
 			await eoa.click()
-			await expect(page.locator('[data-filter="accountType-eoa"] input').first()).not.toBeChecked()
+			await expect(
+				page.locator('[data-filter-choice="accountType-eoa"] input').first(),
+			).not.toBeChecked()
 		}
 	}
 	const contentFor = (surface: string) =>
