@@ -214,7 +214,7 @@ it('uses the least foreground adjustment that protects supported surface composi
 					),
 				),
 			)
-		const worst = (lightness: number, family: string, includeFixed = true) => {
+		const worst = (lightness: number, includeFixed = true) => {
 			const opacity = coefficients('---surface-foundation')[theme]
 			const adjusted = [
 				...ratingColors,
@@ -229,16 +229,13 @@ it('uses the least foreground adjustment that protects supported surface composi
 				? [foregrounds[0], ...(theme === 0 ? [foregrounds[1]] : []), ...adjusted]
 				: adjusted
 			const backing = over(gray, input, opacity)
-			const sequences =
-				family === 'primary'
-					? [
-							['primary'],
-							['secondary'],
-							['tertiary'],
-							['secondary', 'tertiary'],
-							['secondary', 'secondary', 'tertiary'],
-						]
-					: [['secondary'], ['secondary', 'tertiary'], ['secondary', 'secondary', 'tertiary']]
+			const sequences = [
+				['primary'],
+				['secondary'],
+				['tertiary'],
+				['secondary', 'tertiary'],
+				['secondary', 'secondary', 'tertiary'],
+			]
 			const values = sequences.flatMap(sequence => {
 				let painted = backing
 
@@ -267,7 +264,7 @@ it('uses the least foreground adjustment that protects supported surface composi
 				)
 			})
 
-			if (family === 'primary' && includeFixed) {
+			if (includeFixed) {
 				const stage = over(
 					Array.from({ length: 3 }, () => (theme === 0 ? 0 : 1)),
 					backing,
@@ -295,12 +292,10 @@ it('uses the least foreground adjustment that protects supported surface composi
 
 		const lightness = coefficients('---surface-text-lightness')[theme]
 
-		for (const family of ['primary', 'secondary']) {
-			expect(worst(lightness, family), `theme ${theme} ${family}`).toBeGreaterThanOrEqual(4.5)
-		}
+		expect(worst(lightness), `theme ${theme}`).toBeGreaterThanOrEqual(4.5)
 		const previousStep = lightness + (theme === 0 ? 0.001 : -0.001)
 
-		expect(worst(previousStep, 'primary', false)).toBeLessThan(4.5)
+		expect(worst(previousStep, false)).toBeLessThan(4.5)
 	}
 })
 
