@@ -213,6 +213,7 @@ for (const width of [390, 1440]) {
 				summary: number
 				heading: number
 				closed: boolean
+				ancestors: { role: 'wallet' | 'group'; overlaps: boolean; ownsHit: boolean }[]
 			}[] = []
 
 			try {
@@ -225,7 +226,42 @@ for (const width of [390, 1440]) {
 					await new Promise<void>(resolve =>
 						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 					)
+					const summaryBox = element.getBoundingClientRect()
+					const groupHeading = element.closest('.attribute-group')?.querySelector('h2')
+					const ancestors = (
+						[
+							['wallet', document.querySelector('h1 a.wallet-name')],
+							['group', groupHeading?.closest('a')],
+						] as const
+					).map(([role, target]) => {
+						if (!target) {
+							throw new Error('The preceding wallet and group headings must exist')
+						}
+
+						const box = target.getBoundingClientRect()
+						const x = box.left + box.width / 2
+						const y = box.top + box.height / 2
+						const hit = document.elementFromPoint(x, y)
+
+						return {
+							role,
+							overlaps:
+								box.width > 0 &&
+								box.height > 0 &&
+								x >= 0 &&
+								x < innerWidth &&
+								y >= 0 &&
+								y < innerHeight &&
+								x >= summaryBox.left &&
+								x < summaryBox.right &&
+								y >= summaryBox.top &&
+								y < summaryBox.bottom,
+							ownsHit: hit !== null && target.contains(hit),
+						}
+					})
+
 					samples.push({
+						ancestors,
 						requestedScroll: start + offset,
 						scroll: root.scrollTop,
 						closed:
@@ -266,6 +302,19 @@ for (const width of [390, 1440]) {
 			'Closed summary travels above the viewport instead of sticking',
 		).toBeLessThan(-159)
 		expect(travel.at(-1)!.scroll - travel[0].scroll).toBeGreaterThan(400)
+
+		const crossings = travel.flatMap(sample => sample.ancestors.filter(target => target.overlaps))
+
+		for (const role of ['wallet', 'group'] as const) {
+			expect(
+				crossings.some(target => target.role === role),
+				`${role} heading crosses the closed summary`,
+			).toBe(true)
+		}
+		expect(
+			crossings.filter(target => !target.ownsHit),
+			'Closed ordinary-flow content stays below preceding sticky heading controls',
+		).toEqual([])
 
 		for (const part of ['summary', 'heading'] as const) {
 			const worldPositions = travel.map(sample => sample[part] + sample.scroll)
