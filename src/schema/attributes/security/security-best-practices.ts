@@ -310,7 +310,7 @@ function evaluateExternallyConnectable(
 	// When `externally_connectable` is absent, browsers let any installed extension (but no web
 	// page) connect, which is the same as declaring `"ids": ["*"]`, so both are rated the same.
 	const { extensionIds, pageMatches } =
-		manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE'
+		manifest.externallyConnectable === 'NOT_DECLARED'
 			? { extensionIds: ExternalExtensionIdScope.ANY, pageMatches: HostPermissionScope.NONE }
 			: manifest.externallyConnectable
 
@@ -329,6 +329,25 @@ function evaluateExternallyConnectable(
 			),
 			howToImprove: mdParagraph(
 				'{{WALLET_NAME}} should restrict `externally_connectable` page matches to HTTPS origins only.',
+			),
+		})
+	}
+
+	if (extensionIds === ExternalExtensionIdScope.ANY) {
+		return ctx.build({
+			outcome: {
+				id: 'externally_connectable_any_extension',
+				rating: Rating.FAIL,
+				displayName: 'External connections allowed from any extension',
+				shortExplanation: mdSentence(
+					'{{WALLET_NAME}} allows any other installed extension to send it messages directly.',
+				),
+			},
+			details: mdParagraph(
+				'{{WALLET_NAME}} does not restrict which extensions may connect to it, either by omitting `externally_connectable` (the browser default) or by declaring `"ids": ["*"]`. A malicious extension could open a direct message channel to the wallet.',
+			),
+			howToImprove: mdParagraph(
+				'{{WALLET_NAME}} should declare `"ids": []` in `externally_connectable`, or list only the specific extension IDs it trusts.',
 			),
 		})
 	}
@@ -352,30 +371,12 @@ function evaluateExternallyConnectable(
 		})
 	}
 
-	if (extensionIds === ExternalExtensionIdScope.ANY) {
-		return ctx.build({
-			outcome: {
-				id: 'externally_connectable_any_extension',
-				rating: Rating.PARTIAL,
-				displayName: 'External connections allowed from any extension',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} allows any other installed extension to send it messages directly.',
-				),
-			},
-			details: mdParagraph(
-				'{{WALLET_NAME}} does not restrict which extensions may connect to it, either by omitting `externally_connectable` (the browser default) or by declaring `"ids": ["*"]`. A malicious extension could open a direct message channel to the wallet.',
-			),
-			howToImprove: mdParagraph(
-				'{{WALLET_NAME}} should declare `"ids": []` in `externally_connectable`, or list only the specific extension IDs it trusts.',
-			),
-		})
-	}
-
-	const allowedPages = pageMatches === HostPermissionScope.NONE ? 'no web page' : 'only HTTPS pages'
-	const allowedExtensions =
+	const pages =
+		pageMatches === HostPermissionScope.NONE ? 'blocks all web pages' : 'allows only HTTPS pages'
+	const extensions =
 		extensionIds === ExternalExtensionIdScope.SPECIFIC
-			? 'only specific named extensions'
-			: 'no other extension'
+			? 'allows only specific named extensions'
+			: 'blocks all other extensions'
 
 	return ctx.build({
 		outcome: {
@@ -387,7 +388,7 @@ function evaluateExternallyConnectable(
 			),
 		},
 		details: mdParagraph(
-			`{{WALLET_NAME}}'s \`externally_connectable\` lets ${allowedPages} and ${allowedExtensions} send it messages directly.`,
+			`{{WALLET_NAME}}'s \`externally_connectable\` ${pages} and ${extensions}.`,
 		),
 	})
 }
@@ -904,7 +905,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.NONE,
 						webAccessibleResources: WebAccessibleResourcesScope.NONE,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.NONE,
+							pageMatches: HostPermissionScope.NONE,
+						},
 						permissions: [],
 					},
 				),
@@ -942,7 +946,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.NONE,
 						webAccessibleResources: WebAccessibleResourcesScope.HTTPS_ONLY,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.NONE,
+							pageMatches: HostPermissionScope.NONE,
+						},
 						permissions: [],
 					},
 				),
@@ -977,7 +984,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.HTTP_AND_HTTPS,
 						webAccessibleResources: WebAccessibleResourcesScope.HTTP_AND_HTTPS,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: 'NOT_DECLARED',
 						permissions: [],
 					},
 				),
