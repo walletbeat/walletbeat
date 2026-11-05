@@ -3,7 +3,7 @@ import { expect, test } from '../../../tests/browser/verified-test'
 for (const width of [690, 1440]) {
 	test(`destination current state follows heading contact and clears after reverse travel at ${width}px`, async ({
 		page,
-	}) => {
+	}, info) => {
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/phantom/?variant=MOBILE')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
@@ -11,7 +11,15 @@ for (const width of [690, 1440]) {
 			!(await page.evaluate(() => CSS.supports('color: if(style(--a: 1): red)'))),
 			'Native current-state enhancement is unavailable',
 		)
-		await page.evaluate(() => document.fonts.ready)
+		await page.evaluate(async () => {
+			await document.fonts.ready
+			const images = [...document.images]
+
+			images.forEach(image => {
+				image.loading = 'eager'
+			})
+			await Promise.all(images.map(image => image.decode()))
+		})
 		await page.mouse.move(0, 899)
 		const seek = async (top: number) => {
 			await page.locator('#layout').evaluate((element, top) => {
@@ -94,37 +102,98 @@ for (const width of [690, 1440]) {
 				}
 			})
 		const stops = await page.locator('.attribute-group').evaluateAll(groups =>
-			groups.slice(0, 2).flatMap(group =>
+			groups.flatMap(group =>
 				[...group.querySelectorAll('section.attribute')]
 					.filter(element => element.checkVisibility())
-					.slice(0, 2)
+					.filter((_, index, siblings) => index === 0 || index === siblings.length - 1)
 					.map(element => ({
 						id: element.id,
 						group: group.id,
-						top:
-							element.getBoundingClientRect().top +
-							Math.min(element.getBoundingClientRect().height / 2, 200),
 					})),
 			),
 		)
 
-		expect(stops).toHaveLength(4)
+		expect(stops.length).toBeGreaterThanOrEqual(4)
 		expect((await observe()).rowCount).toBeGreaterThan(4)
 
-		for (const stop of [...stops, ...stops.toReversed()]) {
-			await seek(stop.top)
-			const expected = [`#${stop.group}`, `#${stop.id}`].sort()
+		const unreachable: { id: string; open: boolean; top: number; maximum: number }[] = []
 
-			await expect.poll(observe).toMatchObject({
-				contacts: [stop.id],
-				navigation: expected,
-				rows: expected,
-				anchors: expected,
+		for (const open of [true, false]) {
+			await page
+				.locator('.attribute-group section.attribute > details')
+				.evaluateAll((elements, open) => {
+					elements.forEach(element => {
+						if (!(element instanceof HTMLDetailsElement)) {
+							throw Error('Attribute disclosure must be a native details element')
+						}
+
+						element.open = open
+					})
+				}, open)
+			await page.evaluate(async () => {
+				await Promise.all(
+					document
+						.getAnimations()
+						.filter(animation => animation instanceof CSSTransition)
+						.map(animation => animation.finished.catch(() => undefined)),
+				)
 			})
+
+			for (const stop of [...stops, ...stops.toReversed()]) {
+				const target = await page.locator(`#${stop.id}`).evaluate((element, open) => {
+					const root = document.querySelector('#layout')!
+					const subject = open
+						? element
+						: element.querySelector(
+								':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
+							)!
+
+					return {
+						top:
+							root.scrollTop +
+							subject.getBoundingClientRect().top -
+							root.getBoundingClientRect().top -
+							root.clientTop +
+							(open ? Math.min(element.getBoundingClientRect().height / 2, 200) : 2),
+						maximum: root.scrollHeight - root.clientHeight,
+					}
+				}, open)
+
+				if (target.top > target.maximum) {
+					expect(open, `${stop.id}: every open boundary must be reachable`).toBe(false)
+					unreachable.push({ id: stop.id, open, ...target })
+					await seek(target.maximum)
+					await expect
+						.poll(async () => {
+							const actual = await observe()
+
+							return (
+								actual.rows.join() === actual.navigation.join() &&
+								actual.anchors.join() === actual.navigation.join()
+							)
+						})
+						.toBe(true)
+					continue
+				}
+
+				await seek(target.top)
+				const expected = [`#${stop.group}`, `#${stop.id}`].sort()
+
+				await expect.poll(observe).toMatchObject({
+					...(open ? { contacts: [stop.id] } : {}),
+					navigation: expected,
+					rows: expected,
+					anchors: expected,
+				})
+			}
+			await seek(0)
+			await expect
+				.poll(observe)
+				.toMatchObject({ contacts: [], navigation: [], rows: [], anchors: [] })
 		}
-		await seek(0)
-		await expect
-			.poll(observe)
-			.toMatchObject({ contacts: [], navigation: [], rows: [], anchors: [] })
+		await info.attach('unreachable-native-boundaries', {
+			body: JSON.stringify(unreachable),
+			contentType: 'application/json',
+		})
 	})
 }

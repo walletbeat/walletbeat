@@ -416,6 +416,12 @@ test('destination feedback keeps current, focus and hover independent across own
 							Math.abs(Math.hypot(matrix.m11, matrix.m12, matrix.m13) - 1) > 0.000001 ||
 							Math.abs(Math.hypot(matrix.m21, matrix.m22, matrix.m23) - 1) > 0.000001
 					}
+					const boundary = own(owner).find(
+						animation =>
+							animation.animationName.endsWith('-current') &&
+							animation.timeline instanceof ViewTimeline &&
+							animation.timeline.subject?.closest('[data-sticky-breadcrumb~="scope"]') === scope,
+					)
 					const peers = [row, anchor].map(element => {
 						const style = getComputedStyle(element),
 							current = own(element).filter(isCurrent)
@@ -427,8 +433,8 @@ test('destination feedback keeps current, focus and hover independent across own
 							active: style.getPropertyValue('---link-active').trim(),
 							ownCurrentCount: current.length,
 							sharesSourceAndTiming:
-								selected !== undefined &&
-								current.some(animation => sharesSourceAndTiming(animation, selected)),
+								boundary !== undefined &&
+								current.some(animation => sharesSourceAndTiming(animation, boundary)),
 						}
 					})
 

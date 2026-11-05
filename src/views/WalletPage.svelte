@@ -673,14 +673,15 @@
 
 
 		styles.push('@keyframes wallet-current-on { from, to { ---link-current: 1; } } @keyframes wallet-current-off { from, to { ---link-current: 0; } }')
-		for (const group of pieNavigationItems) {
+		for (const [groupIndex, group] of pieNavigationItems.entries()) {
+			const nextGroup = states.find(state => `#${state.id}` === pieNavigationItems[groupIndex + 1]?.href)
 			for (const item of [group, ...(group.children ?? [])]) {
-				const members = new Set([item, ...(item.children ?? [])].map(value => value.href!.slice(1)))
 				const first = states.findIndex(state => state.id === item.href!.slice(1))
 				if (first < 0) continue
-				const boundaries = states.slice(first)
+				const following = item === group ? nextGroup : states[first + 1]
+				const boundaries = following ? [states[first], following] : [states[first]]
 				styles.push(`#top > article [data-pressable-name="${item.href}"]:not([data-pressable-current="inherit"]) {
-					--link-current-animations: ${boundaries.map(state => `wallet-current-${members.has(state.id) ? 'on' : 'off'} auto steps(1,end) forwards`).join(',')};
+					--link-current-animations: ${boundaries.map((_, index) => `wallet-current-${index === 0 ? 'on' : 'off'} auto steps(1,end) forwards`).join(',')};
 					--link-current-timelines: ${boundaries.map(state => state.timeline).join(',')};
 					--link-current-ranges: ${boundaries.map(() => 'exit-crossing -1px exit-crossing -1px').join(',')};
 				}`)
