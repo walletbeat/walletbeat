@@ -7,17 +7,16 @@ import { GITHUB_REPO_URL, githubBlobUrl } from '@/constants/github'
 import Layout from '../layouts/Layout.astro'
 
 // Components
-import { Font } from 'astro:assets'
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 ---
 
 <Layout
+	preloadSpecialHeadingFont
 	metadata={{
 		title: 'Walletbeat - Who watches the wallets?',
 	}}
 >
-	<Font cssVariable='--fontFamily-spMonorium' preload />
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>

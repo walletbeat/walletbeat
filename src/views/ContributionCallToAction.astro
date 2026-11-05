@@ -1,0 +1,29 @@
+---
+import { GITHUB_REPO_URL } from '@/constants/github'
+import LuBinoculars from 'lucide-static/icons/binoculars.svg?raw'
+---
+
+<section aria-labelledby='contribution-heading' data-scroll-item='inline-detached flow'>
+	<div data-card='secondary padding-8' data-column='center gap-4'>
+		<span data-icon aria-hidden='true' set:html={LuBinoculars} />
+		<h2 id='contribution-heading'>Wallet watchers wanted</h2>
+		<p>
+			Missing / outdated data? Submit a pull request in our <a href={GITHUB_REPO_URL}
+				>GitHub repository</a
+			>
+		</p>
+	</div>
+</section>
+
+<style>
+	h2 {
+		font-family: var(--fontFamily-spMonorium);
+		font-weight: 400;
+		text-transform: uppercase;
+	}
+
+	section {
+		padding-block: 2rem;
+		text-align: center;
+	}
+</style>
