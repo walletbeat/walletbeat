@@ -631,8 +631,7 @@ export const gemwallet: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: supported({
 					ref: [
 						{
-							explanation:
-								"Gem's review screen shows network fees but doesn't show the swap provider fee.",
+							explanation: "Gem's review screen shows network fees but doesn't show Uniswap's fee.",
 							file: 'public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png',
 							label: 'Gem review screen for a Uniswap swap from USDC to ETH',
 						},
