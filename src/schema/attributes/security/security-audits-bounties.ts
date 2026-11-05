@@ -26,7 +26,7 @@ import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { markdown, mdSentence, paragraph, type Sentence, sentence } from '@/types/content'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
-import { daysSince } from '@/types/date'
+import { assertCalendarDate, daysBetween, today } from '@/types/date'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptySet, setItems } from '@/types/utils/non-empty'
 import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 
@@ -58,7 +58,11 @@ type SecurityAuditsSubResult = {
 
 /** Whether at least one of the given audits was performed within the last year. */
 export function isAuditedInLastYear(audits: readonly SecurityAudit[]): boolean {
-	return audits.some(audit => daysSince(audit.auditDate) <= 366)
+	// Static reports and hydration must evaluate recency against the same UTC date.
+	const ratingDate: unknown = import.meta.env?.WALLETBEAT_RATING_DATE
+	const asOf = typeof ratingDate === 'string' ? assertCalendarDate(ratingDate) : today()
+
+	return audits.some(audit => daysBetween(audit.auditDate, asOf) <= 366)
 }
 
 function noAudits(): SecurityAuditsSubResult {

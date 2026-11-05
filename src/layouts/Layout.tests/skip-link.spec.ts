@@ -7,6 +7,7 @@ for (const javaScriptEnabled of [true, false]) {
 
 			test('the original focused link owns its paint and activates the main content', async ({
 				page,
+				browser,
 			}) => {
 				await page.goto('/metamask/?variant=BROWSER', { waitUntil: 'domcontentloaded' })
 				await expect(page.locator('#top')).toHaveCount(1)
@@ -25,8 +26,19 @@ for (const javaScriptEnabled of [true, false]) {
 				}
 
 				await expect(skip).toHaveAttribute('href', '#content')
-				await expect(skip).toHaveAttribute('data-astro-reload', '')
-				await page.keyboard.press('Tab')
+				await expect(skip).not.toHaveAttribute('data-astro-reload', '')
+				const forward =
+					process.platform === 'darwin' && browser.browserType().name() === 'webkit'
+						? 'Alt+Tab'
+						: 'Tab'
+
+				for (let entry = 0; entry < 3; entry++) {
+					await page.keyboard.press(forward)
+
+					if (await skip.evaluate(element => element === document.activeElement)) {
+						break
+					}
+				}
 				await expect(skip).toBeFocused()
 				// Synchronous observations also work when page callbacks are disabled.
 				await expect
@@ -60,11 +72,47 @@ for (const javaScriptEnabled of [true, false]) {
 					return { x: box.left + box.width / 2, y: box.top + box.height / 2 }
 				})
 
-				await page.mouse.click(point.x, point.y)
+				await page.mouse.move(point.x, point.y)
+				await page.mouse.down()
+
+				try {
+					await page.waitForTimeout(100)
+					expect(
+						await skip.evaluate((element, point) => {
+							const hit = document.elementFromPoint(point.x, point.y)
+
+							return (
+								hit !== null &&
+								element.contains(hit) &&
+								Number(getComputedStyle(element).opacity) > 0
+							)
+						}, point),
+					).toBe(true)
+				} finally {
+					await page.mouse.up()
+				}
+
 				await expect(page).toHaveURL(/\/metamask\/\?variant=BROWSER#content$/)
 				await expect(page.locator('#content')).toBeFocused()
 				expect(await originalSkip.evaluate(element => element.isConnected)).toBe(true)
 				expect(await originalContent.evaluate(element => element.isConnected)).toBe(true)
+
+				if (javaScriptEnabled) {
+					const returnURL = page.url()
+					const routerCompleted = () =>
+						page.evaluate(
+							() =>
+								new Promise<void>(resolve => {
+									document.addEventListener('astro:page-load', () => resolve(), { once: true })
+								}),
+						)
+
+					await Promise.all([routerCompleted(), page.locator('#nav .logo').click()])
+					await expect(page).toHaveURL('/')
+					await Promise.all([routerCompleted(), page.goBack()])
+					await expect(page).toHaveURL(returnURL)
+					await expect(page.locator('#top')).toHaveCount(1)
+				}
 			})
 		})
 	}

@@ -122,14 +122,6 @@ export function eipMarkdownLinkAndTitle(eip: Eip): string {
 	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
 }
 
-/**
- * Return the label for how long an EIP has been Final (example: "Final for
- * 1,094 days"), given the number of days since its finalization.
- */
-export function eipFinalForLabel(days: number): string {
-	return `Final for ${days.toLocaleString('en-US')} ${days === 1 ? 'day' : 'days'}`
-}
-
 /** Return a human-readable label for an EIP status. */
 export const eipStatusLabel: Record<EipStatus, string> = {
 	[EipStatus.FINAL]: 'Final',

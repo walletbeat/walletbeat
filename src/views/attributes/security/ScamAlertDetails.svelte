@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { ParentHeadingLevel } from '@/types/heading'
 	import {
 		activeUnlimitedApprovalBenchmarks,
 		allUnlimitedApprovalBenchmarksTested,
@@ -19,8 +20,10 @@
 	// Props
 	const {
 		wallet,
+		parentHeadingLevel,
 		outcome,
 	}: {
+		parentHeadingLevel: ParentHeadingLevel
 		wallet: { metadata: WalletMetadata }
 		outcome: Outcome<ScamPreventionMetadata>
 	} = $props()
@@ -112,7 +115,7 @@
 				/>
 
 				{#if refs(outcome.metadata.sendTransactionWarning).length > 0}
-					<ReferenceLinks references={refs(outcome.metadata.sendTransactionWarning)} />
+					<ReferenceLinks {parentHeadingLevel} references={refs(outcome.metadata.sendTransactionWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -165,7 +168,7 @@
 				/>
 
 				{#if refs(outcome.metadata.contractTransactionWarning).length > 0}
-					<ReferenceLinks references={refs(outcome.metadata.contractTransactionWarning)} />
+					<ReferenceLinks {parentHeadingLevel} references={refs(outcome.metadata.contractTransactionWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -192,7 +195,7 @@
 				/>
 
 				{#if refs(outcome.metadata.scamUrlWarning).length > 0}
-					<ReferenceLinks references={refs(outcome.metadata.scamUrlWarning)} />
+					<ReferenceLinks {parentHeadingLevel} references={refs(outcome.metadata.scamUrlWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -215,7 +218,7 @@
 				/>
 
 				{#if refs(outcome.metadata.unlimitedApprovalWarning).length > 0}
-					<ReferenceLinks references={refs(outcome.metadata.unlimitedApprovalWarning)} />
+					<ReferenceLinks {parentHeadingLevel} references={refs(outcome.metadata.unlimitedApprovalWarning)} />
 				{/if}
 			</li>
 		{/if}

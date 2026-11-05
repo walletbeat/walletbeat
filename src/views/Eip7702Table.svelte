@@ -141,10 +141,6 @@
 							<img
 								src={`/images/wallets/${row.id}.${row.iconExtension}`}
 								alt=""
-								onerror={event => {
-									if (event.currentTarget instanceof HTMLImageElement)
-										event.currentTarget.src = '/images/wallets/default.svg'
-								}}
 							/>
 						</span>
 

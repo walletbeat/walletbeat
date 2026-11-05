@@ -37,3 +37,8 @@ declare namespace NodeJS {
 		WALLETBEAT_WALLET_DATA_COLLECTION_TYPE?: string
 	}
 }
+
+interface ImportMetaEnv {
+	/** UTC date shared by static rating evaluation and browser hydration. */
+	readonly WALLETBEAT_RATING_DATE: string | undefined
+}

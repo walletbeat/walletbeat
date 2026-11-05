@@ -43,6 +43,18 @@
 		"hash": "ed5f8785be73b875edb156a767a57c59a39034829db2f481adc1bee03c1513d5",
 		"passedTests": ["file-format"]
 	},
+	"public/images/background/ascii-dot-field.svg": {
+		"hash": "3e974ca63b967f3ba281a3069c07ec50d5430f664179f3f4a8fb664c76db4154",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/background/ascii-flower-block.svg": {
+		"hash": "5e07622c7e3a259502223b5e7f41f3178878aacfc25bf720ef19cc5b1b75027a",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/background/ascii-symbol-clusters.svg": {
+		"hash": "630c606845e7f3e3d689041288c72f78e81689a3e020053ed79ca7addb600544",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/alphabet.svg": {
 		"hash": "e9e75fcfc51c870acf2b1f4cedf4cb3bb0d1cdad9c07760a01c8355ee2a59e6b",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
