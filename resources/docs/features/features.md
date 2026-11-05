@@ -2840,6 +2840,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
 - `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
 - `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
+- `IDLE` = `'idle'`: Detect when the system becomes idle, locked, or active again via chrome.idle.
 - `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
 - `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
 - `NOTIFICATIONS` = `'notifications'`: Show browser notifications to the user.

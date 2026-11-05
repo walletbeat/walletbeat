@@ -145,6 +145,9 @@ export enum BrowserExtensionPermission {
 	/** Access the user's Google Account email address. */
 	IDENTITY_EMAIL = 'identity.email',
 
+	/** Detect when the system becomes idle, locked, or active again via chrome.idle. */
+	IDLE = 'idle',
+
 	/** List, enable, disable, or uninstall other extensions. */
 	MANAGEMENT = 'management',
 

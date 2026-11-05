@@ -417,6 +417,8 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
 	// Retrieves the user's Google account email alongside the OAuth token, used when email is needed for account linking.
 	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
+	// Reports whether the system is active, idle, or locked, used to auto-lock the wallet or refresh state when the user returns.
+	[BrowserExtensionPermission.IDLE]: Rating.PASS,
 	// Displays desktop notifications, used for transaction confirmations and security alerts.
 	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
 	// Creates an off-screen document for DOM operations without a visible window, used for background cryptographic work.
