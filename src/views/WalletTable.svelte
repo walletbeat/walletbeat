@@ -82,6 +82,9 @@
 		new SvelteSet<FilterChoice<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>()
 	)
 
+	let stageModalWalletId = $state<string>()
+	const stageModalWallet = $derived(wallets.find(wallet => wallet.metadata.id === stageModalWalletId))
+
 	// (Derived)
 	const stageFilterDefinitions = $derived(
 		Array.from(
@@ -748,6 +751,7 @@
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
+	import Modal from '@/components/Modal.svelte'
 	import Pie from '@/components/Pie.svelte'
 	import {
 		overallRatingPieLevels,
@@ -801,6 +805,32 @@
 			{/if}
 		</noscript>
 	</header>
+
+	{#snippet StageInformation({ wallet, size = 'medium', fillCell = false }: { wallet: RatedWallet<_AttributeGroupId>, size?: 'small' | 'medium' | 'large', fillCell?: boolean })}
+		{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+
+		{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
+			<small>N/A</small>
+		{:else}
+			<a
+				href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: 'stages' })}
+				data-link="camouflaged"
+				data-pressable={fillCell ? 'to-containing' : ''}
+				aria-label={`View ${wallet.metadata.displayName} stage explanation`}
+				aria-haspopup={interactive ? 'dialog' : undefined}
+				onclick={event => {
+					if (!interactive || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+					event.preventDefault()
+					event.stopPropagation()
+					stageModalWalletId = wallet.metadata.id
+				}}
+			>
+				<span data-pressable="paint">
+					<WalletStageBadge {stage} {ladderEvaluation} {size} />
+				</span>
+			</a>
+		{/if}
+	{/snippet}
 
 	{#snippet FilterHeaderTitle({ column }: { column: Column<RatedWallet<_AttributeGroupId>> })}
 		{@const walletSlot = [...walletFilterSlots, ...stageFilterSlots].find(filterSlot => filterSlot.columnId === column.id)}
@@ -1165,47 +1195,7 @@
 				}}
 
 				{#if column.id === 'stage'}
-					{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
-						<small>N/A</small>
-					{:else if stage === 'UNRATED'}
-						<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
-					{:else}
-						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
-						{@const stageFilterId = `stage-${stageValue}`}
-						{@const stageControlId = `${tableId ?? viewId}-stage-${wallet.metadata.id}`}
-						{@const stageShortcut = stage === 'QUALIFIED_FOR_NO_STAGES' && stageNavigationBase !== undefined
-							? walletSummaryHref(stageNavigationBase, initialStageSelection === 'stage-unqualified' ? '' : 'stage-unqualified', initialSort)
-							: undefined}
-
-
-						<button
-							id={stageControlId}
-							data-pressable="to-containing"
-							type={!interactive && stageShortcut !== undefined ? 'submit' : 'button'}
-							form={stageShortcut === undefined ? undefined : `${viewId}-stage-sort`}
-							formaction={stageShortcut === undefined ? undefined : `${stageShortcut}#${encodeURIComponent(stageControlId)}`}
-							aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-							disabled={!interactive && stageShortcut === undefined}
-							onclick={event => {
-								event.preventDefault()
-								event.stopPropagation()
-								if (stage === 'QUALIFIED_FOR_NO_STAGES')
-									toggleFilterById('stage-unqualified', true)
-								else
-									toggleAttributeFilterById?.(stageFilterId)
-							}}
-						>
-							<span data-pressable="paint">
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="medium"
-								/>
-							</span>
-						</button>
-					{/if}
+					{@render StageInformation({ wallet, fillCell: true })}
 				{:else if column.id === 'wallet'}
 					{@const displayName = wallet.metadata.displayName}
 
@@ -1634,7 +1624,11 @@
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
 										{isInTooltip}
-									/>
+									>
+										{#snippet StageBadge()}
+											{@render StageInformation({ wallet, size: 'large' })}
+										{/snippet}
+									</WalletOverallSummary>
 								{/if}
 							{/snippet}
 						</TooltipOrAccordion>
@@ -1925,6 +1919,19 @@
 		</Table>
 	</div>
 
+	<Modal
+		isOpen={stageModalWallet !== undefined}
+		title={stageModalWallet ? `${stageModalWallet.metadata.displayName} stage` : 'Stage'}
+		onClose={() => { stageModalWalletId = undefined }}
+	>
+		{#if stageModalWallet}
+			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(stageModalWallet)}
+			<WalletStageSummary wallet={stageModalWallet} {stage} {ladderEvaluation} />
+		{/if}
+		{#snippet footer()}
+			<button type="button" data-pressable onclick={() => { stageModalWalletId = undefined }}>Close</button>
+		{/snippet}
+	</Modal>
 </section>
 
 
@@ -2250,6 +2257,8 @@
 
 					summary {
 						box-sizing: content-box;
+						padding: var(--table-cell-padding);
+						column-gap: 0.25em;
 						margin: calc(-1 * var(--table-cell-padding));
 
 						@container wallet-table (width < 42rem) {
@@ -2259,16 +2268,13 @@
 						transition-property: opacity, scale, min-block-size;
 
 						> * {
-							padding: var(--table-cell-padding);
+							padding: 0;
 						}
 					}
 
 					&[open]:has(> [popover]:not(:popover-open)) summary {
 						min-block-size: 5rem;
-
-						> * {
-							padding-block-end: 0.25rem;
-						}
+						padding-block-end: 0.25rem;
 					}
 				}
 			}

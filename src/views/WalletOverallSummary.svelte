@@ -20,11 +20,13 @@
 		score,
 		summaryType = WalletSummaryType.None,
 		isInTooltip = false,
+		StageBadge,
 	}: {
 		wallet: RatedWallet<string>
 		score: MaybeUnratedScore
 		summaryType?: WalletSummaryType
 		isInTooltip?: boolean
+		StageBadge?: import('svelte').Snippet
 	} = $props()
 
 
@@ -72,7 +74,11 @@
 	<div data-column="center gap-2" class:tooltip-score={isInTooltip && displaysScore}>
 		{#if summaryType === WalletSummaryType.Stage && stage !== null && ladderEvaluation !== null}
 			Walletbeat stage:
-			<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+			{#if StageBadge}
+				{@render StageBadge()}
+			{:else}
+				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+			{/if}
 		{:else if displaysScore}
 			Walletbeat score:
 			<ScoreBadge {score} size="large" />
