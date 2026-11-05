@@ -26,7 +26,16 @@ function theme(systemDark: boolean, stored: string | null, storageBlocked = fals
 		function makeDocument() {
 			return {
 				toggle: null,
-				documentElement: { style: { colorScheme: '', removeProperty() { this.colorScheme = '' } } },
+				documentElement: { style: {
+					colorScheme: '',
+					values: new Map(),
+					setProperty(name, value) { this.values.set(name, value) },
+					getPropertyValue(name) { return this.values.get(name) ?? '' },
+					removeProperty(name) {
+						if (name === 'color-scheme') this.colorScheme = '';
+						else this.values.delete(name);
+					}
+				} },
 				getElementById() { return this.toggle },
 				addEventListener(name, fn) { listeners.set(name, fn) }
 			};
@@ -66,6 +75,9 @@ describe('theme preference lifecycle', () => {
 					expect(run('document.documentElement.style.colorScheme')).toBe(
 						stored === 'light' || stored === 'dark' ? stored : '',
 					)
+					expect(run("document.documentElement.style.getPropertyValue('---theme-dark')")).toBe(
+						stored === 'light' ? '0' : stored === 'dark' ? '1' : '',
+					)
 					run('mount()')
 
 					if (!early) {
@@ -77,6 +89,7 @@ describe('theme preference lifecycle', () => {
 
 					expect(run('choice()')).toBe(selected)
 					expect(run('stored')).toBe(selected)
+					expect(run("document.documentElement.style.getPropertyValue('---theme-dark')")).toBe('')
 					run('os(!media.matches); swap()')
 					expect(run('choice()')).toBe(selected)
 					run('click(); swap(); swap()')

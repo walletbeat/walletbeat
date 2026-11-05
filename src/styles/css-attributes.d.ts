@@ -40,6 +40,7 @@ declare global {
 		 * ## [data-card]
 		 *
 		 * Card surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.
+		 * Page-associated logo backdrops use translucent role fills over one outer luminance backing. Card-local foreground lightness protects readability; nested cards share the backing, while dialogs and popovers retain canonical surfaces.
 		 *
 		 * ### Tokens
 		 * - tone: `secondary`
@@ -49,6 +50,7 @@ declare global {
 		 *
 		 * ### CSS Variables
 		 * - `--card-backgroundColor`
+		 * - `--card-primaryOpacity`: primary base opacity on relative logo surfaces; defaults to 0.5.
 		 * - `--card-radius`
 		 * - `--card-padding`
 		 * - `--card-borderWidth`: accent border width; defaults to 2px

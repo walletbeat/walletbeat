@@ -8,6 +8,7 @@ import '@/styles/wbicons.css'
 import type { ComponentProps } from 'astro/types'
 import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
+import type { ComponentProps as SvelteComponentProps } from 'svelte'
 
 type Props = {
 	metadata: ComponentProps<typeof Metadata>['metadata']
@@ -30,6 +31,46 @@ const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
 import Footer from '@/views/Footer.astro'
+import { getLogoPalette, logoBackgroundBlobs } from '@/utils/logo-palette'
+
+const backgroundLogo = metadata.icons?.[0]?.url
+const defaultBlobs = {
+	purple: {
+		lightThemeColor: '#9333ea',
+		darkThemeColor: '#8d1fec',
+		opacity: { fromValue: '8%', toValue: '20%', seconds: 17.5 },
+		translationX: { fromValue: '62%', toValue: '76%', seconds: 25 },
+		translationY: { fromValue: '34%', toValue: '46%', seconds: 22.5 },
+	},
+	magenta: {
+		lightThemeColor: '#d4a5ff',
+		darkThemeColor: '#e895ff',
+		opacity: { fromValue: '4%', toValue: '14%', seconds: 22.5 },
+		translationX: { fromValue: '32%', toValue: '46%', seconds: 30 },
+		translationY: { fromValue: '42%', toValue: '56%', seconds: 27.5 },
+	},
+	pink: {
+		lightThemeColor: '#e7c8fb',
+		darkThemeColor: '#eb88fc',
+		opacity: { fromValue: '4%', toValue: '10%', seconds: 27.5 },
+		translationX: { fromValue: '12%', toValue: '26%', seconds: 35 },
+		translationY: { fromValue: '37%', toValue: '51%', seconds: 32.5 },
+	},
+	cyan: {
+		lightThemeColor: '#f8edff',
+		darkThemeColor: '#d1f4ff',
+		opacity: { fromValue: '2%', toValue: '8%', seconds: 32.5 },
+		translationX: { fromValue: '2%', toValue: '12%', seconds: 40 },
+		translationY: { fromValue: '52%', toValue: '64%', seconds: 37.5 },
+	},
+} satisfies SvelteComponentProps<typeof Background>['blobs']
+const backgroundBlobs =
+	backgroundLogo === undefined
+		? defaultBlobs
+		: logoBackgroundBlobs({
+				light: await getLogoPalette(backgroundLogo, 'light'),
+				dark: await getLogoPalette(backgroundLogo, 'dark'),
+			})
 ---
 
 <!doctype html>
@@ -65,9 +106,14 @@ import Footer from '@/views/Footer.astro'
 							toggle.checked = (preference === 'dark') !== systemDark.matches
 						}
 						doc.documentElement.style.removeProperty('color-scheme')
+						doc.documentElement.style.removeProperty('---theme-dark')
 					} else if (preference) {
 						// First paint precedes the native control. Retire these when it exists.
 						doc.documentElement.style.colorScheme = preference
+						doc.documentElement.style.setProperty(
+							'---theme-dark',
+							preference === 'dark' ? '1' : '0',
+						)
 					}
 				}
 				document.addEventListener('change', ({ target }) => {
@@ -107,38 +153,7 @@ import Footer from '@/views/Footer.astro'
 		}
 	</head>
 	<body>
-		<Background
-			blobs={{
-				purple: {
-					lightThemeColor: '#9333ea',
-					darkThemeColor: '#8d1fec',
-					opacity: { fromValue: '8%', toValue: '20%', seconds: 17.5 },
-					translationX: { fromValue: '62%', toValue: '76%', seconds: 25 },
-					translationY: { fromValue: '34%', toValue: '46%', seconds: 22.5 },
-				},
-				magenta: {
-					lightThemeColor: '#d4a5ff',
-					darkThemeColor: '#e895ff',
-					opacity: { fromValue: '4%', toValue: '14%', seconds: 22.5 },
-					translationX: { fromValue: '32%', toValue: '46%', seconds: 30 },
-					translationY: { fromValue: '42%', toValue: '56%', seconds: 27.5 },
-				},
-				pink: {
-					lightThemeColor: '#e7c8fb',
-					darkThemeColor: '#eb88fc',
-					opacity: { fromValue: '4%', toValue: '10%', seconds: 27.5 },
-					translationX: { fromValue: '12%', toValue: '26%', seconds: 35 },
-					translationY: { fromValue: '37%', toValue: '51%', seconds: 32.5 },
-				},
-				cyan: {
-					lightThemeColor: '#f8edff',
-					darkThemeColor: '#d1f4ff',
-					opacity: { fromValue: '2%', toValue: '8%', seconds: 32.5 },
-					translationX: { fromValue: '2%', toValue: '12%', seconds: 40 },
-					translationY: { fromValue: '52%', toValue: '64%', seconds: 37.5 },
-				},
-			}}
-		/>
+		<Background blobs={backgroundBlobs} />
 		<div id='layout' data-scroll-container data-sticky-container>
 			<a class='skip-link' href='#content' data-astro-reload data-badge='large' data-row>
 				<span data-icon={String.fromCodePoint(0x21b5)}></span>

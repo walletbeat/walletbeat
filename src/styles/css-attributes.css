@@ -1110,6 +1110,7 @@ summary:where(:not([data-column])) {
 
 /**
  * Card surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.
+ * Page-associated logo backdrops use translucent role fills over one outer luminance backing. Card-local foreground lightness protects readability; nested cards share the backing, while dialogs and popovers retain canonical surfaces.
  *
  * ### Tokens
  * - tone: `secondary`
@@ -1119,6 +1120,7 @@ summary:where(:not([data-column])) {
  *
  * ### CSS Variables
  * - `--card-backgroundColor`
+ * - `--card-primaryOpacity`: primary base opacity on relative logo surfaces; defaults to 0.5.
  * - `--card-radius`
  * - `--card-padding`
  * - `--card-borderWidth`: accent border width; defaults to 2px
@@ -1145,11 +1147,49 @@ summary:where(:not([data-column])) {
 [data-card] {
 	/* Inputs */
 	--card-backgroundColor: var(--background-primary);
+	--card-primaryOpacity: 0.5;
 	--card-radius: 0.5em;
 	--card-padding: 1em;
 
 	/* Rules */
 	background-color: var(--card-backgroundColor);
+	---surface-fill-lightness: calc(var(---surface-retention) * l + (1 - var(---surface-retention)) * clamp(0, sign(l - var(---canvas-lightness)), 1));
+
+	@supports (background-color: oklch(from red sign(l) calc(c * 0.25) h / abs(alpha))) {
+		@media not ((max-width: 600px) and (pointer: coarse)) {
+			:where(:root:has(.background-blobs > [id^="logo-"])) &:not(:where(dialog, [popover], dialog *, [popover] *)) {
+			--background-primary: oklch(var(---canvas-neutral-lightness) 0 0 / var(--card-primaryOpacity));
+			--background-secondary: oklch(from var(---secondary-reference) var(---surface-fill-lightness) calc(c * var(---surface-retention)) h / var(---secondary-opacity));
+			--background-tertiary: oklch(from var(---tertiary-reference) var(---surface-fill-lightness) calc(c * var(---surface-retention)) h / var(---tertiary-opacity));
+				--rating-pass-text: oklch(from var(---rating-pass-text-reference) var(---surface-text-lightness) c h);
+				--rating-partial-text: oklch(from var(---rating-partial-text-reference) var(---surface-text-lightness) c h);
+				--rating-fail-text: oklch(from var(---rating-fail-text-reference) var(---surface-text-lightness) c h);
+				--rating-neutral-text: oklch(from var(---rating-neutral-text-reference) var(---surface-text-lightness) c h);
+				--accent-textColor: light-dark(oklch(from var(--accent) min(l, var(---surface-text-lightness)) c h / 1), oklch(from var(--accent) max(l, var(---surface-text-lightness)) c h / 1));
+				--text-secondary: light-dark(var(---text-secondary-reference), oklch(from var(---text-secondary-reference) max(l, var(---surface-text-lightness)) c h));
+				background-color: oklch(var(---canvas-neutral-lightness) 0 0 / var(---surface-foundation));
+				background-image: linear-gradient(var(--card-backgroundColor), var(--card-backgroundColor));
+
+				/* The outer card bounds luminance; nested cards retain that backdrop. */
+				&:where([data-card] *) {
+					background-color: transparent;
+				}
+
+
+				& :is(dialog, [popover]) {
+					--rating-pass-text: var(---rating-pass-text-reference);
+					--rating-partial-text: var(---rating-partial-text-reference);
+					--rating-fail-text: var(---rating-fail-text-reference);
+					--rating-neutral-text: var(---rating-neutral-text-reference);
+					--accent-textColor: initial;
+					--text-secondary: var(---text-secondary-reference);
+					--background-primary: var(--background-canvas);
+					--background-secondary: var(---secondary-reference);
+					--background-tertiary: var(---tertiary-reference);
+				}
+		}
+		}
+	}
 	border-radius: var(--card-radius);
 	padding: var(--card-padding);
 
@@ -1207,6 +1247,20 @@ summary:where(:not([data-column])) {
 
 	&[data-card~="border-accent"] {
 		border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
+	}
+}
+
+
+@supports (background-color: oklch(from red sign(l) calc(c * 0.25) h / abs(alpha))) {
+	@media not ((max-width: 600px) and (pointer: coarse)) {
+		@scope (:where(:root:has(.background-blobs > [id^="logo-"])) [data-card]) {
+			:where(:scope) [data-card]:not(:where(dialog, [popover], dialog *, [popover] *)) {
+				--background-primary: oklch(var(---canvas-neutral-lightness) 0 0 / var(--card-primaryOpacity));
+			}
+			:where(:scope[data-card~="secondary"]) [data-card]:not(:where(dialog, [popover], dialog *, [popover] *)) {
+				--background-primary: oklch(from var(--background-canvas) calc(l * var(---surface-retention)) calc(c * var(---surface-retention)) h / var(---nested-primary-opacity));
+			}
+		}
 	}
 }
 
