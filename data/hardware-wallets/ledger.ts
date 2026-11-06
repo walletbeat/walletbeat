@@ -160,6 +160,7 @@ export const ledgerWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

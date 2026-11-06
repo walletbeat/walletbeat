@@ -123,6 +123,7 @@ export const keystoneWallet: HardwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,

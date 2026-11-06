@@ -119,6 +119,7 @@ export const pillarx: SoftwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

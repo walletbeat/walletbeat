@@ -59,6 +59,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,

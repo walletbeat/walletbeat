@@ -180,6 +180,47 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 	}
 
 	const isMultiVariant = !hasSingleVariant(wallet.variants)
+	const metadataSourceLines: string[] = [
+		'## ERC-7730 metadata sources',
+		'',
+		'Metadata sources are documented separately from decoding support and do not change the rating.',
+		'',
+	]
+
+	for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet<_AttributeGroupId>>(
+		wallet.variants,
+	)) {
+		metadataSourceLines.push(`### ${variantToName(variant, true)}`, '')
+		const sources = resolved.features.security.erc7730MetadataSources
+
+		if (sources === null) {
+			metadataSourceLines.push('The metadata sources have not been confirmed.', '')
+			continue
+		}
+
+		if (sources.length === 0) {
+			metadataSourceLines.push(
+				'The wallet is confirmed not to use an ERC-7730 metadata source.',
+				'',
+			)
+			continue
+		}
+
+		for (const source of sources) {
+			metadataSourceLines.push(
+				`- ${source.name}`,
+				`  - Registry: ${source.registry === null ? 'Not confirmed.' : getUrl(source.registry)}`,
+				`  - Endpoint: ${source.endpoint === null ? 'Not confirmed.' : getUrl(source.endpoint)}`,
+			)
+
+			for (const ref of toFullyQualified(source.ref)) {
+				for (const url of ref.urls) {
+					metadataSourceLines.push(`  - Evidence: ${url.url}`)
+				}
+			}
+		}
+		metadataSourceLines.push('')
+	}
 
 	const groupLines = mapNonExemptAttributeGroupsInTree(
 		attributeTree,
@@ -335,6 +376,12 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 	// exactly once at the bottom. Inline `[Credit: …](#anchor)` links in each
 	// attribute's References list scroll to the matching entry here.
 	const allPageRefs: FullyQualifiedReference[] = mergeRefs(
+		...nonEmptyEntries<Variant, ResolvedWallet<_AttributeGroupId>>(wallet.variants).flatMap(
+			([, resolved]) =>
+				(resolved.features.security.erc7730MetadataSources ?? []).flatMap(source =>
+					toFullyQualified(source.ref),
+				),
+		),
 		...mapNonExemptAttributeGroupsInTree(attributeTree, wallet.overall, (_attrGroup, evalGroup) =>
 			mapNonExemptGroupAttributes(evalGroup, evalAttr =>
 				toFullyQualified(evalAttr.evaluation.references),
@@ -374,5 +421,11 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 		creditsSection.push('')
 	}
 
-	return [...headerLines, ...stageSection, ...groupLines.flat(), ...creditsSection].join('\n')
+	return [
+		...headerLines,
+		...stageSection,
+		...metadataSourceLines,
+		...groupLines.flat(),
+		...creditsSection,
+	].join('\n')
 }

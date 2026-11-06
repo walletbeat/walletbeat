@@ -135,6 +135,7 @@ export const anonWallet: SoftwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				[Variant.BROWSER]: {

@@ -64,6 +64,7 @@ export const fireflyWallet: HardwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: notSupported,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {
