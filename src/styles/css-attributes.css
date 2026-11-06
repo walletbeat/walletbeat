@@ -2858,6 +2858,10 @@ ol {
 				view-timeline-axis: block;
 				view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
 			}
+			&:is(details:not([open]), :has(> details:not([open]))) > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+				inset-block-end: 0;
+				block-size: auto;
+			}
 			> [data-sticky-breadcrumb~="approach"] {
 				position: absolute;
 				pointer-events: none;
