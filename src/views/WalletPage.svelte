@@ -2428,7 +2428,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					--sticky-background: var(--sticky-backgroundColor);
 					z-index: auto;
 					container-type: inline-size;
-					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear both;
+					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear if(style(---inlineDirection: -1): reverse; else: normal) both;
 
 					view-timeline-name: --wallet-pie-source, --wallet-pie-source-inline;
 					view-timeline-axis: block, inline;
@@ -2487,10 +2487,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						inset-inline: auto;
 						inline-size: 100cqi;
 						margin: 0;
-						transform-origin: 100% 0;
-						&:dir(rtl) {
-							transform-origin: 0 0;
-						}
+						transform-origin: calc(50% + 50% * var(---inlineDirection)) 0;
 					}
 				}
 
@@ -2818,6 +2815,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 		}
 		@media (width <= 84rem) {
+			/* Inline measurement clocks share viewport coordinates; each child keeps its reading direction. */
+			:global(#layout:dir(rtl):has([data-sticky-breadcrumb~="root"])) {
+				direction: ltr;
+				> :global(:dir(rtl)) {
+					direction: rtl;
+				}
+			}
 			[data-sticky-breadcrumb~="root"] {
 				--stickyBreadcrumb-clearance: circle;
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);

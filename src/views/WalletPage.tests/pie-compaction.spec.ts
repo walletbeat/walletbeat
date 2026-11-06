@@ -288,6 +288,14 @@ for (const width of [390, 1344]) {
 			await expect(source).toHaveAttribute('data-wallet-toc-state', 'open')
 			await expect.poll(async () => Math.abs((await read()).width - 128)).toBeLessThanOrEqual(1)
 			const opened = await read()
+			const flowerOrigin = await geometry.evaluate(
+				element => getComputedStyle(element).transformOrigin,
+			)
+
+			expect(
+				await source.evaluate(element => getComputedStyle(element, '::before').transformOrigin),
+				'The compact backdrop and flower scale around the same edge',
+			).toBe(flowerOrigin)
 
 			expect(
 				Math.abs(direction === 'rtl' ? opened.left - 8 : width - opened.right - 8),
