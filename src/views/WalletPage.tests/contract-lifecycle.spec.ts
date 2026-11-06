@@ -22,7 +22,7 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 	}))
 	const samples = []
 
-	for (const width of [...widths, 1344, 1345, 390]) {
+	for (const [visit, width] of [...widths, 1344, 1345, 390].entries()) {
 		await page.setViewportSize({ width, height: 900 })
 
 		for (const fraction of [0, 0.3, 0.8, 1, 0.4, 0]) {
@@ -46,6 +46,8 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 				const column = content.getBoundingClientRect()
 
 				return {
+					scroll: layout.scrollTop,
+					scrollExtent: layout.scrollHeight - layout.clientHeight,
 					sameRoot: root === original.root,
 					sameHeader:
 						root.firstElementChild === original.header && original.header!.contains(original.title),
@@ -103,7 +105,24 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 
 			expect(state.footer.left).toBeGreaterThanOrEqual(state.footer.columnLeft - 1)
 			expect(state.footer.right).toBeLessThanOrEqual(state.footer.columnRight + 1)
-			samples.push({ width, fraction, ...state })
+			samples.push({ visit, width, fraction, ...state })
+		}
+
+		const delivered = samples.filter(sample => sample.visit === visit)
+
+		expect(delivered[3].scroll).toBeGreaterThan(delivered[3].scrollExtent / 2)
+		expect(delivered[0].scroll).toBeLessThanOrEqual(1)
+		expect(delivered.at(-1)!.scroll).toBeLessThanOrEqual(1)
+
+		for (let phase = 1; phase < delivered.length; phase++) {
+			const previous = delivered[phase - 1]
+			const current = delivered[phase]
+			const direction = Math.sign(current.fraction - previous.fraction)
+
+			expect(
+				direction * (current.scroll - previous.scroll),
+				'Every forward and reverse lifecycle phase delivers distinct scroll movement',
+			).toBeGreaterThan(1)
 		}
 	}
 
