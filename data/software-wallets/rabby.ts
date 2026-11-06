@@ -1815,7 +1815,7 @@ export const rabby: SoftwareWallet = {
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_OPTIONALLY,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
