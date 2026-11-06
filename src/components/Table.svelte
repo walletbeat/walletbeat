@@ -773,7 +773,7 @@
 									value,
 								})}
 							{:else}
-								{value}
+								<span data-paint>{value}</span>
 							{/if}
 						</td>
 					{/each}
@@ -1233,8 +1233,8 @@
 				counter-reset: TableColumnCount;
 
 				box-shadow:
-					0 var(--table-innerBorderWidth) var(--table-innerBorderColor),
-					0 calc(-1 * var(--table-innerBorderWidth)) var(--table-innerBorderColor);
+					0 var(--table-innerBorderWidth) var(---table-row-borderColor, var(--table-innerBorderColor)),
+					0 calc(-1 * var(--table-innerBorderWidth)) var(---table-row-borderColor, var(--table-innerBorderColor));
 
 				&:nth-of-type(odd) {
 					background-color: var(--table-row-backgroundColor);
@@ -1271,8 +1271,10 @@
 				}
 
 				&[data-disabled] {
-					filter: grayscale();
-					opacity: 0.3;
+					---table-row-filter: grayscale() opacity(0.3);
+					--paint-filter: var(---table-row-filter);
+					--table-row-backgroundColor: color-mix(in srgb, var(--text-secondary) 3%, transparent);
+					---table-row-borderColor: color-mix(in srgb, var(--table-innerBorderColor) 30%, transparent);
 				}
 
 				> :where(td) {
@@ -1283,7 +1285,7 @@
 
 					/* When sorting a non-sticky column, fade cells from other non-sticky columns */
 					tr:has(:not([data-sticky])[data-sort]) &[data-sortable]:not([data-sort], [data-sticky], :hover, :focus-within) {
-						opacity: 0.66;
+						--paint-filter: var(---table-row-filter, opacity(1)) opacity(0.66);
 					}
 				}
 			}
