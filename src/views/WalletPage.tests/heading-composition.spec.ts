@@ -1206,16 +1206,13 @@ for (const width of [390, 1440]) {
 			const excluded = []
 
 			for (const scope of document.querySelectorAll<HTMLElement>(
-				'[data-sticky-breadcrumb~="scope"]',
+				'[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="size"]',
 			)) {
 				const position = scope.querySelector<HTMLElement>(
 					':scope > [data-sticky-breadcrumb~="position"], :scope > details > [data-sticky-breadcrumb~="position"]',
 				)
-				const measure = scope.querySelector<HTMLElement>(
-					':scope > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]',
-				)
 
-				if (!position || !measure || !position.querySelector('[data-sticky-breadcrumb~="end"]')) {
+				if (!position || !position.querySelector('[data-sticky-breadcrumb~="end"]')) {
 					continue
 				}
 
@@ -1229,15 +1226,42 @@ for (const width of [390, 1440]) {
 				position.style.setProperty('--probe-length', 'var(---breadcrumb-availableInlineSize)')
 				const available = parseFloat(getComputedStyle(position).getPropertyValue('--probe-length'))
 
-				position.style.setProperty('--probe-length', 'var(---breadcrumb-endGap)')
+				const exportedWidth = (token: string) => {
+					const exporter = position.querySelector(`[data-sticky-breadcrumb~="${token}"]`)
+
+					if (!exporter) {
+						throw new Error(`${scope.id}: ${token} exporter is missing`)
+					}
+
+					const probe = getComputedStyle(exporter, '::before')
+
+					if (probe.content === 'none' || probe.viewTimelineName === 'none') {
+						throw new Error(`${scope.id}: ${token} has no active measurement`)
+					}
+
+					if (token === 'size-end') {
+						const box = getComputedStyle(exporter)
+
+						return (
+							parseFloat(box.width) -
+							(box.boxSizing === 'border-box'
+								? parseFloat(box.paddingInlineStart) + parseFloat(box.paddingInlineEnd)
+								: 0)
+						)
+					}
+
+					return parseFloat(probe.width) - innerWidth
+				}
+
+				position.style.setProperty(
+					'--probe-length',
+					'calc(var(---breadcrumb-endGap) + var(--stickyBreadcrumb-sourcePaddingInline))',
+				)
 				position.style.setProperty('--probe-number', 'var(---breadcrumb-endWrap)')
 				const required =
-					parseFloat(getComputedStyle(scope, '::before').width) +
-					parseFloat(getComputedStyle(measure, '::before').width) +
-					parseFloat(getComputedStyle(position).getPropertyValue('--probe-length')) +
-					parseFloat(
-						getComputedStyle(position).getPropertyValue('--stickyBreadcrumb-sourcePaddingInline'),
-					)
+					exportedWidth('size-source') +
+					exportedWidth('size-end') +
+					parseFloat(getComputedStyle(position).getPropertyValue('--probe-length'))
 
 				try {
 					if (!Number.isFinite(required) || !Number.isFinite(available)) {

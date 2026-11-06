@@ -3797,6 +3797,9 @@ ol {
 			&::after {
 				---breadcrumb-measuredSize: 100cqb
 			}
+			&[data-sticky-breadcrumb~="size-end"]::before {
+				---breadcrumb-measuredSize: round(up, 100cqi, 0.0625px)
+			}
 			&[data-sticky-breadcrumb~="size-source"]::before {
 				---breadcrumb-measuredSize: round(up, calc((100cqi + var(---breadcrumb-iconInlineCorrection,var(---breadcrumb-iconCorrection)))*var(--stickyBreadcrumb-scale)), 0.0625px)
 			}
