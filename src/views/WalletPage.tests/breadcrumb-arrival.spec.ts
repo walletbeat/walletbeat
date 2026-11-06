@@ -34,9 +34,7 @@ for (const { direction, width, requiresCurve } of [
 			const item = page.locator(`#${id} [data-sticky-breadcrumb~="item"]`).first()
 			const natural = await page.locator(`#${id}`).evaluate(section => {
 				const root = document.querySelector<HTMLElement>('#layout')!
-				const flow = section.querySelector(
-					':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-				)!
+				const flow = section.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')!
 
 				return root.scrollTop + flow.getBoundingClientRect().top - root.getBoundingClientRect().top
 			})
@@ -64,9 +62,7 @@ for (const { direction, width, requiresCurve } of [
 					}
 
 					const scope = element.closest('[data-sticky-breadcrumb~="scope"]'),
-						flow = scope?.querySelector(
-							':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-						)
+						flow = scope?.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')
 
 					if (!flow || animation.timeline.subject !== flow || animation.timeline.source !== root) {
 						throw Error('Arrival must follow its own flow subject in the page scroll root')

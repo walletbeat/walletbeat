@@ -116,12 +116,10 @@
 					</div>
 				</details>
 				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
-				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 				</article>
 			{/each}
 		</div>
 		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </aside>
 
 

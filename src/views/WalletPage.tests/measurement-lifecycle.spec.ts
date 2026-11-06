@@ -593,9 +593,7 @@ test('generic column clocks measure their own row through resize and native disc
 							'#security-news [data-sticky-breadcrumb~="scope"]',
 						)) {
 							if (!scope.checkVisibility()) {
-								const flow = scope.querySelector(
-									':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-								)
+								const flow = scope.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')
 								const measure = flow?.querySelector(':scope > [data-sticky-breadcrumb~="measure"]')
 								const probes: [Element | null | undefined, string | null][] = [
 									[scope, '::before'],
@@ -696,9 +694,7 @@ test('generic column clocks measure their own row through resize and native disc
 										? scope.querySelector(
 												':scope > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]',
 											)
-										: scope.querySelector(
-												':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-											)
+										: scope.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')
 
 								if (!expected || origin !== expected) {
 									throw new Error(

@@ -747,9 +747,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				'.attribute:has(> details[open] > summary > [data-sticky-breadcrumb~="support"])',
 			)
 			const position = scope?.querySelector<HTMLElement>(':scope > details > summary')
-			const flow = scope?.querySelector<HTMLElement>(
-				':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-			)
+			const flow = scope?.querySelector<HTMLElement>(':scope > [data-sticky-breadcrumb~="flow"]')
 
 			if (!root || !scope || !position || !flow) {
 				throw new Error('Required foreground composition absent')

@@ -53,9 +53,7 @@ for (const width of [390, 690]) {
 		const compactScroll = await page.evaluate(() => {
 			const root = document.querySelector<HTMLElement>('#layout')!
 			const scope = document.getElementById('security')!
-			const flow = scope.querySelector<HTMLElement>(
-				':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-			)!
+			const flow = scope.querySelector<HTMLElement>(':scope > [data-sticky-breadcrumb~="flow"]')!
 			const row = scope
 				.querySelector('[data-sticky-breadcrumb~="source"] a[data-pressable-name="#security"]')!
 				.closest<HTMLElement>('[data-sticky]')!

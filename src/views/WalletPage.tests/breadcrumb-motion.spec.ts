@@ -1,3 +1,4 @@
+import { qualifyNativeBreadcrumbClock } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
 for (const direction of ['ltr', 'rtl'] as const) {
@@ -274,6 +275,10 @@ test('passive breadcrumb surfaces preserve arrival, departure and reverse paint 
 	await page.goto('/metamask/')
 	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 	await page.evaluate(() => document.fonts.ready)
+	test.skip(
+		!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
+		'The ordinary-flow layout has no enhanced breadcrumb departure.',
+	)
 	const observations = await page.evaluate(async () => {
 		const root = document.querySelector('#layout')
 
@@ -294,6 +299,27 @@ test('passive breadcrumb surfaces preserve arrival, departure and reverse paint 
 
 			const samples = []
 
+			const surface = header.querySelector(':scope > [data-sticky~="backdrop-before"]')
+
+			if (!surface) {
+				throw new Error(`Missing sticky backdrop: ${id}`)
+			}
+
+			const exit = surface
+				.getAnimations({ subtree: true })
+				.find(
+					animation =>
+						animation instanceof CSSAnimation &&
+						animation.animationName === 'breadcrumb-surface-exit' &&
+						animation.effect instanceof KeyframeEffect &&
+						animation.effect.target === surface &&
+						animation.effect.pseudoElement === '::before',
+				)
+
+			if (!(exit?.timeline instanceof ViewTimeline) || exit.timeline.subject !== section) {
+				throw new Error(`Departure must follow the ${id} section`)
+			}
+
 			for (const phase of ['natural', 'compact', 'departed', 'compact', 'natural']) {
 				const target = phase === 'natural' ? 350 : phase === 'compact' ? -150 : 0
 				const position = () =>
@@ -312,7 +338,7 @@ test('passive breadcrumb surfaces preserve arrival, departure and reverse paint 
 					throw new Error(`Unsettled ${id} ${phase}: ${position()}`)
 				}
 
-				const style = getComputedStyle(header, '::after')
+				const style = getComputedStyle(surface, '::before')
 				const filterOpacity = /opacity\(([^)]+)\)/.exec(style.filter)
 
 				samples.push({

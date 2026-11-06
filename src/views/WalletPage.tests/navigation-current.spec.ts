@@ -144,9 +144,7 @@ for (const width of [690, 1440]) {
 					const root = document.querySelector('#layout')!
 					const subject = open
 						? element
-						: element.querySelector(
-								':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-							)!
+						: element.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')!
 
 					return {
 						top:

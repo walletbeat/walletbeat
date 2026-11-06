@@ -807,7 +807,6 @@ declare global {
 		 * - `end`: independently sized in-flow metadata
 		 * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
 		 * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact
-		 * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
 		 * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
 		 * - `size-export`: empty absolute size container; combine with `size-source`, `size-row` or `size-end` at the corresponding natural owner.
 		 * - `measure`: hidden dimension probes inside the flow marker
@@ -859,7 +858,6 @@ declare global {
 		 *     </header>
 		 *     <div>Section content</div>
 		 *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
-		 *     <span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 		 *   </section>
 		 *   ```
 		 *

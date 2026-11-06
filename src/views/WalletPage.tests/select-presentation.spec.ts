@@ -24,19 +24,17 @@ for (const width of [390, 1440]) {
 			!capability.baseSelect || !capability.timeline,
 			'Custom picker presentation requires native base-select and scroll timelines; fallback presentation remains unobserved here',
 		)
-		const arrival = await page
-			.locator('#top > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])')
-			.evaluate(flow => {
-				const root = document.querySelector<HTMLElement>('#layout')
+		const arrival = await page.locator('#top > [data-sticky-breadcrumb~="flow"]').evaluate(flow => {
+			const root = document.querySelector<HTMLElement>('#layout')
 
-				if (!root) {
-					throw new Error('WalletPage scroll owner is missing')
-				}
+			if (!root) {
+				throw new Error('WalletPage scroll owner is missing')
+			}
 
-				root.style.scrollSnapType = 'none'
+			root.style.scrollSnapType = 'none'
 
-				return flow.getBoundingClientRect().height
-			})
+			return flow.getBoundingClientRect().height
+		})
 		const sample = () =>
 			picker.evaluate(select => {
 				const box = ({ x, y, width, height }: DOMRectReadOnly) => ({ x, y, width, height })
@@ -66,9 +64,7 @@ for (const width of [390, 1440]) {
 				return {
 					scroll: document.querySelector('#layout')?.scrollTop,
 					flow: document
-						.querySelector(
-							'#top > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-						)
+						.querySelector('#top > [data-sticky-breadcrumb~="flow"]')
 						?.getBoundingClientRect().height,
 					rect: box(rect),
 					circle,

@@ -1106,7 +1106,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						group.children?.some(item => item.href === `#${slugifyCamelCase(id)}`))}
 				/>
 				<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/if}
 
@@ -1159,7 +1158,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		</footer>
 	{/if}
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
-	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </div>
 {@html peerBootstrapMarkup()}
 
@@ -1253,7 +1251,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		</div>
 		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
-		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
 {/snippet}
 
@@ -1664,7 +1661,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		</details>
 		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
-		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
 {/snippet}
 
@@ -2956,7 +2952,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 			grid-template: "Header Nav" auto "Content Nav" 1fr / minmax(0, 1fr) auto;
 			> .wallet-header-flow { grid-area: Header; }
-			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+			> [data-sticky-breadcrumb~="flow"] {
 				grid-area: Header;
 				block-size: auto;
 				inset-block-end: 0;

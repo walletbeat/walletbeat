@@ -375,9 +375,7 @@ function observeGeometry({ root, actor, row, header }: ActorState) {
 		}
 	}
 	const scope = actor.closest('[data-sticky-breadcrumb~="scope"]')
-	const flow = scope?.querySelector(
-		':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-	)
+	const flow = scope?.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')
 
 	return {
 		scroll: root.scrollTop,

@@ -1656,7 +1656,6 @@ ol {
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
  * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact
- * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
  * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
  * - `size-export`: empty absolute size container; combine with `size-source`, `size-row` or `size-end` at the corresponding natural owner.
  * - `measure`: hidden dimension probes inside the flow marker
@@ -1708,7 +1707,6 @@ ol {
  *     </header>
  *     <div>Section content</div>
  *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
- *     <span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
  *   </section>
  *   ```
  *
@@ -2841,7 +2839,7 @@ ol {
 					anchor-name: --breadcrumb-source;
 				}
 			}
-			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+			> [data-sticky-breadcrumb~="flow"] {
 				&::before {
 					content: '';
 					inline-size: anchor-size(--column-firstRow block, 0px);
@@ -2858,7 +2856,7 @@ ol {
 				view-timeline-axis: block;
 				view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
 			}
-			&:is(details:not([open]), :has(> details:not([open]))) > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+			&:is(details:not([open]), :has(> details:not([open]))) > [data-sticky-breadcrumb~="flow"] {
 				inset-block-end: 0;
 				block-size: auto;
 			}
@@ -2992,7 +2990,7 @@ ol {
 							var(--stickyBreadcrumb-entryTimeline) '-clearance-size'
 						);
 					}
-					> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])::after {
+					> [data-sticky-breadcrumb~="flow"]::after {
 						content: if(style(---breadcrumb-clearance-supported: 1): '' ; else: none);
 						position: fixed;
 						inset: 0 auto auto 0;
@@ -3169,18 +3167,6 @@ ol {
 					var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart) - 2 *
 						var(--stickyBreadcrumb-paddingBlock, 0.5rem)
 				);
-			}
-			> [data-sticky-breadcrumb~="flow"] {
-				&[data-sticky-breadcrumb~="exit"] {
-					position: absolute;
-					pointer-events: none;
-					inset-inline-start: 0;
-					inline-size: 1px;
-					inset-block-start: calc(100% + var(---breadcrumb-sourceBorderWidth) - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight));
-					block-size: var(---breadcrumb-rowHeight);
-					view-timeline-name: none;
-					display: if(style(--stickyBreadcrumb-exitAnimation: none): none; else: block);
-				}
 			}
 			> [data-sticky-breadcrumb~="position"],
 			> details > [data-sticky-breadcrumb~="position"] {
@@ -3684,7 +3670,7 @@ ol {
 					}
 				}
 			}
-			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
+			> [data-sticky-breadcrumb~="flow"] {
 				position: relative;
 				/* Foreground geometry owns arrival; supporting copy retains ordinary flow. */
 				grid-area: 1 / 1 / 2 / 2;
@@ -3750,7 +3736,7 @@ ol {
 		}
 	}
 	@scope ([data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="size"]) to ([data-sticky-breadcrumb~="scope"]) {
-		:scope::before,:scope::after,:scope>[data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])::before,:scope>[data-sticky-breadcrumb~="flow"]>[data-sticky-breadcrumb~="measure"]::before,:scope>[data-sticky-breadcrumb~="flow"]>[data-sticky-breadcrumb~="measure"]::after {
+		:scope::before,:scope::after,:scope>[data-sticky-breadcrumb~="flow"]::before,:scope>[data-sticky-breadcrumb~="flow"]>[data-sticky-breadcrumb~="measure"]::before,:scope>[data-sticky-breadcrumb~="flow"]>[data-sticky-breadcrumb~="measure"]::after {
 			content: none;
 			view-timeline-name: none
 		}

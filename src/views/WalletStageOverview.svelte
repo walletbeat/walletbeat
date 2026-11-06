@@ -281,7 +281,6 @@
 						</div>
 					</details>
 					<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-					<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 				</section>
 			{/each}
 		</div>

@@ -80,7 +80,7 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 
 					const root = document.querySelector<HTMLElement>('#layout')!
 					const flow = target.querySelector<HTMLElement>(
-						':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
+						':scope > [data-sticky-breadcrumb~="flow"]',
 					)!
 
 					root.scrollTo({

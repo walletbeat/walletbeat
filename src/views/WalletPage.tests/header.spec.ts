@@ -682,9 +682,7 @@ for (const width of [390, 600, 690]) {
 				const header = document.querySelector('#top > header')!
 				const title = document.querySelector<HTMLElement>('#top h1')!
 				const source = document.querySelector<HTMLElement>('.wallet-title-source')!
-				const flow = document.querySelector(
-					'#top > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-				)!
+				const flow = document.querySelector('#top > [data-sticky-breadcrumb~="flow"]')!
 				const controls = [
 					...document.querySelectorAll<HTMLSelectElement>('.wallet-device-controls select'),
 				].map(select => ({

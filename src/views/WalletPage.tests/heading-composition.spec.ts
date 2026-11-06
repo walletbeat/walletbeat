@@ -866,9 +866,7 @@ for (const width of [390, 1440]) {
 							throw new Error('Actual sticky foreground owner is absent inside the position')
 						}
 
-						const marker = scope.querySelector(
-							':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
-						)!
+						const marker = scope.querySelector(':scope > [data-sticky-breadcrumb~="flow"]')!
 						const seeks = []
 
 						for (let attempt = 0; attempt < 2; attempt++) {
