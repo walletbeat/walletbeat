@@ -61,7 +61,7 @@ export const trustWallet: SoftwareWallet = {
 		coinspectId: 'trust-wallet',
 		contributors: [minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-18',
+		lastUpdated: '2026-11-06',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],
 			extensions: [
@@ -215,7 +215,14 @@ export const trustWallet: SoftwareWallet = {
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Trust Wallet warns that a malicious network provider can lie about the state of the blockchain. The wallet trusts the data from its RPC provider and does not verify it with a light client.',
+						label: 'Trust Wallet guide to adding a custom network (archived copy)',
+						url: 'https://web.archive.org/web/20250330101908/https://community.trustwallet.com/t/how-to-add-a-custom-network-on-the-trust-wallet-mobile-app/626781',
+					},
+				}),
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: securityAudits,
