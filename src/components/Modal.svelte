@@ -1,6 +1,7 @@
 <script lang="ts">
 	const titleId = $props.id()
 	let dialog = $state<HTMLDialogElement>()
+	let returnDisclosure: HTMLDetailsElement | null = null
 
 	let {
 		isOpen,
@@ -19,7 +20,10 @@
 	$effect(() => {
 		if (!dialog) return
 
-		if (isOpen && !dialog.open) dialog.showModal()
+		if (isOpen && !dialog.open) {
+			returnDisclosure = document.activeElement?.closest('details') ?? null
+			dialog.showModal()
+		}
 		else if (!isOpen && dialog.open) dialog.close()
 	})
 
@@ -32,7 +36,26 @@
 	aria-labelledby={titleId}
 	closedby="any"
 	onclose={() => {
-		if (isOpen && !dialog?.open) onClose()
+		if (dialog?.open) return
+
+		const disclosure = returnDisclosure
+
+		returnDisclosure = null
+
+		if (isOpen) onClose()
+
+		queueMicrotask(() => {
+			if (dialog?.open || isOpen || document.activeElement !== document.body) return
+
+			for (let owner = disclosure; owner; owner = owner.parentElement?.closest('details') ?? null) {
+				const summary = owner.querySelector<HTMLElement>(':scope > summary')
+
+				if (summary?.checkVisibility({ visibilityProperty: true }) && !summary.closest('[inert]')) {
+					summary.focus({ preventScroll: true })
+					break
+				}
+			}
+		})
 	}}
 >
 	{#if isOpen}

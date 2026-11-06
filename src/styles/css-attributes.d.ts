@@ -474,6 +474,33 @@ declare global {
 		'data-list-item-marker'?: string | boolean
 
 		/**
+		 * ## [data-paint]
+		 *
+		 * Paints ordinary content with inherited visual emphasis, independently of floating surfaces.
+		 * A paint surface must not contain popovers or other floating descendants.
+		 *
+		 * ### Placement
+		 * Apply to the existing content or decorative owner, below containers that own floating UI.
+		 * Nested paint surfaces consume the emphasis once.
+		 *
+		 * ### CSS Variables
+		 * - `--paint-filter`: inherited content filter; defaults to `none`.
+		 *
+		 * ### Examples
+		 * - Mute a label without filtering its sibling popover:
+		 *   ```html
+		 *   <div style="--paint-filter: grayscale() opacity(0.3)">
+		 *     <button data-paint popovertarget="information">Information</button>
+		 *     <div id="information" popover>Full contrast information</div>
+		 *   </div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-paint]`
+		 */
+		'data-paint'?: string | boolean
+
+		/**
 		 * ## [data-pressable]
 		 *
 		 * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.

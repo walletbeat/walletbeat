@@ -5255,6 +5255,7 @@ details {
 			 */
 			&::after,
 			> [data-collapsible-marker] {
+			filter: var(--paint-filter, none);
 			flex-shrink: 0;
 			inline-size: var(---collapsible-markerInlineSize);
 			block-size: 1lh;
@@ -5441,4 +5442,39 @@ details {
 			}
 		}
 	}
+}
+
+/**
+ * Paints ordinary content with inherited visual emphasis, independently of floating surfaces.
+ * A paint surface must not contain popovers or other floating descendants.
+ *
+ * ### Placement
+ * Apply to the existing content or decorative owner, below containers that own floating UI.
+ * Nested paint surfaces consume the emphasis once.
+ *
+ * ### CSS Variables
+ * - `--paint-filter`: inherited content filter; defaults to `none`.
+ *
+ * ### Examples
+ * - Mute a label without filtering its sibling popover:
+ *   ```html
+ *   <div style="--paint-filter: grayscale() opacity(0.3)">
+ *     <button data-paint popovertarget="information">Information</button>
+ *     <div id="information" popover>Full contrast information</div>
+ *   </div>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-paint]`
+ */
+[data-paint] {
+	filter: var(--paint-filter, none);
+
+	> * {
+		--paint-filter: none;
+	}
+}
+
+[popover] {
+	--paint-filter: none;
 }

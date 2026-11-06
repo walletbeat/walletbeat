@@ -346,6 +346,10 @@
 			"description": "## [data-list-item-marker]\n\nCustom literal marker text for a list item.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item-marker]`"
 		},
 		{
+			"name": "data-paint",
+			"description": "## [data-paint]\n\nPaints ordinary content with inherited visual emphasis, independently of floating surfaces.\nA paint surface must not contain popovers or other floating descendants.\n\n### Placement\nApply to the existing content or decorative owner, below containers that own floating UI.\nNested paint surfaces consume the emphasis once.\n\n### CSS Variables\n- `--paint-filter`: inherited content filter; defaults to `none`.\n\n### Examples\n- Mute a label without filtering its sibling popover:\n  ```html\n  <div style=\"--paint-filter: grayscale() opacity(0.3)\">\n    <button data-paint popovertarget=\"information\">Information</button>\n    <div id=\"information\" popover>Full contrast information</div>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-paint]`"
+		},
+		{
 			"name": "data-pressable",
 			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\nNative summaries own their feedback; breadcrumb summaries delegate it to their foreground row.\n\n### Tokens\n- `to-containing`: uses its positioned ancestor for the hit target independently of paint ownership.\n- `paint`: used alone on the non-interactive direct child representing a native control's complete visual body; dims and scales that body while its native hit owner stays fixed.\n\n### Placement\n- A paint body inherits the control's font and corner context; badges inside retain their independent appearance.\n- Keep a label's actual input as a direct child outside its paint body so the native input hit area stays fixed.\n- Use a control-body wrapper rather than putting `paint` directly on an independently styled badge.\n- Paint ownership applies to ordinary native controls and named peers; `to-containing` only expands the target.\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
 			"values": [
@@ -361,7 +365,13 @@
 		},
 		{
 			"name": "data-pressable-current",
-			"description": "## [data-pressable-current]\nCurrent feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.\n\n### Placement\nOn a named peer inside an ancestor publishing the same destination identity.\n\n### Tokens\n- `inherit`: inherit current and active feedback without creating a second current animation; native interaction remains local.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-current]`"
+			"description": "## [data-pressable-current]\nCurrent feedback is owned by each named peer unless it explicitly consumes an ancestor's identical destination state.\n\n### Placement\nOn a named peer inside an ancestor publishing the same destination identity.\n\n### Tokens\n- `inherit`: inherit current and active feedback without creating a second current animation; native interaction remains local.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-current]`",
+			"values": [
+				{
+					"name": "inherit",
+					"description": "`[data-pressable-current~=\"inherit\"]`"
+				}
+			]
 		},
 		{
 			"name": "data-pressable-name",
@@ -372,12 +382,20 @@
 			"description": "## [data-pressable-state]\nPositive peer membership derived from native interaction and canonical destination relationships. Removing a token restores independently owned current/timeline presentation.\n\n### Placement\nPublished by the destination scope on named peers; related group surfaces may consume the relationship without becoming interactive.\n\n### Tokens\n- `interacting`: a hovered, focused or pressed source includes this destination.\n- `pressed`: a natively active source includes this destination; anchors share its press feedback.\n- `exact`: an interacting or interested source has this exact destination identity.\n- `related`: the semantic group contains an interacting or interested source.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable-state]`",
 			"values": [
 				{
+					"name": "exact",
+					"description": "`[data-pressable-state~=\"exact\"]`"
+				},
+				{
 					"name": "interacting",
 					"description": "`[data-pressable-state~=\"interacting\"]`"
 				},
 				{
 					"name": "pressed",
 					"description": "`[data-pressable-state~=\"pressed\"]`"
+				},
+				{
+					"name": "related",
+					"description": "`[data-pressable-state~=\"related\"]`"
 				}
 			]
 		},
@@ -652,6 +670,14 @@
 				{
 					"name": "backdrop-stuck",
 					"description": "`[data-sticky~=\"backdrop-stuck\"]`"
+				},
+				{
+					"name": "background",
+					"description": "`[data-sticky~=\"background\"]`"
+				},
+				{
+					"name": "background-always",
+					"description": "`[data-sticky~=\"background-always\"]`"
 				},
 				{
 					"name": "block",
