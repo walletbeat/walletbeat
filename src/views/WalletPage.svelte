@@ -1105,7 +1105,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					isLocalAttribute={id => attributeNavigationItems.some(group =>
 						group.children?.some(item => item.href === `#${slugifyCamelCase(id)}`))}
 				/>
-				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/if}
@@ -1251,7 +1251,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				{/each}
 			</div>
 		</div>
-		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
@@ -1662,7 +1662,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</div>
 			</div>
 		</details>
-		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
