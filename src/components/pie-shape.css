@@ -25,15 +25,16 @@
 	.pie-navigation .pie-navigation-highlight > span,
 	.pie-navigation .navigation-items summary > a,
 	.pie-navigation .navigation-items menu[data-navigation-depth="1"] > li > a
-) {
+),
+:where(.pie-container .slice:is(button:not(:disabled), a[href]))::before {
 	---slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 	---slice-halfGap: calc(var(--slice-gap) / 2);
 	---slice-outerCornerOffset: calc(var(---slice-halfGap) + var(--slice-outerCornerRadius));
 	---slice-innerCornerOffset: calc(var(---slice-halfGap) + var(--slice-innerCornerRadius));
 	---slice-outerCornerCenterR: calc(var(--slice-outerR) - var(--slice-outerCornerRadius));
 	---slice-innerCornerCenterR: calc(var(--slice-innerR) + var(--slice-innerCornerRadius));
-	---slice-outerAngleInset: asin(var(---slice-outerCornerOffset) / var(---slice-outerCornerCenterR));
-	---slice-innerAngleInset: asin(var(---slice-innerCornerOffset) / var(---slice-innerCornerCenterR));
+	---slice-outerAngleInset: atan2(var(---slice-outerCornerOffset), var(---slice-outerSideR));
+	---slice-innerAngleInset: atan2(var(---slice-innerCornerOffset), var(---slice-innerSideR));
 	---slice-outerSideR: sqrt(
 		pow(var(---slice-outerCornerCenterR), 2) - pow(var(---slice-outerCornerOffset), 2)
 	);

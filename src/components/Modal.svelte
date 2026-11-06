@@ -1,4 +1,8 @@
 <script lang="ts">
+	const titleId = $props.id()
+	let dialog = $state<HTMLDialogElement>()
+	let returnDisclosure: HTMLDetailsElement | null = null
+
 	let {
 		isOpen,
 		title,
@@ -12,27 +16,51 @@
 		children: import('svelte').Snippet
 		footer?: import('svelte').Snippet
 	} = $props()
+
+	$effect(() => {
+		if (!dialog) return
+
+		if (isOpen && !dialog.open) {
+			returnDisclosure = document.activeElement?.closest('details') ?? null
+			dialog.showModal()
+		}
+		else if (!isOpen && dialog.open) dialog.close()
+	})
+
 </script>
 
 
-{#if isOpen}
-	<div
-		class="modal-backdrop"
-		role="button"
-		tabindex="0"
-		onclick={event => {
-			if (event.target === event.currentTarget)
-				onClose()
-		}}
-		onkeydown={event => {
-			if (event.key === 'Enter' || event.key === ' ') {
-				event.preventDefault()
-				onClose()
+<dialog
+	bind:this={dialog}
+	class="modal-dialog"
+	aria-labelledby={titleId}
+	closedby="any"
+	onclose={() => {
+		if (dialog?.open) return
+
+		const disclosure = returnDisclosure
+
+		returnDisclosure = null
+
+		if (isOpen) onClose()
+
+		queueMicrotask(() => {
+			if (dialog?.open || isOpen || document.activeElement !== document.body) return
+
+			for (let owner = disclosure; owner; owner = owner.parentElement?.closest('details') ?? null) {
+				const summary = owner.querySelector<HTMLElement>(':scope > summary')
+
+				if (summary?.checkVisibility({ visibilityProperty: true }) && !summary.closest('[inert]')) {
+					summary.focus({ preventScroll: true })
+					break
+				}
 			}
-		}}
-	>
+		})
+	}}
+>
+	{#if isOpen}
 		<div class="modal" data-card="radius-8 padding-5">
-			<h3>{title}</h3>
+			<h3 id={titleId}>{title}</h3>
 			<div class="modal-content">
 				{@render children()}
 			</div>
@@ -42,24 +70,34 @@
 				</div>
 			{/if}
 		</div>
-	</div>
-{/if}
+	{/if}
+</dialog>
 
 
 <style>
-	.modal-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 50;
+	.modal-dialog {
+		inline-size: min(26rem, calc(100% - 2rem));
+		max-inline-size: calc(100% - 2rem);
+		max-block-size: calc(100dvh - 2rem);
+		margin: auto;
+		padding: 0;
+		border: none;
+		background: transparent;
+		color: inherit;
+		overflow: auto;
+		overscroll-behavior: contain;
+
+		&::backdrop {
+			background: rgba(0, 0, 0, 0.6);
+		}
 	}
 
 	.modal {
-		max-width: 26rem;
 		width: 100%;
+	}
+
+	:global([data-scroll-container]:has(dialog.modal-dialog:modal)) {
+		overflow: hidden;
 	}
 
 	.modal-content {

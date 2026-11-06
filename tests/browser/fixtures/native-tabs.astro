@@ -1,0 +1,46 @@
+---
+import Layout from '@/layouts/Layout.astro'
+
+const labels = Array.from({ length: 15 }, (_, index) => index + 1)
+---
+
+<Layout metadata={{ title: 'Native tabs fixture' }}>
+	<main style='padding: 1rem; max-inline-size: 60rem'>
+		{
+			['horizontal', 'vertical'].map(group => (
+				<div
+					id={group}
+					data-tabs={group === 'vertical' ? 'vertical' : ''}
+					data-scroll-container={group === 'vertical' ? 'block' : 'inline'}
+					style='--tabs-list-size: 12rem; --tabs-sizeBlock: 20rem'
+				>
+					{labels.map(number => (
+						<details name={group} open={number === 1}>
+							<summary>{number === 3 ? 'Long label '.repeat(30) : `Tab ${number}`}</summary>
+							<section data-tab-panel data-scroll-container='block'>
+								<a href='#end'>First link {number}</a>
+								{Array.from({ length: 20 }, () => (
+									<p>Panel content can scroll independently of its labels.</p>
+								))}
+								{number === 1 && (
+									<div data-tabs id={`nested-${group}`}>
+										{[1, 2, 3].map(child => (
+											<details name={`nested-${group}`} open={child === 1}>
+												<summary>Nested {child}</summary>
+												<section data-tab-panel>
+													<a href='#end'>Nested link {child}</a>
+												</section>
+											</details>
+										))}
+									</div>
+								)}
+								<a href='#end'>Last link {number}</a>
+							</section>
+						</details>
+					))}
+				</div>
+			))
+		}
+		<div id='end'>End</div>
+	</main>
+</Layout>

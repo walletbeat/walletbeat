@@ -33,6 +33,10 @@
 	const { stage, ladderEvaluation } = $derived(
 		getWalletStageAndLadder(wallet)
 	)
+	const displaysScore = $derived(
+		summaryType === WalletSummaryType.Score ||
+		(summaryType === WalletSummaryType.Stage && (stage === null || ladderEvaluation === null))
+	)
 
 
 	// Components
@@ -43,7 +47,7 @@
 
 <div
 	class="wallet-overall-summary"
-	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
+	data-card={isInTooltip ? 'popover border-accent' : undefined}
 	data-column
 	style:--accent={
 		score?.score !== undefined ?
@@ -59,24 +63,17 @@
 		<h2 data-row="gap-2">
 			<img
 				src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+				alt=""
 			/>
 			{wallet.metadata.displayName}
 		</h2>
 	</header>
 
-	<div data-column="center gap-2">
-		{#if summaryType === WalletSummaryType.Stage}
-			{#if stage !== null && ladderEvaluation !== null}
-				Walletbeat stage:
-				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
-			{:else if !isInTooltip}
-				Walletbeat score:
-				<ScoreBadge {score} size="large" />
-				{#if score?.hasUnratedComponent}
-					<small>*contains unrated components</small>
-				{/if}
-			{/if}
-		{:else if summaryType === WalletSummaryType.Score && !isInTooltip}
+	<div data-column="center gap-2" class:tooltip-score={isInTooltip && displaysScore}>
+		{#if summaryType === WalletSummaryType.Stage && stage !== null && ladderEvaluation !== null}
+			Walletbeat stage:
+			<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+		{:else if displaysScore}
 			Walletbeat score:
 			<ScoreBadge {score} size="large" />
 			{#if score?.hasUnratedComponent}
@@ -92,6 +89,10 @@
 		font-size: smaller;
 		line-height: 1.4;
 
+		> .tooltip-score {
+			display: none;
+		}
+
 		> header {
 			row-gap: 0.5em;
 
@@ -105,5 +106,9 @@
 				}
 			}
 		}
+	}
+
+	:global(details:not([data-tooltip-floating]) > [popover]) .wallet-overall-summary > .tooltip-score {
+		display: flex;
 	}
 </style>

@@ -22,6 +22,12 @@ export const PieLayout = {
 	FullTop: 'FullTop',
 }
 
+export type PieTransitionElement = 'pie' | 'slices' | 'center'
+export type PieTransitionElements =
+	| PieTransitionElement
+	| `${PieTransitionElement} ${PieTransitionElement}`
+	| `${PieTransitionElement} ${PieTransitionElement} ${PieTransitionElement}`
+
 export type LevelConfig = {
 	outerRadiusFraction: number
 	innerRadiusFraction: number
@@ -148,21 +154,22 @@ export const slicePathData = (
 	const innerCornerOffset = halfGap + innerCornerR
 	const outerCornerCenterR = outerR - outerCornerR
 	const innerCornerCenterR = innerR + innerCornerR
-	const outerAngleInset = Math.asin(outerCornerOffset / outerCornerCenterR)
-	const innerAngleInset = Math.asin(innerCornerOffset / innerCornerCenterR)
 	const outerSideR = Math.sqrt(outerCornerCenterR ** 2 - outerCornerOffset ** 2)
 	const innerSideR = Math.sqrt(innerCornerCenterR ** 2 - innerCornerOffset ** 2)
-	const largeArc = Math.abs(totalAngle) > 180 ? 1 : 0
+	const outerAngleInset = Math.atan2(outerCornerOffset, outerSideR)
+	const innerAngleInset = Math.atan2(innerCornerOffset, innerSideR)
 	const sidePoint = (sideR: number, side: 1 | -1) =>
 		point(side * (sinHalf * sideR - cosHalf * halfGap), -(cosHalf * sideR + sinHalf * halfGap))
 
 	return [
 		`M ${polar(outerAngleInset - halfAngle, outerR)}`,
-		`A ${outerR} ${outerR} 0 ${largeArc} 1 ${polar(halfAngle - outerAngleInset, outerR)}`,
+		`A ${outerR} ${outerR} 0 0 1 ${polar(0, outerR)}`,
+		`A ${outerR} ${outerR} 0 0 1 ${polar(halfAngle - outerAngleInset, outerR)}`,
 		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${sidePoint(outerSideR, 1)}`,
 		`L ${sidePoint(innerSideR, 1)}`,
 		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${polar(halfAngle - innerAngleInset, innerR)}`,
-		`A ${innerR} ${innerR} 0 ${largeArc} 0 ${polar(innerAngleInset - halfAngle, innerR)}`,
+		`A ${innerR} ${innerR} 0 0 0 ${polar(0, innerR)}`,
+		`A ${innerR} ${innerR} 0 0 0 ${polar(innerAngleInset - halfAngle, innerR)}`,
 		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${sidePoint(innerSideR, -1)}`,
 		`L ${sidePoint(outerSideR, -1)}`,
 		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${polar(outerAngleInset - halfAngle, outerR)}`,

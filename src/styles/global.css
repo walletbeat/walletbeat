@@ -134,7 +134,6 @@
 	overflow: hidden;
 
 	font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
-	font-size: min(3.2vw, 16px);
 	/* Disable iOS Safari text autosizing, which inflates some code snippets but not others */
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;
@@ -182,18 +181,14 @@ label:has(> input) {
 	font: inherit;
 	font-size: smaller;
 	line-height: 1;
-	transition-property: opacity, scale;
-	transition-duration: var(--pressable-transitionOutDuration);
-
-	&:active {
-		opacity: var(--pressable-pressed-opacity);
-		scale: var(--pressable-pressed-scale);
-		transition-duration: var(--pressable-transitionInDuration);
-	}
-
 	&:has(> input:focus-visible) {
-		outline: 2px solid var(--accent);
-		outline-offset: -1px;
+		---pressable-outlineColor: var(--accent);
+
+		&:not(:has(> [data-pressable~='paint'])),
+		& > [data-pressable~='paint'] {
+			outline: 2px solid var(---pressable-outlineColor);
+			outline-offset: -1px;
+		}
 	}
 
 	> input {

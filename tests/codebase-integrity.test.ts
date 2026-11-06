@@ -59,6 +59,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.yaml',
 	'.toml',
 	'.snippet',
+	'.patch',
 ])
 
 /** Filenames that are allowed without a recognized extension. */
@@ -525,6 +526,7 @@ describe('codebase integrity', () => {
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
 			'[attrGroupId].astro',
+			'[eip]',
 			'[eip].astro',
 			'[walletName]',
 			'[...slug]',

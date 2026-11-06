@@ -17,34 +17,52 @@
 >
 	<article
 		data-scroll-container="block"
+		data-sticky-container
+		data-sticky-breadcrumb="scope root"
+		style:--stickyBreadcrumb-entryTimeline="--stages-root-entry"
 		data-column="gap-8"
 	>
 		<header
 			id="top"
-			data-column="gap-4"
+			data-sticky-breadcrumb="position"
+			data-column="span-start gap-4"
 			data-scroll-item="inline-detached padding-match-start"
 		>
-			<h1>Wallet Stages</h1>
-			<p class="subtitle">
+			<h1
+				data-sticky-breadcrumb="source"
+				data-sticky="block block-start backdrop-before backdrop-stuck"
+			>
+				<a href="#top" data-link="camouflaged" data-sticky-breadcrumb="item">Wallet Stages</a>
+			</h1>
+			<p class="subtitle" data-sticky-breadcrumb="support">
 				Stages describe the milestones Ethereum wallets should work toward. Each stage builds
 				on the previous, forming a roadmap for wallet teams to follow.
 			</p>
 		</header>
 
+		<div data-column="gap-8">
 		{#each softwareWalletLadder.stages as stage, index (stage.id)}
 			{@const stageColor = stageToColor(index, softwareWalletLadder.stages.length)}
 
-			<section id={stage.id}>
+			<section
+				id={stage.id}
+				data-sticky-container
+				data-sticky-breadcrumb="scope"
+				style:--stickyBreadcrumb-entryTimeline={`--stages-section-${index}-entry`}
+			>
 				<header
-					data-sticky="block backdrop-before backdrop-stuck"
+					data-sticky="block block-start backdrop-before backdrop-stuck"
+					data-sticky-breadcrumb="position"
 					data-row
 					data-scroll-item="inline-detached"
 				>
-					<a
-						data-link="camouflaged"
-						href={`#${stage.id}`}
-					>
-						<h2 data-row="gap-3">
+					<h2 data-sticky-breadcrumb="source">
+						<a
+							data-link="camouflaged"
+							href={`#${stage.id}`}
+							data-sticky-breadcrumb="item"
+							data-row="gap-3"
+						>
 							<data
 								data-badge="medium"
 								value={`STAGE_${index}`}
@@ -53,8 +71,8 @@
 								<strong>{stage.label}</strong>
 							</data>
 							{stage.name}
-						</h2>
-					</a>
+						</a>
+					</h2>
 				</header>
 
 				<div
@@ -125,8 +143,13 @@
 						{/each}
 					</div>
 				</div>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/each}
+		</div>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</article>
 </div>
 

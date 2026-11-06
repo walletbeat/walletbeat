@@ -29,7 +29,7 @@ for (const width of [390, 1440]) {
 			})
 		})
 
-		expect(ids).toHaveLength(29)
+		expect(ids).toHaveLength(35)
 
 		for (const id of ids) {
 			await test.step(`🥧 Annulus / CornerRadii / SliceCounts / SliceHitArea / 🎨 LabelCenters / UprightGlyphs: ${id}`, async () => {
@@ -50,7 +50,23 @@ for (const width of [390, 1440]) {
 						labelR: number
 						path: string
 					}
-					type Model = { id: string; origin: number; width: number; slices: Slice[] }
+					type Plain = { count: number; innerR: number; outerR: number }
+					type Model = {
+						id: string
+						origin: number
+						width: number
+						slices: Slice[]
+						plain: Plain | null
+					}
+					const isPlain = (plain: unknown): plain is Plain =>
+						typeof plain === 'object' &&
+						plain !== null &&
+						'count' in plain &&
+						typeof plain.count === 'number' &&
+						'innerR' in plain &&
+						typeof plain.innerR === 'number' &&
+						'outerR' in plain &&
+						typeof plain.outerR === 'number'
 					const isSlice = (slice: unknown): slice is Slice =>
 						typeof slice === 'object' &&
 						slice !== null &&
@@ -75,7 +91,9 @@ for (const width of [390, 1440]) {
 						typeof model.width === 'number' &&
 						'slices' in model &&
 						Array.isArray(model.slices) &&
-						model.slices.every(isSlice)
+						model.slices.every(isSlice) &&
+						'plain' in model &&
+						(model.plain === null || isPlain(model.plain))
 					const value: unknown = JSON.parse(
 						document.getElementById('pie-models')?.textContent ?? '[]',
 					)
@@ -114,6 +132,24 @@ for (const width of [390, 1440]) {
 						return { ...slice, path: new Path2D(slice.path), matrix, inverse: matrix.inverse() }
 					})
 					const expectedAt = (x: number, y: number) => {
+						if (model.plain) {
+							const dx = x - model.origin,
+								dy = y - model.origin,
+								radius = Math.hypot(dx, dy)
+
+							if (radius < model.plain.innerR || radius > model.plain.outerR) {
+								return null
+							}
+
+							// Equal sectors without gaps are classified from the declared inputs,
+							// independently of either renderer's rounded-angle calculation.
+							const angle = (Math.atan2(dx, -dy) * 180) / Math.PI
+							const step = 360 / model.plain.count
+							const index = Math.floor(((((step / 2 - angle) % 360) + 360) % 360) / step)
+
+							return `${model.id}-${index}`
+						}
+
 						let target: string | null = null
 
 						for (const shape of shapes) {

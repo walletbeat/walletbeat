@@ -31,7 +31,12 @@
 	Item
 ">
 	// Types/constants
+	import { flushSync } from 'svelte'
 	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { TransitionUpdate } from '@/utils/view-transition'
+
+	type FiltersTransitionUpdate = TransitionUpdate<'filters'>
+	const directTransitionUpdate: FiltersTransitionUpdate = update => update()
 
 
 	// Props
@@ -48,6 +53,8 @@
 		),
 		toggleFilter = $bindable(),
 		toggleFilterById = $bindable(),
+		transitionUpdate = directTransitionUpdate,
+		onreset,
 		...restProps
 	}: SvelteHTMLElements['form'] & {
 		items: Item[]
@@ -56,6 +63,7 @@
 		filteredItems: Item[]
 		toggleFilter?: typeof _toggleFilter
 		toggleFilterById?: typeof _toggleFilterById
+		transitionUpdate?: FiltersTransitionUpdate
 	} = $props()
 
 
@@ -103,20 +111,39 @@
 
 
 	// Actions
-	const _toggleFilter = (filter: Filter<Item>, exclusive = false) => {
-		if (!activeFilters.has(filter)) {
-			const filterGroup = (
-				filterGroups
-					.find(group => group.filters.includes(filter))
+	const updateFilters = (update: () => void) => {
+		transitionUpdate(() => flushSync(update), 'filters')
+	}
+
+	const getDefaultFilters = () => (
+		filterGroups.flatMap(group => {
+			const defaultIds = new Set(
+				group.exclusive ?
+					group.defaultFilter ? [group.defaultFilter] : []
+				:
+					group.defaultFilters ?? []
 			)
 
-			if (filterGroup && (exclusive || filterGroup.exclusive))
-				activeFilters = activeFilters.difference(new Set(filterGroup.filters))
+			return group.filters.filter(filter => defaultIds.has(filter.id))
+		})
+	)
 
-			activeFilters = activeFilters.union(new Set([filter]))
-		} else {
-			activeFilters = activeFilters.difference(new Set([filter]))
-		}
+	const _toggleFilter = (filter: Filter<Item>, exclusive = false) => {
+		updateFilters(() => {
+			if (!activeFilters.has(filter)) {
+				const filterGroup = (
+					filterGroups
+						.find(group => group.filters.includes(filter))
+				)
+
+				if (filterGroup && (exclusive || filterGroup.exclusive))
+					activeFilters = activeFilters.difference(new Set(filterGroup.filters))
+
+				activeFilters = activeFilters.union(new Set([filter]))
+			} else {
+				activeFilters = activeFilters.difference(new Set([filter]))
+			}
+		})
 	}
 	toggleFilter = _toggleFilter
 
@@ -160,10 +187,19 @@
 
 <form
 	class="menu"
-	data-card="padding-5 radius-4"
-	data-row="gap-6 wrap"
-	{...restProps}
->
+		data-card="padding-5 radius-4"
+		data-row="gap-6 wrap"
+		{...restProps}
+		onreset={event => {
+			onreset?.(event)
+			if (event.defaultPrevented) return
+
+			event.preventDefault()
+			updateFilters(() => {
+				activeFilters = new SvelteSet(getDefaultFilters())
+			})
+		}}
+	>
 	{#each (
 		filterGroups
 			.map(group => ({
@@ -194,17 +230,15 @@
 					<!-- Single Select -->
 					<Select
 						defaultValue={group.defaultFilter}
-						bind:value={
-							() => (
-								Array.from(activeFilters.intersection(filters))[0]?.id
-							),
-
-							(filterId) => {
+						value={Array.from(activeFilters.intersection(filters))[0]?.id}
+						onchange={event => {
+							const filterId = event.currentTarget.value
+							updateFilters(() => {
 								activeFilters = filterId && filterId !== ''
 									? activeFilters.difference(filters).union(new Set([filterById.get(filterId)!]))
 									: activeFilters.difference(filters)
-							}
-						}
+							})
+						}}
 						options={
 							visibleFilters
 								.map(filter => ({
@@ -254,7 +288,9 @@
 									checked={activeFilter === filter}
 									disabled={count === 0}
 									onchange={() => {
-										activeFilters = activeFilters.difference(filters).union(new Set([filter]))
+										updateFilters(() => {
+											activeFilters = activeFilters.difference(filters).union(new Set([filter]))
+										})
 									}}
 								/>
 								{@render filterItemContent(filter, count)}
@@ -268,15 +304,12 @@
 					<!-- Multiple Select -->
 					<select
 						multiple
-						bind:value={
-							() => (
-								Array.from(
-									activeFilters.intersection(filters),
-									filter => filter.id
-								)
-							),
-
-							(filterIds) => {
+						onchange={event => {
+							const filterIds = Array.from(
+								event.currentTarget.selectedOptions,
+								option => option.value,
+							)
+							updateFilters(() => {
 								activeFilters = (
 									activeFilters
 										.difference(filters)
@@ -286,8 +319,8 @@
 											)
 										)
 								)
-							}
-						}
+							})
+						}}
 						aria-label="Filter by {group.label.toLowerCase()}"
 					>
 						{#each visibleFilters as filter (filter.id)}
@@ -300,7 +333,7 @@
 
 							<option
 								value={filter.id}
-								selected={group.defaultFilters?.includes(filter.id)}
+								selected={activeFilters.has(filter)}
 							>
 								{@render filterItemContent(filter, count)}
 							</option>
@@ -332,17 +365,16 @@
 								<input
 									type="checkbox"
 									defaultChecked={group.defaultFilters?.includes(filter.id)}
-									bind:checked={
-										() => (
-											activeFilters.has(filter)
-										),
-										checked => {
+									checked={activeFilters.has(filter)}
+									onchange={event => {
+										const { checked } = event.currentTarget
+										updateFilters(() => {
 											if (checked)
 												activeFilters.add(filter)
 											else
 												activeFilters.delete(filter)
-										}
-									}
+										})
+									}}
 									disabled={count === 0 && !isChecked}
 								/>
 								{@render filterItemContent(filter, count)}
