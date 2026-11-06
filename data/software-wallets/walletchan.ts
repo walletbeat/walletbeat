@@ -1,3 +1,4 @@
+import { AryaS } from '@/data/contributors/4ryas'
 import { minimalsm } from '@/data/contributors/minimalsm'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
@@ -6,10 +7,14 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const walletchan: SoftwareWallet = {
@@ -18,9 +23,9 @@ export const walletchan: SoftwareWallet = {
 		displayName: 'WalletChan',
 		tableName: 'WalletChan',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [minimalsm],
+		contributors: [minimalsm, AryaS],
 		iconExtension: 'png',
-		lastUpdated: '2026-10-18',
+		lastUpdated: '2026-11-06',
 		urls: {
 			docs: ['https://docs.walletchan.com'],
 			others: [
@@ -51,7 +56,104 @@ export const walletchan: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: [
+				{
+					explanation:
+						'Ethereum uses drpc.org as its default RPC endpoint. When the wallet opens for the first time, it asks this endpoint and the default endpoints of the other networks for the balances of the new account. This happens before the user can open the RPC settings, because there are no settings during setup.',
+					label: 'WalletChan default Ethereum RPC endpoint',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/constants/chainRegistry.ts#L184-L190',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-onboarding-without-rpc-settings.png',
+					label: 'WalletChan setup screen with no network settings',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					explanation:
+						'The settings let the user add an RPC endpoint to each network, including Ethereum and L2 networks, and select it as the endpoint in use.',
+					label: 'WalletChan RPC endpoint settings code',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/components/Settings/RpcEndpointManager.tsx#L316-L325',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-add-ethereum-rpc-endpoint.png',
+					label: 'WalletChan form to add an Ethereum RPC endpoint',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-ethereum-self-hosted-rpc-in-use.png',
+					label: 'WalletChan with a self-hosted Ethereum RPC endpoint in use',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-base-rpc-endpoints.png',
+					label: 'WalletChan RPC endpoint list for Base',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					explanation:
+						'The user can add a custom EVM network with its own RPC endpoint. WalletChan checks the chain ID of the endpoint before it saves the network.',
+					label: 'WalletChan add network code',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/components/Settings/AddChain.tsx#L393-L401',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-add-custom-network.png',
+					label: 'WalletChan form to add a custom network',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					explanation:
+						'When the WalletChan portfolio service is not available, the wallet reads balances from the RPC endpoint of each network.',
+					label: 'WalletChan portfolio fallback code',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/chrome/portfolio/tokenCatalog.ts#L70-L74',
+				},
+				{
+					explanation:
+						'WalletChan reads the Ether balance and ERC-20 balances in one multicall contract call to the RPC endpoint of the network.',
+					label: 'WalletChan onchain balance code',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/chrome/portfolio/onchainBalances.ts#L114-L141',
+				},
+				{
+					explanation:
+						'With network access only to a self-hosted Ethereum node, the wallet shows the Ether balance and the balance of USDC added by its contract address. The balances are after a 10 USDC send. The RPC warning is about the other networks, which had no network access during the test.',
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-balances-from-self-hosted-node.png',
+					label: 'WalletChan balances read from a self-hosted node',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-send-token-picker-usdc-balance.png',
+					label: 'WalletChan send screen with the USDC balance of an imported account',
+					lastRetrieved: '2026-11-06',
+				},
+				{
+					explanation:
+						'WalletChan sends signed transactions to the RPC endpoint of the network with standard Ethereum RPC methods.',
+					label: 'WalletChan transaction broadcast code',
+					url: 'https://github.com/walletchan/walletchan/blob/7f33e0f3b47516c59cfe682b11ff19d8f44704dc/apps/extension/src/chrome/localSigning/transactionBroadcast.ts#L24-L75',
+				},
+				{
+					explanation:
+						'With network access only to a self-hosted Ethereum node, the wallet prepares a send of 10 USDC to another address. After confirmation, the node shows the transfer in the USDC balances of both addresses.',
+					file: 'public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-usdc-send-review.png',
+					label: 'WalletChan USDC send review with a self-hosted node',
+					lastRetrieved: '2026-11-06',
+				},
+			],
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},
