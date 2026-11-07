@@ -80,15 +80,22 @@ for (const javaScriptEnabled of [true, false]) {
 					for (const target of mobile && !open
 						? [pointerTarget]
 						: [pointerTarget, panel.locator('input[type="search"]')]) {
-						await panel.evaluate(element =>
-							element.scrollTo({ top: element.scrollHeight, behavior: 'instant' }),
-						)
+						if (!mobile || open) {
+							await panel.locator('input[type="search"]').hover()
+						}
+
 						await expect
-							.poll(() =>
-								panel.evaluate(
+							.poll(async () => {
+								const remaining = await panel.evaluate(
 									element => element.scrollHeight - element.clientHeight - element.scrollTop,
-								),
-							)
+								)
+
+								if (remaining > 1 && (!mobile || open)) {
+									await page.mouse.wheel(0, remaining + 1)
+								}
+
+								return remaining
+							})
 							.toBeLessThanOrEqual(1)
 						await settleRoot()
 						const box = await target.boundingBox()
