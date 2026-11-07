@@ -723,9 +723,6 @@ for (const [width, direction] of [
 						const pose = await page.locator(selector).evaluate(element => {
 							const pseudo = getComputedStyle(element, '::after')
 							const pie = document.querySelector('.pie-navigation')!
-							const geometry = pie
-								.querySelector('.pie-navigation-geometry')!
-								.getBoundingClientRect()
 							const style = getComputedStyle(pie)
 							const maximum = Number.parseFloat(style.getPropertyValue('--pie-maxR'))
 							const padding = Number.parseFloat(style.getPropertyValue('--pie-padding'))
@@ -763,16 +760,12 @@ for (const [width, direction] of [
 								visibility: pseudo.visibility,
 								width: Number.parseFloat(pseudo.width),
 								height: Number.parseFloat(pseudo.height),
-								circle: {
-									x: geometry.x + geometry.width / 2,
-									y: geometry.y + geometry.height / 2,
-									radius: ((geometry.width / 2) * maximum) / (maximum + padding),
-								},
+								pieRadiusFraction: maximum / (maximum + padding),
 							}
 						})
 						const marker = await quad(selector, true)
 						const parent = await quad(selector)
-						const pieQuad = await quad('.pie-navigation-geometry')
+						const pieQuad = await quad('.pie-navigation-geometry > .navigation-items')
 						const sides = pieQuad.points.map((a, index) => {
 							const b = pieQuad.points[(index + 1) % 4]
 
@@ -783,10 +776,23 @@ for (const [width, direction] of [
 							Math.max(...sides) - Math.min(...sides),
 							'Qualified square pie geometry',
 						).toBeLessThan(0.5)
+						expect(sides.every(side => Number.isFinite(side) && side > 0)).toBe(true)
+						const edges = pieQuad.points.slice(0, 2).map((point, index) => ({
+							x: pieQuad.points[index + 1].x - point.x,
+							y: pieQuad.points[index + 1].y - point.y,
+						}))
+
 						expect(
-							Math.abs(pieQuad.points[0].y - pieQuad.points[1].y),
-							'Pie geometry has no rotated inline axis',
-						).toBeLessThan(0.5)
+							Math.abs(edges[0].x * edges[1].x + edges[0].y * edges[1].y) / (sides[0] * sides[1]),
+							'Orthogonal painted pie basis',
+						).toBeLessThan(0.001)
+						expect(pose.pieRadiusFraction).toBeGreaterThan(0)
+						expect(pose.pieRadiusFraction).toBeLessThanOrEqual(1)
+						const circle = {
+							x: pieQuad.points.reduce((sum, point) => sum + point.x, 0) / 4,
+							y: pieQuad.points.reduce((sum, point) => sum + point.y, 0) / 4,
+							radius: (sides[0] / 2) * pose.pieRadiusFraction,
+						}
 						const painted = [marker]
 
 						if (owner.closed) {
@@ -804,13 +810,26 @@ for (const [width, direction] of [
 								}
 
 								return element.matches('[data-sticky-breadcrumb~="contents"]')
-									? [...element.children].map((child, index) => {
-											child.setAttribute('data-closed-end-child', String(index))
+									? [...element.children]
+											.filter(child => !child.matches('[data-sticky-breadcrumb~="size-export"]'))
+											.map((child, index) => {
+												if (
+													!child.checkVisibility({
+														visibilityProperty: true,
+														opacityProperty: true,
+													})
+												) {
+													throw new Error('Required closed END content is not visible')
+												}
 
-											return index
-										})
+												child.setAttribute('data-closed-end-child', String(index))
+
+												return index
+											})
 									: [-1]
 							})
+
+							expect(children.length, 'Visible closed END content is required').toBeGreaterThan(0)
 
 							for (const index of children) {
 								painted.push(
@@ -824,7 +843,7 @@ for (const [width, direction] of [
 						const after = await page.locator(selector).evaluate(element => {
 							const owner = element.getBoundingClientRect()
 							const pie = document
-								.querySelector('.pie-navigation-geometry')!
+								.querySelector('.pie-navigation-geometry > .navigation-items')!
 								.getBoundingClientRect()
 
 							return {
@@ -838,22 +857,21 @@ for (const [width, direction] of [
 						expect(
 							Math.abs(after.owner.top - Math.min(...parent.points.map(point => point.y))),
 						).toBeLessThan(0.5)
-						expect(Math.abs(after.pie.x + after.pie.width / 2 - pose.circle.x)).toBeLessThan(0.5)
-						expect(Math.abs(after.pie.y + after.pie.height / 2 - pose.circle.y)).toBeLessThan(0.5)
+						expect(Math.abs(after.pie.x + after.pie.width / 2 - circle.x)).toBeLessThan(0.5)
+						expect(Math.abs(after.pie.y + after.pie.height / 2 - circle.y)).toBeLessThan(0.5)
 						expect(pose.content).not.toBe('none')
 						expect(pose.opacity).toBeGreaterThan(0)
 						expect(pose.visibility).toBe('visible')
 						expect(pose.width).toBeGreaterThan(0)
 						expect(pose.height).toBeGreaterThan(0)
-						expect(Number.isFinite(pose.circle.radius) && pose.circle.radius > 0).toBe(true)
-						const clearance = Math.min(...painted.map(box => separation(box.points, pose.circle)))
+						expect(Number.isFinite(circle.radius) && circle.radius > 0).toBe(true)
+						const clearance = Math.min(...painted.map(box => separation(box.points, circle)))
 
 						delivered += direction * (pose.scroll - before)
 
 						if (
-							Math.min(...marker.points.map(point => point.y)) <=
-								pose.circle.y + pose.circle.radius &&
-							Math.max(...marker.points.map(point => point.y)) >= pose.circle.y - pose.circle.radius
+							Math.min(...marker.points.map(point => point.y)) <= circle.y + circle.radius &&
+							Math.max(...marker.points.map(point => point.y)) >= circle.y - circle.radius
 						) {
 							encounters++
 						}
@@ -861,8 +879,8 @@ for (const [width, direction] of [
 						const local = localInline(marker, parent)
 						const verticalDistance = Math.max(
 							0,
-							Math.min(...marker.points.map(point => point.y)) - pose.circle.y,
-							pose.circle.y - Math.max(...marker.points.map(point => point.y)),
+							Math.min(...marker.points.map(point => point.y)) - circle.y,
+							circle.y - Math.max(...marker.points.map(point => point.y)),
 						)
 
 						evidence.push({
@@ -877,9 +895,10 @@ for (const [width, direction] of [
 							local,
 							initialInline,
 							verticalDistance,
+							circle,
 						})
 
-						if (verticalDistance > pose.circle.radius + pose.gap + 1) {
+						if (verticalDistance > circle.radius + pose.gap + 1) {
 							ordinarySamples++
 							expect(
 								owner.closed
@@ -906,16 +925,19 @@ for (const [width, direction] of [
 				).toBeGreaterThan(0)
 			}
 		} finally {
-			await cdp.detach()
-			await info.attach('native-marker-geometry', {
-				body: JSON.stringify({
-					owners,
-					evidence,
-					limits:
-						'Native transformed pseudo border quads, conservative for masked chevron ink. Both native H4 and relocated stage marker required. No compositor or between-sample acceptance.',
-				}),
-				contentType: 'application/json',
-			})
+			try {
+				await info.attach('native-marker-geometry', {
+					body: JSON.stringify({
+						owners,
+						evidence,
+						limits:
+							'Native transformed pseudo border quads, conservative for masked chevron ink. Both native H4 and relocated stage marker required. No compositor or between-sample acceptance.',
+					}),
+					contentType: 'application/json',
+				})
+			} finally {
+				await cdp.detach()
+			}
 		}
 	})
 }
