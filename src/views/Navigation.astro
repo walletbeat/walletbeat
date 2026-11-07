@@ -1,4 +1,5 @@
 ---
+import { navigationLogo } from '@/utils/navigation-logo'
 import type { NavigationItem } from '@/constants/navigation'
 import {
 	navigationAbout,
@@ -39,13 +40,13 @@ const secondaryNavigationItems = [
 			<img
 				src='/logo.svg'
 				alt='Walletbeat'
-				width='516'
-				height='126'
+				width={Math.round(navigationLogo.width)}
+				height={Math.round(navigationLogo.height)}
 				data-safari='invert-lightness'
 			/>
 		</a>
 
-		<menu data-row='gap-2'>
+		<menu data-row>
 			<li>
 				<button
 					type='button'
@@ -149,12 +150,18 @@ const secondaryNavigationItems = [
 
 				img {
 					display: block;
-					width: auto;
-					height: 2.35rem;
+					width: var(---navigation-logoInlineSize);
+					height: var(--navigation-logoBlockSize);
 				}
 			}
 
 			menu {
+				&[data-row] {
+					gap: var(--navigation-controlGap);
+				}
+				[data-icon~="circle"] {
+					--icon-size: var(--navigation-controlSize);
+				}
 				li {
 					display: contents;
 				}

@@ -3,6 +3,7 @@
 import '@/styles/global.css'
 import '@/styles/css-attributes.css'
 import '@/styles/wbicons.css'
+import { navigationLogo } from '@/utils/navigation-logo'
 
 // Props
 import type { ComponentProps } from 'astro/types'
@@ -132,7 +133,12 @@ import Footer from '@/views/Footer.astro'
 				},
 			}}
 		/>
-		<div id='layout' data-scroll-container data-sticky-container>
+		<div
+			id='layout'
+			style={`--navigation-logoAspectRatio: ${navigationLogo.width / navigationLogo.height}`}
+			data-scroll-container
+			data-sticky-container
+		>
 			<a class='skip-link' href='#content' data-astro-reload data-badge='large' data-row>
 				<span data-icon={String.fromCodePoint(0x21b5)}></span>
 				<span>Skip to main content</span>
@@ -165,6 +171,12 @@ import Footer from '@/views/Footer.astro'
 		--navigation-mobile-minBlockSize: 4.16rem;
 		--navigation-mobile-blockSize: var(--navigation-mobile-minBlockSize);
 		--navigation-controlInsetInline: 0.75rem;
+		--navigation-logoBlockSize: 2.35rem;
+		---navigation-logoInlineSize: calc(
+			var(--navigation-logoBlockSize) * var(--navigation-logoAspectRatio)
+		);
+		--navigation-controlSize: 2rem;
+		--navigation-controlGap: 0.5em;
 
 		/* Rules */
 		inline-size: 100%;
@@ -252,31 +264,10 @@ import Footer from '@/views/Footer.astro'
 		inherits: true;
 		initial-value: 0px;
 	}
-	@property ---navigation-logoFraction {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1;
-	}
-	@property ---navigation-controlsFraction {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 1;
-	}
-	@keyframes navigation-logo-size {
-		from {
-			---navigation-logoFraction: 0;
-		}
-		to {
-			---navigation-logoFraction: 1;
-		}
-	}
-	@keyframes navigation-controls-size {
-		from {
-			---navigation-controlsFraction: 0;
-		}
-		to {
-			---navigation-controlsFraction: 1;
-		}
+	@property --navigation-controlGap {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
 	}
 	@property ---wallet-chainWrap {
 		syntax: '<number>';
@@ -330,6 +321,9 @@ import Footer from '@/views/Footer.astro'
 		}
 		@media (width <= 84rem) {
 			#layout:has([data-sticky-breadcrumb~="root"]) {
+				---navigation-controlsInlineSize: calc(
+					2 * var(--navigation-controlSize) + var(--navigation-controlGap)
+				);
 				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
 				---navigation-entryEasing: linear(
 					0,
@@ -362,42 +356,11 @@ import Footer from '@/views/Footer.astro'
 					)
 				);
 				timeline-scope:
-					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
-					--wallet-item-block, --wallet-end-inline, --wallet-end-block, --wallet-entry;
+					--wallet-item-inline, --wallet-item-block, --wallet-end-inline, --wallet-end-block,
+					--wallet-entry;
 				@supports (timeline-scope: all) and (view-timeline-name: ident('a' 'b')) {
 					timeline-scope: --wallet-entry;
 				}
-			}
-			#layout:has([data-sticky-breadcrumb~="root"])::before,
-			#layout:has([data-sticky-breadcrumb~="root"])::after {
-				content: '';
-				position: fixed;
-				inset: 0 auto auto 0;
-				visibility: hidden;
-				pointer-events: none;
-				block-size: 1px;
-				view-timeline-axis: inline;
-				view-timeline-inset: 0;
-			}
-			#layout:has([data-sticky-breadcrumb~="root"])::before {
-				inline-size: anchor-size(--navigation-logo inline);
-				view-timeline-name: --navigation-logo-inline;
-			}
-			#layout:has([data-sticky-breadcrumb~="root"])::after {
-				inline-size: anchor-size(--navigation-controls inline);
-				view-timeline-name: --navigation-controls-inline;
-			}
-			#layout:has([data-sticky-breadcrumb~="root"])
-				[data-sticky-breadcrumb~="root"]
-				> [data-sticky-breadcrumb~="position"]
-				[data-sticky-breadcrumb~="source"] {
-				animation:
-					navigation-logo-size auto linear both,
-					navigation-controls-size auto linear both;
-				animation-timeline: --navigation-logo-inline, --navigation-controls-inline;
-			}
-			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > menu {
-				anchor-name: --navigation-controls;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"][data-sticky-breadcrumb~="scope"] {
@@ -423,12 +386,8 @@ import Footer from '@/views/Footer.astro'
 				---breadcrumb-height: var(---breadcrumb-compactItemHeight);
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header {
-				animation:
-					navigation-logo-size auto linear both,
-					navigation-controls-size auto linear both,
-					breadcrumb-end-inline auto linear both;
-				animation-timeline:
-					--navigation-logo-inline, --navigation-controls-inline, --wallet-end-inline;
+				animation: breadcrumb-end-inline auto linear both;
+				animation-timeline: --wallet-end-inline;
 				---breadcrumb-itemWidth: inherit;
 				---breadcrumb-endWidth: round(
 					up,
@@ -441,8 +400,6 @@ import Footer from '@/views/Footer.astro'
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				[data-sticky-breadcrumb~="source"] {
-				/* Navigation measurements belong to their two consumers, not the page subtree. */
-				---navigation-logoInlineSize: calc(100vw * (1 / var(---navigation-logoFraction) - 1));
 				---wallet-chainWrap: clamp(
 					0,
 					sign(
@@ -451,7 +408,7 @@ import Footer from '@/views/Footer.astro'
 							(
 								var(--navigation-controlInsetInline) +
 									max(
-										calc(100vw * (1 / var(---navigation-controlsFraction) - 1)),
+										var(---navigation-controlsInlineSize),
 										2rem + 0.5rem + var(---breadcrumb-endWidth)
 									)
 							) -
@@ -465,7 +422,6 @@ import Footer from '@/views/Footer.astro'
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) {
 				#nav > header > .logo {
-					anchor-name: --navigation-logo;
 					animation: wallet-scroll-entry auto var(---navigation-entryEasing) both;
 					animation-timeline: --wallet-entry;
 					animation-range: contain 0% contain 100%;
