@@ -1,3 +1,11 @@
+import { builtinPlugins } from 'svgo'
+
+const presetDefault = builtinPlugins.find(plugin => plugin.name === 'preset-default')
+
+if (presetDefault === undefined) {
+	throw new Error('SVGO default preset is unavailable')
+}
+
 /**
  * @typedef {import('svgo').XastRoot} XastRoot
  * @typedef {import('svgo').XastNode} XastNode
@@ -18,6 +26,25 @@ export default {
 					// inlining the non-media `svg { fill }` half breaks cascade / grows files.
 					inlineStyles: false,
 				},
+			},
+			fn(root, params, info) {
+				// Preserve authored path coordinates and focus attributes on inline icons.
+				const inlineIcon = /(^|\/)src\/icons\//.test(info.path?.replaceAll('\\', '/') ?? '')
+
+				return presetDefault.fn(
+					root,
+					inlineIcon
+						? {
+								...params,
+								overrides: {
+									...params.overrides,
+									convertPathData: false,
+									removeUnknownsAndDefaults: { unknownAttrs: false },
+								},
+							}
+						: params,
+					info,
+				)
 			},
 		},
 		{
