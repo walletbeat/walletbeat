@@ -144,6 +144,13 @@ export function observeStickyChain(chain) {
 			(element.closest('[data-sticky-breadcrumb~="position"]') ??
 				element.closest('summary[data-sticky]') ??
 				row) === position
+		/** @param {Element} element */
+		const foregroundOwners = element =>
+			element.matches('[data-sticky-breadcrumb~="end"][data-sticky-breadcrumb~="contents"]')
+				? [...element.children].filter(
+						child => !child.matches('[data-sticky-breadcrumb~="size-export"]'),
+					)
+				: [element]
 		const paintOwners = [
 			position,
 			...position.querySelectorAll(
@@ -339,6 +346,7 @@ export function observeStickyChain(chain) {
 				'[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"]',
 			),
 		]
+			.flatMap(foregroundOwners)
 			.filter(element => ownsForeground(element) && visible(element))
 			.map(element => element.getBoundingClientRect())
 			.filter(box => box.width > 0 && box.height > 0)
@@ -359,13 +367,13 @@ export function observeStickyChain(chain) {
 					bottom: foreground.length ? Math.max(...foreground.map(box => box.bottom)) : 0,
 				}
 		const endBoxes = [...position.querySelectorAll('[data-sticky-breadcrumb~="end"]')]
+			.flatMap(foregroundOwners)
 			.filter(
 				element =>
-					element.closest('[data-sticky-breadcrumb~="position"]') === position &&
-					getComputedStyle(element).visibility !== 'hidden' &&
-					Number(getComputedStyle(element).opacity) > 0.01,
+					element.closest('[data-sticky-breadcrumb~="position"]') === position && visible(element),
 			)
 			.map(element => ({ text: (element.textContent ?? '').trim(), box: rect(element) }))
+			.filter(({ box }) => box.width > 0 && box.height > 0)
 		const support =
 			position.querySelector('.section-caption > div, .subsection-caption > div') ??
 			position.querySelector('p') ??
