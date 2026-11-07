@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 
 import { expect, test } from '../../../tests/browser/verified-test'
 
-const widths = [390, 864, 1024, 1025, 1440]
+const widths = [390, 864, 1344, 1345, 1440]
 
 test('real semantic owners survive scroll, reversal and both responsive crossings', async ({
 	page,
@@ -22,7 +22,7 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 	}))
 	const samples = []
 
-	for (const width of [...widths, 1024, 1025, 390]) {
+	for (const width of [...widths, 1344, 1345, 390]) {
 		await page.setViewportSize({ width, height: 900 })
 
 		for (const fraction of [0, 0.3, 0.8, 1, 0.4, 0]) {
@@ -142,7 +142,7 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 				status: 'pass',
 				complete: true,
 				evidence:
-					'Original semantic owner identities, counts, source order and ordinary footer root coordinates survive forward/reverse scroll and responsive crossings at 390/864/1024/1025/1440px.',
+					'Original semantic owner identities, counts, source order and ordinary footer root coordinates survive forward/reverse scroll and responsive crossings at 390/864/1344/1345/1440px.',
 				widths,
 				fixture: 'software',
 			})),

@@ -45,10 +45,11 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 					),
 				)
 				.toBe(0)
-			await expect(page.locator('#security-audits-and-bounties > details > summary')).toHaveCSS(
-				'position',
-				'static',
-			)
+			expect(
+				await page
+					.locator('#security-audits-and-bounties > details > summary')
+					.evaluate(element => getComputedStyle(element).position),
+			).not.toMatch(/^(sticky|fixed)$/)
 		}
 
 		const result = await page.evaluate(async () => {
@@ -86,13 +87,17 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 
 				return {
 					scroll: root.scrollTop,
-					current: [...pie.querySelectorAll<HTMLAnchorElement>('a[href]')]
+					current: [...document.querySelectorAll<HTMLElement>('#wallet-toc li')]
 						.filter(
-							link =>
-								getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() ===
-								'center',
+							item =>
+								getComputedStyle(item, item.querySelector(':scope > details') ? '::before' : null)
+									.scrollSnapAlign === 'center',
 						)
-						.map(link => link.hash),
+						.map(
+							item =>
+								item.querySelector<HTMLAnchorElement>(':scope > a, :scope > details > summary > a')
+									?.hash,
+						),
 					angle: parseFloat(style.rotate),
 					icons: [group, attribute].map(({ href }) => {
 						const link = links.find(candidate => candidate.hash === href)
@@ -161,6 +166,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 				cases.push({ href: destination.href, boundary, expected: -90 - midAngle, samples })
 			}
 			// Find the real shared-current handoff without forcing a destination state.
+			await seek(0)
 			const ordered = destinations
 				.map(item => ({ ...item, world: root.scrollTop + item.target.getBoundingClientRect().top }))
 				.sort((a, b) => a.world - b.world)
@@ -221,7 +227,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 		for (const destination of result.cases) {
 			for (const sample of destination.samples) {
 				expect(Math.abs(sample.scroll - sample.requested)).toBeLessThanOrEqual(1)
-				expect(sample.icons.filter(icon => icon.visible)).toHaveLength(width > 1024 ? 2 : 1)
+				expect(sample.icons.filter(icon => icon.visible)).toHaveLength(2)
 
 				for (const icon of sample.icons.filter(icon => icon.visible)) {
 					expect(icon.uprightError, icon.href).toBeLessThan(0.05)
@@ -255,13 +261,40 @@ const enhancedNavigation = () =>
 const settleFrames = () =>
 	new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
 
-const selectedDestinations = (links: Element[]) =>
-	links
-		.filter(
-			link =>
-				getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-		)
-		.map(link => new URL(link.getAttribute('href')!, document.baseURI).hash)
+const observeToc = (element: Element) => {
+	const rows = [...element.querySelectorAll('li')].map(item => {
+		const link = item.querySelector<HTMLAnchorElement>(':scope > a, :scope > details > summary > a')
+
+		if (!link) {
+			throw Error('Each TOC snap owner needs its destination link')
+		}
+
+		return {
+			link,
+			href: link.hash,
+			align: getComputedStyle(item, item.querySelector(':scope > details') ? '::before' : null)
+				.scrollSnapAlign,
+			current: Number.parseFloat(getComputedStyle(link).getPropertyValue('---link-current')),
+		}
+	})
+	const selected = rows.filter(row => row.align === 'center')
+	const target = selected[0]?.link.getBoundingClientRect()
+	const port = element.getBoundingClientRect()
+
+	return {
+		selected: selected.map(row => row.href),
+		areas: rows.filter(row => row.align !== 'none').map(row => row.href),
+		currentPaint: selected.map(({ href, current }) => ({ href, current })),
+		visible:
+			selected.length === 1 &&
+			target !== undefined &&
+			target.width > 0 &&
+			target.height > 0 &&
+			selected[0].link.checkVisibility() &&
+			target.top >= Math.max(0, port.top) &&
+			target.bottom <= Math.min(innerHeight, port.bottom),
+	}
+}
 
 test('local stage criterion clicks retain the wallet variant and native page identity', async ({
 	page,
@@ -966,49 +999,78 @@ test('native TOC overlay animates from flow and compact states and survives reop
 						animation.timeline instanceof DocumentTimeline &&
 						Number.isFinite(animation.effect?.getComputedTiming().endTime),
 				)
+		const listeners = new AbortController()
+		let timer = 0
 		const finishedPromise = (async () => {
-			const deadline = performance.now() + 10000
+			await new Promise<void>((resolve, reject) => {
+				panel.addEventListener(
+					'toggle',
+					event => {
+						if (event.newState !== 'closed') {
+							return
+						}
 
-			while (performance.now() < deadline) {
-				await frame()
-				const opacity = Number(getComputedStyle(panel).opacity)
-				const closing = finiteEffects().filter(animation => animation.playState === 'running')
+						listeners.abort()
+						clearTimeout(timer)
+						resolve()
+					},
+					{ signal: listeners.signal },
+				)
+				timer = window.setTimeout(() => reject(Error('Native TOC closing event required')), 10000)
+			})
+			const closing = finiteEffects().filter(animation => animation.playState === 'running')
 
-				if (
-					!panel.matches(':popover-open') &&
-					panel.inert &&
-					panel.hasAttribute('data-closing') &&
-					opacity > 0 &&
-					opacity < 0.999 &&
-					closing.length
-				) {
-					const interrupted = { opacity, effects: closing.length }
-					const finished = closing.map(animation => animation.finished)
-					const button = document.querySelector('button[popovertarget="wallet-toc"]')
-
-					if (!(button instanceof HTMLButtonElement)) {
-						return null
-					}
-
-					button.click()
-					await Promise.allSettled(finished)
-					await frame()
-					await Promise.allSettled(finiteEffects().map(animation => animation.finished))
-					await frame()
-
-					return {
-						interrupted,
-						open: panel.matches(':popover-open'),
-						inert: panel.inert,
-						closing: panel.hasAttribute('data-closing'),
-					}
-				}
+			if (
+				panel.matches(':popover-open') ||
+				!panel.inert ||
+				!panel.hasAttribute('data-closing') ||
+				!closing.length
+			) {
+				throw Error('Native close must retain its inert exit state and active effects')
 			}
 
-			return null
+			for (const animation of closing) {
+				animation.pause()
+				const timing = animation.effect!.getComputedTiming()
+
+				animation.currentTime = Number(timing.delay) + Number(timing.activeDuration) / 2
+			}
+			const opacity = Number(getComputedStyle(panel).opacity)
+			const button = document.querySelector('button[popovertarget="wallet-toc"]')
+
+			if (!(button instanceof HTMLButtonElement) || !(opacity > 0 && opacity < 0.999)) {
+				throw Error('An actual intermediate closing pose and native invoker are required')
+			}
+
+			const interrupted = { opacity, effects: closing.length, controlledPhase: 0.5 }
+			const finished = closing.map(animation => animation.finished)
+
+			for (const animation of closing) {
+				animation.play()
+			}
+			button.click()
+			await Promise.allSettled(finished)
+			await frame()
+			await Promise.allSettled(finiteEffects().map(animation => animation.finished))
+			await frame()
+
+			return {
+				interrupted,
+				open: panel.matches(':popover-open'),
+				inert: panel.inert,
+				closing: panel.hasAttribute('data-closing'),
+			}
 		})()
 
-		return { finishedPromise }
+		void finishedPromise.catch(() => {})
+
+		return {
+			finishedPromise,
+			dispose() {
+				listeners.abort()
+				clearTimeout(timer)
+			},
+		}
 	})
 	let reopening
 
@@ -1016,11 +1078,11 @@ test('native TOC overlay animates from flow and compact states and survives reop
 		await page.keyboard.press('Escape')
 		reopening = await armed.evaluate(async state => state.finishedPromise)
 	} finally {
-		await armed.dispose()
-	}
-
-	if (reopening === null) {
-		throw new Error('No native in-progress closing effect was observed before reopening')
+		try {
+			await armed.evaluate(state => state.dispose())
+		} finally {
+			await armed.dispose()
+		}
 	}
 
 	expect(await idlePaint()).toEqual({ blur: 'none', opacity: '0', hit: true })
@@ -1095,7 +1157,7 @@ test('native TOC overlay animates from flow and compact states and survives reop
 		body: JSON.stringify(
 			{
 				limits:
-					'Computed phase samples verify native transitions, not compositor eligibility or frame pacing.',
+					'Computed phase samples and event-bound interruption at half the native exit duration verify transition and reopening behavior, not default-duration response, compositor eligibility or frame pacing.',
 				reopening,
 				observations,
 			},
@@ -1133,7 +1195,6 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			element.style.scrollSnapType = 'none'
 		})
 		const toc = page.locator('#wallet-toc')
-		const port = page.locator(width > 1024 ? '.page-navigation' : '#wallet-toc')
 
 		if (width === 390) {
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
@@ -1159,35 +1220,16 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 					behavior: 'instant',
 				})
 			}, id)
-		const currentVisible = async () =>
-			port.evaluate(element => {
-				const current = [
-					...document.querySelectorAll<HTMLAnchorElement>('#wallet-toc a[href]'),
-				].find(
-					link =>
-						getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-				)
-
-				if (!current) {
-					return false
-				}
-
-				const target = current.getBoundingClientRect(),
-					port = element.getBoundingClientRect()
-
-				return (
-					target.top >= Math.max(0, port.top) && target.bottom <= Math.min(innerHeight, port.bottom)
-				)
-			})
+		const currentVisible = async () => (await toc.evaluate(observeToc)).visible
 
 		await seek('private-transfers')
 
-		if (width <= 1024 && !(await toc.evaluate(element => element.matches(':popover-open')))) {
+		if (width <= 1344 && !(await toc.evaluate(element => element.matches(':popover-open')))) {
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
 		}
 
 		await expect
-			.poll(() => toc.locator('a[href]').evaluateAll(selectedDestinations))
+			.poll(async () => (await toc.evaluate(observeToc)).selected)
 			.toEqual(['#private-transfers'])
 		await expect.poll(currentVisible).toBe(true)
 
@@ -1195,8 +1237,8 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 		expect(box).not.toBeNull()
 		await page.mouse.move(box!.x + 20, Math.min(700, Math.max(80, box!.y + 50)))
-		await expect(port).toHaveCSS('scroll-snap-type', 'none')
-		const beforeWheel = await port.evaluate(element => ({
+		await expect(toc).toHaveCSS('scroll-snap-type', 'none')
+		const beforeWheel = await toc.evaluate(element => ({
 			top: element.scrollTop,
 			range: element.scrollHeight - element.clientHeight,
 		}))
@@ -1206,28 +1248,50 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			beforeWheel.top > beforeWheel.range / 2
 				? -Math.min(200, beforeWheel.top)
 				: Math.min(200, beforeWheel.range - beforeWheel.top)
-		const end = port.evaluate(
-			element =>
-				new Promise<void>((resolve, reject) => {
-					const timeout = setTimeout(
-						() => reject(new Error('Native TOC wheel scroll did not end')),
-						3500,
-					)
+		const end = await toc.evaluateHandle(element => {
+			let onEnd: () => void
+			let timeout: ReturnType<typeof setTimeout>
+			const finished = new Promise<void>((resolve, reject) => {
+				onEnd = () => {
+					clearTimeout(timeout)
+					resolve()
+				}
+				timeout = setTimeout(() => reject(new Error('Native TOC wheel scroll did not end')), 3500)
+				element.addEventListener('scrollend', onEnd, { once: true })
+			})
 
-					element.addEventListener(
-						'scrollend',
-						() => {
-							clearTimeout(timeout)
-							resolve()
-						},
-						{ once: true },
-					)
+			void finished.catch(() => {})
+
+			return {
+				finished,
+				cleanup: () => {
+					clearTimeout(timeout)
+					element.removeEventListener('scrollend', onEnd)
+				},
+			}
+		})
+
+		try {
+			await page.mouse.wheel(0, wheelDelta)
+			await end.evaluate(state => state.finished)
+		} finally {
+			await info.attach(`toc-wheel-${width}`, {
+				body: JSON.stringify({
+					before: beforeWheel,
+					delta: wheelDelta,
+					after: await toc.evaluate(element => ({
+						top: element.scrollTop,
+						range: element.scrollHeight - element.clientHeight,
+						hover: element.matches(':hover'),
+					})),
 				}),
-		)
+				contentType: 'application/json',
+			})
+			await end.evaluate(state => state.cleanup())
+			await end.dispose()
+		}
 
-		await page.mouse.wheel(0, wheelDelta)
-		await end
-		const hovering = await port.evaluate(element => element.scrollTop)
+		const hovering = await toc.evaluate(element => element.scrollTop)
 
 		expect(
 			Math.abs(hovering - beforeWheel.top),
@@ -1236,33 +1300,15 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 		await seek('address-resolution')
 		await expect
-			.poll(() => toc.locator('a[href]').evaluateAll(selectedDestinations))
+			.poll(async () => (await toc.evaluate(observeToc)).selected)
 			.toEqual(['#address-resolution'])
 		await page.evaluate(settleFrames)
-		expect(Math.abs((await port.evaluate(element => element.scrollTop)) - hovering)).toBeLessThan(1)
+		expect(Math.abs((await toc.evaluate(element => element.scrollTop)) - hovering)).toBeLessThan(1)
 
 		await page.mouse.move(0, 0)
-		await expect(port).toHaveCSS('scroll-snap-type', 'block mandatory')
+		await expect(toc).toHaveCSS('scroll-snap-type', 'block mandatory')
 		await expect.poll(currentVisible).toBe(true)
-		const areas = await toc
-			.locator('a')
-			.evaluateAll(links =>
-				links
-					.filter(link => getComputedStyle(link).scrollSnapAlign !== 'none')
-					.map(link => new URL(link.getAttribute('href')!, document.baseURI).hash),
-			)
-
-		const currentPaint = await toc.locator('a[href]').evaluateAll(links =>
-			links
-				.filter(
-					link =>
-						getComputedStyle(link).getPropertyValue('---navigation-snapAlign').trim() === 'center',
-				)
-				.map(link => ({
-					href: new URL(link.getAttribute('href')!, document.baseURI).hash,
-					current: Number.parseFloat(getComputedStyle(link).getPropertyValue('---link-current')),
-				})),
-		)
+		const { areas, currentPaint, selected } = await toc.evaluate(observeToc)
 
 		expect(currentPaint).toHaveLength(1)
 		expect(
@@ -1270,11 +1316,11 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 			'The unique current snap destination retains shared current paint state',
 		).toBe(1)
 		expect(areas).toHaveLength(1)
-		expect(areas).toEqual(await toc.locator('a[href]').evaluateAll(selectedDestinations))
+		expect(areas).toEqual(selected)
 		observations.push({
 			width,
 			hovering,
-			resumed: await port.evaluate(element => element.scrollTop),
+			resumed: await toc.evaluate(element => element.scrollTop),
 			areas,
 		})
 	}

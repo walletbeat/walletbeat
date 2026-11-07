@@ -4,8 +4,8 @@ import { dirname } from 'node:path'
 
 import sharp from 'sharp'
 
-import { semanticOutline } from '../../../tests/browser/semantic-outline.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
+import { semanticOutline } from './fixtures/semantic-outline.mjs'
 
 const contractHash = createHash('sha256')
 	.update(
@@ -13,7 +13,7 @@ const contractHash = createHash('sha256')
 	)
 	.digest('hex')
 
-for (const width of [390, 768, 1024, 1025, 1440]) {
+for (const width of [390, 768, 1344, 1345, 1440]) {
 	test(`structure at ${width}px`, async ({ page, browserName }, info) => {
 		await page.setViewportSize({ width, height: 900 })
 		const response = await page.goto('/__wallet-page/software/', {
@@ -159,13 +159,14 @@ for (const width of [390, 768, 1024, 1025, 1440]) {
 				exact: true,
 			})
 
-			if (width <= 1024) {
-				await expect(visibleLandmark).toHaveCount(0)
+			await expect(visibleLandmark).toBeVisible()
+
+			if (width <= 1344) {
+				await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
 				await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
-				await expect(visibleLandmark).toBeVisible()
+				await expect(page.locator('#wallet-toc:popover-open')).toBeVisible()
 				await page.keyboard.press('Escape')
-				await expect(visibleLandmark).toHaveCount(0)
-			} else {
+				await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
 				await expect(visibleLandmark).toBeVisible()
 			}
 		})
@@ -413,7 +414,7 @@ test('accessible native control names across ordinary and open navigation', asyn
 
 		await check('ordinary')
 
-		if (width <= 1024) {
+		if (width <= 1344) {
 			const trigger = page.getByRole('button', { name: 'Table of contents', exact: true })
 
 			await trigger.focus()

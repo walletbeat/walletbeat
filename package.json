@@ -72,7 +72,7 @@
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.6.5",
-		"astro": "7.4.0",
+		"astro": "7.4.1",
 		"autoprefixer": "^10.5.4",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.6",
@@ -86,7 +86,7 @@
 		"wagmi": "3.7.7"
 	},
 	"devDependencies": {
-		"@astrojs/check": "^0.9.10",
+		"@astrojs/check": "^0.9.11",
 		"@astrojs/markdown-satteri": "^0.4.4",
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
 		"@fleek-platform/cli": "^3.9.4",

@@ -144,7 +144,7 @@
 					{@attach (input: HTMLInputElement) => {
 						const abortController = new AbortController()
 
-						const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
+						const isMobileNav = globalThis.matchMedia('(max-width: 84rem)')
 
 						const openNavPopover = () => {
 							const navPopover = input.closest('[popover]')
@@ -340,7 +340,7 @@
 		}
 
 		search {
-			@media (max-width: 1024px) {
+			@media (max-width: 84rem) {
 				order: 1;
 			}
 
@@ -387,7 +387,7 @@
 				&[data-sticky-container] {
 					--sticky-marginBlockStart: var(--nav-search-blockSize);
 
-					@media (max-width: 1024px) {
+					@media (max-width: 84rem) {
 						--sticky-marginBlockStart: 0px;
 						--sticky-marginBlockEnd: var(--nav-search-blockSize);
 					}
