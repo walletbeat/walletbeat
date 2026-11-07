@@ -151,7 +151,21 @@ for (const width of [390, 1440]) {
 				expect(state.rect.width).toBeGreaterThan(state.rect.height)
 				expect(Number.parseFloat(state.radius)).toBeGreaterThanOrEqual(state.rect.height / 2)
 				expect(Number.parseFloat(state.padding)).toBeGreaterThan(0)
-				await picker.click()
+				const center = {
+					x: state.rect.x + state.rect.width / 2,
+					y: state.rect.y + state.rect.height / 2,
+				}
+
+				await expect
+					.poll(() =>
+						picker.evaluate(
+							(select, point) =>
+								document.elementFromPoint(point.x, point.y)?.closest('select') === select,
+							center,
+						),
+					)
+					.toBe(true)
+				await page.mouse.click(center.x, center.y)
 				await expect.poll(() => picker.evaluate(select => select.matches(':open'))).toBe(true)
 				await page.keyboard.press('Escape')
 				await expect.poll(() => picker.evaluate(select => select.matches(':open'))).toBe(false)
