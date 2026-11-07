@@ -1206,7 +1206,7 @@
 				{:else if column.id === 'wallet'}
 					{@const displayName = wallet.metadata.displayName}
 
-					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant, model: selectedModels.get(wallet.metadata.id) })}
 					{@const identityId = walletIdentityId(wallet.metadata.id)}
 
 					<TooltipOrAccordion
@@ -1275,7 +1275,7 @@
 										>{displayName}</a>
 										</h3>
 
-										{#if 'hardware' in wallet.variants}
+										{#if hasVariant(wallet.variants, Variant.HARDWARE)}
 											{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
 
 											{#if brandModels.length > 1}
@@ -1293,7 +1293,7 @@
 													}
 													options={[
 														{ value: undefined, label: 'All models' },
-														...brandModels.map(m => ({ value: m.id.split('.')[1], label: `${m.modelName}`, icon: m.iconUrl })),
+														...brandModels.map(m => ({ value: m.modelId, label: `${m.modelName}`, icon: m.iconUrl })),
 													]}
 												/>
 											{/if}
@@ -1365,7 +1365,7 @@
 					</TooltipOrAccordion>
 
 				{:else if column.id === 'displayName'}
-					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant, model: selectedModels.get(wallet.metadata.id) })}
 					{@const identityId = walletIdentityId(wallet.metadata.id)}
 
 					<div

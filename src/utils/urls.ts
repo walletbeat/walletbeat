@@ -5,11 +5,12 @@ import type { Variant } from '@/schema/variants'
 import { slugifyCamelCase } from '@/types/utils/text'
 
 /**
- * Returns the relative URL for a wallet page, optionally including a variant
- * query parameter and/or an anchor.
+ * Returns the relative URL for a wallet page with optional variant and model
+ * query parameters and an attribute fragment.
  *
  * @param wallet - An object carrying `metadata.id` (e.g. `RatedWallet`, `BaseWallet`).
  * @param options.variant - When set, appends `?variant=<variant>` to the URL.
+ * @param options.model - Canonical hardware model ID for the report selection.
  * @param options.attributeAnchor - When set, appends `#<anchor>` to the URL.
  *   Pass a pre-formatted slug (e.g. the result of `slugifyCamelCase(id)`).
  *
@@ -30,17 +31,31 @@ export function getWalletUrl(
 	wallet: { metadata: { id: string } },
 	options?: {
 		variant?: Variant | null
+		model?: string | null
 		attributeAnchor?: string | null
 	},
 ): string {
 	const slug = wallet.metadata.id
 	const variant = options?.variant ?? null
+	const model = options?.model ?? null
 	const attributeAnchor = options?.attributeAnchor ?? null
 
 	let url = `/${slug}/`
 
+	const params = new URLSearchParams()
+
 	if (variant !== null) {
-		url += `?variant=${variant}`
+		params.set('variant', variant)
+	}
+
+	if (model !== null) {
+		params.set('model', model)
+	}
+
+	const query = params.toString()
+
+	if (query !== '') {
+		url += `?${query}`
 	}
 
 	if (attributeAnchor !== null) {
