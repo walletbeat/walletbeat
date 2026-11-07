@@ -45,3 +45,20 @@ Run `WALLET_PAGE_NATIVE_RESIZE=1 pnpm test:browser:collect src/views/WalletPage.
 The journey retains clock markers, native window command acknowledgments, passive browser frame data, a compressed rendering trace, a final screenshot and the existing source/browser identity attachments. Geometry polling occurs before or after the timed journey. A passing collection proves successful capture and eventual viewport delivery; performance remains explicitly unverified pending trace/pixel review and qualified, source-equivalent comparisons. Frame-stream timestamps are not physical-display deadlines. Keep failed captures as evidence; do not promote presentation-changing ablations into causal acceptance.
 
 The existing `WALLET_PAGE_REAL_CHROME_PERFORMANCE=1` headed performance project can collect a focused diagnostic without `WALLET_PAGE_FIRST_PASS`. These captures explicitly report `diagnosticOnly: true` and do not establish performance acceptance. Diagnostic mode loads without CPU throttling before applying the 6x scroll profile; with a first-pass report, the original 6x startup profile is retained. When a first-pass report is supplied, its source, completion, and contract hash must still match. Final performance acceptance requires structural coverage and inspection of the native trace and presentation evidence.
+
+### Native WebKit held-key verification
+
+Use an explicitly selected WebKitTestRunner distribution against the source-matched fixture server. This separate engine witness does not skip or reinterpret a failing bundled Playwright test. The executable and a new absolute private artifact directory are required; no browser installation is performed.
+
+```sh
+WALLET_WEBKIT_RUNNER=/absolute/native/Release/WebKitTestRunner \
+WALLET_PAGE_URL=http://127.0.0.1:4558/__wallet-page/credits/ \
+WALLET_PAGE_RESULTS=/absolute/project-private-artifacts/native-keyboard-new-run \
+node src/views/WalletPage.tests/native-keyboard.mjs
+```
+
+The runner uses the executable's directory for DYLD framework/library lookup; set `WALLET_WEBKIT_FRAMEWORKS` to an absolute directory when the distribution requires another location. It records the executable hash and requested framework path, not an independently proven loaded-engine revision. Retain distribution provenance alongside the result.
+
+The native window is 390 × 900 CSS pixels. Source/build identity, visibility, focus, the native counter positive control and the cumulative-inset H1 endpoint are checked before the journey. After each of four five-key batches, the test verifies trusted keydown/keyup delivery, frame advancement, retained focus and visibility, and forward travel. The output retains stdout, stderr, generated native fixture and JSON result; timeout, missing APIs, source mismatch and failed travel fail the command. The fixture must also expose a closed Security News incident: its entry-flow boundary is checked closed, open and closed again. This is keyboard/disclosure-boundary coverage, not scroll-event/scrollend, compositor or performance acceptance.
+
+The approach differs from the Playwright H1 journey: this witness seeks the independently calibrated H1 endpoint programmatically with snapping enabled, then uses WebKitTestRunner held raw keys. It does not reproduce the Playwright binary seek with snapping temporarily disabled, page-focused trusted wheel approach, or scroll/scrollend delivery assertions. A pass cannot invalidate a failing Playwright wheel-to-key journey. The native fixture uses a fresh 390 × 900 shown window and the user-selected distribution, not Playwright’s browser embedding.
