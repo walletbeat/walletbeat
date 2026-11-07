@@ -597,6 +597,7 @@ for (const wallet of ['metamask', 'ambire']) {
 
 for (const selector of [
 	'.attribute-group section.attribute > details',
+	'.attribute-group section.attribute > details details',
 	'#stages section > details',
 	'#security-news .news-items > [data-sticky-breadcrumb~="scope"] > details',
 ]) {
@@ -828,6 +829,41 @@ for (const selector of [
 							CSS.supports('color: if(style(---breadcrumb-wrap: 1): red)'),
 						inlineStickyAncestors,
 					}
+					const pie = document.querySelector('.pie-navigation')!
+					const geometry = pie.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+					const pieStyle = getComputedStyle(pie)
+					const maximum = parseFloat(pieStyle.getPropertyValue('--pie-maxR'))
+					const padding = parseFloat(pieStyle.getPropertyValue('--pie-padding'))
+					const radius =
+						((Math.min(geometry.width, geometry.height) / 2) * maximum) / (maximum + padding)
+					const center = {
+						x: geometry.left + geometry.width / 2,
+						y: geometry.top + geometry.height / 2,
+					}
+					const range = document.createRange()
+					const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT)
+					const textClearance = []
+
+					while (walker.nextNode()) {
+						const text = walker.currentNode
+
+						if (!text.textContent?.trim() || text.parentElement?.closest('[aria-hidden="true"]')) {
+							continue
+						}
+
+						range.selectNodeContents(text)
+
+						for (const fragment of range.getClientRects()) {
+							const x = Math.max(fragment.left, Math.min(center.x, fragment.right))
+							const y = Math.max(fragment.top, Math.min(center.y, fragment.bottom))
+
+							textClearance.push({
+								text: text.textContent,
+								box: rect(fragment),
+								clearance: Math.hypot(x - center.x, y - center.y) - radius,
+							})
+						}
+					}
 					const header = document.querySelector('#nav > header')!.getBoundingClientRect()
 					const x = Math.max(0, Math.min(innerWidth - 1, headingBox.left + headingBox.width / 2)),
 						y = headingBox.top + headingBox.height / 2
@@ -853,6 +889,7 @@ for (const selector of [
 						card: rect(box),
 						disclosure: rect(disclosureBox),
 						headingOpacity,
+						textClearance,
 						closedFlow,
 						headingVisible,
 						summary: rect(summaryBox),
@@ -1156,6 +1193,18 @@ for (const selector of [
 				`${label}: focusing preserves the starting scroll position`,
 			).toBeLessThan(0.5)
 			expect(observation.settled.open, `${label}: native closure completed`).toBe(false)
+			expect(
+				observation.settled.textClearance.length,
+				`${label}: actual heading text is measured`,
+			).toBeGreaterThan(0)
+
+			for (const fragment of observation.settled.textClearance) {
+				expect(Number.isFinite(fragment.clearance)).toBe(true)
+				expect(
+					fragment.clearance,
+					`${label}: heading fragment clears pie: ${fragment.text}`,
+				).toBeGreaterThanOrEqual(-1)
+			}
 			const layer = observation.settled.closedFlow
 
 			if (layer.enhanced) {

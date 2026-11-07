@@ -370,7 +370,7 @@ Prerequisites: Natural end clusters in §6, heading life cycle in §10 and pie p
 
 - **⭕ `ClearanceEasing`** Dodge departure/return uses exponential-family easing and remains collision-free. A visually matched smooth path/contact approximation is allowed.
 
-- **⭕ `ClosedClearance`** Closing a details does not exempt its still-visible summary end content or chevron from pie clearance.
+- **⭕ `ClosedClearance`** Closing a details does not exempt its still-visible summary end content or chevron from pie clearance. A closed summary title follows ordinary scroll travel behind the pie; it must remain readable at snap and anchor landings. The chevron continues to dodge.
 
 ## 17. TOC placement, popover structure and page chrome
 
