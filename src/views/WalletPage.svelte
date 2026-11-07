@@ -2823,7 +2823,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				}
 			}
 			[data-sticky-breadcrumb~="root"] {
-				--stickyBreadcrumb-occlusionBlockEnd: calc(var(---pie-compactBlockStart) + var(---pie-compactSize));
+				> article {
+					@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
+						--stickyBreadcrumb-occlusionBlockEnd: calc(var(---pie-compactBlockStart) + var(---pie-compactSize));
+					}
+				}
 				--stickyBreadcrumb-clearance: circle;
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);
 				:global(article) {

@@ -61,6 +61,104 @@ for (const width of [390, 934, 1440]) {
 	})
 }
 
+function observePaintedPieBackdrop(enhanced: boolean) {
+	if (
+		!enhanced ||
+		!CSS.supports('clip-path', 'shape(from 0 0, line to 1px 1px, close)') ||
+		!matchMedia('(width <= 84rem)').matches
+	) {
+		return { applicable: false, reason: 'Persistent mobile pie is not applicable' } as const
+	}
+
+	const pie = document.querySelector('.pie-navigation')
+	const geometry = pie?.querySelector(':scope > .pie-navigation-geometry')
+
+	if (!pie || !geometry) {
+		throw new Error('The pie backdrop and its geometry owner are required')
+	}
+
+	const paint = getComputedStyle(pie, '::before')
+	const owner = getComputedStyle(geometry)
+	const properties = [
+		'position',
+		'top',
+		'height',
+		'width',
+		'transform',
+		'transform-origin',
+		'translate',
+		'scale',
+		'rotate',
+		'box-sizing',
+	]
+	const inputs = Object.fromEntries(
+		properties.map(property => [
+			property,
+			{
+				paint: paint.getPropertyValue(property),
+				owner: owner.getPropertyValue(property),
+			},
+		]),
+	)
+	const rect = geometry.getBoundingClientRect()
+	const clip = /^circle\((\d+(?:\.\d+)?)px(?: at 50% 50%)?\)$/.exec(paint.clipPath)
+	const matrix = new DOMMatrixReadOnly(owner.transform === 'none' ? undefined : owner.transform)
+	const visiblePaint =
+		paint.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+		(paint.backdropFilter !== '' && paint.backdropFilter !== 'none')
+	const diagnostics = {
+		inputs,
+		clip: paint.clipPath,
+		content: paint.content,
+		display: paint.display,
+		visibility: paint.visibility,
+		opacity: paint.opacity,
+		background: paint.backgroundColor,
+		backdropFilter: paint.backdropFilter,
+		rect: {
+			top: rect.top,
+			bottom: rect.bottom,
+			left: rect.left,
+			right: rect.right,
+			width: rect.width,
+			height: rect.height,
+		},
+	}
+
+	if (
+		pie.matches('[data-wallet-toc-state="open"], [data-wallet-toc-state="closing"]') ||
+		Object.values(inputs).some(input => input.paint !== input.owner) ||
+		owner.position !== 'fixed' ||
+		owner.boxSizing !== 'border-box' ||
+		owner.rotate !== 'none' ||
+		owner.scale !== 'none' ||
+		!matrix.is2D ||
+		matrix.b !== 0 ||
+		matrix.c !== 0 ||
+		matrix.a <= 0 ||
+		matrix.a !== matrix.d ||
+		!clip ||
+		Math.abs(Number(clip[1]) * 2 - Number.parseFloat(paint.height)) > 0.01 ||
+		!pie.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) ||
+		!geometry.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) ||
+		!paint.content ||
+		paint.content === 'none' ||
+		paint.content === 'normal' ||
+		paint.display === 'none' ||
+		paint.visibility !== 'visible' ||
+		Number(paint.opacity) <= 0 ||
+		!visiblePaint ||
+		![rect.top, rect.bottom, rect.height].every(Number.isFinite) ||
+		rect.height <= 0 ||
+		rect.bottom <= 0 ||
+		rect.top >= innerHeight
+	) {
+		throw new Error('Unqualified persistent painted pie backdrop: ' + JSON.stringify(diagnostics))
+	}
+
+	return { applicable: true, bottom: rect.bottom, diagnostics } as const
+}
+
 for (const width of [390, 690, 1440]) {
 	test(`native summary measurements belong to every rendered sticky owner at ${width}px`, async ({
 		page,
@@ -225,6 +323,8 @@ for (const width of [390, 690, 1440]) {
 		expect(proseSnapOwners.length).toBeGreaterThan(0)
 		expect(proseSnapOwners.filter(owner => owner.snap !== 'start')).toEqual([])
 
+		const pieCapability = await page.evaluate(qualifyNativeBreadcrumbClock)
+
 		for (const { label: selector, target } of targets) {
 			const chain = await target.evaluate(element => {
 				const owners = []
@@ -293,7 +393,13 @@ for (const width of [390, 690, 1440]) {
 					const rootTop = root.getBoundingClientRect().top + root.clientTop
 					const rawPadding = getComputedStyle(root).scrollPaddingBlockStart
 					const padding = rawPadding === 'auto' ? 0 : parseFloat(rawPadding)
-					const margin = parseFloat(getComputedStyle(element).scrollMarginBlockStart)
+					const style = getComputedStyle(element)
+					const margin = parseFloat(style.scrollMarginBlockStart)
+					const proseBreathingRoom = element.matches(
+						'[data-scroll-item~="snap-prose"] > :not([data-sticky-container]), [data-scroll-item~="snap-prose"] :is(p, li):not([data-sticky-container])',
+					)
+						? parseFloat(style.getPropertyValue('---column-gap')) / 2
+						: 0
 					const top = element.getBoundingClientRect().top
 					const requested = root.scrollTop + top - rootTop - padding - margin
 					const maximum = root.scrollHeight - root.clientHeight
@@ -304,6 +410,7 @@ for (const width of [390, 690, 1440]) {
 						rootTop,
 						padding,
 						margin,
+						proseBreathingRoom,
 						top,
 						requested,
 						maximum,
@@ -415,6 +522,15 @@ for (const width of [390, 690, 1440]) {
 							}
 						}
 					}
+					const pieBackdrop = await page.evaluate(
+						observePaintedPieBackdrop,
+						pieCapability.applicable,
+					)
+
+					if (pieBackdrop.applicable) {
+						occupiedBottom = Math.max(occupiedBottom, pieBackdrop.bottom)
+					}
+
 					const top = await target.evaluate(element => element.getBoundingClientRect().top)
 					const landing = await target.evaluate(landingState)
 					const travel = landing.scroll - beforeLanding.scroll
@@ -433,8 +549,14 @@ for (const width of [390, 690, 1440]) {
 
 					if (selector.startsWith('data-credit-')) {
 						expect(
-							Math.abs(landing.rootTop + landing.padding + landing.margin - occupiedBottom),
-							`${selector}: authored margin agrees with actual cumulative painted inset even when range-clamped`,
+							Math.abs(
+								landing.rootTop +
+									landing.padding +
+									landing.margin -
+									occupiedBottom -
+									landing.proseBreathingRoom,
+							),
+							`${selector}: authored margin agrees with actual cumulative painted inset even when range-clamped: ${JSON.stringify({ landing, occupiedBottom, pieBackdrop })}`,
 						).toBeLessThanOrEqual(3)
 					}
 
@@ -444,6 +566,7 @@ for (const width of [390, 690, 1440]) {
 						direction,
 						top,
 						occupiedBottom,
+						pieBackdrop,
 						observation,
 						landing,
 						beforeLanding,

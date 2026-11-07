@@ -872,7 +872,7 @@ declare global {
 		 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling override; defaults to the shared curve or OutExpo
 		 * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
 		 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
-		 * - `--stickyBreadcrumb-occlusionBlockEnd`: viewport block-end of lateral sticky content; closed disclosure landings clear this extent without changing breadcrumb geometry
+		 * - `--stickyBreadcrumb-occlusionBlockEnd`: painted viewport block-end of lateral sticky content; section and prose landings clear the cumulative sticky extent without changing breadcrumb motion
 		 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
 		 * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
 		 *

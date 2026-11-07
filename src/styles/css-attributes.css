@@ -1684,7 +1684,7 @@ ol {
  * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling override; defaults to the shared curve or OutExpo
  * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
- * - `--stickyBreadcrumb-occlusionBlockEnd`: viewport block-end of lateral sticky content; closed disclosure landings clear this extent without changing breadcrumb geometry
+ * - `--stickyBreadcrumb-occlusionBlockEnd`: painted viewport block-end of lateral sticky content; section and prose landings clear the cumulative sticky extent without changing breadcrumb motion
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
  * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
  *
@@ -1758,13 +1758,10 @@ ol {
 		[id][data-sticky-container]:has(> [data-sticky])
 	) {
 		scroll-snap-align: start;
-		scroll-margin-block-start: var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart));
-		&:is(details:not([open]), :has(> details:not([open]))) {
-			scroll-margin-block-start: max(
-				var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart)),
-				calc(var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(--scrollContainer-scrollPaddingBlockStart, 0px))
-			);
-		}
+		scroll-margin-block-start: max(
+			var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart)),
+			calc(var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(--scrollContainer-scrollPaddingBlockStart, 0px))
+		);
 	}
 	&[data-sticky-breadcrumb~="root"] {
 		scroll-margin-block-start: var(--sticky-insetBlockStart);
@@ -2619,7 +2616,10 @@ ol {
 	[data-sticky-breadcrumb~="scope"] {
 		---breadcrumb-parentBlockEnd: var(---breadcrumb-blockEnd);
 		scroll-snap-align: start;
-		scroll-margin-block-start: var(---breadcrumb-parentBlockEnd);
+		scroll-margin-block-start: max(
+			var(---breadcrumb-parentBlockEnd),
+			calc(var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(--scrollContainer-scrollPaddingBlockStart, 0px))
+		);
 	}
 
 	[data-sticky-breadcrumb~="end"] {
@@ -4623,16 +4623,19 @@ ol {
 			&[data-scroll-item~="snap-block-start"],
 			&[data-scroll-item~="snap-prose"] > [data-sticky-container] {
 				scroll-snap-align: start;
-				scroll-margin-block-start: var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart));
+				scroll-margin-block-start: max(
+					var(---breadcrumb-blockEnd, var(--sticky-insetBlockStart)),
+					calc(var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(--scrollContainer-scrollPaddingBlockStart, 0px))
+				);
 			}
 			&[data-scroll-item~="snap-prose"] > :not([data-sticky-container]),
 			&[data-scroll-item~="snap-prose"] :is(p, li):not([data-sticky-container]) {
 				scroll-snap-align: start;
 				scroll-margin-block-start: calc(var(--sticky-insetBlockStart) + var(--sticky-paddingBlockStart) + var(---column-gap) / 2);
 				[data-sticky-breadcrumb~="scope"] :is(&) {
-					scroll-margin-block-start: calc(var(
-						---breadcrumb-blockEnd,
-						calc(var(--sticky-insetBlockStart) + var(--sticky-paddingBlockStart))
+					scroll-margin-block-start: calc(max(
+						var(---breadcrumb-blockEnd, calc(var(--sticky-insetBlockStart) + var(--sticky-paddingBlockStart))),
+						calc(var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(--scrollContainer-scrollPaddingBlockStart, 0px))
 					) + var(---column-gap) / 2);
 				}
 			}
