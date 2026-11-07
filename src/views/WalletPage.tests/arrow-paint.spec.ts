@@ -14,26 +14,12 @@ test('native arrow paint interpolates with a blocked-main positive and CSS-auto 
 	browser,
 	browserName,
 	baseURL,
-	source,
 }, info) => {
 	test.skip(
 		browserName !== 'chromium',
 		'This native paint observer uses Chromium CDP; other engines have native-path checks',
 	)
 	expect(baseURL).toBeTruthy()
-	await info.attach('capture-source', {
-		body: JSON.stringify(source),
-		contentType: 'application/json',
-	})
-	await info.attach('capture-browser', {
-		body: JSON.stringify({
-			name: browserName,
-			version: browser.version(),
-			channel: info.project.use.channel ?? null,
-			requestedExecutable: info.project.use.launchOptions?.executablePath ?? null,
-		}),
-		contentType: 'application/json',
-	})
 	const records: Record<string, unknown>[] = []
 
 	for (const condition of ['blocked-positive', 'native-arrow', 'auto-control'] as const) {
