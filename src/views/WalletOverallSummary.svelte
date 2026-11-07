@@ -20,11 +20,13 @@
 		score,
 		summaryType = WalletSummaryType.None,
 		isInTooltip = false,
+		StageBadge,
 	}: {
 		wallet: RatedWallet<string>
 		score: MaybeUnratedScore
 		summaryType?: WalletSummaryType
 		isInTooltip?: boolean
+		StageBadge?: import('svelte').Snippet
 	} = $props()
 
 
@@ -59,7 +61,7 @@
 			'var(--rating-unrated)'
 	}
 >
-	<header data-row="center gap-3 wrap">
+	<header data-paint data-row="center gap-3 wrap">
 		<h2 data-row="gap-2">
 			<img
 				src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
@@ -71,13 +73,17 @@
 
 	<div data-column="center gap-2" class:tooltip-score={isInTooltip && displaysScore}>
 		{#if summaryType === WalletSummaryType.Stage && stage !== null && ladderEvaluation !== null}
-			Walletbeat stage:
-			<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+			<span data-paint>Walletbeat stage:</span>
+			{#if StageBadge}
+				{@render StageBadge()}
+			{:else}
+				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+			{/if}
 		{:else if displaysScore}
-			Walletbeat score:
-			<ScoreBadge {score} size="large" />
+			<span data-paint>Walletbeat score:</span>
+			<ScoreBadge data-paint {score} size="large" />
 			{#if score?.hasUnratedComponent}
-				<small>*contains unrated components</small>
+				<small data-paint>*contains unrated components</small>
 			{/if}
 		{/if}
 	</div>

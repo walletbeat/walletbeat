@@ -1,0 +1,34 @@
+---
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+import type { SortState } from '@/components/table-sort'
+import type { StageQualificationId } from '@/views/wallet-table-stage'
+
+type Props = {
+	initialStageSelection?: StageQualificationId
+	initialSort?: SortState<string>
+}
+
+const { initialStageSelection, initialSort } = Astro.props
+const summaryHref = '/wallet/summary/'
+---
+
+<Layout
+	metadata={{
+		title: 'Ethereum Wallets - Walletbeat',
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} currentHref={summaryHref} />
+	<main data-column-item='flexible' data-sticky-container data-scroll-item='inline-attached'>
+		<SoftwareWalletTable
+			client:load
+			title='Software Wallets'
+			tableId='software-wallets'
+			{initialSort}
+			{initialStageSelection}
+			stageNavigationBase={summaryHref}
+		/>
+	</main>
+</Layout>

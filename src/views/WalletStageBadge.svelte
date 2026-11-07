@@ -53,6 +53,7 @@
 
 {#snippet badge()}
 <data
+	data-paint
 	data-badge={size}
 	value={stageValue === 'QUALIFIED_FOR_NO_STAGES' ? 'NO_STAGES' : stageValue === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : stageValue}
 	title={stageValue === 'QUALIFIED_FOR_NO_STAGES' ? 'Wallet did not qualify for any stages' : stageValue === 'NOT_APPLICABLE' ? 'Stage rating not applicable to this wallet' : undefined}

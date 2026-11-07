@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { untrack } from 'svelte'
-
 	// Types/constants
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
@@ -10,6 +8,8 @@
 		type Eip7702Row,
 	} from '@/schema/eip-support'
 	import { Rating } from '@/schema/attributes'
+	import { applyFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
+	import { onMount } from 'svelte'
 
 
 	// Props
@@ -23,24 +23,45 @@
 
 
 	// State
-	let activeFilters: Filters<Eip7702Row>['$$prop_def']['activeFilters'] = $state(
+	let activeChoices = $state<Set<FilterChoice<Eip7702Row>>>(
 		new Set()
 	)
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
 
-	let filteredRows: Eip7702Row[] = $state(
-		untrack(() => rows)
-	)
+	const filterSets: FilterSet<Eip7702Row>[] = [{
+		id: 'accountType',
+		label: 'Account Type',
+		cardinality: 'inclusive',
+		match: 'union',
+		choices: [
+			{
+				id: 'accountType-eip7702',
+				label: 'EIP-7702',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.EIP7702,
+			},
+			{
+				id: 'accountType-erc4337',
+				label: 'ERC-4337',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.EIP4337,
+			},
+			{
+				id: 'accountType-eoa',
+				label: 'EOA',
+				icon: KeyIcon,
+				matches: row => row.type === WalletTypeFor7702.NON_7702_EOA,
+			},
+		],
+	}]
+	const matchingRows = $derived(new Set(applyFilterSets(rows, filterSets, activeChoices)))
 
 
 	// Actions
 	let toggleFilterById: Filters<Eip7702Row>['$$prop_def']['toggleFilterById'] = $state(
 		undefined
 	)
-
-	let toggleFilter: Filters<Eip7702Row>['$$prop_def']['toggleFilter'] = $state(
-		undefined
-	)
-
 
 	// Components
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
@@ -67,48 +88,18 @@
 
 		<Filters
 			items={rows}
-			filterGroups={[
-				{
-					id: 'accountType',
-					label: 'Account Type',
-					displayType: 'group',
-					exclusive: false,
-					filters: [
-						{
-							id: 'accountType-eip7702',
-							label: 'EIP-7702',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-									row.type === WalletTypeFor7702.EIP7702,
-						},
-						{
-							id: 'accountType-erc4337',
-							label: 'ERC-4337',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-								row.type === WalletTypeFor7702.EIP4337,
-						},
-						{
-							id: 'accountType-eoa',
-							label: 'EOA',
-							icon: KeyIcon,
-							filterFunction: (row: Eip7702Row) =>
-								row.type === WalletTypeFor7702.NON_7702_EOA,
-						},
-					],
-				},
-			]}
-			bind:activeFilters
-			bind:filteredItems={filteredRows}
-			bind:toggleFilter
+			{filterSets}
+			bind:activeChoices
 			bind:toggleFilterById
 		/>
 	</header>
 
 	<div data-scroll-item="inline-attached underflow-center overflow-start">
 		<Table
-			rows={filteredRows}
+			{rows}
 			rowId={(row: Eip7702Row) => row.id}
+			rowIsDisabled={(row: Eip7702Row) => !matchingRows.has(row)}
+			displaceDisabledRows
 
 			columns={[
 				{
@@ -143,7 +134,7 @@
 		>
 			{#snippet Cell({ row, column, value }: { row: Eip7702Row; column: Column<Eip7702Row>; value: unknown })}
 				{#if column.id === 'wallet'}
-					<div class="wallet-info" data-row>
+					<div data-paint class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
@@ -168,20 +159,15 @@
 					{@const typeFor7702 = row.type}
 
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
-						<Tooltip
-							buttonTriggerPlacement="behind"
-							placement="inline-end"
-						>
-							<button
-								data-tag="eip"
-								aria-label="Filter by EIP-7702"
-								onclick={event => {
+						<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+							{#if interactive}
+								<button data-paint data-tag="eip" aria-label="Filter by EIP-7702" onclick={event => {
 									event.stopPropagation()
 									toggleFilterById!('accountType-eip7702')
-								}}
-							>
-								EIP-7702
-							</button>
+								}}>EIP-7702</button>
+							{:else}
+								<span data-paint data-tag="eip">EIP-7702</span>
+							{/if}
 
 							{#snippet TooltipContent()}
 								<EipDetails eip={eip7702} />
@@ -189,20 +175,15 @@
 						</Tooltip>
 					{:else}
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
-							<Tooltip
-							buttonTriggerPlacement="behind"
-								placement="inline-end"
-							>
-								<button
-									data-tag="eip"
-									aria-label="Filter by ERC-4337"
-									onclick={event => {
+							<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
+								{#if interactive}
+									<button data-paint data-tag="eip" aria-label="Filter by ERC-4337" onclick={event => {
 										event.stopPropagation()
 										toggleFilterById!('accountType-erc4337')
-									}}
-								>
-									ERC-4337
-								</button>
+									}}>ERC-4337</button>
+								{:else}
+									<span data-paint data-tag="eip">ERC-4337</span>
+								{/if}
 
 								{#snippet TooltipContent()}
 									<EipDetails eip={erc4337} />
@@ -211,8 +192,10 @@
 						{:else}
 							{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
 								<button
+									data-paint
 									data-tag="eoa"
 									aria-label="Filter by EOA"
+									disabled={!interactive}
 									onclick={event => {
 										event.stopPropagation()
 										toggleFilterById!('accountType-eoa')
@@ -223,22 +206,22 @@
 							{/if}
 						{/if}
 
-						<small class="muted-text">(non-7702)</small>
+						<small data-paint class="muted-text">(non-7702)</small>
 					{/if}
 
 				{:else if column.id === 'contract'}
 					{@const contract = row.contract}
 
 					{#if contract === undefined}
-						<span class="muted-text">–</span>
+						<span data-paint class="muted-text">–</span>
 					{:else if contract === 'UNKNOWN'}
-						<span class="muted-text">Unknown</span>
+						<span data-paint class="muted-text">Unknown</span>
 					{:else}
 						{@const getContractUrl = (contractAddress: string, anchor?: string) =>
 							`https://etherscan.io/address/${contractAddress}${anchor ? `#${anchor}` : ''}`
 						}
 
-						<div class="contract-info">
+						<div data-paint class="contract-info">
 							<strong>
 								<a
 									href={getContractUrl(contract.address)}
@@ -250,7 +233,7 @@
 							</strong>
 						</div>
 
-						<small>
+						<small data-paint>
 							{#if contract.sourceAvailable}
 								<a
 									href={contract.sourceUrl}
@@ -271,15 +254,15 @@
 					{@const batchingRating = row.batching}
 
 					{#if batchingRating === Rating.PASS}
-						✅
+						<span data-paint>✅</span>
 					{:else if batchingRating === Rating.FAIL}
-						❌
+						<span data-paint>❌</span>
 					{:else}
-						<span class="muted-text">–</span>
+						<span data-paint class="muted-text">–</span>
 					{/if}
 
 				{:else}
-					{value}
+					<span data-paint>{value}</span>
 				{/if}
 			{/snippet}
 		</Table>
@@ -329,9 +312,17 @@
 		}
 	}
 
+	:global([data-tooltip-placement="behind"]):has(> button[data-tag~="eip"]) {
+		display: inline-grid;
+	}
+
 	[data-tag] {
 		&:is(button) {
 			display: inline-flex;
+		}
+
+		&[data-tag~="eip"]:is(button) {
+			min-block-size: 0;
 		}
 	}
 

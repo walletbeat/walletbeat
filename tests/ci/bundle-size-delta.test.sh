@@ -14,7 +14,7 @@ set -euo pipefail
 # of large portions of the site.
 #
 # If either revision's build fails, or no reference branch is an ancestor of
-# HEAD, the test passes vacuously.
+# HEAD, the test passes vacuously. Worktree creation errors fail the test.
 #
 # This test is intentionally NOT part of the default `check:all` runs.
 # It is invoked only by a dedicated CI workflow on pull requests.
@@ -98,16 +98,16 @@ cleanup() {
 trap cleanup EXIT
 
 # Build the given revision in a fresh worktree and print the size of `dist` in
-# bytes on stdout. Returns non-zero if anything goes wrong; the caller then
-# treats the test as passing vacuously.
+# bytes on stdout. Returns 2 for worktree creation errors, or 1 when a build
+# is unavailable and the caller should treat the test as passing vacuously.
 measure_revision() {
 	local rev="$1"
 	local name="$2"
 	local dir="$WORKTREE_ROOT/$name"
 
-	if ! git -C "$ROOT" worktree add --force "$dir" "$rev" >/dev/null 2>&1; then
-		log "Could not create worktree at $rev ($name)."
-		return 1
+	if ! git -c core.longpaths=true -C "$ROOT" worktree add --force "$dir" "$rev" >&2; then
+		log "Could not create worktree at $rev ($name): $dir."
+		return 2
 	fi
 
 	(
@@ -134,16 +134,24 @@ measure_revision() {
 }
 
 log "Building reference ($REFERENCE_HEAD)..."
-if ! REFERENCE_SIZE="$(measure_revision "$REFERENCE_HEAD" "reference")"; then
+REFERENCE_SIZE="$(measure_revision "$REFERENCE_HEAD" "reference")" || {
+	if [[ $? -eq 2 ]]; then
+		log "Reference worktree creation failed; cannot compare bundle sizes."
+		exit 1
+	fi
 	log "Reference build failed; passing vacuously."
 	exit 0
-fi
+}
 
 log "Building current ($CURRENT_HEAD)..."
-if ! CURRENT_SIZE="$(measure_revision "$CURRENT_HEAD" "current")"; then
+CURRENT_SIZE="$(measure_revision "$CURRENT_HEAD" "current")" || {
+	if [[ $? -eq 2 ]]; then
+		log "Current worktree creation failed; cannot compare bundle sizes."
+		exit 1
+	fi
 	log "Current build failed; passing vacuously."
 	exit 0
-fi
+}
 
 log "Reference bundle size: $REFERENCE_SIZE bytes"
 log "Current bundle size: $CURRENT_SIZE bytes"

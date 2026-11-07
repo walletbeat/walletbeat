@@ -525,12 +525,6 @@ describe('codebase integrity', () => {
 		/** Path components that are exempt from the check. */
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
-			'[attrGroupId].astro',
-			'[eip]',
-			'[eip].astro',
-			'[walletName]',
-			'[...slug]',
-			'[...path].[ext].ts',
 			'APPEND_SYSTEM.md',
 		])
 
@@ -551,7 +545,11 @@ describe('codebase integrity', () => {
 						continue
 					}
 
-					if (PATH_COMPONENT_REGEXES.every(regex => !regex.test(component))) {
+					const name = entry.path.startsWith('src/pages/')
+						? component.replace(/\[(?:\.\.\.)?(.+?)\]/g, '$1')
+						: component
+
+					if (PATH_COMPONENT_REGEXES.every(regex => !regex.test(name))) {
 						componentsFailed.push(`${entry.path} (component: ${component})`)
 						break
 					}

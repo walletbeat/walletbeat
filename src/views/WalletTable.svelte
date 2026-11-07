@@ -1,4 +1,5 @@
 <script module lang="ts">
+
 	export enum SummaryVisualization {
 		None = 'none',
 		ScoreDot = 'dot',
@@ -12,18 +13,28 @@
 <script lang="ts" generics="
 	_AttributeGroupId extends string
 ">
+	import { defaultStageQualification, stageQualificationChoices, type StageQualificationId } from './wallet-table-stage'
 	// Types/constants
-	import type { Filter } from '@/components/Filters.svelte'
+	import { applyFilterSets, changeFilterChoice, filterSetIsAvailable, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
+	import { hasVisiblePopoverInvoker, interest, interestDelayMs } from '@/components/interest'
+	import { tooltipUsesDrawer } from '@/components/tooltip-presentation'
 	import type { Column } from '@/components/Table.svelte'
+	import { livePopoverTransition, startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
 	import type { Ladders } from '@/schema/ladders'
+	import type { Eip } from '@/schema/eips'
 	import { variants } from '@/constants/variants'
+	import { eip7702 } from '@/data/eips/eip-7702'
+	import { erc4337 } from '@/data/eips/erc-4337'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import type { AttributeTree } from '@/schema/attribute-groups'
-	import { type Attribute, type OutcomeMetadata, Rating, ratingIcons } from '@/schema/attributes'
+	import { type Attribute, type OutcomeMetadata, Rating, ratingIcons, ratingToColor } from '@/schema/attributes'
 	import { AccountType } from '@/schema/features/account-support'
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { Variant } from '@/schema/variants'
 	import { isRatedEvaluationTreeGroup, type RatedWallet } from '@/schema/wallet'
+	import { WalletType } from '@/schema/wallet-types'
+	import type { SortState } from '@/components/table-sort'
+	import { walletSummaryHref } from './wallet-table-navigation'
 
 
 	// Props
@@ -35,6 +46,9 @@
 		wallets,
 		attributeTree,
 		summaryVisualization = SummaryVisualization.Stage,
+		initialStageSelection = defaultStageQualification,
+		initialSort,
+		stageNavigationBase,
 	}: {
 		tableId?: string,
 		title?: string
@@ -43,22 +57,33 @@
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
 		summaryVisualization?: SummaryVisualization
+		initialStageSelection?: StageQualificationId
+		initialSort?: SortState<string>
+		stageNavigationBase?: string
 	} = $props()
-
-	const walletListUiId = $props.id()
-	const walletListSelectId = `wallet-list-select-${walletListUiId}`
 
 	const attributeGroupList = $derived(
 		Object.values(attributeTree)
 	)
+	const hasMultipleAttributeGroups = $derived(attributeGroupList.length > 1)
+	const attributeRootColumnId = $derived(
+		hasMultipleAttributeGroups ? 'overall' : attributeGroupList[0]?.id
+	)
+	const attributeGroupFlowerGradient = {
+		colors: [Rating.UNRATED, Rating.FAIL, Rating.PARTIAL, Rating.PASS].map(ratingToColor),
+		transparentStopColor: ratingToColor(Rating.UNRATED),
+	}
 
 
 	// State
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
-	let attributeActiveFilters = $state(
-		new SvelteSet<{ id: string, label: string, filterFunction: (item: { attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }) => boolean }>()
+	let attributeActiveChoices = $state(
+		new SvelteSet<FilterChoice<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>()
 	)
+
+	let stageModalWalletId = $state<string>()
+	const stageModalWallet = $derived(wallets.find(wallet => wallet.metadata.id === stageModalWalletId))
 
 	// (Derived)
 	const stageFilterDefinitions = $derived(
@@ -67,7 +92,8 @@
 			([stageId, stage]) => ({
 				id: `stage-${stageId}`,
 				label: stage.label,
-				filterFunction: ({ attribute }: { attribute: Attribute<OutcomeMetadata> }) => (
+				compactLabel: stage.label.replace(/^Stage\s+/u, '').replace('No Stage', '–'),
+				matches: ({ attribute }: { attribute: Attribute<OutcomeMetadata> }) => (
 					isAttributeUsedInStage(attribute, stageId)
 				),
 			})
@@ -86,21 +112,32 @@
 			))
 	)
 
-	let filteredAttributes = $state<Array<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>(
-		[]
+	const attributeFilterSets = $derived([{
+		id: 'stage',
+		label: 'Stage',
+		cardinality: 'inclusive' as const,
+		match: 'union' as const,
+		choices: stageFilterDefinitions,
+	}])
+	const filteredAttributeIds = $derived(
+		attributeActiveChoices.size > 0 ?
+			new Set(applyFilterSets(allAttributes, attributeFilterSets, attributeActiveChoices)
+				.map(attribute => `${attribute.attributeGroupId}.${attribute.attributeId}`))
+		:
+			null
 	)
 
 	const displayedAttributeGroups = $derived.by(() => {
-		let filtered = (
-			wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE]) ?
+		const softwareWallet = wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE])
+		const filtered = (
+			softwareWallet ?
 				// Filter attribute groups to only include non-exempt attributes
 				attributeGroupList
 					.map(attrGroup => ({
 						...attrGroup,
 						attributes: (
 							attrGroup.attributes.filter(({ attribute }) => (
-								wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE])
-									?.overall[attrGroup.id]?.[attribute.id]?.evaluation?.outcome?.rating !== Rating.EXEMPT
+								softwareWallet.overall[attrGroup.id]?.[attribute.id]?.evaluation?.outcome?.rating !== Rating.EXEMPT
 							))
 						),
 					}))
@@ -112,11 +149,7 @@
 		)
 
 		// Filter by stage if any stage filters are active
-		if (attributeActiveFilters.size > 0) {
-			const filteredAttributeIds = new Set(
-				filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
-			)
-
+		if (filteredAttributeIds !== null) {
 			return (
 				filtered
 					.map(attrGroup => ({
@@ -139,44 +172,11 @@
 
 
 	// State
-	let activeFilters = $state(
-		new SvelteSet<Filter<RatedWallet<_AttributeGroupId>>>()
-	)
-
-	const stageZeroWallets = $derived(wallets.filter(wallet => walletQualifiesForStageZero(wallet)))
-
-	const otherWallets = $derived(wallets.filter(wallet => !walletQualifiesForStageZero(wallet)))
-
-	const tableHasStageLadder = $derived(
-		wallets.some(wallet => {
-			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-
-			return stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null
-		}),
-	)
-
-	const showStageListSelect = $derived(
-		tableHasStageLadder && stageZeroWallets.length > 0 && otherWallets.length > 0,
-	)
-
-	let walletListTab = $state<'stage-0' | 'others'>('stage-0')
-
-	const listedWallets = $derived(
-		!showStageListSelect ? wallets : walletListTab === 'others' ? otherWallets : stageZeroWallets,
-	)
-
-	const stageListSelectOptions = $derived([
-		{ value: 'stage-0' as const, label: `Stage 0+ (${stageZeroWallets.length})` },
-		{ value: 'others' as const, label: `Others (${otherWallets.length})` },
-	])
-
-	let filteredWallets = $derived(
-		listedWallets
-	)
-
-	const filteredWalletIds = $derived(
-		new Set(filteredWallets.map(wallet => wallet.metadata.id))
-	)
+	const canHoverDetails = (event: MouseEvent) => {
+		const details = event.currentTarget instanceof Element ? event.currentTarget.closest('details') : null
+		const target = details?.querySelector<HTMLElement>(':scope > [popover]')
+		return details !== null && (details.open || (target != null && hasVisiblePopoverInvoker(details, target)))
+	}
 
 	let selectedAttribute: string | undefined = $state(
 		undefined
@@ -191,10 +191,6 @@
 		attributeGroupId: _AttributeGroupId
 		attributeId?: string
 	} | undefined = $state(
-		undefined
-	)
-
-	let sortedColumn: Column<RatedWallet<_AttributeGroupId>> | undefined = $state(
 		undefined
 	)
 
@@ -217,7 +213,7 @@
 
 	const selectedVariant = $derived.by(() => {
 		// Derive selected variant from active filters
-		const activeVariantFilters = Array.from(activeFilters).filter(filter =>
+		const activeVariantFilters = Array.from(activeChoices).filter(filter =>
 			filter.id.startsWith('variant-') && filter.id !== 'variant-all'
 		)
 
@@ -230,9 +226,9 @@
 		)
 	})
 
-	const hasNonApplicableStages = $derived(
-		filteredWallets.length > 0 &&
-		filteredWallets.every(wallet => {
+	const hasNonApplicableStages = $derived.by(() =>
+		wallets.length > 0 &&
+		wallets.every(wallet => {
 			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 			return stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null
 		})
@@ -263,13 +259,13 @@
 	// Functions
 	import { variantToName } from '@/constants/variants'
 	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
-	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
+	import { evaluatedAttributesEntries } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
 	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
-	import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
+	import { getWalletStageAndLadder, walletStageIndex } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
@@ -286,16 +282,7 @@
 		walletA: RatedWallet<_AttributeGroupId>,
 		walletB: RatedWallet<_AttributeGroupId>,
 	): number => {
-		// Returns -1 for wallets that cleared no stage (or N/A);
-		// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
-		const stageIndex = (wallet: RatedWallet<_AttributeGroupId>): number => {
-			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-			if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
-			if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
-			const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-			return idx >= 0 ? idx : -1
-		}
-		const stageDiff = stageIndex(walletA) - stageIndex(walletB)
+		const stageDiff = (walletStageIndex(walletA) ?? -1) - (walletStageIndex(walletB) ?? -1)
 		if (stageDiff !== 0) return stageDiff
 		const scoreA = getWalletScore(walletA)
 		const scoreB = getWalletScore(walletB)
@@ -303,57 +290,459 @@
 	}
 
 
-	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconID> = {
-		[Variant.BROWSER]: 'wallet_browser',
-		[Variant.DESKTOP]: 'wallet_desktop',
-		[Variant.MOBILE]: 'wallet_mobile',
-		[Variant.EMBEDDED]: 'wallet_embedded',
-		[Variant.HARDWARE]: 'wallet_hardware',
+	/**
+	 * The facets a wallet can be described by. Each facet owns one set of mutually
+	 * comparable values and is the sole author of how that set is filtered, tagged,
+	 * and — once its column is expanded — rendered as a column of its own.
+	 *
+	 * `matches` takes the variant it is asked about: filters compare across every
+	 * variant a wallet ships, while a cell describes the variant being viewed.
+	 */
+	type WalletFacetValue = {
+		id: string
+		label: string
+		/** Tag text, where a cell abbreviates the filter's label. */
+		tagLabel?: string
+		tag?: string
+		eip?: Eip
+		icon?: string
+		matches: (wallet: RatedWallet<_AttributeGroupId>, variant: Variant | 'ALL_VARIANTS') => boolean
 	}
 
-	const mobileAccountTypeFilters = [
-		{ id: 'accountType-eoa', label: 'EOA' },
-		{ id: 'accountType-eip7702', label: 'EIP-7702' },
-		{ id: 'accountType-erc4337', label: 'ERC-4337' },
-		{ id: 'accountType-safe', label: 'safe' },
-		{ id: 'accountType-mpc', label: 'MPC' },
-	] as const
+	type WalletFacet = {
+		id: string
+		label: string
+		cardinality: 'exclusive' | 'inclusive'
+		match: 'union' | 'intersection'
+		defaultChoice?: string
+		appliesTo?: (wallet: RatedWallet<_AttributeGroupId>) => boolean
+		values: WalletFacetValue[]
+	}
 
-	const activeFilterIds = $derived(
-		new Set(Array.from(activeFilters).map(f => f.id))
+	const accountTypeMatches = (accountType: AccountType) => (
+		(wallet: RatedWallet<_AttributeGroupId>, variant: Variant | 'ALL_VARIANTS') => {
+			const accountTypes = walletSupportedAccountTypes(wallet, variant)
+			return accountTypes !== null && accountType in accountTypes
+		}
 	)
 
-	const activeStageFilterIds = $derived(
-		new Set(Array.from(attributeActiveFilters).map(f => f.id))
-	)
-
-	const visibleMobileAccountTypeFilterIds = $derived(
-		new Set(
-			wallets.flatMap(wallet => {
-				const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-				if (!accountTypes) return []
-				return [
-					AccountType.eoa in accountTypes ? 'accountType-eoa' : null,
-					AccountType.eip7702 in accountTypes ? 'accountType-eip7702' : null,
-					AccountType.rawErc4337 in accountTypes ? 'accountType-erc4337' : null,
-					AccountType.safe in accountTypes ? 'accountType-safe' : null,
-					AccountType.mpc in accountTypes ? 'accountType-mpc' : null,
-				].filter((id): id is string => id !== null)
-			})
+	const hardwareManufactureMatches = (manufactureType: HardwareWalletManufactureType) => (
+		(wallet: RatedWallet<_AttributeGroupId>) => (
+			hasVariant(wallet.variants, Variant.HARDWARE)
+			&& wallet.metadata.hardwareWalletManufactureType === manufactureType
 		)
 	)
 
+	const walletFacets: WalletFacet[] = [
+		{
+			id: 'walletType',
+			label: 'Type',
+			cardinality: 'exclusive',
+			match: 'union',
+			defaultChoice: '',
+			values: [
+				{
+					id: '',
+					label: 'All',
+					matches: () => true,
+				},
+				{
+					id: 'walletType-software',
+					label: 'Software',
+					tag: 'wallet-type',
+					icon: AppWindowIcon,
+					matches: wallet => WalletType.SOFTWARE in wallet.types,
+				},
+				{
+					id: 'walletType-hardware',
+					label: 'Hardware',
+					tag: 'wallet-type',
+					icon: HardwareIcon,
+					matches: wallet => WalletType.HARDWARE in wallet.types,
+				},
+				{
+					id: 'walletType-embedded',
+					label: 'Embedded',
+					icon: WalletIcon,
+					matches: wallet => WalletType.EMBEDDED in wallet.types,
+				},
+			],
+		},
+		{
+			id: 'manufactureType',
+			label: 'Manufacture Type',
+			appliesTo: wallet => hasVariant(wallet.variants, Variant.HARDWARE),
+			cardinality: 'inclusive',
+			match: 'union',
+			values: [
+				{
+					id: `manufactureType-${HardwareWalletManufactureType.FACTORY_MADE}`,
+					label: 'Factory-Made',
+					tag: 'manufacture-type',
+					icon: FactoryIcon,
+					matches: hardwareManufactureMatches(HardwareWalletManufactureType.FACTORY_MADE),
+				},
+				{
+					id: `manufactureType-${HardwareWalletManufactureType.DIY}`,
+					label: 'DIY',
+					tag: 'manufacture-type',
+					icon: HandymanIcon,
+					matches: hardwareManufactureMatches(HardwareWalletManufactureType.DIY),
+				},
+			],
+		},
+		{
+			id: 'variant',
+			label: 'Variant',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			values: (
+				Object.entries(variants)
+					.map(([variant, { label, icon }]) => ({
+						id: `variant-${variant}`,
+						label,
+						icon,
+						matches: (wallet: RatedWallet<_AttributeGroupId>) => Boolean(wallet.variants[variant]),
+					}))
+			),
+		},
+		{
+			id: 'accountType',
+			label: 'Account Type',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			values: [
+				{
+					id: 'accountType-eoa',
+					label: 'EOA',
+					tag: 'account-type',
+					matches: accountTypeMatches(AccountType.eoa),
+				},
+				{
+					id: 'accountType-eip7702',
+					label: 'EIP-7702',
+					tagLabel: `#${eip7702.number}`,
+					tag: 'eip',
+					eip: eip7702,
+					matches: accountTypeMatches(AccountType.eip7702),
+				},
+				{
+					id: 'accountType-erc4337',
+					label: 'ERC-4337',
+					tagLabel: `#${erc4337.number}`,
+					tag: 'eip',
+					eip: erc4337,
+					matches: accountTypeMatches(AccountType.rawErc4337),
+				},
+				{
+					id: 'accountType-safe',
+					label: 'Safe',
+					tag: 'safe',
+					matches: accountTypeMatches(AccountType.safe),
+				},
+				{
+					id: 'accountType-mpc',
+					label: 'MPC',
+					tag: 'account-type',
+					matches: accountTypeMatches(AccountType.mpc),
+				},
+			],
+		},
+	]
+
+	const applicableWalletFacets = walletFacets.filter(facet => (
+		!facet.appliesTo || wallets.some(facet.appliesTo)
+	))
+
+	const walletFacetFilterSets: FilterSet<RatedWallet<_AttributeGroupId>>[] = (
+		applicableWalletFacets
+			.map(({ id, label, cardinality, match, defaultChoice, values }) => {
+				const choices = (
+					values
+						.map(({ id, label, tagLabel, icon, matches }) => ({
+							id,
+							label,
+							compactLabel: tagLabel ?? label,
+							icon,
+							matches: (wallet: RatedWallet<_AttributeGroupId>) => matches(wallet, 'ALL_VARIANTS'),
+						}))
+				)
+
+				return (
+					cardinality === 'exclusive' ?
+						{ id, label, cardinality, match, defaultChoice, choices }
+					:
+						{ id, label, cardinality, match, choices }
+				)
+			})
+	)
+
+	const stageStatusFilterSets: FilterSet<RatedWallet<_AttributeGroupId>>[] = wallets.some(wallet => (
+		getWalletStageAndLadder(wallet).ladderEvaluation !== null
+	)) ? [{
+		id: 'stageStatus',
+		label: 'Stage qualification',
+		cardinality: 'exclusive',
+		match: 'union',
+		defaultChoice: defaultStageQualification,
+		alwaysShowChoices: true,
+		choices: stageQualificationChoices.map(choice => {
+			const href = stageNavigationBase === undefined ? undefined : walletSummaryHref(stageNavigationBase, choice.id, initialSort)
+			return {
+				...choice,
+				// The Stage sort control stays focusable in inline and floating filter layouts.
+				href: href === undefined || tableId === undefined ? href : `${href}#${encodeURIComponent(`${tableId}-sort-stage`)}`,
+				matches: choice.id === '' ? undefined : (wallet: RatedWallet<_AttributeGroupId>) => {
+					const { stage } = getWalletStageAndLadder(wallet)
+					return choice.id === defaultStageQualification
+						? stage !== null && typeof stage === 'object'
+						: stage === 'QUALIFIED_FOR_NO_STAGES'
+				},
+			}
+		}),
+	}] : []
+	const walletFilterSets = [...walletFacetFilterSets, ...stageStatusFilterSets]
+	let activeChoices = $state<Set<FilterChoice<RatedWallet<_AttributeGroupId>>>>(
+		resetFilterSets(walletFacetFilterSets, new Set()).union(new Set(
+			stageStatusFilterSets.flatMap(set => set.choices.filter(choice => choice.id === initialStageSelection))
+		))
+	)
+
+	let filteredWallets = $derived(
+		applyFilterSets(wallets, walletFilterSets, activeChoices)
+	)
+
+	const filteredWalletIds = $derived(
+		new Set(filteredWallets.map(wallet => wallet.metadata.id))
+	)
+
+	const viewId = $props.id()
+	let expandedColumnIds = $state(
+		new SvelteSet<string>()
+	)
+	const isWalletExpanded = $derived(
+		expandedColumnIds.has('wallet')
+	)
+
+
+	const visibleWalletFilterSets = $derived(
+		walletFacetFilterSets.filter(set => filterSetIsAvailable(wallets, set, activeChoices))
+	)
+
+	const walletFilterSlots = $derived(
+		isWalletExpanded ?
+			visibleWalletFilterSets.map(set => ({
+				kind: 'wallet' as const,
+				label: set.label,
+				columnId: `facet-${set.id}`,
+				panelId: `${viewId}-wallet-filters`,
+				anchorName: `--${viewId}-${set.id}-filters`,
+				clusterAnchorName: `--${viewId}-wallet-filter-cluster`,
+				filterSets: [set],
+			}))
+		:
+			visibleWalletFilterSets.length ?
+				[{
+					kind: 'wallet' as const,
+					label: 'Wallet',
+					columnId: 'wallet',
+					panelId: `${viewId}-wallet-filters`,
+					anchorName: `--${viewId}-wallet-filters`,
+					clusterAnchorName: `--${viewId}-wallet-filter-cluster`,
+					filterSets: visibleWalletFilterSets,
+				}]
+			:
+				[]
+	)
+	const attributeFilterSlots = $derived.by(() => {
+		if (hasNonApplicableStages || stageFilterDefinitions.length === 0 || !attributeRootColumnId) return []
+
+		return [{
+			kind: 'attribute' as const,
+			label: hasMultipleAttributeGroups ? 'Attributes' : attributeGroupList[0].displayName,
+			columnId: attributeRootColumnId,
+			panelId: `${viewId}-attribute-filters`,
+			anchorName: `--${viewId}-attribute-filters`,
+			clusterAnchorName: `--${viewId}-attribute-filter-cluster`,
+			filterSets: attributeFilterSets,
+		}]
+	})
+	const stageFilterSlots = stageStatusFilterSets.length ? [{
+		kind: 'stage' as const,
+		label: 'Stage',
+		columnId: 'stage',
+		panelId: `${viewId}-stage-filters`,
+		anchorName: `--${viewId}-stage-filters`,
+		clusterAnchorName: `--${viewId}-stage-filter-cluster`,
+		filterSets: stageStatusFilterSets,
+	}] : []
+	let walletFilterOwner = $state('wallet')
+	const walletPanelSlot = $derived(walletFilterSlots.find(slot => slot.columnId === walletFilterOwner) ?? walletFilterSlots[0])
+	// The panel and its choices have one lifetime; column expansion only changes ownership.
+	const allFilterSlots = $derived([
+		...(walletPanelSlot ? [{ ...walletPanelSlot, filterSets: visibleWalletFilterSets }] : []),
+		...stageFilterSlots,
+		...attributeFilterSlots,
+	])
+
+	let openFilterPanelId = $state<string>()
 
 	// Actions
-	import type { ComponentProps } from 'svelte'
+	import { flushSync, onMount, type ComponentProps } from 'svelte'
+	let interactive = $state(false)
+	let identityInterestAvailable = $state(false)
+	let transitionRoot: HTMLElement | undefined = $state()
+	type TransitionKind = 'sort' | 'columns' | 'filters' | 'disclosure'
+	onMount(() => {
+		interactive = true
+		identityInterestAvailable = 'popover' in HTMLElement.prototype
+	})
 
-	let toggleFilterById: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilterById'] = $state()
-	let toggleFilter: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilter'] = $state()
+	const walletIdentityId = (walletId: string) => viewTransitionName(viewId, 'wallet-identity', walletId)
+
+	function walletIdentityInterest(node: HTMLElement) {
+		if (!identityInterestAvailable) return
+		const registration = interest(node, { id: node.id })
+		const motion = livePopoverTransition(node)
+		const lifetime = new AbortController()
+		const listenerOptions = { signal: lifetime.signal }
+		const owner = node.closest('td')
+		const disclosure = node.closest<HTMLDetailsElement>('details.wallet-info-details')
+		const summary = disclosure?.querySelector('summary')
+		const identitySource = summary ?? owner
+		let redirect: ReturnType<typeof setTimeout> | undefined
+		let dismissed = false
+		let keyboardFocusNavigation = false
+		const cancelRedirect = () => {
+			clearTimeout(redirect)
+			redirect = undefined
+		}
+		const dismiss = () => {
+			cancelRedirect()
+			dismissed = true
+		}
+		const beginInterest = (event: Event) => {
+			cancelRedirect()
+			if (event instanceof FocusEvent && dismissed && !keyboardFocusNavigation) return false
+			dismissed = false
+			return true
+		}
+		const endInterest = () => {
+			cancelRedirect()
+			queueMicrotask(() => {
+				if (!node.matches(':hover, :focus-within')) dismissed = false
+			})
+		}
+		const keydown = (event: KeyboardEvent) => {
+			keyboardFocusNavigation = event.isTrusted && event.key === 'Tab'
+			if (event.key === 'Escape' && (node.matches(':hover, :focus-within, :popover-open')
+				|| disclosure?.querySelector(':scope > [popover]:popover-open'))) dismiss()
+		}
+		const keyup = (event: KeyboardEvent) => {
+			if (event.key === 'Tab') keyboardFocusNavigation = false
+		}
+		const activateDisclosure = (event: KeyboardEvent) => {
+			if (event.key === 'Enter' || event.key === ' ') dismiss()
+		}
+		const toggleDisclosure = (event: Event) => {
+			if (event.target !== disclosure || !disclosure?.open) return
+			dismiss()
+			if (node.matches(':popover-open')) node.hidePopover()
+		}
+		const focusSummary = (event: FocusEvent) => {
+			if (event.target !== summary || !summary?.matches(':focus-visible') || !identitySource
+				|| disclosure?.open
+				|| getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() !== '1'
+				|| !beginInterest(event)) return
+			node.showPopover({ source: identitySource })
+		}
+		const showIdentity = (event: ToggleEvent) => {
+			if (event.newState !== 'open') return
+			cancelRedirect()
+			if (dismissed || summary?.matches(':active') || disclosure?.open) {
+				event.preventDefault()
+				return
+			}
+			const compact = getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1'
+			if (compact && owner && event.source === identitySource) {
+				const bounds = owner.getBoundingClientRect()
+
+				owner.style.setProperty('--wallet-identity-flowInlineSize', `${bounds.width}px`)
+				owner.style.setProperty('--wallet-identity-flowBlockSize', `${bounds.height}px`)
+				return
+			}
+			event.preventDefault()
+			const target = compact ? node : disclosure?.querySelector<HTMLElement>(':scope > [popover]')
+			const source = event.source instanceof HTMLElement ? event.source : node
+			// Promoted identity content uses an external invoker; the overview follows DOM order.
+			const popupSource = compact ? identitySource : undefined
+			if (!target || (compact && !popupSource)) return
+			// A separate task leaves the canceled native show operation before opening its replacement.
+			redirect = setTimeout(() => {
+				redirect = undefined
+				if (dismissed || !node.isConnected || !source.isConnected || !target.isConnected || (popupSource && !popupSource.isConnected)
+					|| !node.contains(source) || !source.matches(':hover, :focus-within')
+					|| disclosure?.open || summary?.matches(':active')
+					|| (getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1') !== compact
+					|| target.matches(':popover-open')) return
+				target.showPopover(popupSource ? { source: popupSource } : undefined)
+			}, 0)
+		}
+		node.addEventListener('beforetoggle', showIdentity, listenerOptions)
+		node.addEventListener('pointerenter', beginInterest, listenerOptions)
+		node.addEventListener('focusin', beginInterest, listenerOptions)
+		node.addEventListener('pointerleave', endInterest, listenerOptions)
+		node.addEventListener('focusout', endInterest, listenerOptions)
+		node.addEventListener('loseinterest', endInterest, listenerOptions)
+		node.ownerDocument.addEventListener('keydown', keydown, { ...listenerOptions, capture: true })
+		node.ownerDocument.addEventListener('keyup', keyup, { ...listenerOptions, capture: true })
+		disclosure?.addEventListener('toggle', toggleDisclosure, listenerOptions)
+		summary?.addEventListener('focus', focusSummary, listenerOptions)
+		summary?.addEventListener('click', dismiss, { ...listenerOptions, capture: true })
+		summary?.addEventListener('keydown', activateDisclosure, { ...listenerOptions, capture: true })
+		return () => {
+			cancelRedirect()
+			lifetime.abort()
+			registration?.destroy()
+			motion.destroy()
+			owner?.style.removeProperty('--wallet-identity-flowInlineSize')
+			owner?.style.removeProperty('--wallet-identity-flowBlockSize')
+		}
+	}
+
+	const transitionUpdate = (update: () => void, kind: TransitionKind = 'disclosure') => {
+		if (!transitionRoot) {
+			update()
+			return
+		}
+
+		startScopedViewTransition(
+			transitionRoot,
+			() => flushSync(update),
+			kind === 'disclosure' ? 'none' : 'live',
+		)
+	}
 
 	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
 
+	const toggleFilterById = (filterId: string, exclusive = false) => {
+		const choice = walletFilterSets.flatMap(set => set.choices).find(candidate => candidate.id === filterId)
+		if (!choice) return
+
+		transitionUpdate(() => {
+			activeChoices = changeFilterChoice(walletFilterSets, activeChoices, choice, exclusive)
+		}, 'filters')
+	}
+
 	const disclosureId = (walletId: string, columnId: unknown) => JSON.stringify([walletId, columnId])
+
+	$effect(() => {
+		if (
+			openFilterPanelId
+			&& !allFilterSlots.some(slot => slot.panelId === openFilterPanelId)
+		)
+			openFilterPanelId = undefined
+	})
 
 
 	// Components
@@ -363,14 +752,11 @@
 
 	import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-	import GithubIcon from 'lucide-static/icons/github.svg?raw'
-	import GlobeIcon from 'lucide-static/icons/globe.svg?raw'
-	import KeyIcon from 'lucide-static/icons/key.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
+	import Modal from '@/components/Modal.svelte'
 	import Pie from '@/components/Pie.svelte'
-	import { attributeGroupFlowerGradient } from '@/components/pie-fill'
 	import {
 		overallRatingPieLevels,
 		overallRatingPiePadding,
@@ -380,6 +766,8 @@
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
+	import Tooltip from '@/components/Tooltip.svelte'
+	import EipDetails from '@/views/EipDetails.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
 
@@ -387,17 +775,16 @@
 	import WalletAttributeSummary, { WalletAttributeSummaryType } from '@/views/WalletAttributeSummary.svelte'
 	import WalletOverallSummary, { WalletSummaryType } from '@/views/WalletOverallSummary.svelte'
 	import WalletStageBadge from './WalletStageBadge.svelte'
-	import WalletTags from './WalletTags.svelte'
 
 
 	// Styles
-	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconID } from '@/styles/wbicons'
-
+	import { scoreToColor } from '@/utils/colors'
 </script>
 
 
 <section
+	id={viewId}
+	bind:this={transitionRoot}
 	data-sticky-container
 	data-column="gap-6"
 >
@@ -414,314 +801,291 @@
 				{/if}
 			</div>
 		{/if}
-
-		<!-- Mobile-only filter UI -->
-		<div class="mobile-filters">
-			<div class="mobile-filter-row">
-				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
-					<div class="mobile-filter-group">
-						<legend>stages</legend>
-						{#if showStageListSelect}
-							<Select
-								id="{walletListSelectId}-mobile"
-								class="stage-list-select"
-								bind:value={walletListTab}
-								options={stageListSelectOptions}
-								aria-label="Show Stage 0+ wallets or Others"
-							/>
-						{/if}
-						{#if walletListTab !== 'others'}
-							<div class="mobile-filter-items">
-								{#each stageFilterDefinitions as stageFilter}
-									{@const isActive = activeStageFilterIds.has(stageFilter.id)}
-									<button
-										class="filter-circle"
-										class:active={isActive}
-										aria-pressed={isActive}
-										aria-label={stageFilter.label}
-										onclick={() => toggleAttributeFilterById?.(stageFilter.id)}
-									>
-										<span class="filter-circle-number">{stageFilter.label.split(' ').at(-1)}</span>
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{/if}
-
-				<div class="mobile-filter-group">
-					<legend>variant</legend>
-					<div class="mobile-filter-items">
-						{#each allSupportedVariants as variant}
-							{@const filterId = `variant-${variant}`}
-							{@const isActive = activeFilterIds.has(filterId)}
-							<div class="mobile-filter-item">
-								<button
-									class="filter-circle"
-									class:active={isActive}
-									aria-pressed={isActive}
-									aria-label={variantToName(variant, true)}
-									onclick={() => toggleFilterById?.(filterId)}
-								>
-									<span data-icon="wbicons-simple {variantWbIconIds[variant]}"></span>
-								</button>
-								<span class="filter-circle-label">{variantToName(variant, false)}</span>
-							</div>
-						{/each}
-					</div>
-				</div>
-			</div>
-
-			<div class="mobile-filter-group mobile-filter-group-centered">
-				<legend>account type</legend>
-				<div class="mobile-filter-items">
-					{#each mobileAccountTypeFilters.filter(f => visibleMobileAccountTypeFilterIds.has(f.id)) as { id, label }}
-						{@const isActive = activeFilterIds.has(id)}
-						<div class="mobile-filter-item">
-							<button
-								class="filter-circle"
-								class:active={isActive}
-								aria-pressed={isActive}
-								aria-label={label}
-								onclick={() => toggleFilterById?.(id)}
-							>
-								<span data-icon="wbicons-simple account_type"></span>
-							</button>
-							<span class="filter-circle-label">{label}</span>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</div>
-
-		<div
-			class="filters"
-			data-scroll-container="inline"
-		>
-			<div
-				data-scroll-item="inline-size-max"
-				data-row
-			>
-				<Filters
-					items={listedWallets}
-					filterGroups={
-						[
-							{
-								id: 'walletType',
-								label: 'Type',
-								displayType: 'select',
-								exclusive: true,
-								defaultFilter: '',
-								filters: [
-									{
-										id: '',
-										label: 'All',
-									},
-									{
-										id: 'walletType-software',
-										label: 'Software',
-										icon: AppWindowIcon,
-										filterFunction: wallet => !hasVariant(wallet.variants, Variant.HARDWARE)
-									},
-									{
-										id: 'walletType-hardware',
-										label: 'Hardware',
-										icon: HardwareIcon,
-										filterFunction: wallet => hasVariant(wallet.variants, Variant.HARDWARE)
-									},
-									{
-										id: 'walletType-embedded',
-										label: 'Embedded',
-										icon: WalletIcon,
-										filterFunction: wallet => hasVariant(wallet.variants, Variant.EMBEDDED)
-									},
-								],
-							},
-							{
-								id: 'manufactureType',
-								label: 'Manufacture Type',
-								displayType: 'group',
-								exclusive: false,
-								filters: [
-									{
-										id: `manufactureType-${HardwareWalletManufactureType.FACTORY_MADE}`,
-										label: 'Factory-Made',
-										icon: FactoryIcon,
-										filterFunction: wallet => (
-											hasVariant(wallet.variants, Variant.HARDWARE) &&
-											wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
-										)
-									},
-									{
-										id: `manufactureType-${HardwareWalletManufactureType.DIY}`,
-										label: 'DIY',
-										icon: HandymanIcon,
-										filterFunction: wallet => (
-											hasVariant(wallet.variants, Variant.HARDWARE) &&
-											wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
-										)
-									},
-								],
-							},
-							{
-								id: 'variant',
-								label: 'Variant',
-								// displayType: 'select',
-								// exclusive: true,
-								displayType: 'group',
-								exclusive: false,
-								filters: [
-									// {
-									// 	id: '',
-									// 	label: 'All',
-									// },
-									...(
-										Object.entries(variants)
-											.map(([variant, { label, icon }]) => ({
-												id: `variant-${variant}`,
-												label,
-												icon,
-												filterFunction: (wallet: RatedWallet<_AttributeGroupId>) => Boolean(wallet.variants[variant])
-											}))
-									),
-								],
-							},
-							{
-								id: 'accountType',
-								label: 'Account Type',
-								displayType: 'group',
-								exclusive: false,
-								filters: [
-									{
-										id: 'accountType-eoa',
-										label: 'EOA',
-										icon: KeyIcon,
-										filterFunction: wallet => {
-											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-											return accountTypes !== null && AccountType.eoa in accountTypes
-										}
-									},
-									{
-										id: 'accountType-eip7702',
-										label: 'EIP-7702',
-										icon: KeyIcon,
-										filterFunction: wallet => {
-											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-											return accountTypes !== null && AccountType.eip7702 in accountTypes
-										}
-									},
-									{
-										id: 'accountType-erc4337',
-										label: 'ERC-4337',
-										icon: KeyIcon,
-										filterFunction: wallet => {
-											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-											return accountTypes !== null && AccountType.rawErc4337 in accountTypes
-										}
-									},
-									{
-										id: 'accountType-safe',
-										label: 'Safe',
-										icon: KeyIcon,
-										filterFunction: wallet => {
-											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-											return accountTypes !== null && AccountType.safe in accountTypes
-										}
-									},
-									{
-										id: 'accountType-mpc',
-										label: 'MPC',
-										icon: KeyIcon,
-										filterFunction: wallet => {
-											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-											return accountTypes !== null && AccountType.mpc in accountTypes
-										}
-									},
-								],
-							},
-						]
-					}
-					bind:activeFilters
-					bind:filteredItems={filteredWallets}
-					bind:toggleFilter
-					bind:toggleFilterById
-				/>
-
-				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0 && walletListTab !== 'others'}
-					<Filters
-						items={allAttributes}
-						filterGroups={[
-							{
-								id: 'stage',
-								label: 'Attributes',
-								displayType: 'group',
-								exclusive: false,
-								operation: 'union',
-								filters: stageFilterDefinitions,
-							},
-						]}
-						bind:activeFilters={attributeActiveFilters}
-						bind:filteredItems={filteredAttributes}
-						bind:toggleFilterById={toggleAttributeFilterById}
-					/>
-				{/if}
-			</div>
-		</div>
+		<noscript>
+			{#if stageNavigationBase !== undefined && tableId !== undefined}
+				<p>Column expansion and additional filters require JavaScript. You can sort columns and open wallet details.</p>
+			{:else}
+				<p>Sorting and column expansion require JavaScript. You can still open wallet details.</p>
+			{/if}
+		</noscript>
 	</header>
 
-	{#snippet StageListSelect(_ctx: { column: Column<RatedWallet<_AttributeGroupId>> })}
-		{@const stageListAnchorName = `--${walletListSelectId}`}
-		<button
-			type="button"
-			class="expansion-button"
-			popovertarget={walletListSelectId}
-			title="Show Stage 0+ wallets or Others"
-			aria-label="Show Stage 0+ wallets or Others"
-			style:anchor-name={stageListAnchorName}
-			onclick={event => event.stopPropagation()}
-		></button>
+	{#snippet StageInformation({ wallet, size = 'medium', fillCell = false }: { wallet: RatedWallet<_AttributeGroupId>, size?: 'small' | 'medium' | 'large', fillCell?: boolean })}
+		{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+
+		{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
+			<small data-paint>N/A</small>
+		{:else}
+			<a
+				href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: 'stages' })}
+				data-link="camouflaged"
+				data-pressable={fillCell ? 'to-containing' : ''}
+				aria-label={`View ${wallet.metadata.displayName} stage explanation`}
+				aria-haspopup={interactive ? 'dialog' : undefined}
+				onclick={event => {
+					if (!interactive || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+					event.preventDefault()
+					event.stopPropagation()
+					stageModalWalletId = wallet.metadata.id
+				}}
+			>
+				<span data-pressable="paint">
+					<WalletStageBadge {stage} {ladderEvaluation} {size} />
+				</span>
+			</a>
+		{/if}
+	{/snippet}
+
+	{#snippet WalletName({ wallet, walletUrl }: { wallet: RatedWallet<_AttributeGroupId>; walletUrl: string })}
+		<div data-row="gap-3 start wrap">
+			<h3 data-paint
+				data-view-transition={interactive ? 'named' : undefined}
+				style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
+			>
+				<a
+				data-link="camouflaged"
+				href={walletUrl}
+			>{wallet.metadata.displayName}</a>
+			</h3>
+
+			{#if hasVariant(wallet.variants, Variant.HARDWARE)}
+				{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
+
+				{#if brandModels.length > 1}
+					<Select
+						aria-label={`${wallet.metadata.displayName} wallet model`}
+						disabled={!interactive}
+						bind:value={
+							() => selectedModels.get(wallet.metadata.id),
+							value => {
+								if (value)
+									selectedModels.set(wallet.metadata.id, value)
+								else
+									selectedModels.delete(wallet.metadata.id)
+							}
+						}
+						options={[
+							{ value: undefined, label: 'All models' },
+							...brandModels.map(m => ({ value: m.modelId, label: `${m.modelName}`, icon: m.iconUrl })),
+						]}
+					/>
+				{/if}
+			{/if}
+		</div>
+	{/snippet}
+
+	{#snippet FilterHeaderTitle({ column }: { column: Column<RatedWallet<_AttributeGroupId>> })}
+		{@const walletSlot = [...walletFilterSlots, ...stageFilterSlots].find(filterSlot => filterSlot.columnId === column.id)}
+		{@const attributeSlot = attributeFilterSlots.find(filterSlot => filterSlot.columnId === column.id)}
+		{@const slot = walletSlot ?? attributeSlot}
+
+		{#if slot}
+			{@const activeIds = slot.kind === 'attribute' ?
+				new Set([...attributeActiveChoices].map(filter => filter.id))
+			:
+				new Set([...activeChoices].map(filter => filter.id))}
+			{@const activeSets = slot.filterSets.filter(set => (
+				set.choices.some(choice => activeIds.has(choice.id) && choice.id !== '')
+			))}
+
+			<button
+				type="button"
+				class="filter-trigger"
+				interestfor={slot.panelId}
+				style:interest-delay-start={`${interestDelayMs.start}ms`}
+				style:interest-delay-end={`${interestDelayMs.end}ms`}
+				popovertarget={slot.panelId}
+				popovertargetaction="show"
+				onpointerenter={() => { if (slot.kind === 'wallet') walletFilterOwner = String(column.id) }}
+				onfocusin={() => { if (slot.kind === 'wallet') walletFilterOwner = String(column.id) }}
+				use:interest={{ id: slot.panelId }}
+				style:--filter-anchor={slot.anchorName}
+				aria-haspopup="dialog"
+				aria-controls={slot.panelId}
+				aria-expanded={interactive ? openFilterPanelId === slot.panelId && (slot.kind !== 'wallet' || walletPanelSlot?.columnId === column.id) : undefined}
+				onclick={event => {
+					if (slot.kind === 'wallet') walletFilterOwner = String(column.id)
+					event.stopPropagation()
+				}}
+			>
+				<span class="filter-trigger-label">{column.name}</span>
+				{#if activeSets.length > 0}
+					<span class="filter-cluster-targets" aria-hidden="true">
+						{#each activeSets as set (set.id)}
+							<span
+								class="filter-cluster-target"
+								style:--filter-cluster-anchor={`${slot.clusterAnchorName}-${set.id}`}
+							></span>
+						{/each}
+					</span>
+				{/if}
+			</button>
+		{:else}
+			{column.name}
+		{/if}
+	{/snippet}
+
+	{#snippet FacetTags({ wallet, facetId }: { wallet: RatedWallet<_AttributeGroupId>, facetId: string })}
+		{@const facet = walletFacets.find(facet => facet.id === facetId)!}
+			{#each facet.values.filter(({ matches }) => matches(wallet, selectedVariant ?? 'ALL_VARIANTS')) as { id, label, tagLabel, tag, eip } (id)}
+				{#if tag !== undefined}
+					{@const canFilter = visibleWalletFilterSets.some(set => set.id === facet.id)}
+					{#snippet Tag()}
+					{#if canFilter}
+					<button
+							data-tag={tag}
+							data-paint
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
+							disabled={!interactive}
+						aria-label="Filter by {tagLabel ?? label}"
+						onclick={event => {
+							event.stopPropagation()
+							toggleFilterById!(id)
+						}}
+					>
+						{tagLabel ?? label}
+					</button>
+					{:else}
+						<span
+							data-tag={tag}
+							data-paint
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
+						>{tagLabel ?? label}</span>
+					{/if}
+					{/snippet}
+					{#if eip}
+						<Tooltip placement="inline-end" buttonTriggerPlacement={canFilter ? 'behind' : 'around'}>
+							{@render Tag()}
+							{#snippet TooltipContent()}
+								<div class="eip-tooltip-content"><EipDetails {eip} /></div>
+							{/snippet}
+						</Tooltip>
+					{:else}
+						{@render Tag()}
+					{/if}
+				{/if}
+			{/each}
+	{/snippet}
+
+	{#snippet VariantButtons({ wallet }: { wallet: RatedWallet<_AttributeGroupId> })}
+		{@const supportedVariants = (
+			[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
+				.filter(variant => variant in wallet.variants)
+		)}
+
+		{#if allSupportedVariants.length > 1}
+			<div
+				class="variants"
+				data-paint
+				data-row="gap-1"
+				data-view-transition={interactive ? 'named' : undefined}
+				style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-variants', wallet.metadata.id) : undefined}
+			>
+				{#each supportedVariants as variant}
+					<button
+						data-selected={variant === selectedVariant ? '' : undefined}
+						disabled={!interactive}
+						aria-label={`Select ${variants[variant].label} variant`}
+						aria-pressed={variant === selectedVariant}
+						onclick={event => {
+							event.stopPropagation()
+							toggleFilterById!(`variant-${variant}`, true)
+						}}
+					>
+						<span
+							class="icon"
+							title={variants[variant].label}
+							aria-hidden="true"
+						>
+							{@html variants[variant].icon}
+						</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
+	{/snippet}
+
+	{#snippet HeaderBelow()}
 		<div
-			id={walletListSelectId}
-			class="stage-list-menu"
-			popover="auto"
-			role="listbox"
-			aria-label="Show Stage 0+ wallets or Others"
-			style:position-anchor={stageListAnchorName}
-			style:position-area="block-end span-inline-end"
+			class="filters"
 		>
-			{#each stageListSelectOptions as option (option.value)}
-				<button
-					type="button"
-					role="option"
-					aria-selected={walletListTab === option.value}
-					onclick={event => {
-						walletListTab = option.value
-						const menu = event.currentTarget.closest('[popover]')
-						if (menu instanceof HTMLElement && 'hidePopover' in menu)
-							menu.hidePopover()
+			{#each allFilterSlots as slot (slot.panelId)}
+				<div
+					class="filter-popover"
+					use:livePopoverTransition
+					popover="auto"
+					id={slot.panelId}
+					role="dialog"
+					aria-label={`${slot.kind === 'wallet' ? 'Wallet' : slot.kind === 'stage' ? 'Stage' : 'Attributes'} filters`}
+					style:--filter-anchor={slot.anchorName}
+					data-filter-kind={slot.kind}
+					data-card
+					onanimationstart={event => {
+						if (event.target === event.currentTarget && event.animationName === 'wallet-filters-inline')
+							event.currentTarget.hidePopover()
+					}}
+					onbeforetoggle={event => {
+						if (event.newState === 'open') openFilterPanelId = slot.panelId
+						else if (openFilterPanelId === slot.panelId) openFilterPanelId = undefined
 					}}
 				>
-					{option.label}
-				</button>
+					{#if slot.kind === 'attribute'}
+						<Filters
+							aria-label="Attribute filters"
+							items={allAttributes}
+							filterSets={slot.filterSets}
+							filterGroups={[slot]}
+							bind:activeChoices={attributeActiveChoices}
+							bind:toggleFilterById={toggleAttributeFilterById}
+							transitionUpdate={update => transitionUpdate(update, 'columns')}
+							closedAnchorPrefix={slot.clusterAnchorName}
+						/>
+					{:else}
+						<Filters
+							id={slot.kind === 'stage' && stageNavigationBase !== undefined ? `${viewId}-stage-sort` : undefined}
+							aria-label={slot.kind === 'stage' ? 'Stage filters' : 'Wallet filters'}
+							items={wallets}
+							filterSets={slot.filterSets}
+							filterGroups={slot.kind === 'wallet' ? walletFilterSlots : [slot]}
+							contextFilterSets={walletFilterSets}
+							visibleSetIds={slot.kind === 'wallet' ? walletPanelSlot?.filterSets.map(set => set.id) : undefined}
+							bind:activeChoices
+							{transitionUpdate}
+							closedAnchorPrefix={slot.clusterAnchorName}
+						/>
+					{/if}
+				</div>
 			{/each}
 		</div>
 	{/snippet}
 
 	<div
 		class="desktop-table-container"
+		data-sticky-container
 		data-scroll-item="inline-attached underflow-center overflow-start snap-block-start"
 	>
 		<Table
 			{tableId}
+			{initialSort}
+			sortNavigation={stageNavigationBase === undefined || tableId === undefined ? undefined : {
+				form: `${viewId}-stage-sort`,
+				action: (columnId, sort) => {
+					const url = walletSummaryHref(stageNavigationBase, initialStageSelection, sort)
+					const id = `${tableId}-sort-${columnId}`
+					return url === undefined ? undefined : { id, url: `${url}#${encodeURIComponent(id)}` }
+				},
+			}}
 			class="wallet-table"
+			stickyLeafInlineSize={identityInterestAvailable ? 'var(--wallet-identity-retainedInlineSize, var(--table-stickyLeaf-inlineSize))' : undefined}
+			{HeaderBelow}
 
-			rows={listedWallets}
+			rows={wallets}
 			rowId={wallet => wallet.metadata.id}
-			rowIsDisabled={wallet => (
-				!(
-					filteredWalletIds.has(wallet.metadata.id)
-					&& (!sortedColumn?.value || sortedColumn.value(wallet) !== undefined)
-				)
+			rowIsDisabled={(wallet, table) => (
+				!filteredWalletIds.has(wallet.metadata.id)
+				|| (table.sortedColumn?.value !== undefined && table.sortedColumn.value(wallet) === undefined)
 			)}
 			displaceDisabledRows={true}
 
@@ -732,6 +1096,7 @@
 							.map(attrGroup => ({
 								id: attrGroup.id,
 								name: attrGroup.displayName,
+								HeaderTitle: FilterHeaderTitle,
 								value: wallet => {
 									const evalGroup = wallet.overall[attrGroup.id]
 									const attrGroupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
@@ -762,10 +1127,10 @@
 							}))
 					)
 
-					return [
+					const walletChildColumns: Column<RatedWallet<_AttributeGroupId>>[] = [
 						{
 							id: 'displayName',
-							name: 'Wallet',
+							name: 'Name',
 							value: wallet => wallet.metadata.displayName,
 
 							sort: {
@@ -774,20 +1139,45 @@
 
 							isSticky: true,
 						} satisfies Column<RatedWallet<_AttributeGroupId>>,
+						...(
+							applicableWalletFacets
+								.map(facet => ({
+									id: `facet-${facet.id}`,
+									name: facet.label,
+									HeaderTitle: FilterHeaderTitle,
+									value: wallet => (
+										facet.values
+											.filter(({ matches }) => matches(wallet, 'ALL_VARIANTS'))
+											.map(({ label }) => label)
+											.join(', ') || undefined
+									),
+
+									align: ColumnAlignment.Center,
+								} satisfies Column<RatedWallet<_AttributeGroupId>>))
+						),
+					]
+
+					return [
+						{
+							id: 'wallet',
+							name: 'Wallet',
+							value: wallet => wallet.metadata.displayName,
+							HeaderTitle: FilterHeaderTitle,
+
+							sort: {
+								defaultDirection: SortDirection.Ascending,
+							},
+
+							isSticky: !isWalletExpanded,
+							subcolumns: walletChildColumns,
+							isDefaultExpanded: false,
+						} satisfies Column<RatedWallet<_AttributeGroupId>>,
 
 						...(hasNonApplicableStages ? [] : [{
 							id: 'stage',
-							name: showStageListSelect
-								? (walletListTab === 'others' ? 'Others' : 'Stage 0+')
-								: 'Stage',
-							HeaderExtra: showStageListSelect ? StageListSelect : undefined,
-							value: wallet => {
-								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
-								if (typeof stage === 'string') return null
-								const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-								return stageIndex >= 0 ? stageIndex : null
-							},
+							name: 'Stage',
+							HeaderTitle: FilterHeaderTitle,
+							value: walletStageIndex,
 
 							sort: {
 								defaultDirection: SortDirection.Descending,
@@ -797,11 +1187,12 @@
 						} satisfies Column<RatedWallet<_AttributeGroupId>>]),
 
 						(
-							attrGroupColumns.length > 1 ?
+							hasMultipleAttributeGroups ?
 								{
 									id: 'overall',
-									name: 'Rating',
+									name: 'Attributes',
 									value: wallet => getWalletScore(wallet),
+									HeaderTitle: FilterHeaderTitle,
 
 									sort: {
 										isDefault: true,
@@ -829,7 +1220,8 @@
 					] as Column<RatedWallet<_AttributeGroupId>>[]
 				})()
 			}
-			bind:sortedColumn
+			bind:expandedColumnIds
+			{transitionUpdate}
 		>
 			{#snippet Cell({
 				row: wallet,
@@ -839,58 +1231,45 @@
 					{@const cellDisclosureId = disclosureId(wallet.metadata.id, column.id)}
 					{@const isExpanded = expandedDisclosureIds.has(cellDisclosureId)}
 				{@const setIsExpanded = (open: boolean) => {
-					if (open)
+					transitionUpdate(() => {
+						if (open)
 							expandedDisclosureIds.add(cellDisclosureId)
-					else
+						else
 							expandedDisclosureIds.delete(cellDisclosureId)
+					})
 				}}
 
 				{#if column.id === 'stage'}
-					{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
-						<small>N/A</small>
-					{:else if stage === 'UNRATED'}
-						<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
-					{:else}
-						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
-						{@const stageFilterId = `stage-${stageValue}`}
-
-						<div
-							role="button"
-							tabindex="0"
-							aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-							onclick={event => {
-								event.preventDefault()
-								event.stopPropagation()
-								toggleAttributeFilterById?.(stageFilterId)
-							}}
-							onkeydown={event => {
-								if (event.key !== 'Enter' && event.key !== ' ') return
-
-								event.preventDefault()
-								event.stopPropagation()
-								toggleAttributeFilterById?.(stageFilterId)
-							}}
-						>
-							<WalletStageBadge
-								{stage}
-								{ladderEvaluation}
-								size="medium"
-							/>
-						</div>
-					{/if}
-				{:else if column.id === 'displayName'}
+					{@render StageInformation({ wallet, fillCell: true })}
+				{:else if column.id === 'wallet'}
 					{@const displayName = wallet.metadata.displayName}
-					{@const supportedVariants = (
-						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
-							.filter(variant => variant in wallet.variants)
-					)}
 
-					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant, model: selectedModels.get(wallet.metadata.id) })}
+					{@const identityId = walletIdentityId(wallet.metadata.id)}
 
 					<TooltipOrAccordion
 						class="wallet-info-details"
+						onclick={event => {
+							const details = event.currentTarget
+							const cell = details.parentElement
+
+							if (
+								!interactive || event.defaultPrevented || !cell
+								|| !(event.target instanceof Element)
+								|| event.target.closest('summary')?.parentElement !== details
+								|| event.target.closest('a, button, input, select, textarea, [contenteditable]')
+								|| tooltipUsesDrawer()
+							) return
+
+							const nextOpen = !details.open
+							event.preventDefault()
+							details.setAttribute('data-view-transition', 'item')
+							try {
+								startScopedViewTransition(cell, () => setIsExpanded(nextOpen), 'live')
+							} finally {
+								details.removeAttribute('data-view-transition')
+							}
+						}}
 						bind:isExpanded={
 							() => isExpanded,
 							setIsExpanded
@@ -900,10 +1279,19 @@
 						showAccordionMarker
 						tooltipMaxWidth="20rem"
 					>
-						<div class="wallet-info" data-row="start">
-							<span class="row-count" data-row="center"></span>
+						<div
+							class="wallet-info"
+							id={identityId}
+							popover={identityInterestAvailable ? 'auto' : undefined}
+							data-card="popover"
+							{@attach walletIdentityInterest}
+							data-row="start"
+							data-view-transition={interactive ? 'named' : undefined}
+							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
+						>
+							<span class="row-count" data-paint data-row="center"></span>
 
-							<span class="wallet-icon" data-icon="shadow">
+							<span class="wallet-icon" data-paint data-icon="shadow">
 								<img
 									alt={displayName}
 									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
@@ -914,80 +1302,34 @@
 
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
-									<div data-row="gap-3 start wrap">
-										<h3>
-											<a data-link="camouflaged" href={walletUrl}>{displayName}</a>
-										</h3>
-
-										{#if 'hardware' in wallet.variants}
-											{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-
-											{#if brandModels.length > 1}
-												<Select
-													bind:value={
-														() => selectedModels.get(wallet.metadata.id),
-														value => {
-															if (value)
-																selectedModels.set(wallet.metadata.id, value)
-															else
-																selectedModels.delete(wallet.metadata.id)
-														}
-													}
-													options={[
-														{ value: undefined, label: 'All models' },
-														...brandModels.map(m => ({ value: m.id.split('.')[1], label: `${m.modelName}`, icon: m.iconUrl })),
-													]}
-												/>
-											{/if}
-										{/if}
-									</div>
+									{@render WalletName({ wallet, walletUrl })}
 
 									{#if selectedVariant && selectedVariant in wallet.variants}
-										<div class="variant">
+										<div class="variant" data-paint>
 											<a data-link="camouflaged" href={walletUrl}>{variants[selectedVariant].label}</a>
 										</div>
 									{/if}
 								</div>
 
 								<div class="tags" data-row="start gap-1 wrap">
-									<WalletTags {wallet} {selectedVariant} onFilter={id => toggleFilterById!(id)} />
+									{#each walletFacets.filter(facet => facet.id !== 'variant') as facet (facet.id)}
+										{@render FacetTags({ wallet, facetId: facet.id })}
+									{/each}
 								</div>
 							</div>
 
-							{#if allSupportedVariants.length > 1}
-								<div class="variants" data-row="gap-1">
-									{#each supportedVariants as variant}
-										<button
-											data-selected={variant === selectedVariant ? '' : undefined}
-											aria-label={`Select ${variants[variant].label} variant`}
-											aria-pressed={variant === selectedVariant}
-											onclick={event => {
-												event.stopPropagation()
-												toggleFilterById!(`variant-${variant}`, true)
-											}}
-										>
-											<span
-												class="icon"
-												title={variants[variant].label}
-												aria-hidden="true"
-											>
-												{@html variants[variant].icon}
-											</span>
-										</button>
-									{/each}
-								</div>
-							{/if}
+							{@render VariantButtons({ wallet })}
 						</div>
 
-						{#snippet ExpandedContent({ isInTooltip })}
-							<div class="wallet-summary" data-card={isInTooltip ? 'radius p-sm' : undefined} data-column="gap-4">
+						{#snippet ExpandedContent()}
+							<div class="wallet-summary" data-card="popover" data-column="gap-4">
 								{#if selectedVariant && !wallet.variants[selectedVariant]}
-									<p>
+									<p data-paint>
 										{wallet.metadata.displayName} does not have a {selectedVariant} version.
 									</p>
 								{/if}
 
-								<div class="links" data-row="gap-3 start wrap">
+								<div data-paint class="links" data-row="gap-3 start wrap">
 									<a
 										href={walletUrl}
 										class="info-link"
@@ -1026,6 +1368,48 @@
 						{/snippet}
 					</TooltipOrAccordion>
 
+				{:else if column.id === 'displayName'}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant, model: selectedModels.get(wallet.metadata.id) })}
+					{@const identityId = walletIdentityId(wallet.metadata.id)}
+
+					<div
+						class="wallet-info"
+						id={identityId}
+						popover={identityInterestAvailable ? 'auto' : undefined}
+						data-card="popover"
+						{@attach walletIdentityInterest}
+						data-row="start"
+						data-view-transition={interactive ? 'named' : undefined}
+						style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
+					>
+						<span class="row-count" data-paint data-row="center"></span>
+
+						<span class="wallet-icon" data-paint data-icon="shadow">
+							<img
+								alt={wallet.metadata.displayName}
+								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+								width="16"
+								height="16"
+							/>
+						</span>
+
+						<div class="name-and-tags" data-column="gap-2">
+							<div class="name" data-column="gap-1">
+								{@render WalletName({ wallet, walletUrl })}
+
+							</div>
+						</div>
+					</div>
+				{:else if typeof column.id === 'string' && column.id.startsWith('facet-')}
+					{@const facetId = column.id.slice('facet-'.length)}
+
+					{#if facetId === 'variant'}
+						{@render VariantButtons({ wallet })}
+					{:else}
+						<div class="tags" data-row="start gap-1 wrap">
+							{@render FacetTags({ wallet, facetId })}
+						</div>
+					{/if}
 				{:else}
 					{@const selectedSliceId =
 						selectedAttribute ?
@@ -1065,11 +1449,12 @@
 								() => isExpanded,
 								setIsExpanded
 							}
+							tooltipButtonTriggerPlacement="behind"
+							tooltipHoverTriggerPlacement="around"
 						>
-							{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
-								filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
-							) : null}
-							<Pie
+							<Pie data-paint
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
@@ -1109,8 +1494,8 @@
 																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
 															)
 															&& (
-																overallFilteredAttributeIds === null
-																|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+																filteredAttributeIds === null
+																|| filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
 															)
 														))
 														.map(([attributeId, attribute]) => ({
@@ -1140,7 +1525,8 @@
 
 									selectedAttribute = attributeId && selectedAttribute === attributeId ? undefined : attributeId
 								}}
-								onSliceMouseEnter={sliceId => {
+								onSliceMouseEnter={(sliceId, event) => {
+									if (!canHoverDetails(event)) return
 									const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
 									if (
@@ -1239,7 +1625,11 @@
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
 										{isInTooltip}
-									/>
+									>
+										{#snippet StageBadge()}
+											{@render StageInformation({ wallet, size: 'large' })}
+										{/snippet}
+									</WalletOverallSummary>
 								{/if}
 							{/snippet}
 						</TooltipOrAccordion>
@@ -1251,9 +1641,6 @@
 							{@const evalGroup = wallet.overall[attrGroup.id]}
 						{@const groupScore = calculateAttributeGroupScore(attrGroup, evalGroup)}
 
-						{@const filteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
-							filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
-						) : null}
 						{@const evalEntries = (
 							evaluatedAttributesEntries(evalGroup)
 								.filter(([attributeId, attribute]) => (
@@ -1270,9 +1657,12 @@
 
 						{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
 
-						{@const _currentAttribute = (
-							hasActiveAttribute && activeEntityId?.attributeId !== undefined ?
-								evalGroup[activeEntityId.attributeId]
+						{@const currentAttribute = (
+							hasActiveAttribute ?
+								activeEntityId?.attributeId !== undefined ?
+									evalGroup[activeEntityId.attributeId]
+								:
+									undefined
 							: selectedAttribute ?
 								evalGroup[selectedAttribute]
 							:
@@ -1284,8 +1674,12 @@
 								() => isExpanded,
 								setIsExpanded
 							}
+							tooltipButtonTriggerPlacement="behind"
+							tooltipHoverTriggerPlacement="around"
 						>
-							<Pie
+							<Pie data-paint
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1350,7 +1744,9 @@
 										}
 									)
 								}
-								{highlightedSliceId}
+								highlightedSliceId={currentAttribute
+									? `attrGroup_${attrGroup.id}__attr_${currentAttribute.attribute.id}`
+									: undefined}
 								onSliceClick={sliceId => {
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
@@ -1358,7 +1754,8 @@
 										selectedAttribute = selectedAttribute === attributeId ? undefined : attributeId
 									}
 								}}
-								onSliceMouseEnter={sliceId => {
+								onSliceMouseEnter={(sliceId, event) => {
+									if (!canHoverDetails(event)) return
 									const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
 									if (
@@ -1413,23 +1810,11 @@
 							</Pie>
 
 							{#snippet ExpandedContent({ isInTooltip }: { isInTooltip?: boolean })}
-								{@const displayedAttribute =
-									activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id ?
-										activeEntityId.attributeId !== undefined ?
-											evalGroup[activeEntityId.attributeId]
-										:
-											undefined
-									: selectedAttribute ?
-										evalGroup[selectedAttribute]
-									:
-										undefined
-								}
-
-								{#if displayedAttribute}
+								{#if currentAttribute}
 									<WalletAttributeSummary
 										{wallet}
 										{ladders}
-										attribute={displayedAttribute}
+										attribute={currentAttribute}
 										variant={selectedVariant}
 										summaryType={WalletAttributeSummaryType.Rating}
 										{isInTooltip}
@@ -1463,8 +1848,12 @@
 								() => isExpanded,
 								setIsExpanded
 							}
+							tooltipButtonTriggerPlacement="behind"
+							tooltipHoverTriggerPlacement="around"
 						>
-							<Pie
+							<Pie data-paint
+								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
+								transitionElements="slices"
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
@@ -1531,135 +1920,31 @@
 		</Table>
 	</div>
 
-	<!-- Mobile wallet cards (shown only on mobile, replaces table) -->
-	<div class="mobile-wallet-list">
-		{#each filteredWallets.toSorted((walletA, walletB) => -walletStageThenScoreCompare(walletA, walletB)) as wallet, i}
-			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-			{@const score = getWalletScore(wallet)}
-			{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)) : null}
-			{@const cardSupportedVariants = [Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE].filter(v => v in wallet.variants)}
-			{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
-
-			<div class="mobile-wallet-card">
-				<!-- Header: rank · logo · name + variant icons -->
-				<div class="mobile-card-header">
-					<span class="mobile-card-rank">{i + 1}.</span>
-
-					<div class="mobile-card-logo-wrap">
-						<img
-							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							alt={wallet.metadata.displayName}
-							width="40" height="40"
-						/>
-					</div>
-
-					<div class="mobile-name-and-variants">
-						<h3 class="mobile-card-name">
-							<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
-						</h3>
-
-						{#if stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null}
-							<span class="mobile-card-stage">
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="medium"
-								/>
-							</span>
-						{/if}
-
-						<div class="mobile-card-variants">
-							{#each cardSupportedVariants as variant}
-								<button
-									class="mobile-variant-btn"
-									class:active={variant === selectedVariant}
-									aria-label={variantToName(variant, true)}
-									aria-pressed={variant === selectedVariant}
-									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
-								>
-									<span data-icon="wbicons-simple {variantWbIconIds[variant]}"></span>
-								</button>
-							{/each}
-						</div>
-					</div>
-				</div>
-
-				<!-- Full-size overall Pie -->
-				<div class="mobile-card-pie">
-					<Pie
-						layout={PieLayout.FullTop}
-						padding={8}
-						radius={100}
-						levels={[
-							{
-								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.08,
-								gap: 5,
-								angleGap: 5,
-								offset: 4,
-								outerCornerRadius: 35,
-								innerCornerRadius: 10,
-								labelSizeScale: 1.25,
-							},
-							{
-								outerRadiusFraction: 0.45,
-								innerRadiusFraction: 0.1,
-								gap: 0,
-								anglePadding: -20,
-								angleGap: -30,
-								offset: 100,
-								outerCornerRadius: 10,
-								innerCornerRadius: 10,
-								labelSize: 9,
-							}
-						]}
-						slices={
-							displayedAttributeGroups.map(attrGroup => {
-								const evalGroup = wallet.overall[attrGroup.id]
-								const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
-								return {
-									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
-									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
-									arcIconId: attrGroup.icon,
-									ariaLabel: attrGroup.displayName,
-									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
-									gradient: attributeGroupFlowerGradient,
-									weight: 1,
-									...evalGroup && {
-										children: (
-											evaluatedAttributesEntries(evalGroup)
-												.filter(([attributeId, attribute]) => (
-													(attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT || !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`))
-													&& (overallFilteredAttributeIds === null || overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
-												))
-												.map(([attributeId, attribute]) => ({
-													id: `m_${wallet.metadata.id}_ag_${attrGroup.id}_a_${attributeId}`,
-													color: ratingToColor(attribute.evaluation.outcome.rating),
-													weight: (
-														attrGroup.attributes.find(w => w.attribute.id === attributeId)
-															?.weight
-														?? 1
-													),
-													arcLabel: '',
-													arcIconId: attribute.attribute.icon,
-													ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
-													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
-												}))
-										),
-									},
-								}
-							})
-						}
-					/>
-				</div>
-			</div>
-		{/each}
-	</div>
+	<Modal
+		isOpen={stageModalWallet !== undefined}
+		title={stageModalWallet ? `${stageModalWallet.metadata.displayName} stage` : 'Stage'}
+		onClose={() => { stageModalWalletId = undefined }}
+	>
+		{#if stageModalWallet}
+			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(stageModalWallet)}
+			<WalletStageSummary wallet={stageModalWallet} {stage} {ladderEvaluation} />
+		{/if}
+		{#snippet footer()}
+			<button type="button" data-pressable onclick={() => { stageModalWalletId = undefined }}>Close</button>
+		{/snippet}
+	</Modal>
 </section>
 
 
 <style>
+	.eip-tooltip-content {
+		width: 34rem;
+		max-inline-size: 100%;
+	}
+
 	section {
+		--filter-cluster-size: 1.3rem;
+
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 60.5rem;
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
@@ -1667,51 +1952,340 @@
 		}
 	}
 
+	/* The same filter region follows the complete heading hierarchy. */
+	.filters {
+		display: contents;
+		font-size: 1rem;
+		text-wrap: wrap;
+	}
+
+	.filter-trigger {
+		position: relative;
+		z-index: 1;
+		anchor-name: var(--filter-anchor);
+		display: inline-grid;
+		justify-items: center;
+		gap: 0.35em;
+		font: inherit;
+		color: inherit;
+		padding: 0;
+		background-color: transparent;
+		border: none;
+	}
+
+	.filter-cluster-target {
+		anchor-name: var(--filter-cluster-anchor);
+		display: block;
+		inline-size: var(--filter-cluster-size);
+		block-size: var(--filter-cluster-size);
+	}
+
+	.filter-cluster-targets {
+		display: flex;
+		justify-content: center;
+		gap: 0.25em;
+	}
+
+	:global(#layout:has(.wallet-table)) {
+		/* Native fixed anchors must share the viewport coordinate system. */
+		--scrollContainer-perspective: none;
+		container-name: wallet-table;
+
+		&:global(:has(.wallet-table thead button.sort-button:target)) {
+			/* Native fragment focus must settle before header pointer activation. */
+			scroll-behavior: auto;
+		}
+	}
+
+	.filter-popover {
+		&[data-card] {
+			--card-backgroundColor: transparent;
+		}
+		display: flex;
+		position: fixed;
+		position-anchor: var(--filter-anchor);
+		z-index: 3;
+		top: calc(anchor(bottom) + 0.5rem);
+		margin: 0;
+		inline-size: fit-content;
+		max-inline-size: calc(100dvi - 1rem);
+		border: 1px solid transparent;
+		backdrop-filter: none;
+		pointer-events: none;
+
+		&:not([data-filter-kind="attribute"]) {
+			left: max(0.5rem, anchor(left));
+			right: 0.5rem;
+		}
+
+		&[data-filter-kind="attribute"] {
+			left: auto;
+			right: 0.5rem;
+		}
+
+		@supports (position-area: block-end span-inline-end) {
+			/* The anchor area supplies the remaining viewport block size. */
+			position-area: block-end span-all;
+			top: 0.5rem;
+			max-block-size: calc(100% - 1rem);
+
+			&:popover-open {
+				/* The visible panel can use viewport space beyond its anchor's side. */
+				position-area: block-end span-inline-end;
+				inset-inline: auto;
+				inline-size: max-content;
+				margin-inline: 0.5rem;
+			}
+		}
+
+		@container wallet-table (width >= 42rem) {
+			&:not(:popover-open) {
+				visibility: hidden;
+				:global([data-active-choice] .choice-icon) { visibility: visible; }
+			}
+		}
+	}
+
+	.filter-popover:popover-open {
+		&[data-card] {
+			--card-backgroundColor: var(--background-primary);
+		}
+		border-color: var(--border-color);
+		box-shadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+		pointer-events: auto;
+	}
+
+	/* CSS owns the breakpoint; entering inline mode releases the native top layer. */
+	@keyframes -global-wallet-filters-inline {
+		from { opacity: 1; }
+		to { opacity: 1; }
+	}
+	@container wallet-table (width < 42rem) {
+		.filters {
+			position: relative;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			container-type: scroll-state inline-size;
+			inline-size: 100%;
+			overflow-x: auto;
+			overflow-y: clip;
+			scrollbar-width: none;
+			padding: 0.5rem;
+		}
+
+		.filter-popover {
+			animation: wallet-filters-inline 1ms;
+			display: contents !important;
+			visibility: visible;
+			pointer-events: auto;
+		}
+
+		.filter-popover :global(form.menu) {
+			display: contents;
+		}
+
+		.filter-trigger {
+			pointer-events: none;
+			visibility: hidden;
+			.filter-trigger-label { visibility: visible; }
+		}
+
+		.filter-cluster-target {
+			display: none;
+		}
+	}
+
+	section { ---wallet-identity-context: 1; }
+
+	.desktop-table-container {
+		---wallet-identity-compact: 0;
+		---wallet-identity-rankSize: 1.25em;
+		---wallet-identity-logoSize: 2.25em;
+		---wallet-identity-gap: 1em;
+		---wallet-identity-blockSize: 5rem;
+		z-index: 1;
+
+		:global(td[data-table-column="stage"]) {
+			position: relative;
+		}
+
+		@container wallet-table (width >= 42rem) {
+			:global(.wallet-table:not(:has(> table > thead th[data-expanded])) > table) {
+				max-inline-size: var(--sticky-sizeInline);
+			}
+
+			:global(th[data-table-column="stage"][rowspan]:not([rowspan="1"]):has(.filter-cluster-target)) {
+				vertical-align: top;
+
+				.filter-trigger {
+					grid-auto-flow: column;
+					align-items: center;
+				}
+			}
+		}
+
+		/* Block rows stop producing a max-content track to centre. */
+		@container wallet-table (width < 42rem) {
+			grid-template-columns: 100%;
+			inline-size: 100%;
+			max-inline-size: 100%;
+			min-inline-size: 0;
+			contain: inline-size;
+		}
+	}
+
 	:global {
-		.wallet-table {
-			tr {
-				&:has(svg[height="52"]) {
-					--walletTable-rowClosed-blockSize: 52px;
+		/*
+		 * Narrow table: the same rows re-flow as blocks, so wallet metadata leads the
+		 * row, the remaining columns share the line below it, and the rating pie wraps
+		 * underneath at full width.
+		 */
+		@container wallet-table (width < 42rem) {
+			.wallet-table {
+				--table-inlineSize: 100%;
+
+				table,
+				thead,
+				tbody {
+					display: block;
+					inline-size: 100%;
+					max-inline-size: 100%;
+					min-inline-size: 0;
 				}
 
-				&:has(svg[height="96"]) {
-					--walletTable-rowClosed-blockSize: 96px;
+				colgroup {
+					display: none;
 				}
 
-				&:has(svg[height="176"]) {
-					--walletTable-rowClosed-blockSize: 176px;
+				thead tr {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(min(7rem, 100%), 1fr));
+					gap: 0.25rem;
 				}
 
-				td {
-					&:not(:has(details:open)) {
-						transition-property: vertical-align;
-						transition-delay: 0.25s;
+
+				thead th {
+					min-inline-size: 0;
+					font-size: max(0.75rem, 12px);
+					overflow-wrap: anywhere;
+
+					.header-title {
+						inline-size: auto !important;
+						min-inline-size: 0 !important;
+					}
+				}
+
+				tbody tr {
+					display: grid;
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					align-items: center;
+					padding-block: 1rem;
+				}
+
+				tbody td {
+					padding: 0;
+
+					&:not([data-table-column="wallet"], [data-table-column="stage"], [data-table-column="overall"], [data-table-column="displayName"]) {
+						display: grid;
+						justify-items: center;
+						align-self: stretch;
+						align-content: start;
+						gap: 0.35rem;
+						padding-block-start: 0.5rem;
+
+						&::before {
+							content: attr(data-table-column-name);
+							max-inline-size: 10rem;
+							font-size: 0.75rem;
+							font-weight: 600;
+							line-height: 1.15;
+							text-align: center;
+							text-wrap: balance;
+						}
 					}
 
-					&:has(details:open) {
+					&[data-table-column="wallet"] {
+						grid-column: 1 / -1;
+					}
+
+					&[data-table-column="displayName"] {
+						grid-column: 1 / -1;
+					}
+
+					&[data-table-column="stage"] {
+						grid-column: 1 / -1;
+						display: flex;
+						align-items: center;
+						justify-self: center;
+						gap: 0.5rem;
+
+						&::before {
+							content: attr(data-table-column-name);
+							font-size: 0.75rem;
+							font-weight: 600;
+						}
+					}
+
+					&[data-table-column="overall"] {
+						grid-column: 1 / -1;
+						justify-self: center;
+					}
+
+					&:not([data-table-column="wallet"], [data-table-column="overall"], [data-table-column="displayName"]) {
+						justify-self: center;
+					}
+				}
+
+				.wallet-info {
+					block-size: auto;
+				}
+			}
+		}
+
+		.wallet-table {
+			.header-below {
+				--table-cell-padding: 0;
+			}
+
+			tr {
+				td {
+					&:not(:has(> details[open] > [popover]:not(:popover-open))) {
+						transition-property: vertical-align;
+						transition-delay: 0.25s;
+
+						&:has(> details.wallet-info-details[data-view-transition~="item"]) {
+							transition-property: none;
+						}
+					}
+
+					&:has(> details[open] > [popover]:not(:popover-open)) {
 						--table-cell-verticalAlign: top;
 					}
 				}
 
 				details.wallet-info-details {
+
 					summary {
 						box-sizing: content-box;
+						padding: var(--table-cell-padding);
+						column-gap: 0.25em;
 						margin: calc(-1 * var(--table-cell-padding));
 
+						@container wallet-table (width < 42rem) {
+							margin: 0;
+						}
+
 						transition-property: opacity, scale, min-block-size;
-						min-block-size: var(--walletTable-rowClosed-blockSize);
 
 						> * {
-							padding: var(--table-cell-padding);
+							padding: 0;
 						}
 					}
 
-					&:open summary {
+					&[open]:has(> [popover]:not(:popover-open)) summary {
 						min-block-size: 5rem;
-
-						> * {
-							padding-block-end: 0.25rem;
-						}
+						padding-block-end: 0.25rem;
 					}
 				}
 			}
@@ -1723,48 +2297,16 @@
 		color: var(--text-secondary);
 	}
 
-	:global(select.stage-list-select) {
-		font-weight: 600;
-	}
-
-	.stage-list-menu {
-		margin: 0;
-		padding: 0.25rem;
-		min-inline-size: 12rem;
-		inset: unset;
-
-		background: var(--background-primary);
-		border: 1px solid var(--border-color);
-		border-radius: 0.5rem;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-
-		button {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			width: 100%;
-			font-weight: 600;
-
-			&[aria-selected='true'] {
-				background-color: var(--accent-backgroundColor);
-				border-color: var(--accent);
-				color: var(--accent);
-			}
-		}
-	}
-
-	:global(.wallet-table .header-extra:has(.stage-list-menu:popover-open)) {
-		--isExpanded: 1;
-	}
-
 	.wallet-info {
-		block-size: 5rem;
+		block-size: var(---wallet-identity-blockSize);
+
+		&[data-row] { gap: var(---wallet-identity-gap); }
 
 		text-align: start;
 
 		.row-count {
-			width: 1.25em;
-			height: 1.25em;
+			width: var(---wallet-identity-rankSize);
+			height: var(---wallet-identity-rankSize);
 
 			text-align: center;
 			font-weight: 600;
@@ -1780,7 +2322,7 @@
 		}
 
 		.wallet-icon {
-			--icon-size: 2.25em;
+			--icon-size: var(---wallet-identity-logoSize);
 		}
 
 		.name-and-tags {
@@ -1799,40 +2341,42 @@
 			}
 		}
 
-		.variants {
-			margin-inline-start: auto;
 
-			font-size: 1.25em;
+	}
 
-			button {
-				aspect-ratio: 1;
-				padding: 0.33em;
+	.variants {
+		margin-inline-start: auto;
 
-				background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
-				border-radius: 50%;
+		font-size: 1.25em;
 
-				transition-property: background-color, opacity;
+		button {
+			aspect-ratio: 1;
+			padding: 0.33em;
 
-				&[data-selected] {
-					background-color: var(--accent-backgroundColor);
-					border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
-				}
+			background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
+			border-radius: 50%;
 
-				&:focus {
-					border-color: var(--accent);
-				}
+			transition-property: background-color, opacity;
 
-				&:hover:not(:disabled) {
-					filter: contrast(1.25) brightness(1.1);
-				}
+			&[data-selected] {
+				background-color: var(--accent-backgroundColor);
+				border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
+			}
 
-				&:disabled {
-					opacity: 0.4;
-				}
+			&:focus {
+				border-color: var(--accent);
+			}
 
-				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-					opacity: 0.75;
-				}
+			&:hover:not(:disabled) {
+				filter: contrast(1.25) brightness(1.1);
+			}
+
+			&:disabled {
+				opacity: 0.4;
+			}
+
+			.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
+				opacity: 0.75;
 			}
 		}
 	}
@@ -1843,7 +2387,7 @@
 		line-height: 1.6;
 		text-align: start;
 
-		&[data-card] {
+		:global(:popover-open) & {
 			font-size: 0.75em;
 		}
 
@@ -1877,236 +2421,165 @@
 		line-height: 1;
 	}
 
-	button:has([data-badge]) {
+	button:has(:global([data-badge])) {
+		font: inherit;
 		background: none;
 		border: none;
 		padding: 0;
 	}
 
-	/* ── Mobile filter UI ───────────────────────── */
-
-	.mobile-filters {
-		display: none;
-		width: 100%;
+	:global(::view-transition-group(*.pie)) {
+		animation-duration: 300ms;
+		animation-timing-function: var(--transition-easeOutExpo);
 	}
 
-	/* Default: mobile-only elements hidden on desktop */
-	.mobile-wallet-list {
-		display: none;
-	}
-
-	@media (max-width: 1024px) {
-		/* Show mobile filters, hide desktop filter strip */
-		.mobile-filters {
-			display: flex;
-			flex-direction: column;
-			gap: 1.5rem;
-		}
-
-		.filters {
-			display: none;
-		}
-
-		:global(
-			[data-scroll-container]
-				[data-sticky-container]
-				.desktop-table-container[data-scroll-item][data-scroll-item~="inline-attached"]
-		) {
-			display: none;
-		}
-
-		.mobile-wallet-list {
-			display: flex;
-			flex-direction: column;
-			padding-inline: 1.25rem;
+	@media (prefers-reduced-motion: reduce) {
+		:global(::view-transition-group(*.pie)) {
+			animation-duration: 0s;
 		}
 	}
 
-	.mobile-filter-row {
-		display: flex;
-		gap: 2.5rem;
-		align-items: flex-start;
+	@position-try --wallet-identity-dock {
+		inset-block: auto var(--tooltip-drawerMargin, 0.75rem);
+		inset-inline: var(--tooltip-drawerMargin, 0.75rem);
+		inline-size: auto;
+		max-inline-size: none;
+		max-block-size: var(--tooltip-drawerBlockSize, min(15rem, 50dvb));
+		align-self: auto;
 	}
 
-	.mobile-filter-group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-
-		legend {
-			font-size: 0.75em;
-			font-family: var(--font-mono, monospace);
-			letter-spacing: 0.05em;
-			color: var(--text-secondary);
-			padding: 0;
+	:global {
+		.wallet-table {
+			anchor-scope: --wallet-identity-heading;
+			thead { anchor-name: --wallet-identity-heading; }
+			td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
+				anchor-name: --wallet-identity-cell;
+				anchor-scope: --wallet-identity-cell, --wallet-identity-logo;
+			}
 		}
 
-		&.mobile-filter-group-centered {
-			align-items: center;
-			width: 100%;
+		.desktop-table-container .wallet-info {
+			.wallet-icon { anchor-name: --wallet-identity-logo; }
+
+			&[popover]:not(:popover-open) {
+				--paint-filter: inherit;
+				display: flex;
+				position: static;
+				inset: auto;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				inline-size: auto;
+				max-inline-size: none;
+				max-block-size: none;
+				overflow: visible;
+				background: transparent;
+				color: inherit;
+			}
+
+			&:popover-open {
+				display: flex;
+				&[data-row] { flex-direction: column; align-items: stretch; }
+				position: fixed;
+				position-anchor: --wallet-identity-cell;
+				inset-inline: anchor(--wallet-identity-cell end) auto;
+				inset-block: anchor(--wallet-identity-heading bottom) 0;
+				align-self: anchor-center;
+				position-try-fallbacks: flip-inline, --wallet-identity-dock;
+				position-visibility: anchors-visible;
+				margin-block: 0;
+				margin-inline: 0.5rem;
+				inline-size: max-content;
+				max-inline-size: min(20rem, calc(100dvi - 2rem));
+				block-size: auto;
+				overflow: auto;
+				color: inherit;
+				border: 1px solid var(--border-color);
+
+				:is(.row-count, .wallet-icon) {
+					position: fixed;
+					position-anchor: --wallet-identity-cell;
+					inset-block: anchor(--wallet-identity-heading bottom) 0;
+					align-self: anchor-center;
+					position-visibility: no-overflow;
+					margin: 0;
+				}
+				.row-count { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding))); }
+				.wallet-icon { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap))); }
+			}
 		}
-	}
 
-	.mobile-filter-items {
-		display: flex;
-		gap: 0.75rem;
-		flex-wrap: wrap;
-	}
+		@supports (anchor-scope: --wallet-identity-cell) and (container-type: scroll-state) and (position-visibility: no-overflow) and (animation-timeline: view(inline)) and (animation-range: entry) and (width: anchor-size(--table-sticky inline)) and (timeline-scope: --table-sticky) {
+			@container style(---wallet-identity-context: 1) {
+				@media (hover: hover) and (pointer: fine) {
+					@container wallet-table (width >= 48rem) {
+						.wallet-table:has(.wallet-info[popover]) {
+							--wallet-identity-retainedInlineSize: 6.25rem;
 
-	.mobile-filter-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.375rem;
-	}
+							&:has(td[data-table-column="wallet"]) { --wallet-identity-retainedInlineSize: 8rem; }
 
-	.filter-circle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 3rem;
-		height: 3rem;
-		border-radius: 50%;
-		border: 1px solid var(--icon-navigation-borderColor);
-		background: none;
-		color: inherit;
-		padding: 0;
-		cursor: pointer;
-		transition-property: background-color, border-color, color;
+							td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
+								container-name: wallet-identity-cell;
 
-		[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
-			font-size: 1.5rem;
-		}
+								&:has(.wallet-info:popover-open) {
+									min-inline-size: var(--wallet-identity-flowInlineSize);
+									block-size: var(--wallet-identity-flowBlockSize);
+								}
+							}
 
-		&.active {
-			background-color: var(--accent-backgroundColor);
-			border-color: var(--accent);
-			color: var(--accent);
-		}
+							.wallet-info:not(:popover-open) {
+								> :is(.row-count, .wallet-icon) {
+									position: sticky;
+									inset-inline-start: calc(var(--sticky-insetInlineStart) + var(--table-cell-padding));
+									z-index: 2;
+								}
 
-		&:hover:not(.active) {
-			background-color: rgba(255, 255, 255, 0.06);
-		}
-	}
+								> .wallet-icon {
+									inset-inline-start: calc(var(--sticky-insetInlineStart) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap));
+									z-index: 3;
+								}
 
-	.filter-circle-number {
-		font-size: 1rem;
-		font-weight: 600;
-		font-family: var(--font-mono, monospace);
-		line-height: 1;
-	}
+								> .row-count::after {
+									content: '';
+									position: absolute;
+									inset-block: calc((100% - var(---wallet-identity-blockSize)) / 2);
+									inset-inline-start: calc(-1 * var(--table-cell-padding));
+									inline-size: calc(var(---wallet-identity-rankSize) + var(---wallet-identity-gap) + var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding));
+									background: var(--table-backgroundColor);
+									z-index: -1;
+								}
+							}
 
-	.filter-circle-label {
-		font-size: 0.625rem;
-		letter-spacing: 0.05em;
-		color: var(--text-secondary);
-		text-align: center;
-	}
+							tr:nth-of-type(odd) .wallet-info:not(:popover-open) > .row-count::after {
+								background: linear-gradient(var(--table-row-backgroundColor), var(--table-row-backgroundColor)), var(--table-backgroundColor);
+							}
+						}
 
-	/* ── Mobile wallet cards ────────────────────── */
+						@container wallet-identity-cell scroll-state(stuck: inline-start) {
+							.wallet-info { ---wallet-identity-compact: 1; }
 
-	.mobile-wallet-card {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		padding-block: 1.75rem;
-		border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+							.wallet-info:not(:popover-open) {
+								:is(.name-and-tags, .variants) { visibility: hidden; }
 
-		&:last-child {
-			border-block-end: none;
-		}
-	}
+								.name h3 {
+									position: relative;
+									inset-inline-start: calc(var(--table-stickyLeaf-inlineSize) - var(--wallet-identity-retainedInlineSize));
+								}
 
-	.mobile-card-header {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
+								.name h3 a {
+									color: transparent;
+									visibility: visible;
+									pointer-events: none;
+									outline: none;
+								}
 
-	.mobile-card-rank {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		min-width: 2rem;
-		flex-shrink: 0;
-	}
-
-	.mobile-card-logo-wrap {
-		width: 2.75rem;
-		height: 2.75rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: contain;
-		}
-	}
-
-	.mobile-name-and-variants {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		flex: 1;
-		min-width: 0;
-	}
-
-	.mobile-card-name {
-		font-size: 1.25rem;
-		font-weight: 700;
-		min-width: 0;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-		a {
-			color: inherit;
-			text-decoration: none;
+								&:has(.name h3 a:focus-visible) > .wallet-icon { outline: auto; }
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
-	.mobile-card-stage {
-		flex-shrink: 0;
-	}
-
-	.mobile-card-variants {
-		display: flex;
-		gap: 0.375rem;
-		flex-shrink: 0;
-	}
-
-	.mobile-variant-btn {
-		width: 2rem;
-		height: 2rem;
-		border: none;
-		background: none;
-		color: var(--text-secondary);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		padding: 0;
-		transition-property: color;
-
-		[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
-			font-size: 1.25rem;
-		}
-
-		&.active {
-			color: var(--accent);
-		}
-	}
-
-	.mobile-card-pie {
-		display: flex;
-		justify-content: center;
-		content-visibility: auto;
-		/* Reserve the pie's rendered height while it is skipped, so cards below don't shift when it renders:
-		   2 * padding + 2 * (radius + outer level offset) = 2 * 8 + 2 * (100 + 0.45 * 100) */
-		contain-intrinsic-size: auto 306px;
-	}
 </style>

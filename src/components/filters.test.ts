@@ -1,0 +1,301 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+	applyFilterSets,
+	changeFilterChoice,
+	type FilterChoice,
+	type FilterSet,
+	filterSetIsAvailable,
+	resetFilterSets,
+} from './filters'
+
+type Item = {
+	id: string
+	tags: string[]
+}
+
+const items: Item[] = [
+	{ id: 'browser-eoa', tags: ['browser', 'eoa'] },
+	{ id: 'mobile-smart', tags: ['mobile', 'smart'] },
+	{ id: 'hybrid', tags: ['browser', 'mobile'] },
+	{ id: 'unclassified', tags: [] },
+]
+
+const matches = (tag: string): FilterChoice<Item> => ({
+	id: tag,
+	label: tag,
+	matches: item => item.tags.includes(tag),
+})
+
+const all: FilterChoice<Item> = { id: '', label: 'All' }
+const browser = matches('browser')
+const mobile = matches('mobile')
+
+const exclusive: FilterSet<Item> = {
+	id: 'platform',
+	label: 'Platform',
+	cardinality: 'exclusive',
+	match: 'union',
+	defaultChoice: '',
+	choices: [all, browser, mobile],
+}
+
+describe('filter-set selection semantics', () => {
+	const eoa = matches('eoa')
+	const smart = matches('smart')
+	const account: FilterSet<Item> = {
+		id: 'account',
+		label: 'Account',
+		cardinality: 'inclusive',
+		match: 'union',
+		choices: [eoa, smart],
+	}
+
+	it.each(['union', 'intersection'] as const)(
+		'isolates a selected shortcut before toggling it off with %s matching',
+		match => {
+			const inclusiveAccount: FilterSet<Item> = { ...account, match }
+			const sets = [exclusive, inclusiveAccount]
+			const selected = new Set([browser, eoa, smart])
+			const isolated = changeFilterChoice(sets, selected, eoa, true)
+
+			expect(isolated).toEqual(new Set([browser, eoa]))
+			expect(changeFilterChoice(sets, isolated, eoa, true)).toEqual(new Set([browser]))
+			expect(changeFilterChoice(sets, selected, eoa)).toEqual(new Set([browser, smart]))
+		},
+	)
+
+	it('composes independent sets regardless of their owning panel', () => {
+		expect(
+			applyFilterSets(items, [exclusive, account], new Set([browser, eoa])).map(item => item.id),
+		).toEqual(['browser-eoa'])
+		expect(applyFilterSets(items, [exclusive, account], new Set([mobile, eoa]))).toEqual([])
+	})
+
+	it('resets only the sets owned by the requested group', () => {
+		expect(resetFilterSets([exclusive], new Set([browser, eoa]))).toEqual(new Set([all, eoa]))
+		expect(resetFilterSets([account], new Set([browser, eoa]))).toEqual(new Set([browser]))
+		expect(resetFilterSets([exclusive, account], new Set([browser, eoa]))).toEqual(new Set([all]))
+	})
+
+	it('initializes a non-neutral exclusive default without changing another group on reset', () => {
+		const defaultBrowser: FilterSet<Item> = { ...exclusive, defaultChoice: browser.id }
+		const defaults = resetFilterSets([defaultBrowser, account], new Set())
+
+		expect(defaults).toEqual(new Set([browser]))
+		expect(applyFilterSets(items, [defaultBrowser, account], defaults)).toEqual([
+			items[0],
+			items[2],
+		])
+		expect(resetFilterSets([account], new Set([mobile, eoa]))).toEqual(new Set([mobile]))
+		expect(resetFilterSets([defaultBrowser], new Set([mobile, eoa]))).toEqual(
+			new Set([browser, eoa]),
+		)
+	})
+
+	it('preserves other sets when a row shortcut forces one choice', () => {
+		expect(changeFilterChoice([exclusive, account], new Set([browser, eoa]), mobile, true)).toEqual(
+			new Set([mobile, eoa]),
+		)
+	})
+
+	it('treats no exclusive selection and its All sentinel as the same no-restriction state', () => {
+		expect(applyFilterSets(items, [exclusive], new Set())).toEqual(items)
+		expect(applyFilterSets(items, [exclusive], new Set([all]))).toEqual(items)
+	})
+
+	it('applies the one selected predicate in an exclusive set', () => {
+		expect(applyFilterSets(items, [exclusive], new Set([browser])).map(item => item.id)).toEqual([
+			'browser-eoa',
+			'hybrid',
+		])
+	})
+
+	it('treats no inclusive selection as unrestricted but all union selections as covered values only', () => {
+		const inclusiveUnion: FilterSet<Item> = {
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'union',
+			choices: [browser, mobile],
+		}
+
+		expect(applyFilterSets(items, [inclusiveUnion], new Set())).toEqual(items)
+		expect(
+			applyFilterSets(items, [inclusiveUnion], new Set([browser, mobile])).map(item => item.id),
+		).toEqual(['browser-eoa', 'mobile-smart', 'hybrid'])
+	})
+
+	it('requires every selected predicate when all filters in an intersection set are selected', () => {
+		const inclusiveIntersection: FilterSet<Item> = {
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser, mobile],
+		}
+
+		expect(
+			applyFilterSets(items, [inclusiveIntersection], new Set([browser, mobile])).map(
+				item => item.id,
+			),
+		).toEqual(['hybrid'])
+	})
+
+	it('enforces exclusive cardinality independently from match composition', () => {
+		expect(changeFilterChoice([exclusive], new Set([browser]), mobile)).toEqual(new Set([mobile]))
+		expect(changeFilterChoice([exclusive], new Set([mobile]), mobile)).toEqual(new Set())
+	})
+
+	it('keeps exclusive All explicit while preserving its neutral meaning', () => {
+		const selectedAll = changeFilterChoice([exclusive], new Set([browser]), all)
+
+		expect(selectedAll).toEqual(new Set([all]))
+		expect(applyFilterSets(items, [exclusive], selectedAll)).toEqual(items)
+
+		const selectedConcrete = changeFilterChoice([exclusive], selectedAll, mobile)
+
+		expect(selectedConcrete).toEqual(new Set([mobile]))
+	})
+})
+
+describe('filter-set availability', () => {
+	const known: Item = { id: 'known', tags: ['browser', 'mobile'] }
+	const unclassified: Item = { id: 'unclassified', tags: [] }
+	const records = [known, unclassified]
+	const soleExclusive: FilterSet<Item> = { ...exclusive, choices: [all, browser] }
+	const singleChoiceSets: FilterSet<Item>[] = [
+		soleExclusive,
+		{
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'union',
+			choices: [browser],
+		},
+		{
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser],
+		},
+	]
+
+	it.each(singleChoiceSets)(
+		'retains a useful sole choice with $cardinality/$match selection',
+		set => {
+			const neutral = new Set<FilterChoice<Item>>()
+
+			expect(applyFilterSets(records, [set], neutral)).toContain(unclassified)
+			expect(applyFilterSets(records, [set], new Set([browser]))).not.toContain(unclassified)
+			expect(filterSetIsAvailable(records, set, neutral)).toBe(true)
+			expect(filterSetIsAvailable([known], set, neutral)).toBe(false)
+		},
+	)
+
+	it('keeps an active choice reachable when no items match it', () => {
+		expect(filterSetIsAvailable([unclassified], soleExclusive, new Set([browser]))).toBe(true)
+		expect(filterSetIsAvailable([unclassified], soleExclusive, new Set())).toBe(false)
+	})
+
+	it('preserves an authored stable vocabulary independently from current matches', () => {
+		const stable = { ...soleExclusive, alwaysShowChoices: true }
+
+		expect(filterSetIsAvailable([unclassified], stable, new Set())).toBe(true)
+		expect(filterSetIsAvailable([], stable, new Set())).toBe(true)
+	})
+
+	it('preserves multiple represented alternatives even when their matching items coincide', () => {
+		const set: FilterSet<Item> = {
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser, mobile],
+		}
+
+		expect(filterSetIsAvailable([known], set, new Set())).toBe(true)
+	})
+
+	it('omits a set with no concrete choices', () => {
+		expect(filterSetIsAvailable(records, { ...exclusive, choices: [all] }, new Set([all]))).toBe(
+			false,
+		)
+		expect(
+			filterSetIsAvailable(
+				records,
+				{ ...exclusive, choices: [], alwaysShowChoices: true },
+				new Set(),
+			),
+		).toBe(false)
+	})
+})
+
+describe('filter defaults across selection cardinality and matching composition', () => {
+	const eoa = matches('eoa')
+	const account: FilterSet<Item> = {
+		id: 'account',
+		label: 'Account',
+		cardinality: 'inclusive',
+		match: 'union',
+		choices: [eoa],
+	}
+
+	it.each(['union', 'intersection'] as const)(
+		'restores inclusive defaults with %s matching and scoped reset',
+		match => {
+			for (const defaultChoices of [undefined, [], [browser.id], [browser.id, mobile.id]]) {
+				const platform: FilterSet<Item> = {
+					id: 'platform',
+					label: 'Platform',
+					cardinality: 'inclusive',
+					match,
+					choices: [browser, mobile],
+					...(defaultChoices === undefined ? {} : { defaultChoices }),
+				}
+				const expected = !defaultChoices?.length
+					? items
+					: defaultChoices.length === 1
+						? [items[0], items[2]]
+						: match === 'union'
+							? items.slice(0, 3)
+							: [items[2]]
+				const active = new Set([mobile, eoa])
+				const reset = resetFilterSets([platform], active)
+
+				expect([...reset].map(choice => choice.id).sort()).toEqual(
+					[...(defaultChoices ?? []), eoa.id].sort(),
+				)
+				expect(active).toEqual(new Set([mobile, eoa]))
+				expect(applyFilterSets(items, [platform, account], reset)).toEqual(
+					expected.includes(items[0]) ? [items[0]] : [],
+				)
+				expect(
+					applyFilterSets(items, [platform, account], resetFilterSets([account], reset)),
+				).toEqual(expected)
+			}
+		},
+	)
+
+	it.each(['union', 'intersection'] as const)(
+		'keeps exclusive cardinality and neutral All with %s matching',
+		match => {
+			for (const defaultChoice of [all.id, browser.id]) {
+				const platform: FilterSet<Item> = { ...exclusive, match, defaultChoice }
+				const selected = changeFilterChoice([platform, account], new Set([browser, eoa]), mobile)
+
+				expect(selected).toEqual(new Set([mobile, eoa]))
+				expect(applyFilterSets(items, [platform, account], selected)).toEqual([])
+				const neutral = changeFilterChoice([platform, account], selected, all)
+
+				expect(neutral).toEqual(new Set([all, eoa]))
+				expect(applyFilterSets(items, [platform, account], neutral)).toEqual([items[0]])
+				expect(applyFilterSets(items, [platform], new Set())).toEqual(items)
+				expect(resetFilterSets([platform], selected)).toEqual(
+					new Set([defaultChoice === all.id ? all : browser, eoa]),
+				)
+			}
+		},
+	)
+})

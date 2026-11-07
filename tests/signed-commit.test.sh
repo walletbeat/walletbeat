@@ -7,7 +7,7 @@ set -euo pipefail
 
 commit_object="$(git cat-file -p HEAD)"
 
-if ! echo "$commit_object" | grep -q '^gpgsig '; then
+if ! grep -q '^gpgsig ' <<< "$commit_object"; then
 	echo "The latest commit is not signed." >&2
 	echo 'Please sign your commits. GitHub rebase merges discard signatures; use a signed merge method.' >&2
 	exit 1
