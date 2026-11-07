@@ -231,3 +231,71 @@ describe('filter-set availability', () => {
 		).toBe(false)
 	})
 })
+
+describe('filter defaults across selection cardinality and matching composition', () => {
+	const eoa = matches('eoa')
+	const account: FilterSet<Item> = {
+		id: 'account',
+		label: 'Account',
+		cardinality: 'inclusive',
+		match: 'union',
+		choices: [eoa],
+	}
+
+	it.each(['union', 'intersection'] as const)(
+		'restores inclusive defaults with %s matching and scoped reset',
+		match => {
+			for (const defaultChoices of [undefined, [], [browser.id], [browser.id, mobile.id]]) {
+				const platform: FilterSet<Item> = {
+					id: 'platform',
+					label: 'Platform',
+					cardinality: 'inclusive',
+					match,
+					choices: [browser, mobile],
+					...(defaultChoices === undefined ? {} : { defaultChoices }),
+				}
+				const expected = !defaultChoices?.length
+					? items
+					: defaultChoices.length === 1
+						? [items[0], items[2]]
+						: match === 'union'
+							? items.slice(0, 3)
+							: [items[2]]
+				const active = new Set([mobile, eoa])
+				const reset = resetFilterSets([platform], active)
+
+				expect([...reset].map(choice => choice.id).sort()).toEqual(
+					[...(defaultChoices ?? []), eoa.id].sort(),
+				)
+				expect(active).toEqual(new Set([mobile, eoa]))
+				expect(applyFilterSets(items, [platform, account], reset)).toEqual(
+					expected.includes(items[0]) ? [items[0]] : [],
+				)
+				expect(
+					applyFilterSets(items, [platform, account], resetFilterSets([account], reset)),
+				).toEqual(expected)
+			}
+		},
+	)
+
+	it.each(['union', 'intersection'] as const)(
+		'keeps exclusive cardinality and neutral All with %s matching',
+		match => {
+			for (const defaultChoice of [all.id, browser.id]) {
+				const platform: FilterSet<Item> = { ...exclusive, match, defaultChoice }
+				const selected = changeFilterChoice([platform, account], new Set([browser, eoa]), mobile)
+
+				expect(selected).toEqual(new Set([mobile, eoa]))
+				expect(applyFilterSets(items, [platform, account], selected)).toEqual([])
+				const neutral = changeFilterChoice([platform, account], selected, all)
+
+				expect(neutral).toEqual(new Set([all, eoa]))
+				expect(applyFilterSets(items, [platform, account], neutral)).toEqual([items[0]])
+				expect(applyFilterSets(items, [platform], new Set())).toEqual(items)
+				expect(resetFilterSets([platform], selected)).toEqual(
+					new Set([defaultChoice === all.id ? all : browser, eoa]),
+				)
+			}
+		},
+	)
+})
