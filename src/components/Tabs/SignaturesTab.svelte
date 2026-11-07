@@ -79,11 +79,11 @@
 						</div>
 						<div class="domain-item">
 							<span class="domain-key">Verifying Contract:</span>
-							{selectedSig.domain.verifyingContract}
+							<code>{selectedSig.domain.verifyingContract}</code>
 						</div>
 						<div class="domain-item">
 							<span class="domain-key">Salt:</span>
-							{selectedSig.domain.salt}
+							<code>{selectedSig.domain.salt}</code>
 						</div>
 					</div>
 				</div>
@@ -196,8 +196,7 @@
 	}
 
 	.detail-code {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.8rem;
 		background-color: var(--background-secondary);
 		padding: 0.75rem;
@@ -270,8 +269,7 @@
 	}
 
 	.signature-result {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-			monospace;
+		font-family: var(--fontFamily-monospace);
 		font-size: 0.75rem;
 		background: color-mix(in srgb, var(--background-primary) 50%, transparent);
 		padding: 0.75rem;

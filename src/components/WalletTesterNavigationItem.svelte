@@ -24,122 +24,61 @@
 <button
 	type="button"
 	class="sidebar-item"
-	class:selected={isSelected}
+	aria-pressed={isSelected}
+	data-card={isSelected ? 'padding-3 border-accent' : 'padding-3'}
+	data-column="gap-1"
 	class:completed={isCompleted}
 	class:partial={isPartial}
 	class:failed={isFailed}
-	class:disabled={isDisabled}
 	disabled={isDisabled}
 	{onclick}
 >
-	<div class="sidebar-item-header">
-		<h3 class="sidebar-item-title">{title}</h3>
+	<span data-row="gap-2">
+		<strong>{title}</strong>
 		{#if isCompleted}
-			<span class="sidebar-item-check passed">✓</span>
+			<span>✓</span>
 		{:else if isPartial}
-			<span class="sidebar-item-check partial">⚠</span>
+			<span>⚠</span>
 		{:else if isFailed}
-			<span class="sidebar-item-check failed">✗</span>
+			<span>✗</span>
 		{/if}
-	</div>
+	</span>
 	{#if description}
-		<p class="sidebar-item-desc">{description}</p>
+		<span class="sidebar-item-desc">{description}</span>
 	{/if}
 </button>
 
 
 <style>
 	.sidebar-item {
-		width: 100%;
-		padding: 0.75rem 1rem;
-		background-color: transparent;
-		border: none;
-		border-radius: 0.5rem;
-		text-align: left;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
+		--card-borderWidth: 1px;
+		text-align: start;
+		line-height: 1.4;
 
-	.sidebar-item:hover:not(.disabled) {
-		background-color: var(--background-secondary);
-	}
+		&[data-column] {
+			align-items: stretch;
+		}
 
-	.sidebar-item.selected {
-		background-color: color-mix(in srgb, var(--accent) 15%, transparent);
-		border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-	}
+		&:disabled {
+			cursor: not-allowed;
+			opacity: 0.5;
+		}
 
-	.sidebar-item.completed:not(.selected) {
-		background-color: color-mix(in srgb, var(--rating-pass) 5%, transparent);
-	}
+		&.completed {
+			color: var(--rating-pass-text);
+		}
 
-	.sidebar-item.partial:not(.selected) {
-		background-color: color-mix(in srgb, var(--rating-partial) 5%, transparent);
-	}
+		&.partial {
+			color: var(--rating-partial-text);
+		}
 
-	.sidebar-item.failed:not(.selected) {
-		background-color: color-mix(in srgb, var(--rating-fail) 5%, transparent);
-	}
-
-	.sidebar-item.disabled {
-		cursor: not-allowed;
-		opacity: 0.5;
-	}
-
-	.sidebar-item-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.sidebar-item-title {
-		font-size: 0.9rem;
-		font-weight: 600;
-		color: var(--text-primary);
-		margin: 0;
-	}
-
-	.sidebar-item.selected .sidebar-item-title {
-		color: var(--accent);
-	}
-
-	.sidebar-item.completed .sidebar-item-title {
-		color: var(--rating-pass-text);
-	}
-
-	.sidebar-item.partial .sidebar-item-title {
-		color: var(--rating-partial-text);
-	}
-
-	.sidebar-item.failed .sidebar-item-title {
-		color: var(--rating-fail-text);
-	}
-
-	.sidebar-item-check {
-		font-size: 1rem;
-		font-weight: bold;
-		flex-shrink: 0;
-	}
-
-	.sidebar-item-check.passed {
-		color: var(--rating-pass-text);
-	}
-
-	.sidebar-item-check.partial {
-		color: var(--rating-partial-text);
-	}
-
-	.sidebar-item-check.failed {
-		color: var(--rating-fail-text);
+		&.failed {
+			color: var(--rating-fail-text);
+		}
 	}
 
 	.sidebar-item-desc {
-		font-size: 0.8rem;
+		font-size: smaller;
 		color: var(--text-secondary);
-		margin: 0;
-		text-align: left;
-		line-height: 1.4;
 	}
 </style>

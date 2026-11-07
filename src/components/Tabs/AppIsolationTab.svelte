@@ -95,6 +95,7 @@
 				<button
 					type="button"
 					data-pressable
+					data-column-item="start"
 					onclick={callEthAccounts}
 					disabled={ethAccountsState.isPending}
 					class:running={ethAccountsState.isPending}
@@ -153,6 +154,7 @@
 				<button
 					type="button"
 					data-pressable
+					data-column-item="start"
 					onclick={callWalletConnect}
 					disabled={walletConnectState.isPending}
 					class:running={walletConnectState.isPending}
@@ -273,28 +275,6 @@
 		border-radius: 0.25rem;
 	}
 
-	button[data-pressable] {
-		background-color: var(--accent-color, #3b82f6);
-		color: white;
-		font-weight: 500;
-		padding: 0.6em 1.2em;
-		border: none;
-		border-radius: 0.5em;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-		transition: background-color 0.15s ease, box-shadow 0.15s ease;
-		align-self: flex-start;
-
-		&:hover:not(:disabled) {
-			background-color: color-mix(in srgb, var(--accent-color, #3b82f6) 85%, black);
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-		}
-
-		&:disabled {
-			background-color: var(--border-color);
-			color: var(--text-secondary);
-			cursor: not-allowed;
-		}
-	}
 
 	button[data-pressable].running {
 		opacity: 0.7;

@@ -157,7 +157,7 @@
         spellcheck="false"
         bind:value={calldataState.input}
       ></textarea>
-      <button type="button" data-pressable onclick={computeCalldataDigest}>
+      <button type="button" data-pressable data-column-item="start" onclick={computeCalldataDigest}>
         Compute digest
       </button>
     </div>
@@ -204,7 +204,7 @@
         ></textarea>
       </div>
 
-      <button type="button" data-pressable onclick={computeEip712Hash}>
+      <button type="button" data-pressable data-column-item="start" onclick={computeEip712Hash}>
         Compute EIP-712 digest
       </button>
     </div>
@@ -265,7 +265,7 @@
 
   .code-input {
     width: 100%;
-    font-family: monospace;
+    font-family: var(--fontFamily-monospace);
     font-size: 0.8rem;
     padding: 0.6rem 0.75rem;
     background: var(--background-secondary);
@@ -323,22 +323,5 @@
     margin: 0;
   }
 
-  button[data-pressable] {
-    align-self: flex-start;
-    min-width: 0;
-    background-color: var(--accent-color, #3b82f6);
-    color: white;
-    font-weight: 500;
-    padding: 0.6em 1.2em;
-    border: none;
-    border-radius: 0.5em;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: background-color 0.15s ease, box-shadow 0.15s ease;
 
-    &:hover {
-      background-color: color-mix(in srgb, var(--accent-color, #3b82f6) 85%, black);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-  }
 </style>

@@ -294,31 +294,53 @@ Issued At: ${new Date().toISOString()}`;
 	}
 
 	// Chain switch handlers
+	let chainSwitchIntent = 0
+
 	function openChainSwitchModal(tx: TestTransaction) {
+		chainSwitchIntent++
 		chainState.pendingTransaction = tx
 		chainState.isModalOpen = true
+		chainState.isSwitching = false
+		chainState.error = ''
+	}
+
+	function closeChainSwitchModal() {
+		chainSwitchIntent++
+		chainState.isModalOpen = false
+		chainState.pendingTransaction = null
+		chainState.isSwitching = false
 		chainState.error = ''
 	}
 
 	async function handleSwitchChain() {
-		if (!chainState.pendingTransaction) return
+		const tx = chainState.pendingTransaction
+
+		if (!tx || chainState.isSwitching) return
+
+		const intent = chainSwitchIntent
 
 		chainState.isSwitching = true
 		chainState.error = ''
 
 		try {
 			await switchChain(config, { chainId: mainnet.id });
-			await new Promise(resolve => setTimeout(resolve, 500));
-			account = getAccount(config)
-			const tx = chainState.pendingTransaction;
 
+			if (intent !== chainSwitchIntent) return
+
+			await new Promise(resolve => setTimeout(resolve, 500));
+
+			if (intent !== chainSwitchIntent) return
+
+			account = getAccount(config)
 			chainState.isModalOpen = false
 			chainState.pendingTransaction = null
 			await sendTransactionInternal(tx)
 		} catch (error) {
-			chainState.error = error instanceof Error ? error.message : 'Failed to switch to mainnet';
+			if (intent === chainSwitchIntent) {
+				chainState.error = error instanceof Error ? error.message : 'Failed to switch to mainnet';
+			}
 		} finally {
-			chainState.isSwitching = false
+			if (intent === chainSwitchIntent) chainState.isSwitching = false
 		}
 	}
 
@@ -588,7 +610,20 @@ Issued At: ${new Date().toISOString()}`;
 		}
 	}
 
-	async function runCurrentStep() {
+	let stepActionOrigin: HTMLButtonElement | null = null
+
+	function closeStepResults() {
+		stepTestState.resultsModal.isOpen = false
+		const origin = stepActionOrigin
+
+		stepActionOrigin = null
+		queueMicrotask(() => {
+			if (origin?.isConnected && !origin.disabled) origin.focus({ preventScroll: true })
+		})
+	}
+
+	async function runCurrentStep(event: MouseEvent) {
+		stepActionOrigin = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : null
 		const step = getCurrentStep()
 
 		if (!canRunStep(stepTestState.currentStepIndex)) {
@@ -703,11 +738,11 @@ Issued At: ${new Date().toISOString()}`;
 
 <section
 	class="wallet-test"
-	data-scroll-item="inline-detached padding-match-start"
+	data-scroll-item="inline-detached padding-match-end"
 	data-column="gap-6"
 >
 	<header data-row="gap-3 wrap">
-		<div data-column="gap-2">
+		<div data-column="gap-2" data-row-item="flexible basis-6">
 			<h2>Wallet interaction playground</h2>
 			<p class="subtitle">
 				Quickly test how your wallet behaves when connecting, sending transactions, and signing messages.
@@ -715,11 +750,11 @@ Issued At: ${new Date().toISOString()}`;
 			</p>
 		</div>
 
-		<div class="header-actions" data-column="gap-2 end">
+		<div data-column="gap-2 end" data-row-item="wrap-end">
 			{#if account?.isConnected && account.address}
-				<div class="account-pill" data-badge="medium">
+				<div data-badge="medium" data-row="gap-2">
 					<span class="status-dot" aria-hidden="true"></span>
-					<span class="account-label">
+					<span>
 						Connected as
 						<code>{account.address.slice(0, 6)}…{account.address.slice(-4)}</code>
 					</span>
@@ -744,12 +779,13 @@ Issued At: ${new Date().toISOString()}`;
 	</header>
 
 	<!-- Tab Selector -->
-	<div class="tab-selector" data-row="gap-2">
+	<div class="tab-selector" data-row="start gap-2 wrap" role="group" aria-label="Test categories">
 		{#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts', 'erc-8213'] as tab (tab)}
 			<button
 				type="button"
 				class="tab-button"
-				class:active={uiState.activeTab === tab}
+				aria-pressed={uiState.activeTab === tab}
+				data-card={uiState.activeTab === tab ? 'padding-3 border-accent' : 'padding-3'}
 				onclick={() => {
 					if (tab === 'transactions') {
 						uiState.activeTab = 'transactions'
@@ -787,10 +823,10 @@ Issued At: ${new Date().toISOString()}`;
 	</div>
 
 	<!-- Content Area -->
-	<div class="content-wrapper" data-row="gap-6">
+	<div class="content-wrapper" data-row="gap-6 align-start">
 		<!-- Sidebar -->
 		<div class="sidebar">
-			<div class="sidebar-content" data-card="radius-8 padding-2">
+			<div class="sidebar-content" data-card="radius-8 padding-2" data-column="gap-1" role="group" aria-label="Test cases">
 				{#if uiState.activeTab === 'transactions'}
 					{#each testTransactions as tx (tx.id)}
 						<WalletTesterNavigationItem
@@ -961,7 +997,7 @@ Issued At: ${new Date().toISOString()}`;
 		</div>
 
 		<!-- Main Content -->
-		<div class="main-content">
+		<div class="main-content" data-row-item="flexible">
 			{#if uiState.activeTab === 'transactions'}
 				{@const selectedTx = testTransactions.find(tx => tx.id === uiState.selectedTxId)}
 				<TransactionsTab
@@ -1036,11 +1072,7 @@ Issued At: ${new Date().toISOString()}`;
 		isOpen={chainState.isModalOpen}
 		isSwitching={chainState.isSwitching}
 		currentChainId={account?.chainId}
-		onClose={() => {
-			chainState.isModalOpen = false
-			chainState.pendingTransaction = null
-			chainState.error = ''
-		}}
+		onClose={closeChainSwitchModal}
 		onSwitch={handleSwitchChain}
 	/>
 
@@ -1058,179 +1090,59 @@ Issued At: ${new Date().toISOString()}`;
 		overallPassed={stepTestState.resultsModal.overallPassed}
 		hasPartialResults={stepTestState.resultsModal.hasPartialResults}
 		stepResults={stepTestState.resultsModal.stepResults}
-		onClose={() => (stepTestState.resultsModal.isOpen = false)}
+		onClose={closeStepResults}
 	/>
 </section>
 
 
 <style>
-	.wallet-test {
-		max-width: 80rem;
-		margin-inline: auto;
-	}
-
-	.header-actions {
-		margin-inline-start: auto;
-		align-items: flex-end;
-	}
-
 	.subtitle {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
-		max-width: 38rem;
-	}
-
-	.tab-selector {
-		justify-content: flex-start;
-		gap: 0.75rem;
-		border-bottom: 1px solid var(--background-secondary);
-		padding-bottom: 0.5rem;
+		max-inline-size: 38rem;
 	}
 
 	.tab-button {
-		padding: 0.75rem 1.5rem;
-		border: none;
-		background: transparent;
-		color: var(--text-secondary);
-		font-size: 0.9rem;
-		font-weight: 500;
-		cursor: pointer;
-		border-bottom: 2px solid transparent;
-		margin-bottom: -0.5rem;
-		transition: all 0.2s;
-	}
-
-	.tab-button:hover {
-		color: var(--text-primary);
-	}
-
-	.tab-button.active {
-		color: var(--accent);
-		border-bottom-color: var(--accent);
-	}
-
-	.content-wrapper {
-		align-items: flex-start;
-		margin-bottom: 1.5rem;
+		--card-borderWidth: 1px;
 	}
 
 	.sidebar {
-		width: 18rem;
+		inline-size: 18rem;
 		flex-shrink: 0;
 	}
 
-	.sidebar-content {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
-
-	.main-content {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.account-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
 	.status-dot {
-		width: 0.6rem;
-		height: 0.6rem;
-		border-radius: 9999px;
+		inline-size: 0.6rem;
+		block-size: 0.6rem;
+		border-radius: 50%;
 		background-color: var(--rating-pass);
-		box-shadow: 0 0 0 3px color-mix(in srgb, var(--rating-pass) 40%, transparent);
-	}
-
-	.account-label {
-		font-size: 0.8rem;
-	}
-
-	button[data-pressable] {
-		min-width: 0;
-		background-color: var(--accent-color, #3b82f6);
-		color: white;
-		font-weight: 500;
-		padding: 0.6em 1.2em;
-		border: none;
-		border-radius: 0.5em;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-		transition: background-color 0.15s ease, box-shadow 0.15s ease;
-
-		&:hover:not(:disabled) {
-			background-color: color-mix(in srgb, var(--accent-color, #3b82f6) 85%, black);
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-		}
-
-		&:disabled {
-			background-color: var(--border-color);
-			color: var(--text-secondary);
-			cursor: not-allowed;
-		}
 	}
 
 	@media (max-width: 864px) {
-		.tab-selector {
-			overflow-x: auto;
-			flex-wrap: nowrap;
-			scrollbar-width: none;
-
-			&::-webkit-scrollbar {
-				display: none;
-			}
-		}
-
-		.tab-button {
-			padding: 0.6rem 1rem;
-			font-size: 0.8rem;
-			white-space: nowrap;
-			flex-shrink: 0;
-		}
-
 		.content-wrapper {
-			flex-direction: column;
-			align-items: stretch;
-			width: 100%;
-			min-width: 0;
+			&[data-row] {
+				flex-direction: column;
+				align-items: stretch;
+			}
 		}
 
 		.sidebar {
-			width: 100%;
-			min-width: 0;
-			overflow: hidden;
-		}
-
-		.main-content {
-			width: 100%;
-			min-width: 0;
+			inline-size: 100%;
 		}
 
 		.sidebar-content {
-			display: flex;
-			flex-direction: row;
-			overflow-x: auto;
-			flex-wrap: nowrap;
-			gap: 0.375rem;
-			padding-bottom: 0.25rem;
-			scrollbar-width: none;
+			&[data-column] {
+				flex-direction: row;
+				overflow-x: auto;
+			}
 
-			&::-webkit-scrollbar {
+			:global(.sidebar-item) {
+				flex-shrink: 0;
+			}
+
+			:global(.sidebar-item-desc) {
 				display: none;
 			}
-		}
-
-		.sidebar-content :global(.sidebar-item) {
-			width: auto;
-			flex-shrink: 0;
-			padding: 0.5rem 0.875rem;
-			white-space: nowrap;
-		}
-
-		.sidebar-content :global(.sidebar-item-desc) {
-			display: none;
 		}
 	}
 </style>
