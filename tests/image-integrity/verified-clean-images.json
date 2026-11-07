@@ -1127,6 +1127,58 @@
 		"hash": "d521162baa9ad9d2c9d179a06c6a4033963b119b33f143ad06b7bd86d20701f2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-aave-supply.png": {
+		"hash": "5c40818497af446ee27b6634634ddd839786a957a59ccfe5e6018f89d76dc143",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eip712-struct-and-digests.png": {
+		"hash": "2e8f2f19f5fc0317feceb0aebf536b4dc993d29631b3359c25485506caffb058",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eoa-batch-approve-supply.png": {
+		"hash": "47f852a6a97f59b6db196bfb20a5e48d5343832af359ee619a6583ac5d0ae151",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc1155-transfer.png": {
+		"hash": "9c014d03121f30aafb9236d4c1a153ac11c39c45a678306eb6def7fe474b865d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc20-transfer.png": {
+		"hash": "315a7841e57ec42eb0fde82efc73f4eda5cb0bf5ea330976871e8f4e840ee1c4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc721-transfer.png": {
+		"hash": "91a7261653ad9ccfb890f11d800b35328c4bea708acf4a033ce921b61e5e9de0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eth-transfer-details.png": {
+		"hash": "9910dc6373cce1d74a914c766684bb10a469f67842f06c1f56c194c16ec2ba32",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-failing-transaction.png": {
+		"hash": "600552fb409c4702a729412106302cb2a8a7696f2395b37fd6b119012e773fd4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-safe-multisend-approve-supply.png": {
+		"hash": "959d703afcdf3bf38b6e10119e3ea8e0c02589f313bcf6bf0ab8a3ef04706e99",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-safe-nested-aave-supply.png": {
+		"hash": "661974ac0765c7c4ad28654144e597a9086be932e44a0fb42724006236f5e2de",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-siwe-sign-in.png": {
+		"hash": "9b7a529e05b7df08266dfb61dfee03e068dfeef800b5608f2647113dfed22045",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-usdc-approval-calldata.png": {
+		"hash": "518a958d2bd96dc79b7694eb05ce66a01898d0c07f564fa1ad4587f621ed7bec",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-volatile-outcome.png": {
+		"hash": "df6ec2e00ff4dff1e2fbe58ce473c0007eeeafda020f74d44577c7179ded5288",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png": {
 		"hash": "03a48150f2c60c65cfc016de36fdcb827fe9ad32ce128b3eff4fe053f40a0d9c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
