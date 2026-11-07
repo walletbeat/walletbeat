@@ -131,6 +131,10 @@
 		"hash": "82ca026067fb3c643b3c642df8356035d99e6d680d8242c48b5f1b55da22c967",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/oath.svg": {
+		"hash": "581053bc76a9a16bdb4aca991e294e956d5539967c6fd955eb67ee70b6559c22",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/pimlico.png": {
 		"hash": "6d9ba8b0abf96cc67c267f0a38cfe26035baae6ae37f3a60082832d5ad5c5341",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -265,6 +269,10 @@
 	},
 	"public/images/wallets/nufi.svg": {
 		"hash": "799972b0936c5634bdb759b60bbe1666e2340155c6dc370434f826fbcbf81405",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/oath.svg": {
+		"hash": "581053bc76a9a16bdb4aca991e294e956d5539967c6fd955eb67ee70b6559c22",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/okx.png": {
