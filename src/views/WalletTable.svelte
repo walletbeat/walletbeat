@@ -810,7 +810,7 @@
 		{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
 		{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
-			<small>N/A</small>
+			<small data-paint>N/A</small>
 		{:else}
 			<a
 				href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: 'stages' })}
@@ -892,6 +892,7 @@
 					{#if canFilter}
 					<button
 							data-tag={tag}
+							data-paint
 							data-view-transition={interactive ? 'named' : undefined}
 							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
 							disabled={!interactive}
@@ -906,6 +907,7 @@
 					{:else}
 						<span
 							data-tag={tag}
+							data-paint
 							data-view-transition={interactive ? 'named' : undefined}
 							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-facet', wallet.metadata.id, facet.id, id) : undefined}
 						>{tagLabel ?? label}</span>
@@ -934,6 +936,7 @@
 		{#if allSupportedVariants.length > 1}
 			<div
 				class="variants"
+				data-paint
 				data-row="gap-1"
 				data-view-transition={interactive ? 'named' : undefined}
 				style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-variants', wallet.metadata.id) : undefined}
@@ -1244,9 +1247,9 @@
 							data-view-transition={interactive ? 'named' : undefined}
 							style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
 						>
-							<span class="row-count" data-row="center"></span>
+							<span class="row-count" data-paint data-row="center"></span>
 
-							<span class="wallet-icon" data-icon="shadow">
+							<span class="wallet-icon" data-paint data-icon="shadow">
 								<img
 									alt={displayName}
 									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
@@ -1258,7 +1261,7 @@
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
 									<div data-row="gap-3 start wrap">
-										<h3
+										<h3 data-paint
 											data-view-transition={interactive ? 'named' : undefined}
 											style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
 										>
@@ -1294,7 +1297,7 @@
 									</div>
 
 									{#if selectedVariant && selectedVariant in wallet.variants}
-										<div class="variant">
+										<div class="variant" data-paint>
 											<a data-link="camouflaged" href={walletUrl}>{variants[selectedVariant].label}</a>
 										</div>
 									{/if}
@@ -1313,12 +1316,12 @@
 						{#snippet ExpandedContent()}
 							<div class="wallet-summary" data-card="popover" data-column="gap-4">
 								{#if selectedVariant && !wallet.variants[selectedVariant]}
-									<p>
+									<p data-paint>
 										{wallet.metadata.displayName} does not have a {selectedVariant} version.
 									</p>
 								{/if}
 
-								<div class="links" data-row="gap-3 start wrap">
+								<div data-paint class="links" data-row="gap-3 start wrap">
 									<a
 										href={walletUrl}
 										class="info-link"
@@ -1371,9 +1374,9 @@
 						data-view-transition={interactive ? 'named' : undefined}
 						style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet', wallet.metadata.id) : undefined}
 					>
-						<span class="row-count" data-row="center"></span>
+						<span class="row-count" data-paint data-row="center"></span>
 
-						<span class="wallet-icon" data-icon="shadow">
+						<span class="wallet-icon" data-paint data-icon="shadow">
 							<img
 								alt={wallet.metadata.displayName}
 								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
@@ -1385,7 +1388,7 @@
 						<div class="name-and-tags" data-column="gap-2">
 							<div class="name" data-column="gap-1">
 								<div data-row="gap-3 start wrap">
-									<h3
+									<h3 data-paint
 										data-view-transition={interactive ? 'named' : undefined}
 										style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
 									>
@@ -1451,7 +1454,7 @@
 							tooltipButtonTriggerPlacement="behind"
 							tooltipHoverTriggerPlacement="around"
 						>
-							<Pie
+							<Pie data-paint
 								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
 								transitionElements="slices"
 								layout={PieLayout.FullTop}
@@ -1676,7 +1679,7 @@
 							tooltipButtonTriggerPlacement="behind"
 							tooltipHoverTriggerPlacement="around"
 						>
-							<Pie
+							<Pie data-paint
 								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
 								transitionElements="slices"
 								layout={PieLayout.FullTop}
@@ -1850,7 +1853,7 @@
 							tooltipButtonTriggerPlacement="behind"
 							tooltipHoverTriggerPlacement="around"
 						>
-							<Pie
+							<Pie data-paint
 								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
 								transitionElements="slices"
 								layout={PieLayout.HalfTop}
@@ -2451,6 +2454,7 @@
 			.wallet-icon { anchor-name: --wallet-identity-logo; }
 
 			&[popover]:not(:popover-open) {
+				--paint-filter: inherit;
 				display: flex;
 				position: static;
 				inset: auto;

@@ -134,7 +134,7 @@
 		>
 			{#snippet Cell({ row, column, value }: { row: Eip7702Row; column: Column<Eip7702Row>; value: unknown })}
 				{#if column.id === 'wallet'}
-					<div class="wallet-info" data-row>
+					<div data-paint class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
@@ -161,12 +161,12 @@
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
 						<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
 							{#if interactive}
-								<button data-tag="eip" aria-label="Filter by EIP-7702" onclick={event => {
+								<button data-paint data-tag="eip" aria-label="Filter by EIP-7702" onclick={event => {
 									event.stopPropagation()
 									toggleFilterById!('accountType-eip7702')
 								}}>EIP-7702</button>
 							{:else}
-								<span data-tag="eip">EIP-7702</span>
+								<span data-paint data-tag="eip">EIP-7702</span>
 							{/if}
 
 							{#snippet TooltipContent()}
@@ -177,12 +177,12 @@
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
 							<Tooltip placement="inline-end" buttonTriggerPlacement={interactive ? 'behind' : 'around'}>
 								{#if interactive}
-									<button data-tag="eip" aria-label="Filter by ERC-4337" onclick={event => {
+									<button data-paint data-tag="eip" aria-label="Filter by ERC-4337" onclick={event => {
 										event.stopPropagation()
 										toggleFilterById!('accountType-erc4337')
 									}}>ERC-4337</button>
 								{:else}
-									<span data-tag="eip">ERC-4337</span>
+									<span data-paint data-tag="eip">ERC-4337</span>
 								{/if}
 
 								{#snippet TooltipContent()}
@@ -192,6 +192,7 @@
 						{:else}
 							{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
 								<button
+									data-paint
 									data-tag="eoa"
 									aria-label="Filter by EOA"
 									disabled={!interactive}
@@ -205,22 +206,22 @@
 							{/if}
 						{/if}
 
-						<small class="muted-text">(non-7702)</small>
+						<small data-paint class="muted-text">(non-7702)</small>
 					{/if}
 
 				{:else if column.id === 'contract'}
 					{@const contract = row.contract}
 
 					{#if contract === undefined}
-						<span class="muted-text">–</span>
+						<span data-paint class="muted-text">–</span>
 					{:else if contract === 'UNKNOWN'}
-						<span class="muted-text">Unknown</span>
+						<span data-paint class="muted-text">Unknown</span>
 					{:else}
 						{@const getContractUrl = (contractAddress: string, anchor?: string) =>
 							`https://etherscan.io/address/${contractAddress}${anchor ? `#${anchor}` : ''}`
 						}
 
-						<div class="contract-info">
+						<div data-paint class="contract-info">
 							<strong>
 								<a
 									href={getContractUrl(contract.address)}
@@ -232,7 +233,7 @@
 							</strong>
 						</div>
 
-						<small>
+						<small data-paint>
 							{#if contract.sourceAvailable}
 								<a
 									href={contract.sourceUrl}
@@ -253,15 +254,15 @@
 					{@const batchingRating = row.batching}
 
 					{#if batchingRating === Rating.PASS}
-						✅
+						<span data-paint>✅</span>
 					{:else if batchingRating === Rating.FAIL}
-						❌
+						<span data-paint>❌</span>
 					{:else}
-						<span class="muted-text">–</span>
+						<span data-paint class="muted-text">–</span>
 					{/if}
 
 				{:else}
-					{value}
+					<span data-paint>{value}</span>
 				{/if}
 			{/snippet}
 		</Table>

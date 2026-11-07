@@ -55,7 +55,7 @@
 			'var(--rating-unrated)'
 	}
 >
-	<header data-row="center gap-3 wrap">
+	<header data-paint data-row="center gap-3 wrap">
 		<h3 data-row="gap-2">
 			<span data-icon="wbicons-simple {attributeGroup.icon}"></span> {attributeGroup.displayName}
 		</h3>
@@ -65,7 +65,7 @@
 		{/if}
 	</header>
 
-	<p>
+	<p data-paint>
 		<Typography
 			content={attributeGroup.perWalletQuestion}
 			strings={{
