@@ -836,6 +836,44 @@
 		{/if}
 	{/snippet}
 
+	{#snippet WalletName({ wallet, walletUrl }: { wallet: RatedWallet<_AttributeGroupId>; walletUrl: string })}
+		<div data-row="gap-3 start wrap">
+			<h3 data-paint
+				data-view-transition={interactive ? 'named' : undefined}
+				style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
+			>
+				<a
+				data-link="camouflaged"
+				href={walletUrl}
+			>{wallet.metadata.displayName}</a>
+			</h3>
+
+			{#if hasVariant(wallet.variants, Variant.HARDWARE)}
+				{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
+
+				{#if brandModels.length > 1}
+					<Select
+						aria-label={`${wallet.metadata.displayName} wallet model`}
+						disabled={!interactive}
+						bind:value={
+							() => selectedModels.get(wallet.metadata.id),
+							value => {
+								if (value)
+									selectedModels.set(wallet.metadata.id, value)
+								else
+									selectedModels.delete(wallet.metadata.id)
+							}
+						}
+						options={[
+							{ value: undefined, label: 'All models' },
+							...brandModels.map(m => ({ value: m.modelId, label: `${m.modelName}`, icon: m.iconUrl })),
+						]}
+					/>
+				{/if}
+			{/if}
+		</div>
+	{/snippet}
+
 	{#snippet FilterHeaderTitle({ column }: { column: Column<RatedWallet<_AttributeGroupId>> })}
 		{@const walletSlot = [...walletFilterSlots, ...stageFilterSlots].find(filterSlot => filterSlot.columnId === column.id)}
 		{@const attributeSlot = attributeFilterSlots.find(filterSlot => filterSlot.columnId === column.id)}
@@ -1264,41 +1302,7 @@
 
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
-									<div data-row="gap-3 start wrap">
-										<h3 data-paint
-											data-view-transition={interactive ? 'named' : undefined}
-											style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
-										>
-											<a
-											data-link="camouflaged"
-											href={walletUrl}
-										>{displayName}</a>
-										</h3>
-
-										{#if hasVariant(wallet.variants, Variant.HARDWARE)}
-											{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-
-											{#if brandModels.length > 1}
-												<Select
-													aria-label={`${displayName} wallet model`}
-													disabled={!interactive}
-													bind:value={
-														() => selectedModels.get(wallet.metadata.id),
-														value => {
-															if (value)
-																selectedModels.set(wallet.metadata.id, value)
-															else
-																selectedModels.delete(wallet.metadata.id)
-														}
-													}
-													options={[
-														{ value: undefined, label: 'All models' },
-														...brandModels.map(m => ({ value: m.modelId, label: `${m.modelName}`, icon: m.iconUrl })),
-													]}
-												/>
-											{/if}
-										{/if}
-									</div>
+									{@render WalletName({ wallet, walletUrl })}
 
 									{#if selectedVariant && selectedVariant in wallet.variants}
 										<div class="variant" data-paint>
@@ -1391,17 +1395,7 @@
 
 						<div class="name-and-tags" data-column="gap-2">
 							<div class="name" data-column="gap-1">
-								<div data-row="gap-3 start wrap">
-									<h3 data-paint
-										data-view-transition={interactive ? 'named' : undefined}
-										style:--view-transition-name={interactive ? viewTransitionName(viewId, 'wallet-name', wallet.metadata.id) : undefined}
-									>
-										<a
-											data-link="camouflaged"
-											href={walletUrl}
-										>{value}</a>
-									</h3>
-								</div>
+								{@render WalletName({ wallet, walletUrl })}
 
 							</div>
 						</div>
