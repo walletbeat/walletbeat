@@ -1,3 +1,5 @@
+import type { Page, TestInfo } from '@playwright/test'
+
 import {
 	observeStickyChain,
 	qualifyNativeBreadcrumbClock,
@@ -157,6 +159,147 @@ function observePaintedPieBackdrop(enhanced: boolean) {
 	}
 
 	return { applicable: true, bottom: rect.bottom, diagnostics } as const
+}
+
+function observeScroll(page: Page) {
+	return page.locator('#layout').evaluateHandle(root => {
+		let scroll: number | null = null
+		let position: number | null = null
+		const events: { type: string; position: number; time: number }[] = []
+		const record = (type: string) => {
+			events.push({ type, position: root.scrollTop, time: performance.now() })
+
+			if (events.length > 32) {
+				events.shift()
+			}
+		}
+		const onScroll = () => {
+			scroll = null
+			position = root.scrollTop
+			record('scroll')
+		}
+		const onEnd = () => {
+			scroll = root.scrollTop
+			record('scrollend')
+		}
+
+		root.addEventListener('scroll', onScroll)
+		root.addEventListener('scrollend', onEnd)
+
+		return {
+			snapshot: () => ({
+				actual: root.scrollTop,
+				delivered: position,
+				ended: scroll,
+				events: [...events],
+			}),
+			reset: () => {
+				position = null
+				scroll = null
+				events.length = 0
+			},
+			dispose: () => {
+				root.removeEventListener('scroll', onScroll)
+				root.removeEventListener('scrollend', onEnd)
+			},
+		}
+	})
+}
+
+async function finishScroll(
+	observation: Awaited<ReturnType<typeof observeScroll>>,
+	info: TestInfo,
+	name: string,
+	evidence: unknown,
+	errors: unknown[],
+) {
+	for (const operation of [
+		() => info.attach(name, { body: JSON.stringify(evidence), contentType: 'application/json' }),
+		() => observation.evaluate(state => state.dispose()),
+		() => observation.dispose(),
+	]) {
+		try {
+			await operation()
+		} catch (error) {
+			errors.push(error)
+		}
+	}
+
+	if (errors.length) {
+		throw new AggregateError(errors, 'Scroll journey or observation cleanup failed')
+	}
+}
+
+async function expectKeyboardTravel(page: Page, info: TestInfo) {
+	const ended = await observeScroll(page)
+	const landings: {
+		from: number
+		observation: { actual: number; delivered: number | null; ended: number | null } | null
+	}[] = []
+	const errors: unknown[] = []
+	let attemptedKeys = 0
+	let completedKeys = 0
+	let lastObservation: { actual: number; delivered: number | null; ended: number | null } | null =
+		null
+
+	try {
+		const root = page.locator('#layout')
+		const content = page.locator('#content')
+
+		await content.evaluate(element => element.focus({ preventScroll: true }))
+		await expect(content).toBeFocused()
+		let previousLanding = await root.evaluate(element => element.scrollTop)
+
+		for (let batch = 0; batch < 2; batch++) {
+			await ended.evaluate(state => state.reset())
+
+			for (let key = 0; key < 5; key++) {
+				attemptedKeys++
+				await page.keyboard.press('ArrowDown', { delay: 100 })
+				completedKeys++
+			}
+			let stableSamples = 0
+			let previous = Number.NaN
+
+			await expect
+				.poll(
+					async () => {
+						lastObservation = await ended.evaluate(state => state.snapshot())
+						const { actual: position, delivered } = lastObservation
+
+						stableSamples =
+							position > previousLanding + 1 && delivered === position && previous === position
+								? stableSamples + 1
+								: 0
+						previous = position
+
+						return stableSamples
+					},
+					{
+						message: 'Repeated Arrow Down continues after four quiet position samples',
+						intervals: [80],
+					},
+				)
+				.toBeGreaterThanOrEqual(4)
+			landings.push({ from: previousLanding, observation: lastObservation })
+			previousLanding = await root.evaluate(element => element.scrollTop)
+		}
+	} catch (error) {
+		errors.push(error)
+	} finally {
+		await finishScroll(
+			ended,
+			info,
+			'keyboard-landings',
+			{
+				landings,
+				attemptedKeys,
+				completedKeys,
+				lastObservation,
+			},
+			errors,
+		)
+	}
 }
 
 for (const width of [390, 690, 1440]) {
@@ -592,7 +735,7 @@ for (const width of [390, 690, 1440]) {
 			contentType: 'application/json',
 		})
 	})
-	test(`wheel snapping preserves the H1 endpoint at ${width}px`, async ({ page }, info) => {
+	test(`native keyboard travel from the H1 landing at ${width}px`, async ({ page }, info) => {
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/__wallet-page/credits/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
@@ -601,10 +744,12 @@ for (const width of [390, 690, 1440]) {
 			'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
 		)
 
-		test.skip(
-			!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
-			'This engine uses the ordinary-flow header without the enhanced H1 endpoint',
-		)
+		if (!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable) {
+			await expectKeyboardTravel(page, info)
+
+			return
+		}
+
 		await expect(endpoint).toHaveCSS('display', 'block')
 		const control = await page.addStyleTag({
 			content: '#layout { scroll-snap-type: none !important; }',
@@ -729,43 +874,38 @@ for (const width of [390, 690, 1440]) {
 			'The native wheel targets the page rather than the nested TOC',
 		).toBe('layout')
 		await page.mouse.move(point.x, point.y)
-		const ended = await page.locator('#layout').evaluateHandle(root => {
-			let scroll: number | null = null
-			const onEnd = () => {
-				scroll = root.scrollTop
-			}
-
-			root.addEventListener('scrollend', onEnd)
-
-			return {
-				read: () => scroll,
-				dispose: () => root.removeEventListener('scrollend', onEnd),
-			}
-		})
+		const ended = await observeScroll(page)
+		const errors: unknown[] = []
+		let wheelState: { actual: number; delivered: number | null; ended: number | null } | null = null
 
 		try {
 			await page.mouse.wheel(0, boundary.marker - 8)
 			await expect
-				.poll(() => ended.evaluate(state => state.read()), {
-					message: 'Native wheel must dispatch scrollend after its listener is armed',
-					timeout: 5000,
-				})
+				.poll(
+					async () => {
+						wheelState = await ended.evaluate(state => state.snapshot())
+
+						return wheelState.ended === wheelState.actual &&
+							wheelState.delivered === wheelState.actual
+							? wheelState.ended
+							: null
+					},
+					{
+						message: 'Native wheel must dispatch scrollend after its listener is armed',
+						timeout: 5000,
+					},
+				)
 				.not.toBeNull()
-			const settled = await ended.evaluate(state => state.read())
+			const settled = wheelState!.ended
 
 			expect(Math.abs(settled! - boundary.marker)).toBeLessThanOrEqual(1)
+		} catch (error) {
+			errors.push(error)
 		} finally {
-			await info.attach('h1-wheel-state', {
-				body: JSON.stringify({
-					boundary,
-					eventScroll: await ended.evaluate(state => state.read()),
-					actualScroll: await page.locator('#layout').evaluate(root => root.scrollTop),
-				}),
-				contentType: 'application/json',
-			})
-			await ended.evaluate(state => state.dispose())
-			await ended.dispose()
+			await finishScroll(ended, info, 'h1-wheel-state', { boundary, wheelState }, errors)
 		}
+
+		await expectKeyboardTravel(page, info)
 	})
 }
 
