@@ -1,6 +1,6 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
-for (const width of [390, 690, 1344, 1345, 1600]) {
+for (const width of [390, 690, 1344, 1345, 1600, 1910, 2560]) {
 	test(`wallet navigation leaves readable content across its layout boundary at ${width}px`, async ({
 		page,
 	}, info) => {

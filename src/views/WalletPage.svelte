@@ -1730,7 +1730,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 			&[data-sticky-container] {
 				--sticky-position: sticky;
-				--scrollItem-inlineDetached-maxSize: inherit;
 				--scrollItem-inlineDetached-paddingStart: 0px;
 				--scrollItem-inlineDetached-paddingEnd: 0px;
 			}
@@ -1815,6 +1814,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					position: static;
 				}
 				&[data-sticky-container] {
+					--scrollItem-inlineDetached-maxSize: inherit;
 					--scrollItem-inlineDetached-paddingStart: inherit;
 					--scrollItem-inlineDetached-paddingEnd: inherit;
 				}
