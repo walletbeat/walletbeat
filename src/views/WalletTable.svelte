@@ -2117,6 +2117,10 @@
 		}
 
 		@container wallet-table (width >= 42rem) {
+			:global(.wallet-table:not(:has(> table > thead th[data-expanded])) > table) {
+				max-inline-size: var(--sticky-sizeInline);
+			}
+
 			:global(th[data-table-column="stage"][rowspan]:not([rowspan="1"]):has(.filter-cluster-target)) {
 				vertical-align: top;
 
