@@ -101,7 +101,7 @@
 	style:--accent-textColor={ratingToTextColor(attribute.evaluation.outcome.rating)}
 >
 	<header data-row="center gap-3 wrap">
-		<h4 data-row="gap-2">
+		<h4 data-paint data-row="gap-2">
 			<span data-icon="wbicons-simple {attribute.attribute.icon}"></span>
 			{attribute.attribute.displayName}
 		</h4>
@@ -115,7 +115,8 @@
 						title={`This attribute is required for stage${relevantStageLabels.length > 1 ? 's' : ''} ${relevantStageLabels.join(', ')}`}
 					>
 						<div
-							data-badge="small"
+							data-paint
+					data-badge="small"
 							style:--accent="var(--accent-color)"
 						>
 							<small>Stage {relevantStageLabels.join(', ')}</small>
@@ -135,6 +136,7 @@
 
 			{#if summaryType === WalletAttributeSummaryType.Rating}
 				<data
+					data-paint
 					data-badge="small"
 					value={attribute.evaluation.outcome.rating}
 				>{attribute.evaluation.outcome.rating}</data>
@@ -142,7 +144,7 @@
 		</div>
 	</header>
 
-	<p>
+	<p data-paint>
 		{ratingIcons[attribute.evaluation.outcome.rating]}
 
 		<Typography
