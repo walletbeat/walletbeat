@@ -19,8 +19,8 @@ describe('rewriteUrl', () => {
 		})
 	})
 
-	it('maps a src/pages markdown file to its site route', () => {
-		expect(rewriteUrl('/src/pages/about/_about.md', '/')).toEqual({
+	it('maps imported content markdown to its site route', () => {
+		expect(rewriteUrl('/src/content/about/about.md', '/')).toEqual({
 			url: '/about/',
 			matched: true,
 		})
