@@ -105,7 +105,7 @@ measure_revision() {
 	local name="$2"
 	local dir="$WORKTREE_ROOT/$name"
 
-	if ! git -C "$ROOT" worktree add --force "$dir" "$rev" >&2; then
+	if ! git -c core.longpaths=true -C "$ROOT" worktree add --force "$dir" "$rev" >&2; then
 		log "Could not create worktree at $rev ($name): $dir."
 		return 2
 	fi
