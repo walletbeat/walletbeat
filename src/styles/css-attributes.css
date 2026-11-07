@@ -2923,7 +2923,7 @@ ol {
 			&::after {
 				content: '›' / '';
 				position: absolute;
-				inset-inline-end: 100%;
+				inset-inline-end: calc(100% * (1 - var(---breadcrumb-markerWrap, 0)));
 				inline-size: calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem));
 				padding: 0;
 				font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
