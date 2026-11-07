@@ -41,6 +41,7 @@
 			</span>
 			{#snippet ExpandedContent()}
 				<p>Foreground disclosure content.</p>
+				<a href="#foreground-destination" data-drawer-link>Drawer link</a>
 			{/snippet}
 		</TooltipOrAccordion>
 		<div id="foreground-independent-popover" popover="auto">Independent native command.</div>
