@@ -486,16 +486,20 @@
 		match: 'union',
 		defaultChoice: defaultStageQualification,
 		alwaysShowChoices: true,
-		choices: stageQualificationChoices.map(choice => ({
-			...choice,
-			href: stageNavigationBase === undefined ? undefined : walletSummaryHref(stageNavigationBase, choice.id, initialSort),
-			matches: choice.id === '' ? undefined : (wallet: RatedWallet<_AttributeGroupId>) => {
-				const { stage } = getWalletStageAndLadder(wallet)
-				return choice.id === defaultStageQualification
-					? stage !== null && typeof stage === 'object'
-					: stage === 'QUALIFIED_FOR_NO_STAGES'
-			},
-		})),
+		choices: stageQualificationChoices.map(choice => {
+			const href = stageNavigationBase === undefined ? undefined : walletSummaryHref(stageNavigationBase, choice.id, initialSort)
+			return {
+				...choice,
+				// The Stage sort control stays focusable in inline and floating filter layouts.
+				href: href === undefined || tableId === undefined ? href : `${href}#${encodeURIComponent(`${tableId}-sort-stage`)}`,
+				matches: choice.id === '' ? undefined : (wallet: RatedWallet<_AttributeGroupId>) => {
+					const { stage } = getWalletStageAndLadder(wallet)
+					return choice.id === defaultStageQualification
+						? stage !== null && typeof stage === 'object'
+						: stage === 'QUALIFIED_FOR_NO_STAGES'
+				},
+			}
+		}),
 	}] : []
 	const walletFilterSets = [...walletFacetFilterSets, ...stageStatusFilterSets]
 	let activeChoices = $state<Set<FilterChoice<RatedWallet<_AttributeGroupId>>>>(
@@ -1992,6 +1996,11 @@
 		/* Native fixed anchors must share the viewport coordinate system. */
 		--scrollContainer-perspective: none;
 		container-name: wallet-table;
+
+		&:global(:has(.wallet-table thead button.sort-button:target)) {
+			/* Native fragment focus must settle before header pointer activation. */
+			scroll-behavior: auto;
+		}
 	}
 
 	.filter-popover {
