@@ -53,6 +53,62 @@ describe('css-attributes codegen', () => {
 		}
 	})
 
+	it.each(['Tokens:', '### Tokens', '## Tokens'])(
+		'derives structured tokens from %s documentation',
+		heading => {
+			const css = `
+/**
+ * ## [data-example]
+ * ${heading}
+ * - names: \`alpha\`, \`beta\`: explanation mentioning \`incidental\`
+ * - \`level-1..3\`
+ * - marker: arbitrary text via \`[data-marker]\`
+ * ### CSS Variables
+ * - \`--example-paint\`
+ * ### Examples
+ * - \`unadvertised\`
+ */
+[data-example] { color: var(--example-paint); }
+`
+			const entry = parseCssAttributes(css).get('data-example')
+
+			expect([...(entry?.values ?? [])].sort()).toEqual([
+				'alpha',
+				'beta',
+				'level-1',
+				'level-2',
+				'level-3',
+			])
+			expect([...(entry?.cssVariables ?? [])]).toEqual(['--example-paint'])
+			expect(JSON.parse(generateWalletbeatHtmlDataJson(css))).toMatchObject({
+				globalAttributes: [
+					{
+						name: 'data-example',
+						values: ['alpha', 'beta', 'level-1', 'level-2', 'level-3'].map(name => ({ name })),
+					},
+				],
+			})
+		},
+	)
+
+	it('keeps token groups for other documented attributes with their owners', () => {
+		const css = `
+/**
+ * ## [data-example]
+ * ### Tokens
+ * - example: \`own\`
+ * - other: \`foreign\`
+ */
+[data-example] {}
+/** Other owner. */
+[data-other~="foreign"] {}
+`
+		const entries = parseCssAttributes(css)
+
+		expect([...(entries.get('data-example')?.values ?? [])]).toEqual(['own'])
+		expect([...(entries.get('data-other')?.values ?? [])]).toEqual(['foreign'])
+	})
+
 	it('includes sibling token rules without inventing undocumented attributes', () => {
 		const entries = parseCssAttributes(`
 /** Column child. */

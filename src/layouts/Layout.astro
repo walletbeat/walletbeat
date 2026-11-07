@@ -214,7 +214,7 @@ import Footer from '@/views/Footer.astro'
 			translate: -50% 0;
 			transition-property: translate, opacity;
 
-			&:not(:focus-visible) {
+			&:not(:focus-visible, :active) {
 				opacity: 0;
 				translate: -50% -150%;
 			}

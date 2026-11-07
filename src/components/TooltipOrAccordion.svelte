@@ -70,29 +70,88 @@
 	const disclosureId = $derived(restProps.id ?? generatedId)
 	const initialExpanded = untrack(() => isExpanded)
 	let disclosure: HTMLDetailsElement
+	let expandedContent: HTMLDivElement
 	let enhanced = $state(false)
 	// Floating presentation continues through the native popover's exit transition.
 	let floatingTooltip = $state(false)
-	$effect(() => {
-		if (!enhanced) return
+	let pendingNativeEntry: MouseEvent | null = null
+	let pendingPopoverOpening: ToggleEvent | null = null
+	let closeDisclosureOnToggle = false
 
+	function syncInteractivity(body = disclosure.querySelector<HTMLElement>(':scope > [popover]')) {
+		if (body) body.inert = !disclosure.open && !body.matches(':popover-open')
+	}
+
+	function syncPopover(expanded: boolean, compact: boolean, nativeEntry = false) {
 		const body = disclosure.querySelector<HTMLElement>(':scope > [popover]')
-		const expanded = isExpanded
 
 		if (expanded) floatingTooltip = false
 
-		if ($compactDisclosures && expanded) {
-			if (body && !body.matches(':popover-open'))
+		if (compact && expanded) {
+			if (!body || (!nativeEntry && body.matches(':popover-open'))) return
+
+			if (nativeEntry) {
+				expandedContent.setAttribute('autofocus', '')
+				expandedContent.setAttribute('tabindex', '-1')
+			}
+
+			try {
+				if (nativeEntry && body.matches(':popover-open')) {
+					body.hidePopover()
+				}
+
+				body.inert = false
+
+				// Resolve disclosure visibility before native autofocus searches its descendants.
+				if (nativeEntry) expandedContent.checkVisibility({ visibilityProperty: true })
+
 				body.showPopover({ source: disclosure.querySelector('summary') ?? disclosure })
+			} finally {
+				syncInteractivity(body)
+				expandedContent.removeAttribute('autofocus')
+
+				if (!body.matches(':popover-open')) expandedContent.removeAttribute('tabindex')
+			}
 		} else {
 			body?.hidePopover()
+			expandedContent.removeAttribute('autofocus')
+			expandedContent.removeAttribute('tabindex')
 		}
+	}
+
+	$effect(() => {
+		if (enhanced) syncPopover(isExpanded, $compactDisclosures)
 	})
+
 	onMount(() => {
 		// Untouched peers must not reset a shared controller's adopted native state.
 		if (disclosure.open !== initialExpanded) isExpanded = disclosure.open
 
+		const prepareNativeEntry = (event: Event) => {
+			if (event.target !== disclosure) return
+
+			const nativeEntry = pendingNativeEntry
+
+			pendingNativeEntry = null
+
+			if (disclosure.open && nativeEntry && !nativeEntry.defaultPrevented && tooltipUsesDrawer()) {
+				syncPopover(true, true, true)
+			}
+		}
+
+		const observer = new MutationObserver(() => syncInteractivity())
+
+		observer.observe(disclosure, { attributes: true, attributeFilter: ['open'] })
+		syncInteractivity()
+		disclosure.addEventListener('toggle', prepareNativeEntry, true)
 		enhanced = true
+
+		return () => {
+			observer.disconnect()
+			pendingNativeEntry = null
+			pendingPopoverOpening = null
+			disclosure.removeEventListener('toggle', prepareNativeEntry, true)
+		}
 	})
 </script>
 
@@ -118,7 +177,27 @@
 		data-tooltip-enhanced={enhanced ? '' : undefined}
 		data-tooltip-floating={floatingTooltip ? '' : undefined}
 	>
-		<summary class:no-marker={!showAccordionMarker}>
+		<summary
+			class:no-marker={!showAccordionMarker}
+			onclick={event => {
+				if (!enhanced || !event.isTrusted || event.defaultPrevented || disclosure.open) return
+
+				for (const target of event.composedPath()) {
+					if (target === event.currentTarget) break
+
+					if (target instanceof Element && target.matches(
+						':any-link, audio[controls], button, details, embed, iframe, img:is([usemap], [controls]), input:not([type="hidden" i]), label, select, textarea, video[controls]',
+					)) return
+				}
+
+				const source = disclosure
+
+				pendingNativeEntry = event
+				setTimeout(() => {
+					if (pendingNativeEntry === event && !source.open) pendingNativeEntry = null
+				}, 0)
+			}}
+		>
 			{@render Trigger()}
 		</summary>
 		{@render Popover()}
@@ -135,20 +214,52 @@
 		--popover-borderColor: transparent;
 	"
 	onbeforetoggle={(event: ToggleEvent & { currentTarget: HTMLDivElement }) => {
-		if (event.newState === 'open')
-			floatingTooltip = !event.currentTarget.parentElement?.matches('details[open]')
+		const compact = tooltipUsesDrawer()
+		const body = event.currentTarget
+		const source = disclosure
+		const previousFloating = floatingTooltip
+
+		if (event.newState === 'closed') closeDisclosureOnToggle = compact && source.open
+
+		pendingPopoverOpening = event.newState === 'open' ? event : null
+		body.inert = event.newState === 'closed' && (compact || !source.open)
+
+		if (event.newState === 'open') {
+			floatingTooltip = !source.open
+			setTimeout(() => {
+				if (pendingPopoverOpening !== event) return
+
+				pendingPopoverOpening = null
+
+				if (!event.defaultPrevented) return
+
+				const open = body.matches(':popover-open')
+
+				if (compact && !open && source.open) isExpanded = false
+
+				syncInteractivity(body)
+				floatingTooltip = !source.open && (open || previousFloating)
+			}, 0)
+		}
 
 		if (!event.currentTarget.parentElement?.matches('details[open]')) return
 
-		if (event.newState === 'open' && !tooltipUsesDrawer()) event.preventDefault()
+		if (event.newState === 'open' && !compact) event.preventDefault()
 
-		if (event.newState === 'closed' && tooltipUsesDrawer()) isExpanded = false
+	}}
+	ontoggle={event => {
+		const closeDisclosure = closeDisclosureOnToggle && !event.currentTarget.matches(':popover-open')
+
+		closeDisclosureOnToggle = false
+
+		if (closeDisclosure) isExpanded = false
 	}}
 >
 	{@render children()}
 
 	{#snippet TooltipContent()}
 		<div
+			bind:this={expandedContent}
 			class="expanded-content"
 			style:--tooltip-maxWidth={tooltipMaxWidth ?? '16em'}
 		>
@@ -170,21 +281,16 @@
 			block-size: auto;
 			grid-template-rows: 0fr;
 			content-visibility: visible;
-			visibility: hidden;
 			overflow: visible;
-			transition-property: grid-template-rows, visibility;
+			transition-property: grid-template-rows;
 		}
 
 		&[open]::details-content {
 			grid-template-rows: 1fr;
-			visibility: visible;
-		}
-
-		&[data-tooltip-floating]::details-content {
-			visibility: visible;
 		}
 
 		&:not([data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			--paint-filter: inherit;
 			display: block;
 			position: static;
 			inline-size: auto;
@@ -200,11 +306,16 @@
 			scale: none;
 			translate: none;
 			pointer-events: auto;
+			visibility: visible;
 			transition-property: none;
 		}
 
 		&:not([open], [data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
 			visibility: hidden;
+		}
+
+		&[data-tooltip-enhanced]:not([open], [data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			transition-property: visibility;
 		}
 
 		transition-property: gap;
@@ -262,7 +373,8 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		details,
-		details::details-content {
+		details::details-content,
+		details[data-tooltip-enhanced]:not([data-tooltip-floating]) > :global([popover]) {
 			transition-duration: 0s;
 		}
 	}
@@ -275,7 +387,8 @@
 			transition-property: none;
 		}
 
-		details[data-tooltip-enhanced][open] > :global([popover]) {
+		details[data-tooltip-enhanced]:not([data-tooltip-floating]) > :global([popover]) {
+			--paint-filter: none;
 			display: block;
 			position: fixed;
 			z-index: 3;
@@ -289,6 +402,20 @@
 			border: 1px solid var(--border-color);
 			border-radius: 0.5rem;
 			box-shadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+			transition-property: opacity, translate, visibility, overlay;
+		}
+
+		details[data-tooltip-enhanced][open] > :global([popover]) {
+			transition-property: overlay;
+		}
+
+		details[data-tooltip-enhanced]:not([data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			opacity: 0;
+			translate: 0 100%;
+			transition-property: opacity, translate, visibility, overlay;
+		}
+		details[data-tooltip-enhanced][open]:not([data-tooltip-floating]) > :global([popover]:not(:popover-open)) {
+			transition-property: opacity, translate, overlay;
 		}
 	}
 </style>

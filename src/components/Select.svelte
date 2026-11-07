@@ -39,7 +39,7 @@
 <select {id} bind:value {...restProps}>
 	{@render selectedContent()}
 	{#snippet selectedContent()}
-		<button type="button">
+		<button type="button" data-paint>
 			<selectedcontent></selectedcontent>
 		</button>
 	{/snippet}
@@ -256,6 +256,7 @@
 			}
 			&:open > button::before { transform: perspective(100px) rotateX(180deg); }
 			&::picker-icon {
+				filter: var(--paint-filter, none);
 				content: if(style(---select-timeline: none): none; else: '');
 				position: absolute;
 				margin: 0;
@@ -304,6 +305,7 @@
 		}
 
 		::picker(select) {
+			--paint-filter: none;
 			appearance: base-select;
 			pointer-events: auto;
 

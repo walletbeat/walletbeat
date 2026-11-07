@@ -109,13 +109,20 @@ const parseCommentBlock = (rawComment: string): CssAttributeDoc => {
 		.filter(Boolean)
 
 	const readList = (sectionName: string): string[] | undefined => {
-		const sectionIndex = lines.findIndex(line => line.startsWith(`${sectionName}:`))
+		const sectionIndex = lines.findIndex(
+			line =>
+				line.startsWith(`${sectionName}:`) ||
+				(/^#{1,6}\s+/.test(line) && line.replace(/^#{1,6}\s+/, '') === sectionName),
+		)
 
 		if (sectionIndex === -1) {
 			return undefined
 		}
 
-		const inlineValue = lines[sectionIndex].replace(`${sectionName}:`, '').trim()
+		const sectionLine = lines[sectionIndex]
+		const inlineValue = sectionLine.startsWith(`${sectionName}:`)
+			? sectionLine.slice(sectionName.length + 1).trim()
+			: ''
 
 		if (inlineValue.length > 0) {
 			return [inlineValue]
@@ -254,11 +261,23 @@ const normalizeToken = (token: string): string[] => {
 	return [cleaned]
 }
 
-const addDocValues = (entry: CssAttributeEntry): void => {
+const addDocValues = (entry: CssAttributeEntry, entries: Map<string, CssAttributeEntry>): void => {
 	for (const tokenGroup of entry.doc.tokens ?? []) {
-		for (const tokenMatch of tokenGroup.matchAll(/`([^`]+)`/g)) {
+		const label = tokenGroup
+			.match(/^([^`]+):/)?.[1]
+			.trim()
+			.replaceAll(' ', '-')
+		const owner = label === undefined ? undefined : `data-${label}`
+
+		if (owner !== undefined && entries.has(owner) && owner !== entry.name) {
+			continue
+		}
+
+		const tokenList = tokenGroup.match(/^(?:[^`]+:\s*)?((?:`[^`]+`(?:\s*[,…]\s*)?)+)/)?.[1] ?? ''
+
+		for (const tokenMatch of tokenList.matchAll(/`([^`]+)`/g)) {
 			for (const normalized of normalizeToken(tokenMatch[1])) {
-				if (normalized.length > 0) {
+				if (/^[a-z0-9][a-z0-9-]*$/.test(normalized)) {
 					entry.values.add(normalized)
 				}
 			}
@@ -333,7 +352,7 @@ export const parseCssAttributes = (css: string): Map<string, CssAttributeEntry> 
 	}
 
 	for (const entry of entries.values()) {
-		addDocValues(entry)
+		addDocValues(entry, entries)
 	}
 
 	return entries
