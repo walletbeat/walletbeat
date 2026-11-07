@@ -117,6 +117,7 @@
 			---select-expandedScaleY: min(1, calc((1lh + 2 * var(---select-naturalPadding)) / var(---select-compactSize)));
 			isolation: isolate;
 			position: relative;
+			overflow: clip;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
