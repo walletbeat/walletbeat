@@ -30,14 +30,14 @@
 	style:--accent="#e564bc"
 	data-scroll-item="inline-detached padding-match-end flow"
 	data-sticky-container
-	data-sticky-breadcrumb="scope row-fill clearance size"
+	data-sticky-breadcrumb="scope row-fill clearance size snap-arrival"
 	style:--stickyBreadcrumb-entryTimeline="--security-news-entry"
 >
 	{#snippet description()}<p>{allNewsResolved ? 'Past security incidents (all resolved)' : 'Recent security updates and incidents'}</p>{/snippet}
 	{@render heading('security-news', 'Security News', 'newsletter', description)}
 
 		<div class="news-items" data-column="gap-6">
-			{#each news as newsItem (newsItem.slug)}
+			{#each news as newsItem, index (newsItem.slug)}
 				{@const statusInfo = incidentStatuses[newsItem.status]}
 				{@const severityInfo = severities[newsItem.severity]}
 				{@const typeInfo = newsTypes[newsItem.type]}
@@ -77,7 +77,7 @@
 					</summary>
 
 					<div data-column="gap-4" data-scroll-item="snap-prose">
-						<p class="news-summary">{newsItem.summary}</p>
+						<p class="news-summary">{newsItem.summary}{#if index === 0}<span data-sticky-breadcrumb="snap-offset" style:anchor-name="--breadcrumb-snap-content" aria-hidden="true"></span>{/if}</p>
 
 						<div class="news-details" data-column="gap-2">
 							<div class="news-impact" data-column="gap-1">
@@ -115,6 +115,7 @@
 						</div>
 					</div>
 				</details>
+				{#if index < 2}<span data-sticky-breadcrumb="snap-offset" style:anchor-name={index === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>{/if}
 				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 				</article>
 			{/each}

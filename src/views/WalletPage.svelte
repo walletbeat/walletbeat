@@ -1094,7 +1094,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 			<section
 				id="stages"
-				data-sticky-breadcrumb="scope row-fill size"
+				data-sticky-breadcrumb="scope row-fill size snap-arrival"
 				data-sticky-container
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
@@ -1219,7 +1219,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		aria-label={`${attrGroup.displayName} attributes`}
 		data-score={scoreLevel}
 		style:--accent={scoreColor}
-		data-sticky-breadcrumb="scope row-fill clearance size"
+		data-sticky-breadcrumb="scope row-fill clearance size snap-arrival"
 		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 		style:--stickyBreadcrumb-approachTimeline={`--${groupTargetId(attrGroup)}-approach`}
@@ -1242,9 +1242,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		<div data-column>
 			<div class="attributes" data-column="gap-7">
-				{#each attributes as { attribute, evalAttr }}
+				{#each attributes as { attribute, evalAttr }, index}
 					{@render attributeSnippet({
 						attrGroupId: attrGroup.id,
+						arrivalIndex: index < 2 ? index : undefined,
 						attribute,
 						evalAttr,
 					})}
@@ -1258,10 +1259,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 {#snippet attributeSnippet({
 	attrGroupId,
+	arrivalIndex,
 	attribute,
 	evalAttr,
 }: {
 	attrGroupId: string
+	arrivalIndex: number | undefined
 	attribute: Attribute<OutcomeMetadata>
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
@@ -1661,6 +1664,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</div>
 			</div>
 		</details>
+		{#if arrivalIndex !== undefined}
+			<span data-sticky-breadcrumb="snap-offset" style:anchor-name={arrivalIndex === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
+		{/if}
 		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 	</section>
@@ -2636,6 +2642,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	}
 
 
+	.attributes > .attribute:first-child > details[open] .attribute-rating-details::before {
+		anchor-name: --breadcrumb-arrival-end, --breadcrumb-snap-content;
+	}
+
 	.attribute {
 		position: relative;
 
@@ -2644,16 +2654,23 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			(color: if(style(---breadcrumb-supportGrid: 1): red)) {
 			> details[open] {
 				.attribute-rating-details {
-					anchor-name: --breadcrumb-arrival-end;
+					position: relative;
+
+					&::before {
+						content: '';
+						position: absolute;
+						inset-block-start: calc(-1 * var(---scrollItem-snapOffsetBlockStart));
+						inset-inline-start: 0;
+						inline-size: 0;
+						block-size: 0;
+						pointer-events: none;
+						anchor-name: --breadcrumb-arrival-end;
+					}
 				}
 
 				~ [data-sticky-breadcrumb~="flow"] {
 					--stickyBreadcrumb-arrivalInsetEnd: calc(
-						anchor(--breadcrumb-arrival-end start) +
-						max(
-							var(--scrollContainer-scrollPaddingBlockStart, 0px),
-							var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(---breadcrumb-blockEnd)
-						)
+						anchor(--breadcrumb-arrival-end start) - var(---breadcrumb-blockEnd)
 					);
 				}
 			}
