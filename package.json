@@ -61,7 +61,8 @@
 		"test:browser": "pnpm run test:browser:collect && pnpm run test:browser:accept",
 		"test:browser:collect": "playwright test --project=chromium --project=firefox --project=webkit",
 		"test:browser:accept": "node tests/browser/contract-evidence.mjs",
-		"test:browser:record": "playwright test --project=\"recording-*\""
+		"test:browser:record": "playwright test --project=\"recording-*\"",
+		"generate:breadcrumb-arrival": "node --import tsx src/styles/generate/breadcrumb-arrival.ts"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.4",
