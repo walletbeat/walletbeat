@@ -752,6 +752,7 @@
 
 	import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+	import FilterIcon from 'lucide-static/icons/funnel.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
@@ -888,9 +889,13 @@
 				set.choices.some(choice => activeIds.has(choice.id) && choice.id !== '')
 			))}
 
+			{@const canFilter = interactive || slot.filterSets.some(set => set.choices.some(choice => 'href' in choice && choice.href !== undefined))}
+
 			<button
 				type="button"
 				class="filter-trigger"
+				data-filter-active={activeSets.length > 0 ? '' : undefined}
+				data-filter-available={canFilter ? '' : undefined}
 				interestfor={slot.panelId}
 				style:interest-delay-start={`${interestDelayMs.start}ms`}
 				style:interest-delay-end={`${interestDelayMs.end}ms`}
@@ -908,7 +913,10 @@
 					event.stopPropagation()
 				}}
 			>
-				<span class="filter-trigger-label">{column.name}</span>
+				<span class="filter-trigger-label" data-row="center gap-1">
+					{column.name}
+					<span class="filter-indicator" data-icon aria-hidden="true">{@html FilterIcon}</span>
+				</span>
 				{#if activeSets.length > 0}
 					<span class="filter-cluster-targets" aria-hidden="true">
 						{#each activeSets as set (set.id)}
@@ -1973,6 +1981,21 @@
 		border: none;
 	}
 
+	.filter-indicator {
+		opacity: 0;
+		transition-property: opacity;
+	}
+
+	.filter-trigger:is([data-filter-active], [aria-expanded="true"]) .filter-indicator,
+	:global(th:is(:hover, :focus-within)) .filter-trigger[data-filter-available] .filter-indicator,
+	:global(thead:has(.filter-popover[data-filter-kind="stage"]:popover-open) th[data-table-column="stage"]) .filter-trigger[data-filter-available] .filter-indicator {
+		opacity: 1;
+	}
+
+	@media (hover: none), (any-pointer: coarse) {
+		.filter-trigger[data-filter-available] .filter-indicator { opacity: 1; }
+	}
+
 	.filter-cluster-target {
 		anchor-name: var(--filter-cluster-anchor);
 		display: block;
@@ -2089,6 +2112,7 @@
 			pointer-events: none;
 			visibility: hidden;
 			.filter-trigger-label { visibility: visible; }
+			&:not([data-filter-active]) .filter-indicator { visibility: hidden; }
 		}
 
 		.filter-cluster-target {
