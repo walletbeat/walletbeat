@@ -158,7 +158,31 @@ test('native TOC composition across the complete responsive and direction matrix
 			for (const index of samples) {
 				const link = links.nth(index)
 
+				const moveOffLink = async () => {
+					const point = await link.evaluate(element => {
+						const scroller = element.closest('#wallet-toc')!
+						const box = scroller.getBoundingClientRect()
+
+						for (const y of [box.top + 4, box.top + box.height / 2, box.bottom - 4]) {
+							for (const x of [box.left + 4, box.right - 4, box.left + box.width / 2]) {
+								const hit = document.elementFromPoint(x, y)
+
+								if (scroller.contains(hit) && !element.contains(hit)) {
+									return { x, y }
+								}
+							}
+						}
+						throw new Error('A TOC hit point outside the sampled link is required')
+					})
+
+					await page.mouse.move(point.x, point.y)
+					await expect(page.locator('#wallet-toc:hover')).toHaveCount(1)
+					await expect(link.and(page.locator(':hover'))).toHaveCount(0)
+				}
+
+				await moveOffLink()
 				await link.scrollIntoViewIfNeeded()
+				await moveOffLink()
 				const relative = () =>
 					link.evaluate(element => {
 						const row = element.getBoundingClientRect(),
@@ -172,17 +196,17 @@ test('native TOC composition across the complete responsive and direction matrix
 						}
 					})
 
-				await page.mouse.move(0, 0)
 				const before = await relative()
 
 				for (let repeat = 0; repeat < 3; repeat++) {
 					await link.hover()
+					await expect(link.and(page.locator(':hover'))).toHaveCount(1)
 					const hovered = await relative()
 
 					for (const axis of ['x', 'y', 'width', 'height'] as const) {
 						expect(Math.abs(hovered[axis] - before[axis])).toBeLessThan(0.5)
 					}
-					await page.mouse.move(0, 0)
+					await moveOffLink()
 				}
 			}
 			await info.attach('navigation-composition', {
