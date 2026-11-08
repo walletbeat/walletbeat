@@ -851,8 +851,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 <div
 	id="top"
-	style:---pie-rotation-states={pieRotation.animations}
-	style:---pie-rotation-ranges={pieRotation.ranges}
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-approach-timelines={pieRotation.approachTimelines}
 	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).join(', ') || '--wallet-links'}
@@ -1005,6 +1003,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	</div>
 
 	<aside
+		style:---pie-rotation-states={pieRotation.animations}
+		style:---pie-rotation-ranges={pieRotation.ranges}
 		class="page-navigation"
 		data-scroll-item="inline-detached"
 		data-sticky-container
