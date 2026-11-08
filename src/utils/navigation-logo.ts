@@ -4,7 +4,7 @@ import source from '../../public/logo.svg?raw'
 
 const viewBox = new DOMParser()
 	.parseFromString(source, 'image/svg+xml')
-	.documentElement.getAttribute('viewBox')
+	.documentElement?.getAttribute('viewBox')
 const coordinates = viewBox?.trim().split(/\s+/).map(Number) ?? []
 const [, , width, height] = coordinates
 

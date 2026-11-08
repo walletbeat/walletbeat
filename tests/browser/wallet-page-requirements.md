@@ -60,7 +60,7 @@ Prerequisites: §1.
 
 Prerequisites: Available content width from §2.
 
-- **📐 `Typography`** Use the established typography by role: Space Grotesk for headings, badges, and navigation; inherited Avenir for ordinary page text, with the existing monospace exception. H4 text must look no smaller than paragraph text at 1em after the full font and transform chain.
+- **📐 `Typography`** Use the established typography by role: Space Grotesk for headings, badges, and navigation; inherited Avenir for ordinary page text, with the existing monospace exception. `H4` text must look no smaller than paragraph text at 1em after the full font and transform chain.
 
 - **📐 `TextColumn`** `H2`/`H3` title and leading paragraph form one aligned text column with a visible gap beside the icon.
 
@@ -146,7 +146,7 @@ Prerequisites: Natural rows in §3 and icons in §5.
 
 - **🧩 `HeaderWrapping`** `H1`, variant picker, stage badge and conditional end content share a line when they fit; otherwise whole items wrap predictably.
 
-- **🧩 `PickerGrouping`** The native picker remains grouped with H1 at inline-start in natural flow and may wrap below it when space is tight; expanded and compact geometry must both remain visible and interactive.
+- **🧩 `PickerGrouping`** The native picker remains grouped with `H1` at inline-start in natural flow and may wrap below it when space is tight; expanded and compact geometry must both remain visible and interactive.
 
 - **🧩 `PickerMorph`** Before compaction, the variant picker is a normal icon-bearing native select; its compact circular control matches the shared 2rem control design. The requested shorter expanded pill reduces height only: preserve expanded width, native interaction, the compact circle endpoint and compositor-only compaction.
 
@@ -308,7 +308,7 @@ Prerequisites: Pie shape in §4 and sticky rows/surfaces in §§8–11.
 
 - **📍 `InlinePie`** The mobile pie begins visibly inline in normal flow; compaction preserves that flow reservation.
 
-- **📍 `PieTangent`** The compact pie sits at the logical inline end under the later inset mobile pie/TOC composition. That clarification supersedes the earlier exact first-row-bottom tangency; retain the independent requirement that it does not follow each nested stage vertically or become an unrelated overlay.
+- **📍 `PieTangent`** The compact pie sits at the logical inline end under the later inset mobile pie/TOC composition. That clarification supersedes the earlier exact tangent contact with the first row’s bottom; retain the independent requirement that it does not follow each nested stage vertically or become an unrelated overlay.
 
 - **📍 `PieCompaction`** Mobile compaction begins late near the approaching section, continuously approaching approximately 100×100 and looking squeezed between the upper sticky items and section top.
 
@@ -506,7 +506,7 @@ Prerequisites: Applies to every preceding life cycle and interaction.
 
 - **⚡ `FastScroll`** Fast scrolling does not leave glyph detail, marker content, backgrounds, support prose, pie clearance or companions lagging their corresponding scroll position.
 
-- **⚡ `Smoothness`** No avoidable layout/paint bottleneck makes motion visibly choppy. Negligible discrete icon switching and visually matched compact-row sizing are allowed; exact navigation boundaries still apply. Across the wallet-page series, page-relative anchor activation must respond and finish at the final destination within one second. Preserve native CSS smooth scrolling rather than adding a custom scroll-animation controller. Where browser-defined travel conflicts with that objective, report it separately from WalletPage-induced delay; do not excuse app rendering stalls or claim the original whole-series timing gate passed.
+- **⚡ `Smoothness`** No avoidable layout/paint bottleneck makes motion visibly choppy. Negligible discrete icon switching and visually matched compact-row sizing are allowed; exact navigation boundaries still apply. Across the wallet-page series, page-relative anchor activation must respond and finish at the final destination within one second. Preserve native CSS smooth scrolling rather than adding a custom scroll-animation controller. Where browser-defined travel conflicts with that objective, report it separately from delay introduced by `WalletPage`; do not excuse app rendering stalls or claim the original whole-series timing gate passed.
 
 - **⚡ `FramePacing`** After startup noise, target approximately one-frame `p95` delivery with zero or near-zero frames over `33ms`, and no meaningful comparable regression in frame delay or long tasks.
 

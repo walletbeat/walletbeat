@@ -79,6 +79,8 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 
 				if (
 					!motion ||
+					!('rangeStart' in motion) ||
+					!('rangeEnd' in motion) ||
 					rangeText(motion.rangeStart) !== 'exit-crossing 0%' ||
 					rangeText(motion.rangeEnd) !== 'contain 100%'
 				) {
