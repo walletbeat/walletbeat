@@ -2630,11 +2630,11 @@ ol {
 			translate: 0 -100vh;
 		}
 	}
-	/* Departing foreground stays above ordinary flow and below current rows. */
+	/* Departing foreground stays below current sticky rows. */
 	@keyframes breadcrumb-exit-layer {
 		from,
 		to {
-			z-index: 1;
+			z-index: 0;
 		}
 	}
 	/* Keep the compact row in place while its taller natural box leaves the sticky constraint. */
