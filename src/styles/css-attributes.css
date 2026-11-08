@@ -1750,53 +1750,6 @@ ol {
 	display: none;
 }
 
-@supports (animation-timeline: view()) and (anchor-scope: --breadcrumb-snap-first) and
-	(inset-block-end: anchor(--breadcrumb-snap-first start)) and
-	(color: if(style(---breadcrumb-supportGrid: 1): red)) {
-	[data-sticky-breadcrumb~="snap-arrival"] {
-		&:has([data-sticky-breadcrumb~="snap-offset"]) > [data-sticky-breadcrumb~="flow"] {
-			/* An unavailable anchor resolves to the start, so it cannot win. */
-			---breadcrumb-snapStart: calc(100% + var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceBorderWidth));
-			---breadcrumb-firstSnap: anchor(--breadcrumb-snap-first start, var(---breadcrumb-snapStart));
-			---breadcrumb-contentSnap: anchor(--breadcrumb-snap-content start, var(---breadcrumb-snapStart));
-			---breadcrumb-nextSnap: anchor(--breadcrumb-snap-next start, var(---breadcrumb-snapStart));
-			---breadcrumb-useFirstSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-firstSnap) - 1px), 1);
-			---breadcrumb-useContentSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-contentSnap) - 1px), 1);
-			---breadcrumb-useNextSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-nextSnap) - 1px), 1);
-			---breadcrumb-afterFirstInset: calc(
-				(var(---breadcrumb-contentSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useContentSnap) +
-				(var(---breadcrumb-nextSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useNextSnap) * (1 - var(---breadcrumb-useContentSnap))
-			);
-			--stickyBreadcrumb-arrivalInsetEnd: calc(
-				(var(---breadcrumb-firstSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useFirstSnap) +
-				var(---breadcrumb-afterFirstInset) * (1 - var(---breadcrumb-useFirstSnap))
-			);
-		}
-	}
-
-	:is([data-sticky-container], [data-scroll-item], p):has(> [data-sticky-breadcrumb~="snap-offset"]) {
-		position: relative;
-
-		> [data-sticky-breadcrumb~="snap-offset"] {
-			display: block;
-			position: absolute;
-			inset-block-start: calc(-1 * (var(---scrollItem-snapOffsetBlockStart) + var(---snapOffset-border, 0px)));
-			inset-inline-start: 0;
-			inline-size: 0;
-			block-size: 0;
-			pointer-events: none;
-		}
-
-		&[data-card~="border-accent"] > [data-sticky-breadcrumb~="snap-offset"] {
-			---snapOffset-border: var(--card-borderWidth);
-		}
-	}
-
-	details:not([open]) > :not(summary) [data-sticky-breadcrumb~="snap-offset"] {
-		display: none;
-	}
-}
-
 [data-sticky-breadcrumb~="flow"] {
 	display: none;
 }
@@ -1843,6 +1796,53 @@ ol {
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	@supports (anchor-scope: --breadcrumb-snap-first) and
+		(inset-block-end: anchor(--breadcrumb-snap-first start)) and
+		(color: if(style(---breadcrumb-supportGrid: 1): red)) {
+		[data-sticky-breadcrumb~="snap-arrival"] {
+			&:has([data-sticky-breadcrumb~="snap-offset"]) > [data-sticky-breadcrumb~="flow"] {
+				/* An unavailable anchor resolves to the start, so it cannot win. */
+				---breadcrumb-snapStart: calc(100% + var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceBorderWidth));
+				---breadcrumb-firstSnap: anchor(--breadcrumb-snap-first start, var(---breadcrumb-snapStart));
+				---breadcrumb-contentSnap: anchor(--breadcrumb-snap-content start, var(---breadcrumb-snapStart));
+				---breadcrumb-nextSnap: anchor(--breadcrumb-snap-next start, var(---breadcrumb-snapStart));
+				---breadcrumb-useFirstSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-firstSnap) - 1px), 1);
+				---breadcrumb-useContentSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-contentSnap) - 1px), 1);
+				---breadcrumb-useNextSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-nextSnap) - 1px), 1);
+				---breadcrumb-afterFirstInset: calc(
+					(var(---breadcrumb-contentSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useContentSnap) +
+					(var(---breadcrumb-nextSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useNextSnap) * (1 - var(---breadcrumb-useContentSnap))
+				);
+				--stickyBreadcrumb-arrivalInsetEnd: calc(
+					(var(---breadcrumb-firstSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useFirstSnap) +
+					var(---breadcrumb-afterFirstInset) * (1 - var(---breadcrumb-useFirstSnap))
+				);
+			}
+		}
+
+		:is([data-sticky-container], [data-scroll-item], p):has(> [data-sticky-breadcrumb~="snap-offset"]) {
+			position: relative;
+
+			> [data-sticky-breadcrumb~="snap-offset"] {
+				display: block;
+				position: absolute;
+				inset-block-start: calc(-1 * (var(---scrollItem-snapOffsetBlockStart) + var(---snapOffset-border, 0px)));
+				inset-inline-start: 0;
+				inline-size: 0;
+				block-size: 0;
+				pointer-events: none;
+			}
+
+			&[data-card~="border-accent"] > [data-sticky-breadcrumb~="snap-offset"] {
+				---snapOffset-border: var(--card-borderWidth);
+			}
+		}
+
+		details:not([open]) > :not(summary) [data-sticky-breadcrumb~="snap-offset"] {
+			display: none;
+		}
+	}
+
 	[data-sticky-breadcrumb~="scope"] {
 		--sticky-position: sticky;
 		--sticky-offset: initial;
