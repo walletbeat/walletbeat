@@ -1916,23 +1916,26 @@ ol {
 			)
 			--breadcrumb-cover-position(var(--v));
 	}
-	@function --breadcrumb-clearance-flow-point(--x <number>, --distance <length>, --edge <number>) {
-		result: var(--x) --breadcrumb-cover-position(calc(
+	@function --breadcrumb-clearance-flow-point(--x <number>, --distance <length>, --edge <number>, --projection <custom-ident>: stop) {
+		result: if(style(--projection: inline): var(--x); style(--projection: position): calc(
 			var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-arc-centerY) -
 			(1 - 2 * var(--edge)) * var(--distance) + var(--edge) * var(---breadcrumb-clearance-arc-height)
-		));
+		); else: var(--x) --breadcrumb-cover-position(calc(
+			var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-arc-centerY) -
+			(1 - 2 * var(--edge)) * var(--distance) + var(--edge) * var(---breadcrumb-clearance-arc-height)
+		)));
 	}
-	@function --breadcrumb-clearance-cap-stop(--u <number>, --edge <number>) {
+	@function --breadcrumb-clearance-cap-stop(--u <number>, --edge <number>, --projection <custom-ident>: stop) {
 		result: --breadcrumb-clearance-flow-point(
 			calc(var(---breadcrumb-clearance-joinInline) / 1px * pow(var(--u), 2)),
 			calc(var(---breadcrumb-clearance-contact) + var(--stickyBreadcrumb-clearanceGap, 0px) -
 				var(--stickyBreadcrumb-clearanceGap, 0px) * var(--u) -
 				(var(---breadcrumb-clearance-contact) - var(---breadcrumb-clearance-joinBlock)) * pow(var(--u), 2)),
 			var(--edge)
-		);
+		, var(--projection));
 	}
 	@function --breadcrumb-clearance-tangent-stop(
-		--index <number>, --edge <number>,
+		--index <number>, --edge <number>, --projection <custom-ident>: stop,
 		--start <angle>: acos(clamp(0, calc(var(---breadcrumb-clearance-joinBlock) / var(---breadcrumb-clearance-arc-radius)), 1)),
 		--alpha <angle>: calc(var(--start) + (90deg - var(--start)) * pow(var(--index) / 8, 2)),
 		--beta <angle>: calc(var(--start) + (90deg - var(--start)) * pow((var(--index) + 1) / 8, 2)),
@@ -1943,7 +1946,7 @@ ol {
 			max(0, calc((var(---breadcrumb-clearance-inlineOffset) + var(---breadcrumb-clearance-arc-inlineRadius) * sin(var(--middle)) / cos(var(--half))) / 1px)),
 			calc(var(---breadcrumb-clearance-arc-radius) * cos(var(--middle)) / cos(var(--half))),
 			var(--edge)
-		);
+		, var(--projection));
 	}
 	@function --breadcrumb-clearance-flow-stop(--angle <angle>, --edge <number>) {
 		--y: calc(
@@ -2078,7 +2081,7 @@ ol {
 			0 100%
 		));
 	}
-	@function --breadcrumb-clearance-post(--t <number>) {
+	@function --breadcrumb-clearance-post(--t <number>, --space <custom-ident>: entry) {
 		--v: calc(
 			var(---breadcrumb-clearance-view-size) +
 				(var(---breadcrumb-clearance-arrival-end) - var(---breadcrumb-clearance-view-size)) *
@@ -2091,7 +2094,7 @@ ol {
 				) +
 				var(---breadcrumb-clearance-arc-deltaY) * --breadcrumb-ease-distance(var(--t))
 		);
-		result: --breadcrumb-rounded-clearance(var(--y), var(---breadcrumb-clearance-arc-height), var(---breadcrumb-clearance-arc-centerY), var(---breadcrumb-clearance-arc-radius), var(---breadcrumb-clearance-inlineOffset), var(---breadcrumb-clearance-arc-inlineRadius), var(--stickyBreadcrumb-clearanceGap, 0px)) calc(--breadcrumb-ease-time(var(--t)) * 100%);
+		result: --breadcrumb-rounded-clearance(var(--y), var(---breadcrumb-clearance-arc-height), var(---breadcrumb-clearance-arc-centerY), var(---breadcrumb-clearance-arc-radius), var(---breadcrumb-clearance-inlineOffset), var(---breadcrumb-clearance-arc-inlineRadius), var(--stickyBreadcrumb-clearanceGap, 0px)) if(style(--space: cover): --breadcrumb-cover-position(var(--v)); else: calc(--breadcrumb-ease-time(var(--t)) * 100%));
 	}
 	@function --breadcrumb-clearance-final() returns <number> {
 		--y: calc(
@@ -2109,6 +2112,158 @@ ol {
 			var(---breadcrumb-clearance-inlineOffset),
 			var(---breadcrumb-clearance-arc-inlineRadius), var(--stickyBreadcrumb-clearanceGap, 0px)
 		);
+	}
+	@function --breadcrumb-clearance-post-stops(--space <custom-ident>: entry) {
+		result: --breadcrumb-clearance-post(0, var(--space)),
+			--breadcrumb-clearance-post(0.015625, var(--space)),
+			--breadcrumb-clearance-post(0.03125, var(--space)),
+			--breadcrumb-clearance-post(0.046875, var(--space)),
+			--breadcrumb-clearance-post(0.0625, var(--space)),
+			--breadcrumb-clearance-post(0.078125, var(--space)),
+			--breadcrumb-clearance-post(0.09375, var(--space)),
+			--breadcrumb-clearance-post(0.109375, var(--space)),
+			--breadcrumb-clearance-post(0.125, var(--space)),
+			--breadcrumb-clearance-post(0.140625, var(--space)),
+			--breadcrumb-clearance-post(0.15625, var(--space)),
+			--breadcrumb-clearance-post(0.171875, var(--space)),
+			--breadcrumb-clearance-post(0.1875, var(--space)),
+			--breadcrumb-clearance-post(0.203125, var(--space)),
+			--breadcrumb-clearance-post(0.21875, var(--space)),
+			--breadcrumb-clearance-post(0.234375, var(--space)),
+			--breadcrumb-clearance-post(0.25, var(--space)),
+			--breadcrumb-clearance-post(0.265625, var(--space)),
+			--breadcrumb-clearance-post(0.28125, var(--space)),
+			--breadcrumb-clearance-post(0.296875, var(--space)),
+			--breadcrumb-clearance-post(0.3125, var(--space)),
+			--breadcrumb-clearance-post(0.328125, var(--space)),
+			--breadcrumb-clearance-post(0.34375, var(--space)),
+			--breadcrumb-clearance-post(0.359375, var(--space)),
+			--breadcrumb-clearance-post(0.375, var(--space)),
+			--breadcrumb-clearance-post(0.390625, var(--space)),
+			--breadcrumb-clearance-post(0.40625, var(--space)),
+			--breadcrumb-clearance-post(0.421875, var(--space)),
+			--breadcrumb-clearance-post(0.4375, var(--space)),
+			--breadcrumb-clearance-post(0.453125, var(--space)),
+			--breadcrumb-clearance-post(0.46875, var(--space)),
+			--breadcrumb-clearance-post(0.484375, var(--space)),
+			--breadcrumb-clearance-post(0.5, var(--space)),
+			--breadcrumb-clearance-post(0.515625, var(--space)),
+			--breadcrumb-clearance-post(0.53125, var(--space)),
+			--breadcrumb-clearance-post(0.546875, var(--space)),
+			--breadcrumb-clearance-post(0.5625, var(--space)),
+			--breadcrumb-clearance-post(0.578125, var(--space)),
+			--breadcrumb-clearance-post(0.59375, var(--space)),
+			--breadcrumb-clearance-post(0.609375, var(--space)),
+			--breadcrumb-clearance-post(0.625, var(--space)),
+			--breadcrumb-clearance-post(0.640625, var(--space)),
+			--breadcrumb-clearance-post(0.65625, var(--space)),
+			--breadcrumb-clearance-post(0.671875, var(--space)),
+			--breadcrumb-clearance-post(0.6875, var(--space)),
+			--breadcrumb-clearance-post(0.703125, var(--space)),
+			--breadcrumb-clearance-post(0.71875, var(--space)),
+			--breadcrumb-clearance-post(0.734375, var(--space)),
+			--breadcrumb-clearance-post(0.75, var(--space)),
+			--breadcrumb-clearance-post(0.765625, var(--space)),
+			--breadcrumb-clearance-post(0.78125, var(--space)),
+			--breadcrumb-clearance-post(0.796875, var(--space)),
+			--breadcrumb-clearance-post(0.8125, var(--space)),
+			--breadcrumb-clearance-post(0.828125, var(--space)),
+			--breadcrumb-clearance-post(0.84375, var(--space)),
+			--breadcrumb-clearance-post(0.859375, var(--space)),
+			--breadcrumb-clearance-post(0.875, var(--space)),
+			--breadcrumb-clearance-post(0.890625, var(--space)),
+			--breadcrumb-clearance-post(0.90625, var(--space)),
+			--breadcrumb-clearance-post(0.921875, var(--space)),
+			--breadcrumb-clearance-post(0.9375, var(--space)),
+			--breadcrumb-clearance-post(0.953125, var(--space)),
+			--breadcrumb-clearance-post(0.96875, var(--space)),
+			--breadcrumb-clearance-post(0.984375, var(--space)),
+			--breadcrumb-clearance-post(1, var(--space));
+	}
+	@function --breadcrumb-clearance-post-easing(--gap <length>: var(--stickyBreadcrumb-clearanceGap, 0px)) {
+		result: if(style(--gap: 0px): linear(--breadcrumb-clearance-post-stops()); else: linear);
+	}
+	@function --breadcrumb-clearance-point-inline(--kind <custom-ident>,
+		--index <number>) returns <number> {
+		result: if(style(--kind: cap): --breadcrumb-clearance-cap-stop(var(--index), 0, inline); style(--kind: tangent): --breadcrumb-clearance-tangent-stop(var(--index), 0, inline); style(--kind: peak): max(0, calc((var(---breadcrumb-clearance-inlineOffset) + var(---breadcrumb-clearance-arc-inlineRadius)) / 1px)); else: 0);
+	}
+	@function --breadcrumb-clearance-point-position(--kind <custom-ident>,
+		--index <number>,
+		--edge <number>) returns <length> {
+		result: if(style(--kind: start): calc(-1 * (var(---breadcrumb-clearance-flow-height) + var(---breadcrumb-clearance-view-size))); style(--kind: end): calc(var(---breadcrumb-clearance-flow-height) + var(---breadcrumb-clearance-view-size)); style(--kind: cap): --breadcrumb-clearance-cap-stop(var(--index), var(--edge), position); style(--kind: tangent): --breadcrumb-clearance-tangent-stop(var(--index), var(--edge), position); else: calc(var(---breadcrumb-clearance-native-a) - var(---breadcrumb-clearance-arc-centerY) + var(--edge) * var(---breadcrumb-clearance-arc-height)));
+	}
+	@function --breadcrumb-clearance-flow-cut(--kind0 <custom-ident>,
+		--index0 <number>,
+		--kind1 <custom-ident>,
+		--index1 <number>,
+		--edge1 <number>,
+		--v0 <length>,
+		--cut <length>,
+		--v1 <length>: --breadcrumb-clearance-point-position(var(--kind1), var(--index1), var(--edge1))) {
+		result: if(style(--v1 >= var(--cut)): calc(--breadcrumb-clearance-point-inline(var(--kind0), var(--index0)) + (--breadcrumb-clearance-point-inline(var(--kind1), var(--index1)) - --breadcrumb-clearance-point-inline(var(--kind0), var(--index0))) * (var(--cut) - var(--v0)) / (var(--v1) - var(--v0))) --breadcrumb-cover-position(var(--cut)),; else:);
+	}
+	@function --breadcrumb-clearance-flow-segment(--kind0 <custom-ident>,
+		--index0 <number>,
+		--edge0 <number>,
+		--kind1 <custom-ident>,
+		--index1 <number>,
+		--edge1 <number>,
+		--v0 <length>: --breadcrumb-clearance-point-position(var(--kind0), var(--index0), var(--edge0)),
+		--cut <length>: var(---breadcrumb-clearance-flow-cut, var(---breadcrumb-clearance-view-size))) {
+		result: if(style(--v0 < var(--cut)): --breadcrumb-clearance-point-inline(var(--kind0), var(--index0)) --breadcrumb-cover-position(var(--v0)), --breadcrumb-clearance-flow-cut(var(--kind0), var(--index0), var(--kind1), var(--index1), var(--edge1), var(--v0), var(--cut)); else:);
+	}
+	@function --breadcrumb-clearance-end-easing() {
+		result: if(style(---breadcrumb-clearance-arc-radius: 0px): linear(0, 0); else: linear(
+			--breadcrumb-clearance-flow-segment(start, 0, 0, cap, 0, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0, 0, cap, 0.125, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.125, 0, cap, 0.25, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.25, 0, cap, 0.375, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.375, 0, cap, 0.5, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.5, 0, cap, 0.625, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.625, 0, cap, 0.75, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.75, 0, cap, 0.875, 0)
+			--breadcrumb-clearance-flow-segment(cap, 0.875, 0, cap, 1, 0)
+			--breadcrumb-clearance-flow-segment(cap, 1, 0, tangent, 0, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 0, 0, tangent, 1, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 1, 0, tangent, 2, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 2, 0, tangent, 3, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 3, 0, tangent, 4, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 4, 0, tangent, 5, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 5, 0, tangent, 6, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 6, 0, tangent, 7, 0)
+			--breadcrumb-clearance-flow-segment(tangent, 7, 0, peak, 0, 0)
+			--breadcrumb-clearance-flow-segment(peak, 0, 0, peak, 0, 1)
+			--breadcrumb-clearance-flow-segment(peak, 0, 1, tangent, 7, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 7, 1, tangent, 6, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 6, 1, tangent, 5, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 5, 1, tangent, 4, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 4, 1, tangent, 3, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 3, 1, tangent, 2, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 2, 1, tangent, 1, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 1, 1, tangent, 0, 1)
+			--breadcrumb-clearance-flow-segment(tangent, 0, 1, cap, 1, 1)
+			--breadcrumb-clearance-flow-segment(cap, 1, 1, cap, 0.875, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.875, 1, cap, 0.75, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.75, 1, cap, 0.625, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.625, 1, cap, 0.5, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.5, 1, cap, 0.375, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.375, 1, cap, 0.25, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.25, 1, cap, 0.125, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0.125, 1, cap, 0, 1)
+			--breadcrumb-clearance-flow-segment(cap, 0, 1, end, 0, 0)
+			if(style(---breadcrumb-clearance-reduced: 1): --breadcrumb-clearance-final() --breadcrumb-cover-position(var(---breadcrumb-clearance-arrival-end)),; else: --breadcrumb-clearance-post-stops(cover),)
+			--breadcrumb-clearance-final() 100%
+			));
+	}
+	@function --breadcrumb-clearance-end-animation(--gap <length>: var(--stickyBreadcrumb-clearanceGap, 0px)) {
+		result: if(style(--gap: 0px): breadcrumb-clearance-inline auto --breadcrumb-clearance-flow-easing() both,
+			var(---breadcrumb-clearance-postAnimation),
+			breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both; else:
+			breadcrumb-clearance-inline auto --breadcrumb-clearance-end-easing() both,
+			breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both);
+	}
+	@function --breadcrumb-clearance-end-ranges(--gap <length>: var(--stickyBreadcrumb-clearanceGap, 0px)) {
+		result: if(style(--gap: 0px): cover -100% cover 100%, var(--stickyBreadcrumb-entryRange), var(--stickyBreadcrumb-entryRange); else: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange));
 	}
 
 	@property ---breadcrumb-clearance-contact {
@@ -3486,86 +3641,18 @@ ol {
 						---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(--stickyBreadcrumb-clearanceGap, 0px));
 						@media (prefers-reduced-motion: no-preference) {
 							---breadcrumb-endPaintEasing: var(--transition-easeInOutExpo);
-							---breadcrumb-clearance-postEasing: linear(
-								--breadcrumb-clearance-post(0),
-								--breadcrumb-clearance-post(0.015625),
-								--breadcrumb-clearance-post(0.03125),
-								--breadcrumb-clearance-post(0.046875),
-								--breadcrumb-clearance-post(0.0625),
-								--breadcrumb-clearance-post(0.078125),
-								--breadcrumb-clearance-post(0.09375),
-								--breadcrumb-clearance-post(0.109375),
-								--breadcrumb-clearance-post(0.125),
-								--breadcrumb-clearance-post(0.140625),
-								--breadcrumb-clearance-post(0.15625),
-								--breadcrumb-clearance-post(0.171875),
-								--breadcrumb-clearance-post(0.1875),
-								--breadcrumb-clearance-post(0.203125),
-								--breadcrumb-clearance-post(0.21875),
-								--breadcrumb-clearance-post(0.234375),
-								--breadcrumb-clearance-post(0.25),
-								--breadcrumb-clearance-post(0.265625),
-								--breadcrumb-clearance-post(0.28125),
-								--breadcrumb-clearance-post(0.296875),
-								--breadcrumb-clearance-post(0.3125),
-								--breadcrumb-clearance-post(0.328125),
-								--breadcrumb-clearance-post(0.34375),
-								--breadcrumb-clearance-post(0.359375),
-								--breadcrumb-clearance-post(0.375),
-								--breadcrumb-clearance-post(0.390625),
-								--breadcrumb-clearance-post(0.40625),
-								--breadcrumb-clearance-post(0.421875),
-								--breadcrumb-clearance-post(0.4375),
-								--breadcrumb-clearance-post(0.453125),
-								--breadcrumb-clearance-post(0.46875),
-								--breadcrumb-clearance-post(0.484375),
-								--breadcrumb-clearance-post(0.5),
-								--breadcrumb-clearance-post(0.515625),
-								--breadcrumb-clearance-post(0.53125),
-								--breadcrumb-clearance-post(0.546875),
-								--breadcrumb-clearance-post(0.5625),
-								--breadcrumb-clearance-post(0.578125),
-								--breadcrumb-clearance-post(0.59375),
-								--breadcrumb-clearance-post(0.609375),
-								--breadcrumb-clearance-post(0.625),
-								--breadcrumb-clearance-post(0.640625),
-								--breadcrumb-clearance-post(0.65625),
-								--breadcrumb-clearance-post(0.671875),
-								--breadcrumb-clearance-post(0.6875),
-								--breadcrumb-clearance-post(0.703125),
-								--breadcrumb-clearance-post(0.71875),
-								--breadcrumb-clearance-post(0.734375),
-								--breadcrumb-clearance-post(0.75),
-								--breadcrumb-clearance-post(0.765625),
-								--breadcrumb-clearance-post(0.78125),
-								--breadcrumb-clearance-post(0.796875),
-								--breadcrumb-clearance-post(0.8125),
-								--breadcrumb-clearance-post(0.828125),
-								--breadcrumb-clearance-post(0.84375),
-								--breadcrumb-clearance-post(0.859375),
-								--breadcrumb-clearance-post(0.875),
-								--breadcrumb-clearance-post(0.890625),
-								--breadcrumb-clearance-post(0.90625),
-								--breadcrumb-clearance-post(0.921875),
-								--breadcrumb-clearance-post(0.9375),
-								--breadcrumb-clearance-post(0.953125),
-								--breadcrumb-clearance-post(0.96875),
-								--breadcrumb-clearance-post(0.984375),
-								--breadcrumb-clearance-post(1)
-							);
+							---breadcrumb-clearance-postEasing: --breadcrumb-clearance-post-easing();
 							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-inline auto var(---breadcrumb-clearance-postEasing) forwards;
 						}
 						@media (prefers-reduced-motion: reduce) {
 							---breadcrumb-clearance-finalInline: calc(-1 * var(---inlineDirection) * --breadcrumb-clearance-final() * 1px);
 							---breadcrumb-endPaintEasing: steps(1, end);
-							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-step auto steps(1, end) forwards;
+							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-step auto steps(1, end) forwards; ---breadcrumb-clearance-flow-cut: var(---breadcrumb-clearance-arrival-end); ---breadcrumb-clearance-reduced: 1;
 						}
 						--stickyBreadcrumb-endPaintAnimation:
-							breadcrumb-clearance-inline auto --breadcrumb-clearance-flow-easing() both,
-							var(---breadcrumb-clearance-postAnimation),
-							breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both;
+							--breadcrumb-clearance-end-animation();
 						--stickyBreadcrumb-endPaintTimeline: var(--stickyBreadcrumb-entryTimeline);
-						--stickyBreadcrumb-endPaintRange: cover -100% cover 100%, var(--stickyBreadcrumb-entryRange), var(--stickyBreadcrumb-entryRange);
+						--stickyBreadcrumb-endPaintRange: --breadcrumb-clearance-end-ranges();
 						&[data-sticky-breadcrumb~="contents"] {
 							animation: none;
 						}
