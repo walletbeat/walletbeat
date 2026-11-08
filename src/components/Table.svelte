@@ -650,6 +650,7 @@
 											formaction={!interactive ? sortAction?.url : undefined}
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
+											data-sort-next={nextSort ? nextSort.direction : undefined}
 											onclick={event => {
 												event.stopPropagation()
 												if (interactive) toggleColumnSort(column.id)
@@ -1056,6 +1057,17 @@
 							--column-sortIndicator-fontSize: 1em;
 						}
 
+						&:not([data-sort]):is(:hover, :focus-within) {
+							.sort-button:enabled[data-sort-next] {
+								--column-sortIndicator-fontSize: 1em;
+								--column-sortIndicator-transform: perspective(1000px);
+
+								&[data-sort-next='desc'] {
+									--column-sortIndicator-transform: perspective(1000px) rotateX(180deg);
+								}
+							}
+						}
+
 						&[data-sort] {
 							filter: brightness(150%);
 						}
@@ -1096,6 +1108,7 @@
 									display: inline-block;
 
 									font-size: var(--column-sortIndicator-fontSize);
+									font-family: var(--fontFamily-spaceGrotesk);
 
 									transform: var(--column-sortIndicator-transform);
 
