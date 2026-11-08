@@ -13,12 +13,24 @@ test('TOC native invoker remains usable before client enhancement', async ({ bro
 		await page.goto('/metamask/?variant=BROWSER')
 		const panel = page.locator('#wallet-toc')
 		const button = page.locator('button[popovertarget="wallet-toc"]')
+		const activate = async () => {
+			const { x, y, hit } = await button.evaluate(element => {
+				const box = element.getBoundingClientRect()
+				const x = box.left + box.width / 2
+				const y = box.top + box.height / 2
+
+				return { x, y, hit: element.contains(document.elementFromPoint(x, y)) }
+			})
+
+			expect(hit, 'The native pointer must hit the visible TOC invoker').toBe(true)
+			await page.mouse.click(x, y)
+		}
 
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
 		await expect(button).toBeVisible()
 		await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded')
 
-		await button.click()
+		await activate()
 		await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(1)
 		await expect(panel).toBeVisible()
 		await expect(panel.locator('a[href]').first()).toBeVisible()
@@ -54,7 +66,7 @@ test('TOC native invoker remains usable before client enhancement', async ({ bro
 
 		await page.keyboard.press('Escape')
 		await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
-		await button.click()
+		await activate()
 		await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(1)
 		await expect(panel).toBeVisible()
 		await info.attach('toc-native-fallback', {
