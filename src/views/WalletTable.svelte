@@ -2129,13 +2129,14 @@
 			}
 		}
 
-		/* Block rows stop producing a max-content track to centre. */
 		@container wallet-table (width < 42rem) {
-			grid-template-columns: 100%;
-			inline-size: 100%;
-			max-inline-size: 100%;
-			min-inline-size: 0;
-			contain: inline-size;
+			&:not(:has(thead th[data-expanded])) {
+				grid-template-columns: 100%;
+				inline-size: 100%;
+				max-inline-size: 100%;
+				min-inline-size: 0;
+				contain: inline-size;
+			}
 		}
 	}
 
@@ -2146,7 +2147,7 @@
 		 * underneath at full width.
 		 */
 		@container wallet-table (width < 42rem) {
-			.wallet-table {
+			.wallet-table:not(:has(> table > thead th[data-expanded])) {
 				--table-inlineSize: 100%;
 
 				table,
