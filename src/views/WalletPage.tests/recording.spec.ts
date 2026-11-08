@@ -215,11 +215,25 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 				const links = page.locator(selector).filter({ visible: true })
 
 				expect(await links.count()).toBeGreaterThan(0)
-				const link = links.nth(Math.min(index, (await links.count()) - 1))
+				href = await links.nth(Math.min(index, (await links.count()) - 1)).getAttribute('href')
 
-				href = await link.getAttribute('href')
+				if (!href) {
+					throw new Error('A fragment link is required for the recording')
+				}
+
+				const link = page
+					.locator(selector)
+					.and(page.locator(`a[href=${JSON.stringify(href)}]`))
+					.first()
 				const heading = link.locator('h2')
 				const target = type === 'heading' && (await heading.count()) ? heading : link
+
+				if (type === 'heading') {
+					await page.evaluate(hash => {
+						document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' })
+					}, href)
+					await settleRoot()
+				}
 
 				await target.hover()
 				await target.click()
@@ -241,7 +255,6 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 		}
 	}
 
-	await info.attach('final-frame', { body: await page.screenshot(), contentType: 'image/png' })
 	await info.attach('recording-provenance', {
 		body: JSON.stringify(
 			{
@@ -259,5 +272,9 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 			2,
 		),
 		contentType: 'application/json',
+	})
+	await info.attach('final-frame', {
+		body: await page.screenshot({ timeout: 60000 }),
+		contentType: 'image/png',
 	})
 })
