@@ -3479,7 +3479,8 @@ ol {
 						view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 					}
 					&[data-sticky-breadcrumb~="item-size"] {
-						inline-size: anchor-size(--breadcrumb-compact inline, 0px);
+						/* Keep subpixel anchor noise out of the inherited identity measurement. */
+						inline-size: round(nearest, anchor-size(--breadcrumb-compact inline, 0px), 0.125px);
 						block-size: anchor-size(--breadcrumb-source block, 0px);
 						&::before {
 							view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
