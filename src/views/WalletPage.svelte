@@ -1329,40 +1329,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 									></span>
 									<span>{attribute.displayName}</span>
 								</a>
-								{#if showStage}
-									{@const { ladderEvaluation, ladderType } = primaryStage}
-
-									{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
-
-									{@const stageNumbers =
-										(ladderType &&
-											attributeStages.find(stage => stage.ladderType === ladderType)
-												?.stageNumbers) ||
-										[]}
-
-									{#if stageNumbers.length > 0}
-										{@const stageNumber = stageNumbers[0]}
-										{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
-										{@const stageLabels = ladderEvaluation
-											? stageNumbers
-													.map(n => ladderEvaluation.ladder.stages[n])
-													.filter(s => s !== undefined)
-													.map(s => s.label.replace(/^Stage /, ''))
-											: []}
-
-										{#if stage}
-											<a
-												href={`#${stage.id}`}
-												data-link="camouflaged"
-												title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
-											>
-												<span data-badge="small" style:--accent="var(--accent-color)">
-													<small>Stage {stageLabels.join(', ')}</small>
-												</span>
-											</a>
-										{/if}
-									{/if}
-								{/if}
 							</h3>
 							<span data-sticky-breadcrumb="size-export size-source" aria-hidden="true"></span>
 						</div>
@@ -1372,6 +1338,40 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							data-row-item="wrap-end"
 							data-row="end gap-2 wrap"
 						>
+							{#if showStage}
+								{@const { ladderEvaluation, ladderType } = primaryStage}
+
+								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
+
+								{@const stageNumbers =
+									(ladderType &&
+										attributeStages.find(stage => stage.ladderType === ladderType)
+											?.stageNumbers) ||
+									[]}
+
+								{#if stageNumbers.length > 0}
+									{@const stageNumber = stageNumbers[0]}
+									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+									{@const stageLabels = ladderEvaluation
+										? stageNumbers
+												.map(n => ladderEvaluation.ladder.stages[n])
+												.filter(s => s !== undefined)
+												.map(s => s.label.replace(/^Stage /, ''))
+										: []}
+
+									{#if stage}
+										<a
+											href={`#${stage.id}`}
+											data-link="camouflaged"
+											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
+										>
+											<span data-badge="small" style:--accent="var(--accent-color)">
+												<small>Stage {stageLabels.join(', ')}</small>
+											</span>
+										</a>
+									{/if}
+								{/if}
+							{/if}
 							{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
 									class="variant-indicator"
