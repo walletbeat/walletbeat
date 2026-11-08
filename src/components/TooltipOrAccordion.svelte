@@ -124,33 +124,34 @@
 	})
 
 	onMount(() => {
+		const mountedDisclosure = disclosure
 		// Untouched peers must not reset a shared controller's adopted native state.
-		if (disclosure.open !== initialExpanded) isExpanded = disclosure.open
+		if (mountedDisclosure.open !== initialExpanded) isExpanded = mountedDisclosure.open
 
 		const prepareNativeEntry = (event: Event) => {
-			if (event.target !== disclosure) return
+			if (event.target !== mountedDisclosure) return
 
 			const nativeEntry = pendingNativeEntry
 
 			pendingNativeEntry = null
 
-			if (disclosure.open && nativeEntry && !nativeEntry.defaultPrevented && tooltipUsesDrawer()) {
+			if (mountedDisclosure.open && nativeEntry && !nativeEntry.defaultPrevented && tooltipUsesDrawer()) {
 				syncPopover(true, true, true)
 			}
 		}
 
 		const observer = new MutationObserver(() => syncInteractivity())
 
-		observer.observe(disclosure, { attributes: true, attributeFilter: ['open'] })
+		observer.observe(mountedDisclosure, { attributes: true, attributeFilter: ['open'] })
 		syncInteractivity()
-		disclosure.addEventListener('toggle', prepareNativeEntry, true)
+		mountedDisclosure.addEventListener('toggle', prepareNativeEntry, true)
 		enhanced = true
 
 		return () => {
 			observer.disconnect()
 			pendingNativeEntry = null
 			pendingPopoverOpening = null
-			disclosure.removeEventListener('toggle', prepareNativeEntry, true)
+			mountedDisclosure.removeEventListener('toggle', prepareNativeEntry, true)
 		}
 	})
 </script>
