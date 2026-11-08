@@ -857,6 +857,7 @@ declare global {
 		 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
 		 * - `--stickyBreadcrumb-approachTimeline`: unique view timeline for an optional approach marker; `exit-crossing -100% exit-crossing 0%` spans one heading row before contact
 		 * - `--stickyBreadcrumb-endPaintAnimation`, `--stickyBreadcrumb-endPaintTimeline`, `--stickyBreadcrumb-endPaintRange`: end paint motion; `contents` directs it to existing children and marker while retaining native cluster size and timeline ownership
+		 * - `--stickyBreadcrumb-arrivalInsetEnd`: optional block-end inset on the flow marker, derived from the existing snap area that completes arrival
 		 * - `--stickyBreadcrumb-motionRange`: visual attachment range for contain-based motion; defaults to the entry range. Entry-state timing remains on `--stickyBreadcrumb-entryRange`.
 		 * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both`. Use `forwards` with an extended trailing attachment range to retain the authored initial paint before entry.
 		 * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% contain 100%`

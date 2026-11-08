@@ -2637,6 +2637,26 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	.attribute {
 		position: relative;
 
+		@supports (anchor-scope: --breadcrumb-arrival-end) and
+			(inset-block-end: anchor(--breadcrumb-arrival-end start)) and
+			(color: if(style(---breadcrumb-supportGrid: 1): red)) {
+			> details[open] {
+				.attribute-rating-details {
+					anchor-name: --breadcrumb-arrival-end;
+				}
+
+				~ [data-sticky-breadcrumb~="flow"] {
+					--stickyBreadcrumb-arrivalInsetEnd: calc(
+						anchor(--breadcrumb-arrival-end start) +
+						max(
+							var(--scrollContainer-scrollPaddingBlockStart, 0px),
+							var(--stickyBreadcrumb-occlusionBlockEnd, 0px) - var(---breadcrumb-blockEnd)
+						)
+					);
+				}
+			}
+		}
+
 		> details > summary {
 			min-inline-size: 0;
 			font-size: var(---wallet-attribute-heading-font-size);
