@@ -1478,7 +1478,7 @@
 						>
 							<Pie
 								transitionNamePrefix={JSON.stringify([viewId, wallet.metadata.id])}
-								transitionElements="slices"
+								transitionElements="pie slices"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
