@@ -1988,7 +1988,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 		}
 
-		row-gap: 2rem;
+		---wallet-section-gap: 2rem;
+		row-gap: var(---wallet-section-gap);
 
 		@media (width <= 84rem) {
 			&[data-sticky-container] {
@@ -2481,7 +2482,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							var(--stickyBreadcrumb-entryTimeline);
 						animation-range:
 							cover 0% exit-crossing 0%,
-							exit-crossing 0px exit-crossing calc(var(---pie-size) - var(---pie-compactSize)),
+							exit-crossing calc(var(---pie-compactBlockStart) - var(---breadcrumb-blockEnd) - var(---wallet-section-gap))
+							exit-crossing calc(var(---pie-size) - var(---pie-compactSize)),
 							var(--stickyBreadcrumb-entryRange);
 						inset-block-start: var(---pie-compactBlockStart);
 						inset-inline: auto;
