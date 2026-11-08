@@ -182,6 +182,7 @@ export function observeStickyChain(chain) {
 						style.content === 'none' ||
 						style.display === 'none' ||
 						style.visibility === 'hidden' ||
+						style.filter === 'opacity(0)' ||
 						Number(style.opacity) <= 0.01 ||
 						!visiblePaint
 					) {
@@ -204,6 +205,7 @@ export function observeStickyChain(chain) {
 						positionOwner: element === position,
 						owner: element.tagName,
 						background: style.backgroundColor,
+						opacity: Number(style.opacity),
 						inputs,
 					}
 					/** @param {string} value @param {number} basis */
@@ -325,6 +327,7 @@ export function observeStickyChain(chain) {
 							positionOwner: element === position,
 							owner: element.tagName,
 							source: 'actual-backdrop-self',
+							opacity: Number(style.opacity),
 							...bounds(box),
 						},
 					]
@@ -340,11 +343,12 @@ export function observeStickyChain(chain) {
 		}
 
 		const resolvedSurfaces = surfaces.filter(surface => 'top' in surface)
+		const items = [...position.querySelectorAll('[data-sticky-breadcrumb~="item"]')].filter(
+			ownsForeground,
+		)
 		const foreground = [
-			heading,
-			...position.querySelectorAll(
-				'[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"]',
-			),
+			...(items.length ? items : [heading]),
+			...position.querySelectorAll('[data-sticky-breadcrumb~="end"]'),
 		]
 			.flatMap(foregroundOwners)
 			.filter(element => ownsForeground(element) && visible(element))
@@ -425,6 +429,7 @@ export function observeStickyChain(chain) {
 			...owner,
 			effects,
 			occupiedRow,
+			foreground: foreground.map(bounds),
 			surfaces: resolvedSurfaces,
 			painted,
 			endBoxes,

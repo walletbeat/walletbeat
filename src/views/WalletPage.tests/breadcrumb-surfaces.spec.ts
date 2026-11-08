@@ -1,12 +1,86 @@
+import type { Page } from '@playwright/test'
+
+import { observeStickyChain } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
+
+async function observeIconBoxes(page: Page, scope: string, heading: string) {
+	const selector = scope + ' [data-icon]'
+	const icons = await page.locator(selector).evaluateAll((elements, heading) => {
+		const owner = document.querySelector(heading)?.closest('[data-sticky-breadcrumb~="position"]')
+
+		return elements.map(element => {
+			if (
+				!owner ||
+				element.closest('[data-sticky-breadcrumb~="position"]') !== owner ||
+				!element.closest('[data-sticky-breadcrumb~="item"]') ||
+				!element.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+			) {
+				return []
+			}
+
+			return ['before', 'after'].filter(pseudo => {
+				const style = getComputedStyle(element, '::' + pseudo)
+
+				return (
+					style.content !== 'none' &&
+					style.content !== 'normal' &&
+					style.display !== 'none' &&
+					style.visibility === 'visible' &&
+					Number(style.opacity) > 0.01 &&
+					style.filter !== 'opacity(0)'
+				)
+			})
+		})
+	}, heading)
+	const cdp = await page.context().newCDPSession(page)
+
+	try {
+		const { root } = await cdp.send('DOM.getDocument')
+		const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector })
+
+		expect(nodeIds.length, 'Native and DOM icon inventories must agree').toBe(icons.length)
+		const boxes = []
+
+		for (const [index, pseudos] of icons.entries()) {
+			if (!pseudos.length) {
+				continue
+			}
+
+			const { node } = await cdp.send('DOM.describeNode', { nodeId: nodeIds[index] })
+
+			for (const type of pseudos) {
+				const pseudo = node.pseudoElements?.find(element => element.pseudoType === type)
+
+				expect(pseudo, 'Visible icon layer must have a native paint owner').toBeDefined()
+				const { model } = await cdp.send('DOM.getBoxModel', {
+					backendNodeId: pseudo!.backendNodeId,
+				})
+				const xs = model.border.filter((_, index) => index % 2 === 0)
+				const ys = model.border.filter((_, index) => index % 2 === 1)
+
+				boxes.push({
+					left: Math.min(...xs),
+					right: Math.max(...xs),
+					top: Math.min(...ys),
+					bottom: Math.max(...ys),
+				})
+			}
+		}
+
+		return boxes
+	} finally {
+		await cdp.detach()
+	}
+}
 
 test.use({ headless: false })
 
 for (const wallet of ['metamask', 'ambire']) {
-	for (const width of [390, 768]) {
+	for (const width of [390, 768, 1006]) {
 		for (const family of ['stage', 'attribute', 'group']) {
 			test(`breadcrumb surfaces preserve natural support and cover compact content: ${wallet} ${width} ${family}`, async ({
 				page,
+				browserName,
 			}, info) => {
 				await page.setViewportSize({ width, height: 900 })
 				await page.goto(`/${wallet}/`)
@@ -30,9 +104,57 @@ for (const wallet of ['metamask', 'ambire']) {
 					.first()
 
 				await expect(scope).toHaveCount(1)
+				const { chain, arrivalTops } = await scope.evaluate(element => {
+					const chain = []
+
+					for (
+						let owner: Element | null = element;
+						owner;
+						owner = owner.parentElement?.closest('[data-sticky-breadcrumb~="scope"]') ?? null
+					) {
+						const heading = owner.querySelector('h1, h2, h3, h4')
+
+						if (!heading || !owner.id) {
+							throw Error('Surface observation requires an identified heading scope')
+						}
+
+						chain.unshift({
+							level: Number(heading.tagName.slice(1)),
+							scope: '#' + CSS.escape(owner.id),
+							heading: '#' + CSS.escape(owner.id) + ' ' + heading.tagName.toLowerCase(),
+						})
+					}
+					const heading = element.querySelector('h2, h3')!
+					const flow = element.querySelector('[data-sticky-breadcrumb~="flow"]')!
+					const style = getComputedStyle(heading)
+					const length =
+						flow.getBoundingClientRect().height -
+						parseFloat(style.getPropertyValue('---breadcrumb-parentBlockEnd'))
+
+					return {
+						chain,
+						arrivalTops:
+							style.getPropertyValue('---breadcrumb-wrap').trim() === '0' && length > 0
+								? [0.2, 0.5, 0.8].map(
+										fraction =>
+											element.getBoundingClientRect().top -
+											flow.getBoundingClientRect().top -
+											length * fraction,
+									)
+								: [],
+					}
+				})
+
+				if (wallet === 'metamask' && width === 1006 && family === 'attribute') {
+					expect(
+						arrivalTops,
+						'The wide attribute case must exercise a shared-row arrival',
+					).not.toHaveLength(0)
+				}
+
 				const observations = []
 
-				for (const top of [300, -100]) {
+				for (const top of [300, ...arrivalTops, -100]) {
 					const observed = await scope.evaluate(async (element, top) => {
 						const root = document.querySelector('#layout')
 
@@ -74,57 +196,49 @@ for (const wallet of ['metamask', 'ambire']) {
 						return {
 							top: element.getBoundingClientRect().top,
 							scroll: root.scrollTop,
+							entry: getComputedStyle(header).getPropertyValue('---breadcrumb-entry').trim(),
 							header: rectangle(header),
 							support: rectangle(support),
 							surface: {
 								opacity: Number(surface.opacity),
 								height: Number.parseFloat(surface.height),
 							},
-							surfaces: [...document.querySelectorAll('[data-sticky]')].flatMap(owner =>
-								['::before', '::after'].flatMap(pseudo => {
-									const style = getComputedStyle(owner, pseudo)
-									const box = owner.getBoundingClientRect()
-
-									if (
-										style.content === 'none' ||
-										style.content === 'normal' ||
-										Number(style.opacity) < 0.99 ||
-										style.filter === 'opacity(0)' ||
-										style.backgroundColor === 'rgba(0, 0, 0, 0)'
-									) {
-										return []
-									}
-
-									return [
-										{
-											top: box.top,
-											bottom: box.top + Number.parseFloat(style.height),
-											left: box.left,
-											right: box.left + Number.parseFloat(style.width),
-										},
-									]
-								}),
-							),
-							paint: [
-								...header.querySelectorAll(
-									'[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"] > *',
-								),
-							].map(child => rectangle(child)),
 						}
 					}, top)
 
+					const occupied = await page.evaluate(observeStickyChain, chain)
+					const surfaces = occupied.rows.flatMap(row => row.surfaces)
+					const foreground = occupied.rows.at(-1)!
+					const owner = chain.at(-1)!
+					const iconBoxes =
+						browserName === 'chromium'
+							? await observeIconBoxes(page, owner.scope, owner.heading)
+							: []
+					const paint = foreground.foreground
+
 					observations.push(observed)
 					await info.attach(`surface-pose-${top}`, {
-						body: JSON.stringify(observed),
+						body: JSON.stringify({
+							...observed,
+							surfaces,
+							paint,
+							iconBoxes,
+							nativePseudoBounds: browserName === 'chromium',
+							iconInkCoverage: false,
+						}),
 						contentType: 'application/json',
 					})
 					expect(
 						Math.abs(observed.top - top),
 						'Requested scene must actually be delivered',
 					).toBeLessThan(1)
-					expect(observed.paint.length).toBeGreaterThan(0)
+					expect(paint.length).toBeGreaterThan(0)
 
-					if (top > 0) {
+					if (arrivalTops.includes(top)) {
+						expect(observed.entry, 'The sampled heading must be in its arrival state').toBe('0.5')
+					}
+
+					if (top === 300) {
 						expect(
 							observed.header.bottom,
 							'Natural foreground must not cover its supporting paragraph',
@@ -134,21 +248,30 @@ for (const wallet of ['metamask', 'ambire']) {
 							'Compact backdrop must not obscure natural supporting content',
 						).toBe(0)
 					} else {
-						for (const box of observed.paint) {
-							expect(
-								observed.surfaces.some(
+						for (const box of paint) {
+							const coveredBottom = surfaces
+								.filter(
 									surface =>
-										surface.top <= box.top + 0.5 &&
-										surface.bottom >= box.bottom - 0.5 &&
+										surface.opacity >= 0.99 &&
 										surface.left <= box.left + 0.5 &&
 										surface.right >= box.right - 0.5,
-								),
-								'An occupied row surface must cover its heading and badges, including shared rows',
-							).toBe(true)
+								)
+								.sort((a, b) => a.top - b.top)
+								.reduce(
+									(bottom, surface) =>
+										surface.top <= bottom + 0.5 ? Math.max(bottom, surface.bottom) : bottom,
+									box.top,
+								)
+
+							expect(
+								coveredBottom,
+								'Occupied row surfaces must continuously cover DOM foreground owners',
+							).toBeGreaterThanOrEqual(box.bottom - 0.5)
 						}
 					}
 				}
-				const [natural, compact] = observations
+				const [natural] = observations
+				const compact = observations.at(-1)!
 
 				expect(
 					Math.abs(compact.support.top - natural.support.top + (compact.scroll - natural.scroll)),
