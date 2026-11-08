@@ -684,7 +684,19 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'The Android and iOS apps have no dependency isolation configured.',
+							label: 'Android app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/android/gradle/libs.versions.toml#not-line-specific',
+						},
+						{
+							label: 'iOS app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/.gitmodules#not-line-specific',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
