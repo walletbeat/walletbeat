@@ -122,6 +122,7 @@ function qualifyReversal(
 	target: number,
 	tolerance: number,
 	initialBracket: boolean,
+	returnStart: number | undefined,
 ) {
 	const atTarget = (frame: ClassifiedFrame) =>
 		frame.referencePose !== null && Math.abs(frame.referencePose - target) <= tolerance
@@ -142,7 +143,9 @@ function qualifyReversal(
 	const returnBracket = Boolean(
 		returned &&
 		predecessor &&
-		predecessor.phase === 'reversal-return' &&
+		returnStart !== undefined &&
+		predecessor.natural &&
+		(predecessor.phase === 'reversal-return' || predecessor.timestamp * 1000 <= returnStart) &&
 		predecessor.decodedPose !== null &&
 		predecessor.decodedPose < target - tolerance &&
 		predecessor.timestamp < returned.timestamp,
@@ -183,7 +186,7 @@ export async function observeIconPaint({
 	const result: DetailedReport = {
 		status: 'instrument-rejected',
 		browserClosed: false,
-		probeRevision: 7,
+		probeRevision: 8,
 		workload,
 		mode,
 		phase: 'reference-admission',
@@ -1127,7 +1130,13 @@ export async function observeIconPaint({
 
 		const reversalAdmission =
 			workload === 'reversal'
-				? qualifyReversal(result.frames, D, poseTolerance, targetBracketAdmitted)
+				? qualifyReversal(
+						result.frames,
+						D,
+						poseTolerance,
+						targetBracketAdmitted,
+						reversalWindows.find(window => window.mode === 'reversal-return')?.start,
+					)
 				: { admitted: true }
 
 		result.reversalAdmission = reversalAdmission
