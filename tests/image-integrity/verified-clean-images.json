@@ -455,6 +455,18 @@
 		"hash": "f7633cc320119eb5dfe61606e7c1b378034e9c91b54c43f0ba6bddd6e2abf5cc",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png": {
+		"hash": "948d648ef635e17223f40a8bceedf94ff979ace4d57f2b9ba8ffcadd7d7fb2fe",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-connected-second-wallet.png": {
+		"hash": "1678e10fb118c0381894ebe05045ab15815310566a55203e76e21aaf8b77eba1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png": {
+		"hash": "3931c40a31a2680e2a92aa1807981e754d1ac5e4b4c1bd6fff046bbc4161bdee",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
 		"hash": "15b963a47d182358a47c8f7fdaaee0b22ecf3f6a1280e21f8f225a101b7a6ac0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

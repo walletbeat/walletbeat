@@ -1,8 +1,13 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import {
+	ExposedAccountsBehavior,
+	type ExposedAccountSet,
+} from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -90,9 +95,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman, minimalsm],
+		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-11-04',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -250,7 +255,59 @@ export const gemwallet: SoftwareWallet = {
 				// 	],
 				// }),
 			},
-			appIsolation: { type: 'APP_CONNECTION_NOT_SUPPORTED' },
+			appIsolation: {
+				createInAppConnectionFlow: notSupportedWithRef({
+					ref: {
+						explanation:
+							"The connection screen lists existing wallets and there isn't a way to create a new wallet.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png',
+						label: 'Gem connection screen with the wallet list expanded',
+						lastRetrieved: '2026-11-05',
+					},
+				}),
+				erc7846WalletConnect: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Gem's list of supported requests doesn't include ERC-7846's `wallet_connect`.",
+						label: 'Supported app requests in the Gem source code',
+						url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/crates/primitives/src/wallet_connector.rs#L21-L65',
+					},
+				}),
+				ethAccounts: supported<WithRef<ExposedAccountSet>>({
+					ref: [
+						{
+							explanation:
+								'An app is given only the address of the wallet chosen on the connection screen.',
+							label: 'Connection approval in the Gem source code',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/mod.rs#L203-L212',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem.',
+							label: 'Connection screen default selection',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/rules.rs#L134-L136',
+						},
+					],
+					defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'A second wallet is connected to app.uniswap.org.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-connected-second-wallet.png',
+							label: 'Gem showing the second wallet connected to app.uniswap.org',
+							lastRetrieved: '2026-11-05',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem, instead of the one the site was originally connected with.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png',
+							label: 'Gem connection screen for app.uniswap.org offering the first wallet',
+							lastRetrieved: '2026-11-05',
+						},
+					],
+				}),
+			},
 			dataCollection: null,
 			privacyPolicy: 'https://gemwallet.com/privacy',
 			transactionPrivacy: {
