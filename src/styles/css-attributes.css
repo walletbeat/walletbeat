@@ -3519,16 +3519,16 @@ ol {
 				&[data-sticky-breadcrumb~="approach"] {
 					block-size: var(---breadcrumb-compactItemHeight);
 				}
+				---breadcrumb-inlineWidth: calc(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap));
 				---breadcrumb-fitWrap: clamp(
 					0,
 					sign(
-						var(--stickyBreadcrumb-sourcePaddingInline) + var(---breadcrumb-itemWidth) +
-							var(---breadcrumb-endWidth) + var(---breadcrumb-endGap) - var(---breadcrumb-availableInlineSize)
+						var(--stickyBreadcrumb-sourcePaddingInline) + var(---breadcrumb-inlineWidth) -
+							var(---breadcrumb-availableInlineSize)
 					),
 					1
 				);
 				---breadcrumb-sourceEndWrap: clamp(0, sign(var(---breadcrumb-sourceRowHeight) - max(var(---breadcrumb-itemHeight), var(---breadcrumb-endHeight)) - var(--column-supportGap, 0.5rem) / 2), 1);
-				---breadcrumb-inlineWidth: calc(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap));
 				---breadcrumb-trialWrap: max(var(--stickyBreadcrumb-forceRow), clamp(0, sign(var(---breadcrumb-parentInlineEnd) + var(---breadcrumb-inlineWidth) - var(---breadcrumb-availableInlineSize)), 1));
 				---breadcrumb-trialBlockStart: calc((1 - var(---breadcrumb-trialWrap)) * var(---breadcrumb-parentBlockStart) + var(---breadcrumb-trialWrap) * var(---breadcrumb-parentBlockEnd));
 				---breadcrumb-trialRowHeight: max(var(---breadcrumb-compactItemHeight), var(---breadcrumb-endHeight), calc(var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-trialBlockStart) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)));
@@ -3547,7 +3547,7 @@ ol {
 
 				---breadcrumb-width: calc(
 					(1 - var(---breadcrumb-endWrap)) *
-						(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap)) +
+						var(---breadcrumb-inlineWidth) +
 						var(---breadcrumb-endWrap) *
 						max(var(---breadcrumb-itemWidth), var(---breadcrumb-endWidth))
 				);
