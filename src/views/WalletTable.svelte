@@ -2072,6 +2072,7 @@
 	@container wallet-table (width < 42rem) {
 		.filters {
 			display: flex;
+			position: relative;
 			align-items: center;
 			gap: 0.5rem;
 			container-type: scroll-state inline-size;
