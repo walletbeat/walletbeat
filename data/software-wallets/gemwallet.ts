@@ -49,6 +49,7 @@ import {
 } from '@/schema/features/support'
 import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { type References, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -689,7 +690,32 @@ export const gemwallet: SoftwareWallet = {
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
 				}),
 				hermeticBuilds: notSupported,
-				repositoryChangeControls: null,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'Gem limits who can create or move release tags, but not who can delete them.',
+							label: 'Tag ruleset',
+							url: 'https://github.com/gemwalletcom/wallet/rules/14384859',
+						},
+						{
+							explanation: 'The repository has one ruleset and it targets tags, not branches.',
+							label: 'Repository ruleset list',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/rulesets',
+						},
+						{
+							explanation:
+								"Gem's repo doesn't enforce automated tests on its main codebase. Its other protections are only visible to Gem admins.",
+							label: 'Main branch protection',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/branches/main',
+						},
+					],
+					branchDeletionBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					forcePushBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.UNVERIFIABLE,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+				},
 				reproducibleBuilds: notSupported,
 			},
 		},
