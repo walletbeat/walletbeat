@@ -1,3 +1,23 @@
+export function observeFixedPieBottom() {
+	const elements = document.querySelectorAll('.pie-navigation-geometry')
+
+	if (elements.length !== 1) {
+		throw new Error('Exactly one WalletPage pie geometry must exist')
+	}
+
+	const element = elements[0]
+	const box = element.getBoundingClientRect()
+
+	return getComputedStyle(element).position === 'fixed' &&
+		element.checkVisibility({ opacityProperty: true, visibilityProperty: true }) &&
+		box.bottom > 0 &&
+		box.top < innerHeight &&
+		box.right > 0 &&
+		box.left < innerWidth
+		? box.bottom
+		: 0
+}
+
 export function qualifyNativeBreadcrumbClock() {
 	const applicable = [
 		'animation-timeline: scroll()',

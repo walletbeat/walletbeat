@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
 import {
+	observeFixedPieBottom,
 	observeStickyChain,
 	selectStickyChain,
 } from '../../../tests/browser/sticky-observation.mjs'
@@ -22,19 +23,6 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 		const detailId = chain[3].scope.slice(1).replace(/\\/g, '')
 		const records: unknown[] = []
 		const sample = () => page.evaluate(observeStickyChain, chain)
-		const observePieBottom = () =>
-			page.locator('.pie-navigation-geometry').evaluate(element => {
-				const box = element.getBoundingClientRect()
-
-				return getComputedStyle(element).position === 'fixed' &&
-					element.checkVisibility({ opacityProperty: true, visibilityProperty: true }) &&
-					box.bottom > 0 &&
-					box.top < innerHeight &&
-					box.right > 0 &&
-					box.left < innerWidth
-					? box.bottom
-					: 0
-			})
 		const settle = async (id: string, label: string) => {
 			await expect.poll(() => new URL(page.url()).hash).toBe(`#${id}`)
 			await page.evaluate(() => document.fonts.ready)
@@ -60,7 +48,7 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 			const preceding = observed.rows
 				.slice(0, index)
 				.filter(row => row.opacity > 0.01 && row.headingBox.bottom > 0 && row.headingBox.top < 450)
-			const pieBottom = await observePieBottom()
+			const pieBottom = await page.evaluate(observeFixedPieBottom)
 			const contact = Math.max(
 				observed.siteBottom,
 				pieBottom,
@@ -193,7 +181,7 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 						)
 					const contact = Math.max(
 						observed.siteBottom,
-						await observePieBottom(),
+						await page.evaluate(observeFixedPieBottom),
 						...preceding.map(row => row.occupiedRow.bottom),
 					)
 

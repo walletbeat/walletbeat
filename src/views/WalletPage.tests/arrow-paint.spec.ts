@@ -4,6 +4,7 @@ import type { CDPSession } from '@playwright/test'
 import sharp from 'sharp'
 
 import {
+	observeFixedPieBottom,
 	observeStickyChain,
 	qualifyNativeBreadcrumbClock,
 } from '../../../tests/browser/sticky-observation.mjs'
@@ -408,11 +409,14 @@ test('native arrow paint interpolates with a blocked-main positive and CSS-auto 
 
 				observation.landingChain = chain
 				const parent = chain.rows[0]
-				const occupied = Math.max(chain.siteBottom, parent.occupiedRow.bottom)
+				const pieBottom = await page.evaluate(observeFixedPieBottom)
+
+				observation.pieBottom = pieBottom
+				const occupied = Math.max(chain.siteBottom, parent.occupiedRow.bottom, pieBottom)
 
 				expect(
 					Math.abs(chain.rows[1].scopeBox.top - occupied),
-					'First canonical section clears the actual cumulative parent sticky row',
+					'First canonical section clears the actual parent sticky row and fixed pie',
 				).toBeLessThanOrEqual(3)
 			} else {
 				expect(Math.abs(final.scroll - expectedEnd)).toBeLessThanOrEqual(1)
