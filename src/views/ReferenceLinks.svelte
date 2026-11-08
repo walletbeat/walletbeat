@@ -450,10 +450,13 @@
 			font-size: 0.8125em;
 			line-height: 1.6;
 
-			scrollbar-width: none;
+			/* Keep the scrollbar gutter stable instead of changing its width on hover. */
+			scrollbar-width: thin;
+			scrollbar-color: transparent transparent;
 
-			&:hover {
-				scrollbar-width: thin;
+			&:hover,
+			&:focus-visible {
+				scrollbar-color: var(--border-color) transparent;
 			}
 
 			&::-webkit-scrollbar {
@@ -473,7 +476,6 @@
 			&:focus-visible {
 				outline: 2px solid var(--accent);
 				outline-offset: 2px;
-				scrollbar-width: thin;
 			}
 
 			&:focus-visible::-webkit-scrollbar-thumb {
