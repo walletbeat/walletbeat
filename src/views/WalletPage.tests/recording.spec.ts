@@ -228,7 +228,12 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 				const heading = link.locator('h2')
 				const target = type === 'heading' && (await heading.count()) ? heading : link
 
-				if (type === 'heading') {
+				if (type === 'toc') {
+					const scroller = page.locator('#wallet-toc')
+
+					await scroller.hover()
+					await expect(scroller).toHaveCSS('scroll-snap-type', 'none')
+				} else {
 					await page.evaluate(hash => {
 						document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' })
 					}, href)
