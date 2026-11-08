@@ -101,7 +101,21 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					await expect(page.locator('#layout')).toHaveAttribute('data-wallet-toc-state', 'open')
 					await page.waitForTimeout(300)
 					await capture('open')
-					await capture('closing', true)
+
+					if (reducedMotion === 'reduce') {
+						const immediate = await page.evaluate(witness => witness('close'), witness)
+
+						expect(immediate.state).toBe('closed')
+						expect(immediate.scroll).toBe(top)
+						expect(immediate.effects.every(effect => effect.sameTimeline)).toBe(true)
+						await page.evaluate(
+							() =>
+								new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+						)
+					} else {
+						await capture('closing', true)
+					}
+
 					await expect(page.locator('#layout')).toHaveAttribute('data-wallet-toc-state', 'closed')
 					await capture('closed')
 					await page.waitForTimeout(300)

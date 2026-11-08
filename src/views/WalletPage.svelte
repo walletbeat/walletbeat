@@ -99,10 +99,12 @@
 
 	function prepareTocTransition(event: ToggleEvent & { currentTarget: HTMLElement }) {
 		const previousClosing = tocClosing
-		tocClosing = event.newState === 'closed' ? Symbol() : null
+		tocClosing = event.newState === 'closed' && !matchMedia('(prefers-reduced-motion: reduce)').matches
+			? Symbol()
+			: null
 		const closing = tocClosing
 		const panel = event.currentTarget
-		publishTocState(event.newState === 'open' ? 'open' : 'closing')
+		publishTocState(event.newState === 'open' ? 'open' : closing ? 'closing' : 'closed')
 		queueMicrotask(() => {
 			if (event.defaultPrevented && tocClosing === closing) {
 				tocClosing = previousClosing
