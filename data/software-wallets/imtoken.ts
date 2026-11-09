@@ -289,6 +289,7 @@ export const imtoken: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				[Variant.MOBILE]: {
 					ref: [

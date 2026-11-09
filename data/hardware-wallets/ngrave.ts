@@ -128,6 +128,7 @@ export const ngrave: HardwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

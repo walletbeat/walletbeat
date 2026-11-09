@@ -196,6 +196,7 @@ export const gridplusWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			firmware: {
 				// Source: gridplus team responses fileverse document
 				type: FirmwareType.FAIL,

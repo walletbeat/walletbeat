@@ -497,6 +497,7 @@ export const gemwallet: SoftwareWallet = {
 				},
 				duressMode: notSupported,
 			},
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: [
 					{

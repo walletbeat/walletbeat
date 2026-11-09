@@ -1274,6 +1274,7 @@ export const rabby: SoftwareWallet = {
 					duressMode: notSupported,
 				},
 			},
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [

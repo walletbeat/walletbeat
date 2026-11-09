@@ -134,6 +134,7 @@ export const mtpelerin: SoftwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

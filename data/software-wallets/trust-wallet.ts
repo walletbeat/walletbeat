@@ -212,6 +212,7 @@ export const trustWallet: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {

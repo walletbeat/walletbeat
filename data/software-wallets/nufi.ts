@@ -136,6 +136,7 @@ export const nufi: SoftwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			duressResistance: null,
+			erc7730MetadataSources: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {

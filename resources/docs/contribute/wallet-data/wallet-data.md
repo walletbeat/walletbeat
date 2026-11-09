@@ -587,6 +587,22 @@ After you have populated this data, you should see attributes that rely on this 
 
 ![](../images/privacy-rating.png)
 
+### ERC-7730 metadata registries and endpoints
+
+`features.security.erc7730MetadataSources` records which descriptor sources a wallet uses.
+It is separate from ERC-7730 decoding support and does not change wallet ratings.
+Use a single list when every variant uses the same sources, or a `VariantFeature` map when they differ.
+
+- Use `null` when the sources have not been researched.
+- Use an empty array only when evidence confirms the wallet uses no ERC-7730 metadata source.
+- For each known source, provide `name`, `registry`, `endpoint`, and a real `ref` showing that the wallet uses it.
+- `registry` identifies the descriptor collection or repository. `endpoint` identifies its retrieval URL. Either may be `null` when unknown, including an endpoint for bundled local descriptors.
+- Cite a wallet's configuration, request capture, or integration documentation. A registry existing or a wallet decoding a transaction does not prove that the wallet uses that registry.
+- For hardware wallets, identify the source used by the host application and document that scope in the reference. Do not imply that the device contacts an endpoint.
+- Record a provider only when there is evidence of that wallet's integration. Do not infer adoption from ERC-7730 compatibility.
+
+The wallet page and Markdown export show this information. The JSON export includes it under each variant's `features.security.erc7730MetadataSources` field.
+
 ### **Step 4**: Send a PR to Walletbeat and get it merged
 
 Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. See the corresponding section on the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide for instructions on this.

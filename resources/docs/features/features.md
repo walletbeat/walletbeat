@@ -38,6 +38,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/account-recovery.ts`](#srcschemafeaturessecurityaccount-recoveryts)
 - [`src/schema/features/security/bug-bounty-program.ts`](#srcschemafeaturessecuritybug-bounty-programts)
 - [`src/schema/features/security/duress-resistance.ts`](#srcschemafeaturessecurityduress-resistancets)
+- [`src/schema/features/security/erc7730-metadata.ts`](#srcschemafeaturessecurityerc7730-metadatats)
 - [`src/schema/features/security/firmware.ts`](#srcschemafeaturessecurityfirmwarets)
 - [`src/schema/features/security/hardware-wallet-support.ts`](#srcschemafeaturessecurityhardware-wallet-supportts)
 - [`src/schema/features/security/keys-handling.ts`](#srcschemafeaturessecuritykeys-handlingts)
@@ -90,6 +91,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 - `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
 - `security` (object): Security features.
+  - `erc7730MetadataSources` (`VariantFeature<Erc7730MetadataSource[]>`): ERC-7730 metadata sources used by the wallet, independent of decoding support. Use null for unknown sources and an empty array only for confirmed absence. Each source needs evidence of use by this wallet and variant.
   - `publicSecurityAudits` (`SecurityAudit[] | null`): Public security audits the wallet has gone through. If never audited, this should be an empty array, as 'null' represents the fact that we haven't checked whether there have been any audit.
   - `bugBountyProgram` (`VariantFeature<Support<BugBountyProgramImplementation>>`): Bug bounty program implementation
   - `transactionLegibility` (`VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation >`): Transaction legibility features.
@@ -272,6 +274,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `profile` (`WalletProfile`): The profile of the wallet.
 - `security` (object)
   - `scamAlerts` (`ResolvedFeature<ScamAlerts>`)
+  - `erc7730MetadataSources` (`ResolvedFeature<Erc7730MetadataSource[]>`)
   - `publicSecurityAudits` (`SecurityAudit[] | null`)
   - `lightClient` (object)
     - `ethereumL1` (`ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>`)
@@ -2315,6 +2318,25 @@ Covers the full spectrum from basic lock-screen protection through full duress-p
 
 - `basicUnlock` (`WithRef<BasicUnlock> | 'NO_LOCK_MECHANISM'`): The basic unlock mechanism protecting the wallet from unauthorized access. Set to 'NO_LOCK_MECHANISM' if the wallet has no lock screen at all. A non-null value is a prerequisite for any meaningful duress resistance.
 - `duressMode` (`Support<WithRef<DuressMode>>`): A dedicated duress mode triggered by a separate duress credential. Use `notSupported` when the wallet has no duress mode. Use `supported({ action: ..., ref: ... })` when a duress mode exists.
+
+---
+
+## `src/schema/features/security/erc7730-metadata.ts`
+
+### Type: `Erc7730MetadataSource`
+
+An ERC-7730 metadata source used by a wallet. Record observed configuration or documented use, not inferred adoption. A registry identifies the descriptor collection. An endpoint identifies the service or file URL from which the wallet obtains descriptors.
+
+```typescript
+type Erc7730MetadataSource = MustRef<{
+	/** Name of the metadata provider or descriptor collection. */
+	name: string
+	/** Registry or repository URL. Use null when the upstream collection is unknown. */
+	registry: Url | null
+	/** Retrieval endpoint URL. Use null when it has not been established. */
+	endpoint: Url | null
+}>
+```
 
 ---
 
