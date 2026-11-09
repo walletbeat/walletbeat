@@ -310,7 +310,7 @@ Prerequisites: Pie shape in §4 and sticky rows/surfaces in §§8–11.
 
 - **📍 `PieTangent`** The compact pie sits at the logical inline end under the later inset mobile pie/TOC composition. That clarification supersedes the earlier exact tangent contact with the first row’s bottom; retain the independent requirement that it does not follow each nested stage vertically or become an unrelated overlay.
 
-- **📍 `PieCompaction`** Mobile compaction begins late near the approaching section, continuously approaching approximately 100×100 and looking squeezed between the upper sticky items and section top.
+- **📍 `PieCompaction`** Mobile compaction starts at the preceding snap point before the pie reaches its resting top position, continuously approaching its compact size and looking squeezed between the upper sticky items and section top.
 
 - **📍 `PieReversal`** Reverse scrolling produces no pie bounce or lag.
 

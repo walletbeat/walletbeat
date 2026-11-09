@@ -1,7 +1,7 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
-	test(`native pie contracts at its source contact and reverses (${reducedMotion})`, async ({
+	test(`native pie contracts from the preceding snap and reverses (${reducedMotion})`, async ({
 		page,
 	}, info) => {
 		await page.setViewportSize({ width: 690, height: 900 })
@@ -72,6 +72,28 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			const flow = rect(pie.getBoundingClientRect())
 			const initialSource = source.getBoundingClientRect()
 			const contact = root.scrollTop + initialSource.top - safeTop()
+			const arrival = document.querySelector<HTMLElement>(
+				'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
+			)
+
+			if (!arrival || getComputedStyle(arrival).scrollSnapAlign !== 'start') {
+				throw new Error('The preceding identity arrival must own a native start snap')
+			}
+
+			const margin = Number.parseFloat(getComputedStyle(arrival).scrollMarginBlockStart)
+			const padding = Number.parseFloat(getComputedStyle(root).scrollPaddingBlockStart)
+			const start =
+				root.scrollTop +
+				arrival.getBoundingClientRect().top -
+				root.getBoundingClientRect().top -
+				root.clientTop -
+				margin -
+				padding
+
+			if (!Number.isFinite(start)) {
+				throw new Error('The preceding snap landing must resolve')
+			}
+
 			const read = (requested: number) => ({
 				requested,
 				maximumScroll: root.scrollHeight - root.clientHeight,
@@ -88,6 +110,13 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			root.scrollTo({ top: contact + flow.height + 1, behavior: 'instant' })
 			await settle()
 			const compact = read(flow.height + 1)
+			const end = initialSource.bottom - compact.pie.bottom
+			const travel = end - start
+
+			if (!(travel > 0)) {
+				throw new Error('Compaction must have positive travel from the preceding snap')
+			}
+
 			const buttonBox = button.getBoundingClientRect()
 			const center = {
 				x: buttonBox.left + buttonBox.width / 2,
@@ -122,19 +151,26 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				}),
 			)
 
-			for (const requested of [-1, 0, 55, 110, 165, 220, 221, 165, 110, 55, 0, -1]) {
-				root.scrollTo({ top: contact + requested, behavior: 'instant' })
+			for (const requested of [
+				-1,
+				0,
+				travel / 4,
+				travel / 2,
+				(travel * 3) / 4,
+				travel,
+				travel + 1,
+				(travel * 3) / 4,
+				travel / 2,
+				travel / 4,
+				0,
+				-1,
+			]) {
+				root.scrollTo({ top: start + requested, behavior: 'instant' })
 				await settle()
 				const delivered = read(requested)
 
 				await settle()
-				easing.currentTime = Math.max(
-					0,
-					Math.min(
-						1,
-						(delivered.safeTop - delivered.source.top) / (flow.height - compact.pie.height),
-					),
-				)
+				easing.currentTime = Math.max(0, Math.min(1, (delivered.scroll - start) / travel))
 				samples.push({
 					...delivered,
 					stability: read(requested),
@@ -144,7 +180,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 
 			easing.cancel()
 
-			return { flow, contact, compact, combinedControl, samples }
+			return { flow, contact, start, end, compact, combinedControl, samples }
 		})
 
 		await info.attach('native-pie-compaction.json', {
@@ -187,7 +223,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			const displacement = sample.safeTop - sample.source.top
 			const requestedScroll = Math.max(
 				0,
-				Math.min(sample.maximumScroll, observations.contact + sample.requested),
+				Math.min(sample.maximumScroll, observations.start + sample.requested),
 			)
 
 			expect(
@@ -196,7 +232,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			).toBeLessThanOrEqual(1)
 			expect(
 				Math.abs(displacement - (sample.scroll - observations.contact)),
-				'Actual source contact remains at the measured viewport safe-area top',
+				'Actual source travel matches the delivered root scroll',
 			).toBeLessThanOrEqual(1)
 			expect(sample.overflow).toBeLessThanOrEqual(1)
 			expect(
