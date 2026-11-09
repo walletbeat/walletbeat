@@ -2738,6 +2738,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			overflow: visible;
 
 			summary {
+				@media (prefers-reduced-transparency: reduce) {
+					&[data-sticky~="backdrop-before"]:not(details:not([open]) *) {
+						background: var(---sticky-background);
+					}
+				}
+
 				h4 {
 					max-width: 60ch;
 				}
