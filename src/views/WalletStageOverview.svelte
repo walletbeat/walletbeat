@@ -129,6 +129,7 @@
 					data-sticky-breadcrumb="scope row-fill clearance size"
 					data-sticky-container
 					style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-entry`}
+					style:--stickyBreadcrumb-motionRange="var(--stickyBreadcrumb-entryRange)"
 				>
 					<details name="wallet-stages" open={s.id === nextUnclearedStageId} data-column="gap-0">
 						<summary data-column="span-start" data-sticky-breadcrumb="position">
@@ -168,8 +169,8 @@
 							</header>
 							<div data-sticky-breadcrumb="support">
 									<div data-scroll-item={s.description.contentType === ContentType.TEXT ? 'snap-block-start' : 'snap-prose'}>
-										{#if index === 0 && s.description.contentType === ContentType.TEXT}
-											<span data-sticky-breadcrumb="snap-offset" style:anchor-name="--breadcrumb-snap-content" aria-hidden="true"></span>
+										{#if s.description.contentType === ContentType.TEXT}
+											<span data-sticky-breadcrumb="snap-offset" style:anchor-name={index === 0 ? '--breadcrumb-arrival-end, --breadcrumb-snap-content' : '--breadcrumb-arrival-end'} aria-hidden="true"></span>
 										{/if}
 										{#if isTypographicContent(s.description)}
 											<Typography content={s.description} />
@@ -294,6 +295,17 @@
 {/if}
 
 <style>
+	@supports (anchor-scope: --breadcrumb-arrival-end) and
+		(inset-block-end: anchor(--breadcrumb-arrival-end start)) and
+		(color: if(style(---breadcrumb-supportGrid: 1): red)) {
+		section[data-sticky-breadcrumb~="scope"]:has(> details[open] [data-sticky-breadcrumb~="snap-offset"])
+			> [data-sticky-breadcrumb~="flow"] {
+			--stickyBreadcrumb-arrivalInsetEnd: calc(
+				anchor(--breadcrumb-arrival-end start) - var(---breadcrumb-blockEnd)
+			);
+		}
+	}
+
 	[data-sticky-breadcrumb~="scope"] {
 		--column-supportGap: var(---wallet-section-support-gap, 0.1875rem);
 		---wallet-attribute-heading-font-size: 1.1rem;

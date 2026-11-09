@@ -95,3 +95,54 @@ for (const { width, destinations } of arrivals) {
 		}
 	})
 }
+
+test('the Stage description snap preserves readable copy and completes shared-row title motion', async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 768, height: 900 })
+	await page.goto('/metamask/')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await page.evaluate(() => document.fonts.ready)
+	test.skip(
+		!(await page.evaluate(
+			() =>
+				CSS.supports('animation-timeline: view()') &&
+				CSS.supports('anchor-scope: --snap') &&
+				CSS.supports('color: if(style(--support: 1): red)'),
+		)),
+		'Native snap-linked breadcrumb arrival unavailable',
+	)
+
+	const stage = page.locator('#stages section[id^="stage:"]:has(> details[open])')
+
+	await expect(stage).toHaveCount(1)
+	const result = await stage.evaluate(async section => {
+		const title = section.querySelector('h3 [data-sticky-breadcrumb~="item"]')!
+		const description = section.querySelector(
+			'summary [data-sticky-breadcrumb~="support"] > [data-scroll-item~="snap-block-start"]',
+		)!
+
+		description.scrollIntoView({ block: 'start', behavior: 'instant' })
+		await new Promise<void>(resolve =>
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+		)
+		const effect = title
+			.getAnimations()
+			.find(
+				animation =>
+					animation instanceof CSSAnimation && animation.animationName === 'breadcrumb-arrival',
+			)
+
+		return {
+			alignment: getComputedStyle(description).scrollSnapAlign,
+			clearance: description.getBoundingClientRect().top - title.getBoundingClientRect().bottom,
+			opacity: Number(getComputedStyle(description).opacity),
+			progress: effect?.effect?.getComputedTiming().progress,
+		}
+	})
+
+	expect(result.alignment).toBe('start')
+	expect(result.clearance).toBeGreaterThan(0)
+	expect(result.opacity).toBe(1)
+	expect(result.progress).toBeGreaterThanOrEqual(0.99)
+})
