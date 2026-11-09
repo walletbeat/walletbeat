@@ -3,7 +3,7 @@
 	"name": "Ambire Web3 Wallet",
 	"short_name": "Ambire",
 	"author": "https://www.ambire.com",
-	"version": "6.2.5",
+	"version": "6.25.2",
 	"manifest_version": 3,
 	"permissions": [
 		"storage",
@@ -11,9 +11,12 @@
 		"unlimitedStorage",
 		"activeTab",
 		"notifications",
+		"idle",
 		"scripting",
 		"alarms",
-		"system.display"
+		"system.display",
+		"sidePanel",
+		"offscreen"
 	],
 	"background": {
 		"service_worker": "background.js"
@@ -30,9 +33,12 @@
 	},
 	"host_permissions": ["http://*/*", "https://*/*", "file://*/*", "wss://*/*"],
 	"externally_connectable": {
-		"ids": ["*"]
+		"ids": []
 	},
 	"description": "Fast & secure Web3 wallet to supercharge your account on Ethereum and EVM networks.",
+	"side_panel": {
+		"default_path": "side-panel.html"
+	},
 	"content_security_policy": {
 		"extension_pages": "frame-ancestors 'none'; script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
 	},
