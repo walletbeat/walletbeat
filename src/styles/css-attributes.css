@@ -1673,7 +1673,7 @@ ol {
  * - `--stickyBreadcrumb-endPaintAnimation`, `--stickyBreadcrumb-endPaintTimeline`, `--stickyBreadcrumb-endPaintRange`: end paint motion; `contents` directs it to existing children and marker while retaining native cluster size and timeline ownership
  * - `--stickyBreadcrumb-arrivalInsetEnd`: optional block-end inset on the flow marker, derived from the existing snap area that completes arrival
  * - `--stickyBreadcrumb-motionRange`: visual attachment range for contain-based motion; defaults to the entry range. Entry-state timing remains on `--stickyBreadcrumb-entryRange`.
- * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both`. Use `forwards` with an extended trailing attachment range to retain the authored initial paint before entry.
+ * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both` so natural and compact paint remain represented across attachment boundaries.
  * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% contain 100%`
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
  * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -2827,8 +2827,12 @@ ol {
 	}
 	/* Relative child scales preserve the compact text/icon ratios without 3D projection. */
 	@keyframes breadcrumb-marker-hash {
-		from { opacity: var(---breadcrumb-markerHover, 0); }
-		to { opacity: 0; }
+		contain 0% { opacity: var(---breadcrumb-markerHover, 0); }
+		to, contain 100% { opacity: 0; }
+	}
+	@keyframes breadcrumb-marker-surface {
+		contain 0% { opacity: 0; }
+		to, contain 100% { opacity: 1; }
 	}
 	@keyframes breadcrumb-marker-motion {
 		contain 0% { transform: scale(1); }
@@ -3181,7 +3185,7 @@ ol {
 				transform: scale(1);
 				animation: breadcrumb-marker-motion auto var(---breadcrumb-inlineEasing) var(--stickyBreadcrumb-motionFill, both), breadcrumb-marker-hash auto var(--stickyBreadcrumb-easing, steps(1, start)) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-				animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange)), var(--stickyBreadcrumb-entryRange);
+				animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange));
 				@media (prefers-reduced-motion: reduce) { animation-timing-function: steps(1, end), steps(1, start); }
 			}
 			&::before {
@@ -3200,7 +3204,7 @@ ol {
 				text-align: center;
 				pointer-events: none;
 				opacity: 0;
-				animation-name: breadcrumb-marker-motion, if(style(---breadcrumb-markerWrap: 1): none; else: breadcrumb-surface);
+				animation-name: breadcrumb-marker-motion, if(style(---breadcrumb-markerWrap: 1): none; else: breadcrumb-marker-surface);
 			}
 		}
 

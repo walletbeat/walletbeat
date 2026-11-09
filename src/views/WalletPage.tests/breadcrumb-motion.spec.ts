@@ -245,6 +245,9 @@ test('heading transforms remain attached across their natural-to-sticky boundary
 						animation.effect.getKeyframes().some(frame => 'transform' in frame),
 				)
 			const natural = getComputedStyle(title).transform
+			const naturalProgress = effects.map(
+				effect => effect.effect?.getComputedTiming().progress ?? null,
+			)
 
 			root.scrollTo({ top: root.scrollTop + 500, behavior: 'instant' })
 			await settle()
@@ -255,6 +258,7 @@ test('heading transforms remain attached across their natural-to-sticky boundary
 				count: effects.length,
 				retained: effects.every(effect => current.includes(effect)),
 				natural,
+				naturalProgress,
 			})
 		}
 
@@ -265,6 +269,10 @@ test('heading transforms remain attached across their natural-to-sticky boundary
 		expect(observation.count, observation.id).toBeGreaterThan(0)
 		expect(observation.retained, observation.id).toBe(true)
 		expect(observation.natural, observation.id).toBe('matrix(1, 0, 0, 1, 0, 0)')
+
+		for (const progress of observation.naturalProgress) {
+			expect(progress, `${observation.id} natural paint remains attached`).not.toBeNull()
+		}
 	}
 })
 

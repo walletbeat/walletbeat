@@ -3004,7 +3004,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		[data-sticky-breadcrumb~="root"] {
 			:global([data-sticky-breadcrumb~="scope"]) {
 				--stickyBreadcrumb-motionRange: exit-crossing 0% contain calc(100% + 100vh);
-				--stickyBreadcrumb-motionFill: forwards;
 			}
 			grid-template: "Header Nav" auto "Content Nav" 1fr / minmax(0, 1fr) auto;
 			> .wallet-header-flow { grid-area: Header; }
