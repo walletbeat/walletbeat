@@ -35,15 +35,16 @@ export function qualifyNativeBreadcrumbClock() {
 	const expectedTimeline = position
 		? getComputedStyle(position).getPropertyValue('--stickyBreadcrumb-entryTimeline').trim()
 		: ''
-	const effects = position
-		? position
+	const item = position?.querySelector('[data-sticky-breadcrumb~="item"]')
+	const effects = item
+		? item
 				.getAnimations()
 				.filter(
 					animation =>
 						animation instanceof CSSAnimation &&
-						animation.animationName === 'breadcrumb-entry' &&
+						animation.animationName === 'breadcrumb-item-motion' &&
 						animation.effect instanceof KeyframeEffect &&
-						animation.effect.target === position &&
+						animation.effect.target === item &&
 						!animation.effect.pseudoElement,
 				)
 				.map(animation => ({

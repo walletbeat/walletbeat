@@ -1647,7 +1647,7 @@ ol {
  * - `scope`: natural section and animation-start fragment target containing a position and its following content
  * - `clearance`: combines with `scope` to measure and route an end cluster around a circular obstacle; arrival currently requires zero inline displacement
  * - `row-fill`: on a non-root `scope`, declares that its first row fills the scope content inline size after source padding, sharing the scope inline axis. Width derives from that container; height retains its native clock. Omit for intrinsic, independently sized or differently oriented rows.
- * - `root`: starts a breadcrumb hierarchy
+ * - `root`: starts a breadcrumb hierarchy with a geometric identity; nested scopes own disclosure and attribute-contact entry state
  * - `position`: native heading/focus container coordinating its sticky foreground and natural measurements
  * - `source`: untransformed intrinsic reservation for the item
  * - `item`: transformed real heading identity and native controls
@@ -3210,6 +3210,7 @@ ol {
 
 		[data-sticky-breadcrumb~="scope"] {
 			--stickyBreadcrumb-entryRange: exit-crossing 0% contain 100%;
+			---breadcrumb-entryAnimation: breadcrumb-entry;
 			/* Only the visual row departs; supporting content retains its ordinary opacity. */
 			--stickyBreadcrumb-exitAnimation: breadcrumb-backdrop auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse both;
 			@supports (interactivity: inert) {
@@ -3284,6 +3285,7 @@ ol {
 			--stickyBreadcrumb-forceRow: 0;
 			&[data-sticky-breadcrumb~="root"] {
 				--stickyBreadcrumb-forceRow: 1;
+				---breadcrumb-entryAnimation: none;
 				---breadcrumb-parentInlineEnd: 0px;
 				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
@@ -3465,7 +3467,7 @@ ol {
 					pointer-events: if(style(---breadcrumb-entry: 0): auto; else: none);
 				}
 				animation:
-					breadcrumb-entry auto steps(1, end) forwards,
+					var(---breadcrumb-entryAnimation) auto steps(1, end) forwards,
 					breadcrumb-position-exit auto linear both,
 					var(---breadcrumb-exitLayerAnimation),
 					if(style(---collapsible-markerMeasure: none): none; else: var(---collapsible-markerMeasure) auto linear both);
@@ -3842,7 +3844,7 @@ ol {
 				gap: 0;
 				z-index: auto;
 				anchor-name: none;
-				animation-name: breadcrumb-entry, var(---collapsible-markerMeasure);
+				animation-name: var(---breadcrumb-entryAnimation), var(---collapsible-markerMeasure);
 				animation-timing-function: steps(1, end), linear;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline), if(style(---collapsible-markerMeasure: none): auto; else: var(--collapsible-markerInlineTimeline, --collapsible-marker-inline));
 				animation-range:
