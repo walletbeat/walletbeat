@@ -909,16 +909,16 @@ for (const width of [390, 690, 1440]) {
 	})
 }
 
-test('Stage descriptions and criterion prose retain native snap targets', async ({
-	page,
-}, info) => {
-	test.setTimeout(180000)
-	await page.goto('/metamask/?variant=BROWSER')
-	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 60000 })
-	await page.evaluate(() => document.fonts.ready)
-
-	for (const width of [390, 1440]) {
+for (const width of [390, 1440]) {
+	test(`Stage descriptions and criterion prose retain native snap targets at ${width}px`, async ({
+		page,
+	}, info) => {
+		test.setTimeout(180000)
 		await page.setViewportSize({ width, height: 900 })
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 60000 })
+		await page.evaluate(() => document.fonts.ready)
+
 		const families = [
 			[
 				'description',
@@ -981,5 +981,5 @@ test('Stage descriptions and criterion prose retain native snap targets', async 
 				contentType: 'application/json',
 			})
 		}
-	}
-})
+	})
+}
