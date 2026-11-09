@@ -78,6 +78,7 @@ import {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
+	ExternalExtensionIdScope,
 	HostPermissionScope,
 	KeyStorageMechanism,
 	SecureRngSource,
@@ -737,7 +738,10 @@ export const completedTemplate: SoftwareWallet = {
 					ref: refTodo,
 					browserExtensionHardening: {
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.NONE,
+							pageMatches: HostPermissionScope.NONE,
+						},
 						hostPermissions: HostPermissionScope.NONE,
 						permissions: [],
 						webAccessibleResources: WebAccessibleResourcesScope.NONE,

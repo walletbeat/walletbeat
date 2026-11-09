@@ -1,6 +1,6 @@
 {
 	"contentScripts": "NONE",
-	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "NONE" },
+	"externallyConnectable": { "extensionIds": "NONE", "pageMatches": "NONE" },
 	"hostPermissions": "UNRESTRICTED",
 	"permissions": [
 		"storage",
@@ -8,9 +8,12 @@
 		"unlimitedStorage",
 		"activeTab",
 		"notifications",
+		"idle",
 		"scripting",
 		"alarms",
-		"system.display"
+		"system.display",
+		"sidePanel",
+		"offscreen"
 	],
 	"webAccessibleResources": "NONE"
 }
