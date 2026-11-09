@@ -63,6 +63,7 @@ export const ledgerWalletMetadata: WalletMetadata = {
 		},
 	],
 	iconExtension: 'svg',
+	imprecise: false,
 	lastUpdated: '2025-03-12',
 	urls: {
 		docs: ['https://developers.ledger.com/'],

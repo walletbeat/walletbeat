@@ -52,6 +52,10 @@
 		Object.values(attributeTree)
 	)
 
+	const displayableWallets = $derived(
+		wallets.filter(wallet => isWalletDisplayable(wallet.metadata)),
+	)
+
 
 	// State
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
@@ -91,16 +95,21 @@
 	)
 
 	const displayedAttributeGroups = $derived.by(() => {
+		const representative = displayableWallets.find(
+			w =>
+				w.variants[Variant.BROWSER] ||
+				w.variants[Variant.DESKTOP] ||
+				w.variants[Variant.MOBILE],
+		)
 		let filtered = (
-			wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE]) ?
+			representative ?
 				// Filter attribute groups to only include non-exempt attributes
 				attributeGroupList
 					.map(attrGroup => ({
 						...attrGroup,
 						attributes: (
 							attrGroup.attributes.filter(({ attribute }) => (
-								wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE])
-									?.overall[attrGroup.id]?.[attribute.id]?.evaluation?.outcome?.rating !== Rating.EXEMPT
+								representative.overall[attrGroup.id]?.[attribute.id]?.evaluation?.outcome?.rating !== Rating.EXEMPT
 							))
 						),
 					}))
@@ -143,12 +152,12 @@
 		new SvelteSet<Filter<RatedWallet<_AttributeGroupId>>>()
 	)
 
-	const stageZeroWallets = $derived(wallets.filter(wallet => walletQualifiesForStageZero(wallet)))
+	const stageZeroWallets = $derived(displayableWallets.filter(wallet => walletQualifiesForStageZero(wallet)))
 
-	const otherWallets = $derived(wallets.filter(wallet => !walletQualifiesForStageZero(wallet)))
+	const otherWallets = $derived(displayableWallets.filter(wallet => !walletQualifiesForStageZero(wallet)))
 
 	const tableHasStageLadder = $derived(
-		wallets.some(wallet => {
+		displayableWallets.some(wallet => {
 			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 
 			return stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null
@@ -162,7 +171,7 @@
 	let walletListTab = $state<'stage-0' | 'others'>('stage-0')
 
 	const listedWallets = $derived(
-		!showStageListSelect ? wallets : walletListTab === 'others' ? otherWallets : stageZeroWallets,
+		!showStageListSelect ? displayableWallets : walletListTab === 'others' ? otherWallets : stageZeroWallets,
 	)
 
 	const stageListSelectOptions = $derived([
@@ -211,7 +220,7 @@
 	const allSupportedVariants = $derived(
 		Object.values(Variant)
 			.filter(variant => (
-				wallets.some(wallet => variant in wallet.variants)
+				displayableWallets.some(wallet => variant in wallet.variants)
 			))
 	)
 
@@ -269,7 +278,12 @@
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
-	import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
+	import {
+		getWalletStageAndLadder,
+		walletQualifiesForStageZero,
+		walletStageIndex,
+	} from '@/utils/stage'
+	import { isWalletDisplayable } from '@/utils/wallet-imprecision-visibility'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
@@ -286,16 +300,7 @@
 		walletA: RatedWallet<_AttributeGroupId>,
 		walletB: RatedWallet<_AttributeGroupId>,
 	): number => {
-		// Returns -1 for wallets that cleared no stage (or N/A);
-		// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
-		const stageIndex = (wallet: RatedWallet<_AttributeGroupId>): number => {
-			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-			if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
-			if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
-			const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-			return idx >= 0 ? idx : -1
-		}
-		const stageDiff = stageIndex(walletA) - stageIndex(walletB)
+		const stageDiff = walletStageIndex(walletA) - walletStageIndex(walletB)
 		if (stageDiff !== 0) return stageDiff
 		const scoreA = getWalletScore(walletA)
 		const scoreB = getWalletScore(walletB)
@@ -330,7 +335,7 @@
 
 	const visibleMobileAccountTypeFilterIds = $derived(
 		new Set(
-			wallets.flatMap(wallet => {
+			displayableWallets.flatMap(wallet => {
 				const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
 				if (!accountTypes) return []
 				return [

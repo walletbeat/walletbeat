@@ -55,6 +55,7 @@ export const imtoken: SoftwareWallet = {
 		coinspectId: 'im-token',
 		contributors: [mako, mattmatt, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://docs.token.im/'],

@@ -39,6 +39,7 @@ export const bitget: SoftwareWallet = {
 		coinspectId: 'bitget',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://web3.bitget.com/en/docs'],

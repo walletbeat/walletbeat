@@ -46,6 +46,7 @@ export const keystoneWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			docs: ['https://support.keyst.one/'],

@@ -155,6 +155,7 @@ export const rainbow: SoftwareWallet = {
 		coinspectId: 'rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-09-03',
 		urls: {
 			androidManifestXml:

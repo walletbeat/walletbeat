@@ -46,6 +46,7 @@ export const okx: SoftwareWallet = {
 		coinspectId: 'okx',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
+		imprecise: false,
 		lastUpdated: '2026-10-18',
 		urls: {
 			extensions: [

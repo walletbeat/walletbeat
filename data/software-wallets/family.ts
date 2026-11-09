@@ -16,6 +16,7 @@ export const family: SoftwareWallet = {
 		coinspectId: 'family',
 		contributors: [lucemans],
 		iconExtension: 'png',
+		imprecise: false,
 		lastUpdated: '2025-04-22',
 		urls: {
 			docs: ['https://family.co/docs'],

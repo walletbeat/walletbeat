@@ -65,6 +65,7 @@ export const trezorWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			docs: ['https://trezor.io/learn'],

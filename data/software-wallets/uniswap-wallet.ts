@@ -194,6 +194,7 @@ export const uniswapWallet: SoftwareWallet = {
 		coinspectId: 'uniswap',
 		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:

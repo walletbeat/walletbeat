@@ -60,6 +60,7 @@ export const baseApp: SoftwareWallet = {
 		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],

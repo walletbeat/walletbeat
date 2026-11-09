@@ -48,6 +48,7 @@ export const elytro: SoftwareWallet = {
 		coinspectId: 'elytro',
 		contributors: [nconsigny],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			repositories: ['https://github.com/Elytro-eth'],

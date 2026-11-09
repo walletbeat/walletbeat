@@ -49,6 +49,7 @@ export const daimo: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
+		imprecise: true,
 		lastUpdated: '2025-03-12',
 		pseudonymType: {
 			plural: 'Daimo usernames',

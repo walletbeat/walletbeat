@@ -231,6 +231,7 @@ export const metamask: SoftwareWallet = {
 		coinspectId: 'metamask',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-08-31',
 		urls: {
 			androidManifestXml:

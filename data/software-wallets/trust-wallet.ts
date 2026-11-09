@@ -61,6 +61,7 @@ export const trustWallet: SoftwareWallet = {
 		coinspectId: 'trust-wallet',
 		contributors: [minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],

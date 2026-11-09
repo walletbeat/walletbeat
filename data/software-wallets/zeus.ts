@@ -36,6 +36,7 @@ export const zeus: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-01-12',
 		urls: {
 			docs: ['https://github.com/greekfetacheese/zeus'],

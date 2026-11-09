@@ -24,6 +24,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'jpg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			websites: ['https://firefly.city/'],

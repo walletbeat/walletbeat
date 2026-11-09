@@ -22,6 +22,7 @@ export const mtpelerin: SoftwareWallet = {
 		coinspectId: 'bridge-wallet',
 		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-08-26',
 		urls: {
 			repositories: ['https://github.com/mtpelerin'],

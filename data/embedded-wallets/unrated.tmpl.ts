@@ -12,6 +12,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		coinspectId: null,
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2020-01-01',
 		urls: {
 			docs: ['https://example.com/docs'],

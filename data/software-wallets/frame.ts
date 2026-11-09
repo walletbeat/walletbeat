@@ -23,6 +23,7 @@ export const frame: SoftwareWallet = {
 		coinspectId: 'frame',
 		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-13',
 		urls: {
 			docs: ['https://docs.frame.sh/'],
