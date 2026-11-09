@@ -936,8 +936,9 @@ test('Stage descriptions and criterion prose retain native snap targets', async 
 			expect(index, `Real rendered Stage ${family} exists`).toBeGreaterThanOrEqual(0)
 			const owner = candidates.nth(index)
 			const target =
-				family === 'description' && (await owner.locator(':scope > *').count())
-					? owner.locator(':scope > *').first()
+				family === 'description' &&
+				(await owner.getAttribute('data-scroll-item'))?.split(' ').includes('snap-prose')
+					? owner.locator(':scope > :not([aria-hidden="true"])').first()
 					: owner
 
 			await target.evaluate(element =>
