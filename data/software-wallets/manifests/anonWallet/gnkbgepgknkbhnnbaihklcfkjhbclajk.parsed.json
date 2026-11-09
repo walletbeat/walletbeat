@@ -9,7 +9,8 @@
 		"notifications",
 		"tabs",
 		"alarms",
-		"sidePanel"
+		"sidePanel",
+		"favicon"
 	],
 	"webAccessibleResources": "UNRESTRICTED"
 }
