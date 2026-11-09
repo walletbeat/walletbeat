@@ -377,22 +377,19 @@ test('passive breadcrumb surfaces preserve arrival, departure and reverse paint 
 })
 
 for (const direction of ['ltr', 'rtl'] as const) {
-	test(`closed disclosure controls retain clearance without sticky participation: ${direction}`, async ({
+	test(`closed H4 controls retain native activation and ordinary scroll flow: ${direction}`, async ({
 		page,
-	}) => {
+	}, info) => {
 		await page.setViewportSize({ width: 390, height: 900 })
 		await page.goto('/metamask/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(async direction => {
 			document.documentElement.dir = direction
 			await document.fonts.ready
-			const root = document.querySelector('#layout')
-
-			if (!(root instanceof HTMLElement)) {
-				throw new Error('Missing scroll owner')
-			}
+			const root = document.querySelector<HTMLElement>('#layout')!
 
 			root.style.scrollSnapType = 'none'
+			root.style.scrollBehavior = 'auto'
 			root.style.overflowAnchor = 'none'
 		}, direction)
 		const controls = page.locator('#open-source summary:has(> h4)')
@@ -401,63 +398,68 @@ for (const direction of ['ltr', 'rtl'] as const) {
 
 		for (const summary of await controls.all()) {
 			await summary.evaluate(element => {
-				for (let parent = element.parentElement; parent; parent = parent.parentElement) {
-					if (parent instanceof HTMLDetailsElement) {
-						parent.open = true
+				for (let owner = element.parentElement; owner; owner = owner.parentElement) {
+					if (owner instanceof HTMLDetailsElement) {
+						owner.open = true
 					}
 				}
 			})
+			await expect
+				.poll(() => summary.evaluate(element => element.closest('details')!.open))
+				.toBe(true)
+			await summary.focus()
+			await summary.press('Space')
+			await expect
+				.poll(() => summary.evaluate(element => element.closest('details')!.open))
+				.toBe(false)
+			const samples = await summary.evaluate(async element => {
+				const root = document.querySelector<HTMLElement>('#layout')!,
+					heading = element.querySelector('h4')!
+				const samples = []
 
-			for (const open of [true, false]) {
-				if (
-					(await summary.evaluate(element => element.parentElement?.hasAttribute('open'))) !== open
-				) {
-					await summary.focus()
-					await summary.press('Space')
-				}
-
-				const observation = await summary.evaluate(async element => {
-					const root = document.querySelector('#layout'),
-						details = element.parentElement
-
-					if (!(root instanceof HTMLElement) || !(details instanceof HTMLDetailsElement)) {
-						throw new Error('Missing native disclosure')
-					}
-
-					for (let attempt = 0; attempt < 8; attempt++) {
-						root.scrollTo({
-							top: root.scrollTop + details.getBoundingClientRect().top - 80,
-							behavior: 'instant',
-						})
-						await new Promise(resolve => setTimeout(resolve, 150))
-
-						if (Math.abs(details.getBoundingClientRect().top - 80) < 1) {
-							break
-						}
-					}
-
-					if (Math.abs(details.getBoundingClientRect().top - 80) >= 1) {
-						throw new Error('Control contact not admitted')
-					}
-
-					const control = getComputedStyle(element, '::after')
-
-					return {
-						open: details.open,
+				for (const top of [300, -100]) {
+					root.scrollTo({
+						top: root.scrollTop + element.getBoundingClientRect().top - top,
+						behavior: 'instant',
+					})
+					await new Promise<void>(resolve =>
+						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+					)
+					samples.push({
+						scroll: root.scrollTop,
+						summary: element.getBoundingClientRect().top + root.scrollTop,
+						heading: heading.getBoundingClientRect().top + root.scrollTop,
 						position: getComputedStyle(element).position,
-						content: control.content,
-						shift: new DOMMatrix(control.transform).m41,
-					}
-				})
-
-				expect(observation.open).toBe(open)
-				expect(observation.content).not.toBe('none')
-				expect(observation.shift * (direction === 'ltr' ? 1 : -1)).toBeLessThan(-1)
-
-				if (!open) {
-					expect(observation.position).not.toBe('sticky')
+						content: getComputedStyle(element, '::after').content,
+					})
 				}
+
+				return { id: element.closest('details')!.id, samples }
+			})
+
+			await info.attach(`closed-h4-native-flow-${samples.id}`, {
+				body: JSON.stringify(samples),
+				contentType: 'application/json',
+			})
+			expect(samples.id).not.toBe('')
+			expect(samples.samples[1].scroll - samples.samples[0].scroll).toBeGreaterThan(200)
+
+			for (const sample of samples.samples) {
+				expect(sample.position).not.toBe('sticky')
+				expect(sample.content).not.toBe('none')
 			}
+
+			for (const part of ['summary', 'heading'] as const) {
+				expect(
+					Math.abs(samples.samples[0][part] - samples.samples[1][part]),
+					`Closed ${part} follows delivered document scrolling`,
+				).toBeLessThan(1.5)
+			}
+			await summary.focus()
+			await summary.press('Space')
+			await expect
+				.poll(() => summary.evaluate(element => element.closest('details')!.open))
+				.toBe(true)
 		}
 	})
 }

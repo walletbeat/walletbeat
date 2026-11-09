@@ -463,9 +463,7 @@ for (const [width, direction] of [
 	}, info) => {
 		test.skip(browserName !== 'chromium', 'This pseudo-geometry witness requires Chromium CDP')
 		await page.setViewportSize({ width, height: 900 })
-		await page.goto(
-			width === 390 && direction === 'ltr' ? '/metamask/' : '/__wallet-page/software/',
-		)
+		await page.goto(width === 390 ? '/metamask/' : '/__wallet-page/software/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(direction => {
 			document.documentElement.dir = direction
@@ -481,18 +479,20 @@ for (const [width, direction] of [
 					...document.querySelectorAll<HTMLElement>(
 						'article details > summary[data-sticky~="block-start"]:not([data-sticky-breadcrumb~="position"])',
 					),
-				].find(
-					element =>
-						element.querySelector(':scope > h4') &&
-						getComputedStyle(element, '::after').content !== 'none',
-				)
+				]
+					.filter(
+						element =>
+							element.querySelector(':scope > h4') &&
+							getComputedStyle(element, '::after').content !== 'none',
+					)
+					.filter((element, index) => index === 0 || element.closest('#open-source'))
 				const relocated = [
 					...document.querySelectorAll<HTMLElement>(
 						'article summary[data-sticky~="block-start"] [data-row-item~="wrap-end"]:not([data-sticky-breadcrumb~="end"])',
 					),
 				].find(element => getComputedStyle(element, '::after').content !== 'none')
 
-				if (!native || !relocated) {
+				if (native.length === 0 || !relocated) {
 					throw new Error('Native H4 and relocated stage markers required')
 				}
 
@@ -506,18 +506,22 @@ for (const [width, direction] of [
 					throw new Error('Actual closed END paint owner required')
 				}
 
-				const subjects = [native, relocated, ...(closed ? [closed] : [])]
+				const subjects = [...native, relocated, ...(closed ? [closed] : [])]
 
 				for (const [index, owner] of subjects.entries()) {
 					owner.dataset.markerGeometryProbe = String(index)
 				}
 
-				return subjects.map((owner, index) => ({
-					index,
-					kind: index === 0 ? 'native-h4' : index === 1 ? 'relocated-end' : 'closed-end',
-					closed: index === 2,
-					text: owner.textContent?.trim(),
-				}))
+				return subjects.flatMap((owner, index) =>
+					(index < native.length
+						? ['native-h4', 'closed-h4']
+						: [index === native.length ? 'relocated-end' : 'closed-end']
+					).map(kind => ({
+						index,
+						kind,
+						text: owner.textContent?.trim(),
+					})),
+				)
 			},
 			width === 390 && direction === 'ltr',
 		)
@@ -590,6 +594,24 @@ for (const [width, direction] of [
 		try {
 			for (const owner of owners) {
 				const selector = `[data-marker-geometry-probe="${owner.index}"]`
+				const closed = owner.kind === 'closed-h4' || owner.kind === 'closed-end'
+				const cluster = owner.kind === 'closed-end'
+
+				if (owner.kind === 'closed-h4') {
+					await page.locator(selector).evaluate(element => {
+						element.closest('details')!.open = true
+
+						if (!(element instanceof HTMLElement)) {
+							throw new Error('A native summary is required')
+						}
+
+						element.focus({ preventScroll: true })
+					})
+					await page.locator(selector).press('Space')
+					expect(
+						await page.locator(selector).evaluate(element => element.closest('details')!.open),
+					).toBe(false)
+				}
 
 				await page.locator(selector).evaluate(async (element, closed) => {
 					const changed: HTMLDetailsElement[] = []
@@ -607,7 +629,7 @@ for (const [width, direction] of [
 							changed.push(parent)
 						}
 					}
-					const effects = changed
+					const effects = [...new Set([...changed, element.closest('details')!])]
 						.flatMap(details => details.getAnimations({ subtree: true }))
 						.filter(
 							animation =>
@@ -640,7 +662,7 @@ for (const [width, direction] of [
 					await new Promise<void>(resolve =>
 						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 					)
-				}, owner.closed)
+				}, closed)
 				const principal = await quad(selector)
 				const actual = await page.locator(selector).boundingBox()
 
@@ -658,7 +680,7 @@ for (const [width, direction] of [
 					.locator(selector)
 					.evaluateHandle(element => element.getAnimations({ subtree: true }))
 				const nativeOverride = await page.addStyleTag({
-					content: `${owner.closed ? `${selector}, ` : ''}${selector}::after { transform: none !important; }`,
+					content: `${cluster ? `${selector}, ` : ''}${selector}::after { transform: none !important; }`,
 				})
 				const initialMarker = await quad(selector, true)
 				const nativePrincipal = await quad(selector)
@@ -708,8 +730,10 @@ for (const [width, direction] of [
 				for (const direction of [1, -1]) {
 					let delivered = 0
 					let encounters = 0
+					let requiredDodges = 0
+					let passed = false
 
-					for (let step = 0; step < 12; step++) {
+					for (let step = 0; step < 24; step++) {
 						const before = await page.locator('#layout').evaluate(element => element.scrollTop)
 
 						await page.mouse.move(20, 700)
@@ -795,20 +819,27 @@ for (const [width, direction] of [
 						}
 						const painted = [marker]
 
-						if (owner.closed) {
-							const children = await page.locator(selector).evaluate(element => {
+						if (closed) {
+							const participation = await page.locator(selector).evaluate(element => {
 								const details = element.closest('details')!,
 									summary = details.querySelector(':scope > summary')!
 
-								if (
-									details.hasAttribute('open') ||
-									[summary, ...summary.querySelectorAll('[data-sticky]')].some(
-										node => getComputedStyle(node).position === 'sticky',
-									)
-								) {
-									throw new Error('Closed END must retain ordinary flow')
+								return {
+									open: details.hasAttribute('open'),
+									positions: [summary, ...summary.querySelectorAll('[data-sticky]')].map(
+										node => getComputedStyle(node).position,
+									),
 								}
+							})
 
+							expect(participation.open).toBe(false)
+							expect(participation.positions, 'Closed controls retain ordinary flow').not.toContain(
+								'sticky',
+							)
+						}
+
+						if (cluster) {
+							const children = await page.locator(selector).evaluate(element => {
 								return element.matches('[data-sticky-breadcrumb~="contents"]')
 									? [...element.children]
 											.filter(child => !child.matches('[data-sticky-breadcrumb~="size-export"]'))
@@ -877,6 +908,25 @@ for (const [width, direction] of [
 						}
 
 						const local = localInline(marker, parent)
+						const withoutDodge = marker.points.map(point => ({
+							x:
+								point.x -
+								((local - initialInline) * (parent.points[1].x - parent.points[0].x)) /
+									parent.width,
+							y:
+								point.y -
+								((local - initialInline) * (parent.points[1].y - parent.points[0].y)) /
+									parent.width,
+						}))
+
+						if (!cluster && separation(withoutDodge, circle) < -1) {
+							requiredDodges++
+							expect(
+								Math.abs(local - initialInline),
+								'Actual collision requires a dodge',
+							).toBeGreaterThan(1)
+						}
+
 						const verticalDistance = Math.max(
 							0,
 							Math.min(...marker.points.map(point => point.y)) - circle.y,
@@ -894,26 +944,49 @@ for (const [width, direction] of [
 							clearance,
 							local,
 							initialInline,
+							withoutDodge,
 							verticalDistance,
 							circle,
 						})
 
+						const nativeDisplacement = cluster
+							? Math.abs(
+									Math.min(...parent.points.map(point => point.x)) -
+										Math.min(...nativePrincipal.points.map(point => point.x)),
+								)
+							: Math.abs(local - initialInline)
+
 						if (verticalDistance > circle.radius + pose.gap + 1) {
 							ordinarySamples++
 							expect(
-								owner.closed
-									? Math.abs(
-											Math.min(...parent.points.map(point => point.x)) -
-												Math.min(...nativePrincipal.points.map(point => point.x)),
-										)
-									: Math.abs(local - initialInline),
+								nativeDisplacement,
 								'Outside the declared rounded encounter the marker retains its native inline position',
 							).toBeLessThan(1)
 						}
 
 						expect(clearance, `${owner.kind} native pseudo border quad`).toBeGreaterThanOrEqual(-1)
+						passed =
+							nativeDisplacement < 1 &&
+							(direction > 0
+								? Math.max(...painted.flatMap(box => box.points.map(point => point.y))) <
+									circle.y - circle.radius - 1
+								: Math.min(...painted.flatMap(box => box.points.map(point => point.y))) >
+									circle.y + circle.radius + 1)
+
+						if (delivered > 500 && passed) {
+							break
+						}
 					}
+					expect(passed, 'The painted owner traversed the complete pie encounter').toBe(true)
 					expect(delivered, `Delivered scroll in direction ${direction}`).toBeGreaterThan(500)
+
+					if (!cluster) {
+						expect(
+							requiredDodges,
+							'The marker would collide with the pie without a dodge',
+						).toBeGreaterThan(0)
+					}
+
 					expect(
 						encounters,
 						`Actual marker/pie encounter in direction ${direction}`,
