@@ -54,46 +54,43 @@ if (start < 0 || end < start) {
 
 const offset = (index: number): string =>
 	index === samples.length - 1 ? 'to, contain 100%' : `contain ${samples[index][0]}%`
-const interval = (first: number, last: number): string => {
-	const argumentsFor = (index: number, includePosition: boolean): string => {
-		const [position, x, y] = samples[index]
-
-		return [
-			...(includePosition ? [Number((position / 100).toFixed(6))] : []),
-			index / (samples.length - 1),
-			x,
-			y,
-		].join(', ')
-	}
-
-	return `--breadcrumb-icon-support-bound(${argumentsFor(first, false)}, ${argumentsFor(last, true)})`
-}
 const arrival = samples
 	.map(
 		([, x, y], index) =>
 			`\t\t${offset(index)} {\n\t\t\ttranslate: calc(var(---breadcrumb-arrivalInline) * ${x}) calc(var(---breadcrumb-arrivalBlock) * ${y});\n\t\t}`,
 	)
 	.join('\n')
-// Each bound covers the interval between retained icon samples.
-const iconStep = 4
-const icon = samples
-	.map((_, index) => index)
-	.filter(index => index % iconStep === 0)
-	.map(index => {
-		const bounds: string[] = []
-
-		if (index > 0) {
-			bounds.push(interval(index - iconStep, index))
+const surfaceEasing = samples.map(([position, , y]) => `					${y} ${position}%`).join(',\n')
+// Literal keyframe easing preserves native named-range timing in both motion preferences.
+const surface = [
+	[
+		'breadcrumb-arrival-surface',
+		`linear(
+${surfaceEasing}
+			)`,
+	],
+	['breadcrumb-arrival-surface-step', 'steps(1, end)'],
+]
+	.map(
+		([name, easing]) => `	@keyframes ${name} {
+		contain 0% {
+			opacity: 1;
+			scale: 1 1;
+			animation-timing-function: ${easing};
 		}
-
-		if (index < samples.length - 1) {
-			bounds.push(interval(index, index + iconStep))
+		to, contain 100% {
+			opacity: 1;
+			scale: 1 0;
 		}
-
-		return `\t\t${offset(index)} {\n\t\t\tanimation-timing-function: linear;\n\t\t\ttranslate: calc(var(---inlineDirection) * min(${bounds.join(', ')})) 0px;\n\t\t}`
-	})
+	}`,
+	)
 	.join('\n')
-const generated = `${marker}\n\t@keyframes breadcrumb-arrival {\n${arrival}\n\t}\n\t@keyframes breadcrumb-icon-support-motion {\n${icon}\n\t}\n`
+const generated = `${marker}
+	@keyframes breadcrumb-arrival {
+${arrival}
+	}
+${surface}
+`
 const next = source.slice(0, start) + generated + source.slice(end)
 
 if (source !== next) {
