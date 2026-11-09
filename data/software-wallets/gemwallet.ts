@@ -187,9 +187,40 @@ export const gemwallet: SoftwareWallet = {
 					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg',
 					label: 'Gem wallet allows configurable RPC.',
 				},
+				{
+					explanation:
+						'Gem can create and import wallets, show Ether and ERC-20 token balances, and send ERC-20 tokens using an Ethereum full node. Gem only accepts custom node addresses that start with https://.',
+					urls: [
+						{
+							label: 'Reading token balances from a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/balances.rs#L15-L23',
+						},
+						{
+							label: 'Looking up tokens by contract address on a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/assets/mod.rs#L206-L216',
+						},
+						{
+							label: 'Sending transactions through a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L21-L26',
+						},
+						{
+							label: 'Custom node addresses must use HTTPS',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/node/rules.rs#L83-L91',
+						},
+					],
+				},
 			],
 			customChainRpcEndpoint: notSupported,
-			l1: null,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			}),

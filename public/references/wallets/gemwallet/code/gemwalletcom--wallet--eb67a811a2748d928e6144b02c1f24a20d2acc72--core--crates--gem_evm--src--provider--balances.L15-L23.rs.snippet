@@ -1,0 +1,32 @@
+{
+	"highlightRanges": [
+		{
+			"first": 15,
+			"last": 23
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"use gem_client::Client;",
+				"",
+				"#[cfg(feature = \"rpc\")]",
+				"#[async_trait]",
+				"impl<C: Client + Clone> ChainBalances for EthereumProvider<C> {",
+				"    async fn get_balance_coin(&self, address: String) -> Result<AssetBalance, Box<dyn Error + Sync + Send>> {",
+				"        map_balance_coin(self.get_balance(&address).await?, self.get_chain())",
+				"    }",
+				"",
+				"    async fn get_balance_tokens(&self, address: String, token_ids: Vec<String>) -> Result<Vec<AssetBalance>, Box<dyn Error + Sync + Send>> {",
+				"        let balance_results = self.batch_token_balance_calls(&address, &token_ids).await?;",
+				"        map_balance_tokens(balance_results, token_ids, self.get_chain())",
+				"    }",
+				"",
+				"    async fn get_balance_staking(&self, address: String) -> Result<Option<AssetBalance>, Box<dyn Error + Sync + Send>> {",
+				"        self.provider.get_staking_balance(&address).await",
+				"    }"
+			],
+			"startLine": 11
+		}
+	]
+}
