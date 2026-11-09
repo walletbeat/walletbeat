@@ -89,10 +89,9 @@ https://x.com/alexanderchopan/status/2114440976450326966
 
 Everything we do is in the open, including funding:
 
-We drafted our TheDAO Security Fund initiative on clear signing: ratings, fixes, and ecosystem adoption for hardware and software wallets. And the Ethereum Foundation awarded us a grant, paid in ETH per milestone through January 2027.
+We published our @thedaofund initiative on clear signing: ratings, fixes, and ecosystem adoption for hardware and software wallets.
 
 https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosystem-adoption-for-hardw
-https://beta.walletbeat.eth.limo/governance/grants/2026-08-ethereum-foundation-esp-grant-proposal/
 
 ---
 
