@@ -47,12 +47,17 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
+import {
+	FeeDisplayLevel,
+	FeeType,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { type References, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { nonEmptySet } from '@/types/utils/non-empty'
 import type { Nullable } from '@/types/utils/nullable'
 
 import { certik } from '../entities/certik'
@@ -586,7 +591,26 @@ export const gemwallet: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								"When swapping, the review screen shows the network fee but doesn't show Gem's fee or the swap provider's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-review.png',
+							label: 'Gem review screen for a swap from WETH to USDC',
+						},
+						{
+							explanation: "When swapping, the details screen doesn't break out the swap fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-details.png',
+							label: 'Gem details sheet for a swap from WETH to USDC',
+						},
+						{
+							explanation: 'Gem takes a 0.5% fee on swaps, or 0.25% on swaps between stablecoins.',
+							url: {
+								label: 'Gem swap fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L10-L11',
+							},
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -594,17 +618,27 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.WALLET_FEE]: true,
 						},
 						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				erc20L1Transfer: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								'When sending a token, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-token-send-review.png',
+							label: 'Gem review screen for a WETH send',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -613,16 +647,25 @@ export const gemwallet: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				ethL1Transfer: supported({
-					ref: [],
+					ref: [
+						{
+							explanation: 'When sending ETH, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-eth-send-review.png',
+							label: 'Gem review screen for an ETH send',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -631,16 +674,25 @@ export const gemwallet: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation: "Gem's review screen shows network fees but doesn't show Uniswap's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png',
+							label: 'Gem review screen for a Uniswap swap from USDC to ETH',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -648,12 +700,15 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.WALLET_FEE]: false,
 						},
 						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
