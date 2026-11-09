@@ -639,17 +639,24 @@ for (const width of [390, 690]) {
 	})
 }
 
-for (const width of [390, 600, 690]) {
-	test(`native identity compaction retains its normal-flow reservation at ${width}px`, async ({
+for (const [fixture, width] of [
+	['software', 390],
+	['software', 600],
+	['software', 690],
+	['multipleTypes', 320],
+	['multipleTypes', 390],
+] as const) {
+	test(`native identity compaction retains its normal-flow reservation at ${width}px: ${fixture}`, async ({
 		page,
 	}, info) => {
 		await page.setViewportSize({ width, height: 900 })
-		await page.goto('/__wallet-page/software/')
+		await page.goto(`/__wallet-page/${fixture}/`)
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
 		await expect
 			.poll(() => page.evaluate(qualifyNativeBreadcrumbClock))
 			.toMatchObject({ resolved: true })
+		const breadcrumbClock = await page.evaluate(qualifyNativeBreadcrumbClock)
 		const root = page.locator('#layout')
 
 		await root.evaluate(element => {
@@ -667,7 +674,7 @@ for (const width of [390, 600, 690]) {
 				)
 			}, top)
 		const observe = () =>
-			page.evaluate(() => {
+			page.evaluate(applicable => {
 				const rect = ({ x, y, width, height, top, right, bottom, left }: DOMRectReadOnly) => ({
 					x,
 					y,
@@ -683,20 +690,55 @@ for (const width of [390, 600, 690]) {
 				const title = document.querySelector<HTMLElement>('#top h1')!
 				const source = document.querySelector<HTMLElement>('.wallet-title-source')!
 				const flow = document.querySelector('#top > [data-sticky-breadcrumb~="flow"]')!
+				const enhancedPicker = applicable && CSS.supports('appearance: base-select')
+				const clock = (element: Element | null, name: string) =>
+					element
+						?.getAnimations({ subtree: true })
+						.filter(
+							animation => animation instanceof CSSAnimation && animation.animationName === name,
+						)
+						.map(animation => ({
+							timeline: animation.timeline?.constructor.name,
+							progress: animation.effect?.getComputedTiming().progress,
+						})) ?? []
 				const controls = [
 					...document.querySelectorAll<HTMLSelectElement>('.wallet-device-controls select'),
-				].map(select => ({
-					name: select.getAttribute('aria-label'),
-					box: rect(select.getBoundingClientRect()),
-					progress: select
-						.getAnimations()
-						.filter(
-							animation =>
-								animation instanceof CSSAnimation &&
-								animation.animationName === 'select-compact-box',
-						)
-						.map(animation => animation.effect?.getComputedTiming().progress),
-				}))
+				].map(select => {
+					const box = select.getBoundingClientRect()
+					const rtl = getComputedStyle(select).direction === 'rtl'
+					const circle = {
+						x: rtl ? box.right - box.height : box.left,
+						y: box.top,
+						width: box.height,
+						height: box.height,
+					}
+					const center = { x: circle.x + circle.width / 2, y: circle.y + circle.height / 2 }
+					const label = select.querySelector('selectedcontent .select-label')
+					const trailing = { x: rtl ? box.left + 2 : box.right - 2, y: center.y }
+
+					return {
+						name: select.getAttribute('aria-label'),
+						box: rect(box),
+						circle,
+						allocation: [select.offsetWidth, select.offsetHeight],
+						appearance: getComputedStyle(select).appearance,
+						labelClock: clock(label, 'select-compact-label'),
+						tailClock: clock(select, 'select-compact-tail'),
+						labelOpacity: label ? Number(getComputedStyle(label).opacity) : null,
+						centerHit: document.elementFromPoint(center.x, center.y)?.closest('select') === select,
+						trailingHit:
+							document.elementFromPoint(trailing.x, trailing.y)?.closest('select') === select,
+					}
+				})
+				const titleRange = document.createRange()
+
+				titleRange.selectNodeContents(title.querySelector('a > span')!)
+				const identityPaint = [
+					...titleRange.getClientRects(),
+					title.querySelector('img')!.getBoundingClientRect(),
+				]
+					.filter(box => box.width > 0 && box.height > 0)
+					.map(rect)
 
 				return {
 					scroll: root.scrollTop,
@@ -720,14 +762,24 @@ for (const width of [390, 600, 690]) {
 						root.scrollHeight - root.clientHeight,
 						Math.ceil(root.scrollTop + flow.getBoundingClientRect().bottom + root.clientHeight),
 					),
+					enhancedPicker,
+					identityPaint,
 					controls,
 				}
-			})
+			}, breadcrumbClock.applicable)
 
 		await seek(0)
 		const natural = await observe()
 
-		expect(natural.controls.length).toBeGreaterThan(0)
+		expect(natural.controls).toHaveLength(fixture === 'multipleTypes' ? 2 : 1)
+
+		if (fixture === 'multipleTypes') {
+			expect(
+				Math.min(...natural.controls.map(control => control.box.top)),
+				'The tight two-picker scene must exercise wrapping below H1',
+			).toBeGreaterThanOrEqual(Math.max(...natural.identityPaint.map(box => box.bottom)) - 1)
+		}
+
 		expect(natural.supportWorld.length).toBeGreaterThan(0)
 		const observations = [{ phase: 'natural', requested: 0, ...natural }]
 
@@ -740,6 +792,13 @@ for (const width of [390, 600, 690]) {
 			const actual = await observe()
 
 			observations.push({ phase, requested, ...actual })
+
+			if (phase === 'compact') {
+				await info.attach('identity-compact-pickers-frame', {
+					body: await page.screenshot({ animations: 'allow' }),
+					contentType: 'image/png',
+				})
+			}
 		}
 		await info.attach('identity-normal-flow-reservation', {
 			body: JSON.stringify(observations, null, 2),
@@ -768,25 +827,70 @@ for (const width of [390, 600, 690]) {
 				natural.titleHeight,
 			)
 
-			if (state.phase === 'compact') {
-				for (const control of state.controls) {
-					if (control.progress.length) {
-						expect(
-							control.progress,
-							`${control.name}: actual native producer reaches its compact endpoint`,
-						).toEqual([1])
-						expect(
-							Math.abs(control.box.width - control.box.height),
-							`${control.name}: actual compact native box is square`,
-						).toBeLessThanOrEqual(1)
-					} else {
-						expect(
-							control.box.width,
-							'Native fallback controls retain real geometry',
-						).toBeGreaterThan(0)
-						expect(control.box.height).toBeGreaterThan(0)
-					}
+			for (const [index, control] of state.controls.entries()) {
+				expect(
+					control.allocation,
+					`${state.phase}: native select allocation remains in flow`,
+				).toEqual(natural.controls[index].allocation)
+
+				if (state.phase !== 'compact') {
+					continue
 				}
+
+				if (state.enhancedPicker) {
+					expect(control.appearance).toBe('base-select')
+					expect(
+						control.labelClock,
+						`${control.name}: native label reaches its compact endpoint`,
+					).toEqual([{ timeline: 'ViewTimeline', progress: 1 }])
+					expect(
+						control.tailClock,
+						`${control.name}: native cap reaches its compact endpoint`,
+					).toEqual([{ timeline: 'ViewTimeline', progress: 1 }])
+					expect(control.labelOpacity).toBe(0)
+					expect(
+						control.centerHit,
+						`${control.name}: visible compact circle remains unobstructed`,
+					).toBe(true)
+
+					if (control.box.width > control.circle.width + 4) {
+						expect(
+							control.trailingHit,
+							`${control.name}: invisible label tail is not a hit target`,
+						).toBe(false)
+					}
+
+					const cx = control.circle.x + control.circle.width / 2,
+						cy = control.circle.y + control.circle.height / 2
+
+					for (const ink of state.identityPaint) {
+						const dx = cx - Math.max(ink.left, Math.min(cx, ink.right)),
+							dy = cy - Math.max(ink.top, Math.min(cy, ink.bottom))
+
+						expect(
+							Math.hypot(dx, dy),
+							`${control.name}: compact picker clears H1 ink`,
+						).toBeGreaterThanOrEqual(control.circle.width / 2 - 1)
+					}
+				} else {
+					expect(
+						control.box.width,
+						'Native fallback controls retain real geometry',
+					).toBeGreaterThan(0)
+					expect(control.box.height).toBeGreaterThan(0)
+				}
+			}
+
+			if (state.phase === 'compact' && state.enhancedPicker && state.controls.length === 2) {
+				const [a, b] = state.controls.map(control => control.circle)
+
+				expect(
+					Math.hypot(
+						a.x + a.width / 2 - b.x - b.width / 2,
+						a.y + a.height / 2 - b.y - b.height / 2,
+					),
+					'Both compact picker circles remain separate',
+				).toBeGreaterThanOrEqual((a.width + b.width) / 2 - 1)
 			}
 		}
 	})
