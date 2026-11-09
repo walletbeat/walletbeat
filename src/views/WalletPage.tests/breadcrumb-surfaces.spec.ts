@@ -243,10 +243,20 @@ for (const wallet of ['metamask', 'ambire']) {
 							observed.header.bottom,
 							'Natural foreground must not cover its supporting paragraph',
 						).toBeLessThanOrEqual(observed.support.top + 0.5)
-						expect(
-							observed.surface.opacity,
-							'Compact backdrop must not obscure natural supporting content',
-						).toBe(0)
+
+						for (const surface of surfaces) {
+							const overlapsSupport =
+								surface.opacity > 0 &&
+								surface.left < observed.support.right - 0.5 &&
+								surface.right > observed.support.left + 0.5 &&
+								surface.top < observed.support.bottom - 0.5 &&
+								surface.bottom > observed.support.top + 0.5
+
+							expect(
+								overlapsSupport,
+								'Natural supporting content must clear foreground backdrops',
+							).toBe(false)
+						}
 					} else {
 						for (const box of paint) {
 							const coveredBottom = surfaces
