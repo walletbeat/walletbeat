@@ -173,7 +173,89 @@ export const gemwallet: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: [
+						{
+							explanation: 'Gem allows you to bridge tokens between networks.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png',
+							label: 'Gem swap from ETH on Ethereum to ETH on Base',
+						},
+						{
+							explanation:
+								"When bridging, the review screen shows the network fee but doesn't show Gem's fee or the bridge provider's fee, and gives no warnings about bridge risks.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png',
+							label: 'Gem review screen for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: "When bridging, the details screen doesn't break out bridge fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png',
+							label: 'Gem details sheet for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: 'Gem takes a 0.25% fee on bridges.',
+							url: {
+								label: 'Gem bridge fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L12',
+							},
+						},
+					],
+					feesLargerThan1bps: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupportedWithRef({
+					ref: {
+						explanation:
+							'When sending transactions you must have sufficient funds on the chain you are transacting on. Gem will not pull funds from other chains.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png',
+						label: 'Gem send screen showing an insufficient balance error',
+					},
+				}),
+			},
+			crossChainBalances: {
+				ref: [
+					{
+						explanation: "Gem shows the wallet's total value across all networks.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png',
+						label: 'Gem home screen with the wallet total and ETH on Ethereum and Base',
+					},
+					{
+						explanation:
+							'Gem lists ETH and USDC on each network as separate items but does not add them up across networks.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png',
+						label: 'Gem asset list with ETH and USDC on each network',
+					},
+				],
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
 		chainConfigurability: supported<WithRef<Nullable<ChainConfigurability>>>({
 			ref: [
 				{
