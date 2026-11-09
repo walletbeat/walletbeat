@@ -74,16 +74,20 @@ const arrival = samples
 			`\t\t${offset(index)} {\n\t\t\ttranslate: calc(var(---breadcrumb-arrivalInline) * ${x}) calc(var(---breadcrumb-arrivalBlock) * ${y});\n\t\t}`,
 	)
 	.join('\n')
+// Each bound covers the interval between retained icon samples.
+const iconStep = 4
 const icon = samples
-	.map((_, index) => {
+	.map((_, index) => index)
+	.filter(index => index % iconStep === 0)
+	.map(index => {
 		const bounds: string[] = []
 
 		if (index > 0) {
-			bounds.push(interval(index - 1, index))
+			bounds.push(interval(index - iconStep, index))
 		}
 
 		if (index < samples.length - 1) {
-			bounds.push(interval(index, index + 1))
+			bounds.push(interval(index, index + iconStep))
 		}
 
 		return `\t\t${offset(index)} {\n\t\t\tanimation-timing-function: linear;\n\t\t\ttranslate: calc(var(---inlineDirection) * min(${bounds.join(', ')})) 0px;\n\t\t}`

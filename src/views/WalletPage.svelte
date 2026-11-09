@@ -3029,6 +3029,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
 			--stickyBreadcrumb-minBlockSize: var(---wallet-compact-icon-size);
 			@media (width > 84rem) {
+				:global([data-sticky-breadcrumb~="clearance"]) {
+					---breadcrumb-clearance-supported: 0;
+				}
+
 				--stickyBreadcrumb-minBlockSize: max(
 					var(---wallet-compact-icon-size),
 					calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem))
