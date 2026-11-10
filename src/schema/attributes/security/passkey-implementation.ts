@@ -180,8 +180,8 @@ function webAuthnSolImplementation(
 		outcome: {
 			id: 'web_authn_sol_implementation',
 			rating: Rating.PASS,
-			displayName: 'Audited passkey implementation (WebAuthn.sol)',
-			shortExplanation: mdSentence('{{WALLET_NAME}} implements passkeys using WebAuthn.sol.'),
+			displayName: 'Audited passkey implementation (Base WebAuthn.sol)',
+			shortExplanation: mdSentence('{{WALLET_NAME}} implements passkeys using Base WebAuthn.sol.'),
 			metadata: {
 				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
 				libraryUrl:
@@ -193,6 +193,33 @@ function webAuthnSolImplementation(
 		details: mdParagraph(
 			"{{WALLET_NAME}} implements passkeys using WebAuthn.sol from Base, a Solidity library for verifying WebAuthn authentication assertions. It builds on Daimo's WebAuthn.sol. This library is optimized for Ethereum layer 2 rollup chains but will work on all EVM chains. Signature verification always attempts to use the RIP-7212 precompile and, if this fails, falls back to using FreshCryptoLib. The library has been [audited](https://github.com/coinbase/smart-wallet/tree/main/audits)",
 		),
+	})
+}
+
+function soladyWebAuthnImplementation(
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
+	support: PasskeyVerificationSupport,
+) {
+	return ctx.build({
+		outcome: {
+			id: 'solady_web_authn_implementation',
+			rating: Rating.PASS,
+			displayName: 'Audited passkey implementation (Solady WebAuthn.sol)',
+			shortExplanation: mdSentence(
+				'{{WALLET_NAME}} implements passkeys using [Solady WebAuthn.sol](https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol).',
+			),
+			metadata: {
+				library: PasskeyVerificationLibrary.SOLADY_WEB_AUTHN,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol',
+			},
+		},
+		details: mdParagraph(
+			"{{WALLET_NAME}} implements passkeys using [Solady WebAuthn.sol](https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol), a gas-optimized Solidity library for verifying WebAuthn authentication assertions, modified from Daimo's and Coinbase's WebAuthn.sol. Signature verification uses Solady's P256 library, which calls the RIP-7212 precompile where available and otherwise falls back to a Solidity P256 verifier contract. WebAuthn.sol and P256.sol were in scope of the [Spearbit security review of Solady commissioned by Coinbase](https://github.com/Vectorized/solady/blob/main/audits/cantina-spearbit-coinbase-solady-report.pdf) (January 2025).",
+		),
+		howToImprove: undefined,
 	})
 }
 
@@ -225,7 +252,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 			- [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib)
 			- [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier)
 			- [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
-			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
+			- [Base WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
+			- [Solady WebAuthn.sol](https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol), [audited](https://github.com/Vectorized/solady/blob/main/audits/cantina-spearbit-coinbase-solady-report.pdf) as part of Solady
 
 		2. **Partial**: Using libraries that work but are less optimal:
 			- [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib)
@@ -278,13 +306,25 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 			),
 			exampleRating(
 				mdParagraph(
-					"The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.",
+					"The wallet implements passkeys using [Base WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.",
 				),
 				webAuthnSolImplementation(
 					EvaluationContext.forTest(() => passkeyImplementation),
 					{
 						library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
 						libraryUrl: 'https://github.com/base/webauthn-sol',
+					},
+				),
+			),
+			exampleRating(
+				mdParagraph(
+					'The wallet implements passkeys using [Solady WebAuthn.sol](https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol), which has been [audited](https://github.com/Vectorized/solady/blob/main/audits/cantina-spearbit-coinbase-solady-report.pdf) as part of Solady.',
+				),
+				soladyWebAuthnImplementation(
+					EvaluationContext.forTest(() => passkeyImplementation),
+					{
+						library: PasskeyVerificationLibrary.SOLADY_WEB_AUTHN,
+						libraryUrl: 'https://github.com/Vectorized/solady/blob/main/src/utils/WebAuthn.sol',
 					},
 				),
 			),
@@ -363,6 +403,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 					return freshCryptoLibImplementation(ctx, withoutRefs)
 				case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
 					return webAuthnSolImplementation(ctx, withoutRefs)
+				case PasskeyVerificationLibrary.SOLADY_WEB_AUTHN:
+					return soladyWebAuthnImplementation(ctx, withoutRefs)
 				case PasskeyVerificationLibrary.OTHER:
 					return otherPasskeyImplementation(ctx, withoutRefs)
 				default:
