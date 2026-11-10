@@ -1,0 +1,452 @@
+{
+  "WSR-PERM-001.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet warns about the mismatch or blocks the signing request.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet neither warns about the mismatch nor blocks the signing request.",
+        "score": 0
+      }
+    ],
+    "name": "Mismatching SIWE domain detection"
+  },
+  "WSR-PERM-002~Browser.v1": {
+    "criteria": [
+      {
+        "outcome": "Every request triggers an unlock prompt, none are processed, and no sensitive information is leaked while the wallet is locked.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet processes at least one request without requiring unlock, or leaks information while locked.",
+        "score": 0
+      }
+    ],
+    "name": "Wallet unlock before requests"
+  },
+  "WSR-PERM-002~Mobile.v1": {
+    "criteria": [
+      {
+        "outcome": "Every request requires unlocking before processing and no information is leaked while locked, or the wallet lacks WalletConnect support.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet skips authentication for at least one privileged endpoint, or leaks information while locked.",
+        "score": 0
+      }
+    ],
+    "name": "Wallet unlock before requests"
+  },
+  "WSR-PERM-003.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet rejects the signing request or displays a warning about the `chainId` mismatch, or EIP-712 signing is not working at testing time.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet signs without warning about the `chainId` mismatch.",
+        "score": 0
+      }
+    ],
+    "name": "Mismatching EIP-712 chainId detection"
+  },
+  "WSR-PERM-004.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet lists connected dApps and revoking access prevents further RPC requests from the disconnected dApp.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not list all connected dApps, provides no way to revoke access, or the disconnected dApp can still send RPC requests after revocation.",
+        "score": 0
+      }
+    ],
+    "name": "Connected dApp management"
+  },
+  "WSR-PERM-005.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet lets users list and revoke existing token approvals, either as a built-in feature or through a link to a third-party app or site.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet lacks approval listing or revocation, and does not link to a third-party app or site that provides them.",
+        "score": 0
+      }
+    ],
+    "name": "Token approval management"
+  },
+  "WSR-PERM-006.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet rejects `eth_sign` requests by default or uses `personal_sign` instead.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet allows signing `eth_sign` requests by default.",
+        "score": 0
+      }
+    ],
+    "name": "eth_sign method disabled"
+  },
+  "WSR-PERM-007~Mobile.v1": {
+    "criteria": [
+      {
+        "outcome": "Each request requires confirmation, or the wallet does not support WalletConnect.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet skips confirmation for at least one privileged endpoint.",
+        "score": 0
+      }
+    ],
+    "name": "Confirmation for requests from WalletConnect"
+  },
+  "WSR-PERM-008~Browser.v1": {
+    "criteria": [
+      {
+        "outcome": "Each request is rejected or requires a connection approval, with no information leaked.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet skips connection approval for at least one privileged endpoint, or leaks information.",
+        "score": 0
+      }
+    ],
+    "name": "User consent for dApp access"
+  },
+  "WSR-PERM-009.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet prompts for confirmation before switching networks, or blocks switching to non-approved networks.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet allows switching to non-approved networks without user confirmation.",
+        "score": 0
+      }
+    ],
+    "name": "User confirmation before switching chains"
+  },
+  "WSR-PERM-010~Browser.v1": {
+    "criteria": [
+      {
+        "outcome": "Each request requires explicit user confirmation before execution.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet skips confirmation for at least one privileged endpoint.",
+        "score": 0
+      }
+    ],
+    "name": "User confirmation before processing requests"
+  },
+  "WSR-PERM-010~Mobile.v1": {
+    "criteria": [
+      {
+        "outcome": "Each request requires explicit user confirmation before execution, or the wallet has no embedded browser.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet skips confirmation for at least one privileged endpoint.",
+        "score": 0
+      }
+    ],
+    "name": "User confirmation for requests from embedded browser"
+  },
+  "WSR-PHYS-001.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet limits clipboard exposure (1 min max), warns about clipboard risks, or prevents copying. On mobile, it must also prevent or warn users about screenshot risks.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet offers no clipboard protection, or no screenshot protection on mobile.",
+        "score": 0
+      }
+    ],
+    "name": "Clipboard seed phrase leak prevention"
+  },
+  "WSR-PHYS-002~Browser.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet requires at least an 8 characters long password (standard across most products), and does not allow trivial passwords.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet accepts passwords shorter than 8 characters, or trivial ones.",
+        "score": 0
+      }
+    ],
+    "name": "Robust Authentication"
+  },
+  "WSR-PHYS-002~Mobile.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet supports biometrics. If it allows easy-to-guess passwords/pins, it rate limits attempts after the 5th one.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet lacks biometrics, or allows easy-to-guess passwords/pins without rate limiting attempts after the 5th one.",
+        "score": 0
+      }
+    ],
+    "name": "Robust Authentication"
+  },
+  "WSR-PHYS-003.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet clearly communicates and displays a warning about these risks to the user before revealing the secrets.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet reveals the secrets without a clear warning about the risks.",
+        "score": 0
+      }
+    ],
+    "name": "Seed phrase access warning"
+  },
+  "WSR-PHYS-004.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet includes a manual lock control.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet has no manual lock control.",
+        "score": 0
+      }
+    ],
+    "name": "Manual wallet lock"
+  },
+  "WSR-PHYS-005.v1": {
+    "criteria": [
+      {
+        "outcome": "Authentication is required before displaying mnemonics or private keys, or seed-phrase backup is not available.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet displays mnemonics or private keys without requiring authentication.",
+        "score": 0
+      }
+    ],
+    "name": "Seed phrase access control"
+  },
+  "WSR-PHYS-006~Browser.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet auto-locks after inactivity within 20 minutes.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not auto-lock within 20 minutes of inactivity.",
+        "score": 0
+      }
+    ],
+    "name": "Automatic wallet lock"
+  },
+  "WSR-PHYS-006~Mobile.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet auto-locks after inactivity (1 minute or less by default), when the device locks, or when the app moves to the background.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not auto-lock in any of these cases.",
+        "score": 0
+      }
+    ],
+    "name": "Automatic wallet lock"
+  },
+  "WSR-THRE-001.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet visibly distinguishes verified dApps from unknown ones (e.g. with a checkmark or trust badge).",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not distinguish verified dApps from unknown ones.",
+        "score": 0
+      }
+    ],
+    "name": "Trusted dApp detection"
+  },
+  "WSR-THRE-002.v2": {
+    "criteria": [
+      {
+        "outcome": "For both the known malicious address and the poisoned lookalike address (matching the prefix and suffix of a known recipient but never transacted with), whether entered manually in the wallet UI or supplied by a dApp, the wallet warns, flags, or blocks the transaction.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet warns, flags, or blocks the transaction for only one of the two addresses.",
+        "score": 50
+      },
+      {
+        "outcome": "The wallet neither warns, flags, nor blocks the transaction for neither the malicious or poisoned/lookalike addresses.",
+        "score": 0
+      }
+    ],
+    "name": "Malicious and poisoned address detection"
+  },
+  "WSR-THRE-003.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet warns or prevents the user from visiting or connecting to known phishing sites.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet neither warns about nor prevents the user from visiting or connecting to known phishing sites.",
+        "score": 0
+      }
+    ],
+    "name": "Phishing dApp detection"
+  },
+  "WSR-THRE-004.v1": {
+    "criteria": [
+      {
+        "outcome": "The connection dialog clearly mentions the ability to view the user's balance and activity, as well as to request transaction approvals.",
+        "score": 100
+      },
+      {
+        "outcome": "The connection dialog does not clearly mention viewing balance or activity, or requesting transaction approvals.",
+        "score": 0
+      }
+    ],
+    "name": "dApp access disclosure dialog"
+  },
+  "WSR-THRE-005.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet displays a warning or indicator when an unknown address is used, whether the address is entered manually or provided by a dApp.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet shows no warning or indicator in at least one of the two cases.",
+        "score": 0
+      }
+    ],
+    "name": "Unknown address detection"
+  },
+  "WSR-THRE-006.v1": {
+    "criteria": [
+      {
+        "outcome": "The full dApp origin URL is shown without truncation, or the complete URL can be revealed by hovering over a truncated URL or by widening the connection dialog screen if applicable.",
+        "score": 100
+      },
+      {
+        "outcome": "The dApp origin URL is truncated and cannot be fully revealed.",
+        "score": 0
+      }
+    ],
+    "name": "Full dApp URL display"
+  },
+  "WSR-THRE-007.v1": {
+    "criteria": [
+      {
+        "outcome": "Spam tokens or NFTs are hidden by default or the wallet does not display NFTs.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet displays spam tokens or NFTs by default.",
+        "score": 0
+      }
+    ],
+    "name": "Malicious or spam token filtering"
+  },
+  "WSR-VERI-001.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet blocks the transaction or shows a checksum warning before the transaction proceeds, for both manually entered and dApp-provided addresses (a failed transaction counts as blocked).",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet allows the transaction without a checksum warning in at least one of the two cases.",
+        "score": 0
+      }
+    ],
+    "name": "Invalid address checksum detection"
+  },
+  "WSR-VERI-002.v1": {
+    "criteria": [
+      {
+        "outcome": "Addresses, contract addresses, and transaction hashes are clickable and open a block explorer in both the transaction preview screen and the wallet history.",
+        "score": 100
+      },
+      {
+        "outcome": "Addresses, contract addresses, and transaction hashes are clickable and open a block explorer in only one of the two contexts.",
+        "score": 50
+      },
+      {
+        "outcome": "The wallet provides no block explorer links for these identifiers in either context.",
+        "score": 0
+      }
+    ],
+    "name": "Links to blockchain explorers"
+  },
+  "WSR-VERI-003.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet shows the expected inputs and outputs from the execution of such transaction effects before signing.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not show the expected inputs and outputs before signing.",
+        "score": 0
+      }
+    ],
+    "name": "Transaction simulation"
+  },
+  "WSR-VERI-004.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet renders structured, human-readable signing details rather than just raw JSON parsing, or EIP-712 signing is not supported.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet shows the information only as raw or plain data.",
+        "score": 0
+      }
+    ],
+    "name": "EIP-712 message parsing"
+  },
+  "WSR-VERI-005.v1": {
+    "criteria": [
+      {
+        "outcome": "The wallet clearly identifies the request as an approval and shows the token symbol or address, the spender address, and the approved amount.",
+        "score": 100
+      },
+      {
+        "outcome": "The wallet does not identify the request as an approval, or omits the token symbol or address, the spender address, or the approved amount.",
+        "score": 0
+      }
+    ],
+    "name": "Clear token approval dialog"
+  },
+  "WSR-VERI-006.v1": {
+    "criteria": [
+      {
+        "outcome": "All signing data is visible (including the `verifyingContract` for EIP-712), scrollable, and not truncated for every functional signing method. Non-functional or unsupported methods (e.g. `personal_sign`) are ignored.",
+        "score": 100
+      },
+      {
+        "outcome": "For at least one functional signing method (e.g. `eth_signTypedData`), the wallet truncates the signing data, does not allow scrolling through it, or fails to show the `verifyingContract` for EIP-712.",
+        "score": 0
+      }
+    ],
+    "name": "Clear message signing dialog"
+  },
+  "WSR-VERI-007.v1": {
+    "criteria": [
+      {
+        "outcome": "The sign button remains disabled until the user scrolls through the entire message for every functional signing method. Non-functional or unsupported methods (e.g. `personal_sign`) are ignored.",
+        "score": 100
+      },
+      {
+        "outcome": "The sign button becomes enabled before the user scrolls through the entire message for at least one functional signing method (e.g. `eth_signTypedData`).",
+        "score": 0
+      }
+    ],
+    "name": "Mandatory message review"
+  }
+}
