@@ -335,6 +335,7 @@ export const uniswapWallet: SoftwareWallet = {
 			nonL1: notSupported,
 		}),
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: {
 				duringEOACreation: 'NO',
 				duringEOAImport: 'NO',

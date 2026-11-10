@@ -66,6 +66,7 @@ export const mtpelerin: SoftwareWallet = {
 		chainAbstraction: null,
 		chainConfigurability: null,
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {

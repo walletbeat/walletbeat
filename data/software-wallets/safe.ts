@@ -96,6 +96,7 @@ export const safe: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
+			appTriggeredDelegation: null,
 			delegation: null,
 		},
 		integration: {
