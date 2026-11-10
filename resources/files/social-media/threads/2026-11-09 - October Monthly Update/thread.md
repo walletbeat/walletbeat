@@ -99,7 +99,7 @@ https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosy
 
 Wallet security news of the month:
 
-MetaMask disclosed an infrastructure incident and is exiting affected staking validators. MetaMask found no indication that wallets or funds were affected. Its investigation is ongoing.
+MetaMask disclosed an infrastructure incident and removed the affected validators from staking. It found no indication that wallets or funds were affected.
 
 https://x.com/MetaMask/status/2105442300335620460
 
@@ -108,6 +108,8 @@ https://x.com/MetaMask/status/2105442300335620460
 Keystone confirmed that an external actor obtained customers' shipping information through its website. No card details, recovery phrases, or private keys were exposed.
 
 https://x.com/KeystoneWallet/status/2114054080754770137
+
+---
 
 Want the full breakdown? https://beta.walletbeat.eth.limo/news/
 
