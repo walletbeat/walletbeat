@@ -469,6 +469,7 @@ export const daimo: SoftwareWallet = {
 				},
 			},
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			orderflowPractices: null,

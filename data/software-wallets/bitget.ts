@@ -327,6 +327,7 @@ export const bitget: SoftwareWallet = {
 			permissionsManagement: null,
 			transactionSubmission: null,
 		},
+		testnetSupport: null,
 		transparency: {
 			operationFees: null,
 			orderflowPractices: null,
