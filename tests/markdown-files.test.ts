@@ -33,7 +33,7 @@ const RENDERED_MARKDOWN_DIRS = Object.values(RENDERED_MARKDOWN_COLLECTIONS).map(
  * blob or tree URL. Returns `null` when the URL is not a blob/tree URL for our repo
  * or when no path is present.
  *
- * E.g. `https://github.com/walletbeat/walletbeat/blob/beta/governance/treasury/treasury-transparency.md`
+ * E.g. `https://github.com/walletbeat/walletbeat/blob/master/governance/treasury/treasury-transparency.md`
  * -> `governance/treasury/treasury-transparency.md`
  */
 function repoRelativePathFromGithubUrl(url: string): string | null {

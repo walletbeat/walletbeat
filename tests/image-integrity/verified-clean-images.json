@@ -1675,6 +1675,18 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
+		"hash": "4c5dba25da216e8258202e358bf35c259052506c4d4c015e3a7f34aba1df1450",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg": {
+		"hash": "ffe42a78e281a8a5615cd1c7e56fe47a84dfa02745a895ed21bbcf2306e19d34",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/walletbeat_mission.png": {
+		"hash": "94075e76caa8c5b0bc8548a104d6d57e0a6b045982f82344d7851e9a7306930e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/apoorv_walletchan.png": {
 		"hash": "006a8e5e4c41856f5e06be3adf4653ba847072f063a22d8ec9faa2adad86d25a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1745,6 +1757,10 @@
 	},
 	"resources/files/wbicons/wbicons-complex/chain_verification.svg": {
 		"hash": "28c635c81b9e783dcc01ef227457e61d11140f3ca7b173afdad10693facdf06d",
+		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
+	},
+	"resources/files/wbicons/wbicons-complex/checklist.svg": {
+		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
 	"resources/files/wbicons/wbicons-complex/code_repository.svg": {
@@ -1857,10 +1873,6 @@
 	},
 	"resources/files/wbicons/wbicons-complex/security_audits.svg": {
 		"hash": "f26051c9f25db82468c159cd22b894cb687192a5014d0b8627934ae9d8178bb0",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
-	"resources/files/wbicons/wbicons-complex/security_best_practices.svg": {
-		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
 	"resources/files/wbicons/wbicons-complex/self_sovereignty.svg": {
@@ -2119,10 +2131,6 @@
 		"hash": "d67ac041d3bd09b535c8d4ad370c187dc50c6ca50656c939e1188c506fb9f848",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
-	"resources/files/wbicons/wbicons-simple/security_best_practices.svg": {
-		"hash": "1fe51ca163f24989de0756cebc18a88b1111b1a2417ffe8a0e8ece46eea5082c",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
 	"resources/files/wbicons/wbicons-simple/self_sovereignty.svg": {
 		"hash": "d5768062022593f45885a4a9131dcc84a6f7c468a3dbf330220485341d66074e",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
@@ -2224,11 +2232,15 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"src/assets/fonts/wbicons-complex/wbicons-complex.svg": {
-		"hash": "2e93ff0e3a50e747aa6fcba7b9b7e452d50d6bc0fe45d614484698ef7a5a090d",
+		"hash": "319a3696996deb21ecdc0ea4eac6e0f7c742224a4f8bf3f8b3ea30bd97bce21b",
 		"passedTests": ["file-format"]
 	},
 	"src/assets/fonts/wbicons-simple/wbicons-simple.svg": {
-		"hash": "dd6af0f59536199f4c1e5c9b9769c046d411d80ed94eb2968adade7e8a6892c0",
+		"hash": "1ea9dbe7272022b1beef4b632971f5b19e1bde55d8c8bf97f276f48ebba409f2",
 		"passedTests": ["file-format"]
+	},
+	"tests/browser/fixtures/wide-wallet.svg": {
+		"hash": "5a5c57cf3b58ac167529042d92f5e2922c205409b72d5cee6be299b6c80b9d62",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	}
 }

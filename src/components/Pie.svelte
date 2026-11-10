@@ -3,20 +3,21 @@
 	export type { LevelConfig, Slice } from './pie-geometry'
 </script>
 
-
 <script lang="ts">
+	import './pie-shape.css'
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
+	import { sliceFill, sliceLabelBackground } from './pie-fill'
 	// Types
 	import {
 		computePieSlices,
+		pieMaxRadius,
 		PieLayout as PieLayoutValue,
-		slicePathData,
 		type ComputedSlice,
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
-
 
 	// Props
 	const {
@@ -93,177 +94,77 @@
 		centerContentSnippet?: Snippet
 	} = $props()
 
-
-	// Functions
-	type GradientStops = { color: string; position: number }[]
-
-	/** A gradient slice's color stops (radius in px), or a single flat color. */
-	const sliceGradientStops = (slice: ComputedSlice): GradientStops | string => {
-		const children = slice.children
-		const gradient = slice.gradient
-
-		if (!children?.length || !gradient) return slice.color
-
-		const colorWeights = gradient.colors
-			.map(color => ({
-				color,
-				weight: children
-					.filter(child => child.color === color)
-					.reduce((sum, child) => sum + child.weight, 0),
-			}))
-			.filter(({ weight }) => weight > 0)
-
-		if (colorWeights.length <= 1) {
-			const color = colorWeights[0]?.color ?? slice.color
-
-			return color === gradient.transparentStopColor ? 'var(--rating-unrated)' : color
-		}
-
-		const areaRadiusStops = gradient.areaRadiusStops
-		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
-		const minimumStopGap = Math.min(8, (slice.computed.outerR - slice.computed.innerR) / Math.max(colorWeights.length - 1, 1))
-		const stopPositions = colorWeights
-			.map(({ weight }, index, weights) => {
-				const areaFraction = (weights.slice(0, index).reduce((sum, entry) => sum + entry.weight, 0) + weight / 2) / totalWeight
-				const scaledStopIndex = areaRadiusStops ? areaFraction * (areaRadiusStops.length - 1) : 0
-				const stopIndex = Math.floor(scaledStopIndex)
-				const normalizedRadius = (
-					areaRadiusStops ?
-						areaRadiusStops[stopIndex] + (
-							areaRadiusStops[Math.min(stopIndex + 1, areaRadiusStops.length - 1)] - areaRadiusStops[stopIndex]
-						) * (scaledStopIndex - stopIndex)
-					:
-						Math.sqrt(
-							(
-								slice.computed.innerR ** 2
-								+ (slice.computed.outerR ** 2 - slice.computed.innerR ** 2) * areaFraction
-							),
-					)
-				)
-
-				return areaRadiusStops ? slice.computed.innerR + (slice.computed.outerR - slice.computed.innerR) * normalizedRadius : normalizedRadius
-			})
-			.reduce<number[]>(
-				(stops, stop, index) => [
-					...stops,
-					Math.max(stop, index === 0 ? slice.computed.innerR : stops[index - 1] + minimumStopGap),
-				],
-				[],
-			)
-			.reduceRight<number[]>(
-				(stops, stop, index) => [
-					Math.min(
-						stop,
-						index === colorWeights.length - 1 ? slice.computed.outerR : stops[0] - minimumStopGap,
-					),
-					...stops,
-				],
-				[],
-			)
-
-		return colorWeights.map(({ color }, index) => ({
-			color: color === gradient.transparentStopColor ? 'transparent' : color,
-			position: stopPositions[index],
-		}))
-	}
-
-	const sliceFill = (slice: ComputedSlice) => {
-		const stops = sliceGradientStops(slice)
-
-		if (typeof stops === 'string') return stops
-
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${stops.map(({ color, position }) => `${color} ${position}px`).join(', ')}), var(--rating-unrated)`
-	}
-
-	/**
-	 * The fill color under the slice's label, so the label's ink can contrast
-	 * with what is actually drawn there rather than with the slice's nominal
-	 * color (gradient slices can be mostly unrated grey around the label).
-	 */
-	const sliceLabelBackground = (slice: ComputedSlice) => {
-		const stops = sliceGradientStops(slice)
-
-		if (typeof stops === 'string') return stops
-
-		const nearest = stops.reduce((best, stop) => (
-			Math.abs(stop.position - slice.computed.labelR) < Math.abs(best.position - slice.computed.labelR) ? stop : best
-		))
-
-		return nearest.color === 'transparent' ? 'var(--rating-unrated)' : nearest.color
-	}
-
 	// State
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
 
 	const pieMetrics = $derived.by(() => {
-		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
-		const maxOffset = Math.max(...levels.map(level => (level.offset ?? 0) * (level.outerRadiusFraction ?? 1)))
-		const maxRadius = radius * maxRadiusMultiplier + maxOffset
+		const maxRadius = pieMaxRadius(radius, levels)
 
 		const width = padding * 2 + maxRadius * 2
 		const height = padding * 2 + maxRadius * (layout === PieLayoutValue.HalfTop ? 1 : 2)
-		const viewBoxX = -(padding + maxRadius)
-		const viewBoxY = -(padding + maxRadius)
 
 		return {
 			maxRadius,
 			origin: { x: padding + maxRadius, y: padding + maxRadius },
 			width,
 			height,
-			viewBox: `${viewBoxX} ${viewBoxY} ${width} ${height}`,
 		}
 	})
-
 </script>
-
 
 {#snippet Slice(slice: ComputedSlice)}
 	<svelte:element
-		this={slice.href ? 'a' : 'div'}
-		href={slice.href}
-
+		this={slice.href ? 'a' : onSliceClick ? 'button' : 'div'}
+		{...slice.href ? { href: slice.href } : onSliceClick ? { type: 'button' } : {}}
 		class="slice"
-
-		role="button"
-		tabindex="0"
+		title={slice.arcIconId ? `${wbIconEmojiSequences[slice.arcIconId]} ${slice.ariaLabel}` : slice.ariaLabel}
 		aria-label={slice.ariaLabel}
-		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
-		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
-		onfocus={() => { onSliceFocus?.(slice.id) }}
-		onblur={() => { onSliceBlur?.(slice.id) }}
-		onclick={(event: MouseEvent) => {
-			event.stopPropagation()
-			onSliceClick?.(slice.id)
+		onmouseenter={() => {
+			onSliceMouseEnter?.(slice.id)
 		}}
-		onkeydown={(event: KeyboardEvent) => {
-			if (event.code === 'Enter' || event.code === 'Space')
+		onmouseleave={() => {
+			onSliceMouseLeave?.(slice.id)
+		}}
+		onfocus={() => {
+			onSliceFocus?.(slice.id)
+		}}
+		onblur={() => {
+			onSliceBlur?.(slice.id)
+		}}
+		{...onSliceClick && {
+			onclick: (event: MouseEvent) => {
+				event.stopPropagation()
 				onSliceClick?.(slice.id)
+			},
 		}}
-
 		style:--slice-midAngle={slice.computed.midAngle}
 		style:--slice-offset={slice.computed.offset}
-		style:--slice-clipPath={`path('${slicePathData(slice.computed, pieMetrics.origin)}')`}
-
-		style:--slice-color={slice.color}
+		style:--slice-gap={slice.computed.gap}
+		style:--slice-outerR={slice.computed.outerR}
+		style:--slice-innerR={slice.computed.innerR}
+		style:--slice-outerCornerRadius={slice.computed.outerCornerRadius}
+		style:--slice-innerCornerRadius={slice.computed.innerCornerRadius}
+		style:--slice-totalAngle={slice.computed.totalAngle}
+		style:--slice-opacity={slice.opacity ?? 1}
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-labelBackground={sliceLabelBackground(slice)}
+		style:--slice-backdropFilter={slice.gradient || slice.color === 'var(--rating-unrated)'
+			? 'var(--rating-unrated-backdropFilter)'
+			: 'none'}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
-
 		data-slice-id={slice.id}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
-		<div
-			class="slice-shape"
-		>
+		<span class="slice-shape">
 			{#if slice.arcIconId}
 				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
-		</div>
+		</span>
 	</svelte:element>
 
 	{#if slice.children?.length}
@@ -306,34 +207,70 @@
 	</div>
 </div>
 
-
 <style>
 	@property --pie-rotate {
-		syntax: "<angle>";
+		syntax: '<angle>';
 		inherits: true;
 		initial-value: 0turn;
 	}
 
-	@property --pie-slice-highlightIndex {
-		syntax: "<number>";
+	@property --slice-totalAngle {
+		syntax: '<number>';
 		inherits: true;
 		initial-value: 0;
 	}
+	@property --slice-midAngle {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-outerR {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-innerR {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-outerCornerRadius {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-innerCornerRadius {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-gap {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-offset {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-labelSize {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-labelR {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --slice-scale {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
+	}
 
 	.pie-container {
-		--highlight-color: rgba(255, 255, 255, 1);
-		--highlight-strokeWidth: 1.5px;
-		--hover-brightness: 1.1;
-		--hover-scale: 1.05;
-
-		&[data-layout="TopHalf"] {
-			--center-label-baseline: text-after-edge;
-		}
-		&[data-layout="FullLeft"],
-		&[data-layout="FullTop"] {
-			--center-label-baseline: central;
-		}
-
 		overflow: clip;
 
 		display: grid;
@@ -342,9 +279,6 @@
 		transition-duration: 0.4s;
 
 		.pie {
-			--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-
 			position: relative;
 			display: grid;
 			max-width: 100%;
@@ -354,14 +288,25 @@
 			}
 
 			.slice {
-				--slice-brightness: 1;
 				--slice-scale: 1;
-				--slice-strokeColor: transparent;
-				--slice-strokeWidth: 0px;
 				--slice-offset: 0;
 				--slice-labelSize: var(--pie-labelSize);
 
 				display: grid;
+				transition-property:
+					--pie-rotate, --slice-totalAngle, --slice-midAngle, --slice-outerR, --slice-innerR,
+					--slice-outerCornerRadius, --slice-innerCornerRadius, --slice-gap, --slice-offset,
+					--slice-labelSize, --slice-labelR, --slice-scale, filter;
+
+				&:is(button) {
+					padding: 0;
+					border: 0;
+					border-radius: 0;
+					background: transparent;
+					font: inherit;
+					gap: 0;
+					align-items: normal;
+				}
 
 				pointer-events: none;
 
@@ -372,19 +317,9 @@
 				&:hover,
 				&:focus-within,
 				&.highlighted {
-					--slice-brightness: var(--hover-brightness);
 					--slice-scale: var(--hover-scale);
-					--slice-strokeColor: var(--highlight-color);
-					--slice-strokeWidth: var(--highlight-strokeWidth);
-					--slice-filter: var(--slice-hover-filter);
 
-					filter:
-						brightness(var(--slice-brightness))
-						drop-shadow(var(--slice-strokeWidth) 0 var(--slice-strokeColor))
-						drop-shadow(0 calc(-1 * var(--slice-strokeWidth)) var(--slice-strokeColor))
-						drop-shadow(calc(-1 * var(--slice-strokeWidth)) 0 var(--slice-strokeColor))
-						drop-shadow(0 var(--slice-strokeWidth) var(--slice-strokeColor))
-					;
+					filter: var(---pie-highlightFilter);
 				}
 
 				&:focus-within {
@@ -394,22 +329,17 @@
 				.slice-shape {
 					background: var(--slice-fill);
 
-					clip-path: var(--slice-clipPath);
+					@media (prefers-reduced-transparency: reduce) {
+						backdrop-filter: none;
+					}
 
 					transform-origin: var(--pie-originX) var(--pie-originY);
-					transform:
-						rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
-						scale(var(--slice-scale))
-						translateY(calc(var(--slice-offset) * -1px))
-					;
+					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
+						scale(var(--slice-scale)) translateY(calc(var(--slice-offset) * -1px));
 
 					opacity: var(--slice-opacity);
 
-					transition-property:
-						clip-path,
-						transform,
-						opacity
-					;
+					transition-property: opacity;
 
 					&:hover,
 					&:focus-within,
@@ -425,25 +355,14 @@
 						white-space: nowrap;
 						text-align: center;
 						line-height: 1;
-						/*
-						 * Dark ink on the light rating fills. In dark mode, translucent fills
-						 * (unrated) composite to a dark tone, so their effective lightness
-						 * (l × alpha) picks light ink instead.
-						 */
-						color: light-dark(
-							rgb(19 10 43 / 0.62),
-							oklch(from var(--slice-labelBackground, var(--slice-color, #000)) clamp(0, (0.5 - l * alpha) * 1000, 1) 0 0 / 0.7)
-						);
+
 						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
-						transition-property: translate, rotate, filter;
+						transition-property: filter;
 					}
 				}
 
-				&:not(:hover, :focus-within) > .slice-shape > .label {
-					filter: opacity(0.8);
-				}
 			}
 
 			> .center {
