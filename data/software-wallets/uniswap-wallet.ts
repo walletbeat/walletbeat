@@ -996,6 +996,7 @@ export const uniswapWallet: SoftwareWallet = {
 					secureRng: SecureRngSource.LIBRARY_RNG,
 				},
 			},
+			securityLibraries: null,
 			transactionLegibility: {
 				ref: [
 					{
