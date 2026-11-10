@@ -12,53 +12,122 @@ for (const width of [390, 934, 1440]) {
 
 		for (const wallet of ['rainbow', 'metamask']) {
 			await page.goto(`/${wallet}/#top`)
-			await page.evaluate(() => document.fonts.ready)
 			const root = page.locator('#layout')
 			const start = page.locator('#top')
+			const quiet = await root.evaluateHandle(element => {
+				let changed = performance.now()
+				let deadline = changed + 15000
+				const record = () => {
+					changed = performance.now()
+				}
 
-			const settle = async () => {
-				let previous = Number.NaN
-				let stable = 0
+				element.addEventListener('scroll', record, { passive: true })
+				element.addEventListener('scrollend', record)
 
-				await expect
-					.poll(
-						async () => {
-							const current = await root.evaluate(element => element.scrollTop)
-
-							stable =
-								Math.abs(current - previous) < 0.25 && Math.abs(current) <= 1 ? stable + 1 : 0
-							previous = current
-
-							return stable
-						},
-						{ intervals: [80] },
-					)
-					.toBeGreaterThanOrEqual(4)
-			}
-
-			await settle()
-			await root.evaluate(element => element.scrollTo({ top: 1, behavior: 'instant' }))
-			await settle()
-			const observation = await start.evaluate(element => {
-				const header = element.querySelector(':scope > header')!
-				const h1 = header.querySelector('h1')!
+				const reset = () => {
+					changed = performance.now()
+					deadline = changed + 15000
+				}
 
 				return {
-					top: element.getBoundingClientRect().top,
-					header: header.getBoundingClientRect().top,
-					h1: h1.getBoundingClientRect().top,
-					margin: parseFloat(getComputedStyle(element).scrollMarginBlockStart),
-					hydrated: !element.closest('astro-island')?.hasAttribute('ssr'),
+					reset,
+					request: () => {
+						reset()
+						element.scrollTo({ top: 1, behavior: 'instant' })
+						changed = performance.now()
+					},
+					wait: async () => {
+						while (performance.now() - changed < 320) {
+							if (performance.now() >= deadline) {
+								throw new Error('Page-start scrolling did not settle')
+							}
+
+							await new Promise(resolve => setTimeout(resolve, 80))
+						}
+
+						const position = element.scrollTop
+
+						if (performance.now() >= deadline) {
+							throw new Error('Page-start observation exceeded its deadline')
+						}
+
+						return position
+					},
+					dispose: () => {
+						element.removeEventListener('scroll', record)
+						element.removeEventListener('scrollend', record)
+					},
 				}
 			})
 
-			expect(observation.top).toBeGreaterThanOrEqual(observation.margin - 1)
-			expect(observation.header).toBeGreaterThanOrEqual(observation.top - 1)
-			expect(observation.h1).toBeGreaterThanOrEqual(observation.header - 1)
-			await info.attach(`${wallet}-page-start`, {
-				body: JSON.stringify(observation),
-				contentType: 'application/json',
-			})
+			try {
+				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+				await page.evaluate(() => document.fonts.ready)
+				expect(
+					await root.evaluate(element => element.scrollHeight - element.clientHeight),
+				).toBeGreaterThan(1)
+				const settle = async () => {
+					expect(Math.abs(await quiet.evaluate(state => state.wait()))).toBeLessThan(0.5)
+				}
+
+				await quiet.evaluate(state => state.reset())
+				await settle()
+				await quiet.evaluate(state => state.request())
+				await settle()
+				const observation = await start.evaluate(element => {
+					const header = element.querySelector(':scope > header')!
+					const h1 = header.querySelector('h1')!
+					const port = document.querySelector('#layout')!
+					const portStart =
+						port.getBoundingClientRect().top +
+						parseFloat(getComputedStyle(port).scrollPaddingBlockStart)
+
+					return {
+						top: element.getBoundingClientRect().top,
+						header: header.getBoundingClientRect().top,
+						h1: h1.getBoundingClientRect().top,
+						margin: parseFloat(getComputedStyle(element).scrollMarginBlockStart),
+						hydrated: !element.closest('astro-island')?.hasAttribute('ssr'),
+						portHeight: port.clientHeight,
+						startAreas: [element, ...element.children]
+							.filter(target => {
+								const style = getComputedStyle(target)
+
+								return (
+									style.scrollSnapAlign.split(/\s+/)[0] === 'start' &&
+									target.getBoundingClientRect().height > 0 &&
+									target.getBoundingClientRect().top -
+										portStart -
+										parseFloat(style.scrollMarginBlockStart) <=
+										1
+								)
+							})
+							.map(target => target.getBoundingClientRect().height),
+					}
+				})
+
+				expect(observation.top).toBeGreaterThanOrEqual(observation.margin - 1)
+				expect(observation.header).toBeGreaterThanOrEqual(observation.top - 1)
+				expect(observation.h1).toBeGreaterThanOrEqual(observation.header - 1)
+
+				if ((await page.evaluate(qualifyNativeBreadcrumbClock)).applicable) {
+					expect(observation.startAreas, 'One bounded area owns the page-start stop').toHaveLength(
+						1,
+					)
+					expect(observation.startAreas[0]).toBeLessThan(observation.portHeight)
+				}
+
+				await info.attach(`${wallet}-page-start`, {
+					body: JSON.stringify(observation),
+					contentType: 'application/json',
+				})
+			} finally {
+				try {
+					await quiet.evaluate(state => state.dispose())
+				} finally {
+					await quiet.dispose()
+				}
+			}
 		}
 	})
 }

@@ -3329,6 +3329,16 @@ ol {
 				---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
 				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
 
+				/* A bounded entry flow owns the start snap; the content scope spans the page. */
+				&:has(> [data-sticky-breadcrumb~="flow"]) {
+					scroll-snap-align: none;
+
+					> [data-sticky-breadcrumb~="flow"] {
+						scroll-snap-align: start;
+						scroll-margin-block-start: inherit;
+					}
+				}
+
 				&::before,
 				&::after,
 				> [data-sticky-breadcrumb~="flow"]::before {
