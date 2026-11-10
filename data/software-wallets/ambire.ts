@@ -4,6 +4,7 @@ import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
+import { superkalo } from '@/data/contributors/superkalo'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
@@ -76,6 +77,7 @@ import {
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { type ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -215,9 +217,9 @@ export const ambire: SoftwareWallet = {
 		displayName: 'Ambire',
 		tableName: 'Ambire',
 		coinspectId: 'ambire',
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm, superkalo],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-11-10',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -1223,8 +1225,41 @@ export const ambire: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: notSupported,
-				dependencyAgeGate: null,
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: [
+						{
+							explanation:
+								'Release files and a `SHA256SUMS` checksum list are published as an immutable GitHub release. GitHub signs a release attestation that covers the release tag and the digest of each file.',
+							url: 'https://github.com/AmbireTech/extension/blob/903426c773b390a29d1f454310ffc03f5f6f4b2e/.github/workflows/publish-public-release.yml#L146-L153',
+						},
+						{
+							explanation: 'The build writes the `SHA256SUMS` checksum list for the release files.',
+							url: 'https://github.com/AmbireTech/extension/blob/903426c773b390a29d1f454310ffc03f5f6f4b2e/.github/workflows/build-extensions.yml#L359-L364',
+						},
+						{
+							explanation:
+								'Anyone can verify the release attestation with `gh release verify` and each file with `gh release verify-asset`.',
+							url: 'https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases',
+						},
+					],
+					publication: 'GITHUB_RELEASE',
+					signer: 'BUILD_INFRA_IDENTITY',
+				}),
+				dependencyAgeGate: supported({
+					ref: [
+						{
+							explanation:
+								'CI checks every pull request and push to the main and release branches for new dependency versions.',
+							url: 'https://github.com/AmbireTech/extension/blob/903426c773b390a29d1f454310ffc03f5f6f4b2e/.github/workflows/dependency-age-gate.yml#L39-L46',
+						},
+						{
+							explanation:
+								'The check fails when a new dependency version in `yarn.lock` was published to npm less than 14 days ago.',
+							url: 'https://github.com/AmbireTech/extension/blob/903426c773b390a29d1f454310ffc03f5f6f4b2e/check-dep-age.js#L140-L165',
+						},
+					],
+					minimumAgeDays: 14,
+				}),
 				dependencyLocking: supported({
 					ref: [
 						{
@@ -1238,7 +1273,7 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: supported({
+				dependencySandboxing: notSupportedWithRef({
 					ref: [
 						{
 							explanation:
