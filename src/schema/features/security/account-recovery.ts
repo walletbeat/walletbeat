@@ -391,6 +391,42 @@ export type GuardianPolicyKOfNWithTimelocks = GuardianPolicyBase & {
 export type GuardianPolicy =
 	GuardianPolicySecretSplitAcrossGuardians | GuardianPolicyKOfNWithTimelocks
 
+/**
+ * Validates that a guardian policy describes actual guardian-based recovery.
+ *
+ * A `SECRET_SPLIT_ACROSS_GUARDIANS` policy must involve at least two
+ * guardians, or a single guardian held by someone other than the user (e.g.
+ * a backup stored by the wallet provider). A policy whose only guardian is the
+ * user's own secret (wallet password, passkey, self-custodied key) does not
+ * split anything; such wallets should set `guardianRecovery` to
+ * `notSupported` instead.
+ *
+ * @throws When the policy does not meet the above.
+ */
+export function validateGuardianPolicy(guardianPolicy: GuardianPolicy): void {
+	switch (guardianPolicy.type) {
+		case GuardianPolicyType.K_OF_N_WITH_TIMELOCK:
+			return
+		case GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS: {
+			const guardians = guardianPolicy.requiredGuardians.concat(guardianPolicy.optionalGuardians)
+
+			if (guardians.length === 0) {
+				throw new Error(
+					'Invalid guardian policy: SECRET_SPLIT_ACROSS_GUARDIANS needs at least one guardian. If the wallet has no guardian-based recovery, set guardianRecovery to notSupported.',
+				)
+			}
+
+			if (guardians.length === 1 && guardianEntity(guardians[0]) === null) {
+				throw new Error(
+					`Invalid guardian policy: SECRET_SPLIT_ACROSS_GUARDIANS with a single ${guardians[0].type} guardian does not split the secret across guardians. If recovery only depends on the user's own secret, set guardianRecovery to notSupported.`,
+				)
+			}
+
+			return
+		}
+	}
+}
+
 export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 	switch (guardianPolicy.type) {
 		case GuardianPolicyType.K_OF_N_WITH_TIMELOCK:
