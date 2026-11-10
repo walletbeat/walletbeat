@@ -5,6 +5,7 @@ export const erc7730: Eip = {
 	friendlyName: 'Clear Signing Format',
 	formalTitle: 'Clear Signing Format',
 	appliesTo: variantEnum.set,
+	finalizedDate: null,
 	icon: 'ICON_BOOK_OPEN',
 	number: '7730',
 	prefix: EipPrefix.ERC,

@@ -1,7 +1,11 @@
 :root {
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
-	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
-	--transition-easeInOutExpo: cubic-bezier(0.87, 0, 0.13, 1);
+	--transition-easeOutExpo-x1: 0.16;
+	--transition-easeOutExpo-x2: 0.3;
+	--transition-easeOutExpo: cubic-bezier(var(--transition-easeOutExpo-x1), 1, var(--transition-easeOutExpo-x2), 1);
+	--transition-easeInOutExpo-x1: 0.87;
+	--transition-easeInOutExpo-x2: 0.13;
+	--transition-easeInOutExpo: cubic-bezier(var(--transition-easeInOutExpo-x1), 0, var(--transition-easeInOutExpo-x2), 1);
 	--transition-blob: var(--transition-easeInOutExpo);
 
 	--pressable-transitionInDuration: 0.125s;
@@ -26,16 +30,30 @@
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
 
-	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
-	--rating-fail: light-dark(#FF969699,#FB6682);
-	--rating-partial: light-dark(#FFCC7399,#FFCC73);
-	--rating-neutral: #bdc3c7;
+	/* Opaque hue sources. Both roles below derive from these, so a hue change is one edit. */
+	--rating-pass-base: #B5ED9D;
+	--rating-partial-base: #FFCC73;
+	--rating-fail-base: #FB6682;
+	--rating-neutral-base: #BDC3C7;
+
+	/* Fill role: blobs, pies, badge backgrounds, borders. Light values are hand-tuned per hue. */
+	--rating-pass: light-dark(oklch(from var(--rating-pass-base) 0.873 0.154 h), var(--rating-pass-base));
+	--rating-partial: light-dark(oklch(from var(--rating-partial-base) 0.862 0.151 h), var(--rating-partial-base));
+	--rating-fail: light-dark(oklch(from var(--rating-fail-base) 0.770 0.169 h), var(--rating-fail-base));
+	--rating-neutral: light-dark(oklch(from var(--rating-neutral-base) 0.697 0.013 h), var(--rating-neutral-base));
+
+	/* Text role: uniform L 0.52 clears WCAG AA (4.5:1) against --background-primary for every hue. */
+	--rating-pass-text: light-dark(oklch(from var(--rating-pass-base) 0.52 c h), var(--rating-pass-base));
+	--rating-partial-text: light-dark(oklch(from var(--rating-partial-base) 0.52 c h), var(--rating-partial-base));
+	--rating-fail-text: light-dark(oklch(from var(--rating-fail-base) 0.52 c h), var(--rating-fail-base));
+	--rating-neutral-text: light-dark(oklch(from var(--rating-neutral-base) 0.52 c h), var(--rating-neutral-base));
+
 	--rating-unrated: light-dark(oklch(0.75 0.02 244.87 / 0.45), oklch(0.72 0.015 264.61 / 0.35));
 	--rating-unrated-backdropFilter: blur(6px);
-	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
 	--fontFamily-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+	--fontFamily-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
 	--safeArea-insetTop: env(safe-area-inset-top, 0px);
 	--safeArea-insetBottom: env(safe-area-inset-bottom, 0px);
@@ -117,15 +135,38 @@
 
 	font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
 	font-size: min(3.2vw, 16px);
+	/* Disable iOS Safari text autosizing, which inflates some code snippets but not others */
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 
 	color-scheme: light dark;
+	&:has(#theme-toggle:checked) {
+		color-scheme: dark;
+		@media (prefers-color-scheme: dark) {
+			color-scheme: light;
+		}
+	}
 	color: var(--text-primary);
 	background-color: var(--background-primary);
 	outline-color: var(--accent);
 
 	transition-property: background-color, color;
 
-	touch-action: none;
+	/* Block panning the root (content scrolls in `[data-scroll-container]`), but keep pinch zoom */
+	touch-action: pinch-zoom;
+}
+
+:not(pre) > code {
+	overflow-wrap: anywhere;
+}
+
+/* Physical transforms follow the native inline direction of each direction owner. */
+:root,
+[dir] {
+	---inlineDirection: 1;
+	&:dir(rtl) {
+		---inlineDirection: -1;
+	}
 }
 
 label:has(> input) {
@@ -210,7 +251,6 @@ label:has(> input) {
 	transition-behavior: allow-discrete;
 }
 
-
 hr {
 	margin-inline: 10%;
 	border: none;
@@ -232,6 +272,15 @@ h6,
 	font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
 }
 
+code,
+pre {
+	font-family: var(--fontFamily-monospace);
+}
+
+:not(pre) > code {
+	font-size: 0.875em;
+}
+
 h1,
 h2,
 h3,
@@ -240,4 +289,5 @@ h5,
 h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
+	overflow-wrap: break-word;
 }

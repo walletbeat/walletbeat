@@ -99,13 +99,22 @@ const shouldShieldByExtension: Record<string, boolean> = {
 	// HTML and SRI-compatible resources:
 	html: true,
 	css: true,
+
+	// Images and media:
 	webm: false,
 	webp: false,
 	png: false,
+	gif: false,
 	ico: false,
 	svg: false,
 
-	// Fonts:
+	// Documents / data / etc, must be served raw:
+	pdf: false,
+	sty: false,
+	tsv: false,
+	sh: false,
+
+	// Fonts, served raw:
 	eot: false,
 	ttf: false,
 	woff: false,
@@ -155,6 +164,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	// integrity hash. The shield integration is disabled in astro.config.mjs
 	// for the same reason, so keep its middleware out of the dev request path.
 	if (import.meta.env.DEV) {
+		return next()
+	}
+
+	// The astro-shield integration is disabled on non-Linux platforms (see
+	// astro.config.mjs) because its SRI static generation fails on Windows.
+	if (process.platform !== 'linux') {
 		return next()
 	}
 

@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { allWalletSecurityNews, getNewsForWallet } from '@/data/news'
 import { allWallets } from '@/data/wallets'
+import { toFullyQualified } from '@/schema/reference'
+
+import { grammarLint, warmupHarperLinter } from './utils/grammar'
+import { GrammarTextKind } from './utils/linter'
+
+await warmupHarperLinter()
 
 describe('wallet security news', () => {
 	for (const news of allWalletSecurityNews) {
@@ -22,6 +28,40 @@ describe('wallet security news', () => {
 
 			it('has publishedAt not after updatedAt', () => {
 				expect(news.publishedAt <= news.updatedAt).toBe(true)
+			})
+
+			it('title passes grammar lint', async () => {
+				await grammarLint(news.title, { language: 'plaintext' })
+			})
+
+			it('summary passes grammar lint', async () => {
+				await grammarLint(news.summary, { language: 'plaintext' })
+			})
+
+			it('reference labels pass grammar lint', async () => {
+				for (const fq of toFullyQualified(news.ref)) {
+					for (const urlEntry of fq.urls) {
+						if (urlEntry.label) {
+							await grammarLint(
+								urlEntry.label,
+								{ language: 'markdown' },
+								GrammarTextKind.REFERENCE_LABEL,
+							)
+						}
+					}
+				}
+			})
+
+			it('reference explanations pass grammar lint', async () => {
+				for (const fq of toFullyQualified(news.ref)) {
+					if (fq.explanation) {
+						await grammarLint(
+							fq.explanation,
+							{ language: 'markdown' },
+							GrammarTextKind.REFERENCE_EXPLANATION,
+						)
+					}
+				}
 			})
 		})
 	}

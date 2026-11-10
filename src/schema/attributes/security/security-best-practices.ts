@@ -401,6 +401,8 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
 	// Same as above but also applies to host-matched pages, used when rules must cover specific app domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	// Loads site icons from the browser's favicon cache, used to show which app is connected or requesting a signature.
+	[BrowserExtensionPermission.FAVICON]: Rating.PASS,
 	// Firebase Cloud Messaging for push notifications, used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
 	// OAuth2 token retrieval via the browser's identity API, used for optional social login flows.
@@ -599,6 +601,22 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	// screen contents, and wallets use it defensively, e.g. to warn a user who screenshots their
 	// recovery phrase.
 	[AndroidPermission.DETECT_SCREEN_CAPTURE]: Rating.PASS,
+	// Biometric authentication, used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_BIOMETRIC]: Rating.PASS,
+	// Legacy fingerprint authentication (superseded by USE_BIOMETRIC), used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
+	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
+	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
+	// Foreground services show a persistent notification while they run, e.g. while a wallet syncs
+	// or submits a transaction in the background. No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE]: Rating.PASS,
+	// Foreground service type for data transfers such as wallet sync (Android 14+). No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC]: Rating.PASS,
+	// Keeps the processor awake until background work finishes. No access to user data.
+	[AndroidPermission.WAKE_LOCK]: Rating.PASS,
+	// Lets the app start when the device boots, e.g. to reschedule background work after a reboot.
+	// No access to user data, and no UI over other apps.
+	[AndroidPermission.RECEIVE_BOOT_COMPLETED]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -616,6 +634,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
 	// Broad read of shared storage exposes private files.
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
+	// Advertising ID access exists solely for ad attribution/tracking, not any wallet function.
+	[AndroidPermission.AD_ID]: Rating.FAIL,
 }
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
@@ -635,6 +655,8 @@ const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAI
 	[IosUsageDescription.MICROPHONE]: Rating.FAIL,
 	// Precise GPS location can be used to profile and deanonymize users; not required for any wallet function.
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: Rating.FAIL,
+	// Background location access enables continuous user tracking; not required for any wallet function.
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: Rating.FAIL,
 	// Read access to the full photo library exposes private images; wallets only ever need to write, not read.
 	[IosUsageDescription.PHOTO_LIBRARY]: Rating.FAIL,
 	// Always-on Bluetooth enables passive device-tracking and proximity-based attacks even when the app runs in the background.
@@ -836,7 +858,7 @@ function evaluateKeysHandling(
 
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
-	icon: 'security_best_practices',
+	icon: 'checklist',
 	displayName: 'Security best practices',
 	wording: {
 		midSentenceName: null,

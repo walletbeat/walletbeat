@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
@@ -15,7 +16,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -47,6 +51,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import {
 	featureSupported,
@@ -56,6 +61,7 @@ import {
 } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
@@ -63,6 +69,7 @@ import {
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -76,9 +83,9 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		coinspectId: 'zerion',
-		contributors: [lucemans, mattmatt, ren2140],
+		contributors: [lucemans, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-31',
+		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -97,9 +104,56 @@ export const zerion: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupported,
-			// BIP support is not verified
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							"Zerion's mobile app derives accounts from a standard seed phrase: importing the public test phrase 'test test test test test test test test test test test junk' produces `0xf39f…2266`, the address the BIP-39 and BIP-32 standards define for that phrase.",
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-1.png',
+						label: 'Accounts found when importing the test recovery phrase',
+					},
+					{
+						explanation:
+							'Mobile accounts use the BIP-44 derivation path: the same phrase produces `0x7099…79c8` as the second account, the address BIP-44 defines at index 1.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-2.png',
+						label: 'The second account from the same import',
+					},
+					{
+						explanation: 'Users can view the recovery phrase within the mobile app.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-recovery-phrase-backup.png',
+						label: 'Recovery Phrase listed under Backup in the iOS account group settings',
+					},
+					{
+						explanation: 'Users can view the private key within the mobile app.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-private-key-export.png',
+						label: 'Private Keys listed on the iOS account screen',
+					},
+					{
+						explanation: 'The browser extension derives accounts from a standard seed phrase.',
+						url: [
+							{
+								label: 'Accounts are derived from the recovery phrase',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/create.ts#L72-L76',
+							},
+							{
+								label: 'Derivation path',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/derivation-paths.ts#L6-L10',
+							},
+							{
+								label: 'That path is the default for Ethereum accounts',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/derivation-paths.ts#L43-L44',
+							},
+						],
+					},
+					{
+						explanation: 'Users can view the private key within the browser extension.',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/RevealPrivateKey/RevealPrivateKey.tsx#L128-L179',
+					},
+					{
+						explanation: 'Users can view the recovery phrase within the browser extension.',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/Backup/RecoveryPhrase.tsx#L28-L59',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -113,16 +167,79 @@ export const zerion: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+			[Variant.BROWSER]: {
+				ref: {
+					explanation:
+						"The browser extension supports sending funds to ENS names using Zerion's servers.",
+					url: [
+						{
+							label: 'Browser extension looking up a recipient name',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/ui/components/ReceiverAddressDialog/ReceiverAddressDialog.tsx#L132',
+						},
+						{
+							label: "Browser extension looking up names through Zerion's servers",
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/name-service/index.ts#L47-L54',
+						},
+					],
+				},
+				chainSpecificAddressing: {
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The browser extension doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-05-zerion-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+					}),
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'OFFCHAIN',
-				offchainDataVerifiability: 'NOT_VERIFIABLE',
-				offchainProviderConnection: 'DIRECT_CONNECTION',
-			}),
+			[Variant.MOBILE]: {
+				ref: [
+					{
+						explanation:
+							"The mobile app supports sending funds to ENS names using Zerion's servers.",
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-recipient.png',
+						label: 'Mobile app finding vitalik.eth as a recipient',
+					},
+					{
+						file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-ens-lookup-capture.png',
+						label:
+							"Network capture of the mobile app looking up an ENS name through Zerion's servers",
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					}),
+					erc7831: notSupportedWithRef({
+						ref: {
+							explanation: "The mobile app doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-04-zerion-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					}),
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'OFFCHAIN',
+					offchainDataVerifiability: 'NOT_VERIFIABLE',
+					offchainProviderConnection: 'DIRECT_CONNECTION',
+				}),
+			},
 		},
 		chainAbstraction: {
 			bridging: {
@@ -140,10 +257,19 @@ export const zerion: SoftwareWallet = {
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-comprehensive-swap-view.png',
 							label: 'Zerion Dashboard, comprehensive swap view',
 						},
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -259,7 +385,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -270,11 +396,11 @@ export const zerion: SoftwareWallet = {
 						url: [
 							{
 								label: 'Zerion Wallet Core for iOS',
-								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE#not-line-specific',
 							},
 							{
 								label: 'Zerion Wallet Core for Android',
-								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE#not-line-specific',
 							},
 						],
 					},
@@ -287,7 +413,7 @@ export const zerion: SoftwareWallet = {
 						explanation:
 							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
-						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE#not-line-specific',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
@@ -371,7 +497,15 @@ export const zerion: SoftwareWallet = {
 				ventureCapital: true, // $22.5M across seed, Series A and Series B
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Both the browser extension and the mobile app can add wallets: new addresses from the current recovery phrase (the same wallet group) or a new one, imported wallets, Ledger devices and watch-only addresses.',
+					url: 'https://help.zerion.io/en/articles/8653430-add-an-additional-wallet-to-zerion',
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -559,10 +693,14 @@ export const zerion: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -572,7 +710,7 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps—with an extra hop.',
+							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps, with an extra hop.',
 						url: ['https://www.ledger.com/zerion'],
 					},
 				],
@@ -707,7 +845,31 @@ export const zerion: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Zerion decodes a USDC approval, showing the spender, and the amount allowed to spend.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-usdc-approval.png',
+							label: 'Zerion approve confirmation for a USDC approval',
+						},
+						{
+							explanation: 'Zerion does not decode an Aave supply.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-aave-supply.png',
+							label: 'Zerion send confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction. It only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-aave-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-batch-approve-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -790,17 +952,102 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Zerion swap screen for a 1.21 USDC to ETH swap, before confirming with "Swap Now".',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-08-zerion-swap-review.png',
+						label: 'Zerion swap screen for a 1.21 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The decoded input data of the Approve transaction shows value 1210246, matching the 1.21 USDC swap amount.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-08-zerion-exact-approval.png',
+						label:
+							'Decoded Approve transaction calldata showing a value of 1210246 (1.210246 USDC)',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
-				l1: {
-					ref: refTodo,
-					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+				[Variant.BROWSER]: {
+					l1: {
+						ref: [
+							{
+								file: 'public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-custom-rpc.png',
+								label: 'Zerion browser extension Ethereum network page with a custom RPC set',
+								lastRetrieved: '2026-09-28',
+							},
+							{
+								explanation: 'Zerion supports custom RPCs and sends transactions directly to them.',
+								url: [
+									{
+										label: 'Browser extension uses a custom RPC',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/modules/networks/Networks.ts#L375-L381',
+									},
+									{
+										label: 'Browser extension connecting to a custom RPC to send transactions',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1287-L1301',
+									},
+									{
+										label: 'Browser extension sending a signed transaction through a custom RPC',
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1445-L1449',
+									},
+								],
+							},
+						],
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: featureSupported,
+					},
+					l2: {
+						ref: [
+							{
+								file: 'public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-network-list.png',
+								label: 'Zerion browser extension Networks page listing Arbitrum and Base',
+								lastRetrieved: '2026-09-28',
+							},
+							{
+								explanation:
+									"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
+								url: [
+									{
+										label:
+											"Browser extension sends the signed transaction through the network's RPC",
+										url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/5ca37d38424c03cc929a1205708bb797bc566f2b/src/background/Wallet/Wallet.ts#L1445-L1449',
+									},
+								],
+							},
+						],
+						arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					},
 				},
-				l2: {
-					ref: refTodo,
-					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+				[Variant.MOBILE]: {
+					l1: {
+						ref: {
+							explanation: "Zerion's mobile app supports custom RPCs.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-custom-rpc.png',
+							label: 'Zerion iOS Ethereum network page with an RPC URL field',
+							lastRetrieved: '2026-10-01',
+						},
+						selfBroadcastViaDirectGossip: notSupported,
+						selfBroadcastViaSelfHostedNode: featureSupported,
+					},
+					l2: {
+						ref: {
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
+							file: 'public/references/wallets/zerion/screenshots/2026-10-01-zerion-mobile-network-list.png',
+							label: 'Zerion iOS Networks page listing Base, Optimism and Arbitrum',
+							lastRetrieved: '2026-10-01',
+						},
+						arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					},
 				},
 			},
 		},
@@ -809,15 +1056,29 @@ export const zerion: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'A committed `package-lock.json` pins every dependency to an exact resolved version with an integrity hash.',
-							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json#not-line-specific',
 						},
 					],
 				}),
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The extension has no LavaMoat or SES dependency in its build, and the shipped v1.45.2 extension contains no LavaMoat or SES runtime.',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/dc9be458cd0e08be170058ba256bd4144e362f0a/package.json#not-line-specific',
+							},
+						],
+					}),
+					// The mobile app source is not public.
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
@@ -843,11 +1104,11 @@ export const zerion: SoftwareWallet = {
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: false,
-					requiredReview: false,
-					tagsImmutable: false,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 				},
 				reproducibleBuilds: null,
 			},

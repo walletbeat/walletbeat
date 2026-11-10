@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
 
-import { getRepositoryRoot } from '@/tests/utils/codebase'
 import { getErrorMessage } from '@/types/errors'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 import { generateWalletbeatHtmlDataJson } from './css-attributes-codegen-lib'
 

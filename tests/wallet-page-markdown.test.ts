@@ -15,7 +15,13 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
+import {
+	computeDataSourceCredits,
+	dataCreditAnchorId,
+	mergeRefs,
+	toFullyQualified,
+} from '@/schema/reference'
+import { getUrl, isUrl } from '@/schema/url'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
@@ -122,6 +128,67 @@ describe('walletPageMarkdown', () => {
 				}
 			})
 
+			it('emits inline [Credit: …] links next to each stamped reference', () => {
+				const attributes = mapNonExemptAttributeGroupsInTree(
+					attributeTreeForWallet(wallet),
+					wallet.overall,
+					(_attrGroup, evalGroup) => mapNonExemptGroupAttributes(evalGroup, evalAttr => evalAttr),
+				).flat()
+
+				for (const evalAttr of attributes) {
+					for (const ref of toFullyQualified(evalAttr.evaluation.references)) {
+						if (ref.source === undefined) {
+							continue
+						}
+
+						const marker = `[Credit: ${ref.source.entity.name}](#${dataCreditAnchorId(ref.source.entity)})`
+
+						expect(md).toContain(marker)
+					}
+				}
+			})
+
+			it('emits one page-level data credits section covering every stamped source', () => {
+				const allRefs = mergeRefs(
+					...mapNonExemptAttributeGroupsInTree(
+						attributeTreeForWallet(wallet),
+						wallet.overall,
+						(_attrGroup, evalGroup) =>
+							mapNonExemptGroupAttributes(evalGroup, evalAttr =>
+								toFullyQualified(evalAttr.evaluation.references),
+							).flat(),
+					).flat(),
+				)
+				const credits = computeDataSourceCredits(allRefs)
+
+				if (credits.length === 0) {
+					expect(md).not.toMatch(/^## Data credits?$/m)
+
+					return
+				}
+
+				expect(md).toContain(credits.length === 1 ? '## Data credit' : '## Data credits')
+
+				for (const credit of credits) {
+					const sourceName = credit.source.entity.name
+					const sourceLabel = isUrl(credit.source.entity.url)
+						? `[${sourceName}](${getUrl(credit.source.entity.url)})`
+						: sourceName
+					const reportLinks = credit.reportUrls
+						.map(report => `[${report.label}](${report.url})`)
+						.join(', ')
+
+					expect(md).toContain(
+						`- <a id="${dataCreditAnchorId(credit.source.entity)}"></a>${sourceLabel}`,
+					)
+					expect(md).toContain(`  - Reports: ${reportLinks}`)
+					expect(md).toContain(
+						`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
+					)
+					expect(md).toContain(`  - ${credit.source.attributionText}`)
+				}
+			})
+
 			it('contains stage rating information', () => {
 				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 
@@ -129,6 +196,8 @@ describe('walletPageMarkdown', () => {
 					expect(md).toContain('Stage: Not applicable')
 				} else if (stage === 'QUALIFIED_FOR_NO_STAGES') {
 					expect(md).toContain('Stage: Qualified for no stages')
+				} else if (stage === 'UNRATED') {
+					expect(md).toContain('Stage: Unrated')
 				} else {
 					expect(md).toContain(`Stage: ${stage.label}`)
 				}

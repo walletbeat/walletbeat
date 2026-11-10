@@ -1,10 +1,15 @@
 <script lang="ts">
 	// Types/constants
-	import type {
-		ScamPreventionMetadata,
+	import {
+		activeUnlimitedApprovalBenchmarks,
+		allUnlimitedApprovalBenchmarksTested,
+		type ScamPreventionMetadata,
+		unlimitedApprovalWarningBenchmarkLabels,
+		warnsOnUnlimitedApprovalUnconditionally,
 	} from '@/schema/attributes/security/scam-prevention'
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
+	import type { UnlimitedApprovalWarningBenchmarks } from '@/schema/features/security/scam-alerts'
 	import { refs } from '@/schema/reference'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -47,6 +52,28 @@
 		return ` However, in doing so, it leaks ${commaListFormat(leaking)} to an external provider${
 			leaking.length > 1 ? ' which can correlate them' : ''
 		}.`
+	}
+
+	/**
+	 * Builds the "but only when X" clause for the unlimited-approval warning
+	 * when it is not shown unconditionally.
+	 */
+	function unlimitedApprovalConditionClause(
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks,
+	): string {
+		if (!allUnlimitedApprovalBenchmarksTested(warnsOnUnlimitedApproval)) {
+			return ', although Walletbeat has not yet determined under which conditions'
+		}
+
+		if (warnsOnUnlimitedApprovalUnconditionally(warnsOnUnlimitedApproval)) {
+			return ''
+		}
+
+		return `, but only when ${commaListFormat(
+			activeUnlimitedApprovalBenchmarks(warnsOnUnlimitedApproval).map(
+				benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark],
+			),
+		)}, not unconditionally`
 	}
 </script>
 
@@ -117,15 +144,15 @@
 											]
 												.filter(segment => segment)
 												.map(listItem => `\n* ${listItem}`)
-												.join('')}`
+												.join('')}\n\n`
 										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
-											? 'checking the contract or transaction data against a database of known scams.'
+											? ' checking the contract or transaction data against a database of known scams.'
 											: outcome.metadata.scamAlerts.contractTransactionWarning
 														.previousContractInteractionWarning
-												? 'warning you when interacting with a contract you have not interacted with before.'
+												? ' warning you when interacting with a contract you have not interacted with before.'
 												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
-													? 'warning you when interacting with a contract that has only recently been created onchain.'
-													: 'providing contract warnings.'
+													? ' warning you when interacting with a contract that has only recently been created onchain.'
+													: ' providing contract warnings.'
 								}${leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
 									[
 										outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
@@ -149,7 +176,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.scamUrlWarning)
-							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.${leakClause(outcome.metadata.scamAlerts.scamUrlWarning, [
+							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking the app's URL against a set of known scam apps.${leakClause(outcome.metadata.scamAlerts.scamUrlWarning, [
 									[
 										outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL',
 										'the full URL of the app',
@@ -176,7 +203,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning)
-							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning, [
+							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval${unlimitedApprovalConditionClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval)}.${leakClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning, [
 									[
 										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksSpenderAddress,
 										'the spender address',

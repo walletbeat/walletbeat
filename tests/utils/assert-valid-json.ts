@@ -4,8 +4,7 @@ import path from 'node:path'
 import Ajv2020 from 'ajv/dist/2020'
 
 import { ratedWalletExportSchemaPath } from '@/constants'
-
-import { getRepositoryRoot } from './codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 /**
  * Encapsulates the rated wallet export JSON schema and a single AJV validator instance.

@@ -48,3 +48,17 @@ export function getBaseUrl(): string {
 		'Could not determine site URL root; please set WALLETBEAT_URL_ROOT environment variable',
 	)
 }
+
+/**
+ * Prefix a site-root-relative path (e.g. `/docs/foo/`) with the site's base
+ * path, as configured by the `BASE_URL` environment variable in
+ * `astro.config.mjs`.
+ */
+export function withBasePath(path: `/${string}`): string {
+	// `import.meta.env` is only set when running under Vite (Astro, Vitest),
+	// not when this module is loaded by scripts run with `tsx`.
+	const env: Partial<ImportMetaEnv> | undefined = import.meta.env
+	const base = env?.BASE_URL ?? '/'
+
+	return `${base.replace(/\/+$/, '')}${path}`
+}
