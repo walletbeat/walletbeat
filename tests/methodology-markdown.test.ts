@@ -33,6 +33,10 @@ describe('methodologyPageMarkdown', () => {
 		expect(md).not.toContain('[object Object]')
 	})
 
+	it('has no EIP magic URLs', () => {
+		expect(md).not.toContain('#wb-format=')
+	})
+
 	it('contains each attribute group heading', () => {
 		for (const group of Object.values(attributeTree)) {
 			expect(md).toContain(`## ${group.displayName}`)
