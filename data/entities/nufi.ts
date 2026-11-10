@@ -17,9 +17,7 @@ export const nufi: CorporateEntity & WalletDeveloper = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/nufi-fdfb',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Switzerland',
 	linkedin: 'https://www.linkedin.com/company/nufiwallet',
 	privacyPolicy: 'https://nu.fi/privacy-and-cookies-policy',

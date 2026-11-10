@@ -20,8 +20,8 @@ export const jiffylabs: ChainDataProvider & OffchainDataProvider = {
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: {
 		extension: 'png',
-		height: 200,
-		width: 200,
+		height: 400,
+		width: 400,
 	},
 	jurisdiction: 'UNKNOWN',
 	linkedin: 'https://www.linkedin.com/company/jiffylabs/',

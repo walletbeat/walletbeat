@@ -19,9 +19,7 @@ export const certik: SecurityAuditor = {
 	crunchbase: 'https://www.crunchbase.com/organization/certik',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	// @TODO
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	// @TODO
 	jurisdiction: { type: 'UNKNOWN' },
 	linkedin: 'https://www.linkedin.com/company/certik',

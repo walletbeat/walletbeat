@@ -19,9 +19,7 @@ export const pashov: SecurityAuditor = {
 	crunchbase: 'https://www.crunchbase.com/person/krum-krasimirov-pashov',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	// @TODO
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	// @TODO
 	jurisdiction: { type: 'UNKNOWN' },
 	linkedin: 'https://www.linkedin.com/in/krum-krasimirov-pashov/',
