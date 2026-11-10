@@ -81,6 +81,9 @@ interface CleanImageEntry {
 const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
 	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
+	// Converted from a lossy AVIF source (no higher-quality source available); the
+	// blockiness artifacts are already baked into the pixel data before PNG re-encoding.
+	'resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png',
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
