@@ -1,21 +1,25 @@
 ---
+import { defaultLanguage } from '@/i18n/ui'
+import { useTranslations } from '@/i18n/utils'
 import { FarcasterIcon } from '@/icons/farcaster'
 import { XIcon } from '@/icons/x'
 import LuGithub from 'lucide-static/icons/github.svg?raw'
 
+const t = useTranslations(defaultLanguage)
+
 const socialLinks = [
 	{
-		label: 'Walletbeat on GitHub',
+		label: t('footer.githubLabel'),
 		href: 'https://github.com/walletbeat/walletbeat',
 		icon: LuGithub,
 	},
 	{
-		label: 'Walletbeat on X',
+		label: t('footer.xLabel'),
 		href: 'https://x.com/walletbeat',
 		icon: XIcon,
 	},
 	{
-		label: 'Walletbeat on Farcaster',
+		label: t('footer.farcasterLabel'),
 		href: 'https://farcaster.xyz/~/channel/walletbeat',
 		icon: FarcasterIcon,
 	},
@@ -35,17 +39,17 @@ const socialLinks = [
 		</a>
 
 		<p data-row-item='wrap-center basis-6'>
-			Made with 🌸 & 💗 by the {' '}
+			{t('footer.madeBy')}{' '}
 			<a
 				href='https://github.com/walletbeat/walletbeat/graphs/contributors?all=1'
 				target='_blank'
 				rel='noreferrer'
 			>
-				Walletbeat contributors
+				{t('footer.contributors')}
 			</a>
 		</p>
 
-		<nav data-row='center' data-row-item='wrap-center' aria-label='Walletbeat links'>
+		<nav data-row='center' data-row-item='wrap-center' aria-label={t('footer.linksLabel')}>
 			<ul data-list='unstyled' data-row='center'>
 				{
 					socialLinks.map(link => (
@@ -67,10 +71,7 @@ const socialLinks = [
 		</nav>
 	</div>
 
-	<p class='disclaimer'>
-		Wallets listed on Walletbeat do not represent endorsements and are for informational purposes
-		only.
-	</p>
+	<p class='disclaimer'>{t('footer.disclaimer')}</p>
 </footer>
 
 <style>
