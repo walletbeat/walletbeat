@@ -12,7 +12,7 @@ export const coinbaseSmartWalletContract: SmartWalletContract = {
 	sourceCode: {
 		ref: {
 			label: 'Coinbase Smart Wallet (audited commit 9edcf7f1)',
-			url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+			url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol#not-line-specific',
 		},
 		available: true,
 	},

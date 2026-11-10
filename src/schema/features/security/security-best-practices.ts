@@ -127,6 +127,9 @@ export enum BrowserExtensionPermission {
 	/** Capture the desktop, a window, or a tab as a media stream. */
 	DESKTOP_CAPTURE = 'desktopCapture',
 
+	/** Load website favicons from the browser's favicon cache via `_favicon/` URLs. */
+	FAVICON = 'favicon',
+
 	/** Access the device's geographic location. */
 	GEOLOCATION = 'geolocation',
 
@@ -294,7 +297,8 @@ export interface BrowserExtensionManifest {
  * Enum values match the android:name attribute string exactly.
  *
  * All permissions seen in any wallet manifest must be listed here, including
- * non-security-relevant ones — the manifest collector throws on unknown values.
+ * non-security-relevant ones — the manifest collector throws on unknown values
+ * that `isIgnoredAndroidPermission` does not match.
  */
 export enum AndroidPermission {
 	/** Required for any network communication. */
@@ -357,6 +361,18 @@ export enum AndroidPermission {
 	/** Read images from shared media storage (scoped storage, Android 13+). */
 	READ_MEDIA_IMAGES = 'android.permission.READ_MEDIA_IMAGES',
 
+	/** Run a foreground service, shown to the user as a persistent notification. */
+	FOREGROUND_SERVICE = 'android.permission.FOREGROUND_SERVICE',
+
+	/** Run a foreground service of the data sync type (Android 14+). */
+	FOREGROUND_SERVICE_DATA_SYNC = 'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
+
+	/** Keep the processor awake while background work finishes. */
+	WAKE_LOCK = 'android.permission.WAKE_LOCK',
+
+	/** Receive the broadcast sent when the device finishes booting. */
+	RECEIVE_BOOT_COMPLETED = 'android.permission.RECEIVE_BOOT_COMPLETED',
+
 	/** Access the Google advertising ID — used for ad attribution/tracking. */
 	AD_ID = 'com.google.android.gms.permission.AD_ID',
 }
@@ -382,8 +398,28 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.USE_BIOMETRIC]: true,
 	[AndroidPermission.USE_FINGERPRINT]: true,
 	[AndroidPermission.READ_MEDIA_IMAGES]: true,
+	[AndroidPermission.FOREGROUND_SERVICE]: true,
+	[AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC]: true,
+	[AndroidPermission.WAKE_LOCK]: true,
+	[AndroidPermission.RECEIVE_BOOT_COMPLETED]: true,
 	[AndroidPermission.AD_ID]: true,
 })
+
+/**
+ * Matches `<applicationId>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, the
+ * app-private permission that AndroidX Core declares in every app that uses it
+ * to protect its own dynamically registered broadcast receivers.
+ */
+const dynamicReceiverPermission =
+	/^[A-Za-z]\w*(?:\.[A-Za-z]\w*)+\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$/
+
+/**
+ * Whether a `<uses-permission>` name is left out of `AndroidPermission`.
+ * These names differ per app and are not security-relevant.
+ */
+export function isIgnoredAndroidPermission(name: string): boolean {
+	return dynamicReceiverPermission.test(name)
+}
 
 /**
  * iOS usage description keys declared in Info.plist (NS*UsageDescription).

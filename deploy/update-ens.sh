@@ -45,7 +45,7 @@ run_ens_check() {
 # at the current CID.
 while IFS= read -r RPC_URL; do
 	echo "Checking whether ${ENS_DOMAIN} already points at ${DIRECTORY_CID} (using RPC: ${RPC_URL})..." >&2
-	CHECK_OUTPUT="$(run_ens_check "$RPC_URL" 2>/dev/null || true)"
+	CHECK_OUTPUT="$(run_ens_check "$RPC_URL" || true)"
 	if [[ "$CHECK_OUTPUT" == match* ]]; then
 		echo "ENS domain ${ENS_DOMAIN} already points at ${DIRECTORY_CID}; nothing to update." >&2
 		exit 0

@@ -49,6 +49,25 @@ export type ArtifactSigningDetails = WithRef<ArtifactSigningPayload>
 export type ArtifactSigning = Support<ArtifactSigningDetails>
 
 /**
+ * Whether routine dependency updates only pick up dependency releases that
+ * are at least a minimum age, so that a compromised release has time to be
+ * detected and pulled before the wallet adopts it. One-off updates for
+ * security fixes may bypass the minimum age.
+ *
+ * To test: look in the wallet's source repository for a minimum release age
+ * setting, e.g. `minimumReleaseAge` in `pnpm-workspace.yaml`, `.npmrc` or a
+ * Renovate config, `npmMinimalAgeGate` in `.yarnrc.yml`, or `cooldown` in
+ * `.github/dependabot.yml`. Set to `notSupported` if routine updates have no
+ * minimum age.
+ */
+export type DependencyAgeGate = Support<
+	WithRef<{
+		/** Minimum age, in days, of a dependency release before routine updates adopt it. */
+		minimumAgeDays: number
+	}>
+>
+
+/**
  * Whether the wallet's release builds enforce a lockfile (or equivalent)
  * for locked dependency resolution.
  */
@@ -69,18 +88,60 @@ export type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 export type DependencySandboxing = Support<WithRef<{}>>
 
 /**
+ * Whether a repository change control is in place, and whether that can be
+ * checked publicly.
+ * A `null` value means the control has not been looked into yet.
+ */
+export enum RepositoryChangeControlState {
+	/**
+	 * The control is in place, and anyone can check this.
+	 * (e.g. A GitHub ruleset that is visible on the repository's public
+	 * rules page or rulesets API.)
+	 */
+	VERIFIABLY_PRESENT = 'VERIFIABLY_PRESENT',
+
+	/**
+	 * The control is not in place, and anyone can check this.
+	 * (e.g. The public rulesets do not include it, and the public branch API
+	 * shows no classic branch protection providing it.)
+	 */
+	VERIFIABLY_ABSENT = 'VERIFIABLY_ABSENT',
+
+	/**
+	 * The wallet developer states that the control is in place, but this
+	 * cannot be checked publicly.
+	 * (e.g. A classic branch protection rule, which only repository admins
+	 * can see.)
+	 */
+	CLAIMED_PRESENT = 'CLAIMED_PRESENT',
+
+	/**
+	 * The wallet developer states that the control is not in place.
+	 * This cannot be checked publicly, but a developer has no incentive to
+	 * claim not to have a control, so it is as strong as `VERIFIABLY_ABSENT`.
+	 */
+	CLAIMED_ABSENT = 'CLAIMED_ABSENT',
+
+	/**
+	 * The wallet developer makes no statement either way, and whether the
+	 * control is in place cannot be checked publicly.
+	 */
+	UNVERIFIABLE = 'UNVERIFIABLE',
+}
+
+/**
  * Observable repository-level change controls for the wallet's source
  * repository.
  */
 export type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
+	requiredReview: RepositoryChangeControlState
 	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
+	requiredChecks: RepositoryChangeControlState
 	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
+	forcePushBlocked: RepositoryChangeControlState
 	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
+	branchDeletionBlocked: RepositoryChangeControlState
 	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
+	tagsImmutable: RepositoryChangeControlState
 }>

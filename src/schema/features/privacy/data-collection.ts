@@ -208,6 +208,19 @@ export type MultiAddressHandling =
 			 *   request).
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
+
+			/**
+			 * The best request-correlation chain the classifier could find between
+			 * two requests bearing distinct wallet addresses, or `null` if no
+			 * chain links any two distinct addresses.
+			 *
+			 * The chain may be built from shared correlatable `UserInfo` values
+			 * and/or IP-time-based links (same entity, within
+			 * {@link IP_TIME_CORRELATION_WINDOW_MS}, from the same IP). The
+			 * receiving entity can use any such chain to correlate the user's
+			 * addresses. See {@link CorrelationChain}.
+			 */
+			bestChain: CorrelationChain | null
 	  }
 
 /**
@@ -522,10 +535,53 @@ export const userInfoEnums: Enum<UserInfo> = mergeEnums<PersonalInfo, WalletInfo
 )
 
 /**
+ * Two requests sent within this many milliseconds are considered simultaneous.
+ */
+export const SIMULTANEOUS_WINDOW_MS = 300_000
+
+/**
+ * Two requests to the same entity from the same IP within this many
+ * milliseconds are considered IP-time correlatable.
+ */
+export const IP_TIME_CORRELATION_WINDOW_MS = 30 * 60 * 1000
+
+/**
+ * A single link in a request-correlation chain.
+ *
+ * Two requests are linked by a UserInfo edge when they carry an identical
+ * correlatable `UserInfo` value, and by an IP-time edge when they go to the
+ * same entity within {@link IP_TIME_CORRELATION_WINDOW_MS} from the same IP
+ * (and that entity learns the user's IP address).
+ *
+ * `strength` is a comparable measure of how strongly the link correlates the
+ * two requests: any UserInfo edge is stronger than any IP-time edge; among
+ * UserInfo edges a higher {@link userInfoScore} is stronger; among IP-time
+ * edges a shorter time gap is stronger.
+ */
+export type CorrelationEdge =
+	| { kind: 'userInfo'; userInfo: UserInfo; strength: number }
+	| { kind: 'ipTime'; gapMs: number; strength: number }
+
+/**
+ * The best request-correlation chain found between two requests bearing
+ * distinct wallet addresses.
+ *
+ * A chain's strength is its *weakest* edge (bottleneck): a chain is only as
+ * trustworthy as its weakest correlation link. The best chain is the shortest
+ * one, breaking ties by highest weakest-edge strength.
+ */
+export interface CorrelationChain {
+	/** The number of edges in the chain. */
+	length: number
+	/** The weakest (least trustworthy) edge in the chain. */
+	weakestEdge: CorrelationEdge
+}
+
+/**
  * Rough ordering score for comparing UserInfo.
  * Higher score means the data is more sensitive.
  */
-function userInfoScore(userInfo: UserInfo): number {
+export function userInfoScore(userInfo: UserInfo): number {
 	switch (userInfo) {
 		case PersonalInfo.IP_ADDRESS:
 			return 0
@@ -570,6 +626,66 @@ function userInfoScore(userInfo: UserInfo): number {
 			return 16
 		case PersonalInfo.GOVERNMENT_ID:
 			return 17
+	}
+}
+
+/**
+ * Whether a given `UserInfo` value, when the *same string* appears in two
+ * requests, forms a correlation edge that can transitively link two requests
+ * bearing *distinct* wallet addresses.
+ *
+ * Two requests carrying an identical string value of a correlatable
+ * `UserInfo` (e.g. the same tracking cookie, email address, phone number,
+ * etc) can be linked together by the receiving entity. A chain of such
+ * links lets that entity correlate requests about different wallet addresses,
+ * revealing that the addresses belong to the same user. This is what the
+ * multi-address correlation attribute relies on.
+ *
+ * `UserInfo`s whose string value varies per address (e.g. the account address
+ * itself) are not correlation *signals*: they are the correlation target.
+ */
+export function userInfoCorrelatableAcrossEntities(userInfo: UserInfo): boolean {
+	switch (userInfo) {
+		case PersonalInfo.IP_ADDRESS:
+			return false
+		case WalletInfo.USER_ACTIONS:
+			return false
+		case PersonalInfo.TRACKING_IDENTIFIER:
+			return true
+		case WalletInfo.ASSETS:
+			return false
+		case WalletInfo.BALANCE:
+			return false
+		case WalletInfo.ACCOUNT_ADDRESS:
+			return true
+		case WalletInfo.MEMPOOL_TRANSACTIONS:
+			return true
+		case WalletInfo.WALLET_CONNECTED_DOMAINS:
+			return false
+		case PersonalInfo.PSEUDONYM:
+			return true
+		case PersonalInfo.FARCASTER_ACCOUNT:
+			return true
+		case PersonalInfo.X_DOT_COM_ACCOUNT:
+			return true
+		case PersonalInfo.EMAIL:
+			return true
+		case PersonalInfo.BROWSING_HISTORY_URLS:
+			return false
+		case PersonalInfo.LEGAL_NAME:
+			return true
+		case PersonalInfo.PHONE:
+			return true
+		case PersonalInfo.CONTACTS:
+			return true
+		case PersonalInfo.PHYSICAL_ADDRESS:
+			return true
+		case PersonalInfo.CEX_ACCOUNT:
+			return true
+		case PersonalInfo.FACE:
+			return true
+		case PersonalInfo.GOVERNMENT_ID:
+			return true
 	}
 }
 
@@ -938,7 +1054,7 @@ export type Collection<T extends UserInfo> = NonEmptyRecord<T, CollectionPolicy>
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 
 /** A partially-known set of personal info collected, with reference information. */
@@ -967,7 +1083,7 @@ export type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 	/**
 	 * How multiple addresses are handled, if at all.
 	 */
-	multiAddress?: MultiAddressHandling
+	multiAddress: MultiAddressHandling | null
 }
 
 /**
@@ -979,8 +1095,13 @@ export function qualifiedDataCollection<T extends UserInfo>(
 	userInfo: Collection<T>,
 ): QualifiedDataCollection {
 	const get = (info: UserInfo): CollectionPolicy | undefined => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because L is guaranteed to be non-empty.
-		return (userInfo as WithRef<NonEmptyRecord<UserInfo, CollectionPolicy>>)[info]
+		const policy = (userInfo as Record<string, unknown>)[info as string]
+
+		if (policy === undefined) {
+			return undefined
+		}
+
+		return collectionPolicyEnum.assert(policy)
 	}
 	const first = (...ls: Array<CollectionPolicy | undefined>): CollectionPolicy | undefined =>
 		ls.find(l => l !== undefined)
@@ -1153,7 +1274,7 @@ export type DataCollectionForUserFlowOrUnsupported =
 
 /**
  * A collection of data that a wallet collects.
- * See /docs/mitmproxy-guide for how to collect this.
+ * See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
  */
 export interface DataCollection {
 	/** What data is collected when installing the wallet? */

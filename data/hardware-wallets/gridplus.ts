@@ -49,7 +49,7 @@ export const gridplusWallet: HardwareWallet = {
 				id: 'gridplus-lattice1',
 				name: 'GridPlus Lattice1',
 				isFlagship: true,
-				url: 'https://gridplus.io/products/lattice1',
+				url: 'https://gridplus.io/products/grid-lattice1',
 			},
 		],
 		iconExtension: 'svg',

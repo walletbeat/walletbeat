@@ -1,16 +1,7 @@
 /**
- * Site root for the /beta endpoint.
- * Useful to maintain a beta-endpoint-only branch with minimal code changes
- * versus the main branch.
+ * Root for the /images endpoint.
  */
-export const betaSiteRoot = ''
-
-/**
- * Root for the /images/beta endpoint.
- * Useful to maintain a beta-endpoint-only branch with minimal code changes
- * versus the main branch.
- */
-export const betaImagesRoot = '/images'
+export const imagesRoot = '/images'
 
 /**
  * Path to the rated wallet JSON export schema under the site root (and under public/).

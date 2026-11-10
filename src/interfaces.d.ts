@@ -65,5 +65,5 @@ interface ReadonlyArray<T> {
 	map<const Array extends readonly T[], U>(
 		this: Array,
 		callbackfn: (value: Array[number], index: number, array: Array) => U,
-	): number extends Array['length'] ? U[] : { readonly [K in keyof Array]: U }
+	): number extends Array['length'] ? U[] : { -readonly [K in keyof Array]: U }
 }

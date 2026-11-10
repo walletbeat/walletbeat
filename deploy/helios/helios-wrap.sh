@@ -40,7 +40,7 @@ echo '[Helios] Starting Helios...' >&2
 	--consensus-rpc="$ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT" \
 	--execution-rpc="$ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT" \
 	--strict-checkpoint-age \
-	--data-dir="${SCRIPT_DIR}/data" &
+	--data-dir="${SCRIPT_DIR}/data" >&2 &
 HELIOS_PID="$!"
 
 probe() {
@@ -85,7 +85,7 @@ if ! probe; then
 	maybe_kill -KILL
 	exit 1
 fi
-echo "[Helios] Command exited with code $EXIT_CODE; terminating Helios."
+echo "[Helios] Command exited with code $EXIT_CODE; terminating Helios." >&2
 maybe_kill -TERM || true
 maybe_kill -KILL || true
 exit "$EXIT_CODE"
