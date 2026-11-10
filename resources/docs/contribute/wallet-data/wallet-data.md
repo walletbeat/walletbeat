@@ -194,6 +194,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 		coinspectId: null,
 		contributors: [chainMonkey],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2077-01-01',
 		urls: {
 			docs: ['https://mylittlewallet.com/docs'],

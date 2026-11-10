@@ -34,6 +34,7 @@ export const walletchan: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [minimalsm, AryaS],
 		iconExtension: 'png',
+		imprecise: true,
 		lastUpdated: '2026-11-07',
 		urls: {
 			docs: ['https://docs.walletchan.com'],

@@ -130,6 +130,9 @@ export interface WalletMetadata {
 	/** The last date the wallet information was updated. */
 	lastUpdated: CalendarDate
 
+	/** Whether incomplete ratings make the wallet's ranking too imprecise to show. */
+	imprecise: boolean
+
 	/** List of people who contributed to the information for this wallet. */
 	contributors: NonEmptyArray<Contributor>
 

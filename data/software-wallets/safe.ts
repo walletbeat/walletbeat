@@ -36,6 +36,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			docs: ['https://docs.safe.global/'],

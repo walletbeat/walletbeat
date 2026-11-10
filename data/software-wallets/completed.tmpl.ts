@@ -220,6 +220,7 @@ export const completedTemplate: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-02-27',
 		urls: {
 			docs: ['https://example.com/docs'],

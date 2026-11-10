@@ -53,6 +53,7 @@ export const gridplusWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-03-12',
 		urls: {
 			docs: ['https://docs.gridplus.io/'],

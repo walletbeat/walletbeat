@@ -217,6 +217,7 @@ export const ambire: SoftwareWallet = {
 		coinspectId: 'ambire',
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],

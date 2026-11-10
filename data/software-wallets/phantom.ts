@@ -85,6 +85,7 @@ export const phantom: SoftwareWallet = {
 		coinspectId: 'phantom',
 		contributors: [nconsigny, mattmatt, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://docs.phantom.com/'],

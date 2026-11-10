@@ -103,6 +103,7 @@ export const gemwallet: SoftwareWallet = {
 		coinspectId: 'gem',
 		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-11-04',
 		urls: {
 			androidManifestXml:

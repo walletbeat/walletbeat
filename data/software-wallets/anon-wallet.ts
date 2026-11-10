@@ -27,6 +27,7 @@ export const anonWallet: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://docs.anon.inc'],

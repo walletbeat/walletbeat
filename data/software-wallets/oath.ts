@@ -13,6 +13,7 @@ export const oath: SoftwareWallet = {
 		coinspectId: null,
 		contributors: [devdasx],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-30',
 		urls: {
 			appstore: 'https://apps.apple.com/app/id6780187283',

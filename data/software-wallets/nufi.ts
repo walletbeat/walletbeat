@@ -25,6 +25,7 @@ export const nufi: SoftwareWallet = {
 		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-08-11',
 		urls: {
 			docs: ['https://nufi.gitbook.io/'],

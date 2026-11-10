@@ -48,6 +48,7 @@ export const keycardShell: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-05-02',
 		urls: {
 			docs: ['https://keycard.tech/en/developers/overview', 'https://keycard.tech/start/shell'],

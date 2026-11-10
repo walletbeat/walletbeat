@@ -173,6 +173,7 @@ export const rabby: SoftwareWallet = {
 		coinspectId: 'rabby-wallet',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-08',
 		urls: {
 			androidManifestXml:

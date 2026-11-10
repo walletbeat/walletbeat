@@ -19,6 +19,7 @@ export const pillarx: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [iamkio],
 		iconExtension: 'svg',
+		imprecise: true,
 		lastUpdated: '2025-12-16',
 		urls: {
 			websites: ['https://pillarx.app'],

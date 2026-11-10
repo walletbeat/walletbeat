@@ -85,6 +85,7 @@ export const zerion: SoftwareWallet = {
 		coinspectId: 'zerion',
 		contributors: [lucemans, mattmatt, ren2140, minimalsm],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2026-10-09',
 		urls: {
 			docs: ['https://developers.zerion.io/'],

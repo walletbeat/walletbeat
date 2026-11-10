@@ -39,6 +39,7 @@ export const ngrave: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
+		imprecise: false,
 		lastUpdated: '2025-01-07',
 		urls: {
 			socials: {

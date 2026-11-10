@@ -150,3 +150,20 @@ export function walletQualifiesForStageZero(wallet: RatedWalletStageSlice): bool
 
 	return ladderEvaluation !== null && ladderEvaluation.highestClearedStage !== null
 }
+
+/** Return the stage sort value used by wallet tables, or -1 when no stage applies. */
+export function walletStageIndex(wallet: RatedWalletStageSlice): number {
+	const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+	if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) {
+		return -1
+	}
+
+	if (typeof stage === 'string') {
+		return -1
+	}
+
+	const index = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
+
+	return index >= 0 ? index : -1
+}
