@@ -1923,6 +1923,10 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-11-10 - Fully rated wallets/fully_rated_wallets.png": {
+		"hash": "667d485d75147a8f14d29e16b66a8ee47cc7f97e793fb92f1d007e048ba7f8ac",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
