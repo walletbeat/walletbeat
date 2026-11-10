@@ -117,7 +117,7 @@ Want the full breakdown? https://beta.walletbeat.eth.limo/news/
 
 Devcon prep took over the second half of the month.
 
-We announced our talks, our contributor workshop, our booth, the Cypherpunk Congress panel on privacy's last-mile problem, and the Wallet & Transaction Security roundtable at the Ethereum Forward...
+We announced our talks, our contributor workshop, our booth, the Cypherpunk Congress panel on privacy's last-mile problem, and more! 👇
 
 https://x.com/walletbeat/status/2114847240002933005
 https://x.com/walletbeat/status/2116181349140979995
