@@ -1,0 +1,200 @@
+{
+	"retrieved": "2026-10-09",
+	"wallets": {
+		"ambire": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/AmbireTech/extension",
+					"stars": 71
+				}
+			],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/ambire-web3-wallet/",
+				"averageDailyUsers": 100
+			}
+		},
+		"base-app": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/coinbase/smart-wallet",
+					"stars": 489
+				},
+				{
+					"url": "https://github.com/base/account-sdk",
+					"stars": 171
+				}
+			],
+			"firefoxAddon": null
+		},
+		"bitbox": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/BitBoxSwiss/bitbox02-firmware",
+					"stars": 385
+				}
+			],
+			"firefoxAddon": null
+		},
+		"daimo": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/daimo-eth/daimo",
+					"stars": 408
+				}
+			],
+			"firefoxAddon": null
+		},
+		"frame": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/floating/frame",
+					"stars": 1209
+				}
+			],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/frame-extension/",
+				"averageDailyUsers": 313
+			}
+		},
+		"gemwallet": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/gemwalletcom/wallet",
+					"stars": 340
+				}
+			],
+			"firefoxAddon": null
+		},
+		"imkey": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/consenlabs/imkey-core",
+					"stars": 14
+				}
+			],
+			"firefoxAddon": null
+		},
+		"imtoken": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/consenlabs/token-core-monorepo",
+					"stars": 33
+				}
+			],
+			"firefoxAddon": null
+		},
+		"keycard-shell": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/keycard-tech/keycard-shell",
+					"stars": 82
+				},
+				{
+					"url": "https://github.com/keycard-tech/status-keycard",
+					"stars": 262
+				},
+				{
+					"url": "https://github.com/keycard-tech/eth-abi-repo",
+					"stars": 1
+				}
+			],
+			"firefoxAddon": null
+		},
+		"metamask": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/MetaMask/metamask-extension",
+					"stars": 13224
+				}
+			],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/ether-metamask/",
+				"averageDailyUsers": 313052
+			}
+		},
+		"nufi": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/nufi-official/nufi",
+					"stars": 10
+				}
+			],
+			"firefoxAddon": null
+		},
+		"phantom": {
+			"githubRepositories": [],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/phantom-app/",
+				"averageDailyUsers": 83772
+			}
+		},
+		"rabby": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/RabbyHub/Rabby",
+					"stars": 1906
+				},
+				{
+					"url": "https://github.com/RabbyHub/rabby-mobile",
+					"stars": 82
+				}
+			],
+			"firefoxAddon": null
+		},
+		"rainbow": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/rainbow-me/browser-extension",
+					"stars": 192
+				},
+				{
+					"url": "https://github.com/rainbow-me/rainbow",
+					"stars": 4394
+				}
+			],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/rainbow-extension/",
+				"averageDailyUsers": 843
+			}
+		},
+		"trezor": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/trezor/trezor-suite",
+					"stars": 1062
+				}
+			],
+			"firefoxAddon": null
+		},
+		"uniswap-wallet": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/Uniswap/interface",
+					"stars": 5534
+				}
+			],
+			"firefoxAddon": null
+		},
+		"zerion": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/zeriontech/zerion-wallet-extension",
+					"stars": 88
+				}
+			],
+			"firefoxAddon": {
+				"url": "https://addons.mozilla.org/firefox/addon/zerion-wallet-official/",
+				"averageDailyUsers": 257
+			}
+		},
+		"zeus": {
+			"githubRepositories": [
+				{
+					"url": "https://github.com/greekfetacheese/zeus",
+					"stars": 20
+				}
+			],
+			"firefoxAddon": null
+		}
+	}
+}
