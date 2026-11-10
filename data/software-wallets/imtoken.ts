@@ -430,6 +430,7 @@ export const imtoken: SoftwareWallet = {
 					},
 				}),
 			},
+			softwareUpdates: null,
 		},
 		walletCall: null,
 	},

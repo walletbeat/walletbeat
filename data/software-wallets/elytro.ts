@@ -192,6 +192,7 @@ export const elytro: SoftwareWallet = {
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
+			softwareUpdates: null,
 		},
 		walletCall: null,
 	},
