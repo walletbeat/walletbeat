@@ -1711,6 +1711,10 @@
 		"hash": "e1bddcb47d823ffd072738c0f2926761b2d3ea499a113c8e9b89bbc7b301ceae",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg": {
+		"hash": "1849043ddd17da91f447eece3b3efb10e4a29d3a01d768f6d88231168800881f",
+		"passedTests": ["file-format"]
+	},
 	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_lightning_talk.jpg": {
 		"hash": "edfea5db7f2da18a12803b6049bf668bd21ca3c66e83c1912e4943815bdd74f1",
 		"passedTests": ["blockiness", "file-format"]
