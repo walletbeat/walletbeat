@@ -65,6 +65,7 @@ export const daimo: SoftwareWallet = {
 		},
 	},
 	features: {
+		accountImport: null,
 		accountSupport: {
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: notSupported,
