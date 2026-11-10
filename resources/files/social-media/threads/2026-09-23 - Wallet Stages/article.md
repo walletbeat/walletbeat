@@ -198,3 +198,5 @@ We've built the stage system as a roadmap for Ethereum wallets to progressively 
 If you want to know more about our stages, please visit https://beta.walletbeat.eth.limo/stages/
 
 ![Setting the Bar](./setting_the_bar.png)
+
+![Our Socials](./our_socials.png)

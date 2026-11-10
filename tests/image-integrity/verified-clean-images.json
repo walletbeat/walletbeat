@@ -1635,6 +1635,34 @@
 		"hash": "3c973d5186410ebfc075e28dd8445ee8568ad231c4bf117d91278b44141d71ee",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/our_socials.png": {
+		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/setting_the_bar.png": {
+		"hash": "6d56565b6f9e15e75620045f9f1c42d8d63c2d0136ac154d0022f0db2373712b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.5.png": {
+		"hash": "956a2fe4cc6bb308536bb5b5c6bda5a96def620340b6531c3846a2a08fd85de5",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.png": {
+		"hash": "497c6b2605bb65398533adf2cadc4b7c59392e4e70886b7d1804ef05fb466630",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_1.png": {
+		"hash": "2f41ef778e27c28eca4c176a1c158d132794c7f183818cd2a7ef5067d8839e42",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_2.png": {
+		"hash": "14e6db3e8202f0e0a69166463854bf81356c8a002cfae31e184dd5f4903c3e65",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/wallet_stages.png": {
+		"hash": "d2063f35b8d30453180a8940ed96b450d215c5e07665b6a715f21bae095e35c1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/erc-7730_tracker.png": {
 		"hash": "6fa75ec6e1c9046954b12cad1098420b6908003211233a91f12ab8ab4d9ebe01",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1710,34 +1738,6 @@
 	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/seth_cake_wallet.png": {
 		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/our_socials.png": {
-		"hash": "1a6b8f75976fe478368cc3785105fcad5d2b8301020309c1e6eb93da1b442d10",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/setting_the_bar.png": {
-		"hash": "05264cb53b41c3a85ccdb290a916a7c9e9db593e868d88c82b8c4742e955f8b1",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.5.png": {
-		"hash": "9ac52363ae8f747c446ce0f153712597902c13d3900a1a7059216379415a33f5",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.png": {
-		"hash": "fb446b508a8b69b1d900c2bc42c5af670c37f1b9a9d9bc155a02fbd906382c1d",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_1.png": {
-		"hash": "34e31bd7ce2ef2bc2f9abb60e5194d600e4abcdba391525c23086d18a2662658",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_2.png": {
-		"hash": "9ac6013d333306cd489fcdad72f065962f0c646121b9a687b95749a536fb61dc",
-		"passedTests": ["blockiness"]
-	},
-	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/wallet_stages.png": {
-		"hash": "4075e36622bf99abd1d411892011b2b25ef7037eabc19e973959574d4eded357",
-		"passedTests": ["blockiness"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
