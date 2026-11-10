@@ -1,32 +1,43 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { slowMist } from '@/data/entities/slowmist'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 const elytroAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/132867d031f25261562128e15a73da3c6bed671f/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf#binary-file',
+		ref: {
+			label: 'SlowMist audit report v1.1.0',
+			url: 'https://github.com/Elytro-eth/elytro-wallet-core/blob/68ae7ff6a21143325bcf3f73217b6e95b4ae9deb/audits/SlowMist%20Audit%20Report%20v1.1.0.pdf#binary-file',
+		},
 		auditDate: '2025-07-07',
 		auditor: slowMist,
 		codeSnapshot: {
 			commit:
-				'https://github.com/Elytro-eth/Elytro-wallet-contract/commit/3d64ccd3d0cd8228298cedb25af81eb042172c59',
-			date: '2025-06-26',
-			tag: 'v1.1.1',
+				'https://github.com/Elytro-eth/elytro-wallet-core/commit/26d30a431b42c5f8241db58c6390443896a37077',
+			date: '2025-05-24',
 		},
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: 'ALL_VARIANTS',
 	},
 	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf#binary-file',
+		ref: {
+			label: 'SlowMist audit report v1.0.0',
+			url: 'https://github.com/Elytro-eth/elytro-wallet-core/blob/68ae7ff6a21143325bcf3f73217b6e95b4ae9deb/audits/SlowMist%20Audit%20Report%20v1.0.0.pdf#binary-file',
+		},
 		auditDate: '2024-05-16',
 		auditor: slowMist,
 		codeSnapshot: {
@@ -46,9 +57,9 @@ export const elytro: SoftwareWallet = {
 		displayName: 'Elytro',
 		tableName: 'Elytro',
 		coinspectId: 'elytro',
-		contributors: [nconsigny],
+		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-10-18',
 		urls: {
 			repositories: ['https://github.com/Elytro-eth'],
 			socials: {
@@ -99,9 +110,24 @@ export const elytro: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: {
+					explanation: 'The Elytro extension code is licensed under GPL-3.0.',
+					label: 'Elytro license',
+					url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/LICENSE#L1-L2',
+				},
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
 		monetization: {
-			ref: refTodo,
+			ref: {
+				explanation:
+					'Elytro, formerly Soul Wallet, raised a $3 million seed round from venture investors in 2023.',
+				label: 'TechCrunch on the Soul Wallet seed round',
+				url: 'https://techcrunch.com/2023/03/16/soul-wallet-crypto-wallet/',
+			},
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -112,7 +138,7 @@ export const elytro: SoftwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -135,13 +161,42 @@ export const elytro: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: notSupportedWithRef({
+				ref: {
+					explanation:
+						"Elytro's terms say it has no bug bounty and pays no reward for reported bugs unless it agrees to in writing.",
+					label: 'Elytro Terms of Use, section 3.4',
+					url: 'https://elytro.notion.site/elytro-terms-of-use',
+				},
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
 			},
-			keysHandling: null,
+			keysHandling: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								"The extension creates the account's signing key on the user's device and stores it encrypted with the user's passcode.",
+							urls: [
+								{
+									label: 'Key generation',
+									url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/background/services/keyring.ts#L62-L83',
+								},
+								{
+									label: 'Vault encryption',
+									url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/passworder.ts#L25-L52',
+								},
+							],
+						},
+					],
+					keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+					multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				},
+				[Variant.MOBILE]: null,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -182,15 +237,56 @@ export const elytro: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: { [Variant.BROWSER]: notSupported, [Variant.MOBILE]: null },
 				dependencyAgeGate: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				dependencyLocking: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: {
+							explanation:
+								"The extension's build instructions don't enforce locked dependency versions.",
+							label: 'Build instructions',
+							url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/README.md#L69-L73',
+						},
+					}),
+					[Variant.MOBILE]: null,
+				},
+				dependencySandboxing: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: {
+							explanation:
+								"The extension locks down JavaScript's built-in objects, but it doesn't isolate its dependencies from each other.",
+							label: 'Security setup code',
+							url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/src/utils/security.ts#L19-L43',
+						},
+					}),
+					[Variant.MOBILE]: null,
+				},
+				dependencyVulnerabilityScanning: {
+					[Variant.BROWSER]: notSupported,
+					[Variant.MOBILE]: null,
+				},
+				hasPublicChangelog: { [Variant.BROWSER]: notSupported, [Variant.MOBILE]: null },
+				hermeticBuilds: { [Variant.BROWSER]: notSupported, [Variant.MOBILE]: null },
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: {
+					[Variant.BROWSER]: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Building the extension needs private API keys, and each release build raises the version number automatically.',
+							urls: [
+								{
+									label: 'Required API keys',
+									url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/CONFIGURATION.md#L19-L39',
+								},
+								{
+									label: 'Version bump on build',
+									url: 'https://github.com/Elytro-eth/Elytro/blob/3ac7582f1198810b84f313896baa710241c2b7d2/apps/extension/package.json#L11-L15',
+								},
+							],
+						},
+					}),
+					[Variant.MOBILE]: null,
+				},
 			},
 		},
 		walletCall: null,
