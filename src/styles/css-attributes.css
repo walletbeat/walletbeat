@@ -2403,6 +2403,37 @@ ol {
 			---breadcrumb-clearance-flow-fraction: 1;
 		}
 	}
+	@property ---breadcrumb-clearance-cubicEligible {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@property ---breadcrumb-clearance-cubicX1 {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@property ---breadcrumb-clearance-cubicX2 {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@keyframes breadcrumb-clearance-cubic-in {
+		from {
+			transform: translateX(0px);
+		}
+		to {
+			transform: translateX(var(---breadcrumb-clearance-cubicInline));
+		}
+	}
+	@keyframes breadcrumb-clearance-cubic-out {
+		from {
+			translate: 0px 0px;
+		}
+		to {
+			translate: calc(-1 * var(---breadcrumb-clearance-cubicInline)) 0px;
+		}
+	}
 	@keyframes breadcrumb-clearance-inline {
 		from {
 			transform: translateX(0px);
@@ -5134,7 +5165,14 @@ details {
 							---collapsible-markerInlineEnd: inherit;
 							---breadcrumb-clearance-arc-height: 1lh;
 							transform: translateX(0px);
-							animation: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none;
+							---breadcrumb-clearance-cubicGap: calc(var(--stickyBreadcrumb-clearanceGap, 0px) / var(---breadcrumb-clearance-arc-radius));
+							---breadcrumb-clearance-cubicOffset: calc(var(---breadcrumb-clearance-inlineOffset) / var(---breadcrumb-clearance-arc-inlineRadius));
+							---breadcrumb-clearance-cubicEligible: calc(clamp(0, 1 + sign(var(---breadcrumb-clearance-cubicOffset)), 1) * clamp(0, 1 + sign(var(---breadcrumb-clearance-cubicGap) - 1 / 64), 1) * clamp(0, sign(9 * var(---breadcrumb-clearance-cubicGap) / 4 - var(---breadcrumb-clearance-cubicOffset)), 1));
+							---breadcrumb-clearance-cubicX1: calc((var(---breadcrumb-clearance-cubicGap) - 4 * var(---breadcrumb-clearance-cubicOffset) / 9) / (1 + var(---breadcrumb-clearance-cubicGap)));
+							---breadcrumb-clearance-cubicX2: calc((var(---breadcrumb-clearance-cubicGap) + min(var(---breadcrumb-clearance-cubicGap) / 4, 0.08) - 4 * var(---breadcrumb-clearance-cubicOffset) / 9) / (1 + var(---breadcrumb-clearance-cubicGap)));
+							---breadcrumb-clearance-cubicInline: calc(-1 * var(---inlineDirection) * (var(---breadcrumb-clearance-arc-inlineRadius) + var(---breadcrumb-clearance-inlineOffset)));
+							---breadcrumb-clearance-cubicDistance: calc(var(---breadcrumb-clearance-arc-radius) + var(--stickyBreadcrumb-clearanceGap, 0px));
+							animation: if(style(---breadcrumb-clearance-cubicEligible: 1): breadcrumb-clearance-cubic-in auto cubic-bezier(var(---breadcrumb-clearance-cubicX1), 0, var(---breadcrumb-clearance-cubicX2), 1) both, breadcrumb-clearance-cubic-out auto cubic-bezier(calc(1 - var(---breadcrumb-clearance-cubicX2)), 0, calc(1 - var(---breadcrumb-clearance-cubicX1)), 1) both; else: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none);
 							animation-timeline: view(
 								block
 									calc(
@@ -5147,8 +5185,11 @@ details {
 									)
 							);
 							animation-range:
-								exit-crossing calc(100% - 2 * (var(---breadcrumb-clearance-view-size) + var(---breadcrumb-clearance-flow-height)))
-								exit-crossing 100%;
+								if(style(---breadcrumb-clearance-cubicEligible: 1): exit-crossing calc(100% - 2 * var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-arc-height)) exit-crossing calc(100% - var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-arc-height)), exit-crossing calc(100% - var(---breadcrumb-clearance-cubicDistance)) exit-crossing 100%; else: exit-crossing calc(100% - 2 * (var(---breadcrumb-clearance-view-size) + var(---breadcrumb-clearance-flow-height)))
+								exit-crossing 100%);
+							@media (prefers-reduced-motion: reduce) {
+								---breadcrumb-clearance-cubicEligible: 0;
+							}
 						}
 					}
 				}
@@ -5179,7 +5220,7 @@ details {
 					---breadcrumb-clearance-contact: --breadcrumb-clearance-contact();
 					---breadcrumb-clearance-joinBlock: --breadcrumb-clearance-join(0, var(--stickyBreadcrumb-clearanceGap, 0px));
 					---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(--stickyBreadcrumb-clearanceGap, 0px));
-					---breadcrumb-clearance-flowEasing: --breadcrumb-clearance-flow-easing();
+					---breadcrumb-clearance-flowEasing: if(style(---breadcrumb-clearance-cubicEligible: 1): linear; else: --breadcrumb-clearance-flow-easing());
 				}
 				details:not([open]) > summary [data-sticky-breadcrumb~="end"] {
 					---collapsible-markerInlineEnd: var(---breadcrumb-endViewportInlineEnd);

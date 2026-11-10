@@ -451,26 +451,41 @@ for (const open of [true, false]) {
 }
 
 // CDP exposes native pseudo geometry without reconstructing its CSS motion.
-for (const [width, direction] of [
-	[390, 'ltr'],
-	[390, 'rtl'],
-	[580, 'ltr'],
-	[580, 'rtl'],
+for (const [width, direction, scenario] of [
+	[390, 'ltr', 'default'],
+	[390, 'rtl', 'default'],
+	[580, 'ltr', 'default'],
+	[580, 'rtl', 'default'],
+	[390, 'ltr', 'ordinary'],
+	[390, 'ltr', 'zero-gap'],
+	[580, 'rtl', 'reduced-large-font'],
 ] as const) {
-	test(`breadcrumb painted owners clear the pie during wheel reversal ${width} ${direction}`, async ({
+	test(`breadcrumb painted owners clear the pie during wheel reversal ${width} ${direction} ${scenario}`, async ({
 		page,
 		browserName,
 	}, info) => {
 		test.skip(browserName !== 'chromium', 'This pseudo-geometry witness requires Chromium CDP')
+		const ordinaryOnly = scenario !== 'default'
+
+		await page.emulateMedia({
+			reducedMotion: scenario === 'reduced-large-font' ? 'reduce' : 'no-preference',
+		})
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto(width === 390 ? '/metamask/' : '/__wallet-page/software/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-		await page.evaluate(direction => {
-			document.documentElement.dir = direction
-		}, direction)
+		await page.evaluate(
+			({ direction, scenario }) => {
+				document.documentElement.dir = direction
+
+				if (scenario === 'zero-gap' || scenario === 'reduced-large-font') {
+					document.documentElement.style.fontSize = '18px'
+				}
+			},
+			{ direction, scenario },
+		)
 		await page.evaluate(() => document.fonts.ready)
 		const owners = await page.evaluate(
-			includeClosed => {
+			({ includeClosed, ordinaryOnly, scenario }) => {
 				const root = document.querySelector<HTMLElement>('#layout')!
 
 				root.style.scrollSnapType = 'none'
@@ -492,7 +507,7 @@ for (const [width, direction] of [
 					),
 				].find(element => getComputedStyle(element, '::after').content !== 'none')
 
-				if (native.length === 0 || !relocated) {
+				if (native.length === 0 || (!ordinaryOnly && !relocated)) {
 					throw new Error('Native H4 and relocated stage markers required')
 				}
 
@@ -506,10 +521,16 @@ for (const [width, direction] of [
 					throw new Error('Actual closed END paint owner required')
 				}
 
-				const subjects = [...native, relocated, ...(closed ? [closed] : [])]
+				const subjects = ordinaryOnly
+					? native.slice(0, 1)
+					: [...native, relocated!, ...(closed ? [closed] : [])]
 
 				for (const [index, owner] of subjects.entries()) {
 					owner.dataset.markerGeometryProbe = String(index)
+
+					if (scenario === 'zero-gap') {
+						owner.style.setProperty('--stickyBreadcrumb-clearanceGap', '0px')
+					}
 				}
 
 				return subjects.flatMap((owner, index) =>
@@ -523,7 +544,11 @@ for (const [width, direction] of [
 					})),
 				)
 			},
-			width === 390 && direction === 'ltr',
+			{
+				includeClosed: !ordinaryOnly && width === 390 && direction === 'ltr',
+				ordinaryOnly,
+				scenario,
+			},
 		)
 		const cdp = await page.context().newCDPSession(page)
 		const evidence = []
@@ -663,6 +688,28 @@ for (const [width, direction] of [
 						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 					)
 				}, closed)
+
+				if (scenario === 'ordinary') {
+					const properties = await page
+						.locator(selector)
+						.evaluate(element =>
+							element
+								.getAnimations({ subtree: true })
+								.flatMap(animation =>
+									animation.effect instanceof KeyframeEffect &&
+									animation.effect.target === element &&
+									animation.effect.pseudoElement === '::after'
+										? animation.effect.getKeyframes().flatMap(frame => Object.keys(frame))
+										: [],
+								),
+						)
+
+					expect(
+						properties,
+						'The selected ordinary pseudo exercises both native motion properties',
+					).toEqual(expect.arrayContaining(['transform', 'translate']))
+				}
+
 				const principal = await quad(selector)
 				const actual = await page.locator(selector).boundingBox()
 
@@ -680,7 +727,7 @@ for (const [width, direction] of [
 					.locator(selector)
 					.evaluateHandle(element => element.getAnimations({ subtree: true }))
 				const nativeOverride = await page.addStyleTag({
-					content: `${cluster ? `${selector}, ` : ''}${selector}::after { transform: none !important; }`,
+					content: `${cluster ? `${selector}, ` : ''}${selector}::after { transform: none !important;${cluster ? '' : ' translate: none !important;'} }`,
 				})
 				const initialMarker = await quad(selector, true)
 				const nativePrincipal = await quad(selector)
@@ -733,11 +780,11 @@ for (const [width, direction] of [
 					let requiredDodges = 0
 					let passed = false
 
-					for (let step = 0; step < 24; step++) {
+					for (let step = 0; step < (ordinaryOnly ? 96 : 24); step++) {
 						const before = await page.locator('#layout').evaluate(element => element.scrollTop)
 
 						await page.mouse.move(20, 700)
-						await page.mouse.wheel(0, direction * 48)
+						await page.mouse.wheel(0, direction * (ordinaryOnly ? 12 : 48))
 						await page.evaluate(
 							() =>
 								new Promise<void>(resolve =>
@@ -787,6 +834,11 @@ for (const [width, direction] of [
 								pieRadiusFraction: maximum / (maximum + padding),
 							}
 						})
+
+						if (scenario === 'zero-gap') {
+							expect(pose.gap, 'Public gap override reached the actual pseudo').toBe(0)
+						}
+
 						const marker = await quad(selector, true)
 						const parent = await quad(selector)
 						const pieQuad = await quad('.pie-navigation-geometry > .navigation-items')
@@ -1004,7 +1056,7 @@ for (const [width, direction] of [
 						owners,
 						evidence,
 						limits:
-							'Native transformed pseudo border quads, conservative for masked chevron ink. Both native H4 and relocated stage marker required. No compositor or between-sample acceptance.',
+							'Native transformed pseudo border quads, conservative for masked ink, including hidden poses. Ordinary variants require a collision without their measured dodge. No visibility, compositor, physical-paint or between-sample acceptance.',
 					}),
 					contentType: 'application/json',
 				})
