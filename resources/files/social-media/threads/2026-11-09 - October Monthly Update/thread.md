@@ -99,7 +99,7 @@ https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosy
 
 Wallet security news:
 
-MetaMask disclosed an infrastructure incident and is exiting affected staking validators. It found no indication that wallets or funds were affected. Investigations are still ongoing.
+MetaMask disclosed an infrastructure incident and is exiting affected staking validators. MetaMask found no indication that wallets or funds were affected. Its investigation is ongoing.
 
 https://x.com/MetaMask/status/2105442300335620460
 
@@ -115,7 +115,7 @@ Want the full breakdown? https://beta.walletbeat.eth.limo/news/
 
 Devcon prep took over the second half of the month.
 
-We announced our talks, our contributor workshop, our booth, the Cypherpunk Congress panel on privacy's last-mile problem, and the Wallet & Transaction Security roundtable at the Ethereum Forward[...]
+We announced our talks, our contributor workshop, our booth, the Cypherpunk Congress panel on privacy's last-mile problem, and the Wallet & Transaction Security roundtable at the Ethereum Forward...
 
 https://x.com/walletbeat/status/2114847240002933005
 https://x.com/walletbeat/status/2116181349140979995
