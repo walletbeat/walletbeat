@@ -97,7 +97,7 @@ https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosy
 
 ---
 
-Wallet security news:
+Wallet security news of the month:
 
 MetaMask disclosed an infrastructure incident and is exiting affected staking validators. MetaMask found no indication that wallets or funds were affected. Its investigation is ongoing.
 
