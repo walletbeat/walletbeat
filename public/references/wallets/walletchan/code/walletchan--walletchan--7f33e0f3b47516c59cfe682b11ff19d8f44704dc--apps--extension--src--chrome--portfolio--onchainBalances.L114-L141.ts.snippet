@@ -1,0 +1,68 @@
+{
+	"highlightRanges": [
+		{
+			"first": 114,
+			"last": 141
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}> {"
+			],
+			"startLine": 73
+		},
+		{
+			"lines": [
+				"  const fetchChainBalances = async (",
+				"    [chainId, entries]: [",
+				"      number,",
+				"      { index: number; token: PortfolioToken }[],",
+				"    ],",
+				"  ) => {"
+			],
+			"startLine": 97
+		},
+		{
+			"lines": [
+				"      }",
+				"",
+				"      const addr = address as Address;",
+				"      let successfulBalanceReads = 0;",
+				"      let failedBalanceReads = 0;",
+				"",
+				"      // Build unified call list – native uses Multicall3.getEthBalance,",
+				"      // ERC20 uses balanceOf, all batched into a single multicall",
+				"      const calls: OnchainBalanceCall[] = [];",
+				"",
+				"      for (const entry of entries) {",
+				"        const isNative =",
+				"          entry.token.contractAddress === \"native\" ||",
+				"          entry.token.contractAddress === \"0x0000000000000000000000000000000000000000\";",
+				"",
+				"        calls.push({",
+				"          entryIndex: entry.index,",
+				"          token: entry.token,",
+				"          contract: isNative",
+				"            ? {",
+				"                address: MULTICALL3_ADDRESS,",
+				"                abi: multicall3Abi,",
+				"                functionName: \"getEthBalance\" as const,",
+				"                args: [addr] as const,",
+				"              }",
+				"            : {",
+				"                address: entry.token.contractAddress as Address,",
+				"                abi: erc20Abi,",
+				"                functionName: \"balanceOf\" as const,",
+				"                args: [addr] as const,",
+				"              },",
+				"        });",
+				"      }",
+				"",
+				"      if (calls.length === 0) return;",
+				"      checkedChainIds.add(chainId);"
+			],
+			"startLine": 110
+		}
+	]
+}

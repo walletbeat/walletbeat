@@ -1,0 +1,46 @@
+{
+	"highlightRanges": [
+		{
+			"first": 206,
+			"last": 216
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl GemAssetsService {"
+			],
+			"startLine": 60
+		},
+		{
+			"lines": [
+				"    async fn sync_availability_list(&self, list: AssetList, remote_version: i32) -> Result<(), GemServiceError> {"
+			],
+			"startLine": 187
+		},
+		{
+			"lines": [
+				"        }",
+				"        self.preferences.set_assets_version(list, assets.version.to_string())",
+				"    }",
+				"",
+				"    pub async fn search_tokens(&self, token_id: String, chains: Vec<Chain>) -> Vec<AssetBasic> {",
+				"        let lookups = chains.into_iter().filter(|chain| chain.default_asset_type().is_some()).map(|chain| {",
+				"            let token_id = token_id.clone();",
+				"            async move {",
+				"                if self.gateway.get_is_token_address(chain, token_id.clone()).ok()? {",
+				"                    let asset = self.gateway.get_token_data(chain, token_id).await.ok()?;",
+				"                    (!asset.id.is_native_mirror()).then(|| rules::default_asset_basic(asset))",
+				"                } else {",
+				"                    None",
+				"                }",
+				"            }",
+				"        });",
+				"        futures::future::join_all(lookups).await.into_iter().flatten().collect()",
+				"    }",
+				""
+			],
+			"startLine": 202
+		}
+	]
+}

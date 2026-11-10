@@ -1,12 +1,13 @@
-name: Deploy
+name: Deploy (master)
 
 on:
   push:
     branches:
-      - beta
+      - master
 
 env:
-  ENS_DOMAIN: beta.walletbeat.eth
+  ENS_DOMAIN: walletbeat.eth
+  SKIP_HELIOS: 'true' # Temp for devcon 2026
 
 jobs:
   check:
@@ -103,19 +104,19 @@ jobs:
         run: ./deploy/check-existing-pin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          ACCESS_TOKEN_4EVERLAND: ${{ secrets.WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
       - name: Deploy on IPFS
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/deploy-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+          OMNIPIN_FILECOIN_TOKEN: ${{ secrets.WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
       - name: Pin on 4EVERLAND
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/pin-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
   update-ens:
     name: Update ENS records
     runs-on: ubuntu-latest
@@ -148,12 +149,11 @@ jobs:
         run: ./deploy/check-ipfs-availability.sh
         env:
           DEPLOY_DIRECTORY: dist
-      - name: Update beta.walletbeat.eth ENS records
+      - name: Update walletbeat.eth ENS records
         run: ./deploy/update-ens.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
-          SKIP_HELIOS: 'false'
+          OMNIPIN_PK: ${{ secrets.WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
   unpin-old-ipfs-pins:
     name: Unpin old IPFS pins
     runs-on: ubuntu-latest
@@ -188,4 +188,4 @@ jobs:
         run: ./deploy/unpin-old-ipfs-cids.sh
         env:
           DEPLOY_DIRECTORY: dist
-          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
