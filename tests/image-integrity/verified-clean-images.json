@@ -1699,6 +1699,10 @@
 		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-31 - Devcon Call to Action/cover.png": {
+		"hash": "77cb412718df88197a35e8a416a9414e2c6768c692b716dae5fe0b8bf7f060e1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
