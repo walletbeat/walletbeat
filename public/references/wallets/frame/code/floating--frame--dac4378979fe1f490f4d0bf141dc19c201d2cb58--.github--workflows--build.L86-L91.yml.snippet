@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 86,
+	"highlightLastLine": 91,
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"  build_release:"
+			],
+			"startLine": 33
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"      - run: npm run bundle",
+				"      - name: Sleep for 4 seconds",
+				"        shell: bash",
+				"        run: sleep 4",
+				"      - name: Publish",
+				"        if: ${{ startsWith(matrix.os, 'ubuntu') && endsWith(matrix.os, 'arm') }}",
+				"        run: npm run publish:linux:arm64",
+				"      - name: Publish",
+				"        if: ${{ !startsWith(matrix.os, 'ubuntu') || !endsWith(matrix.os, 'arm') }}",
+				"        run: npm run publish"
+			],
+			"startLine": 82
+		}
+	]
+}
