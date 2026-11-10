@@ -160,6 +160,7 @@ export const elytro: SoftwareWallet = {
 			}),
 			publicSecurityAudits: elytroAudits,
 			scamAlerts: null,
+			secretKeyBackup: null,
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},

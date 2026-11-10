@@ -256,6 +256,7 @@ export const safe: SoftwareWallet = {
 				}),
 				unlimitedApprovalWarning: null,
 			},
+			secretKeyBackup: null,
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,

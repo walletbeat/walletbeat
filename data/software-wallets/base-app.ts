@@ -474,6 +474,7 @@ export const baseApp: SoftwareWallet = {
 					unlimitedApprovalWarning: null,
 				},
 			},
+			secretKeyBackup: null,
 			securityBestPractices: {
 				browser: {
 					ref: {

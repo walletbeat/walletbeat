@@ -219,5 +219,41 @@
 				{/if}
 			</li>
 		{/if}
+
+		{#if outcome.metadata.secretSensitivityWarning?.required}
+			<li data-list-item="gap-2">
+				<Typography
+					content={{
+						contentType: ContentType.MARKDOWN,
+						markdown: outcome.metadata.secretSensitivityWarning.supported
+							? '**{{WALLET_NAME}}** warns you about the sensitivity of your seed phrase or private keys before showing them.'
+							: '**{{WALLET_NAME}}** does not warn you about the sensitivity of your seed phrase or private keys before showing them.',
+					}}
+					strings={getWalletEvalStrings(wallet)}
+				/>
+
+				{#if refs(outcome.metadata.secretSensitivityWarning).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.secretSensitivityWarning)} />
+				{/if}
+			</li>
+		{/if}
+
+		{#if outcome.metadata.secretScreenCaptureBlocking?.required}
+			<li data-list-item="gap-2">
+				<Typography
+					content={{
+						contentType: ContentType.MARKDOWN,
+						markdown: outcome.metadata.secretScreenCaptureBlocking.supported
+							? '**{{WALLET_NAME}}** blocks screenshots and screen recording while your seed phrase or private keys are on screen.'
+							: '**{{WALLET_NAME}}** does not block screenshots or screen recording while your seed phrase or private keys are on screen.',
+					}}
+					strings={getWalletEvalStrings(wallet)}
+				/>
+
+				{#if refs(outcome.metadata.secretScreenCaptureBlocking).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.secretScreenCaptureBlocking)} />
+				{/if}
+			</li>
+		{/if}
 	</ul>
 {/if}

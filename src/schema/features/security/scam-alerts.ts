@@ -183,3 +183,40 @@ export interface ScamAlerts {
 	 */
 	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
 }
+
+/**
+ * Safety measures the wallet applies when it shows the user secret key
+ * material (a seed phrase or private key), e.g. during backup or export.
+ */
+export interface SecretKeyBackupSafety {
+	/**
+	 * Does the wallet warn the user, before showing secret key material, that
+	 * anyone who obtains it gets full control of the account and that it must
+	 * never be shared?
+	 *
+	 * To test: start the seed phrase backup or private key export flow and
+	 * check whether a warning about the sensitivity of the secret appears
+	 * before the secret itself.
+	 */
+	sensitivityWarning: Support
+
+	/**
+	 * Does the wallet block screenshots and screen recording while secret key
+	 * material is on screen?
+	 * Only some platforms let apps do this (e.g. Android's `FLAG_SECURE`).
+	 * Browser extensions cannot, so use `notSupported` for browser variants.
+	 *
+	 * To test: try to take a screenshot while the seed phrase or private key
+	 * is displayed, and check whether the result is blank or blocked.
+	 */
+	screenCaptureBlocking: Support
+}
+
+/**
+ * Whether the wallet shows the user secret key material (a seed phrase or
+ * private key) to back up or export, and if so, which safety measures
+ * accompany it.
+ * Use `notSupported` for wallets that never show secret key material, e.g.
+ * passkey-only or MPC wallets.
+ */
+export type SecretKeyBackup = Support<WithRef<SecretKeyBackupSafety>>
