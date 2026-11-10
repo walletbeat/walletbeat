@@ -48,7 +48,7 @@ https://beta.walletbeat.eth.limo/anon-wallet/
 
 Who learns what when you use your wallet?
 
-We captured real network traffic from the browser extensions of MetaMask, Rabby, Rainbow, Uniswap Wallet, and Ambire during onboarding, ETH and USDC transfers, swaps, dapp connections, and transactions.
+We captured real network traffic from the browser extensions of MetaMask, Rabby, Rainbow, Uniswap Wallet, and Ambire during onboarding, ETH and USDC transfers, swaps, app connections, and transactions.
 
 We also started analyzing how those requests can be correlated with your address and IP.
 
