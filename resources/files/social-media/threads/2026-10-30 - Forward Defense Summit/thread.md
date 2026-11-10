@@ -4,7 +4,7 @@ Thanks to @safe and @LidoFinance for making this happen 🫡
 
 https://x.com/safe/status/2102747214678565081
 
-![Defence Summit](./defence_summit.avif)
+![Defence Summit](./defence_summit.png)
 
 ---
 
@@ -12,7 +12,7 @@ The Ethereum Forward Defence Summit brings together a curated room of top leader
 
 ---
 
-​The Summit runs as a series of closed-door roundtables, where security and engineering leaders engage directly on the questions that matter most for Ethereum's security.
+The Summit runs as a series of closed-door roundtables, where security and engineering leaders engage directly on the questions that matter most for Ethereum's security.
 
 ---
 
