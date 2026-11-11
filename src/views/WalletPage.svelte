@@ -2179,6 +2179,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	}
 
 	.pie-navigation {
+		&[data-sticky] {
+			@media (prefers-reduced-transparency: reduce) {
+				--sticky-backgroundColor: var(--background-tertiary);
+			}
+		}
 		:global(#top) & .pie-navigation-geometry[data-pressable-state~="related"] {
 			---pie-hasRelevant: 1;
 			---pie-opacityAnimation: none;
@@ -2633,6 +2638,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			text-wrap: pretty;
 			:global(p) {
 				margin: 0;
+			}
+		}
+	}
+
+	header[data-icon-metrics][data-sticky-breadcrumb~="position"] {
+		@media (prefers-reduced-transparency: reduce) {
+			&[data-sticky], > [data-sticky] {
+				--sticky-backgroundColor: var(--background-secondary);
 			}
 		}
 	}
