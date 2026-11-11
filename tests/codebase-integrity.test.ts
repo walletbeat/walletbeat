@@ -518,17 +518,13 @@ describe('codebase integrity', () => {
 			/^[a-z0-9]+([_.][a-z0-9]+)*(\.[a-z0-9]+)*$/, // snake_case
 			/^[a-z0-9]+([A-Z][a-z0-9]*)*(\.[a-z0-9]+)*$/, // camelCase
 			/^([A-Z0-9][a-z0-9]*)+(\.[a-z0-9]+)*$/, // PascalCase
+			/^\[(?:\.\.\.)?[a-z][A-Za-z0-9]*\](?:\.(?:[a-z0-9]+|\[[a-z][A-Za-z0-9]*\]))*$/, // Astro route parameters
 			/^\d{4}-\d{2}-\d{2} - [-\w ]+(\.[a-z0-9]+)*$/, // 'YYYY-MM-DD - Something'
 		]
 
 		/** Path components that are exempt from the check. */
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
-			'[attrGroupId].astro',
-			'[eip].astro',
-			'[walletName]',
-			'[...slug]',
-			'[...path].[ext].ts',
 			'APPEND_SYSTEM.md',
 		])
 

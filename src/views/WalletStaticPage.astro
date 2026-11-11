@@ -1,0 +1,100 @@
+---
+// Types/constants
+import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
+import { defaultNavigationItems } from '@/constants/navigation'
+import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
+import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
+
+import { walletSelections } from '@/utils/wallet-static-selection'
+import type { Variant } from '@/schema/variants'
+const {
+	walletName,
+	initialVariant,
+	initialModel,
+	selected = false,
+} = Astro.props as {
+	walletName: string
+	initialVariant?: Variant
+	initialModel?: string
+	selected?: boolean
+}
+
+if (walletName === undefined || !isValidWalletSlug(walletName)) {
+	throw new Error(`invalid wallet slug "${walletName}"`)
+}
+
+// Data
+const wallet = allRatedWalletsBySlug[walletName]
+const walletIcon = await getWalletIcon(wallet.metadata)
+const walletEntry = Object.entries(allWallets).find(([, data]) => data.metadata.id === walletName)
+
+if (walletEntry === undefined) {
+	throw new Error(`no wallet data for slug "${walletName}"`)
+}
+
+const [walletDataName, walletData] = walletEntry
+const codeSnippets = codeSnippetsForWallet(walletDataName, walletData)
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import WalletPageContext from '@/views/WalletPageContext.svelte'
+import selectionSource from '@/views/wallet-selection-destination.js?raw'
+const canonicalPath = `${import.meta.env.BASE_URL}${walletName}/`
+const choices = walletSelections(wallet).map(choice => ({
+	...choice,
+	path: `${canonicalPath}selection/${choice.key}/`,
+}))
+const literal = (value: unknown) => JSON.stringify(value).replaceAll('<', '\\u003c')
+const startup = selected
+	? `const params = new URLSearchParams(location.search); const variant = ${literal(initialVariant ?? null)}; const model = ${literal(initialModel ?? null)}; if (variant) params.set('variant', variant); else params.delete('variant'); if (model) params.set('model', model); else params.delete('model'); const query = params.toString(); history.replaceState(history.state, '', ${literal(canonicalPath)} + (query ? '?' + query : '') + location.hash);`
+	: `try { const target = (${selectionSource.replace('export default ', '')})(document, new URL(location.href)); if (target) location.replace(target.href); } catch {}`
+---
+
+<Layout
+	metadata={{
+		title: `${wallet.metadata.displayName} - Walletbeat`,
+		description: `How does ${wallet.metadata.displayName} stack up as an Ethereum wallet?`,
+		icons: [
+			{
+				url: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+			},
+		],
+		keywordsBefore: [
+			wallet.metadata.id,
+			wallet.metadata.displayName,
+			`${wallet.metadata.id} wallet`,
+			`${wallet.metadata.displayName} wallet`,
+			'wallet',
+		],
+		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
+		image: walletOgImage(wallet),
+	}}
+	preloadComplexIcons
+>
+	<Fragment slot='head'>
+		{
+			choices.map(choice => (
+				<link
+					rel='alternate'
+					data-wallet-selection
+					data-variant={choice.variant ?? ''}
+					data-model={choice.model ?? ''}
+					href={choice.path}
+				/>
+			))
+		}
+		<script is:inline set:html={`{${startup}}`} />
+	</Fragment>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible'>
+		<WalletPageContext
+			{initialVariant}
+			{initialModel}
+			{walletIcon}
+			walletId={wallet.metadata.id}
+			codeSnippets={codeSnippets}
+			client:idle
+		/>
+	</main>
+</Layout>

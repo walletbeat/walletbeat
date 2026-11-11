@@ -8,12 +8,16 @@
 	const {
 		walletIcon,
 		walletId,
+		initialVariant,
+		initialModel,
 		showStage = true,
 		showScores = false,
 		codeSnippets = {},
 	}: {
 		walletIcon: ImageMetadata,
 		walletId: string,
+		initialVariant?: import('@/schema/variants').Variant,
+		initialModel?: string,
 		showStage?: boolean,
 		showScores?: boolean,
 		// The stored code snippets this wallet's data references (see `codeSnippetsForWallet`).
@@ -37,6 +41,8 @@
 
 <WalletPage
 	{walletIcon}
+	{initialVariant}
+	{initialModel}
 	ladders={allWalletLadders}
 	{attributeTree}
 	{wallet}

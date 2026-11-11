@@ -39,6 +39,7 @@ import Footer from '@/views/Footer.astro'
 		<meta charset='UTF-8' />
 		<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
 		<meta name='color-scheme' content='light dark' />
+		<slot name='head' />
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
@@ -496,3 +497,31 @@ import Footer from '@/views/Footer.astro'
 		}
 	}
 </style>
+
+<script>
+	import type { TransitionBeforePreparationEvent } from 'astro:transitions/client'
+	import walletSelectionDestination from '@/views/wallet-selection-destination.js'
+	document.addEventListener(
+		'astro:before-preparation',
+		(event: TransitionBeforePreparationEvent) => {
+			const originalLoader = event.loader
+			event.loader = async () => {
+				await originalLoader()
+				if (event.defaultPrevented || event.signal.aborted || event.formData) {
+					return
+				}
+				const target = walletSelectionDestination(event.newDocument, event.to)
+				if (!target) {
+					return
+				}
+				const canonical = event.to
+				event.to = target
+				try {
+					await originalLoader()
+				} finally {
+					event.to = canonical
+				}
+			}
+		},
+	)
+</script>

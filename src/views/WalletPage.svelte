@@ -69,6 +69,8 @@
 		attributeTree,
 		walletIcon,
 		wallet,
+		initialVariant,
+		initialModel,
 		showStage = true,
 		showScores = false,
 	}: {
@@ -76,12 +78,14 @@
 		attributeTree: AttributeTree<_AttributeGroupId>
 		walletIcon: ImageMetadata
 		wallet: RatedWallet<_AttributeGroupId>
+		initialVariant?: Variant
+		initialModel?: string
 		showStage?: boolean
 		showScores?: boolean
 	} = $props()
 
 	// State
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import '@/styles/wallet-toc-fallback.css'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { getUrl } from '@/schema/url'
@@ -397,7 +401,7 @@
 	)
 
 
-	let selectedVariant = $state<Variant>()
+	let selectedVariant = $state<Variant | undefined>(untrack(() => initialVariant))
 
 	$effect(() => {
 		if (!hasSingleVariant(wallet.variants) && selectedVariant)
@@ -405,7 +409,7 @@
 		else queryParams?.delete('variant')
 	})
 
-	let selectedModel = $state<string>()
+	let selectedModel = $state<string | undefined>(untrack(() => initialModel))
 	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
 
 	onMount(() => {
@@ -923,6 +927,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
+							defaultValue={initialVariant}
 							aria-label="Wallet version"
 							options={[
 								{
@@ -942,6 +947,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 						{#if brandModels.length > 1}
 							<Select
 								bind:value={selectedModel}
+								defaultValue={initialModel}
 								aria-label="Wallet model"
 								options={[
 									{ value: undefined, label: 'All models' },

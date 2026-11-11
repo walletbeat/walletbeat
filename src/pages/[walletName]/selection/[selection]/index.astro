@@ -1,0 +1,20 @@
+---
+import { allRatedWalletsBySlug } from '@/data/wallets'
+import { walletSelections } from '@/utils/wallet-static-selection'
+import WalletStaticPage from '@/views/WalletStaticPage.astro'
+export const prerender = true
+export const getStaticPaths = () =>
+	Object.values(allRatedWalletsBySlug).flatMap(wallet =>
+		walletSelections(wallet).map(choice => ({
+			params: { walletName: wallet.metadata.id, selection: choice.key },
+			props: {
+				walletName: wallet.metadata.id,
+				initialVariant: choice.variant,
+				initialModel: choice.model,
+				selected: true,
+			},
+		})),
+	)
+---
+
+<WalletStaticPage {...Astro.props} />
