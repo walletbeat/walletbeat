@@ -971,6 +971,22 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-custom-rpc.png": {
+		"hash": "1fdd584db782f90054ac02aa8cd21a67741425f837a0117b07c24097c1511257",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-fake-usdc-balance.png": {
+		"hash": "85af1353fe1756857694ec83c58c07e61f69cf43b1d223d9b73d3f7632d12631",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-lying-proxy-log.png": {
+		"hash": "f4bc386b829cf02e78968370c64103cade69b14271377532b87a5357956246d5",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-send-fake-usdc.png": {
+		"hash": "537d52c068ea54b664796f7285dcdf29c5e279f782e80e17172dc61b66524a8e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "5b5321fdcb41c07a239d25c121e1985308346d30862bfcdc7fa5fc745e0ba9e2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
