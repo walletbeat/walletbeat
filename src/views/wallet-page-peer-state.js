@@ -27,6 +27,135 @@ export default function publishPeerState(container, groups, replace = false) {
 	/** @type {Map<Element, string | null>} */
 	const originals = new Map()
 	let disposed = false
+	const nestedPressAttribute = 'data-pressable-descendant-active'
+	/** @type {Set<Element>} */
+	const pressedAncestors = new Set()
+	/** @type {Map<string, Element>} */
+	const pressSources = new Map()
+	/** @type {CSSStyleRule[]} */
+	const pressRules = []
+	/** @param {CSSStyleSheet | CSSGroupingRule} owner */
+	const findPressRules = owner => {
+		for (const rule of owner.cssRules) {
+			if (
+				rule instanceof CSSStyleRule &&
+				rule.style.getPropertyValue('---pressable-opacity') &&
+				rule.selectorText.includes('summary[data-sticky-breadcrumb~="position"]:active')
+			) {
+				pressRules.push(rule)
+			}
+
+			if ('cssRules' in rule) {
+				findPressRules(/** @type {CSSGroupingRule} */ (rule))
+			}
+		}
+	}
+
+	try {
+		for (const sheet of document.styleSheets) {
+			if (!sheet.href || new URL(sheet.href).origin === location.origin) {
+				findPressRules(sheet)
+			}
+		}
+	} catch {
+		pressRules.length = 0
+	}
+
+	const pressRule = pressRules.length === 1 ? pressRules[0] : null
+	const nativePressSelector = pressRule?.selectorText ?? ''
+	const pressBoundary = nativePressSelector.indexOf('):is(')
+	// Consume the authored native classification, including its label exception.
+	const controls = /:has\((:where\(.*?\)):active\)\)/s.exec(nativePressSelector)?.[1]
+	const label = /\):is\(\s*(label:has\(.*?\)),\s*:not/s.exec(nativePressSelector)?.[1]
+	const pressOwners =
+		pressRule?.parentRule instanceof CSSStyleRule ? pressRule.parentRule.selectorText : null
+	let localPressSelector = nativePressSelector
+	let localPressEnabled = false
+	const clearNestedPress = () => {
+		for (const ancestor of pressedAncestors) {
+			ancestor.removeAttribute(nestedPressAttribute)
+		}
+		pressedAncestors.clear()
+		pressSources.clear()
+	}
+	/** @param {Event} event */
+	const updateNestedPress = event => {
+		if (!localPressEnabled || !event.isTrusted) {
+			return
+		}
+
+		if (event instanceof PointerEvent && !event.isPrimary) {
+			return
+		}
+
+		const hadSources = pressSources.size > 0 || pressedAncestors.size > 0
+		const pointer = event instanceof PointerEvent ? `pointer:${event.pointerId}` : null
+		const key =
+			event instanceof KeyboardEvent && [' ', 'Enter'].includes(event.key)
+				? `key:${event.key}`
+				: null
+		const starts = event.type === 'pointerdown' ? pointer : event.type === 'keydown' ? key : null
+		const ends = ['pointerup', 'pointercancel'].includes(event.type)
+			? pointer
+			: event.type === 'keyup'
+				? key
+				: null
+
+		if (starts && controls) {
+			const target = event.composedPath().find(node => node instanceof Element)
+			const source = target instanceof Element ? target.closest(`:is(${controls}, ${label})`) : null
+
+			if (source) {
+				pressSources.set(starts, source)
+			}
+		} else if (ends) {
+			pressSources.delete(ends)
+		} else if (event.type === 'blur') {
+			pressSources.clear()
+		} else if (event.type === 'focusout' || event.type === 'dragend') {
+			const prefix = event.type === 'focusout' ? 'key:' : 'pointer:'
+
+			for (const source of pressSources.keys()) {
+				if (source.startsWith(prefix)) {
+					pressSources.delete(source)
+				}
+			}
+		} else {
+			return
+		}
+
+		refreshNestedPress()
+
+		return hadSources || pressSources.size > 0
+	}
+	/** @param {boolean} [native] */
+	const refreshNestedPress = (native = false) => {
+		for (const ancestor of pressedAncestors) {
+			ancestor.removeAttribute(nestedPressAttribute)
+		}
+		pressedAncestors.clear()
+
+		if (!pressOwners || !label) {
+			return
+		}
+
+		for (const source of pressSources.values()) {
+			if (native && !source.matches(':active')) {
+				continue
+			}
+
+			for (let ancestor = source.parentElement; ancestor; ancestor = ancestor.parentElement) {
+				if (ancestor.matches(pressOwners) && !ancestor.matches(label)) {
+					pressedAncestors.add(ancestor)
+				}
+			}
+		}
+
+		for (const ancestor of pressedAncestors) {
+			ancestor.setAttribute(nestedPressAttribute, '')
+		}
+	}
+
 	/** @param {Element} owner @param {string | null} value */
 	const attribute = (owner, value) => {
 		if (!originals.has(owner)) {
@@ -54,6 +183,7 @@ export default function publishPeerState(container, groups, replace = false) {
 	let published = new Map()
 	/** @type {ReturnType<typeof setTimeout> | undefined} */
 	let pending
+	let publishPending = false
 	const publish = () => {
 		/** @type {Map<Element, Set<string>>} */
 		const states = new Map()
@@ -134,18 +264,21 @@ export default function publishPeerState(container, groups, replace = false) {
 	// Interest state changes after its event's default action, beyond the microtask checkpoint.
 	/** @param {Event} event */
 	const schedule = event => {
-		if (
-			published.size === 0 &&
-			!(
-				event.target instanceof Element &&
+		const pressChanged = updateNestedPress(event)
+
+		const peersChanged =
+			published.size > 0 ||
+			(event.target instanceof Element &&
 				container.contains(event.target) &&
 				(event.type === 'interest' ||
 					event.type === 'loseinterest' ||
-					container.contains(event.target.closest('a[data-pressable-name]')))
-			)
-		) {
+					container.contains(event.target.closest('a[data-pressable-name]'))))
+
+		if (!pressChanged && !peersChanged) {
 			return
 		}
+
+		publishPending ||= peersChanged
 
 		if (pending !== undefined) {
 			return
@@ -153,7 +286,12 @@ export default function publishPeerState(container, groups, replace = false) {
 
 		pending = setTimeout(() => {
 			pending = undefined
-			publish()
+			refreshNestedPress(true)
+
+			if (publishPending) {
+				publishPending = false
+				publish()
+			}
 		}, 0)
 	}
 	const events = [
@@ -177,6 +315,11 @@ export default function publishPeerState(container, groups, replace = false) {
 		}
 
 		disposed = true
+		clearNestedPress()
+
+		if (localPressEnabled && pressRule && pressRule.selectorText === localPressSelector) {
+			pressRule.selectorText = nativePressSelector
+		}
 
 		if (Reflect.get(owner, key) === dispose) {
 			Reflect.deleteProperty(owner, key)
@@ -210,6 +353,26 @@ export default function publishPeerState(container, groups, replace = false) {
 	window.addEventListener('blur', schedule)
 	island?.addEventListener('astro:unmount', dispose, { once: true })
 	publish()
+
+	if (pressRule && pressBoundary >= 0 && controls && label && pressOwners) {
+		try {
+			const selector =
+				nativePressSelector.slice(0, pressBoundary + 1) +
+				':is(' +
+				label +
+				', :not([' +
+				nestedPressAttribute +
+				']))'
+
+			pressRule.selectorText = selector
+			localPressSelector = pressRule.selectorText
+			localPressEnabled =
+				localPressSelector !== nativePressSelector &&
+				localPressSelector.includes(nestedPressAttribute)
+		} catch {
+			localPressEnabled = false
+		}
+	}
 
 	return dispose
 }
