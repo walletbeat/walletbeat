@@ -633,7 +633,7 @@ export const zerion: SoftwareWallet = {
 				},
 			},
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://zerion.io/privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -1110,7 +1110,13 @@ export const zerion: SoftwareWallet = {
 					requiredReview: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
 				},
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The release workflow runs `npm run build:production` then plain `zip -r`/`tar czf` on the output. No determinism measures and no rebuild/verification step for either the Chrome or Firefox build.',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/.github/workflows/release.yml#L37-L48',
+					},
+				}),
 			},
 		},
 		walletCall: notSupported,
