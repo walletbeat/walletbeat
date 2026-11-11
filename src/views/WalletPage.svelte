@@ -299,10 +299,17 @@
 				})
 			})
 		}
-		const openHashDetails = (event?: Event) => {
+		const openHashDetails = () => {
 			retainLanding = true
 			revealTargetDetails(localHashTarget(globalThis.location.hash))
-			if (!event || event.type === 'popstate') restoreLanding()
+		}
+		const restoreHashLanding = () => {
+			openHashDetails()
+			restoreLanding()
+		}
+		const navigation = globalThis.navigation
+		const restoreTraversedEntry = (event: NavigationCurrentEntryChangeEvent) => {
+			if (event.navigationType === 'traverse') restoreHashLanding()
 		}
 		const invalidateLanding = (event: Event) => {
 			if (!event.isTrusted) return
@@ -339,9 +346,10 @@
 				if (active && !event.defaultPrevented) retainLanding = true
 			})
 		}
-		openHashDetails()
+		restoreHashLanding()
 		globalThis.addEventListener('hashchange', openHashDetails)
-		globalThis.addEventListener('popstate', openHashDetails)
+		if (navigation) navigation.addEventListener('currententrychange', restoreTraversedEntry)
+		else globalThis.addEventListener('popstate', restoreHashLanding)
 		globalThis.addEventListener('resize', restoreLanding)
 		globalThis.addEventListener('click', activateLanding, true)
 		globalThis.addEventListener('click', activateLanding)
@@ -353,7 +361,8 @@
 			active = false
 			globalThis.cancelAnimationFrame(landingFrame)
 			globalThis.removeEventListener('hashchange', openHashDetails)
-			globalThis.removeEventListener('popstate', openHashDetails)
+			if (navigation) navigation.removeEventListener('currententrychange', restoreTraversedEntry)
+			else globalThis.removeEventListener('popstate', restoreHashLanding)
 			globalThis.removeEventListener('resize', restoreLanding)
 			globalThis.removeEventListener('click', activateLanding, true)
 			globalThis.removeEventListener('click', activateLanding)

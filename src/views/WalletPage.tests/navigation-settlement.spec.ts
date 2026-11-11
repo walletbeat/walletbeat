@@ -8,6 +8,9 @@ import {
 } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
+declare function recordInstantLanding(id: string, hash: string): Promise<void>
+declare function recordNativeTravel(scroll: number, end: boolean): Promise<void>
+
 // Every route exercises the same original nodes; no surrogate anchor or layout is introduced.
 for (const width of [390, 864, 1344, 1345, 1440]) {
 	test(`native fragment settlement, disclosure and history at ${width}px`, async ({
@@ -263,3 +266,118 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 		})
 	})
 }
+
+test.describe('native fragment routing', () => {
+	test.use({ viewport: { width: 934, height: 1203 }, reducedMotion: 'no-preference' })
+
+	test('ordinary hash pushes avoid instant repair and preserve history landings', async ({
+		page,
+	}, info) => {
+		await page.goto('/rainbow/#top')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		const navigationAvailable = await page.evaluate(() => Boolean(globalThis.navigation))
+
+		test.skip(!navigationAvailable, 'Legacy traversal restoration retains its native fallback')
+		await expect
+			.poll(() => page.locator('#layout').evaluate(root => root.scrollTop))
+			.toBeLessThan(500)
+		const link = page.locator('.pie-navigation a[href="#self-sovereignty"]')
+
+		await link.focus()
+		const start = await page.locator('#layout').evaluate(root => {
+			if (!(root instanceof HTMLElement)) {
+				throw new Error('Expected page scroll owner')
+			}
+
+			return { scroll: root.scrollTop, behavior: getComputedStyle(root).scrollBehavior }
+		})
+
+		expect(start.scroll).toBeLessThan(2000)
+		expect(start.behavior).toBe('smooth')
+		const positions: number[] = []
+		const instantRepairs: { id: string; hash: string }[] = []
+		let ended = false
+
+		await page.exposeFunction('recordInstantLanding', (id: string, hash: string) => {
+			instantRepairs.push({ id, hash })
+		})
+		await page.evaluate(() => {
+			const original: unknown = Reflect.get(Element.prototype, 'scrollIntoView')
+
+			if (typeof original !== 'function') {
+				throw new Error('Expected native scrollIntoView')
+			}
+
+			Element.prototype.scrollIntoView = function (
+				this: Element,
+				options?: boolean | ScrollIntoViewOptions,
+			) {
+				if (typeof options === 'object' && options.behavior === 'instant') {
+					void recordInstantLanding(this.id, location.hash)
+				}
+
+				Reflect.apply(original, this, [options])
+			}
+		})
+		await page.exposeFunction('recordNativeTravel', (scroll: number, end: boolean) => {
+			positions.push(scroll)
+			ended ||= end
+		})
+		await page.locator('#layout').evaluate(root => {
+			const record = (event: Event) => {
+				void recordNativeTravel(root.scrollTop, event.type === 'scrollend')
+			}
+
+			root.addEventListener('scroll', record, { passive: true })
+			root.addEventListener('scrollend', record, { passive: true })
+		})
+		await page.keyboard.press('Enter')
+		await expect.poll(() => new URL(page.url()).hash).toBe('#self-sovereignty')
+		await expect.poll(() => ended, { message: 'Native fragment travel settles' }).toBe(true)
+		const final = await page.locator('#layout').evaluate(root => root.scrollTop)
+
+		expect(final - start.scroll).toBeGreaterThan(5000)
+		const travelPositions = [...positions]
+
+		await page.evaluate(
+			() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+		)
+		const pushInstantRepairs = [...instantRepairs]
+
+		expect(
+			pushInstantRepairs,
+			'An ordinary hash push must not trigger an instant history repair',
+		).toEqual([])
+		const heading = await page.locator('#self-sovereignty h2').boundingBox()
+
+		expect(heading).not.toBeNull()
+		expect(heading!.y).toBeGreaterThanOrEqual(0)
+		expect(heading!.y + heading!.height).toBeLessThan(1203)
+		await page.goBack()
+		await expect.poll(() => new URL(page.url()).hash).toBe('#top')
+		await expect
+			.poll(async () =>
+				Math.abs((await page.locator('#layout').evaluate(root => root.scrollTop)) - start.scroll),
+			)
+			.toBeLessThanOrEqual(3)
+		await page.goForward()
+		await expect.poll(() => new URL(page.url()).hash).toBe('#self-sovereignty')
+		await expect
+			.poll(async () =>
+				Math.abs((await page.locator('#layout').evaluate(root => root.scrollTop)) - final),
+			)
+			.toBeLessThanOrEqual(3)
+		await info.attach('native-fragment-routing', {
+			body: JSON.stringify({
+				navigationAvailable,
+				start,
+				final,
+				positions: travelPositions,
+				pushInstantRepairs,
+				traversalInstantRepairs: instantRepairs.slice(pushInstantRepairs.length),
+			}),
+			contentType: 'application/json',
+		})
+	})
+})
