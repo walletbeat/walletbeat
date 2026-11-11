@@ -34,7 +34,8 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			})
 			const root = document.querySelector<HTMLElement>('#layout')!
 			const source = document.querySelector<HTMLElement>('.page-navigation > .pie-navigation')!
-			const pie = source.querySelector<HTMLElement>('.pie-navigation-geometry')!
+			const occupancy = source.querySelector<HTMLElement>('.pie-navigation-geometry')!
+			const pie = occupancy.querySelector<HTMLElement>(':scope > .navigation-items')!
 			const button = document.querySelector<HTMLButtonElement>('button[popovertarget="wallet-toc"]')
 
 			if (!button) {
@@ -100,6 +101,9 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				scroll: root.scrollTop,
 				source: rect(source.getBoundingClientRect()),
 				pie: rect(pie.getBoundingClientRect()),
+				occupancy: rect(occupancy.getBoundingClientRect()),
+				occupancySticky: occupancy.hasAttribute('data-sticky'),
+				occupancyPosition: getComputedStyle(occupancy).position,
 				safeTop: safeTop(),
 				overflow: Math.max(
 					root.scrollWidth - root.clientWidth,
@@ -235,6 +239,10 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				'Actual source travel matches the delivered root scroll',
 			).toBeLessThanOrEqual(1)
 			expect(sample.overflow).toBeLessThanOrEqual(1)
+			expect(sample.occupancySticky, 'The physical occupancy has a native sticky owner').toBe(true)
+			expect(sample.occupancyPosition).toBe('fixed')
+			expect(Math.abs(sample.occupancy.width - 128)).toBeLessThanOrEqual(0.125)
+			expect(Math.abs(sample.occupancy.height - 128)).toBeLessThanOrEqual(0.125)
 			expect(
 				Math.abs(sample.stability.pie.height - sample.pie.height),
 				'Native endpoint delivery is stable',
@@ -303,7 +311,8 @@ for (const width of [390, 1344]) {
 			)
 			const source = page.locator('.page-navigation > .pie-navigation')
 			const geometry = source.locator('.pie-navigation-geometry')
-			const flower = geometry.locator(':scope > .navigation-items')
+			const carrier = geometry.locator(':scope > .navigation-items')
+			const flower = carrier.locator(':scope > menu')
 			const original = await flower.elementHandle()
 			const read = () =>
 				flower.evaluate(element => {
@@ -324,12 +333,12 @@ for (const width of [390, 1344]) {
 			await expect(source).toHaveAttribute('data-wallet-toc-state', 'open')
 			await expect.poll(async () => Math.abs((await read()).width - 128)).toBeLessThanOrEqual(1)
 			const opened = await read()
-			const flowerOrigin = await geometry.evaluate(
+			const flowerOrigin = await carrier.evaluate(
 				element => getComputedStyle(element).transformOrigin,
 			)
 
 			expect(
-				await source.evaluate(element => getComputedStyle(element, '::before').transformOrigin),
+				await geometry.evaluate(element => getComputedStyle(element, '::before').transformOrigin),
 				'The compact backdrop and flower scale around the same edge',
 			).toBe(flowerOrigin)
 
@@ -338,10 +347,12 @@ for (const width of [390, 1344]) {
 			).toBeLessThanOrEqual(1)
 			expect(Math.abs(opened.height - 128)).toBeLessThanOrEqual(1)
 			await expect
-				.poll(() => geometry.evaluate(element => getComputedStyle(element).animationName))
+				.poll(() => carrier.evaluate(element => getComputedStyle(element).animationName))
 				.toBe('none')
 			await expect
-				.poll(() => source.evaluate(element => getComputedStyle(element, '::before').animationName))
+				.poll(() =>
+					geometry.evaluate(element => getComputedStyle(element, '::before').animationName),
+				)
 				.toBe('none')
 			await expect(page.locator('#wallet-toc')).toBeVisible()
 			await page.keyboard.press('Escape')

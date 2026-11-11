@@ -649,7 +649,12 @@ for (const width of [690, 1440]) {
 					const box = icon.getBoundingClientRect()
 
 					if (box.width === 0 || box.height === 0) {
-						const area = root.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+						const owner = root.querySelector('.pie-navigation-geometry')!
+						const paint =
+							getComputedStyle(owner).position === 'fixed'
+								? owner.querySelector(':scope > .navigation-items')!
+								: owner
+						const area = paint.getBoundingClientRect()
 
 						for (let y = Math.max(0, area.top); y < Math.min(innerHeight, area.bottom); y += 8) {
 							for (let x = Math.max(0, area.left); x < Math.min(innerWidth, area.right); x += 8) {

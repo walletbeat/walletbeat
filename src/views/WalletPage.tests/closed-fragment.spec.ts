@@ -141,7 +141,7 @@ for (const direction of ['ltr', 'rtl'] as const) {
 					const { root } = await cdp.send('DOM.getDocument')
 					const { nodeId } = await cdp.send('DOM.querySelector', {
 						nodeId: root.nodeId,
-						selector: '.pie-navigation-geometry > .navigation-items',
+						selector: '.pie-navigation-geometry > .navigation-items > menu',
 					})
 
 					if (!nodeId) {

@@ -164,6 +164,12 @@ for (const width of [390, 1440]) {
 							box: rectData(element.getBoundingClientRect()),
 						}))
 
+					const pieOwner = root.querySelector('.pie-navigation-geometry')!
+					const piePaint =
+						getComputedStyle(pieOwner).position === 'fixed'
+							? pieOwner.querySelector(':scope > .navigation-items')!
+							: pieOwner
+
 					return {
 						labels,
 						visibleIdentity,
@@ -174,7 +180,7 @@ for (const width of [390, 1440]) {
 						controls,
 						rowGap: Number.parseFloat(getComputedStyle(titleRow).columnGap) || 0,
 						direction: getComputedStyle(titleRow).direction,
-						pie: rectData(root.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()),
+						pie: rectData(piePaint.getBoundingClientRect()),
 						reservedCompactInlineSize: Number.parseFloat(
 							getComputedStyle(root).getPropertyValue('---breadcrumb-itemWidth'),
 						),

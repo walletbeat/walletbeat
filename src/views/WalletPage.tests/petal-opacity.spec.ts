@@ -269,7 +269,11 @@ for (const path of ['/__wallet-page/software/', '/metamask/?variant=BROWSER']) {
 
 		expect(visual.every(row => row.easing.includes('0.87'))).toBe(true)
 		const point = await page.locator('.pie-navigation-geometry').evaluate(geometry => {
-			const box = geometry.getBoundingClientRect()
+			const paint =
+				getComputedStyle(geometry).position === 'fixed'
+					? geometry.querySelector(':scope > .navigation-items')!
+					: geometry
+			const box = paint.getBoundingClientRect()
 
 			for (let y = Math.max(0, box.top) + 2; y < Math.min(innerHeight, box.bottom); y += 4) {
 				for (let x = Math.max(0, box.left) + 2; x < Math.min(innerWidth, box.right); x += 4) {

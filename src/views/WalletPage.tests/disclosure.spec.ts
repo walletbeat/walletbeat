@@ -830,12 +830,19 @@ for (const selector of [
 						inlineStickyAncestors,
 					}
 					const pie = document.querySelector('.pie-navigation')!
-					const geometry = pie.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+					const pieOwner = pie.querySelector('.pie-navigation-geometry')!
+					const compactOwner = getComputedStyle(pieOwner).position === 'fixed'
+					const paint = compactOwner
+						? pieOwner.querySelector(':scope > .navigation-items')!
+						: pieOwner
+					const geometry = paint.getBoundingClientRect()
+					const diameter = compactOwner
+						? geometry.height
+						: Math.min(geometry.width, geometry.height)
 					const pieStyle = getComputedStyle(pie)
 					const maximum = parseFloat(pieStyle.getPropertyValue('--pie-maxR'))
 					const padding = parseFloat(pieStyle.getPropertyValue('--pie-padding'))
-					const radius =
-						((Math.min(geometry.width, geometry.height) / 2) * maximum) / (maximum + padding)
+					const radius = ((diameter / 2) * maximum) / (maximum + padding)
 					const center = {
 						x: geometry.left + geometry.width / 2,
 						y: geometry.top + geometry.height / 2,

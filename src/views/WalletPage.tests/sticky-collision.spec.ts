@@ -785,16 +785,21 @@ for (const { width, wallet, direction, boundary } of [
 											return Number.parseFloat(raw)
 										}
 										const pie = document.querySelector('.pie-navigation')!
-										const geometry = pie
-											.querySelector('.pie-navigation-geometry')!
-											.getBoundingClientRect()
+										const pieOwner = pie.querySelector('.pie-navigation-geometry')!
+										const compactOwner = getComputedStyle(pieOwner).position === 'fixed'
+										const paint = compactOwner
+											? pieOwner.querySelector(':scope > .navigation-items')!
+											: pieOwner
+										const geometry = paint.getBoundingClientRect()
 										const pieStyle = getComputedStyle(pie)
 										const maximum = Number.parseFloat(pieStyle.getPropertyValue('--pie-maxR'))
 										const padding = Number.parseFloat(pieStyle.getPropertyValue('--pie-padding'))
 										const circle = {
 											x: geometry.x + geometry.width / 2,
 											y: geometry.y + geometry.height / 2,
-											radius: ((geometry.width / 2) * maximum) / (maximum + padding),
+											radius:
+												(((compactOwner ? geometry.height : geometry.width) / 2) * maximum) /
+												(maximum + padding),
 										}
 										const rawGap =
 											style.getPropertyValue('--stickyBreadcrumb-clearanceGap').trim() || '0px'
@@ -1138,7 +1143,17 @@ for (const { width, direction, open } of [
 							.getPropertyValue('---breadcrumb-clearance-supported')
 							.trim()
 						const pie = document.querySelector('.pie-navigation')
-						const geometry = pie?.querySelector('.pie-navigation-geometry')?.getBoundingClientRect()
+						const pieOwner = pie?.querySelector('.pie-navigation-geometry')
+						const compactOwner = !!pieOwner && getComputedStyle(pieOwner).position === 'fixed'
+						const paint = compactOwner
+							? pieOwner.querySelector(':scope > .navigation-items')
+							: pieOwner
+
+						if (compactOwner && !paint) {
+							throw new Error('Missing actual pie paint carrier')
+						}
+
+						const geometry = paint?.getBoundingClientRect()
 						const encounter =
 							enhanced && subject.open && pie && geometry
 								? (() => {
@@ -1147,7 +1162,9 @@ for (const { width, direction, open } of [
 										const padding = Number.parseFloat(style.getPropertyValue('--pie-padding'))
 										const x = geometry.x + geometry.width / 2
 										const y = geometry.y + geometry.height / 2
-										const radius = ((geometry.width / 2) * maximum) / (maximum + padding)
+										const radius =
+											(((compactOwner ? geometry.height : geometry.width) / 2) * maximum) /
+											(maximum + padding)
 
 										return {
 											supported,

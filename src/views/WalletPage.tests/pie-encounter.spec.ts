@@ -236,7 +236,12 @@ for (const open of [true, false]) {
 
 						window.__walletPieWitness = element
 						const root = document.querySelector('#layout')!
-						const pie = document.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+						const pieOwner = document.querySelector('.pie-navigation-geometry')!
+						const paint =
+							getComputedStyle(pieOwner).position === 'fixed'
+								? pieOwner.querySelector(':scope > .navigation-items')!
+								: pieOwner
+						const pie = paint.getBoundingClientRect()
 						const sourceTop =
 							root.scrollTop + source.scope.getBoundingClientRect().top + source.offset
 						const span = pie.height + source.height + 2 * 96
@@ -267,15 +272,19 @@ for (const open of [true, false]) {
 								window.__walletPieEncounter = capture
 								const frame = () => {
 									const pie = document.querySelector('.pie-navigation')!
-									const geometry = pie
-										.querySelector('.pie-navigation-geometry')!
-										.getBoundingClientRect()
+									const pieOwner = pie.querySelector('.pie-navigation-geometry')!
+									const compactOwner = getComputedStyle(pieOwner).position === 'fixed'
+									const paint = compactOwner
+										? pieOwner.querySelector(':scope > .navigation-items')!
+										: pieOwner
+									const geometry = paint.getBoundingClientRect()
+									const diameter = compactOwner
+										? geometry.height
+										: Math.min(geometry.width, geometry.height)
 									const style = getComputedStyle(pie)
 									const maximum = parseFloat(style.getPropertyValue('--pie-maxR'))
 									const padding = parseFloat(style.getPropertyValue('--pie-padding'))
-									const radius =
-										((Math.min(geometry.width, geometry.height) / 2) * maximum) /
-										(maximum + padding)
+									const radius = ((diameter / 2) * maximum) / (maximum + padding)
 									const circle = {
 										x: geometry.left + geometry.width / 2,
 										y: geometry.top + geometry.height / 2,
@@ -841,7 +850,7 @@ for (const [width, direction, scenario] of [
 
 						const marker = await quad(selector, true)
 						const parent = await quad(selector)
-						const pieQuad = await quad('.pie-navigation-geometry > .navigation-items')
+						const pieQuad = await quad('.pie-navigation-geometry > .navigation-items > menu')
 						const sides = pieQuad.points.map((a, index) => {
 							const b = pieQuad.points[(index + 1) % 4]
 
@@ -926,7 +935,7 @@ for (const [width, direction, scenario] of [
 						const after = await page.locator(selector).evaluate(element => {
 							const owner = element.getBoundingClientRect()
 							const pie = document
-								.querySelector('.pie-navigation-geometry > .navigation-items')!
+								.querySelector('.pie-navigation-geometry > .navigation-items > menu')!
 								.getBoundingClientRect()
 
 							return {
@@ -1123,7 +1132,12 @@ for (const input of [
 					const style = getComputedStyle(end)
 					const box = end.getBoundingClientRect()
 					const row = end.parentElement!.getBoundingClientRect()
-					const pie = document.querySelector('.pie-navigation-geometry')!.getBoundingClientRect()
+					const pieOwner = document.querySelector('.pie-navigation-geometry')!
+					const paint =
+						getComputedStyle(pieOwner).position === 'fixed'
+							? pieOwner.querySelector(':scope > .navigation-items')!
+							: pieOwner
+					const pie = paint.getBoundingClientRect()
 					const direction = style.direction === 'rtl' ? -1 : 1
 					const edge = direction === 1 ? box.right : box.left
 

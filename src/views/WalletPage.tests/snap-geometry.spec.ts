@@ -142,13 +142,14 @@ function observePaintedPieBackdrop(enhanced: boolean) {
 	}
 
 	const pie = document.querySelector('.pie-navigation')
-	const geometry = pie?.querySelector(':scope > .pie-navigation-geometry')
+	const compact = pie?.querySelector(':scope > .pie-navigation-geometry')
+	const geometry = compact?.querySelector(':scope > .navigation-items')
 
-	if (!pie || !geometry) {
+	if (!pie || !compact || !geometry) {
 		throw new Error('The pie backdrop and its geometry owner are required')
 	}
 
-	const paint = getComputedStyle(pie, '::before')
+	const paint = getComputedStyle(compact, '::before')
 	const owner = getComputedStyle(geometry)
 	const properties = [
 		'position',
@@ -199,7 +200,9 @@ function observePaintedPieBackdrop(enhanced: boolean) {
 	if (
 		pie.matches('[data-wallet-toc-state="open"], [data-wallet-toc-state="closing"]') ||
 		Object.values(inputs).some(input => input.paint !== input.owner) ||
-		owner.position !== 'fixed' ||
+		getComputedStyle(compact).position !== 'fixed' ||
+		!compact.hasAttribute('data-sticky') ||
+		owner.position !== 'absolute' ||
 		owner.boxSizing !== 'border-box' ||
 		owner.rotate !== 'none' ||
 		owner.scale !== 'none' ||
