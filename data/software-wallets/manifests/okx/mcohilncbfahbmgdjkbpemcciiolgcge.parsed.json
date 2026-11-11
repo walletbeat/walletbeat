@@ -13,7 +13,8 @@
 		"system.cpu",
 		"offscreen",
 		"gcm",
-		"alarms"
+		"alarms",
+		"identity"
 	],
 	"webAccessibleResources": "UNRESTRICTED"
 }
