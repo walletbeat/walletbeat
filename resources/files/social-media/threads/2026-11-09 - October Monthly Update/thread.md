@@ -6,9 +6,9 @@ Check out what happened across Walletbeat and the wallet ecosystem through Octob
 
 ---
 
-We published our breakdown of Ambire's ratings: what's strong, what could be better, and where the gaps are.
+We published our breakdown of @ambire's ratings: what's strong, what could be better, and where the gaps are.
 
-The Ambire team responded. They added transaction simulation for ERC-721 transfers and committed to hardening their browser extension by blocking other extensions from connecting to it.
+The Ambire team responded. They added transaction simulation for ERC-721 transfers and hardened their browser extension by blocking other extensions from connecting to it.
 
 https://x.com/walletbeat/status/2113699746070299093
 https://x.com/ambire/status/2115633972189315404
@@ -36,48 +36,62 @@ https://x.com/walletbeat/status/2109464589813567974
 
 ---
 
-Three new wallets joined the database: Trust Wallet (browser extension and mobile), @WalletChan_, and Anon Wallet, a Railgun-based private wallet.
+Three new wallets joined the database 👇
 
-Base App also got its browser extension variant.
+---
 
-https://beta.walletbeat.eth.limo/trust-wallet/
-https://beta.walletbeat.eth.limo/walletchan/
-https://beta.walletbeat.eth.limo/anon-wallet/
+@TrustWallet (browser extension and mobile)
+https://walletbeat.eth.limo/trust-wallet/
+
+---
+
+@WalletChan_
+https://walletbeat.eth.limo/walletchan/
+
+---
+
+@anondotinc Wallet, a Railgun-based private wallet.
+https://walletbeat.eth.limo/anon-wallet/
+
+---
+
+@CoinbaseWallet (previously Base App) also got its browser extension variant.
+https://walletbeat.eth.limo/base-app/
 
 ---
 
 Who learns what when you use your wallet?
 
-We captured real network traffic from the browser extensions of MetaMask, Rabby, Rainbow, Uniswap Wallet, and Ambire during onboarding, ETH and USDC transfers, swaps, app connections, and transactions.
-
-We also started analyzing how those requests can be correlated with your address and IP.
+We captured and analyzed real network traffic from the browser extensions of @MetaMask, @Rabby_io, @rainbowdotme, @Uniswap Wallet, and @ambire during onboarding, ETH and USDC transfers, swaps, app connections, and transactions.
 
 https://github.com/walletbeat/walletbeat/tree/master/data/software-wallets/collection
 
 ---
 
-Wallets and software supply chain security:
+We added a new data point: the Dependency Age Gate. 
 
-We added a new data point: the Dependency Age Gate. Do routine updates only adopt dependency releases that are at least a minimum age?
+If a dependency gets compromised, a wallet that adopts every release the moment it's published has no time to find out. 
 
-Dependency sandboxing is now filled in too: it is supported on Ambire and unsupported on Uniswap Wallet, Rabby, and Zerion's extension.
+An age gate sets a minimum age a release must reach before routine updates adopt it, so a bad release can be caught and pulled first. 
+
+---
+
+Also on supply chain security: dependency sandboxing is now filled in for four wallets.
+
+Does the wallet isolate its dependencies from each other and from its own code at runtime, so a compromised dependency can't reach beyond what its policy grants?
+
+It is supported on Ambire and unsupported on Uniswap Wallet, Rabby, and Zerion's extension.
 
 ---
 
 The EIP tracker got a big upgrade.
 
-Each EIP now shows the wallets implementing it, how many days it has been final, and a support breakdown pie. Cards are sorted by earliest evidence of support.
+Each EIP now shows how many days it has been final, and a support breakdown pie. Cards are sorted by earliest evidence of support.
 
-https://beta.walletbeat.eth.limo/wallet-eips/
+https://walletbeat.eth.limo/wallet-eips/
 
----
-
-Website updates:
-
-- Preview images for every wallet page
-- Lots of performance work
-
-https://walletbeat.eth.limo/
+![EIP Tracker Upgrade](./eip-tracker-upgrade.jpg)
+![EIP Tracker Upgrade 1](./eip-tracker-upgrade1.jpg)
 
 ---
 
@@ -97,21 +111,17 @@ https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosy
 
 ---
 
-Wallet security news of the month:
+Security incidents we've been tracking this month:
 
-MetaMask disclosed an infrastructure incident and removed the affected validators from staking. It found no indication that wallets or funds were affected.
+Keystone confirmed an external actor obtained customer shipping information through its website. No card details, recovery phrases, or private keys were exposed.
 
-https://x.com/MetaMask/status/2105442300335620460
+MetaMask disclosed an infrastructure incident and is exiting affected staking validators. It found no indication that wallets or funds were affected. 
 
----
+https://beta.walletbeat.eth.limo/news/
 
-Keystone confirmed that an external actor obtained customers' shipping information through its website. No card details, recovery phrases, or private keys were exposed.
-
-https://x.com/KeystoneWallet/status/2114054080754770137
-
----
-
-Want the full breakdown? https://beta.walletbeat.eth.limo/news/
+![October Security News](./security-news-october.jpg)
+![Keystone Security Incident](./security-news-october-1.jpg)
+![Metamask Security Incident](./security-news-october-2.jpg)
 
 ---
 
