@@ -17,6 +17,7 @@ import { rudderstack } from '@/data/entities/rudderstack'
 import { segment } from '@/data/entities/segment'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
+import { trustWallet } from '@/data/entities/trust-wallet'
 import { uniswapLabs } from '@/data/entities/uniswap-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
 import type { Entity } from '@/schema/entity'
@@ -45,6 +46,7 @@ export const allEntities = {
 	segment,
 	sentry,
 	sonicLabs,
+	trustWallet,
 	uniswapLabs,
 	walletbeat,
 }
