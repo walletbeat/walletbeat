@@ -51,8 +51,12 @@
       android:name="com.google.firebase.messaging.default_notification_color"
       android:value="@string/notification_accent_color" />
 
+    <!-- Fully qualified, not ".MainActivity": the flavor applicationIds (com.uniswap.mobile[.dev|.beta])
+         differ from the namespace (com.uniswap), and `expo run:android` resolves the launch activity by
+         appending a relative name to the applicationId — yielding a com.uniswap.mobile.MainActivity that
+         doesn't exist. A qualified name is passed through as-is. -->
     <activity
-      android:name=".MainActivity"
+      android:name="com.uniswap.MainActivity"
       android:label="@string/app_name"
       android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
       android:launchMode="singleTop"
@@ -136,6 +140,27 @@
           android:scheme="https"
           android:host="uniswap.org"
           android:pathPrefix="/app/wc" />
+      </intent-filter>
+    </activity>
+
+    <!-- Trampoline for Expo scheme discovery — see ExpoDevClientSchemeActivity.kt.
+         Disabled on purpose: `@expo/config-plugins` reads this manifest statically, so the
+         declaration alone is enough. Leaving it enabled makes it a second match for
+         uniswap://expo-development-client/… alongside MainActivity's host-less `uniswap` filter,
+         and Android answers a two-way implicit match with the ResolverActivity chooser. -->
+    <activity
+      android:name="com.uniswap.ExpoDevClientSchemeActivity"
+      android:enabled="false"
+      android:exported="true"
+      android:launchMode="singleTask"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:scheme="uniswap"
+          android:host="expo-development-client" />
       </intent-filter>
     </activity>
   </application>
