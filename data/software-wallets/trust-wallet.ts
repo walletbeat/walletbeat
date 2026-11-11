@@ -247,12 +247,6 @@ export const trustWallet: SoftwareWallet = {
 							label: 'Trust Wallet announcement on network support changes',
 							url: 'https://trustwallet.com/blog/product/trust-wallet-to-sunset-support-for-multiple-networks-on-september-15-2026',
 						},
-						{
-							explanation:
-								'Trust Wallet warned that a malicious network provider can lie about the state of the blockchain. The guide asks users to only add networks they trust.',
-							label: 'Trust Wallet guide to adding a custom network (archived copy)',
-							url: 'https://web.archive.org/web/20250330101908/https://community.trustwallet.com/t/how-to-add-a-custom-network-on-the-trust-wallet-mobile-app/626781',
-						},
 					],
 				}),
 			},
