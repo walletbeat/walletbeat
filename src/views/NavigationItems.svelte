@@ -347,6 +347,11 @@
 			label {
 				border-color: var(--icon-navigation-borderColor);
 
+				input::placeholder {
+					color: var(--text-secondary);
+					opacity: 1;
+				}
+
 				> .search-icon {
 					padding-inline-start: 1em;
 					color: var(--text-secondary);
