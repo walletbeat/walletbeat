@@ -2840,6 +2840,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
 - `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
 - `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
+- `IDLE` = `'idle'`: Detect when the system becomes idle, locked, or active again via chrome.idle.
 - `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
 - `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
 - `NOTIFICATIONS` = `'notifications'`: Show browser notifications to the user.
@@ -2890,7 +2891,7 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 
 - `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
 - `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
-- `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
+- `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_DECLARED'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_DECLARED' if the field is absent from the manifest, meaning no web page may connect. Browsers still let any installed extension connect in that case.
 - `permissions` (`BrowserExtensionPermission[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
 - `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
 

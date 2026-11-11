@@ -1,6 +1,6 @@
 {
 	"contentScripts": "UNRESTRICTED",
-	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"externallyConnectable": "NOT_DECLARED",
 	"hostPermissions": "HTTP_AND_HTTPS",
 	"permissions": [
 		"activeTab",

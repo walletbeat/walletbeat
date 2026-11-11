@@ -59,6 +59,10 @@
 		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/cloakedTechnologies.png": {
+		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/images/entities/coinbase.svg": {
 		"hash": "d451b6ab3368559fc2d6c03e89668bf745e91fc8417150c44ab7b11076c088e9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -131,6 +135,10 @@
 		"hash": "82ca026067fb3c643b3c642df8356035d99e6d680d8242c48b5f1b55da22c967",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/oath.svg": {
+		"hash": "581053bc76a9a16bdb4aca991e294e956d5539967c6fd955eb67ee70b6559c22",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/pimlico.png": {
 		"hash": "6d9ba8b0abf96cc67c267f0a38cfe26035baae6ae37f3a60082832d5ad5c5341",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -194,6 +202,10 @@
 	"public/images/wallets/bitget.svg": {
 		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/cloaked.png": {
+		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/images/wallets/cypherock.svg": {
 		"hash": "01d46eacc61d583a8249e55df6c3a8eeda2fe0cbd62ea05bece39a5b98edecb9",
@@ -265,6 +277,10 @@
 	},
 	"public/images/wallets/nufi.svg": {
 		"hash": "799972b0936c5634bdb759b60bbe1666e2340155c6dc370434f826fbcbf81405",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/oath.svg": {
+		"hash": "581053bc76a9a16bdb4aca991e294e956d5539967c6fd955eb67ee70b6559c22",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/okx.png": {
@@ -454,6 +470,62 @@
 	"public/references/wallets/gemwallet/screenshots/2026-09-09-gemwallet-swap-review.jpg": {
 		"hash": "f7633cc320119eb5dfe61606e7c1b378034e9c91b54c43f0ba6bddd6e2abf5cc",
 		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png": {
+		"hash": "b77885d3bab4eb95a6da433cc30be07e684079000b1a2ad6be6861c199df4d25",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png": {
+		"hash": "4b2a9644c16647a82be2c8af6e485d6f31edca575e1602e0243dd56587a23e9e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png": {
+		"hash": "6ed56327a19f8dc0f39ccadb20b283af5631ca9d2612da666fd377a0ed97330a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png": {
+		"hash": "bc5e4571c229559bdad0987358813c3f41e1ccf0b8140d77fe9629c2050c7e22",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-eth-send-review.png": {
+		"hash": "cc479b0f3cf736b311ab9eb101404f421a68c2a366e6eaec16ccf2b1a4f169ba",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png": {
+		"hash": "6b3fbfdcd5a6171a3ba5422a063524660dd25f9de06bee63c2049431f938f34a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-details.png": {
+		"hash": "df39b39b06fbd1fc139340e3713cbde254b1b733091d088a07bddc9ff2dc77ec",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-review.png": {
+		"hash": "45baf210ccc4704993cc26ab7d08ac41c6168a356c7481463cb50969c9a48bb2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-token-send-review.png": {
+		"hash": "9fc3dc114546f821df68e5fb19e42d78c90800424a146645e37105536f6cd5f8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png": {
+		"hash": "3a7fdb7f5254bd21a844687ef193857aea0bcd23ee6f8172ff7d1f12eb73537d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png": {
+		"hash": "80fb0d18ed344f3c9227951cc02e13e5dd71316660b85a224bd7ab9bfd058e08",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png": {
+		"hash": "948d648ef635e17223f40a8bceedf94ff979ace4d57f2b9ba8ffcadd7d7fb2fe",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-connected-second-wallet.png": {
+		"hash": "1678e10fb118c0381894ebe05045ab15815310566a55203e76e21aaf8b77eba1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png": {
+		"hash": "3931c40a31a2680e2a92aa1807981e754d1ac5e4b4c1bd6fff046bbc4161bdee",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
 		"hash": "15b963a47d182358a47c8f7fdaaee0b22ecf3f6a1280e21f8f225a101b7a6ac0",
@@ -1095,6 +1167,90 @@
 		"hash": "c8a60ea325b7028436be7dff93ffea73645e8f431f9ebd88dc5ef347283b6f2c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-add-custom-network.png": {
+		"hash": "ed814a5ed35ab73575132c10277fac03adae0f26bd57c52398e5dade06177385",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-add-ethereum-rpc-endpoint.png": {
+		"hash": "49b9947a15198f601bb02f0e3ce71945d043a4266bf17693afbbeb9f2c819b52",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-balances-from-self-hosted-node.png": {
+		"hash": "1d284783216854d47b97603b3a1d1aa0a7cc75afa7412a71064973afccdd41af",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-base-rpc-endpoints.png": {
+		"hash": "13f0a6dd6d88bb49641c02be0180c5ce179bbeecd6f2562242e004f971f0a85e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-ethereum-self-hosted-rpc-in-use.png": {
+		"hash": "a2b655dc0c3687a5d730d9ffe2467d6c38288f659e0dc8d34811250eaf5d1448",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-onboarding-without-rpc-settings.png": {
+		"hash": "e9f03504c02ce81f69b24d4e820052a74d7d26239102e648db0398c1f1c7ca2a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-send-token-picker-usdc-balance.png": {
+		"hash": "5d4b1e2883d15e3be6440dc3295580974c263043891e446976e898573fb78906",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-06-walletchan-usdc-send-review.png": {
+		"hash": "d521162baa9ad9d2c9d179a06c6a4033963b119b33f143ad06b7bd86d20701f2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-aave-supply.png": {
+		"hash": "5c40818497af446ee27b6634634ddd839786a957a59ccfe5e6018f89d76dc143",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eip712-struct-and-digests.png": {
+		"hash": "2e8f2f19f5fc0317feceb0aebf536b4dc993d29631b3359c25485506caffb058",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eoa-batch-approve-supply.png": {
+		"hash": "47f852a6a97f59b6db196bfb20a5e48d5343832af359ee619a6583ac5d0ae151",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc1155-transfer.png": {
+		"hash": "9c014d03121f30aafb9236d4c1a153ac11c39c45a678306eb6def7fe474b865d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc20-transfer.png": {
+		"hash": "315a7841e57ec42eb0fde82efc73f4eda5cb0bf5ea330976871e8f4e840ee1c4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-erc721-transfer.png": {
+		"hash": "91a7261653ad9ccfb890f11d800b35328c4bea708acf4a033ce921b61e5e9de0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-eth-transfer-details.png": {
+		"hash": "9910dc6373cce1d74a914c766684bb10a469f67842f06c1f56c194c16ec2ba32",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-failing-transaction.png": {
+		"hash": "600552fb409c4702a729412106302cb2a8a7696f2395b37fd6b119012e773fd4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-safe-multisend-approve-supply.png": {
+		"hash": "959d703afcdf3bf38b6e10119e3ea8e0c02589f313bcf6bf0ab8a3ef04706e99",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-safe-nested-aave-supply.png": {
+		"hash": "661974ac0765c7c4ad28654144e597a9086be932e44a0fb42724006236f5e2de",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-siwe-sign-in.png": {
+		"hash": "9b7a529e05b7df08266dfb61dfee03e068dfeef800b5608f2647113dfed22045",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-usdc-approval-calldata.png": {
+		"hash": "518a958d2bd96dc79b7694eb05ce66a01898d0c07f564fa1ad4587f621ed7bec",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/walletchan/screenshots/2026-11-07-walletchan-volatile-outcome.png": {
+		"hash": "df6ec2e00ff4dff1e2fbe58ce473c0007eeeafda020f74d44577c7179ded5288",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png": {
 		"hash": "03a48150f2c60c65cfc016de36fdcb827fe9ad32ce128b3eff4fe053f40a0d9c",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1635,6 +1791,34 @@
 		"hash": "3c973d5186410ebfc075e28dd8445ee8568ad231c4bf117d91278b44141d71ee",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/our_socials.png": {
+		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/setting_the_bar.png": {
+		"hash": "6d56565b6f9e15e75620045f9f1c42d8d63c2d0136ac154d0022f0db2373712b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.5.png": {
+		"hash": "956a2fe4cc6bb308536bb5b5c6bda5a96def620340b6531c3846a2a08fd85de5",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_0.png": {
+		"hash": "497c6b2605bb65398533adf2cadc4b7c59392e4e70886b7d1804ef05fb466630",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_1.png": {
+		"hash": "2f41ef778e27c28eca4c176a1c158d132794c7f183818cd2a7ef5067d8839e42",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/stage_2.png": {
+		"hash": "14e6db3e8202f0e0a69166463854bf81356c8a002cfae31e184dd5f4903c3e65",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-23 - Wallet Stages/wallet_stages.png": {
+		"hash": "d2063f35b8d30453180a8940ed96b450d215c5e07665b6a715f21bae095e35c1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/erc-7730_tracker.png": {
 		"hash": "6fa75ec6e1c9046954b12cad1098420b6908003211233a91f12ab8ab4d9ebe01",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1673,6 +1857,14 @@
 	},
 	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/transaction_inclusion.png": {
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Walletbeat Rating Philosophy/rating-philosophy.png": {
+		"hash": "fbc098c185f6829d0e2eea7e4e3027d7019eeb840c0fd50cac6a35a376ac0ba0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-06 - Walletbeat Rating Philosophy/walletbeat-socials.png": {
+		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
@@ -1714,6 +1906,34 @@
 	"resources/files/social-media/threads/2026-10-28 - Booth Activities/booth_banner.png": {
 		"hash": "612751db87fcfe038e5f7325c4177d6592067cac3ef12cfcbf167c027b4ae12d",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/darryl_lightning_talk.jpg": {
+		"hash": "e59bd85170c829a275b27f68e3c672eee1d6e4dc2c3688122181f12a13fcef2c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/matt_lightning_talk.jpg": {
+		"hash": "52af429bd900175dac59beb0c6316483d5ae25ffaeeefd4236b69aded6bdd403",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/matt_workshop.jpg": {
+		"hash": "e1bddcb47d823ffd072738c0f2926761b2d3ea499a113c8e9b89bbc7b301ceae",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg": {
+		"hash": "1849043ddd17da91f447eece3b3efb10e4a29d3a01d768f6d88231168800881f",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_lightning_talk.jpg": {
+		"hash": "edfea5db7f2da18a12803b6049bf668bd21ca3c66e83c1912e4943815bdd74f1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_matt.jpg": {
+		"hash": "c5f107a19cff842e2358de9e79b8f437d09aa023e4fa3094f9f5510f1d12f555",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png": {
+		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
+		"passedTests": ["file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
