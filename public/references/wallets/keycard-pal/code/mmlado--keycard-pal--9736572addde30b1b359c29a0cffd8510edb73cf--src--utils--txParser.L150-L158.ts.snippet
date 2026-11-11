@@ -1,0 +1,35 @@
+{
+	"highlightFirstLine": 150,
+	"highlightLastLine": 158,
+	"segments": [
+		{
+			"lines": [
+				"> = {"
+			],
+			"startLine": 75
+		},
+		{
+			"lines": [
+				"  0x14: {",
+				"    name: 'V4 Position Manager Call',",
+				"  },",
+				"};",
+				"",
+				"function formatDecodedValue(value: unknown): string {",
+				"  if (typeof value === 'bigint') return value.toString();",
+				"  if (typeof value === 'string') return value;",
+				"  if (typeof value === 'boolean') return value ? 'true' : 'false';",
+				"  if (value == null) return String(value);",
+				"  return JSON.stringify(value, (_, nested) =>",
+				"    typeof nested === 'bigint' ? nested.toString() : nested,",
+				"  );",
+				"}",
+				"",
+				"function formatCommandByte(command: number): string {",
+				"  return `0x${command.toString(16).padStart(2, '0')}`;",
+				"}"
+			],
+			"startLine": 145
+		}
+	]
+}

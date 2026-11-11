@@ -122,6 +122,12 @@ export enum HardwareWalletConnection {
 	bluetooth = 'BLUETOOTH',
 
 	/**
+	 * Near-field communication: the hardware wallet is a smart card or tag
+	 * held against the phone (e.g. Keycard).
+	 */
+	NFC = 'NFC',
+
+	/**
 	 * Indirect connection via the WalletConnect protocol — the hardware wallet
 	 * connects through its companion app rather than directly to the software wallet.
 	 */
@@ -137,6 +143,7 @@ export const hardwareWalletConnectionEnum = new Enum<HardwareWalletConnection>({
 	[HardwareWalletConnection.webUSB]: true,
 	[HardwareWalletConnection.webHID]: true,
 	[HardwareWalletConnection.bluetooth]: true,
+	[HardwareWalletConnection.NFC]: true,
 	[HardwareWalletConnection.WALLET_CONNECT]: true,
 })
 
@@ -157,6 +164,8 @@ export function hardwareWalletConnectionToString(
 			return 'WebHID'
 		case HardwareWalletConnection.bluetooth:
 			return 'Bluetooth'
+		case HardwareWalletConnection.NFC:
+			return 'NFC'
 		case HardwareWalletConnection.WALLET_CONNECT:
 			return 'WalletConnect'
 	}

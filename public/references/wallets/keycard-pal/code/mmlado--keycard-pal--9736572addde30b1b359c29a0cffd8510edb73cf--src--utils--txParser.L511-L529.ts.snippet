@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 511,
+	"highlightLastLine": 529,
+	"segments": [
+		{
+			"lines": [
+				"/**",
+				" * dataType 1 = Legacy transaction (or EIP-2930 if first byte is 0x01)",
+				" * dataType 4 = EIP-2718 typed transaction (0x01 EIP-2930 or 0x02 EIP-1559)",
+				" * Others (EIP-712, personal sign) are not transactions — return null.",
+				" */",
+				"export function parseTx(",
+				"  signDataHex: string,",
+				"  dataType: number,",
+				"  nativeCurrencySymbol: string = 'ETH',",
+				"): ParsedTx | null {",
+				"  try {",
+				"    const bytes = Buffer.from(signDataHex, 'hex');",
+				"    if (dataType === 1 && bytes[0] === 0x01)",
+				"      return parseEIP2930(bytes, nativeCurrencySymbol);",
+				"    if (dataType === 1) return parseLegacy(bytes, nativeCurrencySymbol);",
+				"    if (dataType === 4 && bytes[0] === 0x01)",
+				"      return parseEIP2930(bytes, nativeCurrencySymbol);",
+				"    if (dataType === 4 && bytes[0] === 0x02)",
+				"      return parseEIP1559(bytes, nativeCurrencySymbol);",
+				"    return null;",
+				"  } catch {",
+				"    return null;",
+				"  }",
+				"}",
+				"",
+				"export function validateEthTransactionSignData(",
+				"  signDataHex: string,",
+				"  dataType: number,"
+			],
+			"startLine": 506
+		}
+	]
+}

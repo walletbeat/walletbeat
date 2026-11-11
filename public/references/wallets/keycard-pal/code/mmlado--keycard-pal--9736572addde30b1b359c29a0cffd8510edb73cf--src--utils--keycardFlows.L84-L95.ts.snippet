@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 84,
+	"highlightLastLine": 95,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"function prepareEthSign(params: EthSignParams): KeycardFlowRun {",
+				"  const payload = classifyEthPayload(params.signData, params.dataType);",
+				"  // signingDigest throws on 'invalid' with the classification reason —",
+				"  // buildSignKeycardParams withholds the Sign button for these, so this is",
+				"  // a belt-and-braces guard, surfaced as a prepare error.",
+				"  const hash = signingDigest(payload);",
+				"  return flow<Uint8Array>({",
+				"    cardOp: async cmdSet => {",
+				"      const signResp = await cmdSet.signWithPath(",
+				"        hash,",
+				"        params.derivationPath,",
+				"        false,",
+				"      );",
+				"      signResp.checkOK();",
+				"      return signResp.data;",
+				"    },",
+				"    buildOutput: result => {",
+				"      if (params.wcContext) {",
+				"        return {"
+			],
+			"startLine": 80
+		}
+	]
+}

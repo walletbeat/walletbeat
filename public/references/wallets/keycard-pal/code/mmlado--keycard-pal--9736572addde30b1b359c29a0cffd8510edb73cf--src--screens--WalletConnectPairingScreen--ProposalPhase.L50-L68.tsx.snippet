@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 50,
+	"highlightLastLine": 68,
+	"segments": [
+		{
+			"lines": [
+				"function VerifyBanner({",
+				"  validation,",
+				"  isScam,",
+				"}: {",
+				"  validation: VerifyValidation;",
+				"  isScam?: boolean;",
+				"}) {",
+				"  if (isScam) {",
+				"    return (",
+				"      <View style={styles.verifyScam}>",
+				"        <Text style={styles.verifyScamText}>",
+				"          ⚠ This site has been flagged as a scam. Do not connect.",
+				"        </Text>",
+				"      </View>",
+				"    );",
+				"  }",
+				"  if (validation === 'INVALID') {",
+				"    return (",
+				"      <View style={styles.verifyInvalid}>",
+				"        <Text style={styles.verifyInvalidText}>",
+				"          ⚠ Domain could not be verified. Proceed with caution.",
+				"        </Text>",
+				"      </View>",
+				"    );",
+				"  }",
+				"  if (validation === 'VALID') {",
+				"    return (",
+				"      <View style={styles.verifyValid}>"
+			],
+			"startLine": 45
+		}
+	]
+}
