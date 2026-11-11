@@ -11,12 +11,15 @@ import {
 	type WalletLadder,
 	type WalletStage,
 } from '@/schema/stages'
+import { WalletType } from '@/schema/wallet-types'
 import { sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { walletQualifiesForStageZero } from '@/utils/stage'
+import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
 import { allCriteriaInStage, computeCountsAndStatus } from '@/utils/stage-attributes'
 import { ratedWalletJsonExport } from '@/utils/wallet-json-export'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
+
+import { walletFixtures } from './browser/fixtures/wallet-fixtures'
 
 function stage(
 	id: WalletStage<SoftwareAttributeGroupId>['id'],
@@ -195,5 +198,22 @@ describe('stage breakdowns', () => {
 			totalCount: 0,
 			status: 'PASS',
 		})
+	})
+})
+
+describe('stage selection by assigned wallet type', () => {
+	it('keeps software ranking distinct from a hardware type with no applicable ladder', () => {
+		const wallet = walletFixtures.multipleTypes()
+		const software = getWalletStageAndLadder(wallet, WalletType.SOFTWARE)
+		const hardware = getWalletStageAndLadder(wallet, WalletType.HARDWARE)
+
+		expect(software.ladderEvaluation).not.toBeNull()
+		expect(hardware.ladderEvaluation).toBeNull()
+		expect(getWalletStageAndLadder(wallet)).toEqual(software)
+		expect(getWalletStageAndLadder(wallet, WalletType.EMBEDDED).ladderEvaluation).toBeNull()
+	})
+	it('retains the ladder when its criteria are unknown and omits absent ladders', () => {
+		expect(getWalletStageAndLadder(walletFixtures.unknown()).ladderEvaluation).not.toBeNull()
+		expect(getWalletStageAndLadder(walletFixtures.embedded()).ladderEvaluation).toBeNull()
 	})
 })

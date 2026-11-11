@@ -7,11 +7,10 @@
 		"src/tools/wallet-data-collection/agent/backup-tree.bak"
 	],
 	"compilerOptions": {
-		"baseUrl": ".",
 		"paths": {
 			"@/data/*": ["./data/*"],
 			"@/tests/*": ["./tests/*"],
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		},
 		"lib": ["esnext"],
 		"forceConsistentCasingInFileNames": false

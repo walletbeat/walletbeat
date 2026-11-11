@@ -10,7 +10,8 @@
 		"activeTab",
 		"notifications",
 		"offscreen",
-		"contextMenus"
+		"contextMenus",
+		"webRequest"
 	],
 	"webAccessibleResources": "UNRESTRICTED"
 }
