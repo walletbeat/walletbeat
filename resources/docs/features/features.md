@@ -795,15 +795,25 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 
 A naming service whose names a wallet may resolve when sending funds.
 
-- `ENS` = `'ens'`: Ethereum Name Service (`.eth`).
-- `GWEI` = `'gwei'`: Gwei Name Service (`.gwei`), an ENS alternative on Ethereum.
-- `WEI` = `'wei'`: Wei Name Service (`.wei`), an ENS alternative on Ethereum.
-- `MEGA` = `'mega'`: MegaNames (`.mega`) on MegaETH.
-- `HYPERLIQUID` = `'hyperliquid'`: Hyperliquid Names (`.hl`) on HyperEVM.
+- `ENS` = `'ens'`: Ethereum Name Service (`.eth`). To test: type `wallet.ensdao.eth` in the send address field. If it resolves, the wallet supports ENS lookups.
+- `GWEI` = `'gwei'`: Gwei Name Service (`.gwei`), an ENS alternative on Ethereum. To test: type a known registered name, such as `gns.gwei`, in the send address field. If it resolves, the wallet supports Gwei Name Service lookups.
+- `WEI` = `'wei'`: Wei Name Service (`.wei`), an ENS alternative on Ethereum. To test: type a known registered name, such as `roll.wei`, in the send address field. If it resolves, the wallet supports Wei Name Service lookups.
+- `MEGA` = `'mega'`: MegaNames (`.mega`) on MegaETH. To test: type a known registered name, such as `bread.mega`, in the send address field. If it resolves, the wallet supports MegaNames lookups.
+- `HYPERLIQUID` = `'hyperliquid'`: Hyperliquid Names (`.hl`) on HyperEVM. To test: type a known registered name, such as `jeff.hl`, in the send address field. If it resolves, the wallet supports Hyperliquid Names lookups.
 
 ---
 
-### Interface: `NameServiceSupport<ARS = Support<AddressResolutionData> | null>`
+### Interface: `NameServiceInfo`
+
+Human-readable information about a naming service.
+
+- `displayName` (`string`): Name of the naming service, for display in user-facing content.
+- `suffix` (`string`): Suffix of names registered with the naming service.
+- `exampleName` (`string`): A registered name to use when testing support for the naming service.
+
+---
+
+### Type: `NameServiceSupport<ARS = Support<AddressResolutionData> | null>`
 
 Support for resolving names from each tracked naming service.
 
@@ -811,11 +821,9 @@ Each naming service is tracked separately because a wallet may resolve names fro
 
 Only naming services with meaningful adoption are tracked. Smaller-reach services are considered only when there is a clear inclusion criterion.
 
-- `ens` (`ARS`): Support for Ethereum Name Service (`.eth`) lookups. To test: type `wallet.ensdao.eth` in the send address field. If it resolves, it is supported.
-- `gwei` (`ARS`): Support for Gwei Name Service (`.gwei`) lookups. To test: type a known registered name, such as `gns.gwei`, in the send address field. If it resolves, it is supported.
-- `wei` (`ARS`): Support for Wei Name Service (`.wei`) lookups. To test: type a known registered name, such as `roll.wei`, in the send address field. If it resolves, it is supported.
-- `mega` (`ARS`): Support for MegaNames (`.mega`) lookups. To test: type a known registered name, such as `bread.mega`, in the send address field. If it resolves, it is supported.
-- `hyperliquid` (`ARS`): Support for Hyperliquid Names (`.hl`) lookups. To test: type a known registered name, such as `jeff.hl`, in the send address field. If it resolves, it is supported.
+```typescript
+type NameServiceSupport<ARS = Support<AddressResolutionData> | null> = Record<NameService, ARS>
+```
 
 ---
 

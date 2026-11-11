@@ -8,7 +8,7 @@ import {
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
-import { isSupported, type Support, type Supported } from '@/schema/features/support'
+import { isSupported, notSupported, type Support, type Supported } from '@/schema/features/support'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
@@ -16,9 +16,10 @@ import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } fro
 import type {
 	AddressResolution,
 	AddressResolutionData,
+	NameService,
 	NameServiceSupport,
 } from '../../features/privacy/address-resolution'
-import { NameService } from '../../features/privacy/address-resolution'
+import { nameServiceInfo, trackedNameServices } from '../../features/privacy/address-resolution'
 import { hasRefs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
@@ -26,47 +27,8 @@ export type AddressResolutionMetadata = {
 	addressResolution?: AddressResolution<Support<AddressResolutionData> | null>
 }
 
-type NameServiceInfo = {
-	displayName: string
-	suffix: string
-	exampleName: string
-}
-
-const nameServiceOrder: NonEmptyArray<NameService> = [
-	NameService.ENS,
-	NameService.GWEI,
-	NameService.WEI,
-	NameService.MEGA,
-	NameService.HYPERLIQUID,
-]
-
-const nameServiceInfo: Record<NameService, NameServiceInfo> = {
-	[NameService.ENS]: {
-		displayName: 'ENS',
-		suffix: '.eth',
-		exampleName: 'wallet.ensdao.eth',
-	},
-	[NameService.GWEI]: {
-		displayName: 'Gwei Name Service',
-		suffix: '.gwei',
-		exampleName: 'gns.gwei',
-	},
-	[NameService.WEI]: {
-		displayName: 'Wei Name Service',
-		suffix: '.wei',
-		exampleName: 'roll.wei',
-	},
-	[NameService.MEGA]: {
-		displayName: 'MegaNames',
-		suffix: '.mega',
-		exampleName: 'bread.mega',
-	},
-	[NameService.HYPERLIQUID]: {
-		displayName: 'Hyperliquid Names',
-		suffix: '.hl',
-		exampleName: 'jeff.hl',
-	},
-}
+/** The minimum number of naming services a wallet must support to earn a partial rating. */
+const MINIMUM_NAME_SERVICES_FOR_PARTIAL = 2
 
 type SupportedNameService = {
 	service: NameService
@@ -78,7 +40,7 @@ function getSupportedNameServices(
 ): SupportedNameService[] {
 	const supported: SupportedNameService[] = []
 
-	for (const service of nameServiceOrder) {
+	for (const service of trackedNameServices.items) {
 		const support = nameServices[service]
 
 		if (support !== null && isSupported(support)) {
@@ -87,6 +49,17 @@ function getSupportedNameServices(
 	}
 
 	return supported
+}
+
+/** @returns A comma-separated list of every tracked naming service, with its suffix. */
+function nameServiceExamplesMarkdown(): string {
+	return trackedNameServices.items
+		.map(service => {
+			const info = nameServiceInfo[service]
+
+			return `${info.displayName} (\`${info.suffix}\`)`
+		})
+		.join(', ')
 }
 
 /**
@@ -180,7 +153,11 @@ function evaluateAddressResolution(
 	]
 
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
-		if (chainSpecificSupport === null || !isSupported(chainSpecificSupport)) {
+		if (chainSpecificSupport === null) {
+			return unrated(ctx, { addressResolution })
+		}
+
+		if (!isSupported(chainSpecificSupport)) {
 			continue
 		}
 
@@ -230,16 +207,16 @@ function evaluateAddressResolution(
 	}
 
 	const supportedNameServices = getSupportedNameServices(addressResolution.nameServices)
+	const hasUnknownNameService = trackedNameServices.items.some(
+		service => addressResolution.nameServices[service] === null,
+	)
 
 	if (supportedNameServices.length === 0) {
-		const hasUnknownSupport =
-			addressResolution.chainSpecificAddressing.erc7828 === null ||
-			addressResolution.chainSpecificAddressing.erc7831 === null ||
-			nameServiceOrder.some(service => addressResolution.nameServices[service] === null)
-
-		if (hasUnknownSupport) {
+		if (hasUnknownNameService) {
 			return unrated(ctx, { addressResolution })
 		}
+
+		const nameServiceExamples = nameServiceExamplesMarkdown()
 
 		return ctx.build({
 			outcome: {
@@ -250,15 +227,46 @@ function evaluateAddressResolution(
 					addressResolution,
 				},
 				shortExplanation: sentence(
-					'{{WALLET_NAME}} does not resolve human-readable names such as ENS names.',
+					`{{WALLET_NAME}} does not resolve human-readable names such as ${nameServiceExamples}.`,
 				),
 			},
 			details: paragraph(
-				'{{WALLET_NAME}} does not support resolving human-readable names, such as ENS (.eth) names or names from other naming services.',
+				`{{WALLET_NAME}} does not support resolving human-readable names, such as ${nameServiceExamples}.`,
 			),
 			howToImprove: markdown(
-				'When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names or names from other naming services.',
+				`When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ${nameServiceExamples}.`,
 			),
+		})
+	}
+
+	if (supportedNameServices.length < MINIMUM_NAME_SERVICES_FOR_PARTIAL) {
+		const supportedNameService = supportedNameServices[0]
+		const supportedInfo = nameServiceInfo[supportedNameService.service]
+		const supportedNameServiceList = nameServiceListMarkdown(supportedNameServices)
+		const nameServiceExamples = nameServiceExamplesMarkdown()
+
+		return ctx.build({
+			outcome: {
+				id: 'support_only_one_name_service',
+				rating: Rating.FAIL,
+				displayName: `Supports only ${supportedInfo.displayName} addresses`,
+				metadata: {
+					addressResolution,
+				},
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} only supports plain ${supportedInfo.displayName} (\`${supportedInfo.suffix}\`) addresses, which is not enough for a partial rating.`,
+				),
+			},
+			details: markdown(`
+				{{WALLET_NAME}} supports sending funds to human-readable addresses from only one naming service:
+
+				${supportedNameServiceList}
+
+				Walletbeat requires support for at least ${MINIMUM_NAME_SERVICES_FOR_PARTIAL} naming services to earn a partial rating, so that users are not locked into a single naming service.
+			`),
+			howToImprove: markdown(`
+				{{WALLET_NAME}} should add support for names from at least one more naming service, such as ${nameServiceExamples}.
+			`),
 		})
 	}
 
@@ -266,10 +274,7 @@ function evaluateAddressResolution(
 		resolutionPriority(candidate.support) < resolutionPriority(best.support) ? candidate : best,
 	)
 	const supportedNameServiceList = nameServiceListMarkdown(supportedNameServices)
-	const displayName =
-		supportedNameServices.length === 1
-			? `Supports ${nameServiceInfo[bestNameService.service].displayName} addresses`
-			: 'Supports human-readable addresses from multiple naming services'
+	const displayName = `Supports human-readable addresses from ${supportedNameServices.length} naming services`
 
 	if (bestNameService.support.medium === 'CHAIN_CLIENT') {
 		return ctx.build({
@@ -395,9 +400,10 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 
 		Wallets receive a **pass** only if they support ${eipMarkdownLink(erc7828)} or
 		${eipMarkdownLink(erc7831)} (chain-specific human-readable addresses).
-		Wallets that support only plain names from one or more naming services,
-		with or without onchain resolution, receive a **partial** rating.
-		Wallets that support no naming service receive a **fail** rating.
+		Wallets that support plain names from two or more naming services, with
+		or without onchain resolution, receive a **partial** rating.
+		Wallets that support plain names from only one naming service, or from
+		no naming service at all, receive a **fail** rating.
 		Wallets with too little information to determine support are left
 		**unrated**.
 
@@ -441,10 +447,10 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 					{
 						nameServices: {
 							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
-							gwei: { support: 'NOT_SUPPORTED' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -466,11 +472,11 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 					EvaluationContext.forTest(() => addressResolution),
 					{
 						nameServices: {
-							ens: { support: 'NOT_SUPPORTED' },
-							gwei: { support: 'NOT_SUPPORTED' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -490,17 +496,17 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		partial: [
 			exampleRating(
 				mdSentence(
-					'The wallet resolves non-chain-specific ENS addresses (`username.eth`) when sending tokens, using onchain data for resolution.',
+					'The wallet resolves ENS and Gwei Name Service addresses (`username.eth`, `username.gwei`) when sending tokens, using onchain data for resolution.',
 				),
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
 						nameServices: {
 							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
-							gwei: { support: 'NOT_SUPPORTED' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							gwei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -515,17 +521,17 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 			),
 			exampleRating(
 				mdSentence(
-					'The wallet resolves non-chain-specific Gwei Name Service addresses (`username.gwei`) when sending tokens, using onchain data for resolution.',
+					'The wallet resolves Gwei Name Service and Wei Name Service addresses (`username.gwei`, `username.wei`) when sending tokens, using onchain data for resolution.',
 				),
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
 						nameServices: {
-							ens: { support: 'NOT_SUPPORTED' },
+							ens: notSupported,
 							gwei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							wei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -546,11 +552,11 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 					EvaluationContext.forTest(() => addressResolution),
 					{
 						nameServices: {
-							ens: { support: 'NOT_SUPPORTED' },
-							gwei: { support: 'NOT_SUPPORTED' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -574,11 +580,11 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 					EvaluationContext.forTest(() => addressResolution),
 					{
 						nameServices: {
-							ens: { support: 'NOT_SUPPORTED' },
-							gwei: { support: 'NOT_SUPPORTED' },
-							wei: { support: 'NOT_SUPPORTED' },
-							mega: { support: 'NOT_SUPPORTED' },
-							hyperliquid: { support: 'NOT_SUPPORTED' },
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
 						chainSpecificAddressing: {
 							erc7828: {
@@ -595,29 +601,56 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 				),
 			),
 		],
-		fail: exampleRating(
-			mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
-			evaluateAddressResolution(
-				EvaluationContext.forTest(() => addressResolution),
-				{
-					nameServices: {
-						ens: { support: 'NOT_SUPPORTED' },
-						gwei: { support: 'NOT_SUPPORTED' },
-						wei: { support: 'NOT_SUPPORTED' },
-						mega: { support: 'NOT_SUPPORTED' },
-						hyperliquid: { support: 'NOT_SUPPORTED' },
-					},
-					chainSpecificAddressing: {
-						erc7828: {
-							support: 'NOT_SUPPORTED',
+		fail: [
+			exampleRating(
+				mdSentence(
+					'The wallet resolves ENS addresses (`username.eth`) but supports no other naming service.',
+				),
+				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
+					{
+						nameServices: {
+							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
 						},
-						erc7831: {
-							support: 'NOT_SUPPORTED',
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
 						},
 					},
-				},
+				),
 			),
-		),
+			exampleRating(
+				mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
+				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
+					{
+						nameServices: {
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
+						},
+					},
+				),
+			),
+		],
 	},
 	evaluate: (
 		ctx: EvaluationContext<AddressResolutionMetadata>,
@@ -633,11 +666,7 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		ctx.addRef(feature)
 
 		for (const nestedResolution of [
-			feature.nameServices.ens,
-			feature.nameServices.gwei,
-			feature.nameServices.hyperliquid,
-			feature.nameServices.mega,
-			feature.nameServices.wei,
+			...trackedNameServices.items.map(service => feature.nameServices[service]),
 			feature.chainSpecificAddressing.erc7828,
 			feature.chainSpecificAddressing.erc7831,
 		]) {
