@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { sigri } from '@/data/contributors/sigri'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -8,8 +9,17 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -20,9 +30,9 @@ export const mtpelerin: SoftwareWallet = {
 		displayName: 'Bridge Wallet',
 		tableName: 'Bridge Wallet',
 		coinspectId: 'bridge-wallet',
-		contributors: [sigri, mattmatt],
+		contributors: [sigri, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2025-08-26',
+		lastUpdated: '2026-10-18',
 		urls: {
 			repositories: ['https://github.com/mtpelerin'],
 			socials: {
@@ -78,17 +88,36 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		licensing: fullyClosedSource,
 		monetization: {
-			ref: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
+			ref: [
+				{
+					explanation:
+						'Mt Pelerin raised its early funding through a public equity crowdfunding that sold tokenized shares.',
+					label: 'About Mt Pelerin',
+					url: 'https://developers.mtpelerin.com/additional-information/about-mt-pelerin',
+				},
+				{
+					explanation:
+						'Mt Pelerin publishes the commission it charges on purchases, sales, and swaps, and says this is the only way it earns money from users.',
+					label: 'Mt Pelerin pricing',
+					url: 'https://www.mtpelerin.com/pricing',
+				},
+				{
+					explanation:
+						'Apps that integrate the Mt Pelerin exchange service receive a share of the fees paid by the users they bring.',
+					label: 'Mt Pelerin revenue sharing',
+					url: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
+				hiddenConvenienceFees: false,
+				publicOffering: true,
 				selfFunded: true,
-				transparentConvenienceFees: null,
+				transparentConvenienceFees: true,
 				ventureCapital: null,
 			},
 		},
@@ -111,7 +140,17 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: null,
+				guardianRecovery: notSupportedWithRef({
+					ref: {
+						explanation:
+							'The wallet can only be restored from its secret phrase. Mt Pelerin cannot help recover a wallet if the phrase is lost.',
+						label: 'Bridge Wallet FAQ',
+						url: 'https://www.mtpelerin.com/faq',
+					},
+				}),
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
@@ -128,7 +167,7 @@ export const mtpelerin: SoftwareWallet = {
 				platform: BugBountyPlatform.IMMUNEFI,
 				rewards: supported({
 					currency: 'USD',
-					maximum: 100000,
+					maximum: 5000,
 					minimum: 1000,
 				}),
 				upgradePathAvailable: false,
@@ -138,12 +177,21 @@ export const mtpelerin: SoftwareWallet = {
 				ref: refTodo,
 				wallets: {},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: {
+					explanation:
+						'Mt Pelerin says only the user knows the secret phrase, and that it is kept encrypted on the device and not stored anywhere else.',
+					label: 'Bridge Wallet FAQ',
+					url: 'https://www.mtpelerin.com/faq',
+				},
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: null,
@@ -167,15 +215,22 @@ export const mtpelerin: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyAgeGate: null,
 				dependencyLocking: null,
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: notSupported,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation:
+							'WalletScrutiny could not rebuild the app because its source code is not public.',
+						label: 'WalletScrutiny review of Bridge Wallet for Android',
+						url: 'https://walletscrutiny.com/android/com.mtpelerin.bridge/',
+					},
+				}),
 			},
 		},
 		walletCall: null,

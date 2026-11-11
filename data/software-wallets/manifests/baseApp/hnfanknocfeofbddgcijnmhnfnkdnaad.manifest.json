@@ -3,7 +3,7 @@
 	"name": "Coinbase Wallet extension",
 	"description": "Coinbase Wallet extension is the safest and easiest way to use crypto apps in your browser.",
 	"manifest_version": 3,
-	"version": "3.149.0",
+	"version": "3.151.0",
 	"minimum_chrome_version": "102",
 	"permissions": ["activeTab", "alarms", "scripting", "storage"],
 	"host_permissions": [
