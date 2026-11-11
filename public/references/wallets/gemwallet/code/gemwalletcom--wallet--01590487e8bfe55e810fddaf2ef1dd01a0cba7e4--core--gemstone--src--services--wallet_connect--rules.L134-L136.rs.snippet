@@ -1,0 +1,32 @@
+{
+	"highlightRanges": [
+		{
+			"first": 134,
+			"last": 136
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"pub fn session_wallets(wallets: Vec<Wallet>, required: &[Chain], optional: &[Chain]) -> Vec<Wallet> {"
+			],
+			"startLine": 128
+		},
+		{
+			"lines": [
+				"    supported.sort_by_key(|wallet| wallet.wallet_type.rank());",
+				"    supported",
+				"}",
+				"",
+				"pub fn default_wallet(wallets: &[Wallet], current_wallet_id: Option<WalletId>) -> Option<Wallet> {",
+				"    wallets.iter().find(|wallet| Some(&wallet.id) == current_wallet_id.as_ref()).or_else(|| wallets.first()).cloned()",
+				"}",
+				"",
+				"pub fn supported_chains() -> Vec<Chain> {",
+				"    crate::config::wallet_connect::get_wallet_connect_config().chains.iter().filter_map(|chain| Chain::from_str(chain).ok()).collect()",
+				"}"
+			],
+			"startLine": 130
+		}
+	]
+}

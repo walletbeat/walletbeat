@@ -18,7 +18,11 @@ import {
 	validateDataCollectionByEntityRow,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	type FeeDisplay,
+	FeeDisplayLevel,
+	FeeType,
+} from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
 	deriveOrderflowFacts,
@@ -234,11 +238,20 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 			} satisfies OrderflowDisclosure,
 			feeDisplay: {
-				byDefault: FeeDisplayLevel.AGGREGATED,
-				afterSingleAction: FeeDisplayLevel.AGGREGATED,
-				fullySponsored: false,
-				walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
-			},
+				feesInvolved: {
+					[FeeType.NETWORK_FEE]: true,
+					[FeeType.ONCHAIN_APP_FEE]: false,
+					[FeeType.WALLET_FEE]: false,
+				},
+				shownAfterSingleAction: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+				shownByDefault: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+			} satisfies FeeDisplay,
 			expected: 0,
 		},
 		{
@@ -248,11 +261,20 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
 			} satisfies OrderflowDisclosure,
 			feeDisplay: {
-				byDefault: FeeDisplayLevel.AGGREGATED,
-				afterSingleAction: FeeDisplayLevel.AGGREGATED,
-				fullySponsored: false,
-				walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
-			},
+				feesInvolved: {
+					[FeeType.NETWORK_FEE]: true,
+					[FeeType.ONCHAIN_APP_FEE]: false,
+					[FeeType.WALLET_FEE]: false,
+				},
+				shownAfterSingleAction: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+				shownByDefault: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+			} satisfies FeeDisplay,
 			expected: 1,
 		},
 		{
@@ -262,11 +284,20 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 			} satisfies OrderflowDisclosure,
 			feeDisplay: {
-				byDefault: FeeDisplayLevel.COMPREHENSIVE,
-				afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-				fullySponsored: false,
-				walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
-			},
+				feesInvolved: {
+					[FeeType.NETWORK_FEE]: true,
+					[FeeType.ONCHAIN_APP_FEE]: false,
+					[FeeType.WALLET_FEE]: false,
+				},
+				shownAfterSingleAction: {
+					comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+					units: null,
+				},
+				shownByDefault: {
+					comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+					units: null,
+				},
+			} satisfies FeeDisplay,
 			expected: -1,
 		},
 		{
@@ -276,11 +307,20 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
 			} satisfies OrderflowDisclosure,
 			feeDisplay: {
-				byDefault: FeeDisplayLevel.AGGREGATED,
-				afterSingleAction: FeeDisplayLevel.AGGREGATED,
-				fullySponsored: false,
-				walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
-			},
+				feesInvolved: {
+					[FeeType.NETWORK_FEE]: true,
+					[FeeType.ONCHAIN_APP_FEE]: false,
+					[FeeType.WALLET_FEE]: false,
+				},
+				shownAfterSingleAction: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+				shownByDefault: {
+					comprehensiveness: FeeDisplayLevel.AGGREGATED,
+					units: null,
+				},
+			} satisfies FeeDisplay,
 			expected: 1,
 		},
 	])('$description', ({ disclosure, feeDisplay, expected }) => {
