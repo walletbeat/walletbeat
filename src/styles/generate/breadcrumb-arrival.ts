@@ -74,12 +74,10 @@ ${surfaceEasing}
 	.map(
 		([name, easing]) => `	@keyframes ${name} {
 		contain 0% {
-			opacity: 1;
 			scale: 1 1;
 			animation-timing-function: ${easing};
 		}
 		to, contain 100% {
-			opacity: 1;
 			scale: 1 0;
 		}
 	}`,

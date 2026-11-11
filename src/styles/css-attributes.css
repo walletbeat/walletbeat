@@ -2782,7 +2782,6 @@ ol {
 	}
 	@keyframes breadcrumb-arrival-surface {
 		contain 0% {
-			opacity: 1;
 			scale: 1 1;
 			animation-timing-function: linear(
 					0 0%,
@@ -2821,18 +2820,15 @@ ol {
 			);
 		}
 		to, contain 100% {
-			opacity: 1;
 			scale: 1 0;
 		}
 	}
 	@keyframes breadcrumb-arrival-surface-step {
 		contain 0% {
-			opacity: 1;
 			scale: 1 1;
 			animation-timing-function: steps(1, end);
 		}
 		to, contain 100% {
-			opacity: 1;
 			scale: 1 0;
 		}
 	}
@@ -4751,6 +4747,9 @@ ol {
 										calc(var(---breadcrumb-sourceRowHeight) + 2 * var(--stickyBreadcrumb-sourcePaddingBlock)),
 										calc(var(---column-iconSize, 0px) + var(--stickyBreadcrumb-sourcePaddingBlock))
 									);
+									/* The entry track opens and collapses the same surface. */
+									opacity: 1;
+									scale: 1 0;
 									transform-origin: top;
 									animation:
 										breadcrumb-arrival-surface auto linear forwards,
