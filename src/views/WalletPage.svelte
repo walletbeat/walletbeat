@@ -1682,7 +1682,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		{#if arrivalIndex !== undefined}
 			<span data-sticky-breadcrumb="snap-offset" style:anchor-name={arrivalIndex === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
 		{/if}
-		<span data-sticky-breadcrumb="flow" data-scroll-item="snap-margin" aria-hidden="true"></span>
+		<span data-sticky-breadcrumb="flow snap-prefix" data-scroll-item="snap-margin" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 	</section>
 {/snippet}
@@ -2747,9 +2747,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			> details[open] ~ [data-sticky-breadcrumb~="flow"] {
 				/* The first rating card begins after the shared heading and caption rows. */
 				--stickyBreadcrumb-arrivalRowEnd: 3;
-				--stickyBreadcrumb-arrivalInsetEnd: calc(
-					var(---scrollItem-snapOffsetBlockStart) - var(---breadcrumb-blockEnd)
-				);
 			}
 		}
 

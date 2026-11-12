@@ -1656,6 +1656,7 @@ ol {
  * - `end`: independently sized in-flow metadata
  * - `snap-arrival`: derive arrival end from the first eligible existing child snap.
  * - `snap-offset`: hidden anchor at its snap owner’s native landing offset.
+ * - `snap-prefix`: combines with `flow` and `data-scroll-item="snap-margin"` to end an open disclosure’s arrival at its shared grid prefix and native landing offset.
  * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
  * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact
  * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
@@ -3103,7 +3104,7 @@ ol {
 			---breadcrumb-sourceBorderWidth: 0px;
 			position: relative;
 			---breadcrumb-anchorScope:
-				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --breadcrumb-arrival-end, --column-firstRow;
+				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
 			anchor-scope: var(---breadcrumb-anchorScope);
 			&[data-sticky-breadcrumb~="snap-arrival"] {
 				anchor-scope: var(---breadcrumb-anchorScope), --breadcrumb-snap-first, --breadcrumb-snap-next, --breadcrumb-snap-content;
@@ -3851,7 +3852,8 @@ ol {
 			}
 
 			display: grid;
-			grid-template: calc(var(---breadcrumb-sourceRowHeight) + var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-sourceGap)) auto auto / minmax(0, 1fr);
+			---breadcrumb-sourcePrefixBlockSize: calc(var(---breadcrumb-sourceRowHeight) + var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-sourceGap));
+			grid-template: var(---breadcrumb-sourcePrefixBlockSize) auto auto / minmax(0, 1fr);
 
 			> [data-column]:not(details, [data-sticky-breadcrumb~="position"]) {
 				grid-area: 3 / 1 / 4 / 2;
@@ -3919,6 +3921,11 @@ ol {
 						outline: auto;
 					}
 				}
+			}
+			> details[open] ~ [data-sticky-breadcrumb~="flow"][data-sticky-breadcrumb~="snap-prefix"] {
+				--stickyBreadcrumb-arrivalInsetEnd: calc(
+					var(---scrollItem-snapOffsetBlockStart) - var(---breadcrumb-blockEnd)
+				);
 			}
 			> [data-sticky-breadcrumb~="flow"] {
 				position: if(style(--stickyBreadcrumb-arrivalInsetEnd): absolute; else: relative);

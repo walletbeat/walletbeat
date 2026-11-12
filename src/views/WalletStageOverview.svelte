@@ -169,8 +169,8 @@
 							</header>
 							<div data-sticky-breadcrumb="support">
 									<div data-scroll-item={s.description.contentType === ContentType.TEXT ? 'snap-block-start' : 'snap-prose'}>
-										{#if s.description.contentType === ContentType.TEXT}
-											<span data-sticky-breadcrumb="snap-offset" style:anchor-name={index === 0 ? '--breadcrumb-arrival-end, --breadcrumb-snap-content' : '--breadcrumb-arrival-end'} aria-hidden="true"></span>
+										{#if index === 0 && s.description.contentType === ContentType.TEXT}
+											<span data-sticky-breadcrumb="snap-offset" style:anchor-name="--breadcrumb-snap-content" aria-hidden="true"></span>
 										{/if}
 										{#if isTypographicContent(s.description)}
 											<Typography content={s.description} />
@@ -287,7 +287,7 @@
 					{#if index < 2}
 						<span data-sticky-breadcrumb="snap-offset" style:anchor-name={index === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
 					{/if}
-					<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+					<span data-sticky-breadcrumb={s.description.contentType === ContentType.TEXT ? 'flow snap-prefix' : 'flow'} data-scroll-item={s.description.contentType === ContentType.TEXT ? 'snap-margin' : undefined} aria-hidden="true"></span>
 				</section>
 			{/each}
 		</div>
@@ -295,20 +295,19 @@
 {/if}
 
 <style>
-	@supports (anchor-scope: --breadcrumb-arrival-end) and
-		(inset-block-end: anchor(--breadcrumb-arrival-end start)) and
-		(color: if(style(---breadcrumb-supportGrid: 1): red)) {
-		section[data-sticky-breadcrumb~="scope"]:has(> details[open] [data-sticky-breadcrumb~="snap-offset"])
-			> [data-sticky-breadcrumb~="flow"] {
-			--stickyBreadcrumb-arrivalInsetEnd: calc(
-				anchor(--breadcrumb-arrival-end start) - var(---breadcrumb-blockEnd)
-			);
-		}
-	}
-
 	[data-sticky-breadcrumb~="scope"] {
 		--column-supportGap: var(---wallet-section-support-gap, 0.1875rem);
 		---wallet-attribute-heading-font-size: 1.1rem;
+
+		&:has(> details[open] > [data-column] > [data-column] > [data-card]:first-child) {
+			> [data-sticky-breadcrumb~="flow"][data-sticky-breadcrumb~="snap-prefix"] {
+				/* A description above entry yields to the first criteria card. */
+				--stickyBreadcrumb-arrivalRowEnd: calc(2 + clamp(0, sign(
+					var(---scrollItem-snapOffsetBlockStart) - var(---breadcrumb-parentBlockEnd) -
+					var(---breadcrumb-sourceBorderWidth) - var(---breadcrumb-sourcePrefixBlockSize)
+				), 1));
+			}
+		}
 	}
 
 	:is(details, [data-sticky-breadcrumb~="scope"])[data-card] {

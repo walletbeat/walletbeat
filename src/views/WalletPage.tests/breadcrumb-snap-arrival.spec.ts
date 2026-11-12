@@ -1,5 +1,135 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
+async function observeArrival(owner: Element) {
+	const root = document.querySelector<HTMLElement>('#layout')!
+	const item = owner.querySelector('[data-sticky-breadcrumb~="item"]')!
+	const animation = item
+		.getAnimations()
+		.find(effect => effect instanceof CSSAnimation && effect.animationName === 'breadcrumb-arrival')
+
+	if (!(animation?.timeline instanceof ViewTimeline) || !animation.timeline.subject) {
+		throw new Error('Missing native arrival timeline: ' + owner.id)
+	}
+
+	const timeline = animation.timeline
+	const height = () => timeline.subject.getBoundingClientRect().height
+	// Exit-crossing starts when the subject's leading edge crosses the view's start edge.
+	const entry = timeline.endOffset.to('px').value - height()
+	const nativeStart = timeline.startOffset.to('px').value
+	const readLandings = () =>
+		[...owner.querySelectorAll<HTMLElement>('*')].flatMap(element => {
+			const style = getComputedStyle(element)
+			const box = element.getBoundingClientRect()
+
+			if (
+				style.scrollSnapAlign !== 'start' ||
+				box.width <= 0 ||
+				box.height <= 0 ||
+				style.visibility === 'hidden' ||
+				element.closest('details:not([open]) > :not(summary)')
+			) {
+				return []
+			}
+
+			for (
+				let ancestor = element.parentElement;
+				ancestor && ancestor !== root;
+				ancestor = ancestor.parentElement
+			) {
+				if (/auto|scroll|hidden/.test(getComputedStyle(ancestor).overflowY)) {
+					return []
+				}
+			}
+
+			return [
+				root.scrollTop +
+					box.top -
+					root.getBoundingClientRect().top -
+					parseFloat(style.scrollMarginBlockStart) -
+					(parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0),
+			]
+		})
+	const landings = readLandings()
+	const extent = root.scrollHeight
+	const originalStyle = timeline.subject.getAttribute('style')
+	const subject = timeline.subject
+
+	if (!(subject instanceof HTMLElement)) {
+		throw new Error('Missing HTML arrival subject')
+	}
+
+	let control: number[]
+	let controlExtent: number
+	let controlStart: number
+
+	try {
+		// Clock extension must not change the existing content's native snap geometry.
+		subject.style.setProperty('--stickyBreadcrumb-arrivalInsetEnd', 'initial', 'important')
+		await new Promise<void>(resolve =>
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+		)
+		control = readLandings()
+		controlExtent = root.scrollHeight
+		controlStart = timeline.startOffset.to('px').value
+	} finally {
+		if (originalStyle === null) {
+			subject.removeAttribute('style')
+		} else {
+			subject.setAttribute('style', originalStyle)
+		}
+
+		await new Promise<void>(resolve =>
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+		)
+	}
+
+	const restored = readLandings()
+	const restoredStart = timeline.startOffset.to('px').value
+
+	if (control.length !== landings.length || restored.length !== landings.length) {
+		throw new Error('Arrival extension changed the native snap inventory: ' + owner.id)
+	}
+
+	const layoutDelta = Math.max(
+		...landings.flatMap((value, index) => [
+			Math.abs(value - control[index]),
+			Math.abs(value - restored[index]),
+		]),
+	)
+	const extentDelta = Math.max(
+		Math.abs(extent - controlExtent),
+		Math.abs(extent - root.scrollHeight),
+	)
+	const landing = Math.min(...landings.filter(value => value >= entry - 1 / 32))
+
+	if (!Number.isFinite(landing)) {
+		throw new Error('No eligible native child snap: ' + owner.id)
+	}
+
+	root.scrollTo({ top: Math.round(landing), behavior: 'instant' })
+	await new Promise<void>(resolve =>
+		requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+	)
+	const currentEntry = timeline.endOffset.to('px').value - height()
+
+	return {
+		id: owner.id,
+		entry,
+		landing,
+		end: Math.max(timeline.startOffset.to('px').value + height(), currentEntry),
+		scroll: root.scrollTop,
+		count: landings.length,
+		entryDelta: Math.abs(currentEntry - entry),
+		startDelta: Math.max(
+			Math.abs(nativeStart - controlStart),
+			Math.abs(nativeStart - restoredStart),
+			Math.abs(nativeStart - timeline.startOffset.to('px').value),
+		),
+		layoutDelta,
+		extentDelta,
+	}
+}
+
 const arrivals = [
 	{
 		width: 390,
@@ -34,128 +164,14 @@ for (const { width, destinations } of arrivals) {
 				await expect(disclosure).toHaveJSProperty('open', true)
 			}
 
-			const result = await page.locator(section).evaluate(async owner => {
-				const root = document.querySelector<HTMLElement>('#layout')!
-				const item = owner.querySelector('[data-sticky-breadcrumb~="item"]')!
-				const animation = item
-					.getAnimations()
-					.find(
-						effect =>
-							effect instanceof CSSAnimation && effect.animationName === 'breadcrumb-arrival',
-					)
-
-				if (!(animation?.timeline instanceof ViewTimeline) || !animation.timeline.subject) {
-					throw new Error('Section arrival needs a native view timeline')
-				}
-
-				const timeline = animation.timeline
-				const subject = timeline.subject
-
-				if (!(subject instanceof HTMLElement)) {
-					throw new Error('Missing HTML arrival subject')
-				}
-
-				const end = () => {
-					const height = subject.getBoundingClientRect().height
-
-					return Math.max(
-						timeline.startOffset.to('px').value + height,
-						timeline.endOffset.to('px').value - height,
-					)
-				}
-				const frame = () =>
-					new Promise<void>(resolve =>
-						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-					)
-				const targets = [...owner.querySelectorAll<HTMLElement>('*')].filter(element => {
-					const style = getComputedStyle(element)
-					const box = element.getBoundingClientRect()
-
-					let ancestor = element.parentElement
-
-					while (ancestor && ancestor !== root) {
-						if (/auto|scroll|hidden/.test(getComputedStyle(ancestor).overflowY)) {
-							return false
-						}
-
-						ancestor = ancestor.parentElement
-					}
-
-					return (
-						style.scrollSnapAlign === 'start' &&
-						box.width > 0 &&
-						box.height > 0 &&
-						style.visibility !== 'hidden' &&
-						!element.closest('details:not([open]) > :not(summary)')
-					)
-				})
-				const landings = () =>
-					targets.map(
-						element =>
-							root.scrollTop +
-							element.getBoundingClientRect().top -
-							root.getBoundingClientRect().top -
-							parseFloat(getComputedStyle(element).scrollMarginBlockStart) -
-							(parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0),
-					)
-				const original = landings()
-				const originalExtent = root.scrollHeight
-				const originalStart = timeline.startOffset.to('px').value
-				let naturalLandings: number[]
-				let naturalExtent: number
-				let naturalStart: number
-				const originalStyle = subject.getAttribute('style')
-				let naturalEnd: number
-
-				try {
-					// Observe the natural heading boundary independently of its snap extension.
-					subject.style.setProperty('--stickyBreadcrumb-arrivalInsetEnd', 'initial', 'important')
-					await frame()
-					naturalEnd = end()
-					naturalLandings = landings()
-					naturalExtent = root.scrollHeight
-					naturalStart = timeline.startOffset.to('px').value
-				} finally {
-					if (originalStyle === null) {
-						subject.removeAttribute('style')
-					} else {
-						subject.setAttribute('style', originalStyle)
-					}
-
-					await frame()
-				}
-
-				const restored = landings()
-				const landing = Math.min(...original.filter(value => value >= naturalEnd - 1 / 32))
-
-				root.scrollTo({ top: Math.round(landing), behavior: 'instant' })
-				await frame()
-
-				return {
-					landing,
-					end: end(),
-					scroll: root.scrollTop,
-					count: targets.length,
-					extentDelta: Math.max(
-						Math.abs(originalExtent - naturalExtent),
-						Math.abs(originalExtent - root.scrollHeight),
-					),
-					startDelta: Math.abs(originalStart - naturalStart),
-					measurementDelta: Math.max(
-						...original.map((value, index) => Math.abs(value - naturalLandings[index])),
-					),
-					geometryDelta: Math.max(
-						...original.map((value, index) => Math.abs(value - restored[index])),
-					),
-				}
-			})
+			const result = await page.locator(section).evaluate(observeArrival)
 
 			expect(result.count, section).toBeGreaterThan(0)
 			expect(Number.isFinite(result.landing), section).toBe(true)
-			expect(result.geometryDelta, section).toBeLessThan(1 / 32)
-			expect(result.measurementDelta, section).toBeLessThan(1 / 32)
-			expect(result.extentDelta, section).toBe(0)
+			expect(result.entryDelta, section).toBeLessThan(1)
 			expect(result.startDelta, section).toBeLessThan(1 / 32)
+			expect(result.layoutDelta, section).toBeLessThan(1 / 32)
+			expect(result.extentDelta, section).toBe(0)
 			expect(Math.abs(result.landing - result.end), section).toBeLessThan(1)
 			expect(Math.abs(result.scroll - result.end), section).toBeLessThan(1)
 		}
@@ -300,6 +316,70 @@ for (const direction of ['ltr', 'rtl']) {
 				expect(row.alignment, `${width}: ${row.id}`).toBe('start')
 				expect(row.flowAlignment, `${width}: ${row.id}`).toBe('none')
 				expect(Math.abs(row.end - row.landing), `${width}: ${row.id}`).toBeLessThan(1)
+			}
+		}
+	})
+}
+
+for (const direction of ['ltr', 'rtl']) {
+	test(`text Stage arrivals finish at the first eligible native landing in ${direction}`, async ({
+		page,
+	}) => {
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		test.skip(
+			!(await page.evaluate(
+				() =>
+					CSS.supports('animation-timeline: view()') &&
+					CSS.supports('color: if(style(--support: 1): red)'),
+			)),
+			'Native breadcrumb geometry unavailable',
+		)
+		await page.keyboard.press('ArrowDown')
+		await page.evaluate(direction => {
+			document.documentElement.dir = direction
+			document.querySelector<HTMLElement>('#layout')!.style.scrollSnapType = 'none'
+		}, direction)
+
+		for (const width of [390, 690, 1440]) {
+			await page.setViewportSize({ width, height: 900 })
+			const stages = page.locator(
+				'#stages section[data-sticky-breadcrumb~="scope"]:has(> details > summary > [data-sticky-breadcrumb~="support"] > [data-scroll-item~="snap-block-start"]):has(> details > [data-column] > [data-column] > [data-card]:first-child)',
+			)
+
+			expect(await stages.count()).toBeGreaterThan(0)
+
+			for (const stage of await stages.all()) {
+				const details = stage.locator(':scope > details')
+
+				if ((await details.getAttribute('open')) === null) {
+					await details.locator(':scope > summary').press('Space')
+				}
+
+				await expect(details).toHaveJSProperty('open', true)
+				await page.evaluate(
+					() =>
+						new Promise<void>(resolve =>
+							requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+						),
+				)
+				const result = await stage.evaluate(observeArrival)
+
+				expect(result.count, `${width}: ${result.id}`).toBeGreaterThan(0)
+				expect(Number.isFinite(result.landing), `${width}: ${result.id}`).toBe(true)
+				expect(result.entryDelta, `${width}: ${result.id}`).toBeLessThan(1)
+				expect(result.startDelta, `${width}: ${result.id}`).toBeLessThan(1 / 32)
+				expect(result.layoutDelta, `${width}: ${result.id}`).toBeLessThan(1 / 32)
+				expect(result.extentDelta, `${width}: ${result.id}`).toBe(0)
+				expect(
+					Math.abs(result.end - result.landing),
+					JSON.stringify({ width, ...result }),
+				).toBeLessThan(1)
+				expect(
+					Math.abs(result.scroll - result.end),
+					JSON.stringify({ width, ...result }),
+				).toBeLessThan(1)
 			}
 		}
 	})

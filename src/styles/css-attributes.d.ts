@@ -845,6 +845,7 @@ declare global {
 		 * - `end`: independently sized in-flow metadata
 		 * - `snap-arrival`: derive arrival end from the first eligible existing child snap.
 		 * - `snap-offset`: hidden anchor at its snap owner’s native landing offset.
+		 * - `snap-prefix`: combines with `flow` and `data-scroll-item="snap-margin"` to end an open disclosure’s arrival at its shared grid prefix and native landing offset.
 		 * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
 		 * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact
 		 * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
