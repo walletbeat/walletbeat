@@ -230,52 +230,106 @@ test('Security News retains real H2/H3 sticky owners through native disclosure a
 		let firstRequested = contact + naturalStickyHeight + 20
 
 		if (enhanced) {
+			const entry = await page.locator(chain[level - 1].heading).evaluateHandle(heading => {
+				const owner = heading.closest('[data-sticky-breadcrumb~="position"]')
+				const scope = owner?.closest('[data-sticky-breadcrumb~="scope"]')
+				const subject = scope?.querySelector(
+					':scope > [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])',
+				)
+				const clock = owner
+					?.getAnimations()
+					.find(
+						animation =>
+							animation instanceof CSSAnimation &&
+							animation.animationName === 'breadcrumb-entry' &&
+							animation.effect instanceof KeyframeEffect &&
+							animation.effect.target === owner,
+					)
+
+				const rangeEnd = clock && 'rangeEnd' in clock ? clock.rangeEnd : null
+
+				if (
+					!(clock?.timeline instanceof ViewTimeline) ||
+					!owner ||
+					!subject ||
+					clock.timeline.source !== document.querySelector('#layout') ||
+					clock.timeline.subject !== subject ||
+					!rangeEnd ||
+					typeof rangeEnd !== 'object' ||
+					!('rangeName' in rangeEnd) ||
+					rangeEnd.rangeName !== 'contain' ||
+					!('offset' in rangeEnd) ||
+					!(rangeEnd.offset instanceof CSSUnitValue) ||
+					rangeEnd.offset.unit !== 'percent' ||
+					rangeEnd.offset.value !== 100
+				) {
+					throw new Error('News entry must end at its own native flow contain endpoint')
+				}
+
+				const timeline = clock.timeline
+				const height = subject.getBoundingClientRect().height
+				// Containment ends at the later subject/view edge crossing, for either size ordering.
+				const endpoint = Math.max(
+					timeline.startOffset.to('px').value + height,
+					timeline.endOffset.to('px').value - height,
+				)
+
+				if (!(height > 0) || !Number.isFinite(endpoint)) {
+					throw new Error('News entry needs a positive flow box and finite native endpoint')
+				}
+
+				return { owner, subject, clock, endpoint }
+			})
 			const entryProgress = () =>
-				page.locator(chain[level - 1].heading).evaluate(heading => {
-					const owner = heading.closest('[data-sticky-breadcrumb~="position"]')
-					const clock = owner
-						?.getAnimations()
-						.find(
-							animation =>
-								animation instanceof CSSAnimation &&
-								animation.animationName === 'breadcrumb-entry' &&
-								animation.effect instanceof KeyframeEffect &&
-								animation.effect.target === owner,
-						)
-					const progress = clock?.effect?.getComputedTiming().progress
+				entry.evaluate(({ owner, subject, clock, endpoint }) => {
+					const timeline = clock.timeline
+					const rangeEnd = 'rangeEnd' in clock ? clock.rangeEnd : null
 
 					if (
-						!clock?.timeline ||
-						clock.timeline === document.timeline ||
-						clock.timeline.currentTime === null ||
+						!(timeline instanceof ViewTimeline) ||
+						timeline.subject !== subject ||
+						timeline.source !== document.querySelector('#layout') ||
+						!owner.getAnimations().includes(clock) ||
+						!rangeEnd ||
+						typeof rangeEnd !== 'object' ||
+						!('rangeName' in rangeEnd) ||
+						rangeEnd.rangeName !== 'contain' ||
+						!('offset' in rangeEnd) ||
+						!(rangeEnd.offset instanceof CSSUnitValue) ||
+						rangeEnd.offset.unit !== 'percent' ||
+						rangeEnd.offset.value !== 100 ||
+						timeline.currentTime === null ||
 						clock.currentTime === null
 					) {
-						throw new Error('News plateau needs its resolved native entry clock')
+						throw new Error('News entry clock or binding changed during the endpoint witness')
 					}
 
-					return progress
+					const height = subject.getBoundingClientRect().height
+					const currentEnd = Math.max(
+						timeline.startOffset.to('px').value + height,
+						timeline.endOffset.to('px').value - height,
+					)
+
+					if (Math.abs(currentEnd - endpoint) > 1 / 64) {
+						throw new Error('News entry endpoint moved during the endpoint witness')
+					}
+
+					return clock.effect?.getComputedTiming().progress
 				})
-			let low = natural.scroll
-			let high = sourceTop + natural.rows.at(-1)!.scopeBox.height
 
-			await seek(low)
+			await seek(natural.scroll)
 			expect(await entryProgress(), 'Natural entry is not complete').not.toBe(1)
-			await seek(high)
-			expect(await entryProgress(), 'Completed entry endpoint').toBe(1)
-			while (high - low > 1) {
-				const middle = Math.floor((low + high) / 2)
+			const endpoint = await entry.evaluate(({ endpoint }) => endpoint)
 
-				await seek(middle)
-
-				if ((await entryProgress()) === 1) {
-					high = middle
-				} else {
-					low = middle
-				}
-			}
-			firstRequested = high + 1
+			await seek(Math.ceil(endpoint) - 1)
+			expect(
+				await entryProgress(),
+				'Entry is incomplete immediately before its native endpoint',
+			).not.toBe(1)
+			firstRequested = Math.ceil(endpoint) + 1
 			await seek(firstRequested)
 			expect(await entryProgress(), 'Plateau starts after native entry completes').toBe(1)
+			await entry.dispose()
 		}
 
 		await seek(firstRequested)
