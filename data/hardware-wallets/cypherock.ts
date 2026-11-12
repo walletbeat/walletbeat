@@ -71,7 +71,7 @@ export const cypherockWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation: 'Cypherock is open-source and reproducible',
-						url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/3542eeae9f4455bec107fe0f02230453719706a6/LICENSE.md',
+						url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/3542eeae9f4455bec107fe0f02230453719706a6/LICENSE.md#not-line-specific',
 					},
 				],
 				license: FOSSLicense.MIT_WITH_CLAUSE,

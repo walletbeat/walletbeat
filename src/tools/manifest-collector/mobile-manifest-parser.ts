@@ -5,6 +5,7 @@ import {
 	androidPermissions,
 	IosUsageDescription,
 	iosUsageDescriptions,
+	isIgnoredAndroidPermission,
 	type MobileAppManifest,
 } from '@/schema/features/security/security-best-practices'
 
@@ -15,9 +16,10 @@ const TOOLS_NS = 'http://schemas.android.com/tools'
  * Parses an AndroidManifest.xml string and returns the declared permissions.
  *
  * Extracts all `<uses-permission android:name="...">` entries and maps them
- * to `AndroidPermission` enum values. Throws if an unrecognized permission is
- * encountered — add it to the `AndroidPermission` enum if it is security-relevant,
- * or explicitly ignore it there if not.
+ * to `AndroidPermission` enum values, skipping names that
+ * `isIgnoredAndroidPermission` matches. Throws if an unrecognized permission is
+ * encountered — add it to the `AndroidPermission` enum, or to
+ * `isIgnoredAndroidPermission` if its name differs per app.
  *
  * Entries carrying the `tools:node="remove"` manifest-merger directive are
  * skipped: that directive strips the permission from the final merged manifest,
@@ -39,7 +41,10 @@ export function parseAndroidManifest(xmlText: string): Set<AndroidPermission> {
 			)
 		}
 
-		if (elements[i].getAttributeNS(TOOLS_NS, 'node') === 'remove') {
+		if (
+			elements[i].getAttributeNS(TOOLS_NS, 'node') === 'remove' ||
+			isIgnoredAndroidPermission(name)
+		) {
 			continue
 		}
 
