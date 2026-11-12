@@ -1,6 +1,8 @@
 import * as http from 'http'
 import * as https from 'https'
 
+import { getErrorMessage } from '@/types/errors'
+
 // Configuration
 const DEFAULT_PORT = 8545
 const DEFAULT_LIE_MULTIPLIER = 1_000_000n // multiply every ERC-20 balance by this
@@ -212,10 +214,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 		try {
 			upstreamResult = await forwardToUpstream(upstream, rawBody)
 		} catch (err: unknown) {
-			// Node network errors always carry a code (e.g. ECONNREFUSED), but not always a message.
-			const reason = err instanceof Error && 'code' in err ? String(err.code) : String(err)
-
-			respondWithError(res, 502, `Upstream unreachable (${reason})`)
+			respondWithError(res, 502, `Upstream unreachable (${getErrorMessage(err)})`)
 
 			return
 		}
