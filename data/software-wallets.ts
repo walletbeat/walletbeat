@@ -23,6 +23,7 @@ import { oath } from './software-wallets/oath'
 import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
+import { protofireMultisig } from './software-wallets/protofire-multisig'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
@@ -87,6 +88,7 @@ export const softwareWallets = {
 	okx,
 	phantom,
 	pillarx,
+	protofireMultisig,
 	rabby,
 	rainbow,
 	safe,
