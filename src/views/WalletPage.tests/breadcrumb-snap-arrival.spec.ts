@@ -146,3 +146,95 @@ test('the Stage description snap preserves readable copy and completes shared-ro
 	expect(result.opacity).toBe(1)
 	expect(result.progress).toBeGreaterThanOrEqual(0.99)
 })
+
+for (const direction of ['ltr', 'rtl']) {
+	test(`attribute arrival geometry follows the first content landing across wrapping in ${direction}`, async ({
+		page,
+	}) => {
+		await page.goto('/metamask/?variant=BROWSER')
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.evaluate(() => document.fonts.ready)
+		test.skip(
+			!(await page.evaluate(
+				() =>
+					CSS.supports('animation-timeline: view()') &&
+					CSS.supports('color: if(style(--support: 1): red)'),
+			)),
+			'Native breadcrumb geometry unavailable',
+		)
+		await page.keyboard.press('ArrowDown')
+		await page.evaluate(direction => {
+			document.documentElement.dir = direction
+			const root = document.querySelector<HTMLElement>('#layout')!
+
+			root.style.scrollSnapType = 'none'
+		}, direction)
+
+		for (const width of [390, 690, 1440]) {
+			await page.setViewportSize({ width, height: 900 })
+			await page.evaluate(async () => {
+				await document.fonts.ready
+				await new Promise<void>(resolve =>
+					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+				)
+			})
+			const rows = await page.evaluate(() => {
+				const root = document.querySelector<HTMLElement>('#layout')!
+				const rootTop = root.getBoundingClientRect().top
+				const padding = parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0
+
+				return [...document.querySelectorAll<HTMLElement>('.attribute')].map(section => {
+					const card = section.querySelector<HTMLElement>(
+						':scope > details > .attribute-content > .attribute-rating-details',
+					)!
+					const flow = section.querySelector<HTMLElement>(
+						':scope > [data-sticky-breadcrumb~="flow"]',
+					)!
+					const item = section.querySelector(
+						':scope > details > summary [data-sticky-breadcrumb~="item"]',
+					)!
+					const animation = item
+						.getAnimations()
+						.find(
+							effect =>
+								effect instanceof CSSAnimation && effect.animationName === 'breadcrumb-arrival',
+						)
+
+					if (!(animation?.timeline instanceof ViewTimeline) || !animation.timeline.subject) {
+						throw new Error('Missing attribute arrival timeline: ' + section.id)
+					}
+
+					const timeline = animation.timeline
+					const length = timeline.subject.getBoundingClientRect().height
+					const end = Math.max(
+						timeline.startOffset.to('px').value + length,
+						timeline.endOffset.to('px').value - length,
+					)
+					const style = getComputedStyle(card)
+					const landing =
+						root.scrollTop +
+						card.getBoundingClientRect().top -
+						rootTop -
+						parseFloat(style.scrollMarginBlockStart) -
+						padding
+
+					return {
+						id: section.id,
+						end,
+						landing,
+						alignment: style.scrollSnapAlign,
+						flowAlignment: getComputedStyle(flow).scrollSnapAlign,
+					}
+				})
+			})
+
+			expect(rows.length).toBeGreaterThan(0)
+
+			for (const row of rows) {
+				expect(row.alignment, `${width}: ${row.id}`).toBe('start')
+				expect(row.flowAlignment, `${width}: ${row.id}`).toBe('none')
+				expect(Math.abs(row.end - row.landing), `${width}: ${row.id}`).toBeLessThan(1)
+			}
+		}
+	})
+}

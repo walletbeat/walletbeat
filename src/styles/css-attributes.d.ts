@@ -657,7 +657,7 @@ declare global {
 		 * ### Tokens
 		 * - scroll container: `block`, `inline`
 		 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
-		 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `snap-prose`, `block-size-max`, `inline-size-max`
+		 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `snap-margin`, `snap-prose`, `block-size-max`, `inline-size-max`
 		 *
 		 * ### CSS Variables
 		 * - `--scrollContainer-perspective`: perspective applied to the scroll region.
@@ -699,7 +699,8 @@ declare global {
 		 * - width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`
 		 * - `flow`: retain inline-detached sizing in normal flow without a sticky stacking context
 		 * - attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`
-		 * - snap / size: `snap-block-start`, `snap-block-end`, `snap-prose`, `block-size-max`, `inline-size-max`
+		 * - snap / size: `snap-block-start`, `snap-block-end`, `snap-margin`, `snap-prose`, `block-size-max`, `inline-size-max`
+		 * - `snap-margin`: derive the sticky landing margin and offset without changing scroll snap alignment.
 		 * - `snap-prose`: direct children and all nested paragraphs/list items clear the enclosing sticky inset by half their inherited column/list gap.
 		 *
 		 * ### Examples
@@ -860,6 +861,7 @@ declare global {
 		 * - `--stickyBreadcrumb-approachTimeline`: unique view timeline for an optional approach marker; `exit-crossing -100% exit-crossing 0%` spans one heading row before contact
 		 * - `--stickyBreadcrumb-endPaintAnimation`, `--stickyBreadcrumb-endPaintTimeline`, `--stickyBreadcrumb-endPaintRange`: end paint motion; `contents` directs it to existing children and marker while retaining native cluster size and timeline ownership
 		 * - `--stickyBreadcrumb-arrivalInsetEnd`: optional block-end inset on the flow marker, derived from the existing snap area that completes arrival
+		 * - `--stickyBreadcrumb-arrivalRowEnd`: end grid line of the natural arrival prefix; defaults to `2`
 		 * - `--stickyBreadcrumb-motionRange`: visual attachment range for contain-based motion; defaults to the entry range. Entry-state timing remains on `--stickyBreadcrumb-entryRange`.
 		 * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both` so natural and compact paint remain represented across attachment boundaries.
 		 * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% contain 100%`

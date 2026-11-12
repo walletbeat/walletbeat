@@ -1682,7 +1682,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		{#if arrivalIndex !== undefined}
 			<span data-sticky-breadcrumb="snap-offset" style:anchor-name={arrivalIndex === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
 		{/if}
-		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+		<span data-sticky-breadcrumb="flow" data-scroll-item="snap-margin" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 	</section>
 {/snippet}
@@ -2721,37 +2721,35 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	}
 
 
-	.attributes > .attribute:first-child > details[open] .attribute-rating-details::before {
-		anchor-name: --breadcrumb-arrival-end, --breadcrumb-snap-content;
+	.attributes > .attribute:first-child > details[open] .attribute-rating-details {
+		@supports (anchor-scope: --breadcrumb-snap-content) and
+			(inset-block-end: anchor(--breadcrumb-snap-content start)) and
+			(color: if(style(---breadcrumb-supportGrid: 1): red)) {
+			position: relative;
+			&::before {
+				content: '';
+				position: absolute;
+				inset-block-start: calc(-1 * var(---scrollItem-snapOffsetBlockStart));
+				inset-inline-start: 0;
+				inline-size: 0;
+				block-size: 0;
+				pointer-events: none;
+				anchor-name: --breadcrumb-snap-content;
+			}
+		}
 	}
 
 	.attribute {
 		position: relative;
 
-		@supports (anchor-scope: --breadcrumb-arrival-end) and
-			(inset-block-end: anchor(--breadcrumb-arrival-end start)) and
+		@supports (grid-template-rows: subgrid) and
 			(color: if(style(---breadcrumb-supportGrid: 1): red)) {
-			> details[open] {
-				.attribute-rating-details {
-					position: relative;
-
-					&::before {
-						content: '';
-						position: absolute;
-						inset-block-start: calc(-1 * var(---scrollItem-snapOffsetBlockStart));
-						inset-inline-start: 0;
-						inline-size: 0;
-						block-size: 0;
-						pointer-events: none;
-						anchor-name: --breadcrumb-arrival-end;
-					}
-				}
-
-				~ [data-sticky-breadcrumb~="flow"] {
-					--stickyBreadcrumb-arrivalInsetEnd: calc(
-						anchor(--breadcrumb-arrival-end start) - var(---breadcrumb-blockEnd)
-					);
-				}
+			> details[open] ~ [data-sticky-breadcrumb~="flow"] {
+				/* The first rating card begins after the shared heading and caption rows. */
+				--stickyBreadcrumb-arrivalRowEnd: 3;
+				--stickyBreadcrumb-arrivalInsetEnd: calc(
+					var(---scrollItem-snapOffsetBlockStart) - var(---breadcrumb-blockEnd)
+				);
 			}
 		}
 

@@ -192,3 +192,45 @@ main{width:600px;height:360px}main,[data-scroll-container]{box-sizing:content-bo
 		})
 	}
 }
+
+for (const direction of ['ltr', 'rtl']) {
+	test(`landing margins compose independently of snap alignment in ${direction}`, async ({
+		page,
+	}) => {
+		await page.setContent(`<!doctype html><html dir="${direction}"><head><style>${css}
+@property --fixture-offset { syntax: "<length>"; inherits: false; initial-value: -1px; }
+[data-scroll-item] { --fixture-offset: var(---scrollItem-snapOffsetBlockStart); }
+main { width: 600px; height: 400px; }
+</style></head><body>
+<main data-scroll-container="block" data-sticky-container style="--sticky-marginBlockStart:17px;--sticky-paddingBlockStart:11px;--scrollContainer-scrollPaddingBlockStart:9px">
+<section data-sticky-container style="--sticky-marginBlockStart:3px">
+<div id="margin" data-scroll-item="snap-margin">Margin</div>
+<div id="start" data-scroll-item="snap-margin snap-block-start">Start</div>
+<div id="end" data-scroll-item="snap-margin snap-block-end">End</div>
+</section>
+<section data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-occlusionBlockEnd:800px">
+<div id="card" data-card data-scroll-item="snap-margin">Card</div>
+</section>
+</main></body></html>`)
+		const rows = await page.evaluate(() =>
+			['margin', 'start', 'end', 'card'].map(id => {
+				const style = getComputedStyle(document.getElementById(id)!)
+
+				return {
+					id,
+					alignment: style.scrollSnapAlign,
+					margin: parseFloat(style.scrollMarginBlockStart),
+					offset: parseFloat(style.getPropertyValue('--fixture-offset')),
+				}
+			}),
+		)
+
+		for (const row of rows) {
+			expect(row.alignment, row.id).toBe(
+				row.id === 'margin' ? 'none' : row.id === 'end' ? 'end' : 'start',
+			)
+			expect(row.margin, row.id).toBe(row.id === 'card' ? 791 : 31)
+			expect(row.offset, row.id).toBe(row.id === 'card' ? 800 : 40)
+		}
+	})
+}
