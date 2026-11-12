@@ -1,11 +1,72 @@
 import { describe, expect, it } from 'vitest'
 
 import { ContentType, type MarkdownContent } from '@/types/content'
-import { collapseToSingleLine, rewriteMarkdownURLs } from '@/utils/markdown-utils'
+import {
+	collapseToSingleLine,
+	extractProse,
+	extractUrlRanges,
+	rewriteMarkdownURLs,
+} from '@/utils/markdown-utils'
 
 function makeContent(markdown: string): MarkdownContent<null> {
 	return { contentType: ContentType.MARKDOWN, markdown }
 }
+
+describe('standalone URL ranges', () => {
+	it.each([
+		['prose', 'https://wallet.invalid/path'],
+		['source', 'https://wallet.invalid/path),suffix'],
+	] as const)('uses %s delimiters while preserving source offsets', (context, expectedUrl) => {
+		const text = '🔒 "https://wallet.invalid/path),suffix" next'
+		const ranges = extractUrlRanges(text, context)
+
+		expect(ranges.map(({ start, end }) => text.slice(start, end))).toEqual([expectedUrl])
+	})
+})
+
+describe('prose masking', () => {
+	it.each([
+		['inline code', 'before `gate; ship—` after'],
+		['multiple backticks', 'before ``gate ` ship;—`` after'],
+		['backtick fences', 'before\n\n```ts\ngate; ship—\n```\n\nafter'],
+		['tilde fences', 'before\n\n~~~ts\ngate; ship—\n~~~\n\nafter'],
+		['indented code', 'before\n\n    gate; ship—\n\nafter'],
+		['nested destination parentheses', 'before [Wallet](https://example.com/gate_(ship);) after'],
+		['link titles', 'before [Wallet](/gate "ship;—") after'],
+		['reference links', 'before [Wallet][gate]\n\n[gate]: /ship "gate;—"\n\nafter'],
+		['autolinks', 'before <https://example.com/gate;ship> after'],
+		['standalone URLs', 'before https://example.com/gate;ship after'],
+		['URLs inside code', 'before `https://example.com/gate`after'],
+	])('excludes %s while retaining prose and source positions', (_name, markdown) => {
+		const { prose: masked, excludedRanges } = extractProse(markdown)
+
+		expect(masked.match(/\S+/g)).toEqual(
+			markdown.includes('[Wallet]') ? ['before', '[Wallet]', 'after'] : ['before', 'after'],
+		)
+		expect(masked).toBe(
+			markdown.replace(/[^\r\n]/g, (char, offset: number) =>
+				excludedRanges.some(({ start, end }) => start <= offset && offset < end) ? ' ' : char,
+			),
+		)
+	})
+
+	it('preserves escaped delimiters and Unicode offsets', () => {
+		const markdown = '🔒 \\`gate\\` `ship`\r\nKeep this explanation.'
+
+		expect(extractProse(markdown).prose).toBe(markdown.replace('`ship`', ' '.repeat(6)))
+	})
+
+	it('excludes standalone URLs without interpreting plaintext as Markdown', () => {
+		const url = 'https://example.com/gate;ship'
+		const text = `gate \`ship\` ${url} next`
+		const start = text.indexOf(url)
+
+		expect(extractProse(text, 'plaintext')).toEqual({
+			prose: text.replace(url, ' '.repeat(url.length)),
+			excludedRanges: [{ start, end: start + url.length }],
+		})
+	})
+})
 
 describe('collapseToSingleLine', () => {
 	it('collapses whitespace and trims', () => {
