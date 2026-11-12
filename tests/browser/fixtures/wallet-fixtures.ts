@@ -149,7 +149,7 @@ export const walletFixtures = {
 			...unratedTemplate,
 			metadata: {
 				...unratedTemplate.metadata,
-				id: 'ambire',
+				id: 'trezor',
 				displayName: 'Multiple wallet types fixture',
 			},
 			variants: { [Variant.BROWSER]: true, [Variant.HARDWARE]: true },

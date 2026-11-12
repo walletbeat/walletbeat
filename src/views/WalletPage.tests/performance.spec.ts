@@ -175,15 +175,16 @@ test.describe('constrained mobile performance observations after structural acce
 			const controlStart = await page.evaluate(() => performance.now())
 
 			await toc.tap()
-			await expect(
-				page.getByRole('navigation', { name: 'Table of contents', exact: true }),
-			).toBeVisible()
+			await expect(page.locator('#wallet-toc:popover-open')).toBeVisible()
 			const controlEnd = await page.evaluate(() => performance.now())
 
 			await page.keyboard.press('Escape')
+			await expect(page.locator('#wallet-toc:popover-open, #wallet-toc[data-closing]')).toHaveCount(
+				0,
+			)
 			await expect(
 				page.getByRole('navigation', { name: 'Table of contents', exact: true }),
-			).toHaveCount(0)
+			).toHaveCount(1)
 			const observations = await page.evaluate(finishPerformanceObservation)
 
 			await info.attach('native-mobile-observations', {

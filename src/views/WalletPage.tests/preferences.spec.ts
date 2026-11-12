@@ -55,7 +55,7 @@ for (const width of [390, 1440]) {
 				throw new Error('Missing rendered pie geometry')
 			}
 
-			if (width > 1024 || compact) {
+			if (width > 1344 || compact) {
 				if (direction === 'ltr') {
 					expect(geometry.x + geometry.width / 2).toBeGreaterThan(width / 2)
 				} else {
@@ -93,53 +93,77 @@ for (const width of [390, 1440]) {
 	}
 }
 
-test('shared surfaces require an explicit normal transparency preference for blur', async ({
+test('shared surfaces honor explicit reduced transparency and retain unknown-preference fallbacks', async ({
 	page,
+	browserName,
 }, info) => {
 	await page.goto('/__wallet-page/software/')
 	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-	const observed = await page.evaluate(() => {
-		const surface = document.createElement('div')
-		const badge = document.createElement('span')
+	const session = browserName === 'chromium' ? await page.context().newCDPSession(page) : null
+	const preferences = session ? ['no-preference', 'reduce'] : [null]
 
-		surface.setAttribute('data-sticky', 'block backdrop-self backdrop-always')
-		badge.setAttribute('data-badge', 'small')
-		badge.style.setProperty('--badge-backdropFilter', 'blur(6px)')
-		badge.textContent = 'Surface preference'
-		surface.append(badge)
-		const root = document.querySelector('#layout')
-
-		if (!root) {
-			throw new Error('Native scroll container absent')
-		}
-
-		root.append(surface)
-
-		try {
-			const style = getComputedStyle(surface)
-
-			return {
-				normal: matchMedia('(prefers-reduced-transparency: no-preference)').matches,
-				reduce: matchMedia('(prefers-reduced-transparency: reduce)').matches,
-				surfaceFilter: style.backdropFilter,
-				badgeFilter: getComputedStyle(badge).backdropFilter,
-				backgroundImage: style.backgroundImage,
-				backgroundColor: style.backgroundColor,
+	try {
+		for (const preference of preferences) {
+			if (session && preference) {
+				await session.send('Emulation.setEmulatedMedia', {
+					features: [{ name: 'prefers-reduced-transparency', value: preference }],
+				})
 			}
-		} finally {
-			surface.remove()
+
+			const observed = await page.evaluate(() => {
+				const surface = document.createElement('div')
+				const badge = document.createElement('span')
+
+				surface.setAttribute('data-sticky', 'block backdrop-self backdrop-always')
+				badge.setAttribute('data-badge', 'small')
+				badge.style.setProperty('--badge-backdropFilter', 'blur(6px)')
+				badge.textContent = 'Surface preference'
+				surface.append(badge)
+				const root = document.querySelector('#layout')
+
+				if (!root) {
+					throw new Error('Native scroll container absent')
+				}
+
+				root.append(surface)
+
+				try {
+					const style = getComputedStyle(surface)
+
+					return {
+						normal: matchMedia('(prefers-reduced-transparency: no-preference)').matches,
+						reduce: matchMedia('(prefers-reduced-transparency: reduce)').matches,
+						surfaceFilter: style.backdropFilter,
+						badgeFilter: getComputedStyle(badge).backdropFilter,
+						backgroundImage: style.backgroundImage,
+						backgroundColor: style.backgroundColor,
+					}
+				} finally {
+					surface.remove()
+				}
+			})
+
+			await info.attach(`native-transparency-${preference ?? 'native'}`, {
+				body: JSON.stringify(observed),
+				contentType: 'application/json',
+			})
+			expect(observed.normal && observed.reduce).toBe(false)
+
+			if (preference) {
+				expect(observed.reduce).toBe(preference === 'reduce')
+				expect(observed.normal).toBe(preference === 'no-preference')
+			}
+
+			expect(observed.surfaceFilter).toBe(observed.reduce ? 'none' : 'blur(20px)')
+			expect(observed.badgeFilter).toBe(observed.reduce ? 'none' : 'blur(6px)')
+
+			if (observed.reduce) {
+				expect(observed.backgroundImage).toContain('linear-gradient')
+			} else {
+				expect(observed.backgroundImage).toBe('none')
+			}
 		}
-	})
-
-	await info.attach('native-transparency-capability', {
-		body: JSON.stringify(observed),
-		contentType: 'application/json',
-	})
-	expect(observed.normal && observed.reduce).toBe(false)
-	expect(observed.surfaceFilter).toBe(observed.normal ? 'blur(20px)' : 'none')
-	expect(observed.badgeFilter).toBe(observed.normal ? 'blur(6px)' : 'none')
-
-	if (!observed.normal) {
-		expect(observed.backgroundImage).toContain('linear-gradient')
+	} finally {
+		await session?.detach()
 	}
 })

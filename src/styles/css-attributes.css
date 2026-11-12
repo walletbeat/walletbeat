@@ -62,7 +62,7 @@ a {
 	text-decoration: none;
 	font-weight: 600;
 
-	transition-property: color, text-decoration, border-color;
+	transition-property: color, border-color;
 
 	&:hover {
 		text-decoration: underline;
@@ -901,6 +901,13 @@ span svg {
 
 	[data-column~="span-start"] {
 		anchor-scope: --column-firstRow;
+		> [data-row],
+		> :is(header, [data-sticky]) > [data-row] {
+			anchor-name: --column-firstRow;
+		}
+	}
+
+	[data-column~="span-start"]:not([data-sticky-breadcrumb~="position"]) {
 		timeline-scope: var(---column-sizeTimelines);
 		animation:
 			column-inline-size auto linear both,
@@ -916,31 +923,24 @@ span svg {
 			1
 		);
 
-		> [data-row],
-		> :is(header, [data-sticky]) > [data-row] {
-			anchor-name: --column-firstRow;
+		&::before,
+		&::after {
+			content: '';
+			position: fixed;
+			inset: 0 auto auto 0;
+			block-size: 1px;
+			visibility: hidden;
+			pointer-events: none;
+			view-timeline-axis: inline;
+			view-timeline-inset: 0;
 		}
-
-		&:not([data-sticky-breadcrumb~="position"]) {
-			&::before,
-			&::after {
-				content: '';
-				position: fixed;
-				inset: 0 auto auto 0;
-				block-size: 1px;
-				visibility: hidden;
-				pointer-events: none;
-				view-timeline-axis: inline;
-				view-timeline-inset: 0;
-			}
-			&::before {
-				inline-size: anchor-size(--column-firstRow inline);
-				view-timeline-name: var(---column-inlineTimeline);
-			}
-			&::after {
-				inline-size: anchor-size(--column-firstRow block);
-				view-timeline-name: var(---column-blockTimeline);
-			}
+		&::before {
+			inline-size: anchor-size(--column-firstRow inline);
+			view-timeline-name: var(---column-inlineTimeline);
+		}
+		&::after {
+			inline-size: anchor-size(--column-firstRow block);
+			view-timeline-name: var(---column-blockTimeline);
 		}
 	}
 }
@@ -1221,6 +1221,7 @@ summary:where(:not([data-column])) {
  * - `--badge-backgroundColor`
  * - `--badge-borderColor`
  * - `--badge-textColor`
+ * - `--badge-backdropFilter`: optional surface filter; defaults to `none` and is disabled for reduced transparency.
  *
  * ### Examples
  * - Default (inherited text size, no added padding):
@@ -1255,10 +1256,10 @@ summary:where(:not([data-column])) {
 	border-radius: 0.375em;
 	background-color: var(--badge-backgroundColor);
 	border: var(--badge-borderWidth) solid var(--badge-borderColor);
-	backdrop-filter: none;
+	backdrop-filter: var(--badge-backdropFilter);
 
-	@media (prefers-reduced-transparency: no-preference) {
-		backdrop-filter: var(--badge-backdropFilter);
+	@media (prefers-reduced-transparency: reduce) {
+		backdrop-filter: none;
 	}
 
 	color: var(--badge-textColor);
@@ -1657,6 +1658,8 @@ ol {
  * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
  * - `--stickyBreadcrumb-approachTimeline`: unique view timeline for an optional approach marker; `exit-crossing -100% exit-crossing 0%` spans one heading row before contact
  * - `--stickyBreadcrumb-endPaintAnimation`, `--stickyBreadcrumb-endPaintTimeline`, `--stickyBreadcrumb-endPaintRange`: end paint motion; `contents` directs it to existing children and marker while retaining native cluster size and timeline ownership
+ * - `--stickyBreadcrumb-motionRange`: visual attachment range for contain-based motion; defaults to the entry range. Entry-state timing remains on `--stickyBreadcrumb-entryRange`.
+ * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both`. Use `forwards` with an extended trailing attachment range to retain the authored initial paint before entry.
  * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% contain 100%`
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
  * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -2437,111 +2440,112 @@ ol {
 			translate: 0 max(0px, calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd)));
 		}
 	}
+	/* The trailing endpoint holds compact paint beyond contain without replacing the initial underlying pose. */
 	/* Quarter-ellipse samples use the shared InOutExpo pacing; only translation is animated. */
 	@keyframes breadcrumb-arrival {
-		0% {
+		contain 0% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0) calc(var(---breadcrumb-arrivalBlock) * 0);
 		}
-		22.5999% {
+		contain 22.5999% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.0490677) calc(var(---breadcrumb-arrivalBlock) * 0.00120454);
 		}
-		29.6809% {
+		contain 29.6809% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.0980171) calc(var(---breadcrumb-arrivalBlock) * 0.00481527);
 		}
-		34.2607% {
+		contain 34.2607% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.14673) calc(var(---breadcrumb-arrivalBlock) * 0.0108235);
 		}
-		37.5724% {
+		contain 37.5724% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.19509) calc(var(---breadcrumb-arrivalBlock) * 0.0192147);
 		}
-		40.0938% {
+		contain 40.0938% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.24298) calc(var(---breadcrumb-arrivalBlock) * 0.0299687);
 		}
-		42.0706% {
+		contain 42.0706% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.290285) calc(var(---breadcrumb-arrivalBlock) * 0.0430597);
 		}
-		43.6497% {
+		contain 43.6497% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.33689) calc(var(---breadcrumb-arrivalBlock) * 0.0584559);
 		}
-		44.9278% {
+		contain 44.9278% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.382683) calc(var(---breadcrumb-arrivalBlock) * 0.0761205);
 		}
-		45.9731% {
+		contain 45.9731% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.427555) calc(var(---breadcrumb-arrivalBlock) * 0.0960107);
 		}
-		46.8364% {
+		contain 46.8364% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.471397) calc(var(---breadcrumb-arrivalBlock) * 0.118079);
 		}
-		47.5573% {
+		contain 47.5573% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.514103) calc(var(---breadcrumb-arrivalBlock) * 0.142271);
 		}
-		48.1678% {
+		contain 48.1678% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.55557) calc(var(---breadcrumb-arrivalBlock) * 0.16853);
 		}
-		48.6949% {
+		contain 48.6949% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.595699) calc(var(---breadcrumb-arrivalBlock) * 0.196792);
 		}
-		49.1621% {
+		contain 49.1621% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.634393) calc(var(---breadcrumb-arrivalBlock) * 0.22699);
 		}
-		49.5906% {
+		contain 49.5906% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.671559) calc(var(---breadcrumb-arrivalBlock) * 0.259049);
 		}
-		50% {
+		contain 50% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.707107) calc(var(---breadcrumb-arrivalBlock) * 0.292893);
 		}
-		50.4094% {
+		contain 50.4094% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.740951) calc(var(---breadcrumb-arrivalBlock) * 0.328441);
 		}
-		50.8379% {
+		contain 50.8379% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.77301) calc(var(---breadcrumb-arrivalBlock) * 0.365607);
 		}
-		51.3051% {
+		contain 51.3051% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.803208) calc(var(---breadcrumb-arrivalBlock) * 0.404301);
 		}
-		51.8322% {
+		contain 51.8322% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.83147) calc(var(---breadcrumb-arrivalBlock) * 0.44443);
 		}
-		52.4427% {
+		contain 52.4427% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.857729) calc(var(---breadcrumb-arrivalBlock) * 0.485897);
 		}
-		53.1636% {
+		contain 53.1636% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.881921) calc(var(---breadcrumb-arrivalBlock) * 0.528603);
 		}
-		54.0269% {
+		contain 54.0269% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.903989) calc(var(---breadcrumb-arrivalBlock) * 0.572445);
 		}
-		55.0722% {
+		contain 55.0722% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.92388) calc(var(---breadcrumb-arrivalBlock) * 0.617317);
 		}
-		56.3503% {
+		contain 56.3503% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.941544) calc(var(---breadcrumb-arrivalBlock) * 0.66311);
 		}
-		57.9294% {
+		contain 57.9294% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.95694) calc(var(---breadcrumb-arrivalBlock) * 0.709715);
 		}
-		59.9062% {
+		contain 59.9062% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.970031) calc(var(---breadcrumb-arrivalBlock) * 0.75702);
 		}
-		62.4276% {
+		contain 62.4276% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.980785) calc(var(---breadcrumb-arrivalBlock) * 0.80491);
 		}
-		65.7393% {
+		contain 65.7393% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.989177) calc(var(---breadcrumb-arrivalBlock) * 0.85327);
 		}
-		70.3191% {
+		contain 70.3191% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.995185) calc(var(---breadcrumb-arrivalBlock) * 0.901983);
 		}
-		77.4001% {
+		contain 77.4001% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 0.998795) calc(var(---breadcrumb-arrivalBlock) * 0.950932);
 		}
-		100% {
+		to, contain 100% {
 			translate: calc(var(---breadcrumb-arrivalInline) * 1) calc(var(---breadcrumb-arrivalBlock) * 1);
 		}
 	}
 	@keyframes breadcrumb-arrival-step {
-		from { translate: 0px 0px; }
-		to { translate: var(---breadcrumb-arrivalInline) var(---breadcrumb-arrivalBlock); }
+		contain 0% { translate: 0px 0px; }
+		to, contain 100% { translate: var(---breadcrumb-arrivalInline) var(---breadcrumb-arrivalBlock); }
 	}
 	@keyframes breadcrumb-end-progress {
 		from {
@@ -2552,10 +2556,10 @@ ol {
 		}
 	}
 	@keyframes breadcrumb-item-motion {
-		from {
+		contain 0% {
 			transform: scale(1);
 		}
-		to {
+		to, contain 100% {
 			transform: scale(calc(1 + var(---breadcrumb-itemActive) * (var(--stickyBreadcrumb-scale) - 1)));
 		}
 	}
@@ -2565,14 +2569,14 @@ ol {
 		to { opacity: 0; }
 	}
 	@keyframes breadcrumb-marker-motion {
-		from { transform: scale(1); }
-		to { transform: scale(calc(1 / var(--stickyBreadcrumb-scale))); }
+		contain 0% { transform: scale(1); }
+		to, contain 100% { transform: scale(calc(1 / var(--stickyBreadcrumb-scale))); }
 	}
 	@keyframes breadcrumb-icon-motion {
-		from {
+		contain 0% {
 			transform: translateY(0px) scale(1) translateX(0px) translateY(calc(-1em * var(---column-iconTop, 0)));
 		}
-		to {
+		to, contain 100% {
 			transform: translateY(calc(var(---breadcrumb-iconTranslateBlock, 0px) / var(--stickyBreadcrumb-scale)))
 				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)))
 				translateX(calc(-1em * var(---icon-leadingInset, 0) * var(---inlineDirection))) translateY(calc(-1em * var(---icon-ink-top, 0)));
@@ -2583,26 +2587,26 @@ ol {
 		to { --icon-scale: calc((var(---column-iconSize) + var(---breadcrumb-iconCorrection)) * var(--stickyBreadcrumb-scale) / var(--icon-size)); }
 	}
 	@keyframes breadcrumb-icon-complex {
-		from {
+		contain 0% {
 			opacity: var(---breadcrumb-iconComplexFrom);
 		}
-		to {
+		to, contain 100% {
 			opacity: var(---breadcrumb-iconComplexTo);
 		}
 	}
 	@keyframes breadcrumb-icon-simple {
-		from {
+		contain 0% {
 			opacity: calc(1 - var(---breadcrumb-iconComplexFrom));
 		}
-		to {
+		to, contain 100% {
 			opacity: calc(1 - var(---breadcrumb-iconComplexTo));
 		}
 	}
 	@keyframes breadcrumb-text-motion {
-		from {
+		contain 0% {
 			transform: translateX(0px);
 		}
-		to {
+		to, contain 100% {
 			transform: translateX(calc(var(---breadcrumb-itemActive) * var(---inlineDirection) * var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection))));
 		}
 	}
@@ -2831,9 +2835,10 @@ ol {
 			&::before,
 			&::after {
 				transform-origin: calc(50% + 50% * var(---inlineDirection)) 50%;
-				animation: breadcrumb-marker-motion auto var(---breadcrumb-inlineEasing) both, breadcrumb-marker-hash auto var(--stickyBreadcrumb-easing, steps(1, start)) both;
+				transform: scale(1);
+				animation: breadcrumb-marker-motion auto var(---breadcrumb-inlineEasing) var(--stickyBreadcrumb-motionFill, both), breadcrumb-marker-hash auto var(--stickyBreadcrumb-easing, steps(1, start)) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-				animation-range: var(--stickyBreadcrumb-entryRange);
+				animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange)), var(--stickyBreadcrumb-entryRange);
 				@media (prefers-reduced-motion: reduce) { animation-timing-function: steps(1, end), steps(1, start); }
 			}
 			&::before {
@@ -3203,9 +3208,10 @@ ol {
 					[data-icon]::before,
 					> img,
 					> h1 > a > img {
-						animation: breadcrumb-text-motion auto var(---breadcrumb-inlineEasing) both;
+						transform: translateX(0px);
+						animation: breadcrumb-text-motion auto var(---breadcrumb-inlineEasing) var(--stickyBreadcrumb-motionFill, both);
 						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-						animation-range: var(--stickyBreadcrumb-entryRange);
+						animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange));
 						@media (prefers-reduced-motion: reduce) {
 							animation-timing-function: steps(1, end);
 						}
@@ -3213,6 +3219,7 @@ ol {
 					[data-icon]::before,
 					> img,
 					> h1 > a > img {
+						transform: translateY(0px) scale(1) translateX(0px) translateY(calc(-1em * var(---column-iconTop, 0)));
 						animation-name: breadcrumb-icon-motion;
 					}
 					[data-icon] {
@@ -3225,6 +3232,8 @@ ol {
 
 					[data-icon~="circle"]:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"])::before {
 						animation-name: breadcrumb-icon-motion, if(style(---breadcrumb-entry: 0): none; else: breadcrumb-icon-detail);
+						animation-fill-mode: var(--stickyBreadcrumb-motionFill, both), both;
+						animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange)), var(--stickyBreadcrumb-entryRange);
 					}
 
 					[data-icon]::before {
@@ -3299,8 +3308,9 @@ ol {
 							line-height: 1;
 							font-size: calc(var(---column-iconSize) / var(---icon-ink-height));
 							transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
+							transform: translateY(0px) scale(1) translateX(0px) translateY(calc(-1em * var(---column-iconTop, 0)));
 							animation:
-								breadcrumb-icon-motion auto var(---breadcrumb-inlineEasing) both,
+								breadcrumb-icon-motion auto var(---breadcrumb-inlineEasing) var(--stickyBreadcrumb-motionFill, both),
 								breadcrumb-icon-complex auto
 									linear(
 										0 0%,
@@ -3308,11 +3318,12 @@ ol {
 										1 var(---breadcrumb-glyph-threshold),
 										1 100%
 									)
-									both;
+									var(--stickyBreadcrumb-motionFill, both);
 							animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-							animation-range: var(--stickyBreadcrumb-entryRange);
+							animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange));
 						}
 						&::before {
+							opacity: var(---breadcrumb-iconComplexFrom);
 							font-family: var(--fontFamily-wbicons-complex);
 							---icon-ink-height: var(---icon-ink-height-complex);
 							---icon-ink-top: var(---icon-ink-top-complex);
@@ -3320,6 +3331,7 @@ ol {
 							---icon-ink-maxX: var(---icon-ink-maxX-complex);
 						}
 						&::after {
+							opacity: calc(1 - var(---breadcrumb-iconComplexFrom));
 							font-family: var(--fontFamily-wbicons-simple);
 							---icon-ink-height: var(---icon-ink-height-simple);
 							---icon-ink-top: var(---icon-ink-top-simple);
@@ -3364,11 +3376,13 @@ ol {
 						);
 					---breadcrumb-arrivalInline: var(---breadcrumb-translateInline);
 					---breadcrumb-arrivalBlock: var(---breadcrumb-translateBlock);
+					transform: scale(1);
+					translate: 0px 0px;
 					animation:
-						breadcrumb-item-motion auto var(---breadcrumb-inlineEasing) both,
-						var(---breadcrumb-arrivalAnimation, breadcrumb-arrival) auto linear both;
+						breadcrumb-item-motion auto var(---breadcrumb-inlineEasing) var(--stickyBreadcrumb-motionFill, both),
+						var(---breadcrumb-arrivalAnimation, breadcrumb-arrival) auto linear var(--stickyBreadcrumb-motionFill, both);
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-					animation-range: var(--stickyBreadcrumb-entryRange);
+					animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange));
 					@media (prefers-reduced-motion: reduce) {
 						---breadcrumb-arrivalAnimation: breadcrumb-arrival-step;
 						animation-timing-function: steps(1, end);
@@ -4313,16 +4327,16 @@ ol {
 			/* Inputs */
 			--sticky-backgroundColor: light-dark(#f8edff3c, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
-			---sticky-background: linear-gradient(
-					var(--sticky-backgroundColor),
-					var(--sticky-backgroundColor)
-				)
-				var(--background-primary);
-			---sticky-backdropFilter: none;
+			---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
+			---sticky-backdropFilter: var(--sticky-backdropFilter);
 
-			@media (prefers-reduced-transparency: no-preference) {
-				---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
-				---sticky-backdropFilter: var(--sticky-backdropFilter);
+			@media (prefers-reduced-transparency: reduce) {
+				---sticky-background: linear-gradient(
+						var(--sticky-backgroundColor),
+						var(--sticky-backgroundColor)
+					)
+					var(--background-primary);
+				---sticky-backdropFilter: none;
 			}
 
 			&[data-card] {
@@ -5008,4 +5022,52 @@ details {
 			}
 		}
 	}
+}
+
+
+/**
+ * Content-page typography and detached content bounds. Set page-specific widths on the sticky container.
+ *
+ * ### Placement
+ * - On a page's main content container, with its title and optional description in a direct header.
+ *
+ * ### Examples
+ * - A content page with a title and description:
+ *   ```html
+ *   <main data-content-page data-sticky-container data-column="gap-8">
+ *     <header><hgroup><h1>Title</h1><p>Description</p></hgroup></header>
+ *   </main>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-content-page]`
+ */
+[data-content-page] {
+	line-height: 1.4;
+
+	&[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 58rem;
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+		--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+	}
+
+	> header hgroup p {
+		color: var(--text-secondary);
+	}
+}
+
+/**
+ * Reading line height for prose content.
+ *
+ * ### Examples
+ * - A prose body:
+ *   ```html
+ *   <div data-prose><p>Paragraph</p></div>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+ */
+[data-prose] {
+	line-height: 1.8;
 }

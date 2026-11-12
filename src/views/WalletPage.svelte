@@ -841,7 +841,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-approach-timelines={pieRotation.approachTimelines}
 	style:--link-timelines={[...attributeDestinations.values()].flatMap<string>(destination => [destination.timeline, destination.contactTimeline]).join(', ') || '--wallet-links'}
-	style:---pie-rotation-states={pieRotation.animations}
 	data-sticky-breadcrumb="scope root"
 	style:---pie-radiusRatio={overallRatingPieMaxRadius / (overallRatingPieMaxRadius + overallRatingPiePadding)}
 	style:--stickyBreadcrumb-itemInlineTimeline="--wallet-item-inline"
@@ -874,7 +873,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			<div
 				class="wallet-title-row"
 				data-sticky-breadcrumb="item"
-				data-row="start gap-2"
+				data-row="start gap-2 wrap"
 				style="--select-compactTimeline: var(--stickyBreadcrumb-entryTimeline); --select-compactScale: var(--stickyBreadcrumb-scale, 1); --select-compactRange: var(--stickyBreadcrumb-entryRange); --select-compactEasing: var(---breadcrumb-inlineEasing)"
 			>
 			<h1>
@@ -896,12 +895,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</a>
 			</h1>
 			{#if Object.keys(wallet.variants).length > 1 || (Variant.HARDWARE in wallet.variants && brandModels.length > 1)}
-				<div class="wallet-device-controls" data-row="gap-2" inert={!queryParams}>
+				<div class="wallet-device-controls" data-row="gap-2 wrap" inert={!queryParams}>
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
 							aria-label="Wallet version"
-							style="--select-natural-anchor: --wallet-version-natural; --select-visual-anchor: --wallet-version-visual"
 							options={[
 								{
 									value: undefined,
@@ -921,7 +919,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							<Select
 								bind:value={selectedModel}
 								aria-label="Wallet model"
-								style="--select-natural-anchor: --wallet-model-natural; --select-visual-anchor: --wallet-model-visual"
 								options={[
 									{ value: undefined, label: 'All models' },
 									...brandModels.map(m => ({
@@ -994,6 +991,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	<aside
 		class="page-navigation"
+		style:---pie-rotation-states={pieRotation.animations}
 		data-scroll-item="inline-detached"
 		data-sticky-container
 		data-row="center align-start"
@@ -1668,7 +1666,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		---pie-compactSize: 128px;
 		---pie-compactInset: 8px;
 		---pie-compactCenterInline: calc(100vw - var(---pie-compactInset) - var(---pie-compactSize) / 2);
-		---pie-compactBlockStart: calc(var(--safeArea-insetTop, 0px) + 20px);
+		---pie-compactBlockInset: 20px;
+		/* Tall compact headers own vertical clearance; ordinary rows retain the inset. */
+		---pie-compactBlockStart: calc(var(--safeArea-insetTop, 0px) + var(---pie-compactBlockInset) + sign(var(--navigation-mobile-blockSize) - var(--navigation-mobile-minBlockSize)) * (var(--navigation-mobile-blockSize) - var(---pie-compactBlockInset)));
 		---pie-compactCenterBlock: calc(var(---pie-compactBlockStart) + var(---pie-compactSize) / 2);
 		---pie-clearanceSize: calc(var(---pie-compactSize) + var(--stickyBreadcrumb-gap, 1rem) / 2);
 		---wallet-compact-h3: 1rem;
@@ -1714,6 +1714,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			gap: 0;
 
 			&[data-sticky-container] {
+				--sticky-position: sticky;
 				--scrollItem-inlineDetached-maxSize: inherit;
 				--scrollItem-inlineDetached-paddingStart: 0px;
 				--scrollItem-inlineDetached-paddingEnd: 0px;
@@ -1786,7 +1787,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				color: inherit;
 			}
 
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				flex-flow: row wrap;
 				gap: 1rem;
 				z-index: auto;
@@ -1848,15 +1849,20 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							transition-property: backdrop-filter;
 						}
 					}
-					@media not (prefers-reduced-transparency: reduce) {
-						&:popover-open :global(> .navigation-items::after) {
-							transition-property: none;
-							animation: wallet-toc-blur var(---wallet-toc-entryDuration, 0.25s)
-								var(--transition-easeOutExpo);
+					&:popover-open :global(> .navigation-items::after) {
+						transition-property: none;
+						animation: wallet-toc-blur var(---wallet-toc-entryDuration, 0.25s)
+							var(--transition-easeOutExpo);
+						@media (prefers-reduced-transparency: reduce) {
+							animation: none;
 						}
-						&[data-closing] :global(> .navigation-items::after) {
-							opacity: 1;
-							backdrop-filter: blur(0.375rem);
+					}
+					&[data-closing] :global(> .navigation-items::after) {
+						opacity: 1;
+						backdrop-filter: blur(0.375rem);
+						@media (prefers-reduced-transparency: reduce) {
+							opacity: 0;
+							backdrop-filter: none;
 						}
 					}
 					&:not(:popover-open) {
@@ -1949,23 +1955,26 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			&[data-sticky-container] {
 				isolation: auto;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
+				> #wallet-toc:not(:popover-open):not([data-closing]),
+				&::after {
+					flex: 0 1 22rem;
+					max-inline-size: 100%;
+					block-size: var(---pie-size, var(---wallet-page-navigation-inline-size));
+				}
+				&:has(> #wallet-toc:is(:popover-open, [data-closing]))::after {
+					content: '';
+					pointer-events: none;
+				}
 				> #wallet-toc:not(:popover-open):not([data-closing]) {
-							flex: 0 1 22rem;
-							display: flex;
-							overflow-y: auto;
-
-							inline-size: max-content;
-							max-inline-size: 100%;
-							block-size: var(---pie-size);
-
-							position: relative;
-							inset: auto;
-
-							background: none;
-							opacity: 1;
-							clip-path: none;
-
+					display: flex;
+					overflow-y: auto;
+					inline-size: max-content;
+					position: relative;
+					inset: auto;
+					background: none;
+					opacity: 1;
+					clip-path: none;
 					translate: none;
 				}
 			}
@@ -1973,7 +1982,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		row-gap: 2rem;
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 				--sticky-marginInlineEnd: 0px;
@@ -2000,7 +2009,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			scroll-behavior: auto;
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
 	}
@@ -2045,7 +2054,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		&[data-sticky] {
 			z-index: 3;
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			grid-area: Content;
 		}
 	}
@@ -2053,7 +2062,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		margin-inline: var(--navigation-controlInsetInline);
 		margin-block-start: var(--icon-size, 2rem);
 		align-self: end;
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			align-self: start;
 		}
 	}
@@ -2224,7 +2233,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			---pie-scale: tan(atan2(var(---pie-size), calc(var(---pie-diameter) * 1px)));
 			--sticky-insetBlockStart: 0px;
 
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				&::before {
 					display: none;
 				}
@@ -2398,7 +2407,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			pointer-events: none;
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			.container .page-navigation {
 				padding-block-start: 0;
 			}
@@ -2502,7 +2511,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		timeline-scope:
 			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
 			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
-		@media (width > 1024px) {
+		@media (width > 84rem) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), var(---pie-approach-timelines, --wallet-links),
 				var(--stickyBreadcrumb-entryTimeline),
@@ -2536,11 +2545,18 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			flex-basis: max-content;
 			min-inline-size: 0;
 			h1 {
+				anchor-name: --wallet-name-visual;
 				min-inline-size: 0;
 			}
 			> .wallet-device-controls {
-				flex-shrink: 0;
+				/* Natural flex allocations persist; only the last control's tail changes the row's painted extent. */
+				--select-natural-anchor: --wallet-control-natural;
+				--select-visual-anchor: --wallet-control-visual;
+				min-inline-size: min-content;
 				font-size: 1rem;
+				:global(select) {
+					flex-shrink: 0;
+				}
 			}
 			min-block-size: max(
 				var(--wallet-icon-size),
@@ -2792,7 +2808,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				timeline-scope: none;
 			}
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			[data-sticky-breadcrumb~="root"] {
 				--stickyBreadcrumb-clearance: circle;
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);
@@ -2921,6 +2937,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 		}
 		[data-sticky-breadcrumb~="root"] {
+			:global([data-sticky-breadcrumb~="scope"]) {
+				--stickyBreadcrumb-motionRange: exit-crossing 0% contain calc(100% + 100vh);
+				--stickyBreadcrumb-motionFill: forwards;
+			}
 			grid-template: "Header Nav" auto "Content Nav" 1fr / minmax(0, 1fr) auto;
 			> .wallet-header-flow { grid-area: Header; }
 			> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"]) {
@@ -2928,7 +2948,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				block-size: auto;
 				inset-block-end: 0;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				grid-template: "Header" "Nav" "Content" / minmax(0, 1fr);
 			}
 			& > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
@@ -2943,13 +2963,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			--stickyBreadcrumb-scale: calc(var(---wallet-compactFontSize) / var(---wallet-name-flow-font-size));
 			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
 			--stickyBreadcrumb-minBlockSize: var(---wallet-compact-icon-size);
-			@media (width > 1024px) {
+			@media (width > 84rem) {
 				--stickyBreadcrumb-minBlockSize: max(
 					var(---wallet-compact-icon-size),
 					calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem))
 				);
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				--stickyBreadcrumb-exitAnimation: none;
 			}
 			> [data-sticky-breadcrumb~="position"] {
@@ -2964,20 +2984,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					align-self: start;
 					anchor-name: --breadcrumb-source, --column-firstRow;
 					&::before {
-						inline-size: calc(
-							(
-									round(up, anchor-size(--breadcrumb-source inline), 0.0625px) +
-										var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection)) -
-										(
-											anchor-size(--wallet-version-natural inline, 0px) -
-												anchor-size(--wallet-version-visual inline, 0px) +
-												anchor-size(--wallet-model-natural inline, 0px) -
-												anchor-size(--wallet-model-visual inline, 0px)
-										) *
-										round(up, anchor-size(--breadcrumb-source inline), 0.0625px) / anchor-size(--wallet-title-visual inline)
-								) *
-								var(--stickyBreadcrumb-scale)
-						);
+						---wallet-title-sourceWidth: round(up, anchor-size(--breadcrumb-source inline), 0.0625px);
+						---wallet-title-naturalScale: calc(var(---wallet-title-sourceWidth) / anchor-size(--wallet-title-visual inline));
+						inline-size: calc((max(
+							var(---wallet-title-sourceWidth) - (
+								anchor-size(--wallet-control-natural inline, 0px) - anchor-size(--wallet-control-visual inline, 0px)
+							) * var(---wallet-title-naturalScale),
+							anchor-size(--wallet-name-visual inline) * var(---wallet-title-naturalScale)
+						) + var(---breadcrumb-iconInlineCorrection, var(---breadcrumb-iconCorrection))) * var(--stickyBreadcrumb-scale));
 					}
 				}
 				[data-sticky-breadcrumb~="source"] {
@@ -3023,19 +3037,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			> header {
 				--stickyBreadcrumb-sourcePaddingInline: 0px;
 			}
-			@media (width <= 1024px) {
+			@media (width <= 84rem) {
 				--stickyBreadcrumb-forceRow: 1;
 			}
 		}
 		:global([data-sticky-breadcrumb~="scope"]:has(> [data-sticky-breadcrumb~="position"] :is(h3[data-sticky-breadcrumb~="source"], h3[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > h3), > details > [data-sticky-breadcrumb~="position"] :is(h3[data-sticky-breadcrumb~="source"], h3[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > h3))) {
 			---wallet-compactFontSize: var(---wallet-compact-h3);
 			--stickyBreadcrumb-scale: calc(var(---wallet-compactFontSize) / var(---wallet-attribute-heading-font-size));
-		}
-		.wallet-device-controls {
-			display: grid;
-
-			grid-auto-flow: column;
-			grid-auto-columns: max-content;
 		}
 		.wallet-title-row {
 			anchor-name: --wallet-title-visual;

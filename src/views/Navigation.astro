@@ -195,13 +195,13 @@ const secondaryNavigationItems = [
 		}
 	}
 
-	@media (width > 1024px) {
+	@media (width > 84rem) {
 		nav:not(:has(> #nav-menu:popover-open)) li:has(#menu-toggle) {
 			display: none;
 		}
 	}
 
-	@media (width <= 1024px) {
+	@media (width <= 84rem) {
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
@@ -301,7 +301,7 @@ const secondaryNavigationItems = [
 		}
 	}
 
-	@media (width <= 1024px) {
+	@media (width <= 84rem) {
 		:global(body:has([data-sticky-breadcrumb~="root"])) #nav > header {
 			anchor-name: --navigation-row;
 		}
