@@ -2830,10 +2830,6 @@ ol {
 				translateX(calc(-1em * var(---icon-leadingInset, 0) * var(---inlineDirection))) translateY(calc(-1em * var(---icon-ink-top, 0)));
 		}
 	}
-	@keyframes breadcrumb-icon-detail {
-		from { --icon-scale: 1; }
-		to { --icon-scale: calc((var(---column-iconSize) + var(---breadcrumb-iconCorrection)) * var(--stickyBreadcrumb-scale) / var(--icon-size)); }
-	}
 	@keyframes breadcrumb-icon-complex {
 		contain 0% {
 			opacity: var(---breadcrumb-iconComplexFrom);
@@ -3550,12 +3546,6 @@ ol {
 							(1lh - var(---column-iconSize) - var(---breadcrumb-iconCorrection)) *
 								var(--stickyBreadcrumb-scale) / 2
 						);
-					}
-
-					[data-icon~="circle"]:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"])::before {
-						animation-name: breadcrumb-icon-motion, if(style(---breadcrumb-entry: 0): none; else: breadcrumb-icon-detail);
-						animation-fill-mode: var(--stickyBreadcrumb-motionFill, both), both;
-						animation-range: var(--stickyBreadcrumb-motionRange, var(--stickyBreadcrumb-entryRange)), var(--stickyBreadcrumb-entryRange);
 					}
 
 					[data-icon]::before {
