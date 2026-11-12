@@ -9,10 +9,6 @@
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 
-	type WalletPageWallet<_AttributeGroupId extends string> =
-		Omit<RatedWallet<_AttributeGroupId>, 'ladders'> &
-		Partial<Pick<RatedWallet<_AttributeGroupId>, 'ladders'>>
-
 	const {
 		item,
 		depth,
@@ -28,7 +24,7 @@
 		attributeTree: AttributeTree<_AttributeGroupId>
 		evalTree: EvaluationTree<_AttributeGroupId> | null
 		ladders: Ladders<_AttributeGroupId>
-		wallet: WalletPageWallet<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
 		showScores: boolean
 		showStage: boolean
 	} = $props()

@@ -54,7 +54,9 @@ import type {
 	ArtifactSigning,
 	ArtifactSigningDetails,
 	ArtifactSigningPayload,
+	DependencyAgeGate,
 	DependencyLocking,
+	DependencySandboxing,
 	DependencyVulnerabilityScanning,
 	HasPublicChangelog,
 	HermeticBuilds,
@@ -143,7 +145,7 @@ export interface WalletBaseFeatures {
 	privacy: {
 		/**
 		 * Data collection information.
-		 * See /docs/mitmproxy-guide for how to collect this.
+		 * See `resources/docs/wallet-testing/data-collection/data-collection.md` for how to collect this.
 		 */
 		dataCollection: VariantFeature<DataCollection>
 
@@ -178,6 +180,7 @@ export interface WalletBaseFeatures {
 		releaseTransparency: {
 			artifactSigning: VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>
 			dependencyLocking: VariantFeature<DependencyLocking>
+			dependencySandboxing: VariantFeature<DependencySandboxing>
 			dependencyVulnerabilityScanning: VariantFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: VariantFeature<HasPublicChangelog>
 			hermeticBuilds: VariantFeature<HermeticBuilds>
@@ -207,7 +210,9 @@ export interface WalletBaseFeatures {
  *
  * None of the fields in this type should be marked as possibly `undefined`.
  * If you want to add a new field, you need to add it to all existing wallets,
- * even if unrated (i.e. `null`).
+ * even if unrated (i.e. `null`). Use a named sentinel or empty array when the
+ * answer is known to be "none". See the `/data` encoding rule in
+ * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
 export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
@@ -233,7 +238,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: VariantFeature<PermissionsManagementSupport>
 	}
 
 	/** Ecosystem features. */
@@ -257,6 +262,11 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 
 	/**
@@ -287,7 +297,9 @@ export function isWalletSoftwareFeatures(
  *
  * None of the fields in this type should be marked as possibly `undefined`.
  * If you want to add a new field, you need to add it to all existing wallets,
- * even if unrated (i.e. `null`).
+ * even if unrated (i.e. `null`). Use a named sentinel or empty array when the
+ * answer is known to be "none". See the `/data` encoding rule in
+ * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
 export type WalletHardwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
@@ -339,7 +351,9 @@ export function isWalletEmbeddedFeatures(
  *
  * None of the fields in this type should be marked as possibly `undefined`.
  * If you want to add a new field, you need to add it to all existing wallets,
- * even if unrated (i.e. `null`).
+ * even if unrated (i.e. `null`). Use a named sentinel or empty array when the
+ * answer is known to be "none". See the `/data` encoding rule in
+ * `resources/docs/contribute/wallet-data/wallet-data.md`.
  */
 export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
@@ -348,6 +362,11 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	transparency: WalletBaseFeatures['transparency'] & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+
+		releaseTransparency: WalletBaseFeatures['transparency']['releaseTransparency'] & {
+			/** Minimum age of dependency releases that routine updates adopt. */
+			dependencyAgeGate: VariantFeature<DependencyAgeGate>
+		}
 	}
 }
 
@@ -406,7 +425,7 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
-		permissionsManagement: ResolvedFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: ResolvedFeature<PermissionsManagementSupport>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
@@ -415,7 +434,9 @@ export interface ResolvedFeatures {
 		maintenance: ResolvedFeature<MaintenanceSupport>
 		releaseTransparency: {
 			artifactSigning: ResolvedFeature<ArtifactSigning>
+			dependencyAgeGate: ResolvedFeature<DependencyAgeGate>
 			dependencyLocking: ResolvedFeature<DependencyLocking>
+			dependencySandboxing: ResolvedFeature<DependencySandboxing>
 			dependencyVulnerabilityScanning: ResolvedFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: ResolvedFeature<HasPublicChangelog>
 			hermeticBuilds: ResolvedFeature<HermeticBuilds>
@@ -629,9 +650,22 @@ export function resolveFeatures(
 						features => features.transparency.releaseTransparency.artifactSigning,
 					),
 				),
+				dependencyAgeGate:
+					embeddedFeat(
+						'transparency.releaseTransparency.dependencyAgeGate',
+						features => features.transparency.releaseTransparency.dependencyAgeGate,
+					) ??
+					softwareFeat(
+						'transparency.releaseTransparency.dependencyAgeGate',
+						features => features.transparency.releaseTransparency.dependencyAgeGate,
+					),
 				dependencyLocking: baseFeat(
 					'transparency.releaseTransparency.dependencyLocking',
 					features => features.transparency.releaseTransparency.dependencyLocking,
+				),
+				dependencySandboxing: baseFeat(
+					'transparency.releaseTransparency.dependencySandboxing',
+					features => features.transparency.releaseTransparency.dependencySandboxing,
 				),
 				dependencyVulnerabilityScanning: baseFeat(
 					'transparency.releaseTransparency.dependencyVulnerabilityScanning',

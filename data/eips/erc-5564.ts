@@ -5,6 +5,8 @@ export const erc5564: Eip = {
 	friendlyName: 'Stealth Addresses',
 	formalTitle: 'Stealth Addresses',
 	appliesTo: variantEnum.set,
+	// "Move to Final" commit: https://github.com/ethereum/ERCs/commit/db7a32f6667a03ef430416b7f16c518b49f62814
+	finalizedDate: '2024-05-28',
 	icon: 'ICON_EYE_OFF',
 	number: '5564',
 	prefix: EipPrefix.ERC,

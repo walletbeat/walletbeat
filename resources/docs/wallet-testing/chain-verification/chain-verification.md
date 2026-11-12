@@ -19,7 +19,7 @@ More generally, a dishonest or compromised RPC provider could:
 - Lie about transaction receipts or contract state to manipulate your decisions.
 - Hide pending or confirmed transactions from you.
 
-A wallet that integrates a light client (e.g. [Helios](https://github.com/a16z/helios)) can detect such lies by independently verifying block headers against a trusted beacon checkpoint and re-checking `eth_call` results against Merkle proofs. The goal of this test: determining whether the wallet under test does any such verification, or whether it can be trivially deceived.
+A wallet that integrates a light client (e.g. [Helios](https://github.com/a16z/helios)) can detect such lies by independently verifying block headers against a trusted beacon checkpoint and rechecking `eth_call` results against Merkle proofs. The goal of this test: determining whether the wallet under test does any such verification, or whether it can be trivially deceived.
 
 ## High-level guide
 
@@ -129,7 +129,7 @@ Save the setting and switch to that network.
 
 ### Step 5: Import a funded account
 
-Import (or connect) an account that holds a non-zero ERC-20 balance. It is important to use a non-zero balance. A zero balance multiplied by any factor is still displayed as zero (the proxy invents a small non-zero value in this case, but it may fall below the wallet's display threshold).
+Import (or connect) an account that holds a nonzero ERC-20 balance. It is important to use a nonzero balance. A zero balance multiplied by any factor is still displayed as zero (the proxy invents a small nonzero value in this case, but it may fall below the wallet's display threshold).
 
 Use a separate wallet or browser that is **not** pointing at the proxy to confirm the real balance beforehand.
 

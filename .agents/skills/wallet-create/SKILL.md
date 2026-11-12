@@ -33,7 +33,7 @@ Before doing anything else:
      - Software: `data/software-wallets/unrated.tmpl.ts`
      - Hardware: `data/hardware-wallets/unrated.tmpl.ts`
      - Embedded: `data/embedded-wallets/unrated.tmpl.ts`
-   - The contributor guide: `resources/docs/contribute/wallet-data.md`
+   - The contributor guide: `resources/docs/contribute/wallet-data/wallet-data.md`
    - The example entity file: `data/entities/example.ts`
    - The example contributor file: `data/contributors/example.ts`
 
@@ -55,7 +55,7 @@ Using the information collected above (name, affiliation, profile URL), create `
 
 Key rules:
 
-- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: []`.
+- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: 'NO_AFFILIATION'` — do not use `[]` or omit the field.
 - Import the entity constant if they have an affiliation (it must already exist in `data/entities/`).
 
 Example for an affiliated contributor:
@@ -83,7 +83,7 @@ import type { Contributor } from '@/schema/wallet'
 
 export const chainMonkey: Contributor = {
 	name: 'Chain Monkey',
-	affiliation: [],
+	affiliation: 'NO_AFFILIATION',
 }
 ```
 
@@ -120,6 +120,7 @@ Ask the contributor for the wallet developer's company name and legal name.
 Then check whether the entity already exists in `data/entities/`. If so, skip to step `C.2`. If not, create `data/entities/[kebab-case-company-name].ts` yourself by copying `data/entities/example.ts` and filling in the known fields:
 
 - `id`, `name`, `legalName`, `type`, `jurisdiction`, `url`, `repoUrl`, `privacyPolicy`, and social/profile URLs.
+- Every entity field is required. If the company has no website, repo, icon, or social profile, use the matching sentinel from `example.ts` (`{ type: 'NO_WEBSITE' }`, `'NO_ICON'`, `{ type: 'NO_FARCASTER_PROFILE' }`, …). Do not omit the field.
 - Ask the contributor to find an SVG icon, crop transparent edges, and save it to `/public/images/entities/[entityId].svg`. If only PNG is available, save as `.png` and set `icon: { extension: 'png', width: N, height: N }`.
 
 Key type fields:
@@ -138,6 +139,7 @@ Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallet
 - `tableName`: Short name for table display (often same as `displayName`)
 - Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camel case wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
 - `contributors`: `[yourContributorConstant]`
+- `coinspectId`: Coinspect `walletMakerUID` if known, `null` if not yet checked, or `{ type: 'NO_COINSPECT_ID' }` if Coinspect does not list this wallet
 - `iconExtension`: `'svg'` (or `'png'` if no SVG available)
 - `lastUpdated`: Today's date as `'YYYY-MM-DD'`
 - `urls`: Fill in actual wallet URLs; remove social fields that don't apply
@@ -147,7 +149,7 @@ Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallet
   - Embedded: `Variant.EMBEDDED` (already set in template)
 - Ask the contributor to find an SVG icon, crop transparent edges, and save it to `/public/images/wallets/[id].svg`. If only PNG: save as `.png` and set `iconExtension: 'png'` in metadata.
 
-All `features` fields should remain `null` for now — those are populated separately using `/wallet-update`.
+All `features` fields should remain `null` for now — those are populated separately using `/wallet-update`. New `metadata` fields must be set explicitly (`null` if unknown); do not omit them. See "How `/data` fields are encoded" in the contributor guide.
 
 ### Step C.3 — Register in index
 

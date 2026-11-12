@@ -9,11 +9,16 @@ import {
 	isHardwareRatedWallet,
 	isSoftwareRatedWallet,
 } from '@/data/wallets'
+import { coinspectRef } from '@/schema/data-sources'
 import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
+import {
+	ratedWalletJsonExport,
+	serializeReferences,
+	stageToExportString,
+} from '@/utils/wallet-json-export'
 
 import { RatedWalletExportValidator } from './utils/assert-valid-json'
 
@@ -106,5 +111,32 @@ describe('ratedWalletJsonExport', () => {
 				expect(payload.repository).toBe(getUrl(repositories[0]))
 			}
 		}
+	})
+})
+
+describe('serializeReferences', () => {
+	it('projects a stamped ref source without a source URL', () => {
+		const note = 'The wallet warns when sending to a new recipient.'
+		const check = 'WSR-001.v1'
+		const ref = coinspectRef({
+			report: { walletUID: 'metamask-browser', date: '2026-01-12T17:52:05.136Z' },
+			check,
+			note,
+		})
+		const serialized = serializeReferences(ref)
+
+		expect(serialized).toHaveLength(1)
+		expect(serialized[0]?.explanation).toBe(note)
+		expect(serialized[0]?.urls[0]?.label).toBe(`Coinspect ${check}`)
+		expect(serialized[0]?.source).toEqual({
+			id: 'coinspect',
+			name: 'Coinspect',
+			license: {
+				name: 'CC BY 4.0',
+				url: 'https://creativecommons.org/licenses/by/4.0/',
+			},
+			attributionText: 'Adapted from "Wallet Security Ranking" by Coinspect.',
+		})
+		expect(serialized[0]?.source).not.toHaveProperty('url')
 	})
 })

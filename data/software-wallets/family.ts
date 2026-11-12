@@ -13,6 +13,7 @@ export const family: SoftwareWallet = {
 		id: 'family',
 		displayName: 'Family',
 		tableName: 'Family',
+		coinspectId: 'family',
 		contributors: [lucemans],
 		iconExtension: 'png',
 		lastUpdated: '2025-04-22',
@@ -136,7 +137,9 @@ export const family: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

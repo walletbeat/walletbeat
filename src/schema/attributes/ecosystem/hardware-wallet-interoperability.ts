@@ -14,10 +14,11 @@ import {
 	hardwareWalletType,
 	hardwareWalletTypeToString,
 	type SupportedHardwareWallet,
+	supportedHardwareWalletsId,
 	supportsHardwareWalletTypesMarkdown,
 } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary } from '@/schema/reference'
+import { popRefs, refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -69,7 +70,7 @@ function singleHardwareWalletManufacturerSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'single_hardware_wallet_support',
+			id: `single_hardware_wallet_support__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.FAIL,
 			displayName: 'Supports only one hardware wallet manufacturer',
 			shortExplanation: sentence(`
@@ -97,7 +98,7 @@ function insufficientHardwareWalletManufacturerSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'insufficient_hardware_wallet_interoperability',
+			id: `insufficient_hardware_wallet_interoperability__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet interoperability',
 			shortExplanation: sentence(`
@@ -121,7 +122,7 @@ function comprehensiveHardwareWalletSupport(
 ): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
-			id: 'comprehensive_hardware_wallet_interoperability',
+			id: `comprehensive_hardware_wallet_interoperability__${supportedHardwareWalletsId(hardwareWalletSupport)}`,
 			rating: Rating.PASS,
 			displayName: 'Interoperable hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports a wide range of hardware wallets.'),
@@ -295,9 +296,7 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 			})
 		}
 
-		const withoutRefs = ctx.popRefs<HardwareWalletSupport>(
-			ctx.features.security.hardwareWalletSupport,
-		)
+		const { withoutRefs } = popRefs(ctx.features.security.hardwareWalletSupport)
 
 		const hwSupport = hardwareWalletType.fullRecord(withoutRefs.wallets, notSupported)
 		let majorManufacturerSupported = 0
@@ -318,11 +317,15 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 					hardwareWalletSupport: ctx.features.security.hardwareWalletSupport,
 				})
 			case 1:
+				ctx.addRef(ctx.features.security.hardwareWalletSupport)
+
 				return singleHardwareWalletManufacturerSupport(
 					ctx,
 					ctx.features.security.hardwareWalletSupport,
 				)
 			default:
+				ctx.addRef(ctx.features.security.hardwareWalletSupport)
+
 				if (majorManufacturerSupported < minMajorHardwareWalletManufacturers) {
 					return insufficientHardwareWalletManufacturerSupport(
 						ctx,

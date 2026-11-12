@@ -15,8 +15,8 @@ export type SupplyChainDIYMetadata = {
 
 export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	id: 'supplyChainDIY',
-	icon: 'security_best_practices',
-	displayName: 'Supply Chain DIY',
+	icon: 'checklist',
+	displayName: 'Supply chain DIY',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a DIY wallet's supply chain evaluated?",
@@ -27,7 +27,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	question: sentence('Does {{WALLET_NAME}} have a transparent and flexible DIY supply chain?'),
 	why: markdown(
 		`For Do-It-Yourself (DIY) hardware wallets, a transparent and flexible supply chain allows users to source components independently and verify the hardware they are building.
-		Avoiding components that require Non-Disclosure Agreements (NDAs) is crucial for transparency and auditability.`,
+		Avoiding components that require nondisclosure agreements (NDAs) is crucial for transparency and auditability.`,
 	),
 	methodology: markdown(
 		`Evaluated based on:
@@ -42,19 +42,19 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The hardware wallet passes all DIY supply chain sub-criteria.'),
+				sentence('The hardware wallet passes all DIY supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes some DIY supply chain sub-criteria.'),
+				sentence('The hardware wallet passes some DIY supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The hardware wallet fails most or all DIY supply chain sub-criteria.'),
+				sentence('The hardware wallet fails most or all DIY supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -106,7 +106,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 			outcome: {
 				id: 'supply_chain_diy',
 				rating,
-				displayName: 'Supply Chain DIY',
+				displayName: 'Supply chain DIY',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} DIY supply chain.`),
 				metadata: {
 					diyNoNda: diyFeature.diyNoNda,
@@ -114,7 +114,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} DIY supply chain evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

@@ -16,6 +16,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		id: 'unrated',
 		displayName: 'Unrated hardware wallet template',
 		tableName: 'Unrated',
+		coinspectId: null,
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
@@ -115,6 +116,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

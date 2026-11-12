@@ -67,7 +67,7 @@ Privacy is one of the core values of Ethereum, yet it's often treated as a nice-
 
 This Privacy Standard for wallets could help address two different sides of this problem:
 
-- Giving users a reliable guide to choosing only those wallets that meet this standard means that a greater share of Ethereum users will have access to the features they need to have a private on-chain experience. To do this effectively, the standard must be a very high bar and it must regularly be raised as new privacy features are developed by the ecosystem or new threats are found.
+- Giving users a reliable guide to choosing only those wallets that meet this standard means that a greater share of Ethereum users will have access to the features they need to have a private onchain experience. To do this effectively, the standard must be a very high bar and it must regularly be raised as new privacy features are developed by the ecosystem or new threats are found.
 - The standard will encourage wallet teams to prioritize important features to remain compliant.
 
 Ethereum is built around a clear set of CROPS values. Users experience Ethereum through wallets, yet most wallets today don't live up to these very values. No CROPS in wallets results in no CROPS for users.
@@ -94,16 +94,16 @@ Concretely, Walletbeat pushes wallet teams to adopt ecosystem initiatives like K
 - Privacy Hygiene: Does your wallet only send sensitive data with your explicit consent?
   Users shouldn't have to wonder whether their wallet is sending analytics, crash reports, or account information without their knowledge. A private wallet only collects and sends sensitive data after explicit user consent.
 
-## Github Repository Links *
+## GitHub Repository Links *
 
-List all relevant Github repos separated by commas.
+List all relevant GitHub repos separated by commas.
 https://github.com/walletbeat/walletbeat
 
 ## Software License(s) *
 
 List the license(s) of your privacy-critical code. They must be a recognizable open-source license to be eligible for the round.
 
-Walletbeat's website code, rating pipeline, and wallet database are all and will all remain licensed under the MIT License, a Free and Open Source Software license: https://github.com/walletbeat/walletbeat/blob/beta/LICENSE
+Walletbeat's website code, rating pipeline, and wallet database are all and will all remain licensed under the MIT License (a Free and Open Source Software license): https://github.com/walletbeat/walletbeat/blob/beta/LICENSE
 
 ## What is your quantifiable traction? *
 
@@ -132,7 +132,7 @@ https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.
   - Reaction: WalletChan fixes this in their next release
   - Reaction: Ambire thanks Walletbeat for bringing this issue to their attention
 
-- 2026-08: Walletbeat contributor polymutex points out that flagging IPFS gateways such as .eth.limo reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
+- 2026-08: Walletbeat contributor polymutex points out that flagging IPFS gateways such as eth.limo reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
   - Reaction: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
 
 - 2026-08 - Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited token approvals that caused a user to lose ~$500K: https://x.com/0xMattmatt/status/2089770628828237918
@@ -199,15 +199,15 @@ We presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026:
 - Web2 lessons for Web3 privacy at Ethereum Privacy Stack (Devconnect 2025): https://youtu.be/dxvwrqGBBZE?si=ihoAW8GucaIh5hcn
 - Nico Consigny (EF) broke down the criteria behind Walletbeat at Devconnect 2025: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K
 - A State of Privacy in Web3 panel at the Neocypherpunk Summit: https://youtu.be/myRlASvXA_w?si=KAoGuqqkNH9yLE8R
-- a CROPS-in-wallets talk on Ethereum Day: https://youtu.be/2rIVB8WH_-I
-- a Brew workshop teaching attendees to capture wallet network traffic and find privacy leaks: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K
+- A CROPS-in-wallets talk on Ethereum Day: https://youtu.be/2rIVB8WH_-I
+- A Brew workshop teaching attendees to capture wallet network traffic and find privacy leaks: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K
 - A Dappcon workshop that breaks down what makes an Ethereum wallet “good”, and how standards shape interoperability across the ecosystem: https://youtu.be/zOL73Ll_6N0?si=T6B_RU2ceS76wUlo
 
 Recordings and slides are public (https://github.com/walletbeat/walletbeat/tree/beta/resources/talks)
 
 ## What KPIs do you want to be measured by? *
 
-Provide 1-2 verifiable measures.
+Provide 1–2 verifiable measures.
 
 By the privacy work being funded specifically:
 
@@ -218,9 +218,9 @@ Network privacy tooling expansion and wallet research
 - https://github.com/walletbeat/walletbeat/issues/1061
 - https://github.com/walletbeat/walletbeat/issues/1055
 
-The completion of Walletbeat's wallet data collection tool will allow us to systematically capture and analyze the network traffic generated by a wallet across its UX flows. We capture its network packets, remove the HTTPS encryption layer from them if necessary to be able to understand the traffic patterns, and use this data to categorize what piece of user data makes its way to which third parties while the user is using the wallet and whether any form of proxying or onion routing is used.
+The completion of Walletbeat's wallet data collection tool will allow us to systematically capture and analyze the network traffic generated by a wallet across its UX flows. We capture its network packets and, if necessary, remove the HTTPS encryption layer to understand the traffic patterns. We then use this data to categorize what piece of user data makes its way to which third parties while the user is using the wallet, and whether any form of proxying or onion routing is used.
 
-We will then apply this to Kohaku, the EF's privacy wallet SDK that aims to be privacy-centric, featuring native Tor integration and minimal privacy data leakage, to establish a benchmark that other wallets maybe measured against, as we expect Kohaku will act as existence proof and state-of-the-art for other wallets to adopt or follow.
+We will then apply this to Kohaku, the EF's privacy wallet SDK that aims to be privacy-centric, featuring native Tor integration and minimal privacy data leakage. This will establish a benchmark that other wallets may be measured against, as we expect Kohaku to act as an existence proof and state-of-the-art example for other wallets to adopt or follow.
 
 ## Need Help?
 

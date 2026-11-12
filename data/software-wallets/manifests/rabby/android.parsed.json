@@ -1,0 +1,12 @@
+{
+	"usesPermissions": [
+		"android.permission.INTERNET",
+		"android.permission.DETECT_SCREEN_CAPTURE",
+		"android.permission.CAMERA",
+		"android.permission.BLUETOOTH_SCAN",
+		"android.permission.BLUETOOTH_CONNECT",
+		"android.permission.BLUETOOTH",
+		"android.permission.BLUETOOTH_ADMIN",
+		"android.permission.ACCESS_FINE_LOCATION"
+	]
+}

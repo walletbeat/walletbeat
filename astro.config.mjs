@@ -1,37 +1,77 @@
 // @ts-check
 import { resolve } from 'node:path'
 
+import spaceGroteskUnicode from '@fontsource/space-grotesk/unicode.json' with { type: 'json' }
+
+import { satteri } from '@astrojs/markdown-satteri'
 import sitemap from '@astrojs/sitemap'
 import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig, fontProviders } from 'astro/config'
 
+import { assertNonEmptyArray, nonEmptyGet } from './src/types/utils/non-empty'
+
+import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
+import {
+	createStripFirstH1Plugin,
+	createUrlRewritePlugin,
+} from './src/utils/satteri-url-rewrite-plugin'
+
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
+
+/** @typedef {NonNullable<Parameters<ReturnType<typeof fontProviders.local>['resolveFont']>[0]['options']>['variants'][number]} LocalFontVariant */
+const spaceGroteskVariants = assertNonEmptyArray(
+	Object.entries(spaceGroteskUnicode).flatMap(([subset, unicodeRange]) =>
+		[400, 500, 600, 700].map(
+			/** @returns {LocalFontVariant} */
+			weight => {
+				const ranges = assertNonEmptyArray(unicodeRange.split(','))
+				return {
+					src: [`@fontsource/space-grotesk/files/space-grotesk-${subset}-${weight}-normal.woff2`],
+					weight,
+					style: 'normal',
+					unicodeRange: [nonEmptyGet(ranges), ...ranges.slice(1)],
+				}
+			},
+		),
+	),
+)
+
+const isLinux = process.platform === 'linux'
 
 // https://astro.build/config
 export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
-	site: process.env.SITE_URL ?? 'https://wallet.page', // Set your production site URL here
+	site: process.env.SITE_URL ?? 'https://walletbeat.eth.limo', // Set your production site URL here
 	output: 'static',
 	integrations: [svelte()].concat(
 		process.env.WALLETBEAT_DEV === 'true'
 			? []
 			: [
 					sitemap(),
-					shield({
-						sri: {
-							enableMiddleware: false,
-							hashesModule: modulePath,
-						},
-					}),
+					...(isLinux
+						? [
+								shield({
+									sri: {
+										enableMiddleware: false,
+										hashesModule: modulePath,
+									},
+								}),
+							]
+						: []),
 				],
 	),
 	vite: {
+		cacheDir: process.env.WALLETBEAT_DEV === 'true' ? '.astro/vite-dev' : '.astro/vite',
 		build: {
+			// Both bundled CSS compressors currently drop valid named-range keyframes or
+			// individual animation-timeline properties. Preserve the authored modern CSS.
+			cssMinify: false,
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},
+		plugins: [codeSnippetHighlight()],
 	},
 	fonts: [
 		{
@@ -56,9 +96,10 @@ export default defineConfig({
 		{
 			name: 'Space Grotesk',
 			cssVariable: '--fontFamily-spaceGrotesk',
-			provider: fontProviders.fontsource(),
-			weights: [400, 500, 600, 700],
-			styles: ['normal'],
+			provider: fontProviders.local(),
+			options: {
+				variants: [nonEmptyGet(spaceGroteskVariants), ...spaceGroteskVariants.slice(1)],
+			},
 		},
 		{
 			name: 'SP Monorium',
@@ -80,13 +121,27 @@ export default defineConfig({
 			},
 		},
 		{
-			name: 'wbicons',
-			cssVariable: '--fontFamily-wbicons',
+			name: 'wbicons-complex',
+			cssVariable: '--fontFamily-wbicons-complex',
 			provider: fontProviders.local(),
 			options: {
 				variants: [
 					{
-						src: ['./src/assets/fonts/wbicons/wbicons.woff2'],
+						src: ['./src/assets/fonts/wbicons-complex/wbicons-complex.woff2'],
+						weight: '400',
+						style: 'normal',
+					},
+				],
+			},
+		},
+		{
+			name: 'wbicons-simple',
+			cssVariable: '--fontFamily-wbicons-simple',
+			provider: fontProviders.local(),
+			options: {
+				variants: [
+					{
+						src: ['./src/assets/fonts/wbicons-simple/wbicons-simple.woff2'],
 						weight: '400',
 						style: 'normal',
 					},
@@ -94,4 +149,9 @@ export default defineConfig({
 			},
 		},
 	],
+	markdown: {
+		processor: satteri({
+			hastPlugins: [createUrlRewritePlugin(), createStripFirstH1Plugin()],
+		}),
+	},
 })

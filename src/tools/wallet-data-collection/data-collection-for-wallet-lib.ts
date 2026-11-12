@@ -1,30 +1,41 @@
 import { type DataCollection } from '@/schema/features/privacy/data-collection'
-import { variantEnum, type VariantFeature } from '@/schema/variants'
-
-export interface DataCollectionJSON {
-	walletId: string
-	walletVariant: string
-	dataCollection: DataCollection
-}
+import type { AtLeastOneVariant, Variant, VariantFeature } from '@/schema/variants'
+import { variantEnum } from '@/schema/variants'
 
 /**
- * Gather multiple `DataCollectionJSON` entries into a single VariantFeature
- * for them.
+ * Gather multiple variant-specific `DataCollection` objects into a single
+ * `VariantFeature` for them.
+ *
+ * @param variantData A mapping from wallet variant to the `DataCollection`
+ *   observed for that variant. Variants that were not captured must be
+ *   omitted.
+ * @returns A `VariantFeature<DataCollection>` with an entry for every
+ *   variant; uncaptured variants map to `null`. Returns `null` when no
+ *   variant data was provided.
  */
 export function capturedWalletDataCollection(
-	jsonObjects: unknown[],
-): () => VariantFeature<DataCollection> {
-	return () => {
-		if (jsonObjects.length === 0) {
-			return null
+	variantData: Partial<Record<Variant, unknown>>,
+): VariantFeature<DataCollection> {
+	const result: Partial<Record<Variant, DataCollection | null>> = {}
+
+	let foundAny = false
+
+	for (const variant of variantEnum.items) {
+		const dataCollection = variantData[variant]
+
+		if (dataCollection !== undefined) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Already validated by tests.
+			result[variant] = dataCollection as DataCollection
+			foundAny = true
+		} else {
+			result[variant] = null
 		}
-
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Not inherently safe, but there is a unit test that verifies the objects passed to this function match the expected JSON format we want, so this is as correct as that test is.
-		const dataCollectionJsons = jsonObjects as DataCollectionJSON[]
-
-		// TODO: Verify all `dataCollectionJsons` have the same walletId and unique variants.
-		return Object.fromEntries(
-			dataCollectionJsons.map(dc => [variantEnum.assert(dc.walletVariant), dc.dataCollection]),
-		)
 	}
+
+	if (!foundAny) {
+		return null
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- At least one variant has data above, so `result` is non-empty.
+	return result as AtLeastOneVariant<DataCollection | null>
 }

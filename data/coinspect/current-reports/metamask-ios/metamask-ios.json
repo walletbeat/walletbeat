@@ -1,0 +1,795 @@
+{
+    "wallet": "Metamask",
+    "platform": "Ios",
+    "version": "7.56.5",
+    "date": "2025-12-03T21:55:33.249Z",
+    "walletUID": "metamask-ios",
+    "walletMakerUID": "metamask",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-698cf560.jpg",
+                        "metamask-ios-7.56.5-c35f4362.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows transactions to an address with invalid checksums through dApps but prevents them within the app itself."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-023d0fcb.jpg",
+                        "metamask-ios-7.56.5-4c1233e7.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet permits copying for less than a minute, accompanied by an alert, and displays a security warning upon taking a screenshot."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-cdf2fa91.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Has an embedded browser, it requires user confirmation before processing each DApp request"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-586c9e43.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Implements Wallet Connect and, when in a locked state, it requires users to unlock the wallet to start processing requests from DApps. The switch chain method shows a success message but only sends the request when you request another method like send transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-9a095ac6.jpg",
+                        "metamask-ios-7.56.5-55587595.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display any messages when attempting to connect to UniSwap or 1inch, whether through WalletConnect or the embedded browser."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-495e85f4.jpg",
+                        "metamask-ios-7.56.5-a29f18e7.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet alerts users about interactions with known phishing or scam addresses."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-2057fe3b.jpg",
+                        "metamask-ios-7.56.5-8d890032.jpg",
+                        "metamask-ios-7.56.5-6873e0ad.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet supports biometric authentication but does not require its use, permits weak passwords (1 to 8 characters), and lacks rate limiting for login attempts."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-5ec93a97.png",
+                        "metamask-ios-7.56.5-482677c1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Shows a warning about different domains or scheme mismatches when signing an EIP-4361."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-b32d9501.jpg",
+                        "metamask-ios-7.56.5-abdfecf1.jpg",
+                        "metamask-ios-7.56.5-7d1b82b0.jpg",
+                        "metamask-ios-7.56.5-a9c7aa43.jpg",
+                        "metamask-ios-7.56.5-4e2d1643.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "After scanning the WalletConnect QR code from the following site: https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/, the wallet does not display a warning; however, when accessed through the embedded browser, a warning is shown."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-8df751a4.jpg",
+                        "metamask-ios-7.56.5-adb1e494.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links in the transaction history but does not provide them during the transaction-sending process."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-f765cf4d.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the NFT received when providing liquidity to a pool or a swap, as well as the MATIC and the USDC.e to be spent in the process"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-706b1248.jpg",
+                        "metamask-ios-7.56.5-e4e8fc4b.jpg",
+                        "metamask-ios-7.56.5-85e37340.jpg",
+                        "metamask-ios-7.56.5-42473ae5.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet parses EIP-712 objects for well-known contracts and protocols, such as Opensea Seaport listings and ERC-20 Permits."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-8ec45c38.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays a message indicating that it will have access to view accounts, use enabled networks, and suggest transaction approvals when a WalletConnect QR code is scanned."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-b0242ba9.jpg",
+                        "metamask-ios-7.56.5-2709c56c.jpg",
+                        "metamask-ios-7.56.5-21f17976.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Although the wallet displays a question mark icon, it does not warn users when interacting with unknown or untrusted addresses. However, it allows them to add such addresses to their address book."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-613f7153.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It shows the full URL of this site https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-70161b99.jpg",
+                        "metamask-ios-7.56.5-bf2c2b1e.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Yes, it shows a warning when you are signing EIP-712 if the chain ID does not match the currently active chain."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-27ddfff6.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It shows all connected DApps and also the chance to revoke access to them"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-91a7e298.jpg",
+                        "metamask-ios-7.56.5-77269a7b.jpg",
+                        "metamask-ios-7.56.5-5503de20.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes the contract address, token, effect, allowance, and contract spender address when interacting with 1inch."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-86e0c2c8.jpg",
+                        "metamask-ios-7.56.5-57296a39.jpg",
+                        "metamask-ios-7.56.5-5d4a9227.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It does not require user confirmation before executing the method, but includes the connected chains in the connect dialog."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-79473621.jpg",
+                        "metamask-ios-7.56.5-be78e511.jpg",
+                        "metamask-ios-7.56.5-8afdeec6.jpg",
+                        "metamask-ios-7.56.5-d38f3f1b.jpg",
+                        "metamask-ios-7.56.5-7d71b275.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays large messages in personal sign requests without truncation and shows the verifying contract in the EIP-712 object."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-fc47f006.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Implements WalletConnect and requires user confirmation for each dApp request. The switchChain method displays a success message but defers the actual request until another method (e.g., sendTransaction) is invoked."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-9dc7e08d.jpg",
+                        "metamask-ios-7.56.5-16896f97.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows managing approvals in Browser > Connect > Dashboard > Spending Caps."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-6765109e.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display tokens (legitimate or spam) or NFTs; this functionality appears broken. Although it fails to show legitimate NFTs, it also suppresses spam NFTs."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-6c6adcdf.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet automatically locks after 30 seconds of remaining in the background but does not lock when the phone itself is locked or when the app transitions to background execution. It locks immediately upon closing the application."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-01c274b6.jpg",
+                        "metamask-ios-7.56.5-d1df22a4.jpg",
+                        "metamask-ios-7.56.5-e3a1e061.jpg",
+                        "metamask-ios-7.56.5-10f48672.jpg",
+                        "metamask-ios-7.56.5-e9ffb985.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows users to sign data before reviewing it; although they can expand to read the full message, the Sign button remains enabled."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-22c40ec0.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "To secure your wallet, navigate to Settings and scroll down to select the \u201cLock\u201d option located at the bottom of the menu."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-8ac1cc2e.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The method \"eth_sign\" does not exist / is not available."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-3088708f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires a password to reveal mnemonics or private keys."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-ios-7.56.5-03a5e4b8.jpg",
+                        "metamask-ios-7.56.5-596c2636.jpg",
+                        "metamask-ios-7.56.5-b9389261.jpg",
+                        "metamask-ios-7.56.5-1244e3ce.jpg",
+                        "metamask-ios-7.56.5-44195aa4.jpg",
+                        "metamask-ios-7.56.5-15c34aaa.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet features a highly user-friendly interface that prompts users to answer several questions before revealing the mnemonics. This approach is clear and reflects the application\u2019s commitment to preventing users from inadvertently sharing their mnemonics."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

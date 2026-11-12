@@ -16,6 +16,7 @@ export const pillarx: SoftwareWallet = {
 		id: 'pillarx',
 		displayName: 'PillarX',
 		tableName: 'PillarX',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [iamkio],
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',
@@ -75,7 +76,7 @@ export const pillarx: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'PillarX is licensed under the MIT license',
-						url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE',
+						url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE#not-line-specific',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -152,7 +153,9 @@ export const pillarx: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

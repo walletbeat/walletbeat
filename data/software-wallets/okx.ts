@@ -9,26 +9,44 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
 	CallDataDisplay,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import { minimalsm } from '../contributors/minimalsm'
+import { okx7702DelegatorContract } from '../wallet-contracts/okx-7702-delegator'
 
 export const okx: SoftwareWallet = {
 	metadata: {
 		id: 'okx',
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
-		contributors: [mattmatt],
+		coinspectId: 'okx',
+		contributors: [mattmatt, minimalsm],
 		iconExtension: 'png',
-		lastUpdated: '2026-01-28',
+		lastUpdated: '2026-10-18',
 		urls: {
 			extensions: [
 				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -43,8 +61,12 @@ export const okx: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: supported({
-				ref: refTodo,
-				contract: 'UNKNOWN',
+				ref: {
+					explanation:
+						'OKX Wallet upgrades the EOA via an EIP-7702 authorization delegating to its delegator contract.',
+					url: 'https://etherscan.io/tx/0x77cc7ba00cf03825ba3982662ca990c7458346fa659c2075dfcb75182c12e8a1',
+				},
+				contract: okx7702DelegatorContract,
 			}),
 			eoa: supported({
 				ref: refTodo,
@@ -102,13 +124,7 @@ export const okx: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
-			walletAppLicense: {
-				ref: refNotNecessary,
-				license: SourceNotAvailableLicense.PROPRIETARY,
-			},
-		},
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
@@ -132,7 +148,7 @@ export const okx: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://web3.okx.com/help/okx-web3-ecosystem-privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -178,19 +194,115 @@ export const okx: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								"The extension's hardware wallet connect screen lists Keystone, Ledger, OneKey and Trezor.",
+							file: 'public/references/wallets/okx/screenshots/2026-10-13-okx-extension-connect-hardware-wallet.png',
+							label:
+								"Screenshot of the OKX Wallet extension's hardware wallet connect screen, provided by a maintainer",
+						},
+						{
+							explanation:
+								'The browser extension connects to Keystone by scanning its QR code with the camera.',
+							label: 'OKX guide to connecting a Keystone hardware wallet',
+							url: 'https://web3.okx.com/help/how-do-i-connect-my-keystone-hardware-wallet-to-okx-wallet',
+						},
+						{
+							explanation:
+								'OneKey documents that the OKX Wallet extension only adds OneKey hardware wallets over a USB cable.',
+							label: 'OneKey guide to using OneKey with OKX Wallet',
+							url: 'https://help.onekey.so/en/articles/11461103-how-to-use-okx-web3-wallet-with-onekey-hardware-wallets',
+						},
+						{
+							explanation:
+								'Trezor lists OKX Wallet among the desktop wallets that work with Trezor devices.',
+							label: 'Trezor list of compatible wallets',
+							url: 'https://trezor.io/guides/trezor-devices/trezor-fundamentals/trezor-connect',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+					},
+				},
+				[Variant.MOBILE]: null,
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			// SlowMist's 2023 OKX audits cover the OKX exchange app, not the OKX Wallet app or extension, so they are not listed.
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'OKX Wallet decodes a USDC approval, showing the spender (Aave) and an editable amount.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-usdc-approval.png',
+							label: 'OKX Wallet approval confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode an Aave supply properly. It labels it as a deposit and shows the token amount, but the contract is shown as a raw address and the collateral recipient is not shown.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png',
+							label: 'OKX Wallet deposit confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction. It is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-aave-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. It is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-batch-approve-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'OKX Wallet splits a batched USDC approval and Aave supply from an EOA into separate transactions and decodes the approval. But it does not decode the Aave supply properly: it is only shown as a deposit of the token amount, without the collateral recipient.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-batch-approve-supply.png',
+							label:
+								'OKX Wallet multiple transactions confirmation for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: supported({
 					ref: refTodo,
 					calldataDisplay: {
@@ -218,7 +330,22 @@ export const okx: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'OKX Wallet has a "Manage approvals" screen listing token approvals by protocol, which can be selected and revoked.',
+						file: 'public/references/wallets/okx/screenshots/2026-09-24-okx-manage-approvals.png',
+						label: 'OKX Wallet manage approvals screen',
+					},
+				],
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -236,13 +363,21 @@ export const okx: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupportedWithRef({
+					ref: {
+						explanation: 'The OKX Wallet apps are closed source.',
+						label: 'WalletScrutiny review of the OKX Wallet app',
+						url: 'https://walletscrutiny.com/android/com.okx.wallet/',
+					},
+				}),
 			},
 		},
 		walletCall: supported({

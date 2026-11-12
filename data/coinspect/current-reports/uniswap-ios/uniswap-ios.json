@@ -1,0 +1,777 @@
+{
+    "wallet": "Uniswap",
+    "platform": "Ios",
+    "version": "1.60.2",
+    "date": "2025-12-03T21:55:33.249Z",
+    "walletUID": "uniswap-ios",
+    "walletMakerUID": "uniswap",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-2df284f9.jpg",
+                        "uniswap-ios-1.60.2-92174e10.png",
+                        "uniswap-ios-1.60.2-681381b7.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When initiating a transaction through the testing DApp, the wallet does not warn about incorrect address checksums and allows you to confirm the transaction, although it doesn\u2019t process it effectively. However, if attempted manually within the wallet, the transaction is not permitted."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-5d20a765.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lets you copy words without warning for over a minute. But if you take a picture of the screen, it tells you it might not be safe."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-3984accd.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't have an embedded browser."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-b2c88799.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It is asking the user to unlock their wallets in every test"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-a99f8753.jpg",
+                        "uniswap-ios-1.60.2-41a1e65f.jpg",
+                        "uniswap-ios-1.60.2-8581fd20.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet may confuse users when connecting to known phishing or verified dApps such as https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/\ufffc or 1inch, as it displays a verified checkmark in both cases."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-69846020.jpg",
+                        "uniswap-ios-1.60.2-167d40da.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet blocks a transaction to a known malicious address, such as the Tornado Cash attacker."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-a74e1a87.jpg",
+                        "uniswap-ios-1.60.2-7c37e3c0.jpg",
+                        "uniswap-ios-1.60.2-2ed207d9.jpg",
+                        "uniswap-ios-1.60.2-eb6bde17.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet supports biometrics or uses the iPhone passcode for authentication."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-0eea9f83.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't warn users of domain or scheme mismatches when signing an EIP-4361 message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-a54a10f3.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not alert users about connections to known phishing dApps like https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-9e6b5f91.jpg",
+                        "uniswap-ios-1.60.2-f3274a19.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links in the transaction history and during the process of sending a transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-0cbafb14.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only shows outgoing transactions. It doesn't display the transaction incomes, such as NFTs received from a pool."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-762c739f.jpg",
+                        "uniswap-ios-1.60.2-ec250223.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet parses the EIP-712 ERC-20 Permits but not the Opensea Seaport listings, both were tested with the dApp sign v4 button."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-164e5874.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly tells users it can see your address and token amounts, but won't move your assets without your permission."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-ca986251.jpg",
+                        "uniswap-ios-1.60.2-ff81dde5.png",
+                        "uniswap-ios-1.60.2-32dbec62.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet warns users when they are not interacting with a previously known or trusted address if they try to send a manual transaction, but it does not emit any warning if the transaction is done through the dApp."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-c9291c73.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the DApp origin URL in the 'Connect' dialog."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-9eb9f056.jpg",
+                        "uniswap-ios-1.60.2-d8e67692.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not refuse to sign EIP-712 messages when the chain ID doesn't match the currently active chain."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-4d45fde1.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It shows all connected DApps and also the chance to revoke access to them"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-35661b63.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It does not include all the information required, just the contract address of WPOL with a link to PolygonScan and the symbol"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-7b8cdecc.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It doesn\u00b4t require user confirmation before processing the method"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-e5b600d8.jpg",
+                        "uniswap-ios-1.60.2-4da318fc.jpg",
+                        "uniswap-ios-1.60.2-ca114ea8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It fails to show the verifyingContract field in the EIP712Domain. Tested using the PERSONAL SIGN and SIGN TYPED DATA V4 buttons."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-e3564b6f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires user confirmation before processing the switch chain DApp request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-0b8b99a8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks the functionality to display token approvals."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-ef2614e0.jpg",
+                        "uniswap-ios-1.60.2-11e2bb00.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet hides spam or scam tokens and NFTs that are sent to it"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-2c49c402.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet by default does not include any auto-lock feature such as auto-locking on inactivity (1 minute or less by default), when the device gets locked, or when the app is moved to background execution."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-1500c56b.jpg",
+                        "uniswap-ios-1.60.2-bb0d7a24.jpg",
+                        "uniswap-ios-1.60.2-52350d0f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Sign buttons are always enabled"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-8de6c4e0.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks a manual lock feature. Instead, it offers a \"Remove Wallet\" button."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-d23fd6a9.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The eth_sign method breaks the dApp connection and fails to execute. However, personal_sign works correctly."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-830fae74.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "After clicking the 'View' button, the wallet requires a password to display the mnemonics or private keys."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "uniswap-ios-1.60.2-4be12986.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It subtly tells you it's risky to share your secret words or private keys with others. This alert appears before the mnemonic viewing process."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

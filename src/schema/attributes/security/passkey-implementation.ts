@@ -344,6 +344,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 		}
 
 		if (!isSupported(passkeyVerification)) {
+			ctx.addRef(passkeyVerification)
+
 			return noPasskeyImplementation(ctx)
 		}
 

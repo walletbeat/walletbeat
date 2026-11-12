@@ -426,7 +426,7 @@ _Author: @b50mc · Date: 2026-01-12T04:00:00Z_
 >
 > WebRTC disabled by default: prevents IP leak even when user believes they're behind VPN.
 >
-> None of these alter what ends up on-chain. They inject uncertainty into the off-chain correlation game.
+> None of these alter what ends up on-chain. They inject uncertainty into the offchain correlation game.
 >
 > The benchmark treats privacy as orthogonal to security, but at the capital scales 1TS is meant to address, reconnaissance is phase one of any sophisticated attack. Raising the cost of that phase is not a privacy nice-to-have — it's a security requirement.
 >

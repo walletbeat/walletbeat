@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
@@ -16,7 +16,7 @@
 		wallet,
 		linkables,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		linkables?: NonEmptyArray<WalletAddressLinkableBy> | undefined
 	} = $props()
 

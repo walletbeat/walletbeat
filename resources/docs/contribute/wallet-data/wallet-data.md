@@ -86,6 +86,27 @@ Wallet data is located in the top-level `/data` directory. All files are written
 
 _There is also a directory of wallet icons at `/public/images/wallets`._
 
+### How `/data` fields are encoded
+
+Fields in `/data` must be **written down**. When you add a new property to a wallet, entity, or contributor type, it must be required — not omitted, not `undefined`, and not marked optional with `?`.
+
+Use these three states:
+
+- **`null`** means "we have not researched this yet."
+- **A named sentinel** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
+- **A concrete value** means "we know what it is."
+
+This is why searching `/data` for `null` finds incomplete research. Omitted fields are invisible.
+
+Examples:
+
+- `features.security.publicSecurityAudits: null` — we have not looked up audits yet. `[]` — we looked; the wallet has never been audited.
+- `Entity.url: { type: 'NO_WEBSITE' }` — this organization has no website. Do not leave `url` off the object.
+- `Contributor.affiliation: 'NO_AFFILIATION'` — this person has no wallet-development affiliation. Do not use `[]` or omit the field.
+- `WalletMetadata.coinspectId: { type: 'NO_COINSPECT_ID' }` — Coinspect does not list this wallet. `null` means we have not checked yet.
+
+This applies to wallet **features**, **entities**, **contributors**, and **new wallet metadata** fields. Some older `WalletMetadata` / `WalletUrls` properties are still optional (`pseudonymType?`, `urls?`, hardware-only fields); treat those as legacy and do not add more of that shape.
+
 ### **Step 1**: Add a new wallet's basic information to Walletbeat
 
 #### **Step 1.1**: Add an entry for the wallet development entity behind My Little Wallet
@@ -170,6 +191,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 		id: 'myLittleWallet',
 		displayName: 'My Little Wallet',
 		tableName: 'My Little Wallet',
+		coinspectId: null,
 		contributors: [chainMonkey],
 		iconExtension: 'svg',
 		lastUpdated: '2077-01-01',
@@ -264,7 +286,7 @@ _This example walks through the use of the `VariantFeature` and `Support` types,
 
 This field relates to whether or not the wallet lets you use multiple addresses. It is a simple yes/no question.
 
-In your code editor, you should be able to click (perhaps `Ctrl+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
+In your code editor, you should be able to click (perhaps `Control+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
 
 ![](../images/navigate-to-type-definition.gif 'Navigating to a type definition in VSCode')
 
@@ -522,6 +544,8 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	},
 }
 ```
+
+Reference `label` and `explanation` prose must not contain semicolons or em dashes, as these are common tells of AI-generated prose. Split the clauses into separate sentences instead. URLs and code are exempt. Grammar checks also flag overuse of "gate" and "ship" word families relative to the amount of prose.
 
 Alternatively, you may use `ref: refTodo` as a placeholder for references that you have not yet gathered. You can also use `refNotNecessary` for references that are self-evident. _For example, Walletbeat tracks whether a wallet supports **Safe multisigs**. It is obvious that **Safe Wallet** supports them, so `ref: refNotNecessary` would be appropriate there, but this would not be obvious for other wallets._
 

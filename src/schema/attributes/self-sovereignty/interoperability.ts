@@ -36,19 +36,19 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The wallet passes both interoperability sub-criteria.'),
+				sentence('The wallet passes both interoperability subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet passes one interoperability sub-criteria.'),
+				sentence('The wallet passes one interoperability subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The wallet fails one or both interoperability sub-criteria.'),
+				sentence('The wallet fails one or both interoperability subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -92,7 +92,7 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} interoperability evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

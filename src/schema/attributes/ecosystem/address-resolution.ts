@@ -17,6 +17,7 @@ import type {
 	AddressResolution,
 	AddressResolutionData,
 } from '../../features/privacy/address-resolution'
+import { hasRefs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
 export type AddressResolutionMetadata = {
@@ -440,6 +441,16 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		}
 
 		ctx.addRef(ctx.features.addressResolution)
+
+		for (const nestedResolution of [
+			ctx.features.addressResolution.nonChainSpecificEnsResolution,
+			ctx.features.addressResolution.chainSpecificAddressing.erc7828,
+			ctx.features.addressResolution.chainSpecificAddressing.erc7831,
+		]) {
+			if (hasRefs(nestedResolution)) {
+				ctx.addRef(nestedResolution)
+			}
+		}
 
 		if (
 			ctx.features.addressResolution.nonChainSpecificEnsResolution === null ||

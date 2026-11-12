@@ -14,10 +14,10 @@ import LuSun from 'lucide-static/icons/sun.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
+	currentHref?: string
 }
 
-const { navigationItems } = Astro.props
-const currentHref = Astro.url.pathname
+const { navigationItems, currentHref = Astro.url.pathname } = Astro.props
 const secondaryNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -27,47 +27,56 @@ const secondaryNavigationItems = [
 ] satisfies NavigationItem[]
 ---
 
-<script>
-	document.getElementById('theme-toggle')?.addEventListener('click', () => {
-		document.documentElement.style.colorScheme =
-			document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
-		localStorage.setItem('theme', document.documentElement.style.colorScheme)
-		document
-			.querySelector('meta[name="color-scheme"]')
-			?.setAttribute('content', document.documentElement.style.colorScheme)
-	})
-</script>
-
 <nav
 	id='nav'
-	popover='auto'
+	aria-label='Site'
 	data-column='gap-0'
-	data-sticky='backdrop-self backdrop-always'
-	data-scroll-container
+	data-sticky='backdrop-none'
 	data-sticky-container
 >
 	<header data-sticky='backdrop-self backdrop-always' data-row>
 		<a href='/' class='logo'>
-			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
+			<img
+				src='/logo.svg'
+				alt='Walletbeat'
+				width='516'
+				height='126'
+				data-safari='invert-lightness'
+			/>
 		</a>
 
 		<menu data-row='gap-2'>
 			<li>
-				<button type='button' id='theme-toggle' data-icon='circle' data-stack>
-					<span set:html={LuSun} />
-					<span set:html={LuMoon} />
+				<button
+					type='button'
+					id='menu-toggle'
+					aria-label='Open navigation menu'
+					data-icon='circle'
+					popovertarget='nav-menu'
+				>
+					<span set:html={LuMenu} />
 				</button>
 			</li>
 
 			<li>
-				<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
-					<span set:html={LuMenu} />
-				</button>
+				<label data-icon='circle' data-stack title='Toggle color theme'>
+					<input type='checkbox' id='theme-toggle' aria-label='Use opposite color theme' />
+					<span aria-hidden='true' set:html={LuSun} />
+					<span aria-hidden='true' set:html={LuMoon} />
+				</label>
 			</li>
 		</menu>
 	</header>
 
-	<div id='nav-menu' data-column data-column-item='flexible' data-sticky-container>
+	<div
+		id='nav-menu'
+		popover='auto'
+		data-scroll-container='block'
+		data-sticky='block backdrop-self backdrop-always'
+		data-column
+		data-column-item='flexible'
+		data-sticky-container
+	>
 		<NavigationItems
 			client:load
 			transition:persist
@@ -78,12 +87,54 @@ const secondaryNavigationItems = [
 	</div>
 </nav>
 
+<script>
+	import { finishPopoverExit } from './popover-transition'
+
+	let closing: symbol | null = null
+
+	document.addEventListener(
+		'beforetoggle',
+		event => {
+			const panel = event.target
+
+			if (!(panel instanceof HTMLElement) || panel.id !== 'nav-menu') {
+				return
+			}
+			closing = event.newState === 'closed' ? Symbol() : null
+			panel.toggleAttribute('data-closing', closing !== null)
+		},
+		true,
+	)
+	document.addEventListener(
+		'toggle',
+		async event => {
+			const panel = event.target
+			const token = closing
+
+			if (!(panel instanceof HTMLElement) || panel.id !== 'nav-menu' || token === null) {
+				return
+			}
+			await finishPopoverExit(panel)
+			if (closing === token && !panel.matches(':popover-open')) {
+				closing = null
+				panel.removeAttribute('data-closing')
+			}
+		},
+		true,
+	)
+</script>
+
 <style>
 	nav {
+		&:not(:has(> #nav-menu:popover-open)) > #nav-menu[data-scroll-container] {
+			overscroll-behavior: auto;
+		}
+
 		width: 100%;
 		height: 100dvh;
 
 		&[data-sticky][data-sticky] {
+			--sticky-offset: 0px;
 			--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 90%, transparent);
 		}
 
@@ -98,6 +149,7 @@ const secondaryNavigationItems = [
 
 				img {
 					display: block;
+					width: auto;
 					height: 2.35rem;
 				}
 			}
@@ -113,8 +165,16 @@ const secondaryNavigationItems = [
 					}
 				}
 
-				#theme-toggle {
-					> :first-child {
+				label:has(> #theme-toggle) {
+					> input {
+						position: absolute;
+						inset: 0;
+						inline-size: 100%;
+						block-size: 100%;
+						opacity: 0;
+					}
+
+					> span:first-of-type {
 						color: light-dark(currentColor, transparent);
 					}
 					> :last-child {
@@ -125,45 +185,44 @@ const secondaryNavigationItems = [
 		}
 
 		#nav-menu {
+			--sticky-offset: initial;
+			inline-size: 100%;
 			position: relative;
 			z-index: 0;
 			align-content: stretch;
-			min-block-size: max-content;
+			min-block-size: 0;
 			padding: 1rem 0.75rem;
-
-			&[data-sticky-container] {
-				--sticky-marginBlockStart: var(--navigation-mobile-blockSize);
-				--sticky-paddingBlockStart: 1rem;
-				--sticky-paddingBlockEnd: 1rem;
-				--sticky-paddingInlineStart: 0.75rem;
-				--sticky-paddingInlineEnd: 0.75rem;
-			}
 		}
 	}
 
-	@media (min-width: 1025px) {
-		nav:not(:popover-open) li:has(#menu-toggle) {
+	@media (width > 1024px) {
+		nav:not(:has(> #nav-menu:popover-open)) li:has(#menu-toggle) {
 			display: none;
 		}
 	}
 
-	@media (max-width: 1024px) {
+	@media (width <= 1024px) {
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
-			clip-path: inset(0 0 calc(100% - var(--navigation-mobile-blockSize)) 0);
-			transition-property:
-				background-color,
-				-webkit-backdrop-filter,
-				backdrop-filter,
-				clip-path,
-				display,
-				overlay;
-			transition-behavior: allow-discrete;
+			block-size: var(--navigation-mobile-blockSize);
+			height: var(--navigation-mobile-blockSize);
 
-			block-size: 100dvh;
-			height: 100dvh;
-			transform-style: preserve-3d;
+			> header {
+				display: grid;
+				grid-template-columns: 1fr auto 1fr;
+				align-items: center;
+
+				.logo {
+					grid-area: 1 / 2;
+					justify-self: center;
+				}
+
+				menu {
+					grid-area: 1 / 1;
+					justify-self: start;
+				}
+			}
 
 			#nav-menu {
 				.navigation-note {
@@ -173,7 +232,10 @@ const secondaryNavigationItems = [
 				}
 			}
 
-			header ~ * {
+			#nav-menu {
+				position: fixed;
+				inset: var(--navigation-mobile-blockSize) 0 0;
+				block-size: auto;
 				filter: blur(0);
 				mask-image: linear-gradient(
 					to bottom,
@@ -194,10 +256,8 @@ const secondaryNavigationItems = [
 				transition-property: translate;
 			}
 
-			&:not(:popover-open) {
-				overscroll-behavior: none;
-
-				header ~ * {
+			&:not(:has(> #nav-menu:popover-open)) {
+				#nav-menu {
 					display: none;
 					filter: blur(0.375rem);
 					interactivity: inert;
@@ -213,17 +273,13 @@ const secondaryNavigationItems = [
 				}
 			}
 
-			&:popover-open {
-				clip-path: inset(0);
-
+			&:has(> #nav-menu:popover-open) {
 				.navigation-items > label {
 					transition-delay: 0.08s;
 				}
 
 				@starting-style {
-					clip-path: inset(0 0 calc(100% - var(--navigation-mobile-blockSize)) 0);
-
-					header ~ * {
+					#nav-menu {
 						filter: blur(0.375rem);
 						mask-size: 100% 0;
 						opacity: 0;
@@ -239,9 +295,15 @@ const secondaryNavigationItems = [
 
 		@media (prefers-reduced-motion: reduce) {
 			nav,
-			nav header ~ * {
+			nav #nav-menu {
 				translate: 0 0 0;
 			}
+		}
+	}
+
+	@media (width <= 1024px) {
+		:global(body:has([data-sticky-breadcrumb~="root"])) #nav > header {
+			anchor-name: --navigation-row;
 		}
 	}
 </style>

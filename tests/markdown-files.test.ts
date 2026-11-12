@@ -3,15 +3,86 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { extractMarkdownLinks } from '@/utils/markdown-utils'
-
+import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
+import { isRepoRelativeLink } from '@/schema/url'
+import { assertStringHasPrefix } from '@/types/utils/text'
 import {
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
 	getRepositoryRoot,
-} from './utils/codebase'
+	GitIgnoredFiles,
+	normalizePath,
+} from '@/utils/codebase'
+import { extractMarkdownLinks } from '@/utils/markdown-utils'
+
 import { grammarLint, grammarLintMessages } from './utils/grammar'
+
+/**
+ * Repo-root-relative directories whose markdown files are rendered as site
+ * pages (content collections). Links between these files must be
+ * repo-root-relative, not GitHub blob/tree URLs, so that they resolve to the
+ * on-site rendered HTML version during static generation.
+ */
+const RENDERED_MARKDOWN_DIRS = Object.values(RENDERED_MARKDOWN_COLLECTIONS).map(c =>
+	assertStringHasPrefix(c.repoDir, '/').slice(1),
+)
+
+/**
+ * Extract the repo-root-relative file path from a `github.com/walletbeat/walletbeat`
+ * blob or tree URL. Returns `null` when the URL is not a blob/tree URL for our repo
+ * or when no path is present.
+ *
+ * E.g. `https://github.com/walletbeat/walletbeat/blob/master/governance/treasury/treasury-transparency.md`
+ * -> `governance/treasury/treasury-transparency.md`
+ */
+function repoRelativePathFromGithubUrl(url: string): string | null {
+	const prefix = 'https://github.com/walletbeat/walletbeat/'
+
+	if (!url.startsWith(prefix)) {
+		return null
+	}
+
+	const rest = url.slice(prefix.length)
+	const kindMatch = /^(blob|tree)\/([^/]+)\/(.+)$/.exec(rest)
+
+	if (!kindMatch) {
+		return null
+	}
+
+	return kindMatch[3]
+}
+
+/** Whether a repo-root-relative path refers to a rendered markdown file. */
+function isRenderedMarkdownPath(repoPath: string): boolean {
+	if (!repoPath.endsWith('.md')) {
+		return false
+	}
+
+	return RENDERED_MARKDOWN_DIRS.some(dir => repoPath.startsWith(dir + '/'))
+}
+
+/**
+ * Repo-root-relative directories of standalone written content (threads,
+ * articles, posts) whose assets live next to the markdown that uses them.
+ * Every non-markdown file in a directory of these trees must be linked from a
+ * markdown file in that same directory, so unused assets do not pile up.
+ */
+const COLOCATED_ASSET_DIRS: string[] = ['resources/files/social-media']
+
+/**
+ * Resolve an in-repo link found in a markdown file to a repo-root-relative
+ * path, with query parameters and hash fragments removed. Absolute links are
+ * relative to the repository root; other links are relative to the markdown
+ * file's directory.
+ */
+function resolveMarkdownLink(markdownFilePath: string, url: string): string {
+	const resolvedPath = url.startsWith('/')
+		? normalizePath(url.replace(/^\//, ''))
+		: normalizePath(path.join(path.dirname(markdownFilePath), url))
+
+	return resolvedPath.replace(/^\/?/, '').split(/[?#]/)[0]
+}
 
 /**
  * Markdown files that are allowed to fail grammar checks.
@@ -85,35 +156,11 @@ describe('markdown files', async () => {
 				const links = extractMarkdownLinks(content)
 
 				for (const { url, line } of links) {
-					// Skip full links with protocols.
-					if (
-						url.startsWith('data:') ||
-						url.startsWith('https:') ||
-						url.startsWith('http:') ||
-						url.startsWith('mailto:') ||
-						url.startsWith('tel:') ||
-						url.startsWith('#') ||
-						url.startsWith('//')
-					) {
+					if (!isRepoRelativeLink(url)) {
 						continue
 					}
 
-					// For relative/absolute paths, check they point to a valid file.
-					// Resolve relative paths against the source file's directory.
-					const sourceDir = path.dirname(filePath)
-
-					let resolvedPath: string
-
-					if (url.startsWith('/')) {
-						// Absolute path relative to repo root
-						resolvedPath = path.normalize(url.replace(/^\//, '')).replace(/^\/?/, '')
-					} else {
-						// Relative path
-						resolvedPath = path.normalize(path.join(sourceDir, url)).replace(/^\/?/, '')
-					}
-
-					// Normalize to forward slashes
-					resolvedPath = resolvedPath.split(path.sep).join('/')
+					const resolvedPath = resolveMarkdownLink(filePath, url)
 
 					// Check the resolved path doesn't escape the repository root.
 					expect(resolvedPath).toSatisfy(
@@ -121,12 +168,9 @@ describe('markdown files', async () => {
 						`Link to ${url} (line ${line}) escapes repository root directory`,
 					)
 
-					// Check the file exists (it might be a .md, .astro, .html, etc., or a directory).
-					// We strip query params and hash fragments for the file check.
-					const cleanPath = resolvedPath.split(/[?#]/)[0]
-
 					// Check if file exists directly or as a directory.
-					const absResolved = path.join(getRepositoryRoot(), cleanPath)
+					// It might be a .md, .astro, .html, etc., or a directory.
+					const absResolved = path.join(getRepositoryRoot(), resolvedPath)
 					let exists = false
 
 					try {
@@ -151,6 +195,95 @@ describe('markdown files', async () => {
 		})
 	}
 
+	describe('rendered markdown files link to in-repo rendered markdown via repo-root-relative paths', () => {
+		it('rejects GitHub blob/tree links to rendered markdown files', async () => {
+			const renderedMarkdownFiles = allMarkdownFiles.filter(filePath =>
+				RENDERED_MARKDOWN_DIRS.some(dir => filePath.startsWith(dir + '/')),
+			)
+
+			const violations: string[] = []
+
+			for (const filePath of renderedMarkdownFiles) {
+				const absPath = path.join(getRepositoryRoot(), filePath)
+				const content = await fs.readFile(absPath, 'utf-8')
+				const links = extractMarkdownLinks(content)
+
+				for (const { url, line } of links) {
+					const repoPath = repoRelativePathFromGithubUrl(url)
+
+					if (repoPath !== null && isRenderedMarkdownPath(repoPath)) {
+						violations.push(
+							`${filePath}:${line} links to ${url} (a rendered markdown file) via GitHub; use a repo-root-relative link instead (e.g. /${repoPath})`,
+						)
+					}
+				}
+			}
+
+			expect(violations).toEqual([])
+		})
+	})
+
+	describe('colocated assets are linked from markdown in the same directory', () => {
+		it('found at least one colocated asset directory', () => {
+			expect(
+				COLOCATED_ASSET_DIRS.every(dir =>
+					allMarkdownFiles.some(filePath => filePath.startsWith(`${dir}/`)),
+				),
+			).toBe(true)
+		})
+
+		it('has no unreferenced files', async () => {
+			const isInColocatedAssetDir = (p: string): boolean =>
+				COLOCATED_ASSET_DIRS.some(dir => p.startsWith(`${dir}/`))
+			const linkedFiles = new Set<string>()
+
+			for (const filePath of allMarkdownFiles.filter(isInColocatedAssetDir)) {
+				const content = await fs.readFile(path.join(getRepositoryRoot(), filePath), 'utf-8')
+
+				for (const { url } of extractMarkdownLinks(content)) {
+					if (!isRepoRelativeLink(url)) {
+						continue
+					}
+
+					const resolvedPath = resolveMarkdownLink(filePath, url)
+
+					if (path.dirname(resolvedPath) === path.dirname(filePath)) {
+						linkedFiles.add(resolvedPath)
+					}
+				}
+			}
+
+			const unreferencedFiles: string[] = []
+
+			await crawlCodebase({
+				ignore: [
+					'.git',
+					await GitIgnoredFiles(),
+					p =>
+						!(
+							isInColocatedAssetDir(p) ||
+							COLOCATED_ASSET_DIRS.some(dir => `${dir}/`.startsWith(`${p}/`))
+						),
+				],
+				baseTraversalFn: entry => {
+					if (
+						entry.type === CodebaseEntryType.FILE &&
+						!entry.path.endsWith('.md') &&
+						!linkedFiles.has(entry.path)
+					) {
+						unreferencedFiles.push(entry.path)
+					}
+				},
+			})
+
+			expect(
+				unreferencedFiles.sort(),
+				'These files are not linked from any markdown file in their directory; ' +
+					'delete them or link to them.',
+			).toEqual([])
+		})
+	})
+
 	describe('whitelist only contains files that actually fail', () => {
 		for (const whitelistedPath of GRAMMAR_CHECK_WHITELIST) {
 			describe(
@@ -167,5 +300,13 @@ describe('markdown files', async () => {
 				60000,
 			)
 		}
+	})
+
+	describe('whitelist never grows', () => {
+		const whitelistExpectedSizePleaseNeverIncreaseThis = 27 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
+
+		it('has the expected size', () => {
+			expect(GRAMMAR_CHECK_WHITELIST.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)
+		})
 	})
 })

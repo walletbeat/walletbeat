@@ -2,7 +2,7 @@
 	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import { type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import type { WalletLadderEvaluation } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 
 
@@ -11,10 +11,12 @@
 		stage,
 		ladderEvaluation,
 		size = 'medium',
+		href,
 	}: {
-		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		stage: WalletLadderEvaluation<_AttributeGroupId>['stage'] | null
 		ladderEvaluation: WalletLadderEvaluation<string> | null
 		size?: 'small' | 'medium' | 'large'
+		href?: string
 	} = $props()
 
 
@@ -24,8 +26,8 @@
 			return 'NOT_APPLICABLE'
 		}
 
-		if (stage === 'QUALIFIED_FOR_NO_STAGES') {
-			return 'QUALIFIED_FOR_NO_STAGES'
+		if (typeof stage === 'string') {
+			return stage
 		}
 
 		return stage.id
@@ -49,6 +51,7 @@
 </script>
 
 
+{#snippet badge()}
 <data
 	data-badge={size}
 	value={stageValue === 'QUALIFIED_FOR_NO_STAGES' ? 'NO_STAGES' : stageValue === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : stageValue}
@@ -59,15 +62,25 @@
 		N/A
 	{:else if stageValue === 'QUALIFIED_FOR_NO_STAGES'}
 		No Stage
+	{:else if stageValue === 'UNRATED'}
+		Unrated
 	{:else if stage && typeof stage === 'object'}
 		{stage.label}
 	{/if}
 </data>
+{/snippet}
+
+{#if href}
+	<a {href} data-link="camouflaged">{@render badge()}</a>
+{:else}
+	{@render badge()}
+{/if}
 
 
 <style>
 	data {
 		&[value='NO_STAGES'],
+		&[value='UNRATED'],
 		&[value='NOT_APPLICABLE'] {
 			--accent: var(--rating-unrated);
 			--badge-backdropFilter: var(--rating-unrated-backdropFilter);
@@ -80,4 +93,3 @@
 		}
 	}
 </style>
-

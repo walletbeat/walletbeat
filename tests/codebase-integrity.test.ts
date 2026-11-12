@@ -7,7 +7,6 @@ import {
 	iconFontStartCharCode,
 	maxIconFontChars,
 } from '@/tools/icon-font-generator/icon-font-generator-lib'
-
 import {
 	type CodebaseEntry,
 	CodebaseEntryType,
@@ -18,7 +17,7 @@ import {
 	GitIgnoredFiles,
 	normalizePath,
 	type PathPredicate,
-} from './utils/codebase'
+} from '@/utils/codebase'
 
 /** File extensions that are allowed in the repository. */
 const ALLOWED_EXTENSIONS = new Set([
@@ -59,6 +58,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.tsv',
 	'.yaml',
 	'.toml',
+	'.snippet',
 ])
 
 /** Filenames that are allowed without a recognized extension. */
@@ -69,6 +69,7 @@ const ALLOWED_BARE_FILENAMES = new Set([
 	'Makefile',
 	'agentsignore',
 	'checkpoint',
+	'upstream-commit',
 	'torrc',
 	'.editorconfig',
 	'.gitattributes',
@@ -181,7 +182,7 @@ describe('codebase integrity', () => {
 		const symlinks: (CodebaseEntry & { type: CodebaseEntryType.SYMLINK })[] = []
 
 		await crawlCodebase({
-			ignore: ['.git', 'node_modules'],
+			ignore: ['.git', 'node_modules', await GitIgnoredFiles()],
 			complexTraversalFn: async (entryBase, getFullEntry) => {
 				if (entryBase.type === CodebaseEntryType.SYMLINK) {
 					const entry = await getFullEntry()
@@ -193,6 +194,11 @@ describe('codebase integrity', () => {
 					symlinks.push(entry)
 				}
 			},
+		})
+
+		it('has a vacuous test', () => {
+			// Present to make Vitest happy if the codebase has no symlink.
+			expect(true).toBeTruthy()
 		})
 
 		for (const symlink of symlinks) {
@@ -258,6 +264,8 @@ describe('codebase integrity', () => {
 			'→',
 			'←',
 			'↗',
+			'↪',
+			'☰',
 			'⇒',
 			'☠',
 			'…',
@@ -519,6 +527,10 @@ describe('codebase integrity', () => {
 			'[attrGroupId].astro',
 			'[eip].astro',
 			'[walletName]',
+			'[...slug]',
+			'[...path].[ext].ts',
+			'_about.md',
+			'APPEND_SYSTEM.md',
 		])
 
 		const componentsFailed: string[] = []

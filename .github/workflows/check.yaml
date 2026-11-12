@@ -1,15 +1,20 @@
 name: Check
 
 on:
-  push: {}
+  push:
+    branches:
+      - beta
+      - master
   pull_request:
     types:
       - opened
       - reopened
-      - edited
       - synchronize
-      - ready_for_review
       - review_requested
+
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: false
 
 jobs:
   check-quick:
@@ -59,20 +64,35 @@ jobs:
           WALLETBEAT_ENV: CI
   check-full:
     name: 'Run all CI tests'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs:
       - check-quick
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
       - name: Install packages
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y $(cat deploy/debian-packages.txt)
         env:
           DEBIAN_FRONTEND: noninteractive
+      - name: Install packages (macOS)
+        if: runner.os == 'macOS'
+        run: brew install --cask $(cat deploy/macos-packages.txt)
+      - name: Install packages (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: ./deploy/install-windows-packages.sh
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js

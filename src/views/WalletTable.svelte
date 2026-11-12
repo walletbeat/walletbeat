@@ -17,8 +17,6 @@
 	import type { Column } from '@/components/Table.svelte'
 	import type { Ladders } from '@/schema/ladders'
 	import { variants } from '@/constants/variants'
-	import { eip7702 } from '@/data/eips/eip-7702'
-	import { erc4337 } from '@/data/eips/erc-4337'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import type { AttributeTree } from '@/schema/attribute-groups'
 	import { type Attribute, type OutcomeMetadata, Rating, ratingIcons } from '@/schema/attributes'
@@ -46,6 +44,9 @@
 		attributeTree: AttributeTree<_AttributeGroupId>
 		summaryVisualization?: SummaryVisualization
 	} = $props()
+
+	const walletListUiId = $props.id()
+	const walletListSelectId = `wallet-list-select-${walletListUiId}`
 
 	const attributeGroupList = $derived(
 		Object.values(attributeTree)
@@ -142,8 +143,35 @@
 		new SvelteSet<Filter<RatedWallet<_AttributeGroupId>>>()
 	)
 
+	const stageZeroWallets = $derived(wallets.filter(wallet => walletQualifiesForStageZero(wallet)))
+
+	const otherWallets = $derived(wallets.filter(wallet => !walletQualifiesForStageZero(wallet)))
+
+	const tableHasStageLadder = $derived(
+		wallets.some(wallet => {
+			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+			return stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null
+		}),
+	)
+
+	const showStageListSelect = $derived(
+		tableHasStageLadder && stageZeroWallets.length > 0 && otherWallets.length > 0,
+	)
+
+	let walletListTab = $state<'stage-0' | 'others'>('stage-0')
+
+	const listedWallets = $derived(
+		!showStageListSelect ? wallets : walletListTab === 'others' ? otherWallets : stageZeroWallets,
+	)
+
+	const stageListSelectOptions = $derived([
+		{ value: 'stage-0' as const, label: `Stage 0+ (${stageZeroWallets.length})` },
+		{ value: 'others' as const, label: `Others (${otherWallets.length})` },
+	])
+
 	let filteredWallets = $derived(
-		wallets
+		listedWallets
 	)
 
 	const filteredWalletIds = $derived(
@@ -237,11 +265,11 @@
 	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
 	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
-	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
@@ -276,7 +304,7 @@
 
 
 	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconFontID> = {
+	const variantWbIconIds: Record<Variant, WBIconID> = {
 		[Variant.BROWSER]: 'wallet_browser',
 		[Variant.DESKTOP]: 'wallet_desktop',
 		[Variant.MOBILE]: 'wallet_mobile',
@@ -351,48 +379,30 @@
 
 	import Filters from '@/components/Filters.svelte'
 	import Pie from '@/components/Pie.svelte'
+	import { attributeGroupFlowerGradient } from '@/components/pie-fill'
 	import {
 		overallRatingPieLevels,
 		overallRatingPiePadding,
 		overallRatingPieRadius,
 		PieLayout,
-		type Slice,
 	} from '@/components/pie-geometry'
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
-	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
 
-	import EipDetails from '@/views/EipDetails.svelte'
 	import WalletAttributeGroupSummary, { WalletAttributeGroupSummaryType } from '@/views/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary, { WalletAttributeSummaryType } from '@/views/WalletAttributeSummary.svelte'
 	import WalletOverallSummary, { WalletSummaryType } from '@/views/WalletOverallSummary.svelte'
 	import WalletStageBadge from './WalletStageBadge.svelte'
+	import WalletTags from './WalletTags.svelte'
 
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconFontID } from '@/styles/wbicons'
+	import type { WBIconID } from '@/styles/wbicons'
 
-
-	// Flower visualization helpers
-	const attributeGroupFlowerGradient: NonNullable<Slice['gradient']> = {
-		areaRadiusStops: [
-			0.000000, 0.038097, 0.075252, 0.111402, 0.146585, 0.180353, 0.213312, 0.245668, 0.277513,
-			0.308937, 0.339923, 0.370813, 0.401695, 0.432635, 0.463538, 0.494531, 0.525379, 0.555836,
-			0.586127, 0.616255, 0.646222, 0.676031, 0.705683, 0.735183, 0.764631, 0.793975, 0.823297,
-			0.852492, 0.881757, 0.911014, 0.940339, 0.969777, 1.000000,
-		],
-		colors: [
-			ratingToColor(Rating.UNRATED),
-			ratingToColor(Rating.FAIL),
-			ratingToColor(Rating.PARTIAL),
-			ratingToColor(Rating.PASS),
-		],
-		transparentStopColor: ratingToColor(Rating.UNRATED),
-	}
 </script>
 
 
@@ -420,20 +430,31 @@
 				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
 					<div class="mobile-filter-group">
 						<legend>stages</legend>
-						<div class="mobile-filter-items">
-							{#each stageFilterDefinitions as stageFilter}
-								{@const isActive = activeStageFilterIds.has(stageFilter.id)}
-								<button
-									class="filter-circle"
-									class:active={isActive}
-									aria-pressed={isActive}
-									aria-label={stageFilter.label}
-									onclick={() => toggleAttributeFilterById?.(stageFilter.id)}
-								>
-									<span class="filter-circle-number">{stageFilter.label.split(' ').at(-1)}</span>
-								</button>
-							{/each}
-						</div>
+						{#if showStageListSelect}
+							<Select
+								id="{walletListSelectId}-mobile"
+								class="stage-list-select"
+								bind:value={walletListTab}
+								options={stageListSelectOptions}
+								aria-label="Show Stage 0+ wallets or Others"
+							/>
+						{/if}
+						{#if walletListTab !== 'others'}
+							<div class="mobile-filter-items">
+								{#each stageFilterDefinitions as stageFilter}
+									{@const isActive = activeStageFilterIds.has(stageFilter.id)}
+									<button
+										class="filter-circle"
+										class:active={isActive}
+										aria-pressed={isActive}
+										aria-label={stageFilter.label}
+										onclick={() => toggleAttributeFilterById?.(stageFilter.id)}
+									>
+										<span class="filter-circle-number">{stageFilter.label.split(' ').at(-1)}</span>
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				{/if}
 
@@ -451,7 +472,7 @@
 									aria-label={variantToName(variant, true)}
 									onclick={() => toggleFilterById?.(filterId)}
 								>
-									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
+									<span data-icon="wbicons-simple {variantWbIconIds[variant]}"></span>
 								</button>
 								<span class="filter-circle-label">{variantToName(variant, false)}</span>
 							</div>
@@ -473,7 +494,7 @@
 								aria-label={label}
 								onclick={() => toggleFilterById?.(id)}
 							>
-								<span data-icon="wbicons account_type"></span>
+								<span data-icon="wbicons-simple account_type"></span>
 							</button>
 							<span class="filter-circle-label">{label}</span>
 						</div>
@@ -491,7 +512,7 @@
 				data-row
 			>
 				<Filters
-					items={wallets}
+					items={listedWallets}
 					filterGroups={
 						[
 							{
@@ -635,7 +656,7 @@
 					bind:toggleFilterById
 				/>
 
-				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
+				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0 && walletListTab !== 'others'}
 					<Filters
 						items={allAttributes}
 						filterGroups={[
@@ -657,6 +678,44 @@
 		</div>
 	</header>
 
+	{#snippet StageListSelect(_ctx: { column: Column<RatedWallet<_AttributeGroupId>> })}
+		{@const stageListAnchorName = `--${walletListSelectId}`}
+		<button
+			type="button"
+			class="expansion-button"
+			popovertarget={walletListSelectId}
+			title="Show Stage 0+ wallets or Others"
+			aria-label="Show Stage 0+ wallets or Others"
+			style:anchor-name={stageListAnchorName}
+			onclick={event => event.stopPropagation()}
+		></button>
+		<div
+			id={walletListSelectId}
+			class="stage-list-menu"
+			popover="auto"
+			role="listbox"
+			aria-label="Show Stage 0+ wallets or Others"
+			style:position-anchor={stageListAnchorName}
+			style:position-area="block-end span-inline-end"
+		>
+			{#each stageListSelectOptions as option (option.value)}
+				<button
+					type="button"
+					role="option"
+					aria-selected={walletListTab === option.value}
+					onclick={event => {
+						walletListTab = option.value
+						const menu = event.currentTarget.closest('[popover]')
+						if (menu instanceof HTMLElement && 'hidePopover' in menu)
+							menu.hidePopover()
+					}}
+				>
+					{option.label}
+				</button>
+			{/each}
+		</div>
+	{/snippet}
+
 	<div
 		class="desktop-table-container"
 		data-scroll-item="inline-attached underflow-center overflow-start snap-block-start"
@@ -665,7 +724,7 @@
 			{tableId}
 			class="wallet-table"
 
-			rows={wallets}
+			rows={listedWallets}
 			rowId={wallet => wallet.metadata.id}
 			rowIsDisabled={wallet => (
 				!(
@@ -727,7 +786,10 @@
 
 						...(hasNonApplicableStages ? [] : [{
 							id: 'stage',
-							name: 'Stage',
+							name: showStageListSelect
+								? (walletListTab === 'others' ? 'Others' : 'Stage 0+')
+								: 'Stage',
+							HeaderExtra: showStageListSelect ? StageListSelect : undefined,
 							value: wallet => {
 								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
@@ -796,6 +858,8 @@
 
 					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
 						<small>N/A</small>
+					{:else if stage === 'UNRATED'}
+						<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
 					{:else}
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
@@ -825,8 +889,7 @@
 						</div>
 					{/if}
 				{:else if column.id === 'displayName'}
-					{@const displayName = value}
-					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
+					{@const displayName = wallet.metadata.displayName}
 					{@const supportedVariants = (
 						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
 							.filter(variant => variant in wallet.variants)
@@ -895,72 +958,7 @@
 								</div>
 
 								<div class="tags" data-row="start gap-1 wrap">
-									{#each (
-										[
-											// Wallet type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Hardware',
-												filterId: 'walletType-hardware',
-												type: 'wallet-type',
-											},
-											!hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Software',
-												filterId: 'walletType-software',
-												type: 'wallet-type',
-											},
-											// Manufacture type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
-												label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
-												filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
-												type: 'manufacture-type',
-											},
-											// Account type tags
-											...(
-												accountTypes !== null ?
-													[
-														AccountType.eoa in accountTypes && {
-															label: 'EOA',
-															filterId: 'accountType-eoa',
-															type: 'account-type',
-														},
-														AccountType.rawErc4337 in accountTypes && {
-															label: `#${erc4337.number}`,
-															filterId: 'accountType-erc4337',
-															type: 'eip',
-														},
-														AccountType.eip7702 in accountTypes && {
-															label: `#${eip7702.number}`,
-															filterId: 'accountType-eip7702',
-															type: 'eip',
-														},
-														AccountType.safe in accountTypes && {
-															label: 'Safe',
-															filterId: 'accountType-safe',
-															type: 'safe',
-														},
-														AccountType.mpc in accountTypes && {
-															label: 'MPC',
-															filterId: 'accountType-mpc',
-															type: 'account-type',
-														},
-													]
-												:
-													[]
-											),
-										]
-											.filter(Boolean)
-									) as tag (tag.label)}
-										<button
-											data-tag={tag.type}
-											aria-label="Filter by {tag.label}"
-											onclick={event => {
-												event.stopPropagation()
-												toggleFilterById!(tag.filterId)
-											}}
-										>
-											{tag.label}
-										</button>
-									{/each}
+									<WalletTags {wallet} {selectedVariant} onFilter={id => toggleFilterById!(id)} />
 								</div>
 							</div>
 
@@ -1006,26 +1004,28 @@
 										View report
 									</a>
 
-									<hr>
+									{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+										<hr>
 
-									<a
-										href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<span aria-hidden="true">{@html GlobeIcon}</span>
-										Website
-									</a>
+										<a
+											href={getUrl(wallet.metadata.urls.websites[0])}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<span data-icon="wbicons-simple browser_integration"></span>
+											Website
+										</a>
+									{/if}
 
 									{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+											href={getUrl(wallet.metadata.urls.repositories[0])}
 											target="_blank"
 											rel="noopener noreferrer"
 										>
-											<span aria-hidden="true">{@html GithubIcon}</span>
+											<span data-icon="wbicons-simple code_repository"></span>
 											Source Code
 										</a>
 									{/if}
@@ -1082,8 +1082,10 @@
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
 								levels={overallRatingPieLevels(
-											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
+											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ?
 												0.15
+											: summaryVisualization === SummaryVisualization.Stage ?
+												0.08
 											:
 												0.1
 								)}
@@ -1096,7 +1098,8 @@
 										return {
 											id: `attrGroup_${attrGroup.id}`,
 											arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
-										arcIconId: attrGroup.icon,
+											arcIconId: attrGroup.icon,
+											ariaLabel: attrGroup.displayName,
 											color: (
 												groupScore !== null ?
 													scoreToColor(groupScore.score)
@@ -1123,11 +1126,12 @@
 															color: ratingToColor(attribute.evaluation.outcome.rating),
 															weight: (
 																attrGroup.attributes.find(w => w.attribute.id === attributeId)
-																	?.weight
-																?? 1
-															),
-															arcLabel: '',
-															arcIconId: attribute.attribute.icon,
+																			?.weight
+																		?? 1
+																	),
+																	arcLabel: '',
+																	arcIconId: attribute.attribute.icon,
+																	ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
 															},
@@ -1170,22 +1174,6 @@
 											height="40"
 											alt=""
 										/>
-									{:else if summaryVisualization === SummaryVisualization.Stage}
-										{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-											{@const maxStages = ladderEvaluation.ladder.stages.length}
-											{#if stageIndex >= 0}
-												<span
-													class="pie-center-stage-label"
-												>
-													{stageIndex}
-												</span>
-											{:else}
-												<span>❔</span>
-											{/if}
-										{:else}
-											<span>❔</span>
-										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(score)}
@@ -1362,6 +1350,7 @@
 												),
 												arcLabel: '',
 												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}${tooltipSuffix ?? ''}: ${attribute.evaluation.outcome.rating}`,
 												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
 												},
@@ -1416,7 +1405,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-icon="wbicons {attrGroup.icon}"></span>
+										<span class="pie-center-icon" data-icon="wbicons-simple {attrGroup.icon}"></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1521,7 +1510,8 @@
 												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: 1,
 												arcLabel: '',
-												arcIconId: attribute.icon,
+												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 											}
 										]
 									:
@@ -1576,6 +1566,16 @@
 							<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
 						</h3>
 
+						{#if stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null}
+							<span class="mobile-card-stage">
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</span>
+						{/if}
+
 						<div class="mobile-card-variants">
 							{#each cardSupportedVariants as variant}
 								<button
@@ -1585,31 +1585,11 @@
 									aria-pressed={variant === selectedVariant}
 									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
 								>
-									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
+									<span data-icon="wbicons-simple {variantWbIconIds[variant]}"></span>
 								</button>
 							{/each}
 						</div>
 					</div>
-				</div>
-
-				<!-- Attribute group circles -->
-				<div class="mobile-attr-grid">
-					{#each displayedAttributeGroups as attrGroup}
-						{@const evalGroup = wallet.overall[attrGroup.id]}
-						{@const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
-						<a
-							class="mobile-attr-item"
-							href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: attrGroup.id })}
-						>
-							<div
-								class="mobile-attr-circle"
-								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
-							>
-								<span data-icon="wbicons {attrGroup.icon}"></span>
-							</div>
-							<span class="mobile-attr-label">{attrGroup.displayName}</span>
-						</a>
-					{/each}
 				</div>
 
 				<!-- Full-size overall Pie -->
@@ -1621,12 +1601,12 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.15,
+								innerRadiusFraction: 0.08,
 								gap: 5,
 								angleGap: 5,
 								offset: 4,
 								outerCornerRadius: 35,
-								innerCornerRadius: 20,
+								innerCornerRadius: 10,
 								labelSizeScale: 1.25,
 							},
 							{
@@ -1649,6 +1629,7 @@
 									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
 									arcIconId: attrGroup.icon,
+									ariaLabel: attrGroup.displayName,
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
 									gradient: attributeGroupFlowerGradient,
 									weight: 1,
@@ -1669,6 +1650,7 @@
 													),
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
+													ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
 												}))
 										),
@@ -1676,16 +1658,7 @@
 								}
 							})
 						}
-					>
-						{#snippet centerContentSnippet()}
-							{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-								{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-								{#if stageIndex >= 0}
-									<span class="pie-center-stage-label">{stageIndex}</span>
-								{/if}
-							{/if}
-						{/snippet}
-					</Pie>
+					/>
 				</div>
 			</div>
 		{/each}
@@ -1756,6 +1729,40 @@
 	.title-disclaimer {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
+	}
+
+	:global(select.stage-list-select) {
+		font-weight: 600;
+	}
+
+	.stage-list-menu {
+		margin: 0;
+		padding: 0.25rem;
+		min-inline-size: 12rem;
+		inset: unset;
+
+		background: var(--background-primary);
+		border: 1px solid var(--border-color);
+		border-radius: 0.5rem;
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+		button {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+			font-weight: 600;
+
+			&[aria-selected='true'] {
+				background-color: var(--accent-backgroundColor);
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+		}
+	}
+
+	:global(.wallet-table .header-extra:has(.stage-list-menu:popover-open)) {
+		--isExpanded: 1;
 	}
 
 	.wallet-info {
@@ -1863,14 +1870,6 @@
 
 	:global(.wallet-attribute-rating-pie) {
 		margin-inline: -1em;
-	}
-
-	.eip-tooltip-content {
-		width: 34rem;
-	}
-
-	.pie-center-stage-label {
-		color: var(--pie-center-color);
 	}
 
 	.pie-center-dot {
@@ -1983,7 +1982,7 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-icon~="wbicons"] {
+		[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
 			font-size: 1.5rem;
 		}
 
@@ -2058,6 +2057,7 @@
 	.mobile-name-and-variants {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 0.5rem;
 		flex: 1;
 		min-width: 0;
@@ -2075,6 +2075,10 @@
 			color: inherit;
 			text-decoration: none;
 		}
+	}
+
+	.mobile-card-stage {
+		flex-shrink: 0;
 	}
 
 	.mobile-card-variants {
@@ -2096,7 +2100,7 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-icon~="wbicons"] {
+		[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
 			font-size: 1.25rem;
 		}
 
@@ -2105,59 +2109,12 @@
 		}
 	}
 
-	.mobile-attr-grid {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 1.25rem 0.5rem;
-
-		/* First two items sit in row 1, centered across 6 columns */
-		.mobile-attr-item:nth-child(1) {
-			grid-column: 2 / span 2;
-		}
-		.mobile-attr-item:nth-child(2) {
-			grid-column: 4 / span 2;
-		}
-		/* Items 3-5 auto-fill row 2 spanning 2 columns each */
-		.mobile-attr-item:nth-child(n + 3) {
-			grid-column: span 2;
-		}
-	}
-
-	.mobile-attr-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.4rem;
-		text-decoration: none;
-	}
-
-	.mobile-attr-circle {
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		background: color-mix(in srgb, var(--attr-color) 20%, transparent);
-		color: var(--attr-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-
-		[data-icon~="wbicons"] {
-			font-size: 1.4rem;
-		}
-	}
-
-	.mobile-attr-label {
-		font-size: 0.6rem;
-		line-height: 1.3;
-		text-align: center;
-		color: var(--text-secondary);
-		max-width: 4.5rem;
-		overflow-wrap: break-word;
-	}
-
 	.mobile-card-pie {
 		display: flex;
 		justify-content: center;
+		content-visibility: auto;
+		/* Reserve the pie's rendered height while it is skipped, so cards below don't shift when it renders:
+		   2 * padding + 2 * (radius + outer level offset) = 2 * 8 + 2 * (100 + 0.45 * 100) */
+		contain-intrinsic-size: auto 306px;
 	}
 </style>

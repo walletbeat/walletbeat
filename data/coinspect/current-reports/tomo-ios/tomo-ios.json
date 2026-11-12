@@ -1,0 +1,773 @@
+{
+    "wallet": "Tomo",
+    "platform": "Ios",
+    "version": "4.2.4",
+    "date": "2025-12-03T21:55:33.249Z",
+    "walletUID": "tomo-ios",
+    "walletMakerUID": "tomo",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-e463df44.jpg",
+                        "tomo-ios-4.2.4-d148af30.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't allow users to send a transaction with invalid checksums, and it emits a warning about it."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-4b2384d3.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not allow copying the seed phrase but does not prevent or warn against taking screenshots."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-217eb9c1.jpg",
+                        "tomo-ios-4.2.4-ec5a8783.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When receiving requests from the DApp, the wallet only asks for confirmation via Face ID for all methods, without displaying any message or warning."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-8b7eca45.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Locking the wallet automatically disconnects it from the DApp."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-60553804.jpg",
+                        "tomo-ios-4.2.4-9a19e99a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not inform users when they are interacting with well-known, verified URLs (DApps) like Uniswap or 1inch. Connection via WalletConnect by scanning the QR code appears to be broken, while connecting through the embedded browser works, but does not prompt any permission request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-66191c2f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the transaction requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-f1ac6bd4.jpg",
+                        "tomo-ios-4.2.4-356aae20.jpg",
+                        "tomo-ios-4.2.4-a1a60e89.jpg",
+                        "tomo-ios-4.2.4-554c9546.jpg",
+                        "tomo-ios-4.2.4-ea67d228.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires a password of at least 6 characters but allows easily guessable ones. It supports biometrics and enforces rate limiting after the fifth failed attempt."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-a41a87c8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the EIP-4361 (SIWE) requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-22588e62.jpg",
+                        "tomo-ios-4.2.4-70a8c90d.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not alert when visiting or attempting to connect to malicious sites like https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/ or https://trustdappmodal.pages.dev/. Connection via WalletConnect by scanning the QR code appears to be broken, while connecting through the embedded browser works but does not prompt any permission request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-7f33bcb1.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Clicking on the transfer takes you directly to PolygonScan. When attempting to sign the send transaction requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-7a35614a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the pool requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-45d0afb8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the eth_personalSign or any eth_signTypedData requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-a327bda4.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Connection via WalletConnect by scanning the QR code appears to be broken, while connecting through the embedded browser works, and requires viewing the wallet balance and activity, as well as requesting transactions."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-f297342c.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the transaction requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-8c538bf2.jpg",
+                        "tomo-ios-4.2.4-ea17828f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not inform users when they are interacting with well-known, verified URLs (DApps) like Uniswap or 1inch,"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-2cdf3968.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the EIP-712 requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-ce91123d.jpg",
+                        "tomo-ios-4.2.4-bd4fc69d.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Connection via WalletConnect by scanning the QR code appears to be broken, while connecting through the embedded browser works but does not prompt any permission request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-f59ec813.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the approval, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-1ab8f644.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays an \u201cUNDEFINED\u201d message when the switch_chain method is called and does not allow the chain to be changed."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-7bb13c88.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the eth_personalSign or any eth_signTypedData requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-bd257de4.jpg",
+                        "tomo-ios-4.2.4-a07c90d9.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When receiving requests from the DApp, the wallet only asks for confirmation via Face ID for all methods, without displaying any message or warning."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-0f870247.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't offer the ability to list and revoke token approvals via in-app functionality or links to external DApps."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-5659daf3.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not include a dedicated NFT section."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-a978fa07.jpg",
+                        "tomo-ios-4.2.4-c8e2eeb5.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks an option to configure automatic locking and only locks when the app is closed."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-b3da2925.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to sign the eth_personalSign or any eth_signTypedData requests, the wallet doesn\u2019t display any message or warning\u2014it only prompts for Face ID to confirm the request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-1773df71.jpg",
+                        "tomo-ios-4.2.4-6c87ed0f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't include a manual lock button, but logging in again is required to regain access."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-e03e9a73.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The `eth_sign` method is disabled by default."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-3d702e19.jpg",
+                        "tomo-ios-4.2.4-22ed6530.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "In the wallet management settings, clicking the \u201cView seed phrase\u201d button prompts a window requiring the password to reveal the seed phrase."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-ios-4.2.4-749e0527.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "In both the password entry window and the seed phrase display screen, a clear warning is shown indicating that sharing the phrase can give others access to your wallet and funds."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

@@ -1,0 +1,777 @@
+{
+    "wallet": "Tomo",
+    "platform": "Android",
+    "version": "4.2.6",
+    "date": "2025-12-12T13:54:35.964Z",
+    "walletUID": "tomo-android",
+    "walletMakerUID": "tomo",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-391ac23a.png",
+                        "tomo-android-4.2.6-1496d158.png",
+                        "tomo-android-4.2.6-5bb1a597.png",
+                        "tomo-android-4.2.6-964ef2bd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires user registration, then asks for a 6-digit PIN, allowing easy-to-guess combinations like 111111 but rate limits failed attempts to five."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-f99b2e0e.png",
+                        "tomo-android-4.2.6-2cf52adb.png",
+                        "tomo-android-4.2.6-caae3322.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet offers a logout button that functions similarly to a lock button."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-f7e73bcf.png",
+                        "tomo-android-4.2.6-08cd19ba.png",
+                        "tomo-android-4.2.6-3d5b23ef.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks an automatic lock option and does not lock itself after being sent to the background for more than one minute."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-3ca30806.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet enforces authentication before displaying the mnemonics or private keys."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-a69e8307.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet warns users about the risks associated with sharing or revealing mnemonics or private keys."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073810696
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-08c5c7d8.png",
+                        "tomo-android-4.2.6-aeb14129.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows copying mnemonics to the clipboard without warning the users about the risks of doing so, while also does not prevent screenshots."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-c423a15f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not have a feature to display an NFT list and it fails to filter out scam or spam tokens."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-e8eee1ed.png",
+                        "tomo-android-4.2.6-aec02b6a.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not offer token allowance revocation within the app, nor does it provide a third-party external link for this purpose."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-cc7ddabe.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet connects to a dApp immediately after clicking the connect button, without prompting a connection dialog. It also does not display a warning when visiting a malicious dApp."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-808b351b.png",
+                        "tomo-android-4.2.6-d23d0f53.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet connects to a dApp immediately after clicking the connect button, without prompting a confirmation dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-9a8ef68b.png",
+                        "tomo-android-4.2.6-f732c248.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet connects to a dApp immediately after clicking the connect button, without prompting a confirmation dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-8752b562.png",
+                        "tomo-android-4.2.6-d21405d3.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet connects to a dApp immediately after clicking the connect button, without prompting a confirmation dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-4d1f717d.png",
+                        "tomo-android-4.2.6-1db99b64.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not provide a list of connected dApps. Wallet Connect appears to be broken. When using the browser, it does not prompt a connection dialog before connecting and it does not revoke connection when leaving the browser."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-dbcfdee1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not support the eth_sign method."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-9ea25a75.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has an embedded browser and it requires user confirmation before processing each DApp request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-0ce20d4a.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not require user confirmation, but it also does not switch chains."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-7c7166e7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet implements Wallet Connect through its browser and it requires user confirmation before processing each request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-d0a01051.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet disconnects from dApps when it gets locked."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-ead5dffa.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-a3c4169e.png",
+                        "tomo-android-4.2.6-4a58a477.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-6f02ce8a.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet provides clickable links while querying the wallet history and it lacks transactions previews."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-7596a438.png",
+                        "tomo-android-4.2.6-6c0562c5.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-df73ea4e.png",
+                        "tomo-android-4.2.6-57977f51.png",
+                        "tomo-android-4.2.6-6a2797c7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-c49578bb.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-eda370cc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not refuse or warns the user when attempting to sign an EIP-712 object with a chainId that does not match the currently active chain."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-72d8c941.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-e349f256.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only requests biometrics before executing a transaction and does not provide a transaction preview."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-20f3985c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users of a domain or scheme mismatch when signing an EIP-4361 (Sign in With Ethereum - SIWE) message."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "tomo-android-4.2.6-0f1b2f60.png",
+                        "tomo-android-4.2.6-602d6171.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not process transactions with invalid checksum addresses within the dApp. It also warns and prevents the user from sending funds manually."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073195124
+        }
+    ]
+}

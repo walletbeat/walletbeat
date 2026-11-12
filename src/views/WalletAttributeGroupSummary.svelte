@@ -7,10 +7,9 @@
 
 
 <script lang="ts" generics="
-	_AttributeGroupId extends AttributeGroupId
+	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import { AttributeGroupId } from '@/schema/attribute-tree'
 	import { calculateAttributeGroupScore, type AttributeGroup } from '@/schema/attribute-groups'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'
@@ -58,7 +57,7 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h3 data-row="gap-2">
-			<span data-icon="wbicons {attributeGroup.icon}"></span> {attributeGroup.displayName}
+			<span data-icon="wbicons-simple {attributeGroup.icon}"></span> {attributeGroup.displayName}
 		</h3>
 
 		{#if summaryType === WalletAttributeGroupSummaryType.Score}
@@ -87,6 +86,10 @@
 
 			h3 {
 				font-weight: 600;
+			}
+
+			[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
+				font-weight: 400;
 			}
 		}
 	}

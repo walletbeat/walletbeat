@@ -17,14 +17,10 @@ import {
 	type ReferenceInput,
 	toFullyQualified,
 } from '@/schema/reference'
-import {
-	type WalletLadderEvaluation,
-	type WalletStage,
-	type WalletStageGroup,
-} from '@/schema/stages'
+import { type WalletLadderEvaluation, type WalletStageGroup } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
 import { getVariants, type Variant } from '@/schema/variants'
-import { type RatedWallet } from '@/schema/wallet'
+import { type AttributeOverride, getAttributeOverride, type RatedWallet } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
@@ -40,37 +36,51 @@ import {
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
 
-type StageExportInput = WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+type StageExportInput = WalletLadderEvaluation<string>['stage'] | null
 
 /**
  * Maps the wallet stage (from getWalletStageAndLadder) to the string used in JSON export.
  * Single source of truth for stage serialization.
  */
 export function stageToExportString(stage: StageExportInput): string | null {
-	if (stage === null) {
-		return null
-	}
-
-	if (stage === 'NOT_APPLICABLE') {
-		return 'NOT_APPLICABLE'
-	}
-
-	if (stage === 'QUALIFIED_FOR_NO_STAGES') {
-		return 'QUALIFIED_FOR_NO_STAGES'
+	if (stage === null || typeof stage === 'string') {
+		return stage
 	}
 
 	return stage.label
 }
 
-export interface ReferenceUrlJsonExport {
+export type ReferenceUrlJsonExport = {
 	label: string
 	url: string
 }
 
-export interface ReferenceJsonExport {
+export type ReferenceJsonExport = {
 	explanation?: string
 	urls: ReferenceUrlJsonExport[]
+	source?: {
+		id: string
+		name: string
+		license: { name: string; url: string }
+		attributionText: string
+	}
 }
+
+/**
+ * A JSON-serializable value produced by the feature serializer. Feature data
+ * is heterogeneous, so this is a recursive union of the primitives, arrays,
+ * and plain objects (including `ReferenceJsonExport[]` for `ref` fields) that
+ * survive `JSON.stringify`. `undefined` is included for optional fields that
+ * are dropped during stringification.
+ */
+type SerializedFeatureValue =
+	| string
+	| number
+	| boolean
+	| null
+	| undefined
+	| SerializedFeatureValue[]
+	| { [key: string]: SerializedFeatureValue }
 
 /** Attribute-level metadata (same for every wallet). */
 export interface AttributeJsonExport {
@@ -92,6 +102,7 @@ export interface RatingJsonExport {
 	rating: string
 	shortExplanation: string
 	details: string
+	note?: string
 	impact?: string
 	howToImprove?: string
 	references?: ReferenceJsonExport[]
@@ -152,7 +163,7 @@ export interface RatedWalletJsonExport {
 	repository?: string
 }
 
-function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
+export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	const qualified = toFullyQualified(references)
 
 	if (qualified.length === 0) {
@@ -162,6 +173,17 @@ function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] 
 	return qualified.map(ref => ({
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
 		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
+		...(ref.source !== undefined && {
+			source: {
+				id: ref.source.entity.id,
+				name: ref.source.entity.name,
+				license: {
+					name: ref.source.license.name,
+					url: getUrl(ref.source.license.url),
+				},
+				attributionText: ref.source.attributionText,
+			},
+		}),
 	}))
 }
 
@@ -169,22 +191,31 @@ function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] 
  * Serialize ResolvedFeatures to a JSON-serializable plain object for export.
  * Ref fields are normalized to the same shape as attribute references.
  */
-function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
+function serializeResolvedFeatures(features: ResolvedFeatures): SerializedFeatureValue {
 	/**
 	 * Recursively serialize a value from ResolvedFeatures (or nested feature data) to a
 	 * JSON-serializable plain value. Normalizes `ref` properties: real references become
 	 * ReferenceJsonExport[]; refTodo/refNotNecessary become null.
 	 */
-	function serializeFeatureValue(value: unknown): unknown {
-		if (value === null || typeof value !== 'object') {
+	function serializeFeatureValue(value: unknown): SerializedFeatureValue {
+		if (value === null) {
 			return value
+		}
+
+		if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+			return value
+		}
+
+		if (typeof value !== 'object') {
+			// symbol, bigint, function, undefined: not JSON-serializable.
+			return undefined
 		}
 
 		if (Array.isArray(value)) {
 			return value.map(serializeFeatureValue)
 		}
 
-		const result: Record<string, unknown> = {}
+		const result: Record<string, SerializedFeatureValue> = {}
 
 		for (const [key, val] of Object.entries(value)) {
 			if (key === 'ref') {
@@ -215,6 +246,7 @@ function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
 function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	evaluatedAttribute: EvaluatedAttribute<_OutcomeMetadata>,
 	evalStrings: WalletNameAndPseudonymStrings,
+	note: AttributeOverride['note'],
 ): AttributeExportBlock {
 	const { attribute, evaluation } = evaluatedAttribute
 
@@ -238,6 +270,10 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 		details: renderContentToText(evaluation.details, evalStrings, {
 			fallback: DETAILS_FALLBACK,
 		}),
+	}
+
+	if (note !== undefined) {
+		ratingBlock.note = renderTypographicContentToString(note, evalStrings)
 	}
 
 	if (evaluation.impact !== undefined) {
@@ -267,6 +303,7 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
 	evalTree: EvaluationTree<_AttributeGroupId>,
 	evalStrings: WalletNameAndPseudonymStrings,
+	wallet: RatedWallet<_AttributeGroupId>,
 ): AttributeGroupsExport {
 	const result: AttributeGroupsExport = {}
 
@@ -274,7 +311,15 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 		mapNonExemptAttributeGroupsInTree(attributeTree, evalTree, (attrGroup, evalGroup) => {
 			const entries = mapNonExemptGroupAttributes(
 				evalGroup,
-				evalAttr => [evalAttr.attribute.id, serializeAttribute(evalAttr, evalStrings)] as const,
+				evalAttr =>
+					[
+						evalAttr.attribute.id,
+						serializeAttribute(
+							evalAttr,
+							evalStrings,
+							getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)?.note,
+						),
+					] as const,
 			)
 
 			return [attrGroup.id, Object.fromEntries(entries)]
@@ -379,7 +424,7 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 		stageBreakdown,
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
-		overall: serializeEvaluationTree(attributeTree, wallet.overall, evalStrings),
+		overall: serializeEvaluationTree(attributeTree, wallet.overall, evalStrings, wallet),
 		perVariant: {},
 	}
 
@@ -388,7 +433,12 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 
 		if (resolved !== undefined) {
 			payload.perVariant[variant] = {
-				attributes: serializeEvaluationTree(attributeTree, resolved.attributes, evalStrings),
+				attributes: serializeEvaluationTree(
+					attributeTree,
+					resolved.attributes,
+					evalStrings,
+					wallet,
+				),
 				features: serializeResolvedFeatures(resolved.features),
 			}
 		}

@@ -11,7 +11,7 @@
 	_OutcomeMetadata extends OutcomeMetadata
 ">
 	// Types/constants
-	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor, ratingToTextColor } from '@/schema/attributes'
 	import { type Ladders } from '@/schema/ladders'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
@@ -81,6 +81,15 @@
 		||
 			undefined
 	)
+
+	const relevantStageLabels = $derived(
+		ladderEvaluation
+			? relevantStages
+				.map(stageIndex => ladderEvaluation.ladder.stages[stageIndex])
+				.filter(stage => stage !== undefined)
+				.map(stage => stage.label.replace(/^Stage /, ''))
+			: []
+	)
 </script>
 
 
@@ -89,10 +98,11 @@
 	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
 	data-column
 	style:--accent={ratingToColor(attribute.evaluation.outcome.rating)}
+	style:--accent-textColor={ratingToTextColor(attribute.evaluation.outcome.rating)}
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">
-			<span data-icon="wbicons {attribute.attribute.icon}"></span>
+			<span data-icon="wbicons-simple {attribute.attribute.icon}"></span>
 			{attribute.attribute.displayName}
 		</h4>
 
@@ -102,20 +112,19 @@
 					<a
 						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"
-						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+						title={`This attribute is required for stage${relevantStageLabels.length > 1 ? 's' : ''} ${relevantStageLabels.join(', ')}`}
 					>
 						<div
 							data-badge="small"
 							style:--accent="var(--accent-color)"
 						>
-							<small>Stage {relevantStages.join(', ')}</small>
+							<small>Stage {relevantStageLabels.join(', ')}</small>
 						</div>
 					</a>
 
 					{#snippet TooltipContent()}
 						<WalletStageSummary
 							{wallet}
-							{ladders}
 							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}

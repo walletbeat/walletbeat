@@ -35,14 +35,32 @@ export function basicUnlockMechanismName(m: BasicUnlockMechanism): string {
 }
 
 /**
+ * Whether a given unlock mechanism is supported, and if so, whether the
+ * wallet requires it or merely offers it as one of several optional choices.
+ */
+export enum BasicUnlockMechanismSupport {
+	/** The wallet supports this unlock mechanism as an optional choice. */
+	OPTIONAL = 'OPTIONAL',
+
+	/** The wallet requires this unlock mechanism to unlock the wallet. */
+	REQUIRED = 'REQUIRED',
+}
+
+/** Data about a supported unlock mechanism: whether it is required or optional. */
+export interface BasicUnlockMechanismData {
+	/** Whether the wallet requires this unlock mechanism, or merely offers it as an option. */
+	type: BasicUnlockMechanismSupport
+}
+
+/**
  * Information about how the wallet locks itself against unauthorized access.
  */
 export interface BasicUnlock {
 	/**
-	 * Which unlock mechanisms the wallet supports.
-	 * Set each mechanism to `true` if supported, `false` if not.
+	 * Which unlock mechanisms the wallet supports, and whether each one is
+	 * required or merely optional.
 	 */
-	mechanisms: Record<BasicUnlockMechanism, boolean>
+	mechanisms: Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>
 }
 
 /**
@@ -64,7 +82,7 @@ export enum DuressAction {
 	/** Freezes the smart contract onchain, preventing unauthorized transfers. */
 	ONCHAIN_LOCKDOWN = 'ONCHAIN_LOCKDOWN',
 
-	/** Wipes wallet data and forwards all funds to a pre-configured safe address. */
+	/** Wipes wallet data and forwards all funds to a preconfigured safe address. */
 	WIPE_AND_FORWARD = 'WIPE_AND_FORWARD',
 }
 
@@ -92,7 +110,7 @@ export function duressActionDescription(action: DuressAction): string {
 		case DuressAction.SELF_DESTRUCT:
 			return 'wipes the wallet, preventing the attacker from accessing funds'
 		case DuressAction.WIPE_AND_FORWARD:
-			return 'wipes the wallet and forwards all funds to a pre-configured safe address'
+			return 'wipes the wallet and forwards all funds to a preconfigured safe address'
 	}
 }
 

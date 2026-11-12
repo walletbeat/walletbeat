@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import type { AccountUnruggabilityMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
 	import {
 		isAccountRecoverable,
@@ -14,7 +14,7 @@
 		wallet,
 		metadata,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		metadata: AccountUnruggabilityMetadata
 	} = $props()
 
@@ -56,12 +56,7 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 	{#if metadata.minimumGuardianPolicy !== null}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: `### ${wallet.metadata.displayName} account recovery implementation`,
-			}}
-		/>
+		<h4>{wallet.metadata.displayName} account recovery implementation</h4>
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
@@ -76,12 +71,7 @@
 		/>
 	{/if}
 	{#if failedOutcomes.length > 0}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: '### Account takeover scenarios',
-			}}
-		/>
+		<h4>Account takeover scenarios</h4>
 		<ul>
 			{#each failedOutcomes as outcome (`${guardianScenarioId(outcome.scenario)}_${outcome.outcomeId}`)}
 				<li>

@@ -12,6 +12,7 @@ export const fireflyWallet: HardwareWallet = {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
@@ -55,7 +56,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			dataCollection: null,
 			hardwarePrivacy: null,
-			privacyPolicy: '',
+			privacyPolicy: null,
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
@@ -94,6 +95,7 @@ export const fireflyWallet: HardwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

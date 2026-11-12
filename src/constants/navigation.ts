@@ -1,4 +1,5 @@
 // Types
+import type { ComputedSlice } from '@/components/pie-geometry'
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
@@ -30,22 +31,9 @@ export type NavigationItem = {
 	id: string
 	title: string
 	icon?: NavigationIconID
-	iconVariant?: 'emoji'
 	accentColor?: string | null
 	href?: string
-	sliceStyle?: {
-		totalAngle: number
-		midAngle: number
-		offset: number
-		gap: number
-		outerR: number
-		innerR: number
-		outerCornerRadius: number
-		innerCornerRadius: number
-		labelSize: number
-		labelSizeScale: number
-		labelR: number
-	}
+	sliceStyle?: ComputedSlice['computed'] & { fill?: string; labelBackground?: string }
 	children?: NavigationItem[]
 }
 
@@ -115,6 +103,13 @@ export const navigationTesting = {
 	icon: 'wallet_test',
 	title: 'Playground',
 	href: '/test/',
+} as const satisfies NavigationItem
+
+export const navigationDocs = {
+	id: 'docs',
+	icon: 'about',
+	title: 'Documentation',
+	href: '/docs/',
 } as const satisfies NavigationItem
 
 export const navigationFarcasterChannel = {
@@ -242,4 +237,5 @@ export const defaultNavigationItems = [
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,
+	navigationDocs,
 ] as const satisfies NavigationItem[]

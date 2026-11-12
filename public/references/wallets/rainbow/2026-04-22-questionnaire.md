@@ -25,7 +25,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 - **Which account types does your wallet support?** (check all that apply)
   - [ ] EOA (externally owned account -- standard seed phrase wallet)
     - Yes
-  - [ ] MPC (multi-party computation -- key is split across multiple parties)
+  - [ ] MPC (multiparty computation -- key is split across multiple parties)
   - [ ] EIP-7702 (delegating an EOA to act as a smart contract)
     - Yes
   - [ ] ERC-4337 smart account
@@ -45,7 +45,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - [ ] Guardian-based / social recovery
   - [ ] Cloud backup (iCloud, Google Drive, etc.)
     - Yes
-  - [ ] Multi-factor / passkey backup
+  - [ ] Multifactor / passkey backup
   - [ ] Not supported
   - [ ] Other:
 - **[If guardian-based] Please describe your guardian scheme and link to its documentation.**

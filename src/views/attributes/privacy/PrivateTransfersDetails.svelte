@@ -2,7 +2,7 @@
 	// Types/constants
 	import type { WalletNameStrings } from '@/schema/attributes'
 	import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType, type MarkdownParagraph } from '@/types/content'
 
 	const technologyNames: Record<PrivateTransferTechnology, string> = {
@@ -18,7 +18,7 @@
 		wallet,
 		privateTransferDetails,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		privateTransferDetails: Map<PrivateTransferTechnology, {
 			sendingDetails: MarkdownParagraph<WalletNameStrings>
 			receivingDetails: MarkdownParagraph<WalletNameStrings>

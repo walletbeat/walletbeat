@@ -7,6 +7,8 @@ export const eip1193: Eip = {
 	formalTitle: 'Ethereum Provider JavaScript API',
 	// Browser providers are only implemented by browser extension wallets.
 	appliesTo: nonEmptySet(Variant.BROWSER),
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/1156a141aa92e0f62d0506ce472f0188eb5c3706
+	finalizedDate: '2020-09-05',
 	icon: 'ICON_PLUG',
 	noteMarkdown: `
 		EIP-1193 has largely been superseded by EIP-6963, which provides better

@@ -16,7 +16,7 @@ export type HardwarePrivacyMetadata = {
 export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: 'user_privacy',
-	displayName: 'Hardware Privacy',
+	displayName: 'Hardware privacy',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
@@ -43,21 +43,21 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 		pass: [
 			exampleRating(
 				sentence(
-					'The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
+					'The hardware wallet passes all hardware privacy subcriteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
 				),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes some hardware privacy sub-criteria.'),
+				sentence('The hardware wallet passes some hardware privacy subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence(
-					'The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.',
+					'The hardware wallet fails all hardware privacy subcriteria: Device leaks privacy in all aspects.',
 				),
 				outcome => outcome.rating === Rating.FAIL,
 			),
@@ -98,7 +98,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 			outcome: {
 				id: 'hardware_privacy',
 				rating,
-				displayName: 'Hardware Privacy',
+				displayName: 'Hardware privacy',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
 				metadata: {
 					phoningHome: hwPrivacy.phoningHome,
@@ -107,7 +107,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

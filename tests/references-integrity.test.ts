@@ -1,69 +1,36 @@
-import { existsSync } from 'fs'
+import { existsSync, readdirSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
-import { hasRefs, type LooseReference, toFullyQualified } from '@/schema/reference'
+import {
+	collectAllRefs,
+	type CollectedRef,
+	type LooseReference,
+	toFullyQualified,
+} from '@/schema/reference'
+import { CodebaseEntryType, crawlCodebase, GitIgnoredFiles } from '@/utils/codebase'
 
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
+import { GrammarTextKind } from './utils/linter'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(currentDir, '..')
 
-/** A single collected reference with its wallet name, field path, and fully-qualified refs. */
-interface CollectedRef {
-	walletName: string
-	fieldPath: string
-	fullyQualifiedRefs: ReturnType<typeof toFullyQualified>
-}
+await warmupHarperLinter()
+
+const WALLET_REFERENCES_DIR = 'public/references/wallets'
 
 /**
- * Recursively traverse wallet data objects and collect every `ref` field,
- * returning the wallet name, the period-delimited field path, and the
- * fully-qualified references.
+ * Wallet questionnaire responses stored under `public/references/wallets/`.
+ * These are kept even when no wallet ref cites them, so add new questionnaire
+ * files here when you add them.
  */
-export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
-	const results: CollectedRef[] = []
-
-	const findRefs = (path: string[], x: unknown): void => {
-		if (x === undefined || x === null) {
-			return
-		}
-
-		if (Array.isArray(x)) {
-			for (let i = 0; i < x.length; i++) {
-				findRefs(path.concat([`[${i}]`]), x[i])
-			}
-
-			return
-		}
-
-		if (typeof x !== 'object') {
-			return
-		}
-
-		if (hasRefs(x)) {
-			results.push({
-				walletName: path[0],
-				fieldPath: path.join(''),
-				fullyQualifiedRefs: toFullyQualified(x.ref),
-			})
-		}
-
-		for (const [key, val] of Object.entries(x)) {
-			findRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
-		}
-	}
-
-	for (const [walletName, wallet] of Object.entries(wallets)) {
-		findRefs([walletName], wallet)
-	}
-
-	return results
-}
-
-await warmupHarperLinter()
+const QUESTIONNAIRE_FILES: string[] = [
+	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
+]
 
 describe('RepoFileReference', () => {
 	describe('toFullyQualified with file references', () => {
@@ -172,7 +139,11 @@ describe('reference integrity', () => {
 					it('explanation fields pass grammar lint', async () => {
 						for (const fq of fqRefs) {
 							if (fq.explanation) {
-								await grammarLint(fq.explanation)
+								await grammarLint(
+									fq.explanation,
+									{ language: 'markdown' },
+									GrammarTextKind.REFERENCE_EXPLANATION,
+								)
 							}
 						}
 					})
@@ -181,7 +152,11 @@ describe('reference integrity', () => {
 						for (const fq of fqRefs) {
 							for (const urlEntry of fq.urls) {
 								if (urlEntry.label) {
-									await grammarLint(urlEntry.label)
+									await grammarLint(
+										urlEntry.label,
+										{ language: 'markdown' },
+										GrammarTextKind.REFERENCE_LABEL,
+									)
 								}
 							}
 						}
@@ -206,4 +181,98 @@ describe('reference integrity', () => {
 			}
 		})
 	}
+})
+
+describe('wallet references directories', () => {
+	const walletIdByName = new Map<string, string>(
+		Object.entries(allWallets).map(([name, wallet]) => [name, wallet.metadata.id]),
+	)
+	const walletIds = new Set(walletIdByName.values())
+
+	// Checks the directories on disk. Fails on a stale or misnamed directory even if  no wallet data references it
+	// `public/references/wallets/uniswap/` should be `public/references-wallets/uniswap-wallet
+	it('every directory under public/references/wallets/ is named after a known wallet ID', () => {
+		const dirs = readdirSync(resolve(repoRoot, WALLET_REFERENCES_DIR), { withFileTypes: true })
+			.filter(entry => entry.isDirectory())
+			.map(entry => entry.name)
+
+		for (const dir of dirs) {
+			expect(
+				walletIds.has(dir),
+				`"${WALLET_REFERENCES_DIR}/${dir}/" does not match any wallet ID; ` +
+					"rename it to the wallet's `metadata.id`.",
+			).toBe(true)
+		}
+	})
+
+	// Checks the wallet data. Fails when a wallet's ref points into a directory other
+	// than its own `metadata.id`, even if that directory is a valid wallet ID
+	// `uniswapWallet` referencing a file under `public/references/wallets/metamask/`.
+	it("wallet file refs under public/references/wallets/ point to the wallet's own directory", () => {
+		const urlPrefix = `/${WALLET_REFERENCES_DIR.slice('public/'.length)}/`
+
+		for (const collected of collectAllRefs(allWallets)) {
+			const walletId = walletIdByName.get(collected.walletName)
+
+			for (const fq of collected.fullyQualifiedRefs) {
+				for (const { url } of fq.urls) {
+					if (!url.startsWith(urlPrefix)) {
+						continue
+					}
+
+					const dir = url.slice(urlPrefix.length).split('/')[0]
+
+					expect(
+						dir,
+						`${collected.fieldPath} references "public${url}", ` +
+							`which is not under "${WALLET_REFERENCES_DIR}/${walletId}/".`,
+					).toBe(walletId)
+				}
+			}
+		}
+	})
+
+	// Checks the files on disk. Fails on a file that no wallet ref points to, e.g. a
+	// screenshot left behind after its ref was removed or changed to another file.
+	// Code snippets are skipped; `code-snippets-integrity.test.ts` keeps those in sync.
+	// Questionnaire files in `QUESTIONNAIRE_FILES` are also allowed without a ref.
+	it('every file under public/references/wallets/ is referenced by wallet data', async () => {
+		const urlPrefix = `/${WALLET_REFERENCES_DIR.slice('public/'.length)}/`
+		const referencedFiles = new Set<string>(QUESTIONNAIRE_FILES)
+
+		for (const collected of collectAllRefs(allWallets)) {
+			for (const fq of collected.fullyQualifiedRefs) {
+				for (const { url } of fq.urls) {
+					if (url.startsWith(urlPrefix)) {
+						referencedFiles.add(`public${url}`)
+					}
+				}
+			}
+		}
+
+		const unreferencedFiles: string[] = []
+
+		await crawlCodebase({
+			ignore: [
+				'.git',
+				await GitIgnoredFiles(),
+				/\.snippet$/i,
+				path =>
+					!(
+						path.startsWith(`${WALLET_REFERENCES_DIR}/`) ||
+						`${WALLET_REFERENCES_DIR}/`.startsWith(`${path}/`)
+					),
+			],
+			baseTraversalFn: entry => {
+				if (entry.type === CodebaseEntryType.FILE && !referencedFiles.has(entry.path)) {
+					unreferencedFiles.push(entry.path)
+				}
+			},
+		})
+
+		expect(
+			unreferencedFiles.sort(),
+			'These files are not referenced by any wallet data; delete them or add a ref to them.',
+		).toEqual([])
+	})
 })

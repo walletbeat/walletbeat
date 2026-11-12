@@ -106,15 +106,15 @@
 	}
 
 	.sidebar-item.completed .sidebar-item-title {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.sidebar-item.partial .sidebar-item-title {
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 	}
 
 	.sidebar-item.failed .sidebar-item-title {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.sidebar-item-check {
@@ -124,15 +124,15 @@
 	}
 
 	.sidebar-item-check.passed {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.sidebar-item-check.partial {
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 	}
 
 	.sidebar-item-check.failed {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.sidebar-item-desc {

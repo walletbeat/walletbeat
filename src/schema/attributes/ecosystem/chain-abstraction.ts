@@ -18,7 +18,9 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
+	feeDisplayAfterSingleAction,
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { refNotNecessary } from '@/schema/reference'
@@ -34,7 +36,11 @@ function evaluateChainAbstraction(
 ): Evaluation {
 	const { crossChainBalances, bridging } = chainAbstraction
 
-	ctx.addRef(crossChainBalances, bridging.builtInBridging, bridging.suggestedBridging)
+	ctx.addRef(
+		crossChainBalances,
+		isSupported(bridging.builtInBridging) ? bridging.builtInBridging : null,
+		isSupported(bridging.suggestedBridging) ? bridging.suggestedBridging : null,
+	)
 
 	// FAIL conditions follow.
 
@@ -100,6 +106,8 @@ function evaluateChainAbstraction(
 	}
 
 	if (!isSupported(bridging.builtInBridging)) {
+		ctx.addRef(bridging.builtInBridging)
+
 		return ctx.build({
 			outcome: {
 				id: 'chain_abstraction_no_bridging',
@@ -152,9 +160,14 @@ function evaluateChainAbstraction(
 		})
 	}
 
-	if (bridging.builtInBridging.feesLargerThan1bps.byDefault === FeeDisplayLevel.NONE) {
+	const bridgingFees = bridging.builtInBridging.feesLargerThan1bps
+
+	if (
+		bridgingFees !== 'NO_FEES_CHARGED' &&
+		bridgingFees.shownByDefault.comprehensiveness === FeeDisplayLevel.NONE
+	) {
 		const feesHidden =
-			bridging.builtInBridging.feesLargerThan1bps.afterSingleAction === FeeDisplayLevel.NONE
+			feeDisplayAfterSingleAction(bridgingFees).comprehensiveness === FeeDisplayLevel.NONE
 
 		return ctx.build({
 			outcome: {
@@ -250,6 +263,8 @@ function evaluateChainAbstraction(
 	}
 
 	if (!isSupported(bridging.suggestedBridging)) {
+		ctx.addRef(bridging.suggestedBridging)
+
 		return ctx.build({
 			outcome: {
 				id: 'chain_abstraction_no_suggested_bridging',
@@ -264,7 +279,7 @@ function evaluateChainAbstraction(
 				implementing:
 
 				- Global (cross-chain) account valuation.
-				- Cross-chain token balances ("How many Ether do I have
+				- Cross-chain token balances ("How much Ether do I have
 					across all chains?"), while still allowing the user to go into
 					per-chain balances if they wish.
 				- Cross-chain bridging with transparent fee breakdown and risk
@@ -294,7 +309,7 @@ function evaluateChainAbstraction(
 			implementing:
 
 			- Global (cross-chain) account valuation.
-			- Cross-chain token balances ("How many Ether do I have
+			- Cross-chain token balances ("How much Ether do I have
 				across all chains?"), while still allowing the user to go into
 				per-chain balances if they wish.
 			- Cross-chain bridging with transparent fee breakdown and risk
@@ -323,10 +338,19 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 		risksExplained: 'VISIBLE_BY_DEFAULT',
 		feesLargerThan1bps: {
 			ref: [],
-			afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-			byDefault: FeeDisplayLevel.COMPREHENSIVE,
-			fullySponsored: false,
-			walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			feesInvolved: {
+				[FeeType.NETWORK_FEE]: true,
+				[FeeType.ONCHAIN_APP_FEE]: true,
+				[FeeType.WALLET_FEE]: true,
+			},
+			shownAfterSingleAction: {
+				comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+				units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			},
+			shownByDefault: {
+				comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+				units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			},
 		},
 	}),
 	suggestedBridging: featureSupportedNoRef,
@@ -462,10 +486,19 @@ export const chainAbstraction: Attribute = {
 							builtInBridging: supported({
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
-									byDefault: FeeDisplayLevel.NONE,
-									afterSingleAction: FeeDisplayLevel.NONE,
-									fullySponsored: false,
-									walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+									feesInvolved: {
+										[FeeType.NETWORK_FEE]: true,
+										[FeeType.ONCHAIN_APP_FEE]: true,
+										[FeeType.WALLET_FEE]: false,
+									},
+									shownAfterSingleAction: {
+										comprehensiveness: FeeDisplayLevel.NONE,
+										units: null,
+									},
+									shownByDefault: {
+										comprehensiveness: FeeDisplayLevel.NONE,
+										units: null,
+									},
 								},
 								risksExplained: 'VISIBLE_BY_DEFAULT',
 							}),
@@ -487,10 +520,19 @@ export const chainAbstraction: Attribute = {
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
 									ref: [],
-									afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-									byDefault: FeeDisplayLevel.COMPREHENSIVE,
-									fullySponsored: false,
-									walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									feesInvolved: {
+										[FeeType.NETWORK_FEE]: true,
+										[FeeType.ONCHAIN_APP_FEE]: true,
+										[FeeType.WALLET_FEE]: true,
+									},
+									shownAfterSingleAction: {
+										comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+										units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									},
+									shownByDefault: {
+										comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+										units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									},
 								},
 								risksExplained: 'HIDDEN_BY_DEFAULT',
 							}),

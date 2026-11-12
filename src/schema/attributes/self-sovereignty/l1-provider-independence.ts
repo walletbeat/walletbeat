@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	type Evaluation,
@@ -150,7 +151,10 @@ export const l1ProviderIndependence: Attribute = {
 		  before any request is made to that endpoint.
 		- Support basic functions (account creation/import, balance lookups,
 		  token transfers) using nothing but the self-hosted node
-			(no external services, no non-Ethereum-API calls), and whether
+			(no external services, no non-Ethereum-API calls).
+
+		See the [L1 provider independence testing guide](${withBasePath('/docs/wallet-testing/l1-provider-independence/')})
+		for how Walletbeat tests this.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -206,31 +210,34 @@ export const l1ProviderIndependence: Attribute = {
 		}
 
 		if (!isSupported(ctx.features.chainConfigurability)) {
+			ctx.addRef(ctx.features.chainConfigurability)
+
 			return noSelfHostedNode(ctx)
 		}
 
 		ctx.addRef(ctx.features.chainConfigurability)
 
 		if (!isSupported(ctx.features.chainConfigurability.l1)) {
+			ctx.addRef(ctx.features.chainConfigurability.l1)
+
 			return noSelfHostedNode(ctx)
 		}
 
+		const basicOperations =
+			ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
+
 		if (
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountCreation,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
-					.etherBalanceLookup,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
-					.erc20BalanceLookup,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20TokenSend,
-			)
+			!isSupported(basicOperations.accountCreation) ||
+			!isSupported(basicOperations.etherBalanceLookup) ||
+			!isSupported(basicOperations.erc20BalanceLookup) ||
+			!isSupported(basicOperations.erc20TokenSend)
 		) {
+			for (const operation of Object.values(basicOperations)) {
+				if (!isSupported(operation)) {
+					ctx.addRef(operation)
+				}
+			}
+
 			return supportsSelfHostedNodeButCannotDoBasicOperations(
 				ctx,
 				ctx.features.chainConfigurability.l1,

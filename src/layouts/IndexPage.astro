@@ -1,0 +1,160 @@
+---
+// Types
+import type { IndexEntry } from '@/utils/collection-utils'
+
+type Metadata = {
+	title: string
+	description: string
+}
+
+type Props = {
+	metadata: Metadata
+	entries: IndexEntry[]
+	currentDir: string
+	urlPrefix: string
+	parentUrl?: string
+}
+
+const { metadata, entries, parentUrl } = Astro.props
+
+// Layouts
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+---
+
+<Layout metadata={metadata}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>{metadata.title}</h1>
+
+				{metadata.description && <p>{metadata.description}</p>}
+			</hgroup>
+		</header>
+
+		{
+			parentUrl && (
+				<nav data-scroll-item='inline-detached padding-match-start'>
+					<a href={parentUrl}>← Back</a>
+				</nav>
+			)
+		}
+
+		{
+			entries.length > 0 ? (
+				<div data-scroll-item='inline-detached padding-match-end'>
+					<div class='index-grid'>
+						{entries.map(entry => (
+							<a class='index-card' href={entry.path}>
+								<div class='index-card-content'>
+									<h2>{entry.title}</h2>
+
+									{entry.description && <p>{entry.description}</p>}
+								</div>
+
+								<span class='index-card-arrow' aria-hidden='true'>
+									→
+								</span>
+							</a>
+						))}
+					</div>
+				</div>
+			) : (
+				<div data-scroll-item='inline-detached padding-match-end'>
+					<p>No pages in this directory.</p>
+				</div>
+			)
+		}
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 72rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.25rem;
+			font-style: italic;
+			color: var(--text-secondary);
+			opacity: 0.75;
+		}
+
+		h1,
+		h2,
+		h3 {
+			font-family: var(--fontFamily-spMonorium);
+		}
+
+		nav a {
+			font-size: 0.875rem;
+			color: var(--text-secondary);
+			text-decoration: none;
+
+			&:hover {
+				color: var(--text-primary);
+			}
+		}
+	}
+
+	.index-grid {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+	}
+
+	.index-card {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1.25rem 1.5rem;
+		border: 1px solid var(--border);
+		border-radius: 0.5rem;
+		text-decoration: none;
+		color: var(--text-primary);
+		transition:
+			border-color 0.15s ease,
+			background-color 0.15s ease;
+
+		&:hover {
+			border-color: var(--accent);
+			background-color: var(--bg-secondary);
+		}
+	}
+
+	.index-card-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.index-card-content h2 {
+		margin: 0 0 0.25rem;
+		font-size: 1.125rem;
+	}
+
+	.index-card-content p {
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--text-secondary);
+	}
+
+	.index-card-arrow {
+		flex-shrink: 0;
+		font-size: 1.25rem;
+		color: var(--text-secondary);
+		transition: color 0.15s ease;
+	}
+
+	.index-card:hover .index-card-arrow {
+		color: var(--accent);
+	}
+</style>

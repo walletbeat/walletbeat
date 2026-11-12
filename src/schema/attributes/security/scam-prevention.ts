@@ -6,8 +6,19 @@ import {
 	Rating,
 } from '@/schema/attributes'
 import { WalletProfile } from '@/schema/features/profile'
-import type { ScamAlertLeaks, ScamAlerts } from '@/schema/features/security/scam-alerts'
-import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
+import {
+	type ScamAlertLeaks,
+	type ScamAlerts,
+	type UnlimitedApprovalWarningBenchmarks,
+	UnlimitedApprovalWarningBenchmarkSpenders,
+} from '@/schema/features/security/scam-alerts'
+import {
+	featureSupported,
+	isSupported,
+	notSupported,
+	type Support,
+	supported,
+} from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -15,7 +26,7 @@ import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { refNotNecessary, type WithRef } from '../../reference'
+import { hasRefs, refNotNecessary, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
@@ -46,6 +57,60 @@ export type ScamPreventionMetadata =
 	| { scamAlerts: null }
 
 /**
+ * Human-readable label for each unlimited-approval benchmark spender, used
+ * when explaining which spenders a wallet's warning does/doesn't cover.
+ *
+ */
+export const unlimitedApprovalWarningBenchmarkLabels: Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	string
+> = {
+	[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: 'the spender is not a contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]:
+		'the spender is a well-known, verified contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]:
+		'the spender is a known-scam contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+		'the spender contract was recently deployed',
+	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+		"you haven't interacted with the spender contract before",
+}
+
+/**
+ * Whether the wallet warns on unlimited approvals unconditionally, i.e. it
+ * warns on every benchmark spender.
+ */
+export function warnsOnUnlimitedApprovalUnconditionally(
+	benchmarks: Record<UnlimitedApprovalWarningBenchmarkSpenders, Support>,
+): boolean {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).every(benchmark =>
+		isSupported(benchmarks[benchmark]),
+	)
+}
+
+/**
+ * The benchmark spenders the wallet warns on.
+ */
+export function activeUnlimitedApprovalBenchmarks(
+	benchmarks: Record<UnlimitedApprovalWarningBenchmarkSpenders, Support>,
+): UnlimitedApprovalWarningBenchmarkSpenders[] {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).filter(benchmark =>
+		isSupported(benchmarks[benchmark]),
+	)
+}
+
+/**
+ * Whether every benchmark has been tested (none are `null`) for the wallet
+ */
+export function allUnlimitedApprovalBenchmarksTested(
+	benchmarks: UnlimitedApprovalWarningBenchmarks,
+): benchmarks is Record<UnlimitedApprovalWarningBenchmarkSpenders, Support> {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).every(
+		benchmark => benchmarks[benchmark] !== null,
+	)
+}
+
+/**
  * Shared rating logic for scam-alert warnings whose privacy score is a
  * simple leak count (threshold: at most one leaking flag is tolerated).
  *
@@ -67,7 +132,7 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: 
 		return {
 			supported: false,
 			privacyPreserving: true,
-			ref: refNotNecessary,
+			ref: hasRefs(support) ? support.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -116,14 +181,32 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'unlimitedApprovalWarning'
 } {
-	return rateLeakBasedWarning({
+	const baseProps = {
 		feature: 'unlimitedApprovalWarning',
 		humanFeature: 'transactions that grant unlimited token approvals',
-		listFeature: 'Warning you before granting an unlimited ERC-20 token approval',
-		support: scamAlerts.unlimitedApprovalWarning,
-		isValid: d => d.warnsOnUnlimitedApproval,
-		leakFlags: d => [d.leaksUserIp, d.leaksUserAddress, d.leaksSpenderAddress],
-	})
+		listFeature:
+			'Warning you before granting an unlimited ERC-20 token approval, regardless of whether the spender is trusted',
+		required: false,
+	} as const
+	const support = scamAlerts.unlimitedApprovalWarning
+
+	if (!isSupported(support)) {
+		return {
+			supported: false,
+			privacyPreserving: true,
+			ref: refNotNecessary,
+			...baseProps,
+		}
+	}
+
+	return {
+		supported: true,
+		privacyPreserving:
+			[support.leaksUserIp, support.leaksUserAddress, support.leaksSpenderAddress].filter(Boolean)
+				.length <= 1,
+		ref: support.ref,
+		...baseProps,
+	}
 }
 
 function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
@@ -141,7 +224,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 		return {
 			supported: false,
 			privacyPreserving: true,
-			ref: refNotNecessary,
+			ref: hasRefs(scamUrlWarning) ? scamUrlWarning.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -175,12 +258,6 @@ function evaluateScamAlerts(
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
 	const unlimitedApprovalWarning = rateUnlimitedApprovalWarning(scamAlerts)
 
-	ctx.addRef(
-		sendTransactionWarning,
-		contractTransactionWarning,
-		scamUrlWarning,
-		unlimitedApprovalWarning,
-	)
 	const metadata: ScamPreventionMetadata = {
 		scamAlerts,
 		sendTransactionWarning,
@@ -205,6 +282,8 @@ function evaluateScamAlerts(
 	for (const feature of requiredFeatures) {
 		feature.required = true
 	}
+	ctx.addRef(...requiredFeatures)
+
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
@@ -304,6 +383,45 @@ function evaluateScamAlerts(
 		})
 	}
 
+	if (
+		requiredFeatures.includes(unlimitedApprovalWarning) &&
+		isSupported(scamAlerts.unlimitedApprovalWarning)
+	) {
+		const benchmarks = scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval
+
+		if (!allUnlimitedApprovalBenchmarksTested(benchmarks)) {
+			return unrated(ctx, metadata)
+		}
+
+		if (!warnsOnUnlimitedApprovalUnconditionally(benchmarks)) {
+			// Warns about unlimited approvals, but only in certain scenarios
+			// (e.g. only for untrusted spenders) rather than unconditionally.
+			const conditions = commaListFormat(
+				activeUnlimitedApprovalBenchmarks(benchmarks).map(
+					benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark],
+				),
+			)
+
+			return ctx.build({
+				outcome: {
+					id: 'conditional_unlimited_approval_warning',
+					displayName: 'Selective unlimited approval warning',
+					rating: Rating.PARTIAL,
+					shortExplanation: sentence(
+						`{{WALLET_NAME}} only warns about unlimited token approvals when ${conditions}, not unconditionally.`,
+					),
+					metadata,
+				},
+				details: scamAlertsDetailsContent({}),
+				howToImprove: markdown(`
+					{{WALLET_NAME}} should warn the user before granting an unlimited ERC-20 token approval regardless of whether the spender is trusted or known.
+
+					A trusted or previously-encountered contract is not necessarily a secure one, so limiting this warning to untrusted spenders or domains leaves the user exposed to unlimited approvals granted to contracts that later turn out to be compromised or malicious.
+				`),
+			})
+		}
+	}
+
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
 		const needsImprovement = (sas: ScamAlertSupport): boolean =>
 			sas.required && sas.supported && !sas.privacyPreserving
@@ -361,6 +479,16 @@ function evaluateScamAlerts(
 		details: scamAlertsDetailsContent({}),
 	})
 }
+/**
+ * Shorthand for a wallet that warns on every unlimited-approval benchmark.
+ */
+const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmarks = {
+	[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]: featureSupported,
+}
 
 export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	id: 'scamPrevention',
@@ -371,12 +499,12 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	},
 	question: sentence('Does the wallet warn the user about potential scams?'),
 	why: markdown(
-		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.',
+		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction. This is especially true for unlimited token approvals: if the approved contract is later exploited, attackers can use that approval to drain the funds a user approved, a class of exploit that has [stolen over $362M since 2020](https://revoke.cash/exploits).',
 	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
 		scams. This is measured along four scenarios:
-		**Does the wallet *warn* the user when...**
+		**Does the wallet *warn* the user when…**
 
 		* Sending funds to an address the user has never previously sent or
 			received funds from before
@@ -540,7 +668,57 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						}),
 						unlimitedApprovalWarning: supported({
 							ref: refNotNecessary,
-							warnsOnUnlimitedApproval: true,
+							warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
+							leaksSpenderAddress: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+					},
+				),
+			),
+			exampleRating(
+				sentence(
+					'The wallet only warns about unlimited token approvals for untrusted spenders, not unconditionally.',
+				),
+				evaluateScamAlerts(
+					EvaluationContext.forTest(() => scamPrevention),
+					WalletProfile.GENERIC,
+					{
+						contractTransactionWarning: supported({
+							ref: refNotNecessary,
+							contractRegistry: true,
+							previousContractInteractionWarning: true,
+							recentContractWarning: false,
+							leaksContractAddress: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+						scamUrlWarning: supported({
+							ref: refNotNecessary,
+							leaksVisitedUrl: 'NO',
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+						sendTransactionWarning: supported({
+							ref: refNotNecessary,
+							newRecipientWarning: true,
+							userWhitelist: false,
+							addressPoisoningDetection: false,
+							leaksRecipient: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+						unlimitedApprovalWarning: supported({
+							ref: refNotNecessary,
+							warnsOnUnlimitedApproval: {
+								[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+									notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+									notSupported,
+							},
 							leaksSpenderAddress: false,
 							leaksUserAddress: false,
 							leaksUserIp: false,
@@ -583,7 +761,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 					}),
 					unlimitedApprovalWarning: supported({
 						ref: refNotNecessary,
-						warnsOnUnlimitedApproval: true,
+						warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
 						leaksSpenderAddress: false,
 						leaksUserAddress: false,
 						leaksUserIp: false,

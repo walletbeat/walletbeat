@@ -1,10 +1,10 @@
 ---
 name: wallet-update
 description: >
-  Use when a contributor wants to populate or update feature data for a wallet
-  that already exists in the walletbeat project. Guides through filling in null
-  feature fields with proper values, types, and refs. To add a brand-new wallet
-  first, use /wallet-create instead.
+  Use when populating or updating feature data for a wallet that already exists
+  in the Walletbeat project. Guides through filling in null feature fields with
+  proper values, types, and refs. To add a brand-new wallet first, use
+  the `wallet-create` SKILL instead.
 argument-hint: '[wallet-name]'
 ---
 
@@ -31,7 +31,7 @@ Before doing anything else:
 6. Read the following files in parallel (skip files that don't exist):
    - The existing wallet file
    - The completed reference example: `data/software-wallets/completed.tmpl.ts`
-   - The contributor guide: `resources/docs/contribute/wallet-data.md`
+   - The contributor guide: `resources/docs/contribute/wallet-data/wallet-data.md`
    - The example contributor file: `data/contributors/example.ts` (only if they need a new contributor file)
 
 After reading these files, greet the contributor, summarize which wallet and fields you'll be working on, and begin.
@@ -52,7 +52,7 @@ Create `data/contributors/[their-nickname].ts` using `data/contributors/example.
 
 Key rules:
 
-- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: []`.
+- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: 'NO_AFFILIATION'` — do not use `[]` or omit the field.
 - Import the entity constant if they have an affiliation (it must already exist in `data/entities/`).
 
 Example for an affiliated contributor:
@@ -80,7 +80,7 @@ import type { Contributor } from '@/schema/wallet'
 
 export const chainMonkey: Contributor = {
 	name: 'Chain Monkey',
-	affiliation: [],
+	affiliation: 'NO_AFFILIATION',
 }
 ```
 
@@ -96,14 +96,31 @@ The goal is to replace every `null` field (or the specific fields the contributo
 
 For every `null` field:
 
-1. Explain what the field measures (use TSDoc from the type definition — Ctrl+Click on the field name in the editor to navigate to the type)
+1. Explain what the field measures (use TSDoc from the type definition — Control+Click on the field name in the editor to navigate to the type)
 2. Describe how to test or verify it
 3. Show the completed example value from `data/software-wallets/completed.tmpl.ts` if applicable
 4. Let the contributor fill it in with a `ref`
 
+### Comments guidance
+
+Comments are almost always best avoided in wallet data file. Comments are not consumed by anything, so they are not visible on the site. Comments in wallet `/data` files are only appropriate for things like:
+
+- Notes for future wallet data reviewers about something, e.g. an impending change to the wallet implementation that will cause a rating to flip but that can't be rated at the time the comment is written.
+- Commented-out feature fields during refactorings (transient).
+- Explanations on how to retest a specific feature quickly, e.g. keywords to search for in the codebase, etc. (if such things are not already obvious from the `ref` fields)
+- Explanations for why a wallet's feature data doesn't exactly line up with the reality of the wallet, e.g. the wallet's implementation reflects nuance that the feature fields don't capture. If present, such comments should generally be accompanied by an issue number reflecting what needs to be addressed to make the feature field capable of representing this properly.
+- Long explanations of a rating that won't reasonably fit in a `ref.explanation` field (see below). These should be extremely rare; if your explanation is so long-winded that it takes more than a sentence or two to explain, maybe the real problem is that you need to find a more obvious reference.
+
+Comments are **definitely not appropriate** for:
+
+- Prose that repeats what the feature field essentially expresses.
+- Explanations that mirror the contents of `ref` data.
+- Temporal comments reflecting the data change being made in the present moment / PR.
+- Explanations that relate to the rating of the **attribute** that a feature field is related to. Feature fields are distinct from attributes, even though they often have a one-to-one relationship. Explanations for nuanced attribute ratings are rare, but when they are necessary, they should use the `overrides.attributes.*` fields instead, so that they may show up on the site.
+
 ### The type system — read this section carefully
 
-**`null` = unknown.** Never use `undefined`. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing.
+**`null` = unknown.** Never use `undefined` or omit the field. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing. If the answer is known to be "none / does not apply", use a named sentinel (`NO_*`) or empty array — not `undefined`. See "How `/data` fields are encoded" in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 **`VariantFeature<T>`** — Nearly every field is wrapped in this. It means you can either:
 
@@ -134,7 +151,7 @@ chainConfigurability: supported({
 
 ```typescript
 // Single URL (shorthand):
-ref: 'https://github.com/example/wallet/blob/main/src/config.ts'
+ref: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150'
 
 // Single reference object with label and explanation:
 ref: {
@@ -166,6 +183,19 @@ ref: refNotNecessary
 supported<WithRef<ChainConfigurability>>({ ... })
 ```
 
+Reference `label` and `explanation` fields must not contain semicolons or em dashes. Write separate sentences instead. Avoid AI-ish words such as "gate" and "ship".
+
+References often point to wallet code, which should ideally be formatted as GitHub links. When this is the case, the following rules apply:
+
+- The GitHub URL _must_ contain the full commit hash, not a branch name. This pins the content of the file so that the reference always points to the version of the file that was actually reviewed.
+- The GitHub URL _should_ in most cases contain a line number range as anchor (e.g. `#L146-L150`). When specified, this causes the code snippet referred to by the line range to be imported into the Walletbeat repository, which allows it to be displayed directly on the site. Even when a line range is inappropriate (e.g. because the entire file is relevant), a range that covers the whole file may still be fine, as long as the file is reasonably small and inline display adds value.
+  - For binary files where line ranges don't make sense, commit-pinned GitHub file/blob URLs should include the special anchor `#binary-file`. This anchor is synthetic and doesn't exist on GitHub, and it will be stripped out from the rendered links on the site. Walletbeat's integrity checks use it to confirm the contributor has acknowledged this rule. The anchor marks the URL as pointing to a binary file.
+  - For text files where a line number range is truly undesirable, commit-pinned GitHub file/blob URLs should include the special anchor `#not-line-specific`. This anchor is synthetic and doesn't exist on GitHub, and it will be stripped out from the rendered links on the site. Walletbeat's integrity checks use it to confirm the contributor has acknowledged this rule. The anchor marks the URL as a text file intentionally without a line range.
+
+References may also point to files inside the `public/references` subdirectory of the repository. This is achieved by simply putting the repository-root-relative path of the file as the `url` field. This is notably useful for screenshot references, which are displayed as a gallery on the site. Such references are highly preferred over code references for feature fields related to user interface features (e.g. scam prevention, clear signing, etc.), as actual wallet screenshots are much more obvious proof of implementation than UI code itself. Note that adding images to the site requires successfully passing `pnpm check:all`, which updates checked-in image metadata, prior to sending the PR for review.
+
+Reference labels and explanation text are subject to grammar verification rules in `pnpm check:all`. Ensure it all passes. If not, don't remove these fields, but rather update them to abide by the rules, or (in rare cases) update the rules if trying to fit the fields into the mold the rules enforce would degrade their labeling/explanatory quality.
+
 ### Field-by-field guidance
 
 Walk through each `null` field in the wallet file (or only the fields the contributor asked about). For each one, provide:
@@ -192,7 +222,7 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 
 ## Key rules to remind the contributor throughout
 
-- **`null` = unknown** — never use `undefined`; always prefer `null` over guessing.
+- **`null` = unknown** — never use `undefined` or omit the field; always prefer `null` over guessing. Use a sentinel (`NO_*`) or empty array when the answer is known to be "none".
 - **Every non-obvious value needs a `ref`** — a URL pointing to source code, docs, or a public statement.
 - **`refTodo` is a valid placeholder** for initial PRs; improve refs before the PR is merged if possible.
 - **`refNotNecessary`** is only for self-evident facts (e.g., Safe Wallet supports Safe multisigs).
@@ -200,5 +230,5 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 - **Run `pnpm fix` before every commit** to auto-fix formatting.
 - **Run `pnpm check:all` before opening the PR** — it must pass.
 - **Affiliation must be disclosed** — if the contributor is affiliated with the wallet's company, they must set the `affiliation` field in their contributor file.
-- **Ctrl+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
+- **Control+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
 - **Look at `completed.tmpl.ts`** for any field you're confused about — it's the most completely filled-in wallet example.

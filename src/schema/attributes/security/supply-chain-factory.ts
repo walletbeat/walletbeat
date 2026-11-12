@@ -45,8 +45,8 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 
 export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 	id: 'supplyChainFactory',
-	icon: 'security_best_practices',
-	displayName: 'Supply Chain Factory',
+	icon: 'checklist',
+	displayName: 'Supply chain factory',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
@@ -80,19 +80,19 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The hardware wallet passes all factory supply chain sub-criteria.'),
+				sentence('The hardware wallet passes all factory supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes some factory supply chain sub-criteria.'),
+				sentence('The hardware wallet passes some factory supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The hardware wallet fails most or all factory supply chain sub-criteria.'),
+				sentence('The hardware wallet fails most or all factory supply chain subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -158,7 +158,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 			outcome: {
 				id: 'Supply Chain Factory',
 				rating,
-				displayName: 'Supply Chain Factory',
+				displayName: 'Supply chain factory',
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
 				),
@@ -174,7 +174,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 			details: paragraph(
 				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,
 			),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

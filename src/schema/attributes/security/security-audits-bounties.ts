@@ -436,7 +436,7 @@ const sampleSecurityAudit: SecurityAudit = {
 export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAuditsAndBounties',
 	icon: 'security_audits',
-	displayName: 'Security Audits & Bounties',
+	displayName: 'Security audits & bounties',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How are a wallet's security audits and bug bounty program evaluated?",
@@ -605,11 +605,6 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 				return noBugBountyProgram()
 			}
 
-			ctx.addRef(
-				bugBountyFeature,
-				isSupported(bugBountyFeature.legalProtections) ? bugBountyFeature.legalProtections : null,
-			)
-
 			return evaluateBugBountyProgram(bugBountyFeature)
 		})()
 
@@ -623,8 +618,6 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 			if (!isNonEmptyArray(auditsFeature)) {
 				return noAudits()
 			}
-
-			ctx.addRef(...auditsFeature)
 
 			const auditedInLastYear = isAuditedInLastYear(auditsFeature)
 			let hasUnaddressedFlaws = false
@@ -648,6 +641,18 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 			})
 		}
 
+		if (bugBountyFeature === null || auditsFeature === null) {
+			throw new Error('Rated audit and bug bounty features must be researched')
+		}
+
+		ctx.addRef(bugBountyFeature)
+
+		if (isSupported(bugBountyFeature)) {
+			ctx.addRef(bugBountyFeature.legalProtections)
+		}
+
+		ctx.addRef(...auditsFeature)
+
 		return combineEvaluation(ctx, auditsPart, bugBountyPart)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsMetadata>>) => {
@@ -669,10 +674,17 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 				}
 			}
 		}
-		worstEvaluation.outcome.metadata = {
-			securityAudits: allAudits,
-		}
 
-		return worstEvaluation
+		// `pickWorstRating` returns one of the per-variant evaluations as-is,
+		// so build a new evaluation rather than overwriting that variant's audits.
+		return {
+			...worstEvaluation,
+			outcome: {
+				...worstEvaluation.outcome,
+				metadata: {
+					securityAudits: allAudits,
+				},
+			},
+		}
 	},
 }

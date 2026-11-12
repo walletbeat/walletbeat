@@ -6,25 +6,30 @@ import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
+import { anonWallet } from './software-wallets/anon-wallet'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
+import { cloaked } from './software-wallets/cloaked'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
 import { frame } from './software-wallets/frame'
-import { gemwallet } from './software-wallets/gem'
+import { gemwallet } from './software-wallets/gemwallet'
 import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
+import { oath } from './software-wallets/oath'
 import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
+import { trustWallet } from './software-wallets/trust-wallet'
 import { uniswapWallet } from './software-wallets/uniswap-wallet'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
+import { walletchan } from './software-wallets/walletchan'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
 
@@ -65,8 +70,10 @@ export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
+	anonWallet,
 	baseApp,
 	bitget,
+	cloaked,
 	daimo,
 	elytro,
 	family,
@@ -76,13 +83,16 @@ export const softwareWallets = {
 	metamask,
 	mtpelerin,
 	nufi,
+	oath,
 	okx,
 	phantom,
 	pillarx,
 	rabby,
 	rainbow,
 	safe,
+	trustWallet,
 	uniswapWallet,
+	walletchan,
 	zerion,
 	zeus,
 } as const satisfies Record<string, SoftwareWallet>

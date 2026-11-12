@@ -212,10 +212,10 @@ export const accountAbstraction: Attribute = {
 		}
 
 		ctx.addRef(
-			ctx.features.accountSupport.eoa,
-			ctx.features.accountSupport.mpc,
-			ctx.features.accountSupport.rawErc4337,
-			ctx.features.accountSupport.eip7702,
+			supported.eoa ? ctx.features.accountSupport.eoa : null,
+			supported.mpc ? ctx.features.accountSupport.mpc : null,
+			supported.rawErc4337 ? ctx.features.accountSupport.rawErc4337 : null,
+			supported.eip7702 ? ctx.features.accountSupport.eip7702 : null,
 		)
 
 		if (supported.rawErc4337 && supported.eip7702) {
@@ -231,14 +231,20 @@ export const accountAbstraction: Attribute = {
 		}
 
 		if (supported.eoa && supported.mpc) {
+			ctx.addRef(ctx.features.accountSupport.rawErc4337, ctx.features.accountSupport.eip7702)
+
 			return supportsEoaAndMpc(ctx)
 		}
 
 		if (supported.mpc) {
+			ctx.addRef(ctx.features.accountSupport.rawErc4337, ctx.features.accountSupport.eip7702)
+
 			return supportsMpcOnly(ctx)
 		}
 
 		if (supported.eoa) {
+			ctx.addRef(ctx.features.accountSupport.rawErc4337, ctx.features.accountSupport.eip7702)
+
 			return supportsRawEoaOnly(ctx)
 		}
 

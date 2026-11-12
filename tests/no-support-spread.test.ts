@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { commonExclusions, getCodebaseIndex, type IndexedFile } from './utils/codebase'
+import { commonExclusions, getCodebaseIndex, type IndexedFile } from '@/utils/codebase'
 
 interface BannedSpread {
 	name: string

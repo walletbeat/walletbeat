@@ -91,11 +91,11 @@ In either case, you should now have the wallet set up with an account created an
 
 Try to import an account that you've already sent Ether and USDC to (using a separate wallet/browser). Populate the `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountImport` accordingly.
 
-If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint. Import the account, and re-start the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
+If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint. Import the account, and restart the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
 
 ### Step 7: Check your balance
 
-Verify that you can see both your Ether balance and your USDC balance in the wallet. You may have to manually add the USDC ERC-20 contract address to the wallet's list of known tokens; this is OK and acceptable for wallets to require when running in this mode.
+Verify that you can see both your Ether balance and your USDC balance in the wallet. You may have to manually add the USDC ERC-20 contract address to the wallet's list of known tokens; this is okay and acceptable for wallets to require when running in this mode.
 
 Do **not** populate the `etherBalanceLookup` and `erc20BalanceLookup` features yet; it is possible that the wallet may have cached your balance if you imported the account without using the custom JSON-RPC endpoint.
 

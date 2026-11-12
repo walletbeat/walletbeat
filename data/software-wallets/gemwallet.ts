@@ -1,0 +1,924 @@
+import { h3rman } from '@/data/contributors/0xh3rman'
+import { minimalsm } from '@/data/contributors/minimalsm'
+import { ren2140 } from '@/data/contributors/ren2140'
+import type { SoftwareWallet } from '@/data/software-wallets'
+import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import {
+	ExposedAccountsBehavior,
+	type ExposedAccountSet,
+} from '@/schema/features/privacy/app-isolation'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import { WalletProfile } from '@/schema/features/profile'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import {
+	type UnlimitedApprovalWarning,
+	UnlimitedApprovalWarningBenchmarkSpenders,
+} from '@/schema/features/security/scam-alerts'
+import type { SecurityAudit } from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import {
+	FeeDisplayLevel,
+	FeeType,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
+import { type References, type WithRef } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { nonEmptySet } from '@/types/utils/non-empty'
+import type { Nullable } from '@/types/utils/nullable'
+
+import { certik } from '../entities/certik'
+import gemwalletAndroidParsed from './manifests/gemwallet/android.parsed.json'
+import gemwalletIosParsed from './manifests/gemwallet/ios.parsed.json'
+
+const securityAudits: SecurityAudit[] = [
+	{
+		ref: {
+			explanation:
+				'CertiK performed a security audit of Gem Wallet covering key management, transaction signing, seed handling, and address derivation. The report lists 0 critical and 0 major findings, 6 medium-severity findings, and 5 minor findings, all resolved.',
+			label: 'Gem Wallet CertiK Security Audit (April 2026)',
+			url: 'https://static.gemwallet.com/audits/Gem-Wallet-CertiK-Security-Audit-April-2026.pdf',
+		},
+		auditDate: '2026-04-08',
+		auditor: certik,
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: 'ALL_VARIANTS',
+	},
+]
+
+const bugBountyRefs: References = [
+	{
+		explanation:
+			'Gem Wallet launched a self-hosted bug bounty program on November 12, 2025, covering the iOS and Android apps, open-source repositories, and backend infrastructure, with rewards from $100 to $8,000 based on severity.',
+		label: 'Gem Wallet Launches Bug Bounty Program',
+		url: 'https://gemwallet.com/learn/gem-wallet-launches-bug-bounty-program/',
+	},
+	{
+		explanation:
+			'As of June 2, 2026, Gem Wallet no longer operates a standing monetary bug bounty program. Private/responsible vulnerability disclosure remains open for good-faith, reproducible reports, with in-scope targets being the latest iOS/Android apps, the Gem Wallet monorepo, and gemwallet.com/api.gemwallet.com/gemnodes.com. No Safe Harbor or other explicit legal-protection language is provided, only a requirement that testing be conducted in good faith.',
+		label: 'Gem Wallet no longer runs a standing bug bounty program',
+		lastRetrieved: '2026-09-03',
+		url: 'https://gemwallet.com/security/bug-bounty/',
+	},
+]
+
+export const gemwallet: SoftwareWallet = {
+	metadata: {
+		id: 'gemwallet',
+		displayName: 'Gem Wallet',
+		tableName: 'Gem Wallet',
+		coinspectId: 'gem',
+		contributors: [h3rman, minimalsm, ren2140],
+		iconExtension: 'svg',
+		lastUpdated: '2026-11-04',
+		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
+			docs: ['https://docs.gemwallet.com/'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/ios/Gem/Resources/Info.plist',
+			repositories: ['https://github.com/gemwalletcom/wallet'],
+			socials: {
+				discord: 'https://discord.com/invite/4jpxtwT8r6',
+				instagram: 'https://www.instagram.com/GemWalletApp/',
+				reddit: 'https://www.reddit.com/r/gemwallet_official/',
+				telegram: 'https://t.me/gemwallet',
+				x: 'https://x.com/gemwallet',
+				youtube: 'https://www.youtube.com/@gemwallet',
+			},
+			websites: ['https://gemwallet.com'],
+		},
+	},
+	features: {
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							"Gem Wallet's shared Rust core generates a BIP-39 mnemonic locally (entropy from the OS CSPRNG via the `getrandom` crate) and derives account private keys using BIP-44 (BIP-32-style `secp256k1` derivation for EVM chains).",
+						label:
+							'Mnemonic generation (`Mnemonic::generate`) and BIP-44 derivation (`derive_private_key_from_mnemonic`)',
+						urls: [
+							{
+								label: 'gem_keystore mnemonic generation',
+								url: 'https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14',
+							},
+							{
+								label: '`gem_derivation` BIP-44 private key derivation',
+								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_derivation/src/mnemonic/derivation.rs#L39-L58',
+							},
+						],
+					},
+				],
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
+		addressResolution: {
+			ref: [
+				{
+					explanation:
+						'Gem Wallet supports sending to ENS addresses, but users need to verify which chain they are using.',
+					url: 'https://gemwallet.com',
+				},
+			],
+			chainSpecificAddressing: {
+				erc7828: notSupported,
+				erc7831: notSupported,
+			},
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
+		},
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: [
+						{
+							explanation: 'Gem allows you to bridge tokens between networks.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png',
+							label: 'Gem swap from ETH on Ethereum to ETH on Base',
+						},
+						{
+							explanation:
+								"When bridging, the review screen shows the network fee but doesn't show Gem's fee or the bridge provider's fee, and gives no warnings about bridge risks.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png',
+							label: 'Gem review screen for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: "When bridging, the details screen doesn't break out bridge fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png',
+							label: 'Gem details sheet for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: 'Gem takes a 0.25% fee on bridges.',
+							url: {
+								label: 'Gem bridge fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L12',
+							},
+						},
+					],
+					feesLargerThan1bps: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupportedWithRef({
+					ref: {
+						explanation:
+							'When sending transactions you must have sufficient funds on the chain you are transacting on. Gem will not pull funds from other chains.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png',
+						label: 'Gem send screen showing an insufficient balance error',
+					},
+				}),
+			},
+			crossChainBalances: {
+				ref: [
+					{
+						explanation: "Gem shows the wallet's total value across all networks.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png',
+						label: 'Gem home screen with the wallet total and ETH on Ethereum and Base',
+					},
+					{
+						explanation:
+							'Gem lists ETH and USDC on each network as separate items but does not add them up across networks.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png',
+						label: 'Gem asset list with ETH and USDC on each network',
+					},
+				],
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
+		chainConfigurability: supported<WithRef<Nullable<ChainConfigurability>>>({
+			ref: [
+				{
+					explanation:
+						'Gem Wallet lets users switch between a set of built-in RPC providers or add a fully custom RPC endpoint per chain, from Settings > Network.',
+					label: 'Setup a Custom RPC on Gem Wallet',
+					lastRetrieved: '2026-09-03',
+					url: 'https://docs.gemwallet.com/guides/custom-rpc/',
+				},
+				{
+					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg',
+					label: 'Gem wallet allows configurable RPC.',
+				},
+				{
+					explanation:
+						'Gem can create and import wallets, show Ether and ERC-20 token balances, and send ERC-20 tokens using an Ethereum full node. Gem only accepts custom node addresses that start with https://.',
+					urls: [
+						{
+							label: 'Reading token balances from a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/balances.rs#L15-L23',
+						},
+						{
+							label: 'Looking up tokens by contract address on a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/assets/mod.rs#L206-L216',
+						},
+						{
+							label: 'Sending transactions through a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L21-L26',
+						},
+						{
+							label: 'Custom node addresses must use HTTPS',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/node/rules.rs#L83-L91',
+						},
+					],
+				},
+			],
+			customChainRpcEndpoint: notSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
+		ecosystem: {
+			delegation: 'EIP_7702_NOT_SUPPORTED',
+		},
+		integration: {
+			browser: 'NOT_A_BROWSER_WALLET',
+		},
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'Gem Wallet is licensed under the GPL-3.0 license.',
+						url: 'https://github.com/gemwalletcom/gem-ios/blob/ef264f54eacacacba837735ac6ed605c9512f84a/LICENSE#not-line-specific',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
+		monetization: {
+			ref: [
+				{
+					explanation:
+						'Gem Wallet publishes transparent revenue data on Dune Analytics, showing all revenue sources and breakdowns.',
+					url: 'https://dune.com/gemwallet/gem-wallet',
+				},
+			],
+			revenueBreakdownIsPublic: true,
+			strategies: {
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
+				publicOffering: false,
+				selfFunded: true,
+				transparentConvenienceFees: true,
+				ventureCapital: false,
+			},
+		},
+		multiAddress: featureSupported,
+		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+				// crashReports: notSupportedWithRef({
+				// 	ref: [
+				// 		{
+				// 			explanation:
+				// 				'No crash-reporting SDK (e.g. Crashlytics, Sentry) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Performance Monitoring explicitly deactivated via manifest meta-data.',
+				// 			label:
+				// 				'No crash-reporting SDK; Firebase Performance explicitly disabled in AndroidManifest.xml',
+				// 			url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
+				// 		},
+				// 	],
+				// }),
+				// usage: notSupportedWithRef({
+				// 	ref: [
+				// 		{
+				// 			explanation:
+				// 				'No product-analytics SDK was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Analytics and ad-ID collection explicitly deactivated via manifest meta-data.',
+				// 			label:
+				// 				'No product-analytics SDK; Firebase Analytics/ad-ID explicitly disabled in AndroidManifest.xml',
+				// 			url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
+				// 		},
+				// 	],
+				// }),
+			},
+			appIsolation: {
+				createInAppConnectionFlow: notSupportedWithRef({
+					ref: {
+						explanation:
+							"The connection screen lists existing wallets and there isn't a way to create a new wallet.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png',
+						label: 'Gem connection screen with the wallet list expanded',
+						lastRetrieved: '2026-11-05',
+					},
+				}),
+				erc7846WalletConnect: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Gem's list of supported requests doesn't include ERC-7846's `wallet_connect`.",
+						label: 'Supported app requests in the Gem source code',
+						url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/crates/primitives/src/wallet_connector.rs#L21-L65',
+					},
+				}),
+				ethAccounts: supported<WithRef<ExposedAccountSet>>({
+					ref: [
+						{
+							explanation:
+								'An app is given only the address of the wallet chosen on the connection screen.',
+							label: 'Connection approval in the Gem source code',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/mod.rs#L203-L212',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem.',
+							label: 'Connection screen default selection',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/rules.rs#L134-L136',
+						},
+					],
+					defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'A second wallet is connected to app.uniswap.org.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-connected-second-wallet.png',
+							label: 'Gem showing the second wallet connected to app.uniswap.org',
+							lastRetrieved: '2026-11-05',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem, instead of the one the site was originally connected with.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png',
+							label: 'Gem connection screen for app.uniswap.org offering the first wallet',
+							lastRetrieved: '2026-11-05',
+						},
+					],
+				}),
+			},
+			dataCollection: null,
+			privacyPolicy: 'https://gemwallet.com/privacy',
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			accountRecovery: {
+				drills: notSupported,
+				guardianRecovery: notSupported,
+			},
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: bugBountyRefs,
+				availability: BugBountyProgramAvailability.INACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2025-11-12',
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
+				upgradePathAvailable: true,
+			}),
+			duressResistance: {
+				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								"On iOS, unlocking the wallet's keystore password stored in the Keychain requires Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store requires `BiometricPrompt` authentication.",
+							urls: [
+								{
+									label: 'iOS keystore password protected by biometrics/device passcode',
+									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L104',
+								},
+								{
+									label:
+										'Android `BiometricPrompt` authenticators (biometric or device credential)',
+									url: 'https://github.com/gemwalletcom/wallet/blob/5225ec8834ee5ff33ffe64a7b9c9b1c3ff026762/android/app/src/main/kotlin/com/gemwallet/android/SystemAuthPolicy.kt#L18-L19',
+								},
+							],
+						},
+
+						{
+							explanation:
+								'Face ID / biometric app-lock is documented as a Settings > Security toggle.',
+							label: 'How to Configure Your Gem Wallet Settings',
+							lastRetrieved: '2026-09-03',
+							url: 'https://docs.gemwallet.com/guides/configure-settings/',
+						},
+						{
+							file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-security-face-id.jpg',
+							label:
+								"Gem Wallet's mobile app shows Face ID as a security lock but no pin or passwords.",
+						},
+					],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: supported({
+							type: BasicUnlockMechanismSupport.OPTIONAL,
+						}),
+						[BasicUnlockMechanism.PATTERN]: notSupported,
+					},
+				},
+				duressMode: notSupported,
+			},
+			hardwareWalletSupport: {
+				ref: [
+					{
+						explanation:
+							'Ledger and Trezor hardware wallet integration is listed as a "Coming Soon" item on Gem Wallet\'s public roadmaps.',
+						label: 'Gem Wallet security page (hardware wallet roadmap) and public roadmap',
+						lastRetrieved: '2026-09-03',
+						urls: [
+							{ label: 'Security page', url: 'https://gemwallet.com/security/' },
+							{
+								label: 'Public roadmap',
+								url: 'https://github.com/orgs/gemwalletcom/projects/4',
+							},
+						],
+					},
+				],
+				wallets: {},
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							"Gem Wallet's shared Rust core generates the BIP-39 mnemonic entropy locally via the OS CSPRNG (`getrandom` crate) with no server involvement. The full private key/mnemonic is held and used entirely on the user's device (standard BIP-32/44 derivation, no key splitting or MPC).",
+						urls: [
+							{
+								label: 'Local entropy generation via OS CSPRNG',
+								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_crypto/src/random.rs#not-line-specific',
+							},
+							{
+								label: 'Mnemonic generated on-device from that entropy',
+								url: 'https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14',
+							},
+						],
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
+			lightClient: {
+				ethereumL1: notSupported,
+			},
+			passkeyVerification: notSupported,
+			publicSecurityAudits: securityAudits,
+			scamAlerts: {
+				contractTransactionWarning: supported({
+					ref: [
+						{
+							explanation:
+								'Gem Wallet uses GoPlus and HashDit for security detection, providing malicious contract detection and transaction analysis.',
+							url: 'https://gemwallet.com',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+				}),
+				scamUrlWarning: notSupported,
+				sendTransactionWarning: supported({
+					ref: [
+						{
+							explanation:
+								'Gem Wallet warns users about outgoing transactions to unknown addresses.',
+							url: 'https://gemwallet.com',
+						},
+					],
+					addressPoisoningDetection: false,
+					leaksRecipient: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					newRecipientWarning: true,
+					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: [
+						{
+							explanation:
+								'Gem Wallet\'s simulation engine detects ERC-20 `approve` calls whose amount equals the max `uint160`/`uint256` value and displays the approval value as "Unlimited" (rather than an exact amount) as part of a transaction warning, purely from local calldata decoding.',
+							urls: [
+								{
+									label: 'Unlimited approval detection',
+									url: 'https://github.com/gemwalletcom/wallet/blob/c8721ea2ea2d612a71acd8d4a243815751e6a860/core/crates/simulation/src/evm/approval_value.rs#L8-L34',
+								},
+								{
+									label: 'Approval simulation warning built from the decoded value',
+									url: 'https://github.com/gemwalletcom/wallet/blob/a51a29c1015ffa9af3896c313aebd65ee63ece52/core/crates/simulation/src/evm/approval_request.rs#L143-L160',
+								},
+							],
+						},
+					],
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: {
+						[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+							featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+							featureSupported,
+					},
+				}),
+			},
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								"Gem Wallet's shared Rust core (`gem_keystore` v4) encrypts each wallet's mnemonic/private key with AES-256-GCM under a key derived via Argon2Id from a 256-bit random per-device password, using a random salt/nonce per encryption and an authenticated file format.",
+							label: 'Argon2Id key derivation and AES-256-GCM seal/open',
+							url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_keystore/src/storage/crypto.rs#L1-L26',
+						},
+						{
+							explanation:
+								'The 256-bit device password that seals the keystore file is itself generated with `SecureRandom` and stored via Tink, wrapped by an AES-256-GCM key held in the Android Keystore. On iOS, the equivalent device secret is stored in the system Keychain.',
+							urls: [
+								{
+									label: 'Random 256-bit device password generation',
+									url: 'https://github.com/gemwalletcom/wallet/blob/34fdd5958f97b860b75789513c6869ee8c8fe8d0/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkPasswordStore.kt#L26-L52',
+								},
+								{
+									label: 'Tink AEAD keyset wrapped by an Android Keystore master key',
+									url: 'https://github.com/gemwalletcom/wallet/blob/eaf09d562edaee530d0d12b5214d1125031ea656/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkEncryptedKeyValueStore.kt#L60-L91',
+								},
+								{
+									label: 'iOS Keychain-backed device secret storage',
+									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L100-L106',
+								},
+							],
+						},
+						{
+							explanation:
+								'Entropy for mnemonic/salt generation is drawn from the OS CSPRNG via the `getrandom` crate.',
+							url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_crypto/src/random.rs#not-line-specific',
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					mobileAppHardening: parseMobileManifestJson(gemwalletAndroidParsed, gemwalletIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+			},
+			transactionLegibility: null,
+		},
+		selfSovereignty: {
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Gem Wallet swap review screen for a 1.25 USDC to ETH swap, before confirming. No approve step or approval amount is shown to the user here.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-09-09-gemwallet-swap-review.jpg',
+						label: 'Gem Wallet swap review screen for a 1.25 USDC to ETH swap',
+						lastRetrieved: '2026-09-09',
+					},
+					{
+						explanation:
+							'The decoded input data of the Approve transaction generated by that swap shows an unlimited approval, not the 1.25 USDC swap amount, and not disclosed anywhere in the swap review UI.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-09-09-gemwallet-approve-unlimited-calldata.png',
+						label: 'Decoded Approve transaction calldata showing an unlimited (max) approval value',
+						lastRetrieved: '2026-09-09',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED,
+			},
+			transactionSubmission: {
+				l1: {
+					ref: [
+						{
+							explanation:
+								'Every chain client (including the EVM broadcast path) is built from a single per-chain endpoint URL supplied by the platform-side `AlienProvider.get_endpoint(chain)`, the same endpoint Gem Wallet lets users override with a fully custom RPC node from Settings > Network. There is no separate relay/bundler path for transaction broadcast: `eth_sendRawTransaction` goes out over that same client.',
+							url: {
+								label: 'EVM transaction broadcast goes through that same client',
+								url: 'https://github.com/gemwalletcom/wallet/blob/61971f542acbe85caabea6363fb84e4a612cf701/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L20-L26',
+							},
+						},
+					],
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
+				},
+				l2: {
+					ref: [
+						{
+							explanation:
+								'Both Arbitrum and OP Stack chains are supported chains with their own EVM provider wiring, but no force-inclusion. Transactions can only be submitted through the configured RPC endpoint.',
+							urls: [
+								{
+									label: 'Arbitrum, Optimism, Base among the supported EVM chains',
+									url: 'https://github.com/gemwalletcom/wallet/blob/a226cade5f681218649cf75bbe26be07c3977329/core/crates/primitives/src/chain_evm.rs#L21-L23',
+								},
+							],
+						},
+					],
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+				},
+			},
+		},
+		transparency: {
+			operationFees: {
+				builtInErc20Swap: supported({
+					ref: [
+						{
+							explanation:
+								"When swapping, the review screen shows the network fee but doesn't show Gem's fee or the swap provider's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-review.png',
+							label: 'Gem review screen for a swap from WETH to USDC',
+						},
+						{
+							explanation: "When swapping, the details screen doesn't break out the swap fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-details.png',
+							label: 'Gem details sheet for a swap from WETH to USDC',
+						},
+						{
+							explanation: 'Gem takes a 0.5% fee on swaps, or 0.25% on swaps between stablecoins.',
+							url: {
+								label: 'Gem swap fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L10-L11',
+							},
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+				erc20L1Transfer: supported({
+					ref: [
+						{
+							explanation:
+								'When sending a token, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-token-send-review.png',
+							label: 'Gem review screen for a WETH send',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+				ethL1Transfer: supported({
+					ref: [
+						{
+							explanation: 'When sending ETH, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-eth-send-review.png',
+							label: 'Gem review screen for an ETH send',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [
+						{
+							explanation: "Gem's review screen shows network fees but doesn't show Uniswap's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png',
+							label: 'Gem review screen for a Uniswap swap from USDC to ETH',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+			},
+			orderflowPractices: null,
+			releaseTransparency: {
+				artifactSigning: notSupported,
+				dependencyAgeGate: null,
+				dependencyLocking: supported<WithRef<{}>>({
+					ref: [
+						{
+							explanation:
+								'Gradle dependency locking is enabled for the Android build (committed `settings-gradle.lockfile`). The Rust core commits a `Cargo.lock`. Each Swift Package commits a `Package.resolved`, resolved by CI via `just spm-resolve` before building.',
+							urls: [
+								{
+									label: 'Android Gradle settings lockfile',
+									url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/settings-gradle.lockfile#not-line-specific',
+								},
+								{
+									label: 'Rust core Cargo.lock',
+									url: 'https://github.com/gemwalletcom/wallet/blob/d88663d1e12e4f15b041bf36a00ef9bb89a2293b/core/Cargo.lock#not-line-specific',
+								},
+								{
+									label: 'iOS SPM `Package.resolved` (example package)',
+									url: 'https://github.com/gemwalletcom/wallet/blob/d705e619cc493eeba850d0eb5eaf7ddded043937/ios/Packages/Validators/Package.resolved#not-line-specific',
+								},
+							],
+						},
+					],
+				}),
+				dependencySandboxing: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'The Android and iOS apps have no dependency isolation configured.',
+							label: 'Android app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/android/gradle/libs.versions.toml#not-line-specific',
+						},
+						{
+							label: 'iOS app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/.gitmodules#not-line-specific',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/gemwalletcom/wallet/releases',
+				}),
+				hermeticBuilds: notSupported,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'Gem limits who can create or move release tags, but not who can delete them.',
+							label: 'Tag ruleset',
+							url: 'https://github.com/gemwalletcom/wallet/rules/14384859',
+						},
+						{
+							explanation: 'The repository has one ruleset and it targets tags, not branches.',
+							label: 'Repository ruleset list',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/rulesets',
+						},
+						{
+							explanation:
+								"Gem's repo doesn't enforce automated tests on its main codebase. Its other protections are only visible to Gem admins.",
+							label: 'Main branch protection',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/branches/main',
+						},
+					],
+					branchDeletionBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					forcePushBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.UNVERIFIABLE,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+				},
+				reproducibleBuilds: notSupported,
+			},
+		},
+		walletCall: notSupportedWithRef({
+			ref: [
+				{
+					explanation:
+						'Gem connects to apps through WalletConnect. Its EVM request handler supports signing, sending transactions and switching or adding chains, but not the EIP-5792 methods. Requests for methods outside its list are rejected as unsupported.',
+					urls: [
+						{
+							label: 'Gem features: WalletConnect',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/docs/FEATURES.md#L84-L101',
+						},
+						{
+							label: 'WalletConnect method identifiers',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/core/crates/primitives/src/wallet_connector.rs#L21-L38',
+						},
+					],
+				},
+			],
+		}),
+	},
+	variants: {
+		[Variant.MOBILE]: true,
+	},
+}

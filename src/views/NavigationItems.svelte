@@ -1,51 +1,12 @@
 <script lang="ts">
 	// Types
-	import type { LucideNavigationIcon, NavigationItem } from '@/constants/navigation'
+	import type { NavigationItem } from '@/constants/navigation'
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 
 	// Icons
-	import AtSignIcon from 'lucide-static/icons/at-sign.svg?raw'
-	import BellIcon from 'lucide-static/icons/bell.svg?raw'
-	import BookOpenIcon from 'lucide-static/icons/book-open.svg?raw'
-	import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
-	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-	import EyeOffIcon from 'lucide-static/icons/eye-off.svg?raw'
-	import { FarcasterIcon } from '@/icons/farcaster'
-	import FileCodeIcon from 'lucide-static/icons/file-code.svg?raw'
-	import GlobeIcon from 'lucide-static/icons/globe.svg?raw'
-	import HashIcon from 'lucide-static/icons/hash.svg?raw'
-	import LayersIcon from 'lucide-static/icons/layers.svg?raw'
-	import LogInIcon from 'lucide-static/icons/log-in.svg?raw'
-	import PlugIcon from 'lucide-static/icons/plug.svg?raw'
-	import RadarIcon from 'lucide-static/icons/radar.svg?raw'
+	import { lucideNavigationIcons as LUCIDE_ICONS } from '@/icons/lucide-navigation-icons'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
-	import SignatureIcon from 'lucide-static/icons/signature.svg?raw'
-	import StairsIcon from 'lucide-static/icons/chart-no-axes-column-increasing.svg?raw'
-	import UserCogIcon from 'lucide-static/icons/user-cog.svg?raw'
-	import { XIcon } from '@/icons/x'
-	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
-
-	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
-		ICON_AT_SIGN: AtSignIcon,
-		ICON_BELL: BellIcon,
-		ICON_BOOK_OPEN: BookOpenIcon,
-		ICON_CHART_BAR: ChartBarIcon,
-		ICON_CHART_PIE: ChartPieIcon,
-		ICON_EYE_OFF: EyeOffIcon,
-		ICON_FARCASTER: FarcasterIcon,
-		ICON_FILE_CODE: FileCodeIcon,
-		ICON_GLOBE: GlobeIcon,
-		ICON_HASH: HashIcon,
-		ICON_LAYERS: LayersIcon,
-		ICON_LOG_IN: LogInIcon,
-		ICON_PLUG: PlugIcon,
-		ICON_RADAR: RadarIcon,
-		ICON_SIGNATURE: SignatureIcon,
-		ICON_STAIRS: StairsIcon,
-		ICON_TWITTER: XIcon,
-		ICON_USER_COG: UserCogIcon,
-		ICON_WALLET: WalletIcon,
-	}
 
 	type NavigationGroup = {
 		items: NavigationItem[]
@@ -56,20 +17,24 @@
 		items,
 		groups,
 		currentHref,
-		ariaLabel = 'Navigation',
 		defaultOpen = false,
 		iconSnippet,
 		afterLabelSnippet,
+		afterLinkSnippet,
 		showSearch = true,
+		showLabels = true,
+		destinationState,
 	}: {
 		items: NavigationItem[]
 		groups?: NavigationGroup[]
 		currentHref?: string
-		ariaLabel?: string
 		defaultOpen?: boolean
 		iconSnippet?: Snippet<[NavigationItem, number]>
 		afterLabelSnippet?: Snippet<[NavigationItem, number]>
+		afterLinkSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
+		showLabels?: boolean
+		destinationState?: (href: string | undefined, link?: boolean) => Record<string, string>
 	} = $props()
 
 	let navigationGroups = $derived(groups ?? [{ items }])
@@ -81,11 +46,36 @@
 	let searchValue = $state('')
 	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
+	// Stable between server and client, so the client can find its server-rendered markup.
+	const instanceId = $props.id()
+
 	// Functions
-	const hasCurrentPage = (item: NavigationItem) => (
-		currentHref === item.href
-		|| (item.children?.some(hasCurrentPage) ?? false)
-	)
+	const hasCurrentPage = (item: NavigationItem) =>
+		currentHref === item.href || (item.children?.some(hasCurrentPage) ?? false)
+
+	/*
+	 * Copies the open state of groups (native <details>) toggled before
+	 * hydration, so the `open` bindings below keep it.
+	 */
+	const adoptPreHydrationToggles = () => {
+		const root = globalThis.document?.querySelector(`[data-navigation-instance="${instanceId}"]`)
+
+		if (!root) return
+
+		const flatten = (items: NavigationItem[]): NavigationItem[] => (
+			items.flatMap(item => [item, ...flatten(item.children ?? [])])
+		)
+		const allItems = (groups ?? [{ items }]).flatMap(group => flatten(group.items))
+
+		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
+			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)
+
+			if (item && details.open !== (defaultOpen || hasCurrentPage(item)))
+				isOpen.set(item, details.open)
+		}
+	}
+
+	adoptPreHydrationToggles()
 
 	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
 		const ranges: [number, number][] = []
@@ -110,32 +100,26 @@
 		return ranges
 	}
 
-	const matchesSearch = (item: NavigationItem, query: string): boolean => (
-		!query
-		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
-	)
+	const matchesSearch = (item: NavigationItem, query: string): boolean =>
+		!query ||
+		!!fuzzyMatch(item.title, query) ||
+		(item.children?.some(child => matchesSearch(child, query)) ?? false)
 
-	const hasNestedNavigation = (items: NavigationItem[]): boolean => (
+	const hasNestedNavigation = (items: NavigationItem[]): boolean =>
 		items.some(item => item.children?.length)
-	)
 
 	const highlightText = (text: string, query: string) => {
 		const ranges = fuzzyMatch(text, query)
 
-		return (
-			ranges ?
-				[
+		return ranges
+			? [
 					...ranges.flatMap(([start, end], i, arr) => [
 						text.slice(arr[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),
-				]
-					.join('')
-			:
-				text
-		)
+				].join('')
+			: text
 	}
 </script>
 
@@ -143,47 +127,46 @@
 	class="navigation-items"
 	data-column="gap-3"
 	data-column-item="flexible"
-	aria-label={ariaLabel}
 	data-sticky-container
+	data-navigation-instance={instanceId}
 >
 	{#if showSearch}
-		<search
-			data-sticky="block backdrop-before backdrop-stuck"
-		>
+		<search data-sticky="block backdrop-before backdrop-stuck">
 			<label data-row="gap-0">
 				<span class="search-icon" aria-hidden="true">{@html SearchIcon}</span>
 
 				<input
 					type="search"
+					aria-label="Search navigation"
 					bind:value={searchValue}
 					placeholder="Search..."
 					data-row-item="flexible"
-
 					{@attach (input: HTMLInputElement) => {
 						const abortController = new AbortController()
 
-						const navPopover = input.closest('nav[popover]')
 						const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
 
 						const openNavPopover = () => {
+							const navPopover = input.closest('[popover]')
+
 							if (
-								isMobileNav.matches
-								&& navPopover instanceof HTMLElement
-								&& !navPopover.matches(':popover-open')
+								isMobileNav.matches &&
+								navPopover instanceof HTMLElement &&
+								!navPopover.matches(':popover-open')
 							)
 								navPopover.showPopover()
 						}
 
 						globalThis.addEventListener(
 							'keydown',
-							(event) => {
+							event => {
 								if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
 									event.preventDefault()
 									openNavPopover()
 									input.focus()
 								}
 							},
-							{ signal: abortController.signal }
+							{ signal: abortController.signal },
 						)
 
 						input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
@@ -193,8 +176,7 @@
 						}
 					}}
 					onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
-						if (event.key === 'Escape')
-							event.currentTarget.blur()
+						if (event.key === 'Escape') event.currentTarget.blur()
 					}}
 				/>
 
@@ -206,13 +188,11 @@
 	{@render navigationGroupsList(navigationGroups)}
 </div>
 
-
 {#snippet navigationGroupsList(groups: NavigationGroup[])}
 	{#each groups as group, groupIndex (groupIndex)}
 		{@render navigationItems(group.items, 0)}
 	{/each}
 {/snippet}
-
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
 	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}
@@ -221,41 +201,45 @@
 		data-sticky-container={ownsStickyStep ? true : undefined}
 		data-column
 	>
-		{#each (
-			effectiveSearchValue ?
-				items.filter(item => matchesSearch(item, effectiveSearchValue))
-			:
-				items
-		) as item (item.id)}
-			<li>
+		{#each effectiveSearchValue ? items.filter( item => matchesSearch(item, effectiveSearchValue) ) : items as item (item.id)}
+			<li {...!item.children?.length && destinationState?.(item.href)}
+				style:--slice-fill={item.sliceStyle ? (item.sliceStyle.fill ?? 'initial') : undefined}
+				style:--slice-labelBackground={item.sliceStyle?.labelBackground}
+				style:--slice-totalAngle={item.sliceStyle?.totalAngle}
+				style:--slice-midAngle={item.sliceStyle?.midAngle}
+				style:--slice-offset={item.sliceStyle?.offset}
+				style:--slice-gap={item.sliceStyle?.gap}
+				style:--slice-outerR={item.sliceStyle?.outerR}
+				style:--slice-innerR={item.sliceStyle?.innerR}
+				style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
+				style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
+				style:--slice-labelSize={item.sliceStyle?.labelSize}
+				style:--slice-labelR={item.sliceStyle?.labelR}
+			>
 				{@render navigationItem(item, depth)}
 			</li>
 		{/each}
 	</menu>
 {/snippet}
 
-
 {#snippet navigationItem(item: NavigationItem, depth = 0)}
 	{#if !item.children?.length}
 		{@render linkable(item, depth)}
 	{:else}
 		<details
+			{...destinationState?.(item.href)}
+			data-navigation-item={item.id}
 			bind:open={
-				() => (
+				() =>
 					effectiveSearchValue
 						? matchesSearch(item, effectiveSearchValue)
-						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item)))
-				),
+						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item))),
 				(_: boolean) => {
-					if (!effectiveSearchValue && _ !== undefined)
-						isOpen.set(item, _)
+					if (!effectiveSearchValue && _ !== undefined) isOpen.set(item, _)
 				}
 			}
 		>
-			<summary
-				data-sticky="block backdrop-before backdrop-stuck"
-				data-row="gap-2"
-			>
+			<summary data-sticky="block backdrop-before backdrop-stuck" data-row="gap-2">
 				{@render linkable(item, depth)}
 			</summary>
 
@@ -264,11 +248,13 @@
 	{/if}
 {/snippet}
 
-
 {#snippet linkable(item: NavigationItem, depth = 0)}
 	{#if item.href}
 		<a
+			{...destinationState?.(item.href, true)}
 			href={item.href}
+			title={item.sliceStyle ? `${Object.entries(wbIconEmojiSequences).find(([id]) => id === item.icon)?.[1] ?? ''} ${item.title}`.trim() : undefined}
+			data-link="camouflaged"
 			{...currentHref === item.href && { 'aria-current': 'page' }}
 			{...item.href.startsWith('http') && {
 				target: '_blank',
@@ -279,64 +265,52 @@
 			}}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
-			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
-			style:--slice-midAngle={item.sliceStyle?.midAngle}
-			style:--slice-offset={item.sliceStyle?.offset}
-			style:--slice-gap={item.sliceStyle?.gap}
-			style:--slice-outerR={item.sliceStyle?.outerR}
-			style:--slice-innerR={item.sliceStyle?.innerR}
-			style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
-			style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
-			style:--slice-labelSize={item.sliceStyle?.labelSize}
-			style:--slice-labelSizeScale={item.sliceStyle?.labelSizeScale}
-			style:--slice-labelR={item.sliceStyle?.labelR}
-			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
-			{@render navigationIcon(item, depth)}
-
-			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
-
-			{#if afterLabelSnippet}
-				<span class="navigation-item-after" data-row="gap-1">
-					{@render afterLabelSnippet(item, depth)}
-				</span>
-			{/if}
+			{@render navigationContent(item, depth)}
 		</a>
-	{:else}
-		{@render navigationIcon(item, depth)}
-
-		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
-
-		{#if afterLabelSnippet}
-			<span class="navigation-item-after" data-row="gap-1">
-				{@render afterLabelSnippet(item, depth)}
-			</span>
+		{#if afterLinkSnippet}
+			{@render afterLinkSnippet(item, depth)}
 		{/if}
+	{:else}
+		{@render navigationContent(item, depth)}
 	{/if}
 {/snippet}
 
-
-{#snippet navigationIcon(item: NavigationItem, depth = 0)}
+{#snippet navigationContent(item: NavigationItem, depth: number)}
 	{#if iconSnippet}
 		{@render iconSnippet(item, depth)}
 	{:else if item.icon}
 		{@const iconShape = depth === 0 ? 'circle' : ''}
 		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-			<span data-icon>
-				<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+			<span aria-hidden="true" data-icon="grayscale">
+				<img
+					src={item.icon.slice('ICON_WALLET_IMG:'.length)}
+					alt=""
+					width="32"
+					height="32"
+					loading="lazy"
+					decoding="async"
+				/>
 			</span>
 		{:else if item.icon in LUCIDE_ICONS}
-			<span data-icon={iconShape}>
+			<span aria-hidden="true" data-icon={iconShape}>
 				{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 			</span>
 		{:else}
-			<span
-				data-icon="{iconShape} wbicons {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
-			></span>
+			<span aria-hidden="true" data-icon="{iconShape} wbicons-simple {item.icon}"></span>
 		{/if}
 	{/if}
-{/snippet}
 
+	<span data-row-item="flexible" data-visually-hidden={showLabels ? undefined : ''}
+		>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span
+	>
+
+	{#if afterLabelSnippet}
+		<span class="navigation-item-after" data-row="gap-1">
+			{@render afterLabelSnippet(item, depth)}
+		</span>
+	{/if}
+{/snippet}
 
 <style>
 	.navigation-items {
@@ -346,8 +320,16 @@
 		--navItem-rowGap: 0.5em;
 		--navItem-radius: 0.5em;
 		--navItem-current-backgroundColor: color-mix(in oklch, var(--accent) 25%, transparent);
-		--navItem-hover-backgroundColor: color-mix(in oklch, var(--accent) 15%, var(--background-primary));
-		--navItem-current-hover-backgroundColor: color-mix(in oklch, var(--accent) 30%, var(--background-primary) 20%);
+		--navItem-hover-backgroundColor: color-mix(
+			in oklch,
+			var(--accent) 15%,
+			var(--background-primary)
+		);
+		--navItem-current-hover-backgroundColor: color-mix(
+			in oklch,
+			var(--accent) 30%,
+			var(--background-primary) 20%
+		);
 		--navIcon-size: 1.25em;
 
 		--nav-submenu-gap: 0.33rem;
@@ -356,8 +338,6 @@
 		&:has(> search) {
 			--nav-search-blockSize: 3rem;
 		}
-
-		scroll-target-group: auto;
 
 		search {
 			@media (max-width: 1024px) {
@@ -400,7 +380,7 @@
 			margin: 0;
 			padding: 0;
 
-			&[data-navigation-depth='0'] {
+			&[data-navigation-depth="0"] {
 				--icon-navigation-borderColor: currentColor;
 				--navIcon-size: 2em;
 
@@ -413,22 +393,19 @@
 					}
 				}
 			}
-			&[data-navigation-depth='1'] {
+			&[data-navigation-depth="1"] {
 				--navIcon-size: 1.5em;
-
-				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
-					--sticky-marginBlockEnd: var(--navItem-gap);
-				}
 			}
-			&[data-navigation-depth='2'] {
+			&[data-navigation-depth="2"] {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+			}
 
-				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
-					--sticky-marginBlockEnd: var(--navItem-gap);
-				}
+			&:is([data-navigation-depth="1"], [data-navigation-depth="2"])[data-sticky-container] {
+				--sticky-marginBlockStart: calc(
+					var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap)
+				);
+				--sticky-marginBlockEnd: var(--navItem-gap);
 			}
 
 			details {
@@ -456,33 +433,20 @@
 				---backgroundColor: transparent;
 				---color: inherit;
 
-				&:hover,
-				&:focus-visible,
-				&:focus-within,
-				&:interest-source {
+				&:is(:hover, :focus-visible, :focus-within, :interest-source, [data-pressable-state~="interacting"]),
+				&:is(details[data-pressable-state~="interacting"] > summary) {
 					---backgroundColor: var(--navItem-hover-backgroundColor);
 					---color: var(--accent);
+					--icon-grayscale-filter: none;
 				}
 
-				&:is(a):is(
-					[aria-current='page'],
-					:target-current
-				),
+				&:is(a)[aria-current="page"],
 				&:is(summary):is(
-					:has(
-						a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					),
-					:not(details:open > &):has(
-						~ menu a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					)
-				) {
+						:has(a[aria-current="page"]),
+						:not(details:open > &):has(~ menu a[aria-current="page"])
+					) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
+					--icon-grayscale-filter: none;
 
 					&:hover,
 					&:focus-visible,
@@ -494,8 +458,8 @@
 				---startRadius: var(--navItem-radius);
 				---endRadius: var(--navItem-radius);
 
-				&:is(a):has(> [data-icon~='circle']),
-				&:is(summary):has(> a > [data-icon~='circle']) {
+				&:is(a):has(> [data-icon~="circle"]),
+				&:is(summary):has(> a > [data-icon~="circle"]) {
 					---startRadius: 1.5rem;
 				}
 
@@ -506,31 +470,18 @@
 					--sticky-backgroundColor: var(---backgroundColor);
 					--sticky-backdropFilter: blur(16px);
 
-					&[data-sticky~='backdrop-stuck'][data-sticky~="backdrop-before"]::before {
+					&[data-sticky~="backdrop-stuck"][data-sticky~="backdrop-before"]::before {
 						background-color: var(---backgroundColor);
 					}
 				}
 
-				border-radius:
-					var(---startRadius)
-					var(---endRadius)
-					var(---endRadius)
-					var(---startRadius)
-				;
-				padding:
-					var(--navItem-paddingBlock)
-					var(--navItem-paddingInline)
-				;
+				border-radius: var(---startRadius) var(---endRadius) var(---endRadius) var(---startRadius);
+				padding: var(--navItem-paddingBlock) var(--navItem-paddingInline);
 
 				color: var(---color);
 				font-weight: 500;
 
-				transition-property:
-					opacity,
-					scale,
-					background-color,
-					color
-				;
+				transition-property: opacity, scale, background-color, color;
 
 				:global(mark) {
 					font-weight: 600;
@@ -557,9 +508,7 @@
 
 			menu {
 				margin-block-start: var(--nav-submenu-gap);
-				margin-inline-start: calc(
-					var(--nav-submenu-parentIconSize) + var(--navItem-rowGap)
-				);
+				margin-inline-start: calc(var(--nav-submenu-parentIconSize) + var(--navItem-rowGap));
 
 				position: relative;
 				padding-inline-start: 0;
@@ -569,9 +518,8 @@
 					position: absolute;
 					inset-block: 0;
 					inset-inline-start: calc(
-						var(--navItem-paddingInline)
-						- var(--nav-submenu-parentIconSize) / 2
-						- var(--navItem-rowGap)
+						var(--navItem-paddingInline) - var(--nav-submenu-parentIconSize) / 2 -
+							var(--navItem-rowGap)
 					);
 					inline-size: 1px;
 					background-color: var(--border-color);
@@ -583,4 +531,17 @@
 			}
 		}
 	}
+	@supports (color: if(style(---link-current: 1): red)) {
+		.navigation-items :is(a[data-pressable-name], details[data-pressable-name] > summary) {
+			---backgroundColor: if(style(---link-current: 1): var(--navItem-current-backgroundColor); else: transparent);
+			--icon-grayscale-filter: if(style(---link-current: 1): none; else: grayscale(1) opacity(0.8));
+
+			&:is(:hover, :focus-visible, :focus-within, [data-pressable-state~="interacting"]),
+			&:is(details[data-pressable-state~="interacting"] > summary) {
+				---backgroundColor: if(style(---link-current: 1): var(--navItem-current-hover-backgroundColor); else: var(--navItem-hover-backgroundColor));
+				--icon-grayscale-filter: none;
+			}
+		}
+	}
+
 </style>

@@ -13,7 +13,7 @@ export enum KeyStorageMechanism {
 
 	/**
 	 * The key is encrypted with a user-known secret before being stored on disk,
-	 * but the key derivation is non-standard or ad-hoc.
+	 * but the key derivation is nonstandard or ad-hoc.
 	 */
 	ENCRYPTED_WITH_USER_SECRET_WEAK_KDF = 'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF',
 
@@ -127,6 +127,9 @@ export enum BrowserExtensionPermission {
 	/** Capture the desktop, a window, or a tab as a media stream. */
 	DESKTOP_CAPTURE = 'desktopCapture',
 
+	/** Load website favicons from the browser's favicon cache via `_favicon/` URLs. */
+	FAVICON = 'favicon',
+
 	/** Access the device's geographic location. */
 	GEOLOCATION = 'geolocation',
 
@@ -141,6 +144,9 @@ export enum BrowserExtensionPermission {
 
 	/** Access the user's Google Account email address. */
 	IDENTITY_EMAIL = 'identity.email',
+
+	/** Detect when the system becomes idle, locked, or active again via chrome.idle. */
+	IDLE = 'idle',
 
 	/** List, enable, disable, or uninstall other extensions. */
 	MANAGEMENT = 'management',
@@ -262,8 +268,9 @@ export interface BrowserExtensionManifest {
 	 * Which external web pages and other extensions may open a direct message
 	 * channel to the wallet (e.g. to send RPC requests).
 	 * Maps to the `externally_connectable` manifest field.
-	 * Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the
-	 * manifest, meaning no external connections are permitted.
+	 * Set to 'NOT_DECLARED' if the field is absent from the manifest, meaning
+	 * no web page may connect. Browsers still let any installed extension
+	 * connect in that case.
 	 */
 	externallyConnectable:
 		| {
@@ -272,7 +279,7 @@ export interface BrowserExtensionManifest {
 				/** Which web page origins may send messages directly to the wallet. */
 				pageMatches: HostPermissionScope
 		  }
-		| 'NOT_EXTERNALLY_CONNECTABLE'
+		| 'NOT_DECLARED'
 
 	/**
 	 * Security-sensitive Browser API permissions declared in the `permissions`
@@ -294,7 +301,8 @@ export interface BrowserExtensionManifest {
  * Enum values match the android:name attribute string exactly.
  *
  * All permissions seen in any wallet manifest must be listed here, including
- * non-security-relevant ones — the manifest collector throws on unknown values.
+ * non-security-relevant ones — the manifest collector throws on unknown values
+ * that `isIgnoredAndroidPermission` does not match.
  */
 export enum AndroidPermission {
 	/** Required for any network communication. */
@@ -314,6 +322,9 @@ export enum AndroidPermission {
 
 	/** Modify global audio settings. */
 	MODIFY_AUDIO_SETTINGS = 'android.permission.MODIFY_AUDIO_SETTINGS',
+
+	/** Control device vibration. */
+	VIBRATE = 'android.permission.VIBRATE',
 
 	/** Bluetooth (Android < 12). */
 	BLUETOOTH = 'android.permission.BLUETOOTH',
@@ -341,6 +352,33 @@ export enum AndroidPermission {
 
 	/** Write files to shared external storage (legacy, pre-scoped-storage). */
 	WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE',
+
+	/** Be notified when the user screenshots the app (Android 14+). */
+	DETECT_SCREEN_CAPTURE = 'android.permission.DETECT_SCREEN_CAPTURE',
+
+	/** Authenticate with biometric hardware (fingerprint, face, etc.). */
+	USE_BIOMETRIC = 'android.permission.USE_BIOMETRIC',
+
+	/** Legacy fingerprint authentication (superseded by USE_BIOMETRIC). */
+	USE_FINGERPRINT = 'android.permission.USE_FINGERPRINT',
+
+	/** Read images from shared media storage (scoped storage, Android 13+). */
+	READ_MEDIA_IMAGES = 'android.permission.READ_MEDIA_IMAGES',
+
+	/** Run a foreground service, shown to the user as a persistent notification. */
+	FOREGROUND_SERVICE = 'android.permission.FOREGROUND_SERVICE',
+
+	/** Run a foreground service of the data sync type (Android 14+). */
+	FOREGROUND_SERVICE_DATA_SYNC = 'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
+
+	/** Keep the processor awake while background work finishes. */
+	WAKE_LOCK = 'android.permission.WAKE_LOCK',
+
+	/** Receive the broadcast sent when the device finishes booting. */
+	RECEIVE_BOOT_COMPLETED = 'android.permission.RECEIVE_BOOT_COMPLETED',
+
+	/** Access the Google advertising ID — used for ad attribution/tracking. */
+	AD_ID = 'com.google.android.gms.permission.AD_ID',
 }
 
 export const androidPermissions = new Enum<AndroidPermission>({
@@ -350,6 +388,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.CAMERA]: true,
 	[AndroidPermission.RECORD_AUDIO]: true,
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
+	[AndroidPermission.VIBRATE]: true,
 	[AndroidPermission.BLUETOOTH]: true,
 	[AndroidPermission.BLUETOOTH_ADMIN]: true,
 	[AndroidPermission.BLUETOOTH_CONNECT]: true,
@@ -359,7 +398,32 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.USE_FULL_SCREEN_INTENT]: true,
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: true,
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: true,
+	[AndroidPermission.DETECT_SCREEN_CAPTURE]: true,
+	[AndroidPermission.USE_BIOMETRIC]: true,
+	[AndroidPermission.USE_FINGERPRINT]: true,
+	[AndroidPermission.READ_MEDIA_IMAGES]: true,
+	[AndroidPermission.FOREGROUND_SERVICE]: true,
+	[AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC]: true,
+	[AndroidPermission.WAKE_LOCK]: true,
+	[AndroidPermission.RECEIVE_BOOT_COMPLETED]: true,
+	[AndroidPermission.AD_ID]: true,
 })
+
+/**
+ * Matches `<applicationId>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, the
+ * app-private permission that AndroidX Core declares in every app that uses it
+ * to protect its own dynamically registered broadcast receivers.
+ */
+const dynamicReceiverPermission =
+	/^[A-Za-z]\w*(?:\.[A-Za-z]\w*)+\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$/
+
+/**
+ * Whether a `<uses-permission>` name is left out of `AndroidPermission`.
+ * These names differ per app and are not security-relevant.
+ */
+export function isIgnoredAndroidPermission(name: string): boolean {
+	return dynamicReceiverPermission.test(name)
+}
 
 /**
  * iOS usage description keys declared in Info.plist (NS*UsageDescription).
@@ -384,6 +448,9 @@ export enum IosUsageDescription {
 	/** Location access while the app is in use, required for BLE on iOS. */
 	LOCATION_WHEN_IN_USE = 'NSLocationWhenInUseUsageDescription',
 
+	/** Location access at all times, including while in use. */
+	LOCATION_ALWAYS_AND_WHEN_IN_USE = 'NSLocationAlwaysAndWhenInUseUsageDescription',
+
 	/** Microphone access. */
 	MICROPHONE = 'NSMicrophoneUsageDescription',
 
@@ -392,6 +459,9 @@ export enum IosUsageDescription {
 
 	/** Read images from the photo library. */
 	PHOTO_LIBRARY = 'NSPhotoLibraryUsageDescription',
+
+	/** Prompt string for user notifications. */
+	USER_NOTIFICATIONS = 'NSUserNotificationsUsageDescription',
 }
 
 export const iosUsageDescriptions = new Enum<IosUsageDescription>({
@@ -400,9 +470,11 @@ export const iosUsageDescriptions = new Enum<IosUsageDescription>({
 	[IosUsageDescription.CAMERA]: true,
 	[IosUsageDescription.FACE_ID]: true,
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: true,
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: true,
 	[IosUsageDescription.MICROPHONE]: true,
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
 	[IosUsageDescription.PHOTO_LIBRARY]: true,
+	[IosUsageDescription.USER_NOTIFICATIONS]: true,
 })
 
 /**

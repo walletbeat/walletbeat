@@ -20,6 +20,7 @@ export const frame: SoftwareWallet = {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
+		coinspectId: 'frame',
 		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
@@ -175,7 +176,9 @@ export const frame: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
+				dependencyAgeGate: null,
 				dependencyLocking: null,
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
 				hermeticBuilds: null,

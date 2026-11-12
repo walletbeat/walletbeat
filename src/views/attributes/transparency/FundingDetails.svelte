@@ -6,7 +6,7 @@
 		monetizationStrategyName
 	} from '@/schema/features/transparency/monetization'
 	import { refs } from '@/schema/reference'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 
 
@@ -15,7 +15,7 @@
 		wallet,
 		monetization,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		monetization: Monetization | undefined
 	} = $props()
 

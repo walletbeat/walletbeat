@@ -1,6 +1,6 @@
 import { AbiFunction, Address, Bytes, Ens, Hex } from 'ox'
 
-import { prefixError } from '@/types/errors'
+import { getErrorMessage, prefixError } from '@/types/errors'
 
 /**
  * The canonical ENS registry contract on Ethereum mainnet.
@@ -85,43 +85,53 @@ export function base32Encode(bytes: Uint8Array): string {
 
 /**
  * The `multicodec` prefix for an IPFS content-hash, as defined by EIP-1577.
- * A content-hash is `<codec><value>`; for IPFS the codec is `0xe3` and the
- * value is the raw (base32-decoded) CIDv1 bytes.
+ * A content-hash is `<codec><value>`; for IPFS the codec is `0xe3`, which is
+ * an unsigned variable-length integer encoded as the two bytes `0xe3 0x01`.
+ * The value is the raw (base32-decoded) CIDv1 bytes.
  */
-const IPFS_CONTENT_HASH_CODEC = 0xe3
+const IPFS_CONTENT_HASH_PREFIX = Uint8Array.of(0xe3, 0x01)
 
 /**
  * Compute the exact ENS content-hash bytes that `omnipin ens` would write for a
- * given base32 (CIDv1) IPFS CID. The content-hash is `0xe3` followed by the raw
- * CID bytes, so comparing these bytes directly with what the resolver returns
+ * given base32 (CIDv1) IPFS CID. The content-hash is `0xe301` followed by the
+ * raw CID bytes, so comparing these bytes directly with what the resolver returns
  * is the most faithful way to tell whether the domain already points at the CID.
  */
 export function cidToContentHash(cid: string): `0x${string}` {
 	const rawCidBytes = cid.startsWith('b') ? base32Decode(cid.slice(1)) : base32Decode(cid)
 
-	return Hex.fromBytes(Bytes.from(Uint8Array.of(IPFS_CONTENT_HASH_CODEC, ...rawCidBytes)))
+	return Hex.fromBytes(Bytes.concat(IPFS_CONTENT_HASH_PREFIX, rawCidBytes))
 }
 
 /**
  * Decode the raw bytes of an ENS content-hash back into a base32 (CIDv1) IPFS
  * CID. Returns `null` when the content-hash does not use the IPFS codec
- * (`0xe3`).
+ * (`0xe301`).
  */
 export function contentHashToCid(contentHash: Hex.Hex): string | null {
 	const bytes = Hex.toBytes(contentHash)
+	const prefixLength = IPFS_CONTENT_HASH_PREFIX.length
 
-	if (bytes.length < 2 || bytes[0] !== IPFS_CONTENT_HASH_CODEC) {
+	if (
+		bytes.length <= prefixLength ||
+		!Bytes.isEqual(bytes.subarray(0, prefixLength), IPFS_CONTENT_HASH_PREFIX)
+	) {
 		return null
 	}
 
-	return `b${base32Encode(bytes.subarray(1))}`
+	return `b${base32Encode(bytes.subarray(prefixLength))}`
 }
 
 /** Minimal JSON-RPC client used to make `eth_call` queries against an RPC URL. */
 
 const ETH_CALL_GAS = '0x100000' // 1_048_576
 
-async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Promise<Hex.Hex> {
+async function ethCall(
+	rpcUrl: string,
+	to: Address.Address,
+	data: Hex.Hex,
+	timeoutMs: number,
+): Promise<Hex.Hex> {
 	const response = await fetch(rpcUrl, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -131,6 +141,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 			params: [{ to, data, gas: ETH_CALL_GAS }, 'latest'],
 			id: 1,
 		}),
+		signal: AbortSignal.timeout(timeoutMs),
 	})
 
 	if (!response.ok) {
@@ -146,9 +157,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 	const { error, result } = payload as { error?: unknown; result?: unknown }
 
 	if (error !== undefined) {
-		const message = typeof error === 'string' ? error : 'RPC returned an unknown error.'
-
-		throw new Error(message)
+		throw new Error(`RPC returned an error: ${getErrorMessage(error)}`)
 	}
 
 	if (!Hex.validate(result)) {
@@ -162,6 +171,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 export async function readEnsContentHashCid(
 	rpcUrl: string,
 	domain: string,
+	timeoutMs: number,
 ): Promise<string | null> {
 	const node = Ens.namehash(domain)
 	const resolverCalldata = AbiFunction.encodeData(resolverAbi, [node])
@@ -169,7 +179,7 @@ export async function readEnsContentHashCid(
 	let resolverData: Hex.Hex
 
 	try {
-		resolverData = await ethCall(rpcUrl, ENS_REGISTRY_ADDRESS, resolverCalldata)
+		resolverData = await ethCall(rpcUrl, ENS_REGISTRY_ADDRESS, resolverCalldata, timeoutMs)
 	} catch (error) {
 		throw prefixError('Failed to query ENS resolver', error)
 	}
@@ -185,7 +195,7 @@ export async function readEnsContentHashCid(
 	let contenthashData: Hex.Hex
 
 	try {
-		contenthashData = await ethCall(rpcUrl, resolverAddress, contenthashCalldata)
+		contenthashData = await ethCall(rpcUrl, resolverAddress, contenthashCalldata, timeoutMs)
 	} catch (error) {
 		throw prefixError('Failed to query ENS resolver content-hash', error)
 	}
@@ -200,9 +210,10 @@ export async function ensPointsToCid(
 	rpcUrl: string,
 	domain: string,
 	expectedCid: string,
+	timeoutMs: number,
 ): Promise<boolean> {
 	try {
-		const currentCid = await readEnsContentHashCid(rpcUrl, domain)
+		const currentCid = await readEnsContentHashCid(rpcUrl, domain, timeoutMs)
 
 		return currentCid === expectedCid
 	} catch (error) {

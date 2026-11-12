@@ -38,7 +38,7 @@ App permissions: does the wallet request only what it needs, or does it over-per
 
 Rating scale:
 
-❌ Keys generated off-device, stored with weak encryption, or using a non-standard RNG.
+❌ Keys generated off-device, stored with weak encryption, or using a nonstandard RNG.
 
 ⚠️ Keys generated on-device but with partial protections. e.g. OS-sandboxed plaintext storage, or only a software-level KDF.
 

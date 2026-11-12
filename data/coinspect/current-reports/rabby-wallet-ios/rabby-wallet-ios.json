@@ -1,0 +1,773 @@
+{
+    "wallet": "Rabby Wallet",
+    "platform": "Ios",
+    "version": "0.6.41",
+    "date": "2025-12-03T21:55:33.249Z",
+    "walletUID": "rabby-wallet-ios",
+    "walletMakerUID": "rabby-wallet",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-417eccbe.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "With the dApp, the wallet rejects requests containing addresses with invalid checksums. It does not process transactions with improperly formatted addresses. However, the \"Send\" button of the app allows sending a transaction with an invalid checksum. When performing the transaction with WalletConnect, the wallet corrected the address and allowed the transaction to be sent."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-df6b1f2a.png",
+                        "rabby-wallet-ios-0.6.41-116a9b0f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet prevents screenshot capture. Attempted screenshots result in a solid-colored image with a \"Safety Alert\", protecting sensitive data. However, copying is allowed, and the copied information remains in the clipboard for over a minute without a warning. After entering the password, the next screenshot is the solid-colored image"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-f4a2185e.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes an embedded browser. It prompts users for confirmation before processing each DApp request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-193aebe3.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When attempting to test with the delayed RUN AUTH button, locking the wallet causes the connection with the dApp to break. It displays a success alert for adding chain methods but doesn't execute these changes within the wallet."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-91a90acd.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet informs users when they are interacting with well-known, verified URLs (DApps) with a level of site popularity like Uniswap"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-5647b1ae.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not alert users about interactions with known phishing or scam addresses."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-dfcd25e0.jpg",
+                        "rabby-wallet-ios-0.6.41-e31c88be.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Allows weak passwords (e.g., 12345678) and doesn't block further attempts after the fifth failed password attempt. Face ID can be enabled; however, it is not exclusive, as users can still enter the password at any time."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-bf08ff07.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't warn users of domain or scheme mismatches when signing an EIP-4361 message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-9cb29ea0.jpg",
+                        "rabby-wallet-ios-0.6.41-9dbddffb.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't alert about connections to unknown dApps or known phishing DApps. For example in the screenshots,https://main--wallettesting.netlify.app and https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-2daf73f4.jpg",
+                        "rabby-wallet-ios-0.6.41-5cecfc19.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet omits clickable links during the transaction sending process, but not in the transaction history."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-216108c0.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly displays the NFT received when contributing liquidity to a pool, as well as the incomes and outcomes when performing a swap."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-efccd603.jpg",
+                        "rabby-wallet-ios-0.6.41-4ec6145c.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet parses EIP-712 objects for well-known contracts/protocols, like detailing Opensea Seaport listings or ERC-20 Permits"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-6163d9d0.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display the permissions granted to DApps during the connection process."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-9f0a6a1d.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet alerts users when interacting with unfamiliar or untrusted addresses. It prevents signing transactions after users dismiss these warnings."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-cda46726.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the DApp origin URL in the 'Connect' dialog."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-2ec40836.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet refuses to attempt to sign an EIP-712 object with a chainId that does not match the currently active chain."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-5ae1ca12.jpg",
+                        "rabby-wallet-ios-0.6.41-3e76979f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display a list of all connected dApps but allows users to revoke access directly within each dApp."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-582148ff.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Includes the contract address in Token Approval (\"view Raw\" button), the token, effect, allowance, and contract spender address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-e3643ebf.jpg",
+                        "rabby-wallet-ios-0.6.41-139ad39a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Does not require user confirmation before processing the switchChain method, and the connect dialog shows the connected chain."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-0264340c.jpg",
+                        "rabby-wallet-ios-0.6.41-35ac4e9f.jpg",
+                        "rabby-wallet-ios-0.6.41-a23d2ace.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "There is a verification contract present in the displayed object, and it does not truncate large input messages during a personal signature."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-97d85bf8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet implements Wallet Connect through the embedded browser and requires user confirmation before processing each DApp request to the following RPC endpoints. It displays a success alert for adding chain methods but doesn't execute these changes within the wallet."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-ca430a8e.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet can clearly list and revoke token approvals via in-app functionality."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-7e1bfdf8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet by default doesn't hides spam tokens, legitimate tokens, or NFTs;"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-c5b0d8e6.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not automatically lock after 1 minute of inactivity when the device gets locked, or when the app is moved to background execution. While you can set an auto-lock time, the minimum duration is 5 minutes. It will automatically lock after 24 hours of inactivity."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-bf5fbb74.jpg",
+                        "rabby-wallet-ios-0.6.41-3f8f1ed6.jpg",
+                        "rabby-wallet-ios-0.6.41-10c8465d.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays truncated message content. The sign button is immediately available without the need to review the entire message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-9a483f00.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks a manual lock feature. Instead, it offers a \"Delete account\" button."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-4eacd097.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The 'eth_sign' method is disabled by default"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-f014a47d.jpg",
+                        "rabby-wallet-ios-0.6.41-2dd6eded.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "After clicking the 'Backup Seed Phrase' button, the wallet requires a password to display the mnemonics or private keys."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "rabby-wallet-ios-0.6.41-cc954958.jpg",
+                        "rabby-wallet-ios-0.6.41-136ae026.png",
+                        "rabby-wallet-ios-0.6.41-e531777b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "After the confirm button and under solid color, there is a \"Safety Alert\" and above the mnemonics display, there is a warning about the risks of sharing mnemonics and private keys. The wallet alerts users about taking screenshots and sharing mnemonics but doesn't warn against copying the mnemonics."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

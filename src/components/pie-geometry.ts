@@ -3,13 +3,13 @@ import type { WBIconID } from '@/styles/wbicons'
 export type Slice = {
 	id: string
 	color: string
+	opacity?: number
 	weight: number
 	arcLabel: string
 	arcIconId?: WBIconID
-	titleText: string
+	ariaLabel: string
 	href?: string
 	gradient?: {
-		areaRadiusStops?: number[]
 		colors: string[]
 		transparentStopColor?: string
 	}
@@ -47,7 +47,6 @@ export type ComputedSlice = Slice & {
 		level: number
 		offset: number
 		labelSize: number
-		labelSizeScale: number
 		labelR: number
 	}
 	children?: ComputedSlice[]
@@ -80,11 +79,96 @@ export const overallRatingPieLevels = (innerRadiusFraction = 0.15): LevelConfig[
 	},
 ]
 
-export const overallRatingPieMaxRadius = Math.max(
-	...overallRatingPieLevels().map(
-		level => overallRatingPieRadius * level.outerRadiusFraction + (level.offset ?? 0),
-	),
+export const pieMaxRadius = (radius: number, levels: LevelConfig[]): number =>
+	Math.max(
+		0,
+		...levels.map(level => radius * level.outerRadiusFraction + Math.abs(level.offset ?? 0)),
+	)
+
+export const overallRatingPieMaxRadius = pieMaxRadius(
+	overallRatingPieRadius,
+	overallRatingPieLevels(),
 )
+
+/**
+ * Path data for a computed slice, drawn pointing up (toward negative y)
+ * around the pie origin, before its `rotate(midAngle)` and
+ * `translate(0, -offset)` transforms. Usable both as SVG path data and in
+ * CSS `clip-path: path()`.
+ */
+export const slicePathData = (
+	{
+		totalAngle,
+		outerR,
+		innerR,
+		outerCornerRadius,
+		innerCornerRadius,
+		gap,
+	}: ComputedSlice['computed'],
+	origin: { x: number; y: number } = { x: 0, y: 0 },
+): string => {
+	const point = (x: number, y: number) =>
+		`${(origin.x + x).toFixed(3)} ${(origin.y + y).toFixed(3)}`
+	const polar = (angle: number, r: number) => point(Math.sin(angle) * r, -Math.cos(angle) * r)
+
+	if (Math.abs(totalAngle) >= 359.99) {
+		return [
+			`M ${point(outerR, 0)}`,
+			`A ${outerR} ${outerR} 0 1 1 ${point(-outerR, 0)}`,
+			`A ${outerR} ${outerR} 0 1 1 ${point(outerR, 0)}`,
+			`L ${point(innerR, 0)}`,
+			`A ${innerR} ${innerR} 0 1 0 ${point(-innerR, 0)}`,
+			`A ${innerR} ${innerR} 0 1 0 ${point(innerR, 0)}`,
+			'Z',
+		].join(' ')
+	}
+
+	const halfAngle = (Math.abs(totalAngle) * Math.PI) / 360
+	const sinHalf = Math.sin(halfAngle)
+	const cosHalf = Math.cos(halfAngle)
+	const halfGap = gap / 2
+	const maxCornerR = (outerR - innerR) / 2
+	const outerCornerR = Math.max(
+		0,
+		Math.min(
+			outerCornerRadius,
+			maxCornerR,
+			Math.max(0, (sinHalf * outerR - halfGap) / (1 + sinHalf)),
+		),
+	)
+	const innerCornerR = Math.max(
+		0,
+		Math.min(
+			innerCornerRadius,
+			maxCornerR,
+			Math.max(0, (sinHalf * innerR - halfGap) / Math.max(0.000001, 1 - sinHalf)),
+		),
+	)
+	const outerCornerOffset = halfGap + outerCornerR
+	const innerCornerOffset = halfGap + innerCornerR
+	const outerCornerCenterR = outerR - outerCornerR
+	const innerCornerCenterR = innerR + innerCornerR
+	const outerAngleInset = Math.asin(outerCornerOffset / outerCornerCenterR)
+	const innerAngleInset = Math.asin(innerCornerOffset / innerCornerCenterR)
+	const outerSideR = Math.sqrt(outerCornerCenterR ** 2 - outerCornerOffset ** 2)
+	const innerSideR = Math.sqrt(innerCornerCenterR ** 2 - innerCornerOffset ** 2)
+	const largeArc = Math.abs(totalAngle) > 180 ? 1 : 0
+	const sidePoint = (sideR: number, side: 1 | -1) =>
+		point(side * (sinHalf * sideR - cosHalf * halfGap), -(cosHalf * sideR + sinHalf * halfGap))
+
+	return [
+		`M ${polar(outerAngleInset - halfAngle, outerR)}`,
+		`A ${outerR} ${outerR} 0 ${largeArc} 1 ${polar(halfAngle - outerAngleInset, outerR)}`,
+		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${sidePoint(outerSideR, 1)}`,
+		`L ${sidePoint(innerSideR, 1)}`,
+		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${polar(halfAngle - innerAngleInset, innerR)}`,
+		`A ${innerR} ${innerR} 0 ${largeArc} 0 ${polar(innerAngleInset - halfAngle, innerR)}`,
+		`A ${innerCornerR} ${innerCornerR} 0 0 1 ${sidePoint(innerSideR, -1)}`,
+		`L ${sidePoint(outerSideR, -1)}`,
+		`A ${outerCornerR} ${outerCornerR} 0 0 1 ${polar(outerAngleInset - halfAngle, outerR)}`,
+		'Z',
+	].join(' ')
+}
 
 export const computePieSlices = ({
 	slices,
@@ -120,7 +204,7 @@ export const computePieSlices = ({
 		const levelConfig = getLevelConfig(level)
 		const parentLevelConfig = getLevelConfig(level - 1)
 		const outerR = radius * levelConfig.outerRadiusFraction
-		const innerR = radius * levelConfig.innerRadiusFraction
+		const configuredInnerR = radius * levelConfig.innerRadiusFraction
 		const orientation = Math.sign(endAngle - startAngle)
 		const anglePadding = levelConfig.anglePadding ?? 0
 		const angleGap = levelConfig.angleGap ?? 0
@@ -151,11 +235,36 @@ export const computePieSlices = ({
 			const labelSizeScale = levelConfig.labelSizeScale ?? 1
 			const effectiveLabelSize = (levelConfig.labelSize ?? labelSize) * labelSizeScale
 			const labelRadius = effectiveLabelSize / 2
-			const minimumLabelR = Math.sqrt((outerR - labelRadius) * (innerR + labelRadius))
 			const halfAngle = (Math.abs(totalAngle) * Math.PI) / 360
+			const gap = Math.abs(totalAngle) >= 360 ? 0 : levelConfig.gap
+			const halfGap = gap / 2
+			const innerR = Math.min(
+				outerR,
+				Math.max(
+					configuredInnerR,
+					halfAngle > 0 && halfAngle < Math.PI / 2 ? halfGap / Math.sin(halfAngle) : 0,
+				),
+			)
+			const minimumLabelR = Math.sqrt((outerR - labelRadius) * (innerR + labelRadius))
+			const outerCornerRadius = Math.max(
+				0,
+				Math.min(
+					levelConfig.outerCornerRadius ?? halfGap,
+					(outerR - innerR) / 2,
+					(Math.sin(halfAngle) * outerR - halfGap) / (1 + Math.sin(halfAngle)),
+				),
+			)
+			const innerCornerRadius = Math.max(
+				0,
+				Math.min(
+					levelConfig.innerCornerRadius ?? halfGap,
+					(outerR - innerR) / 2,
+					(Math.sin(halfAngle) * innerR - halfGap) / Math.max(0.000001, 1 - Math.sin(halfAngle)),
+				),
+			)
 			const centroidLabelR =
 				(2 / 3) *
-				((outerR ** 3 - innerR ** 3) / (outerR ** 2 - innerR ** 2)) *
+				((outerR ** 2 + outerR * innerR + innerR ** 2) / (outerR + innerR)) *
 				(halfAngle === 0 ? 1 : Math.sin(halfAngle) / halfAngle)
 			const maximumLabelR = outerR - labelRadius
 			const labelR = Math.max(minimumLabelR, Math.min(centroidLabelR, maximumLabelR))
@@ -169,13 +278,12 @@ export const computePieSlices = ({
 					midAngle,
 					outerR,
 					innerR,
-					outerCornerRadius: levelConfig.outerCornerRadius ?? levelConfig.gap / 2,
-					innerCornerRadius: levelConfig.innerCornerRadius ?? levelConfig.gap / 2,
+					outerCornerRadius,
+					innerCornerRadius,
 					level,
 					offset: levelConfig.offset ?? 0,
-					gap: levelConfig.gap,
+					gap,
 					labelSize: effectiveLabelSize,
-					labelSizeScale,
 					labelR,
 				},
 				...(children && {
