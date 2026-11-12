@@ -143,6 +143,10 @@
 		"hash": "dd45661ffb6b18f48eb41e79c8543c84ab38caf0a342ff74b865179da6818c3a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/images/entities/trustWallet.svg": {
+		"hash": "8d061fb735928e5050e88a0dab04ce30b231e0770e7411dbbd63fb42f5f94c67",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/uniswapLabs.svg": {
 		"hash": "f558ef12e11e7e79a272449a4dc9c42d09b09c4433ea2ffdd799ed17db706ab0",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -295,9 +299,17 @@
 		"hash": "6765523805c5f15d0549e8a2cc8f97720e98acf196af748962a25815214cf488",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/wallets/trust-wallet.svg": {
+		"hash": "8d061fb735928e5050e88a0dab04ce30b231e0770e7411dbbd63fb42f5f94c67",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/wallets/uniswap-wallet.svg": {
 		"hash": "c8c7d819cee5310530a0e67f1213801960f5a05632b63e4b840a1e4aca16f89b",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/walletchan.png": {
+		"hash": "7aacf2dd85083b8f2172f71cad3dd35bbd66a2e464469d6d91cca15340774c72",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/images/wallets/zerion.svg": {
 		"hash": "8117a299080eb4b793d51bb4bd7c5788978d9a812cc788e4186fcb54245c7d62",
@@ -573,6 +585,10 @@
 	},
 	"public/references/wallets/okx/screenshots/2026-09-24-okx-manage-approvals.png": {
 		"hash": "1562c9fc8d893ea88f20ed1580b84942035fc9ff38180b9359a33489adaa33c9",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/okx/screenshots/2026-10-13-okx-extension-connect-hardware-wallet.png": {
+		"hash": "366ab9fb093bf3f23cde2c4f2f15d93d479e5ad57e0e5d42b27ba01308bee792",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png": {
@@ -1639,10 +1655,6 @@
 		"hash": "6abf0c4b532101838bd47478e01aac477152a8872371864d5a801ad6c58e1948",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/chain_verification.png": {
-		"hash": "e3ae5b19066ea73752e8ffbc52ebbf114a5a87e51c6231ddf23d50b79c624ba0",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"resources/files/social-media/threads/2026-10-06 - Self-sovereignty Deep Dive/l1_provider_independence.png": {
 		"hash": "3ac9e526c787861df91fc196c7456ba594e4fc5522662ad5d44298e817530abc",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1663,9 +1675,45 @@
 		"hash": "cb2e77705f673fb3c4937b0764fdd43388d16a32a6c98ec70fbfbb8182798fb0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
+		"hash": "4c5dba25da216e8258202e358bf35c259052506c4d4c015e3a7f34aba1df1450",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg": {
+		"hash": "ffe42a78e281a8a5615cd1c7e56fe47a84dfa02745a895ed21bbcf2306e19d34",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/walletbeat_mission.png": {
+		"hash": "94075e76caa8c5b0bc8548a104d6d57e0a6b045982f82344d7851e9a7306930e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-19 - Supply Chain Security Talk/polymutex_talk.jpg": {
 		"hash": "edfea5db7f2da18a12803b6049bf668bd21ca3c66e83c1912e4943815bdd74f1",
 		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/apoorv_walletchan.png": {
+		"hash": "006a8e5e4c41856f5e06be3adf4653ba847072f063a22d8ec9faa2adad86d25a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/luc_ef.png": {
+		"hash": "9342bf5b5c85ccacb06c63f7dc96d87a7595779ec298c002caaa9ecff873c05d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg": {
+		"hash": "1849043ddd17da91f447eece3b3efb10e4a29d3a01d768f6d88231168800881f",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_walletbeat.png": {
+		"hash": "329c6dbfa0b68a98732bd645241ea85f46ae0c4699b6631677dbd3e9f8e86c23",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/raul_safelabs.png": {
+		"hash": "20a9b81ef5a4f140e3eec1bc353b4f127d69ed55b0380a12bffca5c90be85969",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/seth_cake_wallet.png": {
+		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
@@ -1709,6 +1757,10 @@
 	},
 	"resources/files/wbicons/wbicons-complex/chain_verification.svg": {
 		"hash": "28c635c81b9e783dcc01ef227457e61d11140f3ca7b173afdad10693facdf06d",
+		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
+	},
+	"resources/files/wbicons/wbicons-complex/checklist.svg": {
+		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
 	"resources/files/wbicons/wbicons-complex/code_repository.svg": {
@@ -1821,10 +1873,6 @@
 	},
 	"resources/files/wbicons/wbicons-complex/security_audits.svg": {
 		"hash": "f26051c9f25db82468c159cd22b894cb687192a5014d0b8627934ae9d8178bb0",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
-	"resources/files/wbicons/wbicons-complex/security_best_practices.svg": {
-		"hash": "3132d3f194651fb7dc017e99ca51422a937358e19096234b6ef6aa102eb6d3e6",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
 	"resources/files/wbicons/wbicons-complex/self_sovereignty.svg": {
@@ -2083,10 +2131,6 @@
 		"hash": "d67ac041d3bd09b535c8d4ad370c187dc50c6ca50656c939e1188c506fb9f848",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
 	},
-	"resources/files/wbicons/wbicons-simple/security_best_practices.svg": {
-		"hash": "1fe51ca163f24989de0756cebc18a88b1111b1a2417ffe8a0e8ece46eea5082c",
-		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
-	},
 	"resources/files/wbicons/wbicons-simple/self_sovereignty.svg": {
 		"hash": "d5768062022593f45885a4a9131dcc84a6f7c468a3dbf330220485341d66074e",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
@@ -2188,11 +2232,15 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"src/assets/fonts/wbicons-complex/wbicons-complex.svg": {
-		"hash": "2e93ff0e3a50e747aa6fcba7b9b7e452d50d6bc0fe45d614484698ef7a5a090d",
+		"hash": "319a3696996deb21ecdc0ea4eac6e0f7c742224a4f8bf3f8b3ea30bd97bce21b",
 		"passedTests": ["file-format"]
 	},
 	"src/assets/fonts/wbicons-simple/wbicons-simple.svg": {
-		"hash": "dd6af0f59536199f4c1e5c9b9769c046d411d80ed94eb2968adade7e8a6892c0",
+		"hash": "1ea9dbe7272022b1beef4b632971f5b19e1bde55d8c8bf97f276f48ebba409f2",
 		"passedTests": ["file-format"]
+	},
+	"tests/browser/fixtures/wide-wallet.svg": {
+		"hash": "5a5c57cf3b58ac167529042d92f5e2922c205409b72d5cee6be299b6c80b9d62",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	}
 }
