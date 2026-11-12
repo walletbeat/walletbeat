@@ -28,6 +28,7 @@
 
 
 {#if credits.length > 0}
+	<hr />
 	{#snippet sourceHeading(entity: Entity)}
 		{#if entity.icon !== 'NO_ICON'}
 			<span data-icon aria-hidden="true">
@@ -67,15 +68,16 @@
 	<section
 		class="data-credits"
 		data-card="secondary"
+		data-scroll-item="snap-prose"
 	>
-		<h5>
+		<h2>
 			{credits.length > 1 ? 'Data credits' : 'Data credit'}
 			{#if credits.length > 1}
 				({credits.length})
 			{/if}
-		</h5>
+		</h2>
 
-		<ul class="data-credits-list">
+		<ul>
 			{#each credits as credit (credit.source.entity.id)}
 				<li id={dataCreditAnchorId(credit.source.entity)}>{@render creditLine(credit)}</li>
 			{/each}
@@ -90,13 +92,8 @@
 		line-height: 1.7;
 	}
 
-	.data-credits-list li {
-		/* Ensures inline `#data-credit-*` anchor links from reference
-		   markers do not land underneath the sticky page header. */
-		scroll-margin-block-start: 4em;
-	}
 
-	h5 {
+	h2 {
 		font-size: 1em;
 	}
 

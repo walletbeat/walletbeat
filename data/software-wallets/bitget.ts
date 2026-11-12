@@ -8,6 +8,15 @@ import {
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
 import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
@@ -23,7 +32,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -39,7 +48,7 @@ export const bitget: SoftwareWallet = {
 		coinspectId: 'bitget',
 		contributors: [mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-08',
+		lastUpdated: '2026-10-18',
 		urls: {
 			docs: ['https://web3.bitget.com/en/docs'],
 			extensions: [
@@ -84,10 +93,19 @@ export const bitget: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -159,7 +177,7 @@ export const bitget: SoftwareWallet = {
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://web3.bitget.com/resource/policy.html',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -194,8 +212,87 @@ export const bitget: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
-			duressResistance: null,
-			hardwareWalletSupport: null,
+			duressResistance: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'The app asks for a 6-digit PIN to open the wallet and sign transactions, and face or fingerprint unlock is optional. The "Unlock required" option can be turned off, so the app then opens without the PIN or biometrics.',
+								urls: [
+									{
+										label: 'Bitget Wallet guide to PIN codes',
+										url: 'https://web3.bitget.com/en/academy/pincode',
+									},
+									{
+										label: 'Privacy policy, section 10',
+										url: 'https://web3.bitget.com/resource/policy.html',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
+			},
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'The browser extension supports Ledger hardware wallets connected by USB cable.',
+							urls: [
+								{
+									label: 'Getting started with Ledger',
+									url: 'https://web3.bitget.com/helpCenter/769',
+								},
+								{
+									label: 'Connect your Ledger',
+									url: 'https://web3.bitget.com/helpCenter/767',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation: 'The app adds a Keystone hardware wallet by scanning its QR code.',
+							urls: [
+								{
+									label: 'Keystone: Bitget Wallet (Mobile)',
+									url: 'https://guide.keyst.one/docs/bitget',
+								},
+								{
+									label: 'Bitget Wallet: Keystone import tutorial',
+									url: 'https://web3.bitget.com/en/academy/bitget-wallet-adds-support-for-hardware-wallet-keystone-newbie-import-tutorial',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+					},
+				},
+			},
 			keysHandling: {
 				ref: [
 					{
@@ -235,7 +332,7 @@ export const bitget: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+								'Bitget Wallet does not decode an Aave supply. It shows a generic signature confirmation.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
 							label: 'Bitget Wallet signature confirmation for an Aave supply',
 						},

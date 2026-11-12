@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte'
+	import type { WBIconID } from '@/styles/wbicons'
 	import type { WalletSecurityNews } from '@/types/content/news'
 	import {
 		incidentStatuses,
@@ -11,73 +13,47 @@
 
 	const {
 		news,
-		shouldExpandNews = true,
+		heading,
 		allNewsResolved = false,
 	}: {
 		news: WalletSecurityNews[]
-		shouldExpandNews?: boolean
+		heading: Snippet<[string, string, WBIconID, Snippet?, Snippet?]>
 		allNewsResolved?: boolean
 	} = $props()
 </script>
 
 
-<section
-	class="attribute security-news"
+<aside
+	class="security-news"
 	id="security-news"
 	aria-label="Security News"
 	style:--accent="#e564bc"
-	data-rating="pass"
+	data-scroll-item="inline-detached padding-match-end flow"
+	data-sticky-container
+	data-sticky-breadcrumb="scope clearance size"
+	style:--stickyBreadcrumb-entryTimeline="--security-news-entry"
 >
-	<details
-		data-card="radius-8 padding-6 border-accent"
-		data-column="gap-0"
-		open={shouldExpandNews}
-	>
-		<summary data-row>
-			<header data-row>
-				<div>
-					<div data-row="start gap-2">
-						<a data-link="camouflaged" href="#security-news">
-							<h2 data-row="start gap-2">
-								<span data-icon="📰" aria-hidden="true"></span>
-								Security News
-							</h2>
-						</a>
-					</div>
+	{#snippet description()}<p>{allNewsResolved ? 'Past security incidents (all resolved)' : 'Recent security updates and incidents'}</p>{/snippet}
+	{@render heading('security-news', 'Security News', 'newsletter', description)}
 
-					<div class="subsection-caption">
-						<p>
-							{#if !allNewsResolved}
-								Recent security updates and incidents
-							{:else if shouldExpandNews}
-								All incidents resolved. This section will collapse automatically after 30 days.
-							{:else}
-								Past security incidents (all resolved)
-							{/if}
-						</p>
-					</div>
-				</div>
-
-				<data
-					data-badge="medium"
-					value="INFO"
-				>INFO</data>
-			</header>
-		</summary>
-
-
-		<div class="attribute-accordions news-items" data-column="gap-3">
-			{#each news as newsItem (newsItem.title)}
+		<div class="news-items" data-column="gap-6">
+			{#each news as newsItem (newsItem.slug)}
 				{@const statusInfo = incidentStatuses[newsItem.status]}
 				{@const severityInfo = severities[newsItem.severity]}
 				{@const typeInfo = newsTypes[newsItem.type]}
 				{@const impactInfo = impactCategories[newsItem.impact.category]}
 				{@const newsRefs = extractRefs(newsItem)}
-				<details data-card="padding-5 secondary radius-4" data-column="gap-0">
-					<summary data-row="gap-2">
-						<div data-column="gap-1" data-row-item="flexible">
-							<h3>{newsItem.title}</h3>
-							<div class="news-meta" data-row="start gap-2 wrap">
+				<article data-card="padding-5 secondary radius-4" data-column="gap-0"
+					id={`security-news-${newsItem.slug}`}
+					data-sticky-container data-sticky-breadcrumb="scope clearance"
+					style:--stickyBreadcrumb-entryTimeline={`--security-news-${newsItem.slug}-entry`}>
+					<details data-column="gap-0">
+					<summary data-row="gap-2" data-sticky-breadcrumb="position" data-sticky="block block-start backdrop-before backdrop-stuck">
+						<div data-column="span-start" data-row-item="flexible"
+							style:--column-sizeTimelinePrefix="var(--stickyBreadcrumb-entryTimeline)">
+							<div data-row="start" data-sticky="block block-start backdrop-self backdrop-always">
+							<h3 data-sticky-breadcrumb="source"><a data-sticky-breadcrumb="item" data-link="camouflaged" href={`#security-news-${newsItem.slug}`}>{newsItem.title}</a></h3>
+							<div class="news-meta" data-row="end gap-2 wrap" data-row-item="wrap-end" data-sticky-breadcrumb="end contents">
 								<span
 									class="news-badge news-type"
 									data-badge="small"
@@ -96,10 +72,11 @@
 									{statusInfo.label}
 								</span>
 							</div>
+							</div>
 						</div>
 					</summary>
 
-					<section data-column="gap-4">
+					<div data-column="gap-4" data-scroll-item="snap-prose">
 						<p class="news-summary">{newsItem.summary}</p>
 
 						<div class="news-details" data-column="gap-2">
@@ -136,83 +113,19 @@
 								/>
 							{/if}
 						</div>
-					</section>
+					</div>
 				</details>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
+				</article>
 			{/each}
 		</div>
-	</details>
-</section>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
+</aside>
 
 
 <style>
-	.security-news {
-		> details {
-			display: grid;
-			scroll-margin-top: 3.5rem;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-			transition:
-				box-shadow 0.2s ease,
-				transform 0.2s ease;
-
-			&:hover {
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-				transform: translateY(-1px);
-			}
-
-			> summary {
-				> header {
-					flex-grow: 1;
-
-					> div {
-						display: grid;
-						gap: 0.5rem;
-
-						h2 {
-							font-size: 1.17em;
-							font-weight: 600;
-						}
-					}
-				}
-			}
-
-			> summary + :last-child {
-				display: grid;
-				gap: 1.5rem;
-			}
-
-			.subsection-caption {
-				opacity: 0.8;
-				color: var(--text-secondary);
-			}
-		}
-	}
-
-	.attribute-accordions {
-		details {
-			overflow: hidden;
-
-			summary {
-				h3 {
-					font-size: 1em;
-					max-width: 60ch;
-					word-wrap: break-word;
-					overflow-wrap: break-word;
-				}
-			}
-
-			section {
-				padding: 1.25rem;
-				padding-top: 0.25rem;
-				overflow: hidden;
-
-				p {
-					word-wrap: break-word;
-					overflow-wrap: break-word;
-				}
-			}
-		}
-	}
-
 	.news-items {
 		.news-meta {
 			font-size: 0.85rem;
@@ -234,8 +147,6 @@
 		}
 
 		.news-summary {
-			word-wrap: break-word;
-			overflow-wrap: break-word;
 			color: var(--text-secondary);
 		}
 
