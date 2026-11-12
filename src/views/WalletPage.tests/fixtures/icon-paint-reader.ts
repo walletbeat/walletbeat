@@ -248,6 +248,33 @@ function observeActor({ root, actor, row, header }: ActorState) {
 		Math.ceil(Math.max(a.right, (sourceBox?.left ?? a.left) + sourceWidth) + guard),
 	)
 
+	const keyframes = motion.effect.getKeyframes()
+	const namedPercent = (value: unknown, name: string, percent: number) =>
+		typeof value === 'object' &&
+		value !== null &&
+		'rangeName' in value &&
+		value.rangeName === name &&
+		'offset' in value &&
+		value.offset instanceof CSSUnitValue &&
+		value.offset.unit === 'percent' &&
+		value.offset.value === percent
+	const naturalFrame = keyframes.find(frame => namedPercent(frame.offset, 'contain', 0))
+	const compactFrame = keyframes.find(frame => namedPercent(frame.offset, 'contain', 100))
+	const terminalFrame = keyframes.find(frame => frame.offset === 1)
+
+	if (
+		!('rangeStart' in motion) ||
+		!namedPercent(motion.rangeStart, 'exit-crossing', 0) ||
+		!naturalFrame ||
+		naturalFrame.computedOffset !== 0 ||
+		!compactFrame ||
+		!(compactFrame.computedOffset > 0 && compactFrame.computedOffset <= 1) ||
+		!terminalFrame ||
+		terminalFrame.transform !== compactFrame.transform
+	) {
+		throw Error('Visible arrival must use native containment keyframes before its attachment tail')
+	}
+
 	const subject = motion.timeline.subject
 
 	if (!subject) {
@@ -269,6 +296,7 @@ function observeActor({ root, actor, row, header }: ActorState) {
 		scroll: root.scrollTop,
 		maximum: root.scrollHeight - root.clientHeight,
 		progress,
+		arrivalInterval: { start: begin, end },
 		source: motion.timeline.source.id,
 		row: { transform: rs.transform, translate: rs.translate },
 		interaction: { row: interaction(row), actor: interaction(actor) },
@@ -277,7 +305,7 @@ function observeActor({ root, actor, row, header }: ActorState) {
 			pending: motion.pending,
 			timing: motion.effect.getTiming(),
 			computedTiming: motion.effect.getComputedTiming(),
-			keyframes: motion.effect.getKeyframes(),
+			keyframes,
 			timeline: { source: motion.timeline.source.id, axis: motion.timeline.axis },
 		},
 		before,

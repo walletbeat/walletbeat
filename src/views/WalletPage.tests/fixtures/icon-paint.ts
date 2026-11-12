@@ -186,7 +186,7 @@ export async function observeIconPaint({
 	const result: DetailedReport = {
 		status: 'instrument-rejected',
 		browserClosed: false,
-		probeRevision: 8,
+		probeRevision: 9,
 		workload,
 		mode,
 		phase: 'reference-admission',
@@ -216,128 +216,9 @@ export async function observeIconPaint({
 
 	try {
 		await verifyServerSource(baseURL, source)
-		result.phase = 'geometry-discovery'
-		browser = await browserType.launch(launchOptions)
-		const discoveryContext = await browser.newContext({
-			viewport,
-			deviceScaleFactor: 1,
-			colorScheme: 'dark',
-			reducedMotion: 'no-preference',
-		})
-		const discoveryPage = await discoveryContext.newPage()
-
-		await discoveryPage.goto(new URL('/metamask/?variant=BROWSER', baseURL).href)
-		await discoveryPage.locator('astro-island[ssr]:has(#top)').waitFor({ state: 'detached' })
-		await discoveryPage.evaluate(() => document.fonts.ready)
-		const discoveryState = await discoveryPage.evaluateHandle(selector => {
-			const actor = document.querySelector(selector),
-				root = document.querySelector('#layout')
-
-			if (!(actor instanceof HTMLElement) || !(root instanceof HTMLElement)) {
-				throw Error('Unique actor/root required')
-			}
-
-			const row = actor.closest('[data-sticky-breadcrumb~="item"]'),
-				header = actor.closest('[data-sticky-breadcrumb~="position"]')
-
-			if (!(row instanceof HTMLElement) || !(header instanceof HTMLElement)) {
-				throw Error('Native row/header required')
-			}
-
-			return { actor, root, row, header }
-		}, selector)
-
-		assert.equal(await discoveryPage.locator(selector).count(), 1)
-		const initialGeometry = await discoveryState.evaluate(observeGeometry)
-		const initialObservation = await discoveryState.evaluate(observeActor)
-		const discoveredBrowser = browser.version()
-
-		await discoveryState.evaluate(({ root }) => {
-			root.style.scrollSnapType = 'none'
-			root.style.scrollBehavior = 'auto'
-			root.style.overflowAnchor = 'none'
-		})
-		const progressAt = async (top: number) => {
-			await discoveryState.evaluate(({ root }, value) => {
-				root.scrollTop = value
-			}, top)
-			await delay(40)
-
-			return (await discoveryState.evaluate(observeActor)).progress
-		}
-		const maximum = initialObservation.maximum
-
-		assert.equal(await progressAt(maximum), 1)
-		let low = 0,
-			high = maximum
-
-		while (high - low > 0.125) {
-			const middle = (low + high) / 2
-
-			if ((await progressAt(middle)) === 1) {
-				high = middle
-			} else {
-				low = middle
-			}
-		}
-		const end = high
-
-		low = 0
-		high = end
-		while (high - low > 0.125) {
-			const middle = (low + high) / 2,
-				progress = await progressAt(middle)
-
-			if (progress !== null && progress > 0) {
-				high = middle
-			} else {
-				low = middle
-			}
-		}
-		const start = low
-
-		assert.ok(end - start > 4, 'Native interval needs three distinct integer reference poses')
-		assert.ok(arrivalProgress === 0.35 || arrivalProgress === 0.75)
-		D = Math.round(start + (end - start) * arrivalProgress)
-		assert.ok(D - 1 > start && D + 1 < end)
-		await progressAt(D)
-		const phaseObservation = await discoveryState.evaluate(observeActor)
-		const opacityPhase = {
-			before: Number(phaseObservation.before.opacity),
-			after: Number(phaseObservation.after.opacity),
-			actualProgress: phaseObservation.progress,
-		}
-
-		assert.ok(
-			arrivalProgress < 0.5
-				? opacityPhase.before > opacityPhase.after
-				: opacityPhase.after > opacityPhase.before,
-			'Sampled native opacity must admit the intended complex/simple glyph phase',
-		)
-		const discovery = {
-			opacityPhase,
-			selector,
-			browserVersion: discoveredBrowser,
-			initialGeometry,
-			initialObservation,
-			interval: { start, end },
-			D,
-		}
-
-		result.discovery = discovery
-		result.D = D
-		await writeFile(new URL('discovery.json', out), json(discovery))
-		await browser.close()
-		browser = null
-		const reference = { selector, browserVersion: discoveredBrowser, initialGeometry }
-		let refs: Reference[] = []
-
-		result.phase = 'source-admission'
-		await verifyServerSource(baseURL, source)
 		result.phase = 'context-admission'
 		browser = await browserType.launch(launchOptions)
 		result.browserVersion = browser.version()
-		assert.equal(result.browserVersion, reference.browserVersion)
 		const context = await browser.newContext({
 			viewport,
 			deviceScaleFactor: 1,
@@ -444,55 +325,29 @@ export async function observeIconPaint({
 		})
 		// These reads admit the initial document. They never seek the target or paint/hide the icon.
 		await writeFile(new URL('result.json', out), json(result))
-		const initial = reference.initialGeometry
+		const initialObservation = result.initialObservation
+		const { start, end } = initialObservation.arrivalInterval
 
 		assert.ok(
-			Math.abs(result.initialGeometry.scroll - initial.scroll) <= 0.25,
-			'Natural initial scroll must match the reference document before any diagnostic mutation',
+			Number.isFinite(start) && Number.isFinite(end) && end - start > 4,
+			'Visible native interval needs three distinct integer reference poses',
 		)
-
-		for (const owner of ['root', 'actor', 'header', 'row', 'scope', 'flow'] as const) {
-			for (const axis of ['x', 'y', 'width', 'height'] as const) {
-				const actualBox = result.initialGeometry[owner],
-					referenceBox = initial[owner]
-
-				assert.ok(actualBox && referenceBox)
-				assert.ok(
-					Math.abs(actualBox[axis] - referenceBox[axis]) <= 0.0625,
-					`Initial ${owner}.${axis} must match the reference geometry`,
-				)
-			}
-		}
-		assert.equal(result.initialGeometry.timeline.source, initial.timeline.source)
-		assert.equal(result.initialGeometry.timeline.axis, initial.timeline.axis)
-
-		for (const endpoint of ['startOffset', 'endOffset'] as const) {
-			const actual = result.initialGeometry.timeline[endpoint]?.px,
-				expected = initial.timeline[endpoint]?.px
-
-			assert.ok(
-				typeof actual === 'number' &&
-					typeof expected === 'number' &&
-					Number.isFinite(actual) &&
-					Number.isFinite(expected) &&
-					Math.abs(actual - expected) <= 0.0625,
-				`Initial native ${endpoint} must match the reference timeline`,
-			)
-		}
-		assert.ok(result.initialGeometry.properties.header && initial.properties.header)
-
-		for (const property of [
-			'--stickyBreadcrumb-entryRange',
-			'---breadcrumb-parentBlockEnd',
-			'---breadcrumb-blockEnd',
-			'--stickyBreadcrumb-sourcePaddingBlock',
-		]) {
-			assert.equal(
-				result.initialGeometry.properties.header[property],
-				initial.properties.header[property],
-				`Initial heading ${property} must match`,
-			)
-		}
+		D = Math.round(start + (end - start) * arrivalProgress)
+		assert.ok(D - 1 > start && D + 1 < end)
+		result.D = D
+		result.discovery = { interval: { start, end } }
+		await writeFile(
+			new URL('discovery.json', out),
+			json({
+				method: 'native-containment',
+				selector,
+				browserVersion: result.browserVersion,
+				initialGeometry: result.initialGeometry,
+				initialObservation,
+				interval: { start, end },
+				D,
+			}),
+		)
 		assert.equal(result.resourceAdmission.scrollExtent, initialObservation.maximum)
 		assert.equal(result.resourceAdmission.fonts, 'loaded')
 		assert.ok(
@@ -500,15 +355,6 @@ export async function observeIconPaint({
 			'Actual icon font faces must already be loaded, rather than concealed by a fallback',
 		)
 
-		for (const pseudo of ['before', 'after'] as const) {
-			for (const property of ['fontSize', 'fontFamily', 'content'] as const) {
-				assert.equal(
-					result.initialObservation[pseudo][property],
-					initialObservation[pseudo][property],
-					`Cross-context ${pseudo}.${property} must match`,
-				)
-			}
-		}
 		result.colorAdmission = await state.evaluate(({ actor }) => {
 			const colors = ['::before', '::after'].map(pseudo => ({
 				pseudo,
@@ -619,7 +465,7 @@ export async function observeIconPaint({
 			'Clock markers must not alter source extent',
 		)
 		assert.ok(
-			Math.abs(result.before.scroll - initial.scroll) <= 0.25,
+			Math.abs(result.before.scroll - result.initialGeometry.scroll) <= 0.25,
 			'No reference sweep or target seek is permitted',
 		)
 		assert.ok(result.before.scroll < D - 0.5)
@@ -750,7 +596,7 @@ export async function observeIconPaint({
 			return actual
 		}
 
-		refs = []
+		const refs: Reference[] = []
 
 		for (const offset of [-1, 0, 1]) {
 			const actual = await seek(D + offset),
