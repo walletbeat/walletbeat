@@ -27,6 +27,10 @@ function parseArgs(): { port: number; upstream: string; multiplier: bigint } {
 
 	return { port, upstream, multiplier }
 }
+
+function log(message: string): void {
+	process.stdout.write(`[l1-lying-rpc-proxy] ${message}\n`)
+}
 // ERC-20 detection helpers
 const BALANCE_OF_SELECTOR = '70a08231'
 
@@ -52,19 +56,9 @@ function isErc20BalanceOfCall(params: unknown[]): params is [EthCallParams, ...u
 }
 
 // Response manipulation
-function lieAboutBalance(hexResult: string, multiplier: bigint): string {
-	const clean = hexResult.startsWith('0x') ? hexResult.slice(2) : hexResult
-
-	if (clean.length === 0 || clean === '0'.repeat(clean.length)) {
-		const lied = 1_000_000n * multiplier
-
-		return '0x' + lied.toString(16).padStart(64, '0')
-	}
-
-	const original = BigInt('0x' + clean)
-	const lied = original * multiplier
-
-	return '0x' + lied.toString(16).padStart(64, '0')
+function lieAboutBalance(balance: bigint, multiplier: bigint): bigint {
+	// Multiplying zero yields zero, so invent a nonzero balance to inflate instead.
+	return (balance === 0n ? 1_000_000n : balance) * multiplier
 }
 // JSON-RPC types
 interface JsonRpcRequest {
@@ -155,15 +149,16 @@ function forwardToUpstream(
 	})
 }
 // Main request handler
-function jsonError(message: string): Buffer {
-	return Buffer.from(JSON.stringify({ error: message }), 'utf8')
+function respondWithError(res: http.ServerResponse, statusCode: number, message: string): void {
+	log(`Error: ${message}`)
+	res.writeHead(statusCode, { 'Content-Type': 'application/json' })
+	res.end(JSON.stringify({ error: message }))
 }
 
 function createHandler(upstream: string, multiplier: bigint) {
 	return async (req: http.IncomingMessage, res: http.ServerResponse): Promise<void> => {
 		if (req.method !== 'POST') {
-			res.writeHead(405, { 'Content-Type': 'application/json' })
-			res.end(jsonError('Method not allowed – use POST'))
+			respondWithError(res, 405, 'Method not allowed – use POST')
 
 			return
 		}
@@ -181,8 +176,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 		try {
 			parsed = JSON.parse(rawBody.toString('utf8')) as unknown
 		} catch {
-			res.writeHead(400, { 'Content-Type': 'application/json' })
-			res.end(jsonError('Invalid JSON'))
+			respondWithError(res, 400, 'Invalid JSON')
 
 			return
 		}
@@ -193,8 +187,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 
 		for (const r of rawRequests) {
 			if (!isJsonRpcRequest(r)) {
-				res.writeHead(400, { 'Content-Type': 'application/json' })
-				res.end(jsonError('Invalid JSON-RPC request'))
+				respondWithError(res, 400, 'Invalid JSON-RPC request')
 
 				return
 			}
@@ -202,21 +195,33 @@ function createHandler(upstream: string, multiplier: bigint) {
 			requests.push(r)
 		}
 
-		const lieFlags: boolean[] = requests.map(
-			r => r.method === 'eth_call' && isErc20BalanceOfCall(r.params ?? []),
-		)
-		const anyLie = lieFlags.some(Boolean)
+		for (const r of requests) {
+			log(`Request: ${r.method}`)
+		}
+
+		const balanceOfCalls: (EthCallParams | null)[] = requests.map(r => {
+			const params = r.params ?? []
+
+			return r.method === 'eth_call' && isErc20BalanceOfCall(params) ? params[0] : null
+		})
+		const anyLie = balanceOfCalls.some(call => call !== null)
 
 		// Forward to upstream
 		let upstreamResult: { statusCode: number; body: Buffer }
 
 		try {
 			upstreamResult = await forwardToUpstream(upstream, rawBody)
-		} catch {
-			res.writeHead(502, { 'Content-Type': 'application/json' })
-			res.end(jsonError('Upstream unreachable'))
+		} catch (err: unknown) {
+			// Node network errors always carry a code (e.g. ECONNREFUSED), but not always a message.
+			const reason = err instanceof Error && 'code' in err ? String(err.code) : String(err)
+
+			respondWithError(res, 502, `Upstream unreachable (${reason})`)
 
 			return
+		}
+
+		if (upstreamResult.statusCode >= 400) {
+			log(`Upstream responded with HTTP ${upstreamResult.statusCode}`)
 		}
 
 		// Parse upstream response
@@ -228,8 +233,11 @@ function createHandler(upstream: string, multiplier: bigint) {
 			// Upstream returned non-JSON. If we need to lie about any response,
 			// we cannot do our job — return an error instead of passing garbage through.
 			if (anyLie) {
-				res.writeHead(502, { 'Content-Type': 'application/json' })
-				res.end(jsonError('Upstream returned non-JSON response for a proxied ERC-20 balance query'))
+				respondWithError(
+					res,
+					502,
+					'Upstream returned non-JSON response for a proxied ERC-20 balance query',
+				)
 
 				return
 			}
@@ -248,11 +256,10 @@ function createHandler(upstream: string, multiplier: bigint) {
 
 		// Verify the upstream response array is the same length as the request array.
 		if (rawResponses.length !== requests.length) {
-			res.writeHead(502, { 'Content-Type': 'application/json' })
-			res.end(
-				jsonError(
-					`Upstream response count mismatch: expected ${requests.length}, got ${rawResponses.length}`,
-				),
+			respondWithError(
+				res,
+				502,
+				`Upstream response count mismatch: expected ${requests.length}, got ${rawResponses.length}`,
 			)
 
 			return
@@ -262,8 +269,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 
 		for (const r of rawResponses) {
 			if (!isJsonRpcResponse(r)) {
-				res.writeHead(502, { 'Content-Type': 'application/json' })
-				res.end(jsonError('Upstream returned invalid JSON-RPC response'))
+				respondWithError(res, 502, 'Upstream returned invalid JSON-RPC response')
 
 				return
 			}
@@ -272,17 +278,22 @@ function createHandler(upstream: string, multiplier: bigint) {
 		}
 
 		// Mutate ERC-20 balance responses
-		for (let i = 0; i < responses.length; i++) {
-			if (!lieFlags[i]) {
-				continue
-			}
-
+		for (const [i, call] of balanceOfCalls.entries()) {
 			const resp = responses[i]
 
-			if (resp !== undefined && typeof resp.result === 'string' && resp.result.startsWith('0x')) {
-				const liedBalance = lieAboutBalance(resp.result, multiplier)
+			if (
+				call !== null &&
+				resp !== undefined &&
+				typeof resp.result === 'string' &&
+				resp.result.startsWith('0x')
+			) {
+				const balance = resp.result === '0x' ? 0n : BigInt(resp.result)
+				const liedBalance = lieAboutBalance(balance, multiplier)
 
-				resp.result = liedBalance
+				log(
+					`LYING: balanceOf on ${call.to ?? 'unknown token'} changed ${balance} to ${liedBalance}`,
+				)
+				resp.result = '0x' + liedBalance.toString(16).padStart(64, '0')
 			}
 		}
 
@@ -299,12 +310,16 @@ const { port, upstream, multiplier } = parseArgs()
 const server = http.createServer((req, res) => {
 	createHandler(upstream, multiplier)(req, res).catch((err: unknown) => {
 		if (!res.headersSent) {
-			res.writeHead(500, { 'Content-Type': 'application/json' })
-			res.end(jsonError('Internal proxy error'))
+			respondWithError(res, 500, 'Internal proxy error')
 		}
 
 		throw err
 	})
 })
 
-server.listen(port)
+server.listen(port, () => {
+	log(`Listening on http://localhost:${port}`)
+	// Only the origin is shown, as provider URLs often embed an API key in the path.
+	log(`Upstream: ${new URL(upstream).origin}`)
+	log(`ERC-20 balance multiplier: ×${multiplier}`)
+})
