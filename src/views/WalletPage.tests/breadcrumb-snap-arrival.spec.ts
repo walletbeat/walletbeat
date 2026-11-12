@@ -16,12 +16,21 @@ async function observeArrival(owner: Element) {
 	// Exit-crossing starts when the subject's leading edge crosses the view's start edge.
 	const entry = timeline.endOffset.to('px').value - height()
 	const nativeStart = timeline.startOffset.to('px').value
+	const endpoint = owner.matches('[data-sticky-breadcrumb~="snap-arrival"]')
+		? timeline.subject.querySelector<HTMLElement>(':scope > [data-scroll-item~="snap-block-start"]')
+		: null
+
+	if (owner.matches('[data-sticky-breadcrumb~="snap-arrival"]') && endpoint === null) {
+		throw new Error('Missing natural arrival snap: ' + owner.id)
+	}
+
 	const readLandings = () =>
 		[...owner.querySelectorAll<HTMLElement>('*')].flatMap(element => {
 			const style = getComputedStyle(element)
 			const box = element.getBoundingClientRect()
 
 			if (
+				element === endpoint ||
 				style.scrollSnapAlign !== 'start' ||
 				box.width <= 0 ||
 				box.height <= 0 ||
@@ -51,7 +60,8 @@ async function observeArrival(owner: Element) {
 		})
 	const landings = readLandings()
 	const extent = root.scrollHeight
-	const originalStyle = timeline.subject.getAttribute('style')
+	const controlTarget = endpoint ?? timeline.subject
+	const originalStyle = controlTarget.getAttribute('style')
 	const subject = timeline.subject
 
 	if (!(subject instanceof HTMLElement)) {
@@ -63,8 +73,13 @@ async function observeArrival(owner: Element) {
 	let controlStart: number
 
 	try {
-		// Clock extension must not change the existing content's native snap geometry.
-		subject.style.setProperty('--stickyBreadcrumb-arrivalInsetEnd', 'initial', 'important')
+		// The endpoint marker or prefix extension must not move real content snap areas.
+		if (endpoint) {
+			endpoint.style.setProperty('display', 'none', 'important')
+		} else {
+			subject.style.setProperty('--stickyBreadcrumb-arrivalInsetEnd', 'initial', 'important')
+		}
+
 		await new Promise<void>(resolve =>
 			requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 		)
@@ -73,9 +88,9 @@ async function observeArrival(owner: Element) {
 		controlStart = timeline.startOffset.to('px').value
 	} finally {
 		if (originalStyle === null) {
-			subject.removeAttribute('style')
+			controlTarget.removeAttribute('style')
 		} else {
-			subject.setAttribute('style', originalStyle)
+			controlTarget.setAttribute('style', originalStyle)
 		}
 
 		await new Promise<void>(resolve =>
@@ -100,7 +115,15 @@ async function observeArrival(owner: Element) {
 		Math.abs(extent - controlExtent),
 		Math.abs(extent - root.scrollHeight),
 	)
-	const landing = Math.min(...landings.filter(value => value >= entry - 1 / 32))
+	const endpointLanding = () =>
+		endpoint
+			? root.scrollTop +
+				endpoint.getBoundingClientRect().top -
+				root.getBoundingClientRect().top -
+				parseFloat(getComputedStyle(endpoint).scrollMarginBlockStart) -
+				(parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0)
+			: Math.min(...landings.filter(value => value >= entry - 1 / 32))
+	const landing = endpointLanding()
 
 	if (!Number.isFinite(landing)) {
 		throw new Error('No eligible native child snap: ' + owner.id)
@@ -125,7 +148,7 @@ async function observeArrival(owner: Element) {
 			Math.abs(nativeStart - restoredStart),
 			Math.abs(nativeStart - timeline.startOffset.to('px').value),
 		),
-		layoutDelta,
+		layoutDelta: Math.max(layoutDelta, Math.abs(landing - endpointLanding())),
 		extentDelta,
 	}
 }
@@ -139,7 +162,7 @@ const arrivals = [
 ] as const
 
 for (const { width, destinations } of arrivals) {
-	test(`section breadcrumbs finish at existing native snap landings (${width}px)`, async ({
+	test(`section breadcrumbs finish at stable natural snap landings (${width}px)`, async ({
 		page,
 	}) => {
 		await page.setViewportSize({ width, height: 900 })

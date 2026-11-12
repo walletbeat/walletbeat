@@ -169,9 +169,6 @@
 							</header>
 							<div data-sticky-breadcrumb="support">
 									<div data-scroll-item={s.description.contentType === ContentType.TEXT ? 'snap-block-start' : 'snap-prose'}>
-										{#if index === 0 && s.description.contentType === ContentType.TEXT}
-											<span data-sticky-breadcrumb="snap-offset" style:anchor-name="--breadcrumb-snap-content" aria-hidden="true"></span>
-										{/if}
 										{#if isTypographicContent(s.description)}
 											<Typography content={s.description} />
 										{:else}
@@ -284,9 +281,6 @@
 							{/if}
 						</div>
 					</details>
-					{#if index < 2}
-						<span data-sticky-breadcrumb="snap-offset" style:anchor-name={index === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
-					{/if}
 					<span data-sticky-breadcrumb={s.description.contentType === ContentType.TEXT ? 'flow snap-prefix' : 'flow'} data-scroll-item={s.description.contentType === ContentType.TEXT ? 'snap-margin' : undefined} aria-hidden="true"></span>
 				</section>
 			{/each}

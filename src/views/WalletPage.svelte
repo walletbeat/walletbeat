@@ -1122,7 +1122,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					isLocalAttribute={id => attributeNavigationItems.some(group =>
 						group.children?.some(item => item.href === `#${slugifyCamelCase(id)}`))}
 				/>
-				<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-scroll-item="snap-block-start"></span></span>
 			</section>
 		{/if}
 
@@ -1257,29 +1257,27 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		<div data-column>
 			<div class="attributes" data-column="gap-7">
-				{#each attributes as { attribute, evalAttr }, index}
+				{#each attributes as { attribute, evalAttr }}
 					{@render attributeSnippet({
 						attrGroupId: attrGroup.id,
-						arrivalIndex: index < 2 ? index : undefined,
+
 						attribute,
 						evalAttr,
 					})}
 				{/each}
 			</div>
 		</div>
-		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-scroll-item="snap-block-start"></span></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 	</section>
 {/snippet}
 
 {#snippet attributeSnippet({
 	attrGroupId,
-	arrivalIndex,
 	attribute,
 	evalAttr,
 }: {
 	attrGroupId: string
-	arrivalIndex: number | undefined
 	attribute: Attribute<OutcomeMetadata>
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
@@ -1679,9 +1677,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</div>
 			</div>
 		</details>
-		{#if arrivalIndex !== undefined}
-			<span data-sticky-breadcrumb="snap-offset" style:anchor-name={arrivalIndex === 0 ? '--breadcrumb-snap-first' : '--breadcrumb-snap-next'} aria-hidden="true"></span>
-		{/if}
 		<span data-sticky-breadcrumb="flow snap-prefix" data-scroll-item="snap-margin" aria-hidden="true"></span>
 		<span data-sticky-breadcrumb="approach" aria-hidden="true"></span>
 	</section>
@@ -2720,24 +2715,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		--column-supportGap: var(---wallet-section-support-gap);
 	}
 
-
-	.attributes > .attribute:first-child > details[open] .attribute-rating-details {
-		@supports (anchor-scope: --breadcrumb-snap-content) and
-			(inset-block-end: anchor(--breadcrumb-snap-content start)) and
-			(color: if(style(---breadcrumb-supportGrid: 1): red)) {
-			position: relative;
-			&::before {
-				content: '';
-				position: absolute;
-				inset-block-start: calc(-1 * var(---scrollItem-snapOffsetBlockStart));
-				inset-inline-start: 0;
-				inline-size: 0;
-				block-size: 0;
-				pointer-events: none;
-				anchor-name: --breadcrumb-snap-content;
-			}
-		}
-	}
 
 	.attribute {
 		position: relative;

@@ -843,8 +843,7 @@ declare global {
 		 * - `support`: supporting copy; direct summary support stays in ordinary flow below the compact foreground
 		 * - `fade`: combines with support for paragraph content that fades during its final line's passage behind the occupied sticky rows; existing direct children own opacity only
 		 * - `end`: independently sized in-flow metadata
-		 * - `snap-arrival`: derive arrival end from the first eligible existing child snap.
-		 * - `snap-offset`: hidden anchor at its snap owner’s native landing offset.
+		 * - `snap-arrival`: expose the natural arrival endpoint as a native snap area.
 		 * - `snap-prefix`: combines with `flow` and `data-scroll-item="snap-margin"` to end an open disclosure’s arrival at its shared grid prefix and native landing offset.
 		 * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
 		 * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact

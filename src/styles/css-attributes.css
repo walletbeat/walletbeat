@@ -1654,9 +1654,8 @@ ol {
  * - `support`: supporting copy; direct summary support stays in ordinary flow below the compact foreground
  * - `fade`: combines with support for paragraph content that fades during its final line's passage behind the occupied sticky rows; existing direct children own opacity only
  * - `end`: independently sized in-flow metadata
- * - `snap-arrival`: derive arrival end from the first eligible existing child snap.
- * - `snap-offset`: hidden anchor at its snap owner’s native landing offset.
- * - `snap-prefix`: combines with `flow` and `data-scroll-item="snap-margin"` to end an open disclosure’s arrival at its shared grid prefix and native landing offset.
+ * - `snap-arrival`: expose the natural arrival endpoint as a native snap area.
+  * - `snap-prefix`: combines with `flow` and `data-scroll-item="snap-margin"` to end an open disclosure’s arrival at its shared grid prefix and native landing offset.
  * - `flow`: non-sticky clock for foreground arrival and heading-start snap target; support copy does not extend the clock's subject
  * - `approach`: direct child of a destination scope providing a compact-heading approach clock ending at leading-edge contact
  * - `size`: source/row/end size exports use paired, transform-independent horizontal clocks; source exporters share sticky participation while row and end exporters retain visible closed summaries.
@@ -1748,10 +1747,6 @@ ol {
 	}
 }
 
-[data-sticky-breadcrumb~="snap-offset"] {
-	display: none;
-}
-
 [data-sticky-breadcrumb~="flow"] {
 	display: none;
 }
@@ -1798,52 +1793,6 @@ ol {
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 	(color: if(style(---breadcrumb-wrap: 1): red)) {
-	@supports (anchor-scope: --breadcrumb-snap-first) and
-		(inset-block-end: anchor(--breadcrumb-snap-first start)) and
-		(color: if(style(---breadcrumb-supportGrid: 1): red)) {
-		[data-sticky-breadcrumb~="snap-arrival"] {
-			&:has([data-sticky-breadcrumb~="snap-offset"]) > [data-sticky-breadcrumb~="flow"] {
-				/* An unavailable anchor resolves to the start, so it cannot win. */
-				---breadcrumb-snapStart: calc(100% + var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceBorderWidth));
-				---breadcrumb-firstSnap: anchor(--breadcrumb-snap-first start, var(---breadcrumb-snapStart));
-				---breadcrumb-contentSnap: anchor(--breadcrumb-snap-content start, var(---breadcrumb-snapStart));
-				---breadcrumb-nextSnap: anchor(--breadcrumb-snap-next start, var(---breadcrumb-snapStart));
-				---breadcrumb-useFirstSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-firstSnap) - 1px), 1);
-				---breadcrumb-useContentSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-contentSnap) - 1px), 1);
-				---breadcrumb-useNextSnap: clamp(0, sign(var(---breadcrumb-snapStart) - var(---breadcrumb-nextSnap) - 1px), 1);
-				---breadcrumb-afterFirstInset: calc(
-					(var(---breadcrumb-contentSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useContentSnap) +
-					(var(---breadcrumb-nextSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useNextSnap) * (1 - var(---breadcrumb-useContentSnap))
-				);
-				--stickyBreadcrumb-arrivalInsetEnd: calc(
-					(var(---breadcrumb-firstSnap) - var(---breadcrumb-blockEnd)) * var(---breadcrumb-useFirstSnap) +
-					var(---breadcrumb-afterFirstInset) * (1 - var(---breadcrumb-useFirstSnap))
-				);
-			}
-		}
-
-		:is([data-sticky-container], [data-scroll-item], p):has(> [data-sticky-breadcrumb~="snap-offset"]) {
-			position: relative;
-
-			> [data-sticky-breadcrumb~="snap-offset"] {
-				display: block;
-				position: absolute;
-				inset-block-start: calc(-1 * (var(---scrollItem-snapOffsetBlockStart) + var(---snapOffset-border, 0px)));
-				inset-inline-start: 0;
-				inline-size: 0;
-				block-size: 0;
-				pointer-events: none;
-			}
-
-			&[data-card~="border-accent"] > [data-sticky-breadcrumb~="snap-offset"] {
-				---snapOffset-border: var(--card-borderWidth);
-			}
-		}
-
-		details:not([open]) > :not(summary) [data-sticky-breadcrumb~="snap-offset"] {
-			display: none;
-		}
-	}
 
 	[data-sticky-breadcrumb~="scope"] {
 		--sticky-position: sticky;
@@ -3106,8 +3055,14 @@ ol {
 			---breadcrumb-anchorScope:
 				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
 			anchor-scope: var(---breadcrumb-anchorScope);
-			&[data-sticky-breadcrumb~="snap-arrival"] {
-				anchor-scope: var(---breadcrumb-anchorScope), --breadcrumb-snap-first, --breadcrumb-snap-next, --breadcrumb-snap-content;
+			&[data-sticky-breadcrumb~="snap-arrival"] > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
+				display: block;
+				position: absolute;
+				inset-block-start: calc(max(0px, 100% - var(---breadcrumb-blockEnd)) + var(---scrollItem-snapOffsetBlockStart));
+				inset-inline-start: 0;
+				inline-size: 1px;
+				block-size: 1px;
+				pointer-events: none;
 			}
 			&[data-card~="border-accent"] {
 				---breadcrumb-sourceBorderWidth: var(--card-borderWidth);
