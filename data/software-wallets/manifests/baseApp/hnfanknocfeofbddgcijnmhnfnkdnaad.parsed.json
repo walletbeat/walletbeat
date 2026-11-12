@@ -1,6 +1,6 @@
 {
 	"contentScripts": "NONE",
-	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"externallyConnectable": "NOT_DECLARED",
 	"hostPermissions": "HTTP_AND_HTTPS",
 	"permissions": ["activeTab", "alarms", "scripting", "storage"],
 	"webAccessibleResources": "HTTP_AND_HTTPS"

@@ -1,8 +1,13 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import {
+	ExposedAccountsBehavior,
+	type ExposedAccountSet,
+} from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -42,11 +47,17 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
+import {
+	FeeDisplayLevel,
+	FeeType,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { RepositoryChangeControlState } from '@/schema/features/transparency/release-transparency'
 import { type References, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { nonEmptySet } from '@/types/utils/non-empty'
 import type { Nullable } from '@/types/utils/nullable'
 
 import { certik } from '../entities/certik'
@@ -90,9 +101,9 @@ export const gemwallet: SoftwareWallet = {
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
 		coinspectId: 'gem',
-		contributors: [h3rman, minimalsm],
+		contributors: [h3rman, minimalsm, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-11-04',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
@@ -162,7 +173,89 @@ export const gemwallet: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: [
+						{
+							explanation: 'Gem allows you to bridge tokens between networks.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-quote.png',
+							label: 'Gem swap from ETH on Ethereum to ETH on Base',
+						},
+						{
+							explanation:
+								"When bridging, the review screen shows the network fee but doesn't show Gem's fee or the bridge provider's fee, and gives no warnings about bridge risks.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-review.png',
+							label: 'Gem review screen for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: "When bridging, the details screen doesn't break out bridge fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-bridge-details.png',
+							label: 'Gem details sheet for a bridge from Ethereum to Base',
+						},
+						{
+							explanation: 'Gem takes a 0.25% fee on bridges.',
+							url: {
+								label: 'Gem bridge fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L12',
+							},
+						},
+					],
+					feesLargerThan1bps: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupportedWithRef({
+					ref: {
+						explanation:
+							'When sending transactions you must have sufficient funds on the chain you are transacting on. Gem will not pull funds from other chains.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-10-31-gemwallet-insufficient-balance.png',
+						label: 'Gem send screen showing an insufficient balance error',
+					},
+				}),
+			},
+			crossChainBalances: {
+				ref: [
+					{
+						explanation: "Gem shows the wallet's total value across all networks.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-total-value.png',
+						label: 'Gem home screen with the wallet total and ETH on Ethereum and Base',
+					},
+					{
+						explanation:
+							'Gem lists ETH and USDC on each network as separate items but does not add them up across networks.',
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-per-network-balances.png',
+						label: 'Gem asset list with ETH and USDC on each network',
+					},
+				],
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
 		chainConfigurability: supported<WithRef<Nullable<ChainConfigurability>>>({
 			ref: [
 				{
@@ -176,9 +269,40 @@ export const gemwallet: SoftwareWallet = {
 					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg',
 					label: 'Gem wallet allows configurable RPC.',
 				},
+				{
+					explanation:
+						'Gem can create and import wallets, show Ether and ERC-20 token balances, and send ERC-20 tokens using an Ethereum full node. Gem only accepts custom node addresses that start with https://.',
+					urls: [
+						{
+							label: 'Reading token balances from a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/balances.rs#L15-L23',
+						},
+						{
+							label: 'Looking up tokens by contract address on a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/assets/mod.rs#L206-L216',
+						},
+						{
+							label: 'Sending transactions through a full node',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L21-L26',
+						},
+						{
+							label: 'Custom node addresses must use HTTPS',
+							url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/gemstone/src/services/node/rules.rs#L83-L91',
+						},
+					],
+				},
 			],
 			customChainRpcEndpoint: notSupported,
-			l1: null,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			}),
@@ -250,7 +374,59 @@ export const gemwallet: SoftwareWallet = {
 				// 	],
 				// }),
 			},
-			appIsolation: { type: 'APP_CONNECTION_NOT_SUPPORTED' },
+			appIsolation: {
+				createInAppConnectionFlow: notSupportedWithRef({
+					ref: {
+						explanation:
+							"The connection screen lists existing wallets and there isn't a way to create a new wallet.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png',
+						label: 'Gem connection screen with the wallet list expanded',
+						lastRetrieved: '2026-11-05',
+					},
+				}),
+				erc7846WalletConnect: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Gem's list of supported requests doesn't include ERC-7846's `wallet_connect`.",
+						label: 'Supported app requests in the Gem source code',
+						url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/crates/primitives/src/wallet_connector.rs#L21-L65',
+					},
+				}),
+				ethAccounts: supported<WithRef<ExposedAccountSet>>({
+					ref: [
+						{
+							explanation:
+								'An app is given only the address of the wallet chosen on the connection screen.',
+							label: 'Connection approval in the Gem source code',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/mod.rs#L203-L212',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem.',
+							label: 'Connection screen default selection',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/core/gemstone/src/services/wallet_connect/rules.rs#L134-L136',
+						},
+					],
+					defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'A second wallet is connected to app.uniswap.org.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-connected-second-wallet.png',
+							label: 'Gem showing the second wallet connected to app.uniswap.org',
+							lastRetrieved: '2026-11-05',
+						},
+						{
+							explanation:
+								'The connection screen defaults to the wallet currently selected in Gem, instead of the one the site was originally connected with.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png',
+							label: 'Gem connection screen for app.uniswap.org offering the first wallet',
+							lastRetrieved: '2026-11-05',
+						},
+					],
+				}),
+			},
 			dataCollection: null,
 			privacyPolicy: 'https://gemwallet.com/privacy',
 			transactionPrivacy: {
@@ -528,7 +704,26 @@ export const gemwallet: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								"When swapping, the review screen shows the network fee but doesn't show Gem's fee or the swap provider's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-review.png',
+							label: 'Gem review screen for a swap from WETH to USDC',
+						},
+						{
+							explanation: "When swapping, the details screen doesn't break out the swap fees.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-swap-details.png',
+							label: 'Gem details sheet for a swap from WETH to USDC',
+						},
+						{
+							explanation: 'Gem takes a 0.5% fee on swaps, or 0.25% on swaps between stablecoins.',
+							url: {
+								label: 'Gem swap fee',
+								url: 'https://github.com/gemwalletcom/wallet/blob/eb67a811a2748d928e6144b02c1f24a20d2acc72/core/crates/swapper/src/fees/mod.rs#L10-L11',
+							},
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -536,17 +731,27 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.WALLET_FEE]: true,
 						},
 						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				erc20L1Transfer: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								'When sending a token, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-token-send-review.png',
+							label: 'Gem review screen for a WETH send',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -555,16 +760,25 @@ export const gemwallet: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				ethL1Transfer: supported({
-					ref: [],
+					ref: [
+						{
+							explanation: 'When sending ETH, the review screen shows the network fee in dollars.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-01-gemwallet-eth-send-review.png',
+							label: 'Gem review screen for an ETH send',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -573,16 +787,25 @@ export const gemwallet: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation: "Gem's review screen shows network fees but doesn't show Uniswap's fee.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-04-gemwallet-uniswap-swap-review.png',
+							label: 'Gem review screen for a Uniswap swap from USDC to ETH',
+						},
+					],
 					fees: {
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
@@ -590,12 +813,15 @@ export const gemwallet: SoftwareWallet = {
 							[FeeType.WALLET_FEE]: false,
 						},
 						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.FIAT,
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+							),
 						},
 						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
@@ -626,13 +852,50 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: notSupportedWithRef({
+					ref: [
+						{
+							explanation: 'The Android and iOS apps have no dependency isolation configured.',
+							label: 'Android app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/android/gradle/libs.versions.toml#not-line-specific',
+						},
+						{
+							label: 'iOS app libraries',
+							url: 'https://github.com/gemwalletcom/wallet/blob/01590487e8bfe55e810fddaf2ef1dd01a0cba7e4/.gitmodules#not-line-specific',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
 				}),
 				hermeticBuilds: notSupported,
-				repositoryChangeControls: null,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'Gem limits who can create or move release tags, but not who can delete them.',
+							label: 'Tag ruleset',
+							url: 'https://github.com/gemwalletcom/wallet/rules/14384859',
+						},
+						{
+							explanation: 'The repository has one ruleset and it targets tags, not branches.',
+							label: 'Repository ruleset list',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/rulesets',
+						},
+						{
+							explanation:
+								"Gem's repo doesn't enforce automated tests on its main codebase. Its other protections are only visible to Gem admins.",
+							label: 'Main branch protection',
+							url: 'https://api.github.com/repos/gemwalletcom/wallet/branches/main',
+						},
+					],
+					branchDeletionBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					forcePushBlocked: RepositoryChangeControlState.UNVERIFIABLE,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+					requiredReview: RepositoryChangeControlState.UNVERIFIABLE,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_ABSENT,
+				},
 				reproducibleBuilds: notSupported,
 			},
 		},

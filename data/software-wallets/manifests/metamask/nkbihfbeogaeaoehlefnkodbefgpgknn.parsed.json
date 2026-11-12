@@ -5,7 +5,6 @@
 	"permissions": [
 		"activeTab",
 		"alarms",
-		"clipboardWrite",
 		"notifications",
 		"scripting",
 		"storage",
@@ -16,5 +15,5 @@
 		"sidePanel",
 		"cookies"
 	],
-	"webAccessibleResources": "NONE"
+	"webAccessibleResources": "SPECIFIC_ORIGINS"
 }

@@ -284,13 +284,12 @@ export const parseCssAttributes = (css: string): Map<string, CssAttributeEntry> 
 		const doc = parseCommentBlock(block.comment)
 		const docMarkdown = parseCommentMarkdown(block.comment)
 		const blockText = `${block.selectorHeader}\n${block.body}`
-		const selectorAttributeNames = parseAttributeNames(block.selectorHeader)
-		const allBlockAttributeNames = parseAttributeNames(blockText)
-		const nestedAttributeNames = allBlockAttributeNames.filter(
-			name => !selectorAttributeNames.includes(name),
+		const documentedAttributeNames = parseAttributeNames(
+			docMarkdown.match(/^## .+$/m)?.[0] ?? block.selectorHeader,
 		)
+		const allBlockAttributeNames = parseAttributeNames(blockText)
 
-		for (const name of selectorAttributeNames) {
+		for (const name of documentedAttributeNames) {
 			const existing = entries.get(name)
 
 			if (existing === undefined) {
@@ -314,46 +313,22 @@ export const parseCssAttributes = (css: string): Map<string, CssAttributeEntry> 
 			existing.sourceSelector = `[${name}]`
 		}
 
-		for (const name of nestedAttributeNames) {
-			const existingNested = entries.get(name)
-
-			if (existingNested === undefined) {
-				entries.set(name, {
-					name,
-					doc: { ...doc },
-					docMarkdown,
-					values: new Set<string>(),
-					cssVariables: new Set<string>(),
-					sourceSelector: `[${name}]`,
-				})
-				continue
-			}
-
-			if (block.nested === true) {
-				existingNested.doc = {
-					...existingNested.doc,
-					...doc,
-				}
-				existingNested.docMarkdown = joinDocMarkdown(existingNested.docMarkdown, docMarkdown)
-			}
-		}
-
-		for (const tokenMatch of blockText.matchAll(
-			/\[(data-[a-z0-9-]+)~=(?:'([^']*)'|"([^"]*)")\]/g,
-		)) {
-			const name = tokenMatch[1]
-			const token = tokenMatch[2] ?? tokenMatch[3]
-			const entry = entries.get(name)
-
-			if (entry !== undefined && token !== undefined && token.length > 0) {
-				entry.values.add(token)
-			}
-		}
-
 		for (const cssVarMatch of blockText.matchAll(/--[a-zA-Z0-9-_]+/g)) {
 			for (const name of allBlockAttributeNames) {
 				entries.get(name)?.cssVariables.add(cssVarMatch[0])
 			}
+		}
+	}
+
+	// Supported token rules may be siblings of their attribute documentation.
+
+	for (const tokenMatch of css.matchAll(/\[(data-[a-z0-9-]+)~=(?:'([^']*)'|"([^"]*)")\]/g)) {
+		const name = tokenMatch[1]
+		const token = tokenMatch[2] ?? tokenMatch[3]
+		const entry = entries.get(name)
+
+		if (entry !== undefined && token !== undefined && token.length > 0) {
+			entry.values.add(token)
 		}
 	}
 
