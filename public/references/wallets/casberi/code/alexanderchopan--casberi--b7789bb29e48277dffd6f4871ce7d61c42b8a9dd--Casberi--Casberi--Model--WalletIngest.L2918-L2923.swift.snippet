@@ -1,0 +1,41 @@
+{
+	"highlightRanges": [
+		{
+			"first": 2918,
+			"last": 2923
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum WalletIngest {"
+			],
+			"startLine": 19
+		},
+		{
+			"lines": [
+				"    private struct HeldToken: Sendable, Codable {"
+			],
+			"startLine": 2897
+		},
+		{
+			"lines": [
+				"        /// the token — review 2026-07-16).",
+				"        let owner: String",
+				"    }",
+				"",
+				"    /// Every priced token (>= the dust floor) the given addresses hold, across",
+				"    /// the read chains — Alchemy's Portfolio `by-address` (balances + metadata +",
+				"    /// prices in one call). Chunked at 3 addresses (\"Maximum allowed addresses",
+				"    /// is 3\", measured 2026-07-15 — a 4th 400s the whole call) and paged up to",
+				"    /// 8 pages (≈800 tokens) so a whale's real holdings surface without",
+				"    /// unbounded paging. nil only when nothing was reachable at all.",
+				"    /// One holding as the Portfolio endpoint hands it over, before the floor is",
+				"    /// applied. The price is optional because a missing one isn't always a",
+				"    /// junk token — on Solana it's the norm (see `priceSPL`).",
+				"    private struct Candidate {"
+			],
+			"startLine": 2914
+		}
+	]
+}

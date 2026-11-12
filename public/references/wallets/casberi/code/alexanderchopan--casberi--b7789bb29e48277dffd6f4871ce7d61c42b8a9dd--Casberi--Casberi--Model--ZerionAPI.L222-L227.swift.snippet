@@ -1,0 +1,41 @@
+{
+	"highlightRanges": [
+		{
+			"first": 222,
+			"last": 227
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum ZerionAPI {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"    static func holdings(address: String, networks: Set<String> = []) async -> [Holding]? {"
+			],
+			"startLine": 183
+		},
+		{
+			"lines": [
+				"        // answers across everything it knows and the caller's own",
+				"        // `allowed.contains(h.network)` pass drops the rest — which is where",
+				"        // the real filtering has always happened.",
+				"        let wanted = networks.isEmpty ? Set(networkFor.values) : networks",
+				"        let ids = networkFor.filter { $0.key != \"solana\" && wanted.contains($0.value) }",
+				"            .keys.sorted().joined(separator: \",\")",
+				"        let base = \"filter[positions]=only_simple\"",
+				"            + \"&filter[trash]=only_non_trash\"",
+				"            + \"&currency=usd\"",
+				"        let stem = \"https://api.zerion.io/v1/wallets/\\(encoded)/positions/?\\(base)\"",
+				"",
+				"        // The number the person is looking at goes before every transactions",
+				"        // sweep queued on the lane (prd §1722).",
+				"        var rows: [[String: Any]]?"
+			],
+			"startLine": 218
+		}
+	]
+}

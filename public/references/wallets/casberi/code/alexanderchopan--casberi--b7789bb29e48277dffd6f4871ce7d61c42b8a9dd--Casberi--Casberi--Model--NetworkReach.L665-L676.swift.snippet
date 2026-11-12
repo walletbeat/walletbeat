@@ -1,0 +1,48 @@
+{
+	"highlightRanges": [
+		{
+			"first": 665,
+			"last": 676
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum NetworkReach {"
+			],
+			"startLine": 39
+		},
+		{
+			"lines": [
+				"    static let shipped: [Endpoint] = ["
+			],
+			"startLine": 109
+		},
+		{
+			"lines": [
+				"        Endpoint(service: \"Your own node\",",
+				"                 reach: .whenConnected(bridge: \"Wallet\"),",
+				"                 purpose: \"When you turn on your own node, your account reads that network from the address you give it, and from nothing else, directly rather than through Tor. Your node sees your account's address and what it reads. Sending still goes through the public bundlers.\",",
+				"                 hosts: [\"the node address you give it\"],",
+				"                 credentialed: false),",
+				"        // Move's checks (prd §1509 item 2, §1513): what a send or a swap is",
+				"        // looked up against before you sign. GoPlus names the address you",
+				"        // are about to pay, and Blockscout the contract, so both go through",
+				"        // Tor on a circuit of their own; OFAC's list is downloaded whole",
+				"        // and names no wallet (raw.githubusercontent.com, declared above).",
+				"        Endpoint(service: \"Move's checks\",",
+				"                 reach: .whenConnected(bridge: \"Wallet\"),",
+				"                 purpose: \"Before you send or swap, asks GoPlus whether the address you are about to pay has been reported for theft or fraud, and Blockscout when a contract was made, both through Tor. OFAC's list of sanctioned addresses is downloaded whole once a day and matched on this phone. Carries the one address being checked, nothing else about you.\",",
+				"                 hosts: [\"api.gopluslabs.io\", \"base.blockscout.com\", \"eth.blockscout.com\", \"robinhoodchain.blockscout.com\"],",
+				"                 credentialed: false,",
+				"                 throughTor: true),",
+				"        // Bitrefill's accountless checkout (prd §1473): Move's Buy. Reached",
+				"        // only when you tap Buy — a sign-in signed by your account, the",
+				"        // catalogue, an invoice, and its payment as a signed USDC",
+				"        // authorization. No account, no key; the codes are bound to the",
+				"        // paying wallet. Separate from the keyed Bitrefill seat above."
+			],
+			"startLine": 660
+		}
+	]
+}
