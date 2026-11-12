@@ -3,6 +3,7 @@ import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
 import { citrea } from '@/data/entities/citrea'
+import { cloakedTechnologies } from '@/data/entities/cloaked'
 import { cloudflare } from '@/data/entities/cloudflare'
 import { cloudinary } from '@/data/entities/cloudinary'
 import { consensys } from '@/data/entities/consensys'
@@ -32,6 +33,7 @@ export const allEntities = {
 	ambire: ambireEntity,
 	apple,
 	citrea,
+	cloakedTechnologies,
 	cloudflare,
 	cloudinary,
 	consensys,
