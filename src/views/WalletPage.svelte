@@ -3117,7 +3117,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				);
 			}
 			@media (width <= 84rem) {
-				--stickyBreadcrumb-exitAnimation: none;
+				--stickyBreadcrumb-exit: 0;
 			}
 			> [data-sticky-breadcrumb~="position"] {
 				--stickyBreadcrumb-sourcePaddingBlock: min(

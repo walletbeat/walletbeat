@@ -1685,7 +1685,7 @@ ol {
  * - `--stickyBreadcrumb-forceRow`: starts a row when 1
  * - `--stickyBreadcrumb-easing`: scale and fade curve; omitted preserves their individual defaults. Rounded arrival retains standard InOutExpo pacing
  * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling override; defaults to the shared curve or OutExpo
- * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
+ * - `--stickyBreadcrumb-exit`: `1` enables row and backdrop departure; `0` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-occlusionBlockEnd`: painted viewport block-end of lateral sticky content; section and prose landings clear the cumulative sticky extent without changing breadcrumb motion
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
@@ -2637,6 +2637,10 @@ ol {
 		from { interactivity: auto; }
 		to { interactivity: inert; }
 	}
+	@keyframes breadcrumb-surface-hit {
+		from { pointer-events: auto; }
+		to { pointer-events: none; }
+	}
 	@keyframes breadcrumb-surface {
 		from { opacity: 0; }
 		to { opacity: 1; }
@@ -3238,15 +3242,14 @@ ol {
 		[data-sticky-breadcrumb~="scope"] {
 			--stickyBreadcrumb-entryRange: exit-crossing 0% contain 100%;
 			---breadcrumb-entryAnimation: breadcrumb-entry;
+			--stickyBreadcrumb-exit: 1;
 			/* Only the visual row departs; supporting content retains its ordinary opacity. */
-			--stickyBreadcrumb-exitAnimation: breadcrumb-backdrop auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse both;
+			---breadcrumb-exitAnimation: if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-backdrop auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse both);
 			@supports (interactivity: inert) {
-				--stickyBreadcrumb-exitAnimation:
-					breadcrumb-fade auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse both,
-					breadcrumb-interactivity auto steps(1, end) both;
+				---breadcrumb-exitAnimation: if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-fade auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse both, breadcrumb-interactivity auto steps(1, end) both);
 			}
 			---breadcrumb-exitLayerAnimation: if(
-				style(--stickyBreadcrumb-exitAnimation: none): none;
+				style(--stickyBreadcrumb-exit: 0): none;
 				else: breadcrumb-exit-layer auto steps(1, start) forwards
 			);
 			--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
@@ -3543,7 +3546,7 @@ ol {
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
 					animation:
 						var(---link-currentAnimations, none),
-						var(--stickyBreadcrumb-exitAnimation);
+						var(---breadcrumb-exitAnimation);
 					animation-timeline:
 						var(---link-currentTimelines, none), var(---breadcrumb-exitTimeline), var(---breadcrumb-exitTimeline);
 					animation-range: var(---link-currentRanges, normal), var(---breadcrumb-exitRange), var(---breadcrumb-exitRange);
@@ -4717,16 +4720,14 @@ ol {
 							&[data-sticky~="backdrop-before"]::before,
 							&[data-sticky~="backdrop-after"]::after {
 								@container style(---breadcrumb-wrap: 1) {
-									animation: breadcrumb-backdrop auto var(--stickyBreadcrumb-easing, var(--transition-easeOutExpo)) both;
-									animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-									animation-range: var(--stickyBreadcrumb-entryRange);
-									@container style(---breadcrumb-entry: 1) {
-										opacity: 1;
-										visibility: visible;
-										animation: var(--stickyBreadcrumb-exitAnimation);
-										animation-timeline: var(---breadcrumb-exitTimeline);
-										animation-range: var(---breadcrumb-exitRange);
-									}
+									visibility: visible;
+									pointer-events: if(style(---breadcrumb-entry: 0): none; else: auto);
+									animation:
+										breadcrumb-fade auto var(--stickyBreadcrumb-easing, var(--transition-easeOutExpo)) both,
+										if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-surface-exit auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse forwards),
+										if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-surface-hit auto steps(1, end) forwards);
+									animation-timeline: var(--stickyBreadcrumb-entryTimeline), var(---breadcrumb-exitTimeline), var(---breadcrumb-exitTimeline);
+									animation-range: var(--stickyBreadcrumb-entryRange), var(---breadcrumb-exitRange), var(---breadcrumb-exitRange);
 								}
 							}
 						}
@@ -4737,7 +4738,7 @@ ol {
 								pointer-events: none;
 								@container style(---breadcrumb-wrap: 1) {
 									animation: breadcrumb-surface auto var(--stickyBreadcrumb-easing, var(--transition-easeOutExpo)) both,
-										if(style(--stickyBreadcrumb-exitAnimation: none): none; else: breadcrumb-surface-exit auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse forwards);
+										if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-surface-exit auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse forwards);
 									animation-timeline: var(--stickyBreadcrumb-entryTimeline), var(---breadcrumb-exitTimeline);
 									animation-range: var(--stickyBreadcrumb-entryRange), var(---breadcrumb-exitRange);
 								}
@@ -4753,11 +4754,11 @@ ol {
 									transform-origin: top;
 									animation:
 										breadcrumb-arrival-surface auto linear forwards,
-										if(style(--stickyBreadcrumb-exitAnimation: none): none; else: breadcrumb-surface-exit auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse forwards);
+										if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-surface-exit auto var(--stickyBreadcrumb-easing, var(--transition-easeInExpo)) reverse forwards);
 									animation-timeline: var(--stickyBreadcrumb-entryTimeline), var(---breadcrumb-exitTimeline);
 									animation-range: var(--stickyBreadcrumb-entryRange), var(---breadcrumb-exitRange);
 									@media (prefers-reduced-motion: reduce) {
-										animation-name: breadcrumb-arrival-surface-step, if(style(--stickyBreadcrumb-exitAnimation: none): none; else: breadcrumb-surface-exit);
+										animation-name: breadcrumb-arrival-surface-step, if(style(--stickyBreadcrumb-exit: 0): none; else: breadcrumb-surface-exit);
 									}
 								}
 							}

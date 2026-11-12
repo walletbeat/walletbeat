@@ -873,7 +873,7 @@ declare global {
 		 * - `--stickyBreadcrumb-forceRow`: starts a row when 1
 		 * - `--stickyBreadcrumb-easing`: scale and fade curve; omitted preserves their individual defaults. Rounded arrival retains standard InOutExpo pacing
 		 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling override; defaults to the shared curve or OutExpo
-		 * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
+		 * - `--stickyBreadcrumb-exit`: `1` enables row and backdrop departure; `0` retains the row while its support content keeps scrolling
 		 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
 		 * - `--stickyBreadcrumb-occlusionBlockEnd`: painted viewport block-end of lateral sticky content; section and prose landings clear the cumulative sticky extent without changing breadcrumb motion
 		 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
