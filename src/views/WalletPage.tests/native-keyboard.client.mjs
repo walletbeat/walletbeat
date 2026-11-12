@@ -175,9 +175,16 @@ export async function runNativeKeyboard(config, qualifyNativeBreadcrumbClock) {
 			const endpoint = root.scrollTop + marker.getBoundingClientRect().top - inset
 
 			assert(Number.isFinite(endpoint) && endpoint >= 0, 'Invalid initial H1 endpoint')
-			root.scrollTo({ top: endpoint, behavior: 'instant' })
-			await settle()
 			content.focus({ preventScroll: true })
+			eventSender.rawKeyDown('downArrow')
+
+			try {
+				await wait(100)
+			} finally {
+				eventSender.rawKeyUp('downArrow')
+			}
+
+			await settle()
 			const clock = qualifyNativeBreadcrumbClock()
 
 			assert(
@@ -203,7 +210,7 @@ export async function runNativeKeyboard(config, qualifyNativeBreadcrumbClock) {
 			assert(getComputedStyle(root).scrollSnapType !== 'none', 'Native snapping is disabled')
 			assert(
 				Math.abs(before.marker.top - inset) <= 1 && Math.abs(before.scroll - endpoint) <= 1,
-				'Initial H1 landing calibration failed',
+				'Initial H1 landing calibration failed: ' + JSON.stringify(before),
 			)
 			assert(
 				before.extent - before.clientHeight - before.scroll > 1000,
