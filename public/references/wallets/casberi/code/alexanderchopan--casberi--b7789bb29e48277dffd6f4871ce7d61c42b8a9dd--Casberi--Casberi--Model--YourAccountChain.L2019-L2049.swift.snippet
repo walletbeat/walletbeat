@@ -1,0 +1,72 @@
+{
+	"highlightRanges": [
+		{
+			"first": 2019,
+			"last": 2049
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountChain {"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"    static func assemble(_ items: [Item], account: String, roundUp: RoundUpBuy?, renew: Bool,"
+			],
+			"startLine": 1764
+		},
+		{
+			"lines": [
+				"        let assembled = Assembled(items: items, net: net, account: account, calls: calls, words: words,"
+			],
+			"startLine": 2011
+		},
+		{
+			"lines": [
+				"                                  roundUpWaits: roundUpWaits, crossing: crossing, arrives: arrives)",
+				"        return AssembledParts(assembled: assembled, approvalCount: approvalCalls.count, symbols: symbols)",
+				"    }",
+				"",
+				"    // MARK: - Revoke (prd §1437)",
+				"",
+				"    /// Take back what the account let others spend: every revoke on one",
+				"    /// network in one operation, signed by this iPhone, with the key change.",
+				"    /// The calls are `WalletPrepare`'s own (`revokeTo`/`revokeData`), the",
+				"    /// same bytes the prepare card has always shown.",
+				"    static func revoke(_ revokes: [(to: String, data: String)], on net: Network, reason: String,",
+				"                       stage: @escaping @Sendable (Stage) async -> Void) async throws -> Sent {",
+				"        guard let account = YourAccountKey.address else {",
+				"            throw Failure(message: String(localized: \"There is no account on this iPhone\"))",
+				"        }",
+				"        guard let zero = SafeABI.word(uint256: \"0\") else { throw Failure(message: String(localized: \"This send could not be written\")) }",
+				"        var calls: [YourAccountOp.Call] = []",
+				"        for r in revokes {",
+				"            guard SafeABI.word(address: r.to) != nil, let data = SafeABI.hexBytes(r.data) else {",
+				"                throw Failure(message: String(localized: \"This send could not be written\"))",
+				"            }",
+				"            calls.append(.init(operation: 0, to: r.to, value: zero, data: data))",
+				"        }",
+				"        guard !calls.isEmpty else { throw Failure(message: String(localized: \"Nothing to revoke\")) }",
+				"        await stage(.preparing)",
+				"        let deployed = try await isDeployed(net, account)",
+				"        let (signerIndex, device) = try await deviceSigner(net, account, deployed: deployed)",
+				"        let next = try YourAccountKey.nextKey(after: signerIndex)",
+				"        guard let nextKey = YourAccountKey.publicKey(next) else {",
+				"            throw Failure(message: String(localized: \"This send could not be written\"))",
+				"        }",
+				"        let outcome = try await operate(net, account: account, deployed: deployed, calls: calls,",
+				"                                        rotateTo: nextKey, payments: [], signer: device,",
+				"                                        reason: reason, stage: stage)",
+				"        return Sent(outcome: await settle(outcome, net, account, next: next, x: nextKey.x), network: net)",
+				"    }",
+				"",
+				"    // MARK: - Private money's contract calls (prd §1563)",
+				""
+			],
+			"startLine": 2015
+		}
+	]
+}

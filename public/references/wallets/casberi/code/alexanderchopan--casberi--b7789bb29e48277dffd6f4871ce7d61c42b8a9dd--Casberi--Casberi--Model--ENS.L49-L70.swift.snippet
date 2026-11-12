@@ -1,0 +1,51 @@
+{
+	"highlightRanges": [
+		{
+			"first": 49,
+			"last": 70
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum ENS {"
+			],
+			"startLine": 9
+		},
+		{
+			"lines": [
+				"    /// with `0x1111…`, the outdated-resolver answer, where web3.bio answers",
+				"    /// the current `0x2222…`. A fallback that can name the WRONG address is",
+				"    /// worse than none, so an outage now resolves nothing.",
+				"    ///",
+				"    /// **On chain first (prd §1629).** web3.bio itself began answering",
+				"    /// `0x1111…` on 2026-10-29, so a name is read through ENS's Universal",
+				"    /// Resolver (`ENSName.Universal`) on the Ethereum nodes the `.wei` names",
+				"    /// use. Only a gateway name (Basenames, Linea), which the resolver",
+				"    /// answers with `OffchainLookup`, goes to web3.bio; no node answering",
+				"    /// still resolves nothing.",
+				"    static func resolve(_ raw: String) async -> String? {",
+				"        guard !DemoMode.isActive else { return nil }",
+				"        let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)",
+				"        guard looksLikeName(name), let data = ENSName.Universal.calldata(for: name) else { return nil }",
+				"        let answer: ENSName.Universal.Answer",
+				"        switch await WalletApprovals.ethCallKeepingRevert(network: \"eth-mainnet\",",
+				"                                                          to: ENSName.Universal.address, data: data) {",
+				"        case .result(let hex):         answer = ENSName.Universal.answer(result: hex)",
+				"        case .reverted(let data):      answer = ENSName.Universal.answer(revertData: data)",
+				"        case .unreachable:             answer = .unreadable",
+				"        }",
+				"        switch answer {",
+				"        case .address(let hex): return hex",
+				"        case .noAddress, .unreadable: return nil",
+				"        case .offchain:",
+				"            guard let hex = await Web3Bio.resolve(name), isHexAddress(hex) else { return nil }",
+				"            return hex",
+				"        }",
+				"    }",
+				""
+			],
+			"startLine": 45
+		}
+	]
+}

@@ -1,0 +1,46 @@
+{
+	"highlightRanges": [
+		{
+			"first": 36,
+			"last": 46
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountPreview {"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"    static func networkFee(verification: UInt64, call: UInt64, preVerification: UInt64, maxFeePerGas: UInt64) -> String? {"
+			],
+			"startLine": 30
+		},
+		{
+			"lines": [
+				"        let (b, o2) = a.addingReportingOverflow(preVerification)",
+				"        let (c, o3) = b.multipliedReportingOverflow(by: maxFeePerGas)",
+				"        return o1 || o2 || o3 ? nil : String(c)",
+				"    }",
+				"",
+				"    /// The grey line's fee: \"Fee under a cent\" (the swap's words, a ceiling",
+				"    /// under a cent is a charge under a cent), else \"Fee up to $0.03\"; with",
+				"    /// no dollar price, the coin.",
+				"    static func feePhrase(usd: Double?, wei: String, coin: String = \"ETH\", money: (Double) -> String) -> String {",
+				"        if let usd {",
+				"            return usd < 0.01 ? String(localized: \"Fee under a cent\") : String(localized: \"Fee up to \\(money(usd))\")",
+				"        }",
+				"        return String(localized: \"Fee up to \\(Self.coin(wei)) \\(coin)\")",
+				"    }",
+				"",
+				"    /// Wei as the coin, to two significant figures under one: \"0.0000031\",",
+				"    /// never the six places that round a fee to \"0.000003\".",
+				"    static func coin(_ wei: String) -> String {",
+				"        let whole = Op.display(wei, decimals: 18, places: 18)"
+			],
+			"startLine": 32
+		}
+	]
+}

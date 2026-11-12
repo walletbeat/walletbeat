@@ -1,0 +1,62 @@
+{
+	"highlightRanges": [
+		{
+			"first": 134,
+			"last": 160
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum MoveChecks {"
+			],
+			"startLine": 20
+		},
+		{
+			"lines": [
+				"    static func report(_ address: String, chainId: Int) async -> MoveWarnings.Report? {"
+			],
+			"startLine": 124
+		},
+		{
+			"lines": [
+				"        await cache.put(report: r, key)",
+				"        return r",
+				"    }",
+				"",
+				"    /// The explorer each network's creation dates are read from.",
+				"    static func explorer(_ chainId: Int) -> String? {",
+				"        switch chainId {",
+				"        case 8453: \"base.blockscout.com\"",
+				"        case 1: \"eth.blockscout.com\"",
+				"        case 4663: \"robinhoodchain.blockscout.com\"",
+				"        default: nil",
+				"        }",
+				"    }",
+				"",
+				"    /// When `address` was made as a contract, or that it is none; nil when",
+				"    /// the explorer did not answer. Blockscout's Cloudflare wall turns away",
+				"    /// a request without a browser's User-Agent (measured).",
+				"    static func creation(_ address: String, chainId: Int) async -> MoveWarnings.Creation? {",
+				"        let key = \"\\(chainId)|\\(address.lowercased())\"",
+				"        if let hit = await cache.creation(key) { return hit }",
+				"        guard let host = explorer(chainId),",
+				"              let url = URL(string: \"https://\\(host)/api?module=contract&action=getcontractcreation&contractaddresses=\\(address.lowercased())\")",
+				"        else { return nil }",
+				"        var request = URLRequest(url: url)",
+				"        request.setValue(IngestSupport.safariUserAgent, forHTTPHeaderField: \"User-Agent\")",
+				"        guard let (data, http) = await IngestSupport.sendRequest(request, service: service),",
+				"              http.statusCode == 200, let c = MoveWarnings.creation(data) else { return nil }",
+				"        await cache.put(creation: c, key)",
+				"        return c",
+				"    }",
+				"",
+				"    /// An hour for a report (a fresh one can land), for good for a creation.",
+				"    private actor Cache {",
+				"        private var reports: [String: (MoveWarnings.Report, Date)] = [:]",
+				"        private var creations: [String: MoveWarnings.Creation] = [:]"
+			],
+			"startLine": 130
+		}
+	]
+}
