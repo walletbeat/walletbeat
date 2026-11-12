@@ -1,5 +1,6 @@
 import type { LucideNavigationIcon } from '@/constants/navigation'
 import type { WBIconID } from '@/styles/wbicons'
+import type { CalendarDate } from '@/types/date'
 
 import type { AtLeastOneTrueVariant } from './variants'
 
@@ -60,6 +61,14 @@ export interface Eip {
 	status: EipStatus
 
 	/**
+	 * The date the EIP moved to Final status, or null if its status is not
+	 * Final. The spec frontmatter does not record this date; it is the
+	 * committer date (UTC) of the spec's "Move to Final" commit in the
+	 * ethereum/EIPs or ethereum/ERCs repository.
+	 */
+	finalizedDate: CalendarDate | null
+
+	/**
 	 * The wallet variants this EIP can apply to.
 	 * The EIP is treated as not applicable for wallets of any other variant.
 	 */
@@ -111,6 +120,14 @@ export function eipMarkdownLink(eip: Eip): string {
 /** Return a markdown link and a title for an EIP. */
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
 	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
+}
+
+/**
+ * Return the label for how long an EIP has been Final (example: "Final for
+ * 1,094 days"), given the number of days since its finalization.
+ */
+export function eipFinalForLabel(days: number): string {
+	return `Final for ${days.toLocaleString('en-US')} ${days === 1 ? 'day' : 'days'}`
 }
 
 /** Return a human-readable label for an EIP status. */

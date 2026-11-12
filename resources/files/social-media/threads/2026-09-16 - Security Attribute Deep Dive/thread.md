@@ -18,7 +18,7 @@ This means that, as a user, you should be able to understand what the transactio
 ---
 
 Why does this matter?
-This is how we avoid situations like the ByBit Hack, which was the largest computer hack in history, as defined by amount of lost funds.
+This is how we avoid situations like the Bybit Hack, which was the largest computer hack in history, as defined by amount of lost funds.
 
 The @ethereumfndn has launched the Clear Signing Initiative as a result of this hack 👇
 

@@ -1,23 +1,37 @@
 <script lang="ts">
 	// Types/constants
-	import type { FullyQualifiedReference } from '@/schema/reference'
-	import { isRepoImageUrl } from '@/schema/url'
+	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
+	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
+
+	// Stored code snippets for this page, provided by the island's root component.
+	const codeSnippetForUrl = getCodeSnippetLookup()
 
 
 	// Props
 	const {
 		references,
 		cardBackground = 'primary',
+		headingLevel = 4,
 	}: {
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
+		headingLevel?: 2 | 3 | 4 | 5 | 6
 	} = $props()
 
 
 	// Internal state
 	let lightbox = $state<{ open: (url: string) => void }>()
 
+	// Long lists show their first few references until expanded. A list is only
+	// cut when that hides at least two references, so "show all" is never for one.
+	const collapsedCount = 2
+	let showAll = $state(false)
+
 	// (Derived)
+	const isCollapsible = $derived(references.length > collapsedCount + 1)
+	const isCollapsed = $derived(isCollapsible && !showAll)
+	const shownReferences = $derived(isCollapsed ? references.slice(0, collapsedCount) : references)
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -38,7 +52,86 @@
 	)
 
 
+	// A reference URL together with its locally stored code snippet.
+	// Snippet-backed URLs are rendered as inline code blocks with their own
+	// caption link, so they are excluded from the plain link list.
+	const codeSnippetEntries = (
+		urls: LabeledUrl[],
+	): { url: LabeledUrl; snippet: ResolvedCodeSnippet }[] => {
+		const entries: { url: LabeledUrl; snippet: ResolvedCodeSnippet }[] = []
+
+		for (const url of urls) {
+			const snippet = codeSnippetForUrl(url.url)
+
+			if (snippet !== null) {
+				entries.push({ snippet, url })
+			}
+		}
+
+		return entries
+	}
+
+
 	// Actions
+
+	// Centers the highlighted (referenced) lines in the fixed-height snippet box
+	// the first time the box comes near the viewport. Only the box scrolls, not
+	// the page.
+	const highlightScrollTop = (pre: HTMLElement): number | undefined => {
+		const highlighted = pre.querySelectorAll<HTMLElement>('.row.highlighted')
+
+		if (highlighted.length === 0) {
+			return undefined
+		}
+
+		const first = highlighted[0]
+		const last = highlighted[highlighted.length - 1]
+		const preTop = pre.getBoundingClientRect().top
+		const firstTop = first.getBoundingClientRect().top - preTop + pre.scrollTop
+		const lastBottom = last.getBoundingClientRect().bottom - preTop + pre.scrollTop
+		const center = (firstTop + lastBottom) / 2
+
+		return Math.max(0, center - pre.clientHeight / 2)
+	}
+
+	let highlightObserver: IntersectionObserver | undefined
+
+	const scrollToHighlight = (pre: HTMLElement) => {
+		if (pre.querySelector('.row.highlighted') === null) {
+			return
+		}
+
+		highlightObserver ??= new IntersectionObserver(
+			entries => {
+				// Measure every box that came into range before scrolling any.
+				const scrolls = entries
+					.filter(entry => entry.isIntersecting)
+					.map(entry => entry.target)
+					.filter(box => box instanceof HTMLElement)
+					.map(box => {
+						highlightObserver?.unobserve(box)
+
+						return { box, scrollTop: highlightScrollTop(box) }
+					})
+
+				for (const { box, scrollTop } of scrolls) {
+					if (scrollTop !== undefined) {
+						box.scrollTo({ top: scrollTop, behavior: 'instant' })
+					}
+				}
+			},
+			{ rootMargin: '50% 0px' },
+		)
+
+		highlightObserver.observe(pre)
+
+		return {
+			destroy: () => {
+				highlightObserver?.unobserve(pre)
+			},
+		}
+	}
+
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
 		// Plain left-clicks open the lightbox; modified clicks
 		// (middle, ctrl/cmd/shift) keep default link behavior
@@ -56,6 +149,7 @@
 	// Components
 	import ImageLightbox from '@/components/ImageLightbox.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import CodeIcon from 'lucide-static/icons/code.svg?raw'
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 	import ImageIcon from 'lucide-static/icons/image.svg?raw'
 	import { markdown } from '@/types/content'
@@ -69,21 +163,22 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<h5>
+		<svelte:element this={`h${headingLevel}`} class="sources-heading">
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</h5>
+		</svelte:element>
 
-		<ul class="references-list" data-list="gap-2">
-			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
+		<ul class="references-list" data-list="gap-2" data-scroll-item="snap-prose">
+			{#each shownReferences as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
-				{@const linkUrls =
-					inlineImage === undefined
-						? ref.urls
-						: ref.urls.filter(url => url.url !== inlineImage.url)}
+				{@const refSnippets = codeSnippetEntries(ref.urls)}
+				{@const snippetUrls = new Set(refSnippets.map(entry => entry.url.url))}
+				{@const linkUrls = ref.urls.filter(
+					url => url.url !== inlineImage?.url && !snippetUrls.has(url.url),
+				)}
 
 				{#snippet Url({ url, label }: { url: string, label: string })}
 					{#if isRepoImageUrl(url)}
@@ -113,13 +208,13 @@
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
 
-						<p class="explanation">
+						<div class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
 								<br>
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</p>
+						</div>
 					{/if}
 
 					{#if linkUrls.length === 1}
@@ -135,6 +230,34 @@
 							{/each}
 						</ul>
 					{/if}
+
+					{#each refSnippets as { url, snippet } (url.url)}
+						{@const sourceLocation = getUrlLabel(url.url)}
+						<figure class="code-snippet" data-column="start gap-1">
+							<figcaption>
+								<a
+									href={url.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<cite>{url.label}</cite>
+									{#if sourceLocation !== url.label}
+										<br>
+										<span class="source-location">{sourceLocation}</span>
+									{/if}
+									<span>{@html CodeIcon}</span>
+								</a>
+							</figcaption>
+							<!-- The snippet box scrolls, so it is focusable. -->
+							<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+							<pre
+								use:scrollToHighlight
+								tabindex="0"
+								role="group"
+								aria-label={`Code: ${url.label}`}
+							><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
+						</figure>
+					{/each}
 
 					{#if inlineImage !== undefined}
 						<figure class="inline-image" data-column="start gap-1">
@@ -165,9 +288,29 @@
 						</figure>
 					{/if}
 
-					{#if ref.lastRetrieved}
-						<small class="last-retrieved">
-							Last retrieved <time datetime={ref.lastRetrieved}>{ref.lastRetrieved}</time>
+					{#if ref.lastRetrieved || ref.source}
+						<small class="ref-meta">
+							{#if ref.lastRetrieved}
+								<span class="last-retrieved">
+									Last retrieved <time datetime={ref.lastRetrieved}>{ref.lastRetrieved}</time>
+								</span>
+							{/if}
+							{#if ref.source}
+								{@const source = ref.source}
+								<a
+									class="ref-credit"
+									href={`#${dataCreditAnchorId(source.entity)}`}
+									title={`Data source: ${source.entity.name}`}
+								>
+									{#if source.entity.icon !== 'NO_ICON'}
+										<img
+											src={`/images/entities/${source.entity.id}.${source.entity.icon.extension}`}
+											alt=""
+										/>
+									{/if}
+									<cite>Credit: {source.entity.name}</cite>
+								</a>
+							{/if}
 						</small>
 					{/if}
 				{/snippet}
@@ -193,7 +336,10 @@
 										<img
 											src={image.url}
 											alt={image.label}
+											width="128"
+											height="96"
 											loading="lazy"
+											decoding="async"
 										/>
 									</a>
 								{/each}
@@ -205,6 +351,17 @@
 				</li>
 			{/each}
 		</ul>
+
+		{#if isCollapsible}
+			<button
+				class="references-toggle"
+				type="button"
+				aria-expanded={showAll}
+				onclick={() => { showAll = !showAll }}
+			>
+				{showAll ? 'Show fewer sources' : `Show all ${totalUrls} sources`}
+			</button>
+		{/if}
 
 		<ImageLightbox
 			bind:this={lightbox}
@@ -220,7 +377,7 @@
 		line-height: 1.7;
 	}
 
-	h5 {
+	.sources-heading {
 		font-size: 1em;
 	}
 
@@ -228,9 +385,32 @@
 		font-style: normal;
 	}
 
+	.source-location {
+		font-weight: normal;
+		font-size: 0.85em;
+		color: var(--text-secondary);
+	}
+
 	.last-retrieved {
 		color: var(--text-secondary);
 		font-size: 0.875em;
+	}
+
+	.ref-credit {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25em;
+		vertical-align: middle;
+
+		img {
+			block-size: 1em;
+			inline-size: 1em;
+			object-fit: contain;
+		}
+
+		cite {
+			font-style: normal;
+		}
 	}
 
 	.inline-image {
@@ -244,6 +424,116 @@
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
 		}
+	}
+
+	.code-snippet {
+		margin: 0;
+		inline-size: 100%;
+		max-inline-size: 100%;
+		min-inline-size: 0;
+
+		pre {
+			margin: 0;
+			contain: inline-size;
+			inline-size: 100%;
+			max-inline-size: 100%;
+			min-inline-size: 0;
+			/* About 12 lines; the box scrolls itself to the highlighted lines when first shown. */
+			max-block-size: 20em;
+			overflow: auto;
+
+			padding: 0.75em 1em;
+			border: 1px solid light-dark(#d1d9e0, #3d444d);
+			border-radius: 0.5em;
+			background-color: light-dark(#fff, #0d1117);
+
+			font-size: 0.8125em;
+			line-height: 1.6;
+
+			scrollbar-width: none;
+
+			&:hover {
+				scrollbar-width: thin;
+			}
+
+			&::-webkit-scrollbar {
+				inline-size: 0.5em;
+				block-size: 0.5em;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background-color: transparent;
+				border-radius: 0.25em;
+			}
+
+			&:hover::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+			}
+
+			&:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+				scrollbar-width: thin;
+			}
+
+			&:focus-visible::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+			}
+		}
+
+		code {
+			display: block;
+			inline-size: max-content;
+			min-inline-size: 100%;
+		}
+
+		.row {
+			display: flex;
+			white-space: pre;
+		}
+
+		.row.line.highlighted {
+			inline-size: calc(100% + 2em);
+			margin-inline: -1em;
+			padding-inline: 1em;
+			background-color: light-dark(#fff8c5, #bb800926);
+			box-shadow: inset 3px 0 0 light-dark(#9a6700, #9e6a03);
+		}
+
+		.row.gap {
+			justify-content: center;
+
+			.line-number {
+				min-inline-size: 0;
+				margin-inline-end: 0;
+			}
+
+			.line-content {
+				display: none;
+			}
+		}
+
+		.line-number {
+			flex-shrink: 0;
+			min-inline-size: 4ch;
+			margin-inline-end: 1.25em;
+
+			text-align: end;
+			color: var(--text-secondary);
+			user-select: none;
+		}
+
+		.line-content {
+			flex: 1;
+		}
+	}
+
+	.references-toggle {
+		align-self: start;
+		margin-block-start: 0.75em;
+		padding-inline: 1em;
+		border-radius: 999em;
+		font-weight: 600;
 	}
 
 	.thumbnail {

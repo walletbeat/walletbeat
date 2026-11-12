@@ -1,11 +1,10 @@
 import { attributeTree } from '@/schema/attribute-tree'
 import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
-import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
+import { allWalletLadders, type Ladders, WalletLadderType } from '@/schema/ladders'
 import {
 	getEvaluateFunctionAttributeId,
 	StageCriterionRating,
 	type StageEvaluatableWallet,
-	type WalletLadder,
 	type WalletStage,
 	type WalletStageCriterion,
 } from '@/schema/stages'
@@ -40,7 +39,7 @@ export const allCriteriaInStage = <_AttributeGroupId extends string>(
 /**
  * Aggregate status for a stage or criteria group based on applicable criterion ratings.
  * Rule: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
- * Throws if every criterion is EXEMPT (stage must have at least one applicable criterion).
+ * All-exempt criteria pass, with zero applicable criteria.
  */
 export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
 
@@ -53,7 +52,7 @@ export interface StageCountsAndStatus {
 /**
  * Compute passed/total counts and aggregate status for a set of stage criteria.
  * "Applicable" = not EXEMPT. Status: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
- * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
+ * All-exempt criteria pass, with zero applicable criteria.
  */
 export function computeCountsAndStatus<_AttributeGroupId extends string>(
 	criteria: WalletStageCriterion<_AttributeGroupId>[],
@@ -69,9 +68,7 @@ export function computeCountsAndStatus<_AttributeGroupId extends string>(
 		allEvaluations.length > 0 && allEvaluations.every(e => e.rating === StageCriterionRating.EXEMPT)
 
 	if (allExempt) {
-		throw new Error(
-			'Stage has no applicable criteria for this wallet (all criteria are EXEMPT). The stage definition should have at least one criterion that applies.',
-		)
+		return { passedCount, totalCount, status: 'PASS' }
 	}
 
 	const hasUnrated = applicableEvaluations.some(e => e.rating === StageCriterionRating.UNRATED)
@@ -171,19 +168,29 @@ export function getAttributeCriteriaForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Ladders<_AttributeGroupId>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 ) {
 	return Object.entries(ladders)
-		.flatMap(([ladderType, ladder]) =>
-			ladder.stages.map((stage, stageIndex) => ({
+		.flatMap(entry => {
+			if (entry === undefined) {
+				throw new Error('Ladder entry is undefined')
+			}
+
+			const [ladderType, ladder] = entry
+
+			if (ladder === undefined) {
+				throw new Error(`Ladder ${ladderType} is undefined`)
+			}
+
+			return ladder.stages.map((stage, stageIndex) => ({
 				ladderType,
 				ladder,
 				stage,
 				stageIndex,
-			})),
-		)
+			}))
+		})
 		.filter(({ ladder }) => ladder.applicableTo(wallet))
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.flatMap(({ ladderType, stage, stageIndex }) =>
@@ -214,7 +221,7 @@ export function getAttributeStagesForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Ladders<_AttributeGroupId>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: RatedWallet<_AttributeGroupId>,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {

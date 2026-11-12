@@ -8,7 +8,7 @@ import {
 	commonExclusions,
 	crawlCodebase,
 	getRepositoryRoot,
-} from '@/tests/utils/codebase'
+} from '@/utils/codebase'
 
 describe('astro-middleware shouldShield', async () => {
 	const publicFiles: string[] = []

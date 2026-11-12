@@ -30,6 +30,14 @@
 			]
 		>
 
+		HeaderExtra?: Snippet<
+			[
+				{
+					column: Column<_RowValue, _CellValue, _ColumnId>
+				},
+			]
+		>
+
 		Cell?: Snippet<
 			[
 				{
@@ -118,7 +126,9 @@
 				Math.max(
 					1,
 					...columns.map(column =>
-						!column.subcolumns?.length ? 1 : 1 + getMaxLevel(column.subcolumns),
+						column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+							? 1 + getMaxLevel(column.subcolumns)
+							: 1,
 					),
 				)
 
@@ -431,7 +441,7 @@
 	// Transitions/animations
 	import { flip } from 'svelte/animate'
 	import { expoOut } from 'svelte/easing'
-	import { fade, fly } from 'svelte/transition'
+	import { fly } from 'svelte/transition'
 </script>
 
 
@@ -491,6 +501,7 @@
 				{@const isSortable = !!column.sort}
 				{@const isExpandable = !!column.subcolumns?.length}
 				{@const isExpanded = table.isColumnExpanded(column.id)}
+				{@const hasHeaderExtra = !!column.HeaderExtra}
 
 				<th
 					{colspan}
@@ -505,7 +516,7 @@
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
 					data-column-align={column.align ? column.align.toLowerCase() : undefined}
-					data-expandable={isExpandable ? '' : undefined}
+					data-expandable={isExpandable || hasHeaderExtra ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
 					<div
@@ -548,7 +559,14 @@
 							{/if}
 						</div>
 
-						{#if isExpandable}
+						{#if hasHeaderExtra}
+							<div
+								class="header-extra"
+								data-sticky="backdrop-before backdrop-stuck"
+							>
+								{@render column.HeaderExtra?.({ column })}
+							</div>
+						{:else if isExpandable}
 							<button
 								type="button"
 								class="expansion-button"
@@ -619,8 +637,6 @@
 									value,
 								})
 							}
-							animate:flip={{ duration: 300, easing: expoOut }}
-							in:fade={{ duration: 300, easing: expoOut }}
 						>
 							{#if column.Cell}
 								{@render column.Cell({
@@ -700,7 +716,7 @@
 				}
 			}
 
-			@container not scroll-state(stuck: none) {
+			@container scroll-state(not (stuck: none)) {
 				border-start-start-radius: 0;
 				border-start-end-radius: 0;
 			}
@@ -710,22 +726,22 @@
 					&[data-header-level='0'] {
 						font-weight: 700;
 						font-size: 1.1em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.02));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 2%);
 					}
 					&[data-header-level='1'] {
 						font-weight: 600;
 						font-size: 0.825em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.01));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 1%);
 					}
 					&[data-header-level='2'] {
 						font-weight: 500;
 						font-size: 0.7em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.005));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 0.5%);
 					}
 					&[data-header-level='3'] {
 						font-weight: 400;
 						font-size: 0.7em;
-						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.0025));
+						background-color: color-mix(in oklch, var(--table-backgroundColor), white 0.25%);
 					}
 
 					> .header-cell-content {
@@ -819,7 +835,8 @@
 							--isExpanded: 1;
 						}
 
-						.expansion-button {
+						.expansion-button,
+						.header-extra :global(.expansion-button) {
 							margin: var(--table-cell-padding);
 							margin-inline-start: calc(-2 * var(--table-cell-padding));
 
@@ -846,6 +863,11 @@
 								transition-property: transform;
 							}
 						}
+
+						.header-extra {
+							display: flex;
+							align-items: center;
+						}
 					}
 				}
 
@@ -863,7 +885,7 @@
 					}
 				}
 
-				@container not scroll-state(stuck: none) {
+				@container scroll-state(not (stuck: none)) {
 					&:first-child {
 						border-start-start-radius: 0.5em !important;
 						border-start-end-radius: 0.5em !important;
@@ -928,8 +950,8 @@
 						& td.sticky {
 							backdrop-filter: none;
 							transition:
-								all var(--active-transitionInDuration),
-								backdrop-filter none;
+								all var(--pressable-transitionInDuration),
+								backdrop-filter 0s;
 							opacity: 0;
 							scale: 0.9;
 						}

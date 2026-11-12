@@ -162,7 +162,7 @@ function restrictedAppConnectionSupport(
 export const appConnectionSupport: Attribute = {
 	id: 'appConnectionSupport',
 	icon: 'hardware_wallet_support',
-	displayName: 'app Connection Support',
+	displayName: 'App connection support',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's app connection support evaluated?",

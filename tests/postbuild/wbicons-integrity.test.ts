@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { wbiconsIDs, wbiconsMarkers } from '@/styles/wbicons'
-import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/tests/utils/codebase'
+import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/utils/codebase'
 
 const distDir = path.join(getRepositoryRoot(), 'dist')
 

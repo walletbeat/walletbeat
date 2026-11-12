@@ -2,12 +2,12 @@ import * as path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { assertValidMarkdown } from '@/tests/utils/assert-valid-markdown'
-import { getRepositoryRoot } from '@/tests/utils/codebase'
 import {
 	featuresMarkdownUpdate,
 	generateMarkdown,
 } from '@/tools/features-markdown-generator/features-markdown-generator-lib'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 const repoRoot = getRepositoryRoot()
 

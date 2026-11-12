@@ -29,6 +29,11 @@ log() {
 	echo "[Build determinism]" "$@" >&2
 }
 
+if ( hash uname &>/dev/null ) &&  [[ "$(uname -s)" != "Linux" ]]; then
+	log "Not running on Linux; skipping build-determinism test (bwrap is Linux-only)."
+	exit 0
+fi
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 HEAD="$(git -C "$ROOT" rev-parse HEAD)"
 

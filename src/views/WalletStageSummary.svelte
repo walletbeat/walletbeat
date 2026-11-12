@@ -8,11 +8,9 @@
 		stageCriterionRatings,
 		type StageEvaluatableWallet,
 		type WalletLadderEvaluation,
-		type WalletStage,
 	} from '@/schema/stages'
 	import { isTypographicContent } from '@/types/content'
-	import { slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletUrl } from '@/utils/urls'
+	import { getWalletAttributeUrl, getWalletUrl } from '@/utils/urls'
 	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
@@ -24,7 +22,7 @@
 		showNextStageCriteria = true,
 	}: {
 		wallet: RatedWallet<_AttributeGroupId>
-		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		stage: WalletLadderEvaluation<_AttributeGroupId>['stage'] | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
 	} = $props()
@@ -78,7 +76,14 @@
 	)
 
 	const targetStage = $derived(
-		showNextStageCriteria ?
+		stage === 'UNRATED' && ladderDefinition ?
+			ladderDefinition.stages[
+				(ladderEvaluation?.highestClearedStage ?
+					ladderDefinition.stages.findIndex(s => s.id === ladderEvaluation.highestClearedStage?.id)
+				:
+					-1) + 1
+			] ?? null
+		: showNextStageCriteria ?
 			(stage === 'QUALIFIED_FOR_NO_STAGES' ? stage0 : nextStage)
 		: stage === 'QUALIFIED_FOR_NO_STAGES' ?
 			stage0
@@ -100,7 +105,10 @@
 						evaluation: criterion.evaluate(stageEvaluatableWallet),
 					}))
 					.filter(({ evaluation }) =>
-						!showNextStageCriteria || evaluation.rating !== StageCriterionRating.PASS
+						!showNextStageCriteria || (
+							evaluation.rating !== StageCriterionRating.PASS &&
+							evaluation.rating !== StageCriterionRating.EXEMPT
+						)
 					)
 			)
 	)
@@ -122,6 +130,12 @@
 		<p>
 			Stage rating is not applicable to this wallet.
 		</p>
+	{:else if stage === 'UNRATED'}
+		<header data-column="gap-2">
+			<h3 data-row="gap-2">
+				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+			</h3>
+		</header>
 	{:else if stage === 'QUALIFIED_FOR_NO_STAGES'}
 		<header data-column="gap-2">
 			<h3 data-row="gap-2">
@@ -158,13 +172,13 @@
 		</header>
 	{/if}
 
-	{#if targetStage && criteria.length > 0 && displayStage}
+	{#if targetStage && criteria.length > 0 && (displayStage || stage === 'UNRATED')}
 		{#if showNextStageCriteria}
 			<hr>
 		{/if}
 
 		<section data-column="gap-4">
-			{#if showNextStageCriteria && targetStage && typeof targetStage === 'object'}
+			{#if showNextStageCriteria && targetStage && typeof targetStage === 'object' && stage !== 'UNRATED'}
 				<h4>
 					Criteria needed to advance to
 					<a
@@ -185,13 +199,14 @@
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
-					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
+					{@const attributeLink = attributeId ? getWalletAttributeUrl(wallet, attributeId) : null}
 					{@const criterionRatingMeta = stageCriterionRatings[evaluation.rating]}
 
 					<li
 						data-list-item-marker={criterionRatingMeta.icon}
 						data-stage-criterion-rating={evaluation.rating}
 						style:--accent={criterionRatingMeta.color}
+						style:--accent-textColor={criterionRatingMeta.textColor}
 						title={criterionRatingMeta.label}
 					>
 						{#if attributeName}
@@ -240,7 +255,6 @@
 	[data-stage-criterion-rating] {
 		&[data-stage-criterion-rating="EXEMPT"] {
 			text-decoration: line-through;
-			opacity: 0.6;
 		}
 	}
 </style>

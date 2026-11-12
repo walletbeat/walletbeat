@@ -319,7 +319,7 @@
 
   .error-text {
     font-size: 0.85rem;
-    color: var(--rating-fail, #ef4444);
+    color: var(--rating-fail-text);
     margin: 0;
   }
 

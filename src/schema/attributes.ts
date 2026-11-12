@@ -178,18 +178,25 @@ export function ratingToColor(rating: Rating): string {
 	}
 }
 
-export function borderRatingToColor(rating: Rating): string {
+/**
+ * Convert a rating to a color legible as text.
+ *
+ * Use this wherever the color lands on glyphs rather than on a fill, including
+ * `--accent` on any element that wraps a link: `[data-link], a` mixes `--accent`
+ * into its own text color, so the fill variants wash out there in light mode.
+ */
+export function ratingToTextColor(rating: Rating): string {
 	switch (rating) {
-		case Rating.FAIL:
-			return '#FB6682' // Red
-		case Rating.PARTIAL:
-			return '#FFCC73' // Yellow
 		case Rating.PASS:
-			return '#B5ED9D' // Green
+			return 'var(--rating-pass-text)'
+		case Rating.PARTIAL:
+			return 'var(--rating-partial-text)'
+		case Rating.FAIL:
+			return 'var(--rating-fail-text)'
 		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-unrated)'
 		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-neutral-text)'
 	}
 }
 

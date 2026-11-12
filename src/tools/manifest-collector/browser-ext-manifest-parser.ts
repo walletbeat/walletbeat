@@ -176,7 +176,7 @@ function parseExternallyConnectable(
 	const ec = getMaybeObj(raw, 'externally_connectable')
 
 	if (ec === undefined) {
-		return 'NOT_EXTERNALLY_CONNECTABLE'
+		return 'NOT_DECLARED'
 	}
 
 	const ids = getStringArray(ec, 'ids')
