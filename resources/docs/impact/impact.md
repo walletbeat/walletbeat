@@ -26,5 +26,7 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
 - **2026-10**: Walletbeat publishes its official breakdown of Ambire's ratings: https://x.com/walletbeat/status/2113699746070299093
   - **Reaction**: Ambire adds transaction simulation for ERC-721 token transfers: https://x.com/ambire/status/2115633972189315404
   - **Reaction**: Ambire team member Kalo commits to harden Ambire's browser extension by blocking other extensions from connecting to it: https://x.com/0xSuperKalo/status/2115757525517717577
+    - **Reaction**: Ambire's official update blocking other extensions from connecting to it: https://github.com/AmbireTech/extension/commit/c8b654a0eefac62c555cd6751143f44e9c504b7d
+  - **Reaction**: Bitget Wallet silently pushed the same fix, no official post: https://github.com/walletbeat/walletbeat/pull/1734
 - **2026-10**: Alexander Chopan points out that Walletbeat has a list of things it wishes wallets did: https://x.com/alexanderchopan/status/2114440976450326966
   - Casberi uses Walletbeat's evaluation framework and stage system for its wallet roadmap.

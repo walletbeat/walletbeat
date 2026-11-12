@@ -9,6 +9,7 @@ import { ambire } from './software-wallets/ambire'
 import { anonWallet } from './software-wallets/anon-wallet'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
+import { cloaked } from './software-wallets/cloaked'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
@@ -18,6 +19,7 @@ import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
+import { oath } from './software-wallets/oath'
 import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
@@ -71,6 +73,7 @@ export const softwareWallets = {
 	anonWallet,
 	baseApp,
 	bitget,
+	cloaked,
 	daimo,
 	elytro,
 	family,
@@ -80,6 +83,7 @@ export const softwareWallets = {
 	metamask,
 	mtpelerin,
 	nufi,
+	oath,
 	okx,
 	phantom,
 	pillarx,
