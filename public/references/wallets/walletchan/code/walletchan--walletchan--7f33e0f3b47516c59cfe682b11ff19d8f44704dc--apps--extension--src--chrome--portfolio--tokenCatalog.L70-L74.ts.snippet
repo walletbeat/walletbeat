@@ -1,0 +1,50 @@
+{
+	"highlightRanges": [
+		{
+			"first": 70,
+			"last": 74
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export async function loadPortfolioTokenCatalog(",
+				"  address: string,",
+				"  options: LoadPortfolioTokenCatalogOptions = {},",
+				"): Promise<PortfolioTokenCatalog> {"
+			],
+			"startLine": 38
+		},
+		{
+			"lines": [
+				"  const [",
+				"    portfolioResult,",
+				"    customTokens,",
+				"    networksInfo,",
+				"    recentReceived,",
+				"    hiddenTokenKeys,",
+				"  ] =",
+				"    await Promise.all(["
+			],
+			"startLine": 50
+		},
+		{
+			"lines": [
+				"      getRecentReceivedTokens(),",
+				"      getHiddenPortfolioTokenKeys(),",
+				"    ]);",
+				"",
+				"  const apiUnavailable = !portfolioResult.ok;",
+				"  if (apiUnavailable && options.signal?.aborted) throw portfolioResult.err;",
+				"  if (apiUnavailable) {",
+				"    console.warn(\"[portfolio] API unavailable, falling back to onchain native balances:\", portfolioResult.err);",
+				"  }",
+				"  const data = portfolioResult.ok",
+				"    ? portfolioResult.data",
+				"    : {",
+				"        tokens: [],"
+			],
+			"startLine": 66
+		}
+	]
+}
