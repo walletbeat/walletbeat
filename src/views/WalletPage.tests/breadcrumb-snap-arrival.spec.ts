@@ -3,25 +3,9 @@ import { expect, test } from '../../../tests/browser/verified-test'
 const arrivals = [
 	{
 		width: 390,
-		destinations: [
-			['#stages', '[id="stage:software-0"] [data-scroll-item~="snap-block-start"]'],
-			['#privacy', '#address-correlation .attribute-rating-details'],
-			['#security-news', '#security-news-consensys-metamask-north-korean-hacker'],
-			[
-				'#security-news',
-				'#security-news-metamask-infrastructure-security-incident .news-summary',
-				true,
-			],
-		],
+		destinations: [['#stages'], ['#privacy'], ['#security-news'], ['#security-news', true]],
 	},
-	{
-		width: 1440,
-		destinations: [
-			['#stages', '[id="stage:software-0"]'],
-			['#privacy', '#address-correlation'],
-			['#security-news', '#security-news-metamask-infrastructure-security-incident'],
-		],
-	},
+	{ width: 1440, destinations: [['#stages'], ['#privacy'], ['#security-news']] },
 ] as const
 
 for (const { width, destinations } of arrivals) {
@@ -42,7 +26,7 @@ for (const { width, destinations } of arrivals) {
 			'Native snap-linked breadcrumb arrival unavailable',
 		)
 
-		for (const [section, destination, open] of destinations) {
+		for (const [section, open] of destinations) {
 			if (open) {
 				const disclosure = page.locator(`${section} article > details`).first()
 
@@ -50,9 +34,9 @@ for (const { width, destinations } of arrivals) {
 				await expect(disclosure).toHaveJSProperty('open', true)
 			}
 
-			const result = await page.locator(destination).evaluate(async (snap, section) => {
+			const result = await page.locator(section).evaluate(async owner => {
 				const root = document.querySelector<HTMLElement>('#layout')!
-				const item = document.querySelector(`${section} [data-sticky-breadcrumb~="item"]`)!
+				const item = owner.querySelector('[data-sticky-breadcrumb~="item"]')!
 				const animation = item
 					.getAnimations()
 					.find(
@@ -65,33 +49,115 @@ for (const { width, destinations } of arrivals) {
 				}
 
 				const timeline = animation.timeline
-				const targetStyle = getComputedStyle(snap)
-				const margin = parseFloat(targetStyle.scrollMarginBlockStart) || 0
-				const padding = parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0
-				const landing =
-					root.scrollTop +
-					snap.getBoundingClientRect().top -
-					root.getBoundingClientRect().top -
-					margin -
-					padding
+				const subject = timeline.subject
+
+				if (!(subject instanceof HTMLElement)) {
+					throw new Error('Missing HTML arrival subject')
+				}
+
+				const end = () => {
+					const height = subject.getBoundingClientRect().height
+
+					return Math.max(
+						timeline.startOffset.to('px').value + height,
+						timeline.endOffset.to('px').value - height,
+					)
+				}
+				const frame = () =>
+					new Promise<void>(resolve =>
+						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+					)
+				const targets = [...owner.querySelectorAll<HTMLElement>('*')].filter(element => {
+					const style = getComputedStyle(element)
+					const box = element.getBoundingClientRect()
+
+					let ancestor = element.parentElement
+
+					while (ancestor && ancestor !== root) {
+						if (/auto|scroll|hidden/.test(getComputedStyle(ancestor).overflowY)) {
+							return false
+						}
+
+						ancestor = ancestor.parentElement
+					}
+
+					return (
+						style.scrollSnapAlign === 'start' &&
+						box.width > 0 &&
+						box.height > 0 &&
+						style.visibility !== 'hidden' &&
+						!element.closest('details:not([open]) > :not(summary)')
+					)
+				})
+				const landings = () =>
+					targets.map(
+						element =>
+							root.scrollTop +
+							element.getBoundingClientRect().top -
+							root.getBoundingClientRect().top -
+							parseFloat(getComputedStyle(element).scrollMarginBlockStart) -
+							(parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0),
+					)
+				const original = landings()
+				const originalExtent = root.scrollHeight
+				const originalStart = timeline.startOffset.to('px').value
+				let naturalLandings: number[]
+				let naturalExtent: number
+				let naturalStart: number
+				const originalStyle = subject.getAttribute('style')
+				let naturalEnd: number
+
+				try {
+					// Observe the natural heading boundary independently of its snap extension.
+					subject.style.setProperty('--stickyBreadcrumb-arrivalInsetEnd', 'initial', 'important')
+					await frame()
+					naturalEnd = end()
+					naturalLandings = landings()
+					naturalExtent = root.scrollHeight
+					naturalStart = timeline.startOffset.to('px').value
+				} finally {
+					if (originalStyle === null) {
+						subject.removeAttribute('style')
+					} else {
+						subject.setAttribute('style', originalStyle)
+					}
+
+					await frame()
+				}
+
+				const restored = landings()
+				const landing = Math.min(...original.filter(value => value >= naturalEnd - 1 / 32))
 
 				root.scrollTo({ top: Math.round(landing), behavior: 'instant' })
-				await new Promise<void>(resolve =>
-					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-				)
+				await frame()
 
-				const length = timeline.subject.getBoundingClientRect().height
-				const end = Math.max(
-					timeline.startOffset.to('px').value + length,
-					timeline.endOffset.to('px').value - length,
-				)
+				return {
+					landing,
+					end: end(),
+					scroll: root.scrollTop,
+					count: targets.length,
+					extentDelta: Math.max(
+						Math.abs(originalExtent - naturalExtent),
+						Math.abs(originalExtent - root.scrollHeight),
+					),
+					startDelta: Math.abs(originalStart - naturalStart),
+					measurementDelta: Math.max(
+						...original.map((value, index) => Math.abs(value - naturalLandings[index])),
+					),
+					geometryDelta: Math.max(
+						...original.map((value, index) => Math.abs(value - restored[index])),
+					),
+				}
+			})
 
-				return { alignment: targetStyle.scrollSnapAlign, landing, end, scroll: root.scrollTop }
-			}, section)
-
-			expect(result.alignment, destination).toBe('start')
-			expect(Math.abs(result.landing - result.end), destination).toBeLessThan(1)
-			expect(Math.abs(result.scroll - result.end), destination).toBeLessThan(1)
+			expect(result.count, section).toBeGreaterThan(0)
+			expect(Number.isFinite(result.landing), section).toBe(true)
+			expect(result.geometryDelta, section).toBeLessThan(1 / 32)
+			expect(result.measurementDelta, section).toBeLessThan(1 / 32)
+			expect(result.extentDelta, section).toBe(0)
+			expect(result.startDelta, section).toBeLessThan(1 / 32)
+			expect(Math.abs(result.landing - result.end), section).toBeLessThan(1)
+			expect(Math.abs(result.scroll - result.end), section).toBeLessThan(1)
 		}
 	})
 }
