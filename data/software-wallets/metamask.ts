@@ -6,6 +6,16 @@ import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
@@ -14,7 +24,10 @@ import {
 	BugBountyProgramAvailability,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -42,6 +55,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -54,6 +68,7 @@ import {
 } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
@@ -61,8 +76,16 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
-import { refTodo, type WithRef } from '@/schema/reference'
+import {
+	OnchainVerificationDocumentation,
+	OrderflowDisclosureLevel,
+	type OrderflowPracticesPageContents,
+} from '@/schema/features/transparency/orderflow'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
+import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -75,10 +98,130 @@ import { consensys } from '../entities/consensys'
 import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
+import { github } from '../entities/github'
+import { hyperFoundation } from '../entities/hyper-foundation'
+import { quicknode } from '../entities/quicknode'
+import { segment } from '../entities/segment'
+import { sentry } from '../entities/sentry'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 import metamaskAndroidParsed from './manifests/metamask/android.parsed.json'
 import metamaskIosParsed from './manifests/metamask/ios.parsed.json'
 import metamaskRawExtManifest from './manifests/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn.manifest.json'
+
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation: 'The extension is installed from the Chrome Web Store.',
+			url: 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+		},
+	],
+	github: [
+		{
+			explanation:
+				'After installation, MetaMask loads its phishing warning page from GitHub Pages. Token icons are loaded from the Trust Wallet asset repository on GitHub.',
+			url: [
+				'https://metamask.github.io/phishing-warning/',
+				'https://raw.githubusercontent.com/trustwallet/assets',
+			],
+		},
+	],
+	hyperFoundation: [
+		{
+			explanation:
+				"While the wallet is open, the active account address is sent to Hyperliquid's API to look up perpetuals positions.",
+			url: 'https://api.hyperliquid.xyz/info',
+		},
+	],
+	infura: [
+		{
+			explanation:
+				'RPC traffic for default networks goes through Infura, operated by Consensys. Balances are refreshed with Multicall `eth_call` requests that each carry one account address, sent back to back for every account in the wallet.',
+			url: 'https://mainnet.infura.io',
+		},
+	],
+	metamaskApi: [
+		{
+			explanation:
+				'MetaMask services operated by Consensys fetch balances, transaction history, token metadata, prices, and notifications. Notification requests list all accounts in the wallet in a single request.',
+			url: [
+				'https://accounts.api.cx.metamask.io',
+				'https://notification.api.cx.metamask.io',
+				'https://trigger.api.cx.metamask.io',
+				'https://price.api.cx.metamask.io',
+				'https://token.api.cx.metamask.io',
+			],
+		},
+		{
+			explanation:
+				'When creating a wallet, the profile sync service receives the MetaMetrics ID together with the account addresses.',
+			url: 'https://authentication.api.cx.metamask.io/api/v2/profile/accounts',
+		},
+		{
+			explanation:
+				'Transactions are simulated and submitted through the Transaction Sentinel service, and addresses, transactions, and connected apps are checked by the security alerts and app scanning services.',
+			urls: [
+				{
+					label: 'Transaction Sentinel service',
+					url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io',
+				},
+				{
+					label: 'Security alerts service',
+					url: 'https://security-alerts.api.cx.metamask.io',
+				},
+				{
+					label: 'App scanning service',
+					url: 'https://dapp-scanning.api.cx.metamask.io/v2/scan',
+				},
+			],
+		},
+		{
+			explanation: 'Swap quotes are fetched from the MetaMask bridge API.',
+			url: 'https://bridge.api.cx.metamask.io/getQuoteStream',
+		},
+	],
+	quicknode: [
+		{
+			explanation:
+				'When importing a wallet, some balance lookups are sent to QuickNode endpoints on Arbitrum, Base, Optimism, and Monad.',
+			url: 'https://www.quicknode.com/',
+		},
+	],
+	segment: [
+		{
+			explanation:
+				'MetaMetrics product analytics are sent to Segment with the MetaMetrics ID as `userId`, a profile ID, and the actions taken. Transaction events include the connected app as `referrer`. MetaMask asks for consent to MetaMetrics during onboarding.',
+			url: 'https://api.segment.io/v1/batch',
+		},
+	],
+	sentry: [
+		{
+			explanation: 'Sentry receives performance traces and error reports.',
+			url: 'https://sentry.io/api/273505/envelope/',
+		},
+	],
+	smartTransactions: [
+		{
+			explanation:
+				'MetaMask documents Smart Transactions as routing eligible transactions privately and auctioning them to a network of block builders. The capture shows the transaction submitted to this infrastructure, not whether that particular transaction was auctioned.',
+			url: 'https://metamask.io/news/introducing-smart-transactions',
+		},
+		{
+			explanation:
+				'The signed swap transaction is submitted to the Smart Transactions service, which returns an ID used for status polling.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/v1/networks/1/submitTransactions',
+		},
+		{
+			explanation:
+				'The status of the submitted transaction is then polled until it is mined or canceled.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/v1/networks/1/batchStatus',
+		},
+		{
+			explanation:
+				'Network capabilities and configuration, including Smart Transactions support, are fetched from the same service.',
+			url: 'https://tx-sentinel-ethereum-mainnet.api.cx.metamask.io/networks',
+		},
+	],
+}
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -117,7 +260,50 @@ export const metamask: SoftwareWallet = {
 				contract: metamask7702DelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Seed phrase and key derivation libraries',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L20-L34',
+							},
+							{
+								label: 'BIP-44 derivation path',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L38',
+							},
+							{
+								label: 'Deriving each account',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L208-L230',
+							},
+							{
+								label: 'Browser extension depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/package.json#L413',
+							},
+							{
+								label: 'Mobile app depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/package.json#L318',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -138,8 +324,32 @@ export const metamask: SoftwareWallet = {
 				},
 			],
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "MetaMask doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
@@ -163,10 +373,19 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -261,14 +480,14 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The MetaMask browser extension uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
 				[Variant.MOBILE]: {
 					ref: {
 						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE#not-line-specific',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
@@ -325,7 +544,582 @@ export const metamask: SoftwareWallet = {
 				}),
 				useAppSpecificLastConnectedAddresses: notSupported,
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SWAP_QUOTE,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.smartTransactions,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.ORDERFLOW_AUCTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 0, kind: 'ipTime', strength: 1800000 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.quicknode,
+							byEntity: quicknode,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.github,
+							byEntity: github,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.SCAM_DETECTION,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 1, kind: 'ipTime', strength: 1799999 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.hyperFoundation,
+							byEntity: hyperFoundation,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.infura,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.metamaskApi,
+							byEntity: consensys,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.SCAM_DETECTION,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.segment,
+							byEntity: segment,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.PHYSICAL_ADDRESS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.PROMPTED,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.PROMPTED,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+			},
 			privacyPolicy: 'https://consensys.io/privacy-notice/',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -444,10 +1238,12 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -463,10 +1259,14 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -551,7 +1351,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf#binary-file',
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -561,7 +1361,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf#binary-file',
 					auditDate: '2025-04-01',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -642,7 +1442,31 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask shows the amount, sender, recipient, network, network fee, and nonce on an ETH transfer request.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_2.png',
+						label: 'MetaMask transfer request for an ETH transfer',
+					},
+					{
+						explanation:
+							'MetaMask simulates a transaction that reverts and warns that it is likely to fail.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_6.png',
+						label: 'MetaMask transaction request warning that the transaction is likely to fail',
+					},
+					{
+						explanation: 'MetaMask simulates an ERC-721 mint and shows the NFT the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png',
+						label: 'MetaMask transaction request for an ERC-721 mint',
+					},
+					{
+						explanation:
+							'MetaMask simulates an ERC-1155 mint and shows the token the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_9.png',
+						label: 'MetaMask transaction request for an ERC-1155 mint',
+					},
+				],
 				erc4361: supported({
 					ref: {
 						explanation: 'MetaMask formats SIWE requests for easy readability.',
@@ -651,12 +1475,37 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask decodes a USDC approval as a spending cap request, showing the spender, and amount.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-usdc-approval.png',
+							label: 'MetaMask spending cap request for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask does not decode an Aave supply. It only shows the simulated balance change and the contract being interacted with.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
+							label: 'MetaMask transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-aave-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-batch-approve-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -670,7 +1519,32 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask shows the EIP-712 primary type and message fields of a typed data signature request.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png',
+							label: 'MetaMask signature request for EIP-712 typed data',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC approval into the function name, spender, and value, with a button to copy the raw data.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_3.png',
+							label: 'MetaMask decoded calldata for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC transfer into the function name, recipient, and value.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_4.png',
+							label: 'MetaMask decoded calldata for a USDC transfer',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of an Aave supply into the function name and its parameters.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_5.png',
+							label: 'MetaMask decoded calldata for an Aave supply',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -734,19 +1608,99 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'MetaMask mobile swap review screen for a 3 USDC to ETH swap, showing the quote, rate, network fee, slippage, and MetaMask fee. Does not itself show a separate approve step or its requested amount.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask mobile swap review screen for a 3 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-custom-rpc.png',
+							label: 'MetaMask browser extension Edit network page with a custom Ethereum RPC set',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-add-network.png',
+							label: 'MetaMask mobile app Add a network form with an RPC URL field',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation: 'MetaMask supports custom RPCs and sends transactions directly to them.',
+							url: [
+								{
+									label: 'Browser extension only uses Smart Transactions on RPCs MetaMask allows',
+									url: 'https://github.com/MetaMask/metamask-extension/blob/795627f6e64b74bc461409d24f9aed7b9f7cc6c4/shared/lib/selectors/smart-transactions.ts#L172-L202',
+								},
+								{
+									label:
+										"Browser extension only uses MetaMask's relay when gas is paid with an ERC-20 token or sponsored",
+									url: 'https://github.com/MetaMask/metamask-extension/blob/795627f6e64b74bc461409d24f9aed7b9f7cc6c4/app/scripts/lib/transaction/hooks/delegation-7702-publish.ts#L125-L132',
+								},
+								{
+									label: 'Mobile app only uses Smart Transactions on RPCs MetaMask allows',
+									url: 'https://github.com/MetaMask/metamask-mobile/blob/fb064d202bc62b00c153c78a63d1de2bbd8f2765/app/util/smart-transactions/index.ts#L93-L113',
+								},
+								{
+									label:
+										"Mobile app only uses MetaMask's relay when gas is paid with an ERC-20 token or sponsored",
+									url: 'https://github.com/MetaMask/metamask-mobile/blob/fb064d202bc62b00c153c78a63d1de2bbd8f2765/app/util/transactions/hooks/delegation-7702-publish.ts#L156-L163',
+								},
+								{
+									label:
+										'For sends paid in ETH, MetaMask skips the relay and broadcasts the transaction through the RPC',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/TransactionController.ts#L4478-L4486',
+								},
+								{
+									label: 'Transactions get routed to the custom RPC',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/utils/provider.ts#L68-L79',
+								},
+								{
+									label: 'Transactions are submitted with `eth_sendRawTransaction`',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/TransactionController.ts#L3262-L3267',
+								},
+							],
+						},
+					],
 					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-network-list.png',
+							label: 'MetaMask browser extension network picker listing Base, Arbitrum and OP',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-network-list.png',
+							label: 'MetaMask mobile app Networks list with Base, Arbitrum and OP enabled',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
+							url: [
+								{
+									label: "Transactions are sent to the network's RPC",
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/utils/provider.ts#L68-L79',
+								},
+							],
+						},
+					],
 				},
 			},
 		},
@@ -756,40 +1710,116 @@ export const metamask: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon; the network fee is shown by default but the wallet fee is not.',
+								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon. The network fee is shown by default, but the wallet fee is not.',
 							file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
 							label:
 								'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
-			orderflowPractices: null,
+			orderflowPractices: {
+				disclosure: {
+					ref: {
+						explanation:
+							'The swap review screen shows the rate, network fee, slippage, price impact, minimum received, and MetaMask fee, but does not mention that the transaction is routed through Smart Transactions or auctioned to block builders.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask swap review screen',
+					},
+					afterSingleAction: OrderflowDisclosureLevel.NONE,
+					byDefault: OrderflowDisclosureLevel.NONE,
+				},
+				practicesPage: supported({
+					ref: {
+						explanation:
+							'The Smart Transactions support article explains that Smart Transactions is on by default and works by auctioning transactions to a network of trusted block builders, who may profit from some transactions without changing the trade price. It documents how to turn the feature off, but does not name the builders. It only notes that transactions appear on block explorers once confirmed.',
+						url: 'https://support.metamask.io/manage-crypto/transactions/smart-transactions/',
+					},
+					contents: {
+						documentsHowToChangeDefaults: true,
+						explainsDefaultOrderflowAuctioning: true,
+						listsEntitiesAndWhatTheyDo: false,
+						onchainVerification: OnchainVerificationDocumentation.NO_METHOD_DOCUMENTED,
+						pageLastUpdated: '2026-09-30',
+					},
+				} satisfies MustRef<{ contents: OrderflowPracticesPageContents }>),
+				userCanRemoveAuctioning: supported({
+					ref: {
+						explanation:
+							'Smart Transactions can be turned off in Settings > Transactions on the extension and Settings > Advanced on mobile. Setting a custom RPC for a supported network also overrides it.',
+						url: 'https://support.metamask.io/manage-crypto/transactions/smart-transactions/',
+					},
+				}),
+			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({
 					ref: [
@@ -807,12 +1837,13 @@ export const metamask: SoftwareWallet = {
 					publication: 'SIGSTORE_REKOR',
 					signer: 'BUILD_INFRA_IDENTITY',
 				}),
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'The repo pins a `yarn.lock` lockfile committed alongside `package.json`.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#not-line-specific',
 						},
 						{
 							explanation: 'CI lints the lockfile and checks yarn resolutions on every run.',
@@ -820,6 +1851,23 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: {
+					[Variant.BROWSER]: supported({
+						ref: [
+							{
+								explanation:
+									'Production `build` and `dist` scripts run webpack under LavaMoat, enforcing a per-package policy on bundled dependencies.',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#L49-L51',
+							},
+							{
+								explanation:
+									'Committed LavaMoat policies (with overrides) for each build type define what each dependency may access.',
+								url: 'https://github.com/MetaMask/metamask-extension/tree/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/lavamoat/webpack',
+							},
+						],
+					}),
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
@@ -829,7 +1877,7 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation: 'A dedicated static security code scanner runs on push and PR.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml#not-line-specific',
 						},
 					],
 				}),
@@ -837,7 +1885,7 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The repo maintains a publicly accessible `CHANGELOG.md`, validated by CI on every run.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md#not-line-specific',
 					},
 				}),
 				hermeticBuilds: notSupported,
@@ -871,11 +1919,11 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/metamask-extension/rules/18725950',
 						},
 					],
-					branchDeletionBlocked: true,
-					forcePushBlocked: true,
-					requiredChecks: true,
-					requiredReview: true,
-					tagsImmutable: true,
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredReview: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
 				},
 				// MetaMask rebuilds and compares its own Firefox releases, but the harness
 				// and reviewer instructions are private so it can't be independently

@@ -1,0 +1,17 @@
+{
+	"contentScripts": "HTTP_AND_HTTPS",
+	"externallyConnectable": "NOT_DECLARED",
+	"hostPermissions": "HTTP_AND_HTTPS",
+	"permissions": [
+		"alarms",
+		"tabs",
+		"storage",
+		"unlimitedStorage",
+		"clipboardWrite",
+		"notifications",
+		"scripting",
+		"sidePanel",
+		"gcm"
+	],
+	"webAccessibleResources": "NONE"
+}

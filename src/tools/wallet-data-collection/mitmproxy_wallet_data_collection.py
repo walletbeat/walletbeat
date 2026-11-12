@@ -44,6 +44,7 @@ _KNOWN_BENIGN_HEADERS = frozenset(
         "Connection",
         "Origin",
         "Pragma",
+        "Referer",
         "Upgrade",
         "Upgrade-Insecure-Requests",
         "Vary",
@@ -592,15 +593,17 @@ class WalletRequest:
         return cls(
             domain=data["domain"],
             path=data["path"],
+            scheme=data.get("scheme"),
+            referer=data.get("referer"),
             query=_decode_str_multidict("query"),
             json_rpc_method=json_rpc_method,
             content=_decode_content("content"),
             cookies=_decode_str_multidict("cookies"),
-            referer_domain=data.get("refererDomain"),
             odd_headers=_decode_str_multidict("oddHeaders"),
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
             review=data.get("review"),
+            proxy=data.get("proxy"),
             response_status=data.get("responseStatus"),
             response_headers=_decode_str_multidict("responseOddHeaders") or None,
             response_payload=_decode_if_set("responsePayload"),
@@ -632,18 +635,16 @@ class WalletRequest:
                     json_rpc_method = tuple(rpc["method"] for rpc in payload)
             except json.JSONDecodeError:
                 pass  # Not JSON-RPC
-        referer_domain: str | None = None
-        if "Referer" in req.headers:
-            referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
 
         return cls(
             domain=url.hostname,
             path=url.path,
+            scheme=url.scheme,
+            referer=req.headers.get("Referer"),
             query=_multidict_to_dict_of_tuples(req.query),
             json_rpc_method=json_rpc_method,
             content=text,
             cookies=_multidict_to_dict_of_tuples(req.cookies),
-            referer_domain=referer_domain,
             odd_headers=_multidict_to_dict_of_tuples(
                 req.headers, filter_fn=lambda k: not is_benign_header(k)
             ),
@@ -664,26 +665,30 @@ class WalletRequest:
         json_rpc_method: tuple[str, ...],
         content: str | None,
         cookies: dict[str, tuple[str, ...]],
-        referer_domain: str | None,
         odd_headers: dict[str, tuple[str, ...]],
         odd_trailers: dict[str, tuple[str, ...]],
         session_time: int,
         review: object | None,
+        proxy: dict | None = None,
         response_status: int | None = None,
         response_headers: dict[str, tuple[str, ...]] | None = None,
         response_payload: str | None = None,
+        scheme: str | None = None,
+        referer: str | None = None,
     ):
         self._domain = domain
         self._path = path
+        self._scheme = scheme
+        self._referer = referer
         self._query = query
         self._json_rpc_method = json_rpc_method
         self._content = content
         self._cookies = cookies
-        self._referer_domain = referer_domain
         self._odd_headers = odd_headers
         self._odd_trailers = odd_trailers
         self._session_time = session_time
         self._review = review
+        self._proxy = proxy
         self._response_status: int | None = response_status
         self._response_headers: dict[str, tuple[str, ...]] = (
             response_headers if response_headers is not None else {}
@@ -720,10 +725,8 @@ class WalletRequest:
             if len(self._json_rpc_method) == 0
             else f" rpc={','.join(sorted(self._json_rpc_method))}"
         )
-        referer_domain = (
-            "" if self._referer_domain is None else f" referer={self._referer_domain}"
-        )
         content = "" if self._content is None else f" content={self._content}"
+        referer = "" if self._referer is None else f" referer={self._referer}"
         response_status = (
             "" if self._response_status is None else f" status={self._response_status}"
         )
@@ -737,7 +740,7 @@ class WalletRequest:
             f"{_maybe_multidict('query', self._query)}"
             f"{json_rpc}{content}"
             f"{_maybe_multidict('cookie', self._cookies)}"
-            f"{referer_domain}"
+            f"{referer}"
             f"{_maybe_multidict('headers', self._odd_headers)}"
             f"{_maybe_multidict('trailers', self._odd_trailers)}"
             f"{response_status}"
@@ -751,6 +754,12 @@ class WalletRequest:
             "path": self._path,
             "sessionTime": self._session_time,
         }
+
+        if self._scheme is not None:
+            data["scheme"] = self._scheme
+
+        if self._referer is not None:
+            data["referer"] = self._referer
 
         def _encode_multidict(name: str, md: dict[str, tuple[str, ...]]):
             if len(md) == 0:
@@ -783,9 +792,6 @@ class WalletRequest:
 
         _encode_multidict("cookies", self._cookies)
 
-        if self._referer_domain is not None:
-            data["refererDomain"] = self._referer_domain
-
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
 
@@ -800,6 +806,9 @@ class WalletRequest:
 
         if self._review is not None:
             data["review"] = self._review
+
+        if self._proxy is not None:
+            data["proxy"] = self._proxy
 
         return data
 

@@ -15,14 +15,17 @@ import {
 	type DataCollectionForFlowWithOnchainData,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	type EndpointCollection,
 	EntityRole,
 	leastConfigurableCollectionPolicy,
+	type MultiAddressHandling,
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
 	userFlow,
 	userFlowMayBeMarkedUnsupported,
 	type UserInfo,
+	userInfoCorrelatableAcrossEntities,
 	userInfoEnums,
 	validateDataCollectionByEntityRow,
 	WalletInfo,
@@ -30,7 +33,6 @@ import {
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
-import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
@@ -45,6 +47,7 @@ import {
 	setItems,
 } from '@/types/utils/non-empty'
 import { assertStringHasPrefix } from '@/types/utils/text'
+import { escapeRegExp } from '@/utils/codebase'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 import {
 	expectArray,
@@ -56,6 +59,13 @@ import {
 	stableJSONStringify,
 } from '@/utils/json'
 
+import {
+	type AddressBearingRequest,
+	classifyEntityMultiAddressHandling,
+	type CorrelatableOnlyRequest,
+	type EntityRequests,
+} from './multi-address-classification'
+import { removeFile, writeFileAtomically } from './read-only'
 import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
@@ -63,6 +73,7 @@ import {
 	type WalletCaptureAnnotations,
 	type WalletRequestMatcher,
 } from './wallet-capture-annotations'
+import { requestIdToString } from './wallet-capture-classification-audit-log'
 
 export enum RecordedOnlyFlow {
 	IDLE_PRE_INSTALL = 'IDLE_PRE_INSTALL',
@@ -111,6 +122,8 @@ interface EncodedWalletDataRequest {
 	domain: string
 	path: string
 	sessionTime: number
+	scheme?: string
+	referer?: string
 
 	/**
 	 * Encoded as omitted if empty, otherwise Record<key, string | string[]>.
@@ -132,7 +145,6 @@ interface EncodedWalletDataRequest {
 	content?: string | EncodedContentBase64
 
 	cookies?: EncodedMultiDict
-	refererDomain?: string
 	oddHeaders?: EncodedMultiDict
 	oddTrailers?: EncodedMultiDict
 
@@ -156,7 +168,31 @@ interface EncodedWalletDataRequest {
 	 */
 	responsePayload?: EncodedResponsePayload
 
+	/**
+	 * Encoded as omitted if the request was not routed through a proxy,
+	 * otherwise the proxy the request was routed through.
+	 */
+	proxy?: EncodedWalletDataRequestProxy
+
 	review?: EncodedWalletRequestReview
+}
+
+/**
+ * Encoded representation of the proxy through which a request was routed.
+ */
+interface EncodedWalletDataRequestProxy {
+	/**
+	 * The kind of proxy.
+	 */
+	kind: 'TOR'
+
+	/**
+	 * Opaque identifier for the isolation circuit within the proxy.
+	 * Two requests routed through the same circuit appear to the receiving entity
+	 * as coming from the same IP address.
+	 * `null` means no specific circuit was used.
+	 */
+	circuit: string | null
 }
 
 /**
@@ -741,6 +777,18 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 	const path = expectString(obj.path, `${at}.path`)
 	const sessionTime = expectNumber(obj.sessionTime, `${at}.sessionTime`)
 
+	let scheme: string | undefined
+
+	if (obj.scheme !== undefined) {
+		scheme = expectString(obj.scheme, `${at}.scheme`)
+	}
+
+	let referer: string | undefined
+
+	if (obj.referer !== undefined) {
+		referer = expectString(obj.referer, `${at}.referer`)
+	}
+
 	let query: EncodedMultiDict | undefined
 
 	if (obj.query !== undefined) {
@@ -751,12 +799,6 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 
 	if (obj.cookies !== undefined) {
 		cookies = parseEncodedMultiDict(obj.cookies, `${at}.cookies`)
-	}
-
-	let refererDomain: string | undefined
-
-	if (obj.refererDomain !== undefined) {
-		refererDomain = expectString(obj.refererDomain, `${at}.refererDomain`)
 	}
 
 	let oddHeaders: EncodedMultiDict | undefined
@@ -830,13 +872,34 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		responsePayload = parseEncodedResponsePayload(obj.responsePayload, `${at}.responsePayload`)
 	}
 
+	let proxy: EncodedWalletDataRequestProxy | undefined
+
+	if (obj.proxy !== undefined) {
+		const proxyObj = expectRecord(obj.proxy, `${at}.proxy`)
+
+		const kind = proxyObj.kind
+
+		if (kind !== 'TOR') {
+			throw new Error(`Unexpected ${at}.proxy.kind=${String(kind)}`)
+		}
+
+		const circuit = proxyObj.circuit
+
+		if (circuit !== null && typeof circuit !== 'string') {
+			throw new Error(`Expected string or null at ${at}.proxy.circuit`)
+		}
+
+		proxy = { kind, circuit }
+	}
+
 	return {
 		domain,
 		path,
 		sessionTime,
+		...(scheme ? { scheme } : {}),
+		...(referer ? { referer } : {}),
 		...(query && Object.keys(query).length ? { query } : {}),
 		...(cookies && Object.keys(cookies).length ? { cookies } : {}),
-		...(refererDomain ? { refererDomain } : {}),
 		...(oddHeaders && Object.keys(oddHeaders).length ? { oddHeaders } : {}),
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
@@ -844,6 +907,7 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		...(responseStatus !== undefined ? { responseStatus } : {}),
 		...(responseOddHeaders && Object.keys(responseOddHeaders).length ? { responseOddHeaders } : {}),
 		...(responsePayload ? { responsePayload } : {}),
+		...(proxy ? { proxy } : {}),
 		...(review ? { review } : {}),
 	}
 }
@@ -1916,9 +1980,8 @@ export class WalletDataStrings {
 
 			for (const origin of s.getOrigins().values()) {
 				const req = origin.request
-				const matcher = this.captureFile.findMatcherForReq(req)
 
-				if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+				if (req.isNotWalletInitiated()) {
 					continue
 				}
 
@@ -2103,6 +2166,7 @@ export class WalletRequestReview {
 
 		if (this.extraPurposes.length === 0) {
 			this.extraPurposes = 'NOT_WALLET_INITIATED'
+			this.request.refreshNotWalletInitiatedByProxy()
 
 			return
 		}
@@ -2167,14 +2231,17 @@ export class WalletRequest {
 	public readonly jsonRpcMethods: string[]
 	public readonly content: string | null
 	public readonly cookies: UserDataDict
-	public readonly refererDomain: string | null
+	public readonly scheme: string | null
+	public readonly referer: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
 	public readonly responseStatus: number | null
 	public readonly responseOddHeaders: UserDataDict
 	private readonly _responsePayloadEncoded: EncodedResponsePayload | null
 	private readonly _responsePayload: DecodedResponsePayload | null
+	private readonly _proxy: EncodedWalletDataRequestProxy | null
 	public readonly review: WalletRequestReview
+	public notWalletInitiatedByProxy: WalletRequest | null = null
 	private readonly _key: string
 
 	private constructor(args: {
@@ -2186,12 +2253,14 @@ export class WalletRequest {
 		jsonRpcMethods: string[]
 		content: string | null
 		cookies: UserDataDict
-		refererDomain: string | null
+		scheme: string | null
+		referer: string | null
 		oddHeaders: UserDataDict
 		oddTrailers: UserDataDict
 		responseStatus: number | null
 		responseOddHeaders: UserDataDict
 		responsePayloadEncoded: EncodedResponsePayload | null
+		proxy: EncodedWalletDataRequestProxy | null
 		review: EncodedWalletRequestReview | null
 	}) {
 		this._captureFile = args.captureFile
@@ -2202,12 +2271,14 @@ export class WalletRequest {
 		this.jsonRpcMethods = args.jsonRpcMethods
 		this.content = args.content
 		this.cookies = args.cookies
-		this.refererDomain = args.refererDomain
+		this.scheme = args.scheme
+		this.referer = args.referer
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
 		this.responseStatus = args.responseStatus
 		this.responseOddHeaders = args.responseOddHeaders
 		this._responsePayloadEncoded = args.responsePayloadEncoded
+		this._proxy = args.proxy
 		this._responsePayload =
 			args.responsePayloadEncoded !== null
 				? DecodedResponsePayload.fromEncoded(args.responsePayloadEncoded)
@@ -2260,12 +2331,14 @@ export class WalletRequest {
 					)
 				})() ?? null,
 			cookies: decodeUserDataDict(req.cookies, `${at}.cookies`),
-			refererDomain: req.refererDomain ?? null,
+			scheme: req.scheme ?? null,
+			referer: req.referer ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
 			responseStatus: req.responseStatus ?? null,
 			responseOddHeaders: decodeUserDataDict(req.responseOddHeaders, `${at}.responseOddHeaders`),
 			responsePayloadEncoded: req.responsePayload ?? null,
+			proxy: req.proxy ?? null,
 			review: req.review ?? null,
 		})
 	}
@@ -2329,7 +2402,8 @@ export class WalletRequest {
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
 			...(contentEncoded !== undefined ? { content: contentEncoded } : {}),
 			...(cookies ? { cookies } : {}),
-			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
+			...(this.scheme !== null ? { scheme: this.scheme } : {}),
+			...(this.referer !== null ? { referer: this.referer } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
 			...(oddTrailers ? { oddTrailers } : {}),
 			...(this.responseStatus !== null && this.responseStatus !== 200
@@ -2337,6 +2411,7 @@ export class WalletRequest {
 				: {}),
 			...(responseOddHeaders ? { responseOddHeaders } : {}),
 			...(responsePayloadEncoded !== null ? { responsePayload: responsePayloadEncoded } : {}),
+			...(this._proxy !== null ? { proxy: this._proxy } : {}),
 			...(this.review.toJSON() === undefined ? {} : { review: this.review.toJSON() }),
 		}
 	}
@@ -2364,7 +2439,9 @@ export class WalletRequest {
 			this.jsonRpcMethods.length === 0 ? '' : ` rpc=${[...this.jsonRpcMethods].sort().join(',')}`
 
 		const content = this.content ? ` content=${this.content.toString()}` : ''
-		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
+		const refererDomain = this.refererDomain()
+			? ` referer=${(this.refererDomain() ?? '').toString()}`
+			: ''
 
 		const responseStatus = this.responseStatus !== null ? ` status=${this.responseStatus}` : ''
 		const responsePayload =
@@ -2411,7 +2488,9 @@ export class WalletRequest {
 			return true
 		}
 
-		if (this.refererDomain !== null && this.refererDomain.includes(needle)) {
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.includes(needle)) {
 			return true
 		}
 
@@ -2422,16 +2501,192 @@ export class WalletRequest {
 		return false
 	}
 
+	/**
+	 * Returns the subset of the given wallet addresses in this request.
+	 */
+	public async walletAddressesPresent(
+		walletAddresses: ReadonlySet<Erc55Address>,
+	): Promise<Erc55Address[]> {
+		if (walletAddresses.size === 0) {
+			return []
+		}
+
+		// Build the request's strings once, then check each wallet address
+		// against them. This avoids re-parsing the request per address.
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const stringValues = reqStrings.strings().map(s => s.str.str.toLowerCase())
+
+		const present: Erc55Address[] = []
+
+		for (const walletAddr of walletAddresses) {
+			const addr = walletAddr.toLowerCase()
+
+			const found = stringValues.some(v => v.includes(addr))
+
+			if (found) {
+				present.push(walletAddr)
+			}
+		}
+
+		return present
+	}
+
+	/**
+	 * The correlatable `UserInfo` string values carried by this request, keyed
+	 * by `UserInfo` type. These are the actual string values (e.g. cookie
+	 * values, email addresses, phone numbers) that have been classified as a
+	 * {@link UserInfo} that passes
+	 * {@link userInfoCorrelatableAcrossEntities}.
+	 */
+	public async correlatableUserInfo(): Promise<ReadonlyMap<UserInfo, ReadonlySet<string>>> {
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		const result = new Map<UserInfo, Set<string>>()
+
+		for (const s of reqStrings.strings()) {
+			for (const info of s.str.pieces) {
+				if (!userInfoCorrelatableAcrossEntities(info)) {
+					continue
+				}
+
+				let values = result.get(info)
+
+				if (values === undefined) {
+					values = new Set()
+					result.set(info, values)
+				}
+
+				values.add(s.str.str)
+			}
+		}
+
+		return result
+	}
+
+	/**
+	 * The proxy circuit this request was routed through, or `null` if it was
+	 * not proxied. Two requests routed through the same circuit appear to the
+	 * receiving entity as coming from the same IP address.
+	 *
+	 * The returned string is `\`<kind>\`` (e.g. `TOR`) when no specific circuit
+	 * was used, or `\`<kind>:<circuit>\`` (e.g. `TOR:some-circuit-id`) otherwise.
+	 */
+	public proxy(): string | null {
+		if (this._proxy === null) {
+			return null
+		}
+
+		return this._proxy.circuit === null
+			? this._proxy.kind
+			: `${this._proxy.kind}:${this._proxy.circuit}`
+	}
+
+	/**
+	 * Details about the secure enclave the request's endpoint runs in, or
+	 * `null` if the endpoint is not an IP-hiding secure enclave
+	 */
+	public secureEnclaveDetails(): null {
+		return null // Secure enclaves not yet supported.
+	}
+
+	/**
+	 * True when this request is directly identified as NOT_WALLET_INITIATED,
+	 * either by a matching request matcher or by manual review.
+	 */
+	public isNotWalletInitiatedDirectly(): boolean {
+		const matcher = this._captureFile.findMatcherForReq(this)
+
+		if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+			return true
+		}
+
+		return this.review.getExtraPurposes() === 'NOT_WALLET_INITIATED'
+	}
+
+	/**
+	 * True when this request is identified as NOT_WALLET_INITIATED, either
+	 * directly (via matcher or manual review) or by proxy via its referer header.
+	 */
+	public isNotWalletInitiated(): boolean {
+		return this.isNotWalletInitiatedDirectly() || this.notWalletInitiatedByProxy !== null
+	}
+
+	/**
+	 * The URL signature of this request: scheme (may be `null` for capture
+	 * files that predate scheme storage), host (domain) and path. Used for
+	 * NOT_WALLET_INITIATED by-proxy matching.
+	 */
+	public urlSignature(): { scheme: string | null; host: string; path: string } {
+		return { scheme: this.scheme, host: this.domain, path: this.path }
+	}
+
+	/**
+	 * The URL signature of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererUrlSignature(): {
+		scheme: string | null
+		host: string | null
+		path: string
+	} | null {
+		if (this.referer === null) {
+			return null
+		}
+
+		try {
+			const url = new URL(this.referer)
+
+			return {
+				scheme: url.protocol.replace(/:$/, ''),
+				host: url.hostname,
+				path: url.pathname,
+			}
+		} catch {
+			return null
+		}
+	}
+
+	/**
+	 * The domain (hostname) of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererDomain(): string | null {
+		return this.refererUrlSignature()?.host ?? null
+	}
+
+	/**
+	 * Refreshes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		this._captureFile.refreshNotWalletInitiatedByProxy()
+	}
+
 	public get key(): string {
 		return this._key
 	}
 
+	/** The canonical request ID: `walletId:walletVariant:sessionTime`. */
+	public requestIdString(): `${string}:${string}:${string}` {
+		return requestIdToString({
+			walletId: this._captureFile.identity.walletId,
+			walletVariant: this._captureFile.identity.walletVariant,
+			sessionTime: this.sessionTime.toNumber(),
+		})
+	}
+
 	public domains(): NonEmptyArray<string> {
-		if (
-			this.refererDomain !== null &&
-			this.refererDomain.toLowerCase() !== this.domain.toLowerCase()
-		) {
-			return [this.domain, this.refererDomain]
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.toLowerCase() !== this.domain.toLowerCase()) {
+			return [this.domain, refererDomain]
 		}
 
 		return [this.domain]
@@ -2475,7 +2730,10 @@ export class WalletRequest {
 			}
 		}
 
-		setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+		if (this.proxy() === null) {
+			setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+		}
+
 		const reqStrings = new WalletDataStrings(this._captureFile)
 
 		await this.populateStringsInto(reqStrings)
@@ -2704,11 +2962,7 @@ export class WalletCaptureFlow {
 	}
 
 	public async unreviewableRequests(strings: WalletDataStrings): Promise<WalletRequest[]> {
-		const filtered = this._requests.filter(req => {
-			const matcher = this.file.findMatcherForReq(req)
-
-			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
-		})
+		const filtered = this._requests.filter(req => !req.isNotWalletInitiated())
 		const keepIndexes = await Promise.all(
 			filtered.map(async req => !(await req.isReadyForReview(strings))),
 		)
@@ -2718,11 +2972,7 @@ export class WalletCaptureFlow {
 
 	public unreviewedRequests(): WalletRequestReview[] {
 		return this._requests
-			.filter(req => {
-				const matcher = this.file.findMatcherForReq(req)
-
-				return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
-			})
+			.filter(req => !req.isNotWalletInitiated())
 			.map(req => req.review)
 			.filter(review => !review.isManuallyReviewed())
 	}
@@ -2776,6 +3026,24 @@ export interface WalletCaptureFileIdentity {
 	walletType: WalletType
 	walletVariant: Variant
 	walletId: string
+}
+
+/**
+ * The classification fingerprint of a single request, resolved across the whole
+ * repository so it can be diffed to detect classification changes. Canonical and
+ * deterministic (sorted arrays) so `JSON.stringify` equality is a valid diff.
+ */
+export interface WalletRequestClassification {
+	/** Sorted, deduped purposes from matcher + manual review. */
+	purposes: DataCollectionPurpose[]
+	/** Sorted `{ userInfo, policy }` resolved via request.userInfo + matcher policy. */
+	userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }>
+	/** Operator + intermediaries resolved from the domain mapping, as `{ entityId, role }`. */
+	receivingEntities: Array<{ entityId: string; role: EntityRole }>
+	/** True when the request is NOT_WALLET_INITIATED (directly or by proxy). */
+	notWalletInitiated: boolean
+	/** True when the request's domain has no entity mapping (unclassifiable). */
+	unclassifiable: boolean
 }
 
 export class WalletCaptureFile {
@@ -2937,6 +3205,8 @@ export class WalletCaptureFile {
 		for (const info of this.captureInfo) {
 			this.userData.addCaptureInfo(info)
 		}
+
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	private toJSON(): EncodedWalletCaptureFile {
@@ -2986,6 +3256,10 @@ export class WalletCaptureFile {
 			[UserFlow.APP_CONNECTION]: null,
 		}
 
+		// The set of the wallet's own addresses that appear anywhere across all
+		// flows.
+		const totalWalletAddressesSeen = await this.computeWalletAddressesSeen()
+
 		for (const recFlow of recordedFlow.items) {
 			const flow = this.getFlow(recFlow)
 
@@ -3006,7 +3280,11 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = await this.processFlowRequests(flow, options.strict ?? false)
+			const collected = await this.processFlowRequests(
+				flow,
+				options.strict ?? false,
+				totalWalletAddressesSeen,
+			)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -3028,11 +3306,35 @@ export class WalletCaptureFile {
 	}
 
 	/**
+	 * Compute the set of the wallet's own addresses that appear across all
+	 * recorded flows.
+	 */
+	private async computeWalletAddressesSeen(): Promise<Set<Erc55Address>> {
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
+		const seen = new Set<Erc55Address>()
+
+		for (const request of this.getRequests()) {
+			const carried = await request.walletAddressesPresent(walletOwnAddressesSet)
+
+			for (const addr of carried) {
+				seen.add(addr)
+			}
+		}
+
+		return seen
+	}
+
+	/**
 	 * Process flow requests to build DataCollectionByEntity array.
+	 *
+	 * @param totalWalletAddressesSeen The set of the wallet's own addresses
+	 *   seen across all flows.
 	 */
 	private async processFlowRequests(
 		flow: WalletCaptureFlow,
 		strict: boolean,
+		totalWalletAddressesSeen: ReadonlySet<Erc55Address>,
 	): Promise<WithRef<DataCollectionByEntity>[]> {
 		const maybeThrow = (error: string) => {
 			if (strict) {
@@ -3048,8 +3350,17 @@ export class WalletCaptureFile {
 				role: EntityRole
 				info: Map<UserInfo, CollectionPolicy>
 				purposes: Set<DataCollectionPurpose>
+				/** The wallet's own addresses observed by this entity. */
+				walletAddresses: Set<Erc55Address>
+				/** The address-bearing requests observed by this entity. */
+				addressRequests: AddressBearingRequest[]
+				/** The correlatable-UserInfo-only requests observed by this entity. */
+				correlatableOnlyRequests: CorrelatableOnlyRequest[]
 			}
 		>()
+
+		const walletOwnAddresses = this.walletOwnAddresses()
+		const walletOwnAddressesSet = new Set<Erc55Address>(walletOwnAddresses ?? [])
 
 		for (const request of flow.requests) {
 			const resolved = entitiesForDomain(request.domain)
@@ -3062,6 +3373,11 @@ export class WalletCaptureFile {
 			const matcher = this.findMatcherForReq(request)
 			const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
 			const purposes = new Set<DataCollectionPurpose>()
+
+			// Not a wallet-initiated request (directly or by proxy); skip.
+			if (request.notWalletInitiatedByProxy !== null) {
+				continue
+			}
 
 			if (matcher !== null) {
 				if (matcher.purposes === 'NOT_WALLET_INITIATED') {
@@ -3085,6 +3401,9 @@ export class WalletCaptureFile {
 				purposes.add(purpose)
 			}
 
+			const carriedWalletAddresses = await request.walletAddressesPresent(walletOwnAddressesSet)
+			const correlatableUserInfo = await request.correlatableUserInfo()
+
 			// The data is seen by the operator and by every intermediary on the
 			// way there, so record one receipt per entity with its role.
 			const receivingEntities: Array<{ entity: Entity; role: EntityRole }> = [
@@ -3105,6 +3424,9 @@ export class WalletCaptureFile {
 						role,
 						info: new Map<UserInfo, CollectionPolicy>(),
 						purposes: new Set<DataCollectionPurpose>(),
+						walletAddresses: new Set<Erc55Address>(),
+						addressRequests: [],
+						correlatableOnlyRequests: [],
 					}
 					perEntity.set(perEntityKey, entData)
 				}
@@ -3127,6 +3449,30 @@ export class WalletCaptureFile {
 				for (const purpose of purposes) {
 					entData.purposes.add(purpose)
 				}
+
+				if (carriedWalletAddresses.length > 0) {
+					for (const addr of carriedWalletAddresses) {
+						entData.walletAddresses.add(addr)
+					}
+
+					entData.addressRequests.push({
+						addresses: assertNonEmptyArray(carriedWalletAddresses),
+						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
+				} else if (correlatableUserInfo.size > 0) {
+					// A request that carries correlatable `UserInfo` values but no
+					// wallet address can still participate in a correlation chain,
+					// so record it separately.
+					entData.correlatableOnlyRequests.push({
+						correlatableUserInfo,
+						proxy: request.proxy(),
+						secureEnclaveDetails: request.secureEnclaveDetails(),
+						sessionMilliseconds: request.sessionTime.toNumber(),
+					})
+				}
 			}
 		}
 
@@ -3146,26 +3492,41 @@ export class WalletCaptureFile {
 				continue
 			}
 
+			const multiAddress = ((): MultiAddressHandling | null => {
+				if (entData.walletAddresses.size === 0) {
+					return null
+				}
+
+				const entityRequests: EntityRequests = {
+					addresses: assertNonEmptyArray(Array.from(entData.walletAddresses)),
+					requests: entData.addressRequests,
+					correlatableOnlyRequests: entData.correlatableOnlyRequests,
+				}
+
+				return classifyEntityMultiAddressHandling(totalWalletAddressesSeen.size, entityRequests)
+			})()
+
+			const dataCollection: EndpointCollection = {
+				// TODO: Implement support for other values here once any wallet supports this, i.e. Kohaku wallet.
+				endpoint: RegularEndpoint,
+				multiAddress,
+				...nonEmptyMapToRecord(userInfos, info => {
+					const policy = entData.info.get(info)
+
+					if (policy === undefined) {
+						maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
+
+						return CollectionPolicy.ALWAYS
+					}
+
+					return policy
+				}),
+			}
+
 			const row: WithRef<DataCollectionByEntity> = {
 				byEntity: entData.entity,
 				role: entData.role,
-				dataCollection: {
-					// TODO: Implement support for other values here once any wallet supports this...
-					endpoint: RegularEndpoint,
-					// TODO: Handle multiAddress.
-					multiAddress: undefined,
-					...nonEmptyMapToRecord(userInfos, info => {
-						const policy = entData.info.get(info)
-
-						if (policy === undefined) {
-							maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
-
-							return CollectionPolicy.ALWAYS
-						}
-
-						return policy
-					}),
-				},
+				dataCollection,
 				purposes: purposes,
 				ref: refNotNecessary,
 			}
@@ -3224,11 +3585,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${this.path}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = this.path + '.tmp'
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, this.path)
+			await writeFileAtomically(this.path, content)
 			changed.push(this.path)
 		}
 
@@ -3261,7 +3618,7 @@ export class WalletCaptureFile {
 					throw new Error(`File not in sync: ${jsonPath}`)
 				}
 
-				await fs.promises.rm(jsonPath)
+				await removeFile(jsonPath)
 
 				return [jsonPath]
 			}
@@ -3287,11 +3644,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${jsonPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${jsonPath}.tmp`
-
-			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
-			await fs.promises.writeFile(tmpPath, content, 'utf8')
-			await fs.promises.rename(tmpPath, jsonPath)
+			await writeFileAtomically(jsonPath, content)
 			changed.push(jsonPath)
 		}
 
@@ -3339,6 +3692,7 @@ export class WalletCaptureFile {
 		variants.sort((a, b) => a.localeCompare(b))
 
 		const wantLines: string[] = [
+			"import { Variant } from '@/schema/variants'",
 			"import { capturedWalletDataCollection } from '@/tools/wallet-data-collection/data-collection-for-wallet-lib.ts'",
 			'',
 		]
@@ -3352,7 +3706,7 @@ export class WalletCaptureFile {
 
 		wantLines.push('')
 		wantLines.push(
-			`const ${dataCollectionVarName} = capturedWalletDataCollection([${variants.map(variant => `${variant.toLowerCase()}Data`).join(', ')}])`,
+			`const ${dataCollectionVarName} = capturedWalletDataCollection({ ${variants.map(variant => `[Variant.${variant}]: ${variant.toLowerCase()}Data`).join(', ')} })`,
 		)
 		wantLines.push('')
 		wantLines.push(`export default ${dataCollectionVarName}`)
@@ -3381,11 +3735,7 @@ export class WalletCaptureFile {
 				throw new Error(`File not in sync: ${aggregationLibPath}`)
 			}
 		} else if (needsWrite) {
-			const tmpPath = `${aggregationLibPath}.tmp`
-
-			await fs.promises.mkdir(dir, { recursive: true })
-			await fs.promises.writeFile(tmpPath, wantTypescript, 'utf8')
-			await fs.promises.rename(tmpPath, aggregationLibPath)
+			await writeFileAtomically(aggregationLibPath, wantTypescript)
 			changed.push(aggregationLibPath)
 		}
 
@@ -3408,9 +3758,45 @@ export class WalletCaptureFile {
 		return this.flows[flow] ?? null
 	}
 
+	/** Returns every request across all recorded flows (excluding `NOT_SUPPORTED` flows). */
+	public getRequests(): WalletRequest[] {
+		const requests: WalletRequest[] = []
+
+		for (const flow of recordedFlow.items) {
+			const resolved = this.getFlow(flow)
+
+			if (resolved === null || resolved === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const request of resolved.requests) {
+				requests.push(request)
+			}
+		}
+
+		return requests
+	}
+
 	/** Returns the list of capture-info entries recorded so far (possibly empty). */
 	public getCaptureInfo(): CaptureInfo[] {
 		return this.captureInfo
+	}
+
+	/**
+	 * Returns the set of the wallet's own addresses recorded in capture info.
+	 */
+	public walletOwnAddresses(): NonEmptyArray<Erc55Address> | null {
+		const addresses = new Set<Erc55Address>()
+
+		for (const info of this.captureInfo) {
+			for (const addr of info.walletAddresses) {
+				addresses.add(ethereumErc55Address(addr))
+			}
+		}
+
+		const allAddresses = Array.from(addresses)
+
+		return isNonEmptyArray(allAddresses) ? allAddresses : null
 	}
 
 	/** Replaces the full list of capture-info entries. */
@@ -3723,6 +4109,228 @@ export class WalletCaptureFile {
 		return this.annotations.matches(request)
 	}
 
+	/**
+	 * Resolve the full classification fingerprint of a single request, mirroring the
+	 * per-request body of {@link processFlowRequests}. The result is canonical (sorted
+	 * arrays, deterministic key order) so that `JSON.stringify` equality is a valid diff.
+	 */
+	public async resolveRequestClassification(
+		request: WalletRequest,
+	): Promise<WalletRequestClassification> {
+		const resolved = entitiesForDomain(request.domain)
+		const notWalletInitiated = request.isNotWalletInitiated()
+
+		if (resolved === null) {
+			return {
+				purposes: [],
+				userData: [],
+				receivingEntities: [],
+				notWalletInitiated,
+				unclassifiable: true,
+			}
+		}
+
+		const matcher = this.findMatcherForReq(request)
+		const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
+
+		const receivingEntities: Array<{ entityId: string; role: EntityRole }> = [
+			{ entityId: resolved.operator.id, role: EntityRole.OPERATOR },
+			...resolved.intermediaries.map(entity => ({
+				entityId: entity.id,
+				role: EntityRole.INTERMEDIARY,
+			})),
+		]
+
+		const purposes = new Set<DataCollectionPurpose>()
+
+		if (!notWalletInitiated) {
+			if (
+				matcher !== null &&
+				matcher.purposes !== 'NOT_WALLET_INITIATED' &&
+				matcher.purposes !== null
+			) {
+				for (const purpose of setItems(matcher.purposes)) {
+					purposes.add(purpose)
+				}
+			}
+
+			const extraPurposes = request.review.getExtraPurposes()
+
+			if (extraPurposes !== 'NOT_WALLET_INITIATED') {
+				for (const purpose of extraPurposes) {
+					purposes.add(purpose)
+				}
+			}
+		}
+
+		const userData: Array<{ userInfo: UserInfo; policy: CollectionPolicy }> = []
+
+		if (!notWalletInitiated) {
+			for (const [userInfo, policy] of userInfos.entries()) {
+				if (policy !== null) {
+					userData.push({ userInfo, policy })
+				}
+			}
+		}
+
+		// Canonicalize so the fingerprint is deterministic and can be diffed.
+		const purposesSorted = [...purposes].sort((a, b) => a.localeCompare(b))
+
+		const userDataSorted = userData
+			.map(entry => ({ userInfo: entry.userInfo, policy: entry.policy }))
+			.sort((a, b) => {
+				const infoCmp = compareUserInfo(a.userInfo, b.userInfo)
+
+				if (infoCmp !== 0) {
+					return infoCmp
+				}
+
+				return a.policy.localeCompare(b.policy)
+			})
+
+		const receivingEntitiesSorted = receivingEntities
+			.map(entry => ({ entityId: entry.entityId, role: entry.role }))
+			.sort((a, b) => {
+				const idCmp = a.entityId.localeCompare(b.entityId)
+
+				if (idCmp !== 0) {
+					return idCmp
+				}
+
+				return a.role.localeCompare(b.role)
+			})
+
+		return {
+			purposes: purposesSorted,
+			userData: userDataSorted,
+			receivingEntities: receivingEntitiesSorted,
+			notWalletInitiated,
+			unclassifiable: false,
+		}
+	}
+
+	/**
+	 * Recomputes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file. A request is identified as
+	 * NOT_WALLET_INITIATED by proxy when its referer header matches the URL of
+	 * another request that is itself identified as NOT_WALLET_INITIATED (either
+	 * directly or by proxy), transitively.
+	 *
+	 * Throws if the expansion would mark a request as NOT_WALLET_INITIATED by
+	 * proxy that has been explicitly manually tagged as anything other than
+	 * NOT_WALLET_INITIATED.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		const requests: WalletRequest[] = []
+
+		for (const f of recordedFlow.items) {
+			const flow = this.getFlow(f)
+
+			if (flow === null || flow === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const req of flow.requests) {
+				requests.push(req)
+			}
+		}
+
+		for (const req of requests) {
+			req.notWalletInitiatedByProxy = null
+		}
+
+		// Index requests by the URL their referer header points at (host + path).
+		// Each entry records the referer's scheme so it can be compared against
+		// the source request's scheme when available.
+		const byRefererUrl = new Map<
+			string,
+			Array<{ candidate: WalletRequest; scheme: string | null }>
+		>()
+
+		for (const req of requests) {
+			const ref = req.refererUrlSignature()
+
+			if (ref === null || ref.host === null) {
+				continue
+			}
+
+			const key = `${ref.host.toLowerCase()}\u0000${ref.path}`
+			const entry = { candidate: req, scheme: ref.scheme }
+			const arr = byRefererUrl.get(key)
+
+			if (arr === undefined) {
+				byRefererUrl.set(key, [entry])
+			} else {
+				arr.push(entry)
+			}
+		}
+
+		// Seeds the transitive expansion with directly-identified requests.
+		const queue: WalletRequest[] = requests.filter(req => req.isNotWalletInitiatedDirectly())
+		const expanded = new Set<WalletRequest>()
+
+		while (queue.length > 0) {
+			const source = queue.shift()
+
+			if (source === undefined || expanded.has(source)) {
+				continue
+			}
+
+			expanded.add(source)
+			const sourceUrl = source.urlSignature()
+			const key = `${sourceUrl.host.toLowerCase()}\u0000${sourceUrl.path}`
+			const entries = byRefererUrl.get(key)
+
+			if (entries === undefined) {
+				continue
+			}
+
+			for (const { candidate, scheme } of entries) {
+				if (candidate === source) {
+					continue
+				}
+
+				// The source request's scheme must match the referer's scheme when
+				// it is known (older capture files may not store it).
+				if (sourceUrl.scheme !== null && scheme !== sourceUrl.scheme) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED directly: nothing to do.
+				if (candidate.isNotWalletInitiatedDirectly()) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED by proxy: nothing to do.
+				if (candidate.notWalletInitiatedByProxy !== null) {
+					continue
+				}
+
+				// Contradiction: explicitly manually tagged as anything but
+				// NOT_WALLET_INITIATED.
+				const extraPurposes = candidate.review.getExtraPurposes()
+
+				if (Array.isArray(extraPurposes) && extraPurposes.length > 0) {
+					const refererUrl = candidate.refererUrlSignature()
+					const refererDescription =
+						refererUrl === null
+							? (candidate.refererDomain() ?? '<unknown>')
+							: `${refererUrl.scheme ?? ''}${refererUrl.host ?? ''}${refererUrl.path}`
+
+					throw new Error(
+						`Cannot identify request ${candidate.toString()} as NOT_WALLET_INITIATED by proxy: ` +
+							`its referer header (${refererDescription}) matches the URL of request ${source.toString()}, ` +
+							'which is identified as NOT_WALLET_INITIATED; however, the request has already been manually ' +
+							`tagged with purposes: ${extraPurposes.join(' & ')}.`,
+					)
+				}
+
+				candidate.notWalletInitiatedByProxy = source
+				queue.push(candidate)
+			}
+		}
+	}
+
 	public addRequestMatcher(
 		matcher: WalletRequestMatcher,
 		force: boolean,
@@ -3780,11 +4388,14 @@ export class WalletCaptureFile {
 			}
 		}
 
+		this.refreshNotWalletInitiatedByProxy()
+
 		return matched
 	}
 
 	public removeRequestMatcher(matcher: WalletRequestMatcher) {
 		this.annotations.remove(matcher)
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	public addBenignString(str: string, global: boolean) {
@@ -3806,9 +4417,7 @@ export class WalletCaptureFile {
 			}
 
 			for (const req of flow.requests) {
-				const matcher = this.findMatcherForReq(req)
-
-				if (matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED') {
+				if (!req.isNotWalletInitiated()) {
 					await req.populateStringsInto(strings)
 				}
 			}

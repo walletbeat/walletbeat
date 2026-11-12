@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import semver from 'semver'
 import { describe, expect, it } from 'vitest'
 
-import { getRepositoryRoot } from './utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 interface PnpmLocation {
 	section: string

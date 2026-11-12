@@ -52,7 +52,7 @@
 		},
 		"stage": {
 			"oneOf": [{ "type": "null" }, { "type": "string" }],
-			"description": "Walletbeat stage label, or null if not applicable."
+			"description": "Walletbeat stage label, UNRATED when missing data prevents determining the stage, QUALIFIED_FOR_NO_STAGES when no stage was cleared, or NOT_APPLICABLE/null when not applicable."
 		},
 		"stageBreakdown": {
 			"oneOf": [

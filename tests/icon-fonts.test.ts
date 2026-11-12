@@ -3,12 +3,12 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { knownSingleVariantIcons, wbIconEmojiSequences } from '@/styles/wbicons'
-import { getRepositoryRoot } from '@/tests/utils/codebase'
 import {
 	generatedIconFontCSS,
 	repeatedIconFontUnicodeSequences,
 	SVGFont,
 } from '@/tools/icon-font-generator/icon-font-generator-lib'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 describe('wbicons', async () => {
 	const wbicons = await SVGFont.create({

@@ -17,15 +17,20 @@
  * ```
  */
 
+import type { allWallets } from '@/data/wallets'
+import type { AttributeGroupId } from '@/schema/attribute-tree'
 import type { DataSource } from '@/schema/data-sources'
 import type { Entity } from '@/schema/entity'
+import type { BaseWallet } from '@/schema/wallet'
 import type { CalendarDate } from '@/types/date'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
 	type NonEmptyArray,
 	nonEmptyGet,
+	nonEmptyMap,
 } from '@/types/utils/non-empty'
+import { isRecord } from '@/types/utils/record'
 import { slugifyCamelCase } from '@/types/utils/text'
 
 import {
@@ -35,6 +40,7 @@ import {
 	type LabeledUrl,
 	labeledUrl,
 	mergeLabeledUrls,
+	stripSyntheticAnchor,
 	type Url,
 } from './url'
 
@@ -101,12 +107,12 @@ export function isLooseReference(x: unknown): x is LooseReference {
 	}
 
 	return (
+		isRecord(x) &&
 		Object.hasOwn(x, 'url') &&
 		((url: unknown) =>
 			isUrl(url) ||
 			(Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
-			(x as unknown as { url: unknown }).url,
+			x.url,
 		)
 	)
 }
@@ -133,13 +139,10 @@ export interface FullyQualifiedReference {
 /** Type predicate for FullyQualifiedReference. */
 export function isFullyQualifiedReference(x: unknown): x is FullyQualifiedReference {
 	return (
-		x !== undefined &&
-		x !== null &&
-		typeof x === 'object' &&
+		isRecord(x) &&
 		Object.hasOwn(x, 'urls') &&
 		((urls: unknown) => Array.isArray(urls) && isNonEmptyArray(urls) && urls.every(isLabeledUrl))(
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
-			(x as unknown as { urls: unknown }).urls,
+			x.urls,
 		)
 	)
 }
@@ -201,7 +204,15 @@ export function toFullyQualified(
 	}
 
 	if (isFullyQualifiedReference(reference)) {
-		return [reference]
+		return [
+			{
+				...reference,
+				urls: nonEmptyMap(reference.urls, url => ({
+					label: url.label,
+					url: stripSyntheticAnchor(url.url),
+				})),
+			},
+		]
 	}
 
 	if (typeof reference === 'string') {
@@ -275,7 +286,7 @@ export function toFullyQualified(
 	if (isLabeledUrl(urlRef)) {
 		return [
 			{
-				urls: [urlRef],
+				urls: [{ label: urlRef.label, url: stripSyntheticAnchor(urlRef.url) }],
 				explanation,
 				lastRetrieved,
 			},
@@ -321,7 +332,7 @@ export function toFullyQualified(
 	return urlRef.url.map(url => {
 		if (isLabeledUrl(url)) {
 			return {
-				urls: [url],
+				urls: [{ label: url.label, url: stripSyntheticAnchor(url.url) }],
 				explanation,
 				lastRetrieved,
 			}
@@ -335,7 +346,7 @@ export function toFullyQualified(
 		return {
 			urls: [
 				{
-					url,
+					url: stripSyntheticAnchor(url),
 					label: (labelTotals.get(label) ?? 0) > 1 ? `${label} ${count + 1}` : label,
 				},
 			],
@@ -368,17 +379,102 @@ export function isReferenceInput(x: unknown): x is ReferenceInput {
 /** Type predicate for `WithRef`. */
 export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown> {
 	return (
-		maybeWithRef !== undefined &&
-		maybeWithRef !== null &&
-		typeof maybeWithRef === 'object' &&
+		isRecord(maybeWithRef) &&
 		Object.hasOwn(maybeWithRef, 'ref') &&
-		((): boolean => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
-			const ref = (maybeWithRef as unknown as { ref: unknown }).ref
+		(() => {
+			const ref = maybeWithRef.ref
 
 			return isReference(ref) || isNoRef(ref) || (Array.isArray(ref) && ref.every(isReference))
 		})()
 	)
+}
+
+/** A single raw reference collected from a wallet's data, before qualification. */
+export interface RawCollectedRef {
+	walletName: string
+	fieldPath: string
+	rawRef: WithRef<unknown>['ref']
+}
+
+/**
+ * Recursively traverse a wallet's data and collect every `ref` field,
+ * returning the wallet name and the period-delimited field path. The `ref`
+ * values are left unqualified so callers can inspect the raw data.
+ */
+export function collectRawWalletRefs(
+	walletName: string,
+	wallet: BaseWallet<AttributeGroupId>,
+): RawCollectedRef[] {
+	const results: RawCollectedRef[] = []
+
+	const findRefs = (path: string[], x: unknown): void => {
+		if (x === undefined || x === null) {
+			return
+		}
+
+		if (Array.isArray(x)) {
+			for (let i = 0; i < x.length; i++) {
+				findRefs(path.concat([`[${i}]`]), x[i])
+			}
+
+			return
+		}
+
+		if (typeof x !== 'object') {
+			return
+		}
+
+		if (hasRefs(x)) {
+			results.push({
+				walletName,
+				fieldPath: path.join(''),
+				rawRef: x.ref,
+			})
+		}
+
+		for (const [key, val] of Object.entries(x)) {
+			findRefs(path.concat([`.${key}`]), val)
+		}
+	}
+
+	findRefs([walletName], wallet)
+
+	return results
+}
+
+/** A single collected reference with its wallet name, field path, and fully-qualified refs. */
+export interface CollectedRef {
+	walletName: string
+	fieldPath: string
+	fullyQualifiedRefs: ReturnType<typeof toFullyQualified>
+}
+
+/** Qualify the raw refs collected from a wallet. */
+export function collectWalletRefs(
+	walletName: string,
+	wallet: BaseWallet<AttributeGroupId>,
+): CollectedRef[] {
+	return collectRawWalletRefs(walletName, wallet).map(raw => ({
+		walletName: raw.walletName,
+		fieldPath: raw.fieldPath,
+		fullyQualifiedRefs: toFullyQualified(raw.rawRef),
+	}))
+}
+
+/** Collect the raw refs for every wallet in `wallets`. */
+export function collectAllRawRefs(wallets: typeof allWallets): RawCollectedRef[] {
+	return Object.entries(wallets).flatMap(([walletName, wallet]) =>
+		collectRawWalletRefs(walletName, wallet),
+	)
+}
+
+/** `collectAllRawRefs` for every wallet in `wallets`, qualified. */
+export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
+	return collectAllRawRefs(wallets).map(raw => ({
+		walletName: raw.walletName,
+		fieldPath: raw.fieldPath,
+		fullyQualifiedRefs: toFullyQualified(raw.rawRef),
+	}))
 }
 
 /** Extract references out of `withRef`. */

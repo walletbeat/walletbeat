@@ -782,10 +782,7 @@
 					"domain": "rabby.io",
 					"path": "/static/js/main.8565a187.js",
 					"sessionTime": 2000015065,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -795,10 +792,7 @@
 					"domain": "rabby.io",
 					"path": "/static/css/main.24aaf755.css",
 					"sessionTime": 2000015483,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -824,20 +818,16 @@
 						],
 						"display": "swap"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://rabby.io/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "rabby.io",
 					"path": "/js/jquery.scrollTo.min.js",
 					"sessionTime": 2000015854,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -847,10 +837,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/images/logo-new.svg",
 					"sessionTime": 2000016223,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -860,10 +847,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/images/menu.svg",
 					"sessionTime": 2000016229,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -873,10 +857,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/logos/symbol-new.svg",
 					"sessionTime": 2000016238,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -886,10 +867,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/google-play.svg",
 					"sessionTime": 2000016428,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -899,10 +877,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/brave.svg",
 					"sessionTime": 2000016429,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -912,10 +887,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/apple-new.svg",
 					"sessionTime": 2000016441,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -925,10 +897,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/windows-new.svg",
 					"sessionTime": 2000016616,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -938,10 +907,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/edge.svg",
 					"sessionTime": 2000016656,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -951,10 +917,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/images/slogon.svg",
 					"sessionTime": 2000016658,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -964,10 +927,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/download/apple-store-blue.svg",
 					"sessionTime": 2000016659,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -980,19 +940,13 @@
 					"query": {
 						"id": "G-H8G6S9KCTX"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
 					"path": "/assets/download/chrome.svg",
 					"sessionTime": 2000016670,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -1002,10 +956,7 @@
 					"domain": "rabby.io",
 					"path": "/assets/images/twitter.svg",
 					"sessionTime": 2000016675,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"extraPurposes": "NOT_WALLET_INITIATED"
@@ -1015,10 +966,7 @@
 					"domain": "static-assets.rabby.io",
 					"path": "/files/47cf47d9-ca2e-46d5-862b-cf3602f2492d.png",
 					"sessionTime": 2000016904,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					},
+					"referer": "https://rabby.io/",
 					"review": {
 						"manuallyReviewed": true,
 						"collectionPolicy": "ALWAYS"
@@ -1028,226 +976,151 @@
 					"domain": "static-assets.rabby.io",
 					"path": "/files/80a81992-2394-4405-81be-afce56c4ba93.png",
 					"sessionTime": 2000016907,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/042b7d5b-926a-43ec-80b1-6dc5186bc016.png",
 					"sessionTime": 2000016921,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/0feab942-cccf-4034-a652-3d478339b0bb.png",
 					"sessionTime": 2000016922,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/6704ff3a-0733-4c2d-9c0d-cc6c708a34f2.png",
 					"sessionTime": 2000016923,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/77a04411-dbc5-4197-96b8-4d2239bf6d58.png",
 					"sessionTime": 2000016925,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
 					"path": "/assets/images/IconVerify.svg",
 					"sessionTime": 2000016926,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/a09c8b29-a35c-4dca-8708-3b5a75d1ef1a.jpg",
 					"sessionTime": 2000017049,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/65f8d112-d0ef-4e3f-a8a9-1825c1712947.jpg",
 					"sessionTime": 2000017050,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/441491eb-e498-4127-ae8d-472de7a35d75.jpg",
 					"sessionTime": 2000017054,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/0b46f80b-297a-4557-b394-d7740efec67d.jpg",
 					"sessionTime": 2000017054,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/a97acf7a-1f33-4f92-a896-b0e2b3b4fdb1.jpg",
 					"sessionTime": 2000017055,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/d4ab1414-562e-457f-a4c8-f6e6076e9c75.jpg",
 					"sessionTime": 2000017056,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/supported_chains.json",
 					"sessionTime": 2000017110,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
 					"path": "/assets/images/redirect.svg",
 					"sessionTime": 2000017125,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
 					"path": "/assets/download/extension-new.svg",
 					"sessionTime": 2000017321,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/1be93705-8648-465c-b02e-9416d7c39820.png",
 					"sessionTime": 2000017394,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/f7c069f9-46e4-4968-8c31-02acc6344aca.png",
 					"sessionTime": 2000017508,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/32bb2ac2-060d-4cb8-8faf-24c2cd323b6b.png",
 					"sessionTime": 2000017523,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
 					"path": "/files/64656aec-8d65-4b6c-9212-e431eb689e3b.png",
 					"sessionTime": 2000017524,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/0df22c68-d9b4-485c-90cd-d0dd4dac34d4.jpg",
 					"sessionTime": 2000017526,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/7a31c986-2622-4443-b5fa-7907624fec0e.jpg",
 					"sessionTime": 2000017547,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/1f4a7fab-a703-4ee5-ae41-93fcebae3d4b.jpg",
 					"sessionTime": 2000017554,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/ce970618-5c3d-45b2-985f-162dd548d538.png",
 					"sessionTime": 2000017556,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/7cb9ce79-5e7b-4277-9e8c-137c7fa8708f.jpg",
 					"sessionTime": 2000017557,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/c83eaf61-78b2-4d98-be7f-8794e12fc0fb.jpg",
 					"sessionTime": 2000017736,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1257,55 +1130,37 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/2bf520f3-a7fa-4a1c-b94a-fb7fd4730444.jpg",
 					"sessionTime": 2000017981,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/557e4cf8-b8b4-40fe-9db6-8085dc6a3650.jpg",
 					"sessionTime": 2000018014,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/b0736c78-cf76-4500-90bc-22e9d0240c89.jpg",
 					"sessionTime": 2000018021,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/9443e68b-70ac-4be7-8e57-468a459b5d2c.jpg",
 					"sessionTime": 2000018022,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.debank.com",
 					"path": "/files/c3bb46a7-3322-423e-bece-0894dc292cb0.jpg",
 					"sessionTime": 2000018023,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1315,10 +1170,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1328,10 +1180,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1341,10 +1190,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1354,10 +1200,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1367,10 +1210,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1380,10 +1220,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1393,10 +1230,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "region1.google-analytics.com",
@@ -1438,10 +1272,7 @@
 						"_ee": "1",
 						"tfd": "4242"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1451,10 +1282,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1464,10 +1292,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1477,10 +1302,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1490,10 +1312,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
@@ -1503,9 +1322,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1517,9 +1335,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1531,9 +1348,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1545,9 +1361,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1559,9 +1374,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1573,9 +1387,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1587,10 +1400,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "rabby.io",
@@ -1600,82 +1410,55 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807624$j60$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/shib/4ec79ed9ee4988dfdfc41e1634a447be.png",
 					"sessionTime": 2000018680,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/fon/369618f4d45053fa4439943c9c2d387d.png",
 					"sessionTime": 2000018766,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/xai/b02622ce65251bdcb31aa6621a10a096.png",
 					"sessionTime": 2000018770,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/klay/1df018b8493cb97c50b7e390ef63cba4.png",
 					"sessionTime": 2000018771,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/scrl/1fa5c7e0bfd353ed0a97c1476c9c42d2.png",
 					"sessionTime": 2000018773,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/mobm/a8442077d76b258297181c3e6eb8c9cc.png",
 					"sessionTime": 2000018777,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/dfk/233867c089c5b71be150aa56003f3f7a.png",
 					"sessionTime": 2000018877,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/pego/6b81cf47fdc1b86707d3fbf02f90cf18.png",
 					"sessionTime": 2000018990,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "region1.google-analytics.com",
@@ -1717,82 +1500,55 @@
 						"_et": "4",
 						"tfd": "5522"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/pls/aa6be079fa9eb568e02150734ebb3db0.png",
 					"sessionTime": 2000018997,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/bsc/bc73fa84b7fc5337905e527dadcbc854.png",
 					"sessionTime": 2000019000,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/wan/f3aa8b31414732ea5e026e05665146e6.png",
 					"sessionTime": 2000019002,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/doge/2538141079688a7a43bc22c7b60fb45f.png",
 					"sessionTime": 2000019075,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/era/2cfcd0c8436b05d811b03935f6c1d7da.png",
 					"sessionTime": 2000019191,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/core/ccc02f660e5dd410b23ca3250ae7c060.png",
 					"sessionTime": 2000019212,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/mnt/0af11a52431d60ded59655c7ca7e1475.png",
 					"sessionTime": 2000019215,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/okt/428bf6035abb3863c9f5c1a10dc3afd3.png",
 					"sessionTime": 2000019215,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
@@ -1802,9 +1558,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807626$j58$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1812,10 +1567,7 @@
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/eos/7e3122a9ce6f9d522e6d5519d43b6a72.png",
 					"sessionTime": 2000019295,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
@@ -1825,9 +1577,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807626$j58$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1835,37 +1586,25 @@
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/flr/9ee03d5d7036ad9024e81d55596bb4dc.png",
 					"sessionTime": 2000019398,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/fx/6fee82420b2394e0b68d7d7e692a0a01.png",
 					"sessionTime": 2000019428,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/manta/0e25a60b96a29d6a5b9e524be7565845.png",
 					"sessionTime": 2000019436,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/arb/854f629937ce94bebeb2cd38fb336de7.png",
 					"sessionTime": 2000019440,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
@@ -1875,9 +1614,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807626$j58$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-"
 					}
 				},
@@ -1885,19 +1623,13 @@
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/rose/33ade55b0f3efa10e9eec002c6417257.png",
 					"sessionTime": 2000019595,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/bfc/7c10f5191b16d0cc068cb6eff32b6347.png",
 					"sessionTime": 2000019698,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static-assets.rabby.io",
@@ -1907,9 +1639,8 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807626$j58$l0$h0"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"Referer": "https://rabby.io/",
 						"Range": "bytes=0-895163",
 						"If-Range": "\"ee55d835abfc140af9cb61b11d886d9c\""
 					}
@@ -1918,262 +1649,175 @@
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/oas/61dfecab1ba8a404354ce94b5a54d4b3.png",
 					"sessionTime": 2000019706,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/linea/32d4ff2cf92c766ace975559c232179c.png",
 					"sessionTime": 2000019722,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/cfx/eab0c7304c6820b48b2a8d0930459b82.png",
 					"sessionTime": 2000019733,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/boba/e43d79cd8088ceb3ea3e4a240a75728f.png",
 					"sessionTime": 2000019825,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/rari/67fc6abba5cfc6bb3a57bb6afcf5afee.png",
 					"sessionTime": 2000020010,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/sgb/619f46d574d62a50bdfd9f0e2f47ddc1.png",
 					"sessionTime": 2000020011,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/beam/90a1e9f46664d070752deeb65878a3bd.png",
 					"sessionTime": 2000020044,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/lyx/dbe6eef57e66817e61297d9b188248ed.png",
 					"sessionTime": 2000020055,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/nova/06eb2b7add8ba443d5b219c04089c326.png",
 					"sessionTime": 2000020062,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/hubble/dc3b830260f712058db0d70bc073dfda.png",
 					"sessionTime": 2000020233,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/merlin/458e4686dfb909ba871bd96fe45417a8.png",
 					"sessionTime": 2000020253,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/loot/0f098333a1a4f474115b05862e680573.png",
 					"sessionTime": 2000020288,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/etc/7ccf90ee6822ab440fb603337da256fa.png",
 					"sessionTime": 2000020296,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/tenet/803be22e467ee9a5abe00d69a9c3ea4f.png",
 					"sessionTime": 2000020301,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/zeta/d0e1b5e519d99c452a30e83a1263d1d0.png",
 					"sessionTime": 2000020381,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/mtr/2dc6f079f52ca22778eb684e1ce650b3.png",
 					"sessionTime": 2000020472,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/zkfair/c66f35d57c6146cdff82dfeb316ba801.png",
 					"sessionTime": 2000020486,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/wemix/d1ba88d1df6cca0b0cb359c36a09c054.png",
 					"sessionTime": 2000020529,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/opbnb/07e2e686e363a842d0982493638e1285.png",
 					"sessionTime": 2000020556,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/mode/466e6e12f4fd827f8f497cceb0601a5e.png",
 					"sessionTime": 2000020615,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/base/ccc1513e4f390542c4fb2f4b88ce9579.png",
 					"sessionTime": 2000020718,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/fuse/7a21b958761d52d04ff0ce829d1703f4.png",
 					"sessionTime": 2000020720,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/pze/a2276dce2d6a200c6148fb975f0eadd3.png",
 					"sessionTime": 2000020779,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/avax/4d1649e8a0c7dec9de3491b81807d402.png",
 					"sessionTime": 2000020791,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/zora/de39f62c4489a2359d5e1198a8e02ef1.png",
 					"sessionTime": 2000020834,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/fsn/047789979f0b5733602b29517753bdf3.png",
 					"sessionTime": 2000020936,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/movr/4b0de5a711b437f187c0d0f15cc0398b.png",
 					"sessionTime": 2000020950,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/iotx/d3be2cd8677f86bd9ab7d5f3701afcc9.png",
 					"sessionTime": 2000021016,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/step/db79600b8feafe17845617ca9c606dbe.png",
 					"sessionTime": 2000021047,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "region1.google-analytics.com",
@@ -2214,136 +1858,91 @@
 						"_et": "1268",
 						"tfd": "7592"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/matic/52ca152c08831e4765506c9bd75767e8.png",
 					"sessionTime": 2000021115,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/ckb/e821893503104870d5e73f56dbd73746.png",
 					"sessionTime": 2000021173,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/btt/2130a8d57ff2a0f3d50a4ec9432897c6.png",
 					"sessionTime": 2000021206,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/alot/0ed4884da27d022dbd5ed5bc919ee248.png",
 					"sessionTime": 2000021277,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/blast/15132294afd38ce980639a381ee30149.png",
 					"sessionTime": 2000021326,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/rsk/ff47def89fba98394168bf5f39920c8c.png",
 					"sessionTime": 2000021363,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/canto/47574ef619e057d2c6bbce1caba57fb6.png",
 					"sessionTime": 2000021387,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/ftm/14133435f89637157a4405e954e1b1b2.png",
 					"sessionTime": 2000021401,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/aurora/da491099bb44690eda122cdd67c5c610.png",
 					"sessionTime": 2000021416,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/evmos/26e038b4d5475d5a4b92f7fc08bdabc9.png",
 					"sessionTime": 2000021559,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/karak/a9e47f00f6eeb2c9cc8f9551cff5fe68.png",
 					"sessionTime": 2000021602,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/eth/42ba589cd077e7bdd97db6480b0ff61d.png",
 					"sessionTime": 2000021610,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/platon/b5df1214981b0888e48fbb18d302c6ba.png",
 					"sessionTime": 2000021617,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/op/01ae734fe781c9c2ae6a4cc7e9244056.png",
 					"sessionTime": 2000021631,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "chrome.google.com",
@@ -2352,128 +1951,88 @@
 					"cookies": {
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://rabby.io/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/cro/f947000cc879ee8ffa032793808c741c.png",
 					"sessionTime": 2000021776,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/hmy/b3bfb4681f81a85e25c28e150dcbfe51.png",
 					"sessionTime": 2000021796,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/astar/398c7e0014bdada3d818367a7273fabe.png",
 					"sessionTime": 2000021826,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/kava/b26bf85a1a817e409f9a3902e996dc21.png",
 					"sessionTime": 2000021835,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/kcc/3a5a4ef7d5f1db1e53880d70219d75b6.png",
 					"sessionTime": 2000021844,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/eon/36deb31f3e0a7c74762971d79245f82e.png",
 					"sessionTime": 2000021971,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/sbch/d78ac780803e7f0a17b73558f423502e.png",
 					"sessionTime": 2000022025,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/telos/f9f7493def4c08ed222540bebd8ce87a.png",
 					"sessionTime": 2000022027,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/xdai/43c1e09e93e68c9f0f3b132976394529.png",
 					"sessionTime": 2000022054,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/metis/7485c0a61c1e05fdf707113b6b6ac917.png",
 					"sessionTime": 2000022093,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/heco/db5152613c669e0cc8624d466d6c94ea.png",
 					"sessionTime": 2000022168,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/frax/2e210d888690ad0c424355cc8471d48d.png",
 					"sessionTime": 2000022226,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "static.debank.com",
 					"path": "/image/chain/logo_url/celo/41da5c1d3c0945ae822a1f85f02c76cf.png",
 					"sessionTime": 2000022256,
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "chromewebstore.google.com",
@@ -2482,10 +2041,9 @@
 					"cookies": {
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://rabby.io/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -2496,11 +2054,10 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=kUI7Y0W_7lnPC2P0KGJt_0_WOExWXYX0RF8wv0MLICDWflvmdltXF7l2zXN5YAz5Z7Rdj03EKsUOt2PP51dm_HxcYuQsvZRTkeWHenqKnw2cBcQYmdfL46FGXxXgHvck4yRmdYydbQOBz2LMzHCfzkg2ZMIiivRMKcgKSc_RhhA2hY-xG0lEOnZF26uRcA9ofVF02mlndFtr"
 					},
-					"refererDomain": "rabby.io",
+					"referer": "https://rabby.io/",
 					"oddHeaders": {
 						"X-Client-Data": "CND2ygE=",
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://rabby.io/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -2511,10 +2068,7 @@
 						"_ga": "GA1.1.556861405.1771807625",
 						"_ga_H8G6S9KCTX": "GS2.1.s1771807624$o1$g1$t1771807628$j56$l0$h0"
 					},
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "fonts.googleapis.com",
@@ -2523,66 +2077,60 @@
 					"query": {
 						"family": "Google Sans Text_old:wght@400;500;700"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/i/productlogos/chrome_store/v7/192px.svg",
 					"sessionTime": 2000024120,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/am=gMAAAACAWQ/d=1/excm=_b,_tp,itemdetailview/ed=1/dg=0/wt=2/ujg=1/rs=AEP720JYLkhk5f20F31X0W-M3h4Otp16Zg/dti=1/m=_b,_tp",
 					"sessionTime": 2000024133,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/bPbwQr58ZU2zD7RWbidgw_r8k07S3uALerlklo6jiK3j8ovgS84iScj1i7IcyWAzA8Xq_ygyXfb0tNVLjx-O3_XsK7w=s60",
 					"sessionTime": 2000024528,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/b7fkTBtgxeo6fPUzxZo0lI5V7A8njaEYu5IaNPlYQXJS2ySmzxn8nAB8yY3huNDBxfiXLsq1NI0N265T9R3IdrUsq0M=s275-w275-h175",
 					"sessionTime": 2000024802,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/images/branding/productlogos/chrome/v7/192px.svg",
 					"sessionTime": 2000024989,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -2622,119 +2170,106 @@
 						"tfd": "12209"
 					},
 					"content": "en=clickDownload&_ee=1&ep.event_category=User&ep.event_label=Chrome&_et=2054\r\nen=user_engagement&_et=1977",
-					"refererDomain": "rabby.io",
-					"oddHeaders": {
-						"Referer": "https://rabby.io/"
-					}
+					"referer": "https://rabby.io/"
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/og/_/ss/k=og.qtm.vjyYcS7rQwo.L.W.O/m=qcwid,d_b_gm3,d_wi_gm3,d_lo_gm3/excm=qaaw,qadd,qaid,qein,qhaw,qhba,qhbr,qhch,qhga,qhid,qhin/d=1/ed=1/ct=zgms/rs=AA2YrTtEJMqNNb04d2z46AITatL-Y66Oww",
 					"sessionTime": 2000025749,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/og/_/js/k=og.qtm.en_US.ns4MzfOWkmI.2019.O/rt=j/m=qabr,q_dnp,qcwid,qapid,qads,q_dg/exm=qaaw,qadd,qaid,qein,qhaw,qhba,qhbr,qhch,qhga,qhid,qhin/d=1/ed=1/rs=AA2YrTvr9C9n1V96nD2p1y9Qi7Q4gkQxzw",
 					"sessionTime": 2000025775,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/googlesans/v58/4UaRrENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iq2vgCI.woff2",
 					"sessionTime": 2000025834,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/productsans/v9/pxiDypQkot1TnFhsFMOfGShVF9eO.woff2",
 					"sessionTime": 2000025846,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/googlesanstext/v22/5aUp9-KzpRiLCAt4Unrc-xIKmCU5oLlVnmhjtg.woff2",
 					"sessionTime": 2000025854,
-					"refererDomain": "fonts.googleapis.com",
+					"referer": "https://fonts.googleapis.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://fonts.googleapis.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=_b,_tp/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=ws9Tlc,O6y8ed,aW3pY,n73qwf,UUJqVe,IZT63,e5qFLc,pw70Gc,KUM7Z,O1Gjze,ebZ3mb,gIl2M,mI3LFb,byfTOb,lsjVmc,xUdipf,ZDZcre,OTA3Ae,ZwDk9d,RyvaUb,HNUyHc,p8L0ob,MT4Hub,h4ilFc,M0x0ie,zKiH5d,o2G9me,mUxuKd,ri2s0b,iJmdtd,Tl2FDf,UkbOSe,DNlSjf,Xi0ENb,MtauGd,Fu7Bjd,MpJwZc,PrPYRd,lazG7b,LEikZe,NwH0H,V3dDOb,XVMNvd,duFQFc,QIhFr,xQtZb,sI9bWe,lwddkf,gychg,w9hDv,RMhBfe,SdcwHb,mdR7q,EFQ78c,Ulmmrd,A7fCU,hc6Ubd,FdMhB,MI6k7c,kjKdXe,JNoxi,BVgquf,SpsfSb,YA1iG,V9amgb,hKSk3e,Z5uLle,BBI74,MdUzUe,zbML3c,zr1jrb,QvLWAb,Uas9Hd,pjICDe",
 					"sessionTime": 2000025976,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,BBI74,BVgquf,DNlSjf,EFQ78c,FdMhB,Fu7Bjd,HNUyHc,IZT63,JNoxi,KUM7Z,LEikZe,M0x0ie,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O6y8ed,OTA3Ae,PrPYRd,QIhFr,QvLWAb,RMhBfe,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZwDk9d,_b,_tp,aW3pY,byfTOb,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,iJmdtd,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p8L0ob,pjICDe,pw70Gc,ri2s0b,sI9bWe,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=HsQQib,cephkf,i8oNZb,RiINWe,MH0hJe,AWpPDd,QVysJe,BXHDh,ZvHseb,PIVayb,LBaJxb,bZ0mod,uoEu0c,sQ8PT,tw4SJc,dsBBae,OhgRI,O626Fe,EKHvcb,VBl5Ff,R6rk4,cKRgNd,w9C4d,LcrBLd",
 					"sessionTime": 2000026125,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/Pgz_SRppFPDZzX_NmjeqMepB_WyfitEP757UuDbkNQsS9WAiSWdHfFc1yOJ5dIMpDqJOPgUshNBZvjjjzW1PvH-yDw=s275-w275-h175",
 					"sessionTime": 2000026190,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/vKSKTNzpPw0-OvsxyUz0PqN689nVW6xaE1tGwiXld5pjX79VftPPtgJ3y0jYvI3xfG0phX0nZHYFnYVQmaHm19Uelg=s275-w275-h175",
 					"sessionTime": 2000026205,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/aSW2h_11RVpzOt3M-O5CLwKkc1cxnQ9g8OMTkeJEdeMF8-Bmto869mOEdTV5R1nt7uIfvzU_KJjLN2LGthf7VXFg=s275-w275-h175",
 					"sessionTime": 2000026206,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -2744,65 +2279,59 @@
 					"query": {
 						"id": "G-KHZNC1Q6K0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/FLSKa8-PwU_yrsh6Z1uIKT6NLn1S9zlF3paTDkkeoDGxE5Sv-_wfxvCOPUiQVfrLFtfjFiSCM8O4P1BRQqItgl76=s275-w275-h175",
 					"sessionTime": 2000026273,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/5KhDb_CYPuUIBdZgLu4AOFIRjerLSQdC9Jrbv5ReXPQudO7_RlcNHZZJDqNrWQpoN2-xMg20j2uASzVdBoI1sq0kECo=s275-w275-h175",
 					"sessionTime": 2000026274,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/R0adxjTx9AhZmrSjJ6xKwwA75wIKQL_6NwIuoR-Nvvy5RNmjl9ZfxL6Lz4vgUdYnNoOjD4Oj6Q_Qpwz12apCHsMhCg=s275-w275-h175",
 					"sessionTime": 2000026276,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/googlesanstext/v22/5aUu9-KzpRiLCAt4Unrc-xIKmCU5qEp2iw.woff2",
 					"sessionTime": 2000026288,
-					"refererDomain": "fonts.googleapis.com",
+					"referer": "https://fonts.googleapis.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://fonts.googleapis.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "fonts.gstatic.com",
 					"path": "/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
 					"sessionTime": 2000026289,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -2822,110 +2351,100 @@
 					"domain": "lh3.googleusercontent.com",
 					"path": "/IVMG0tKgiu2YEPBbsrkK8rrenC7jMkE-0NpQ7EawKnSGpik0AuYIrsgl1B-MkFPmNVwAFtdVHiNjT0f5QuxEaRVLrZ8=s275-w275-h175",
 					"sessionTime": 2000026406,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/m2yX5Vc23wCqmWS5M1pv9tdjHxGYRtaaSmnvmDjMZsAGTpvsAV7iomjsb1IjWsXkmCdnLiHNC9QFS-LMLAskHpmwGg=s275-w275-h175",
 					"sessionTime": 2000026519,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/zNRfICSuwivk1bsfhz7BEM77mscZygsoUcCt72F8RCd0doV5I554in8PSB4Qpkt3BItun6p_4kToEZqu9uS-9381OB4=s275-w275-h175",
 					"sessionTime": 2000026524,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/BTwPiTyE48QEx-ybmXul-ClKwYIUo6fgAn-UMbVIkXdJaKf4ru20EZPKNo8toOChMwneCChtXSTr7ODDH2TUvPrLKQ=s275-w275-h175",
 					"sessionTime": 2000026565,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/dofMA8SS4f5cMeTwlte05wlLK9LrEfbB9mnF_XXPWSTCg6i1ktME48WijFFNY96Y4t_2vV_xeUmfDHgImNnISFIM=s275-w275-h175",
 					"sessionTime": 2000026620,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/zDjaRSA0QQ8C7DGRyt9dC_fYfdy3fhpywh24BMTL4WC1mGtre-OsqWpdRM0IR2CuaKAhc4aDx51KJUUC9pOCsLGVsak=s1280-w1280-h800",
 					"sessionTime": 2000026636,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "ogads-pa.clients6.google.com",
 					"path": "/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
 					"sessionTime": 2000026652,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Access-Control-Request-Method": "POST",
-						"Access-Control-Request-Headers": "content-type,x-goog-api-key,x-user-agent",
-						"Referer": "https://chromewebstore.google.com/"
+						"Access-Control-Request-Headers": "content-type,x-goog-api-key,x-user-agent"
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/8PPPVtmqpNnOkV-aUnvxmjwqae_lBMixlBdA1qtZ0fJZ7RTWkTSCkwvGAH7VEgA8uGkvrZAXqBAORLNhV-jvXsasnfY=s1280-w1280-h800",
 					"sessionTime": 2000026654,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/D-ouy9wqVNdlhcaPcWs503RB2w_EcP64KL8e_xSQzGg7vHXMn7G66Rj7JvIqRfV0Tykgiir5UIe-k9loC71BK71vHA=s1280-w1280-h800",
 					"sessionTime": 2000026753,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/lIGi1e_zZnkjNrOzJdy7SwXIQrYa6cig4_GPkFB7oxg79kzZUn1wOQ-4c35Sq9tmNqvOV9mVNJF_fTfGPZI4dhTt=s1280-w1280-h800",
 					"sessionTime": 2000026802,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -2936,88 +2455,80 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/66kmM8YM0raaT9d6mUgnaFDufyST-QWowjzkO3BAtNsShIZ4s0Qy0HlLAHlfCY3h7YUChys2v4Zq74UbWSkDgP613uo=s1280-w1280-h800",
 					"sessionTime": 2000026839,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/8PPPVtmqpNnOkV-aUnvxmjwqae_lBMixlBdA1qtZ0fJZ7RTWkTSCkwvGAH7VEgA8uGkvrZAXqBAORLNhV-jvXsasnfY=s192-w192-h120",
 					"sessionTime": 2000026867,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,R6rk4,RMhBfe,RiINWe,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p8L0ob,pjICDe,pw70Gc,ri2s0b,sI9bWe,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=p3hmRc,LvGhrf,RqjULd",
 					"sessionTime": 2000027004,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/feedback/js/help/prod/service/lazy.min.js",
 					"sessionTime": 2000027009,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,ri2s0b,sI9bWe,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=sOXFj,q0xTif,Qy2cOb",
 					"sessionTime": 2000027053,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/D-ouy9wqVNdlhcaPcWs503RB2w_EcP64KL8e_xSQzGg7vHXMn7G66Rj7JvIqRfV0Tykgiir5UIe-k9loC71BK71vHA=s192-w192-h120",
 					"sessionTime": 2000027138,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,Qy2cOb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,q0xTif,ri2s0b,sI9bWe,sOXFj,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=P6sQOc",
 					"sessionTime": 2000027147,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3029,68 +2540,62 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"X-User-Agent": "grpc-web-javascript/0.1",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-Api-Key": "AIzaSyCbsbvGCe7C9mCtdaTycZB2eUFuzsYKG_E",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/lIGi1e_zZnkjNrOzJdy7SwXIQrYa6cig4_GPkFB7oxg79kzZUn1wOQ-4c35Sq9tmNqvOV9mVNJF_fTfGPZI4dhTt=s192-w192-h120",
 					"sessionTime": 2000027288,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,P6sQOc,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,Qy2cOb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,q0xTif,ri2s0b,sI9bWe,sOXFj,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=ld80Uc",
 					"sessionTime": 2000027295,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,P6sQOc,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,Qy2cOb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,ld80Uc,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,q0xTif,ri2s0b,sI9bWe,sOXFj,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=db7dHd",
 					"sessionTime": 2000027298,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/66kmM8YM0raaT9d6mUgnaFDufyST-QWowjzkO3BAtNsShIZ4s0Qy0HlLAHlfCY3h7YUChys2v4Zq74UbWSkDgP613uo=s192-w192-h120",
 					"sessionTime": 2000027388,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "lh3.googleusercontent.com",
 					"path": "/zDjaRSA0QQ8C7DGRyt9dC_fYfdy3fhpywh24BMTL4WC1mGtre-OsqWpdRM0IR2CuaKAhc4aDx51KJUUC9pOCsLGVsak=s192-w192-h120",
 					"sessionTime": 2000027488,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3102,11 +2607,10 @@
 						"hasfast": "true",
 						"authuser": "0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Access-Control-Request-Method": "POST",
-						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser",
-						"Referer": "https://chromewebstore.google.com/"
+						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser"
 					}
 				},
 				{
@@ -3122,11 +2626,10 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3172,10 +2675,9 @@
 						"_ee": "1",
 						"tfd": "6048"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3233,10 +2735,9 @@
 						"up.browser_validation": "",
 						"tfd": "6070"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3282,10 +2783,9 @@
 						"_et": "2",
 						"tfd": "6080"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3297,11 +2797,10 @@
 						"hasfast": "true",
 						"authuser": "0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Access-Control-Request-Method": "POST",
-						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser",
-						"Referer": "https://chromewebstore.google.com/"
+						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser"
 					}
 				},
 				{
@@ -3318,13 +2817,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3369,10 +2867,9 @@
 						"_et": "2",
 						"tfd": "6372"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3425,10 +2922,9 @@
 						"_et": "285",
 						"tfd": "6372"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3479,10 +2975,9 @@
 						"_et": "3",
 						"tfd": "6379"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3493,11 +2988,10 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3543,10 +3037,9 @@
 						"_et": "132",
 						"tfd": "6519"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3558,11 +3051,10 @@
 						"hasfast": "true",
 						"authuser": "0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Access-Control-Request-Method": "POST",
-						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser",
-						"Referer": "https://chromewebstore.google.com/"
+						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser"
 					}
 				},
 				{
@@ -3588,12 +3080,11 @@
 						"_ga": "GA1.1.488228406.1771807634",
 						"_ga_KHZNC1Q6K0": "GS2.1.s1771807634$o1$g0$t1771807634$j60$l0$h0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"X-Same-Domain": "1",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3605,11 +3096,10 @@
 						"hasfast": "true",
 						"authuser": "0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Access-Control-Request-Method": "POST",
-						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser",
-						"Referer": "https://chromewebstore.google.com/"
+						"Access-Control-Request-Headers": "content-encoding,content-type,x-goog-authuser"
 					}
 				},
 				{
@@ -3626,13 +3116,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3650,10 +3139,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3671,10 +3159,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3691,13 +3178,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3714,13 +3200,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3736,11 +3221,10 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3755,11 +3239,10 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3773,10 +3256,9 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "feedback-pa.clients6.google.com",
+					"referer": "https://feedback-pa.clients6.google.com/",
 					"oddHeaders": {
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://feedback-pa.clients6.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3790,10 +3272,9 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "feedback-pa.clients6.google.com",
+					"referer": "https://feedback-pa.clients6.google.com/",
 					"oddHeaders": {
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://feedback-pa.clients6.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3810,13 +3291,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3840,23 +3320,21 @@
 						"_ga": "GA1.1.488228406.1771807634",
 						"_ga_KHZNC1Q6K0": "GS2.1.s1771807634$o1$g0$t1771807634$j60$l0$h0"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"X-Same-Domain": "1",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,P6sQOc,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,Qy2cOb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,db7dHd,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,i8oNZb,iJmdtd,kjKdXe,lazG7b,ld80Uc,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,q0xTif,ri2s0b,sI9bWe,sOXFj,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=Wt6vjf,hhhU8,FCpbqb,WhJNk",
 					"sessionTime": 2000030547,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3871,7 +3349,7 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "feedback-pa.clients6.google.com",
+					"referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.gapi.en.drdv2eaOuoE.O%2Fd%3D1%2Frs%3DAHpOoo9QpDB4BZxPNyi-IhgNVED-jgfZ-w%2Fm%3D__features__",
 					"oddHeaders": {
 						"X-Referer": "https://chromewebstore.google.com",
 						"X-Goog-Encode-Response-If-Executable": "base64",
@@ -3881,19 +3359,17 @@
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Requested-With": "XMLHttpRequest",
 						"X-Goog-Api-Key": "AIzaSyCB6OnnfuitFnaYWu4BvtGKaoLFk4cm-GE",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.gapi.en.drdv2eaOuoE.O%2Fd%3D1%2Frs%3DAHpOoo9QpDB4BZxPNyi-IhgNVED-jgfZ-w%2Fm%3D__features__"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "ssl.gstatic.com",
 					"path": "/chrome/webstore/images/icon_48px.png",
 					"sessionTime": 2000031002,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -3938,10 +3414,9 @@
 						"_et": "1",
 						"tfd": "9911"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -3993,10 +3468,9 @@
 						"_et": "3385",
 						"tfd": "9912"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4047,10 +3521,9 @@
 						"_et": "5",
 						"tfd": "9920"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4067,24 +3540,22 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
 					"domain": "www.gstatic.com",
 					"path": "/_/mss/boq-chrome-webstore/_/js/k=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.en_US.8fepFJssYCI.2018.O/ck=boq-chrome-webstore.ChromeWebStoreConsumerFeUi.3nE0SXeLsls.L.B1.O/am=gMAAAACAWQ/d=1/exm=A7fCU,AWpPDd,BBI74,BVgquf,BXHDh,DNlSjf,EFQ78c,EKHvcb,FCpbqb,FdMhB,Fu7Bjd,HNUyHc,HsQQib,IZT63,JNoxi,KUM7Z,LBaJxb,LEikZe,LcrBLd,LvGhrf,M0x0ie,MH0hJe,MI6k7c,MT4Hub,MdUzUe,MpJwZc,MtauGd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OhgRI,P6sQOc,PIVayb,PrPYRd,QIhFr,QVysJe,QvLWAb,Qy2cOb,R6rk4,RMhBfe,RiINWe,RqjULd,RyvaUb,SdcwHb,SpsfSb,Tl2FDf,UUJqVe,Uas9Hd,UkbOSe,Ulmmrd,V3dDOb,V9amgb,VBl5Ff,WhJNk,Wt6vjf,XVMNvd,Xi0ENb,YA1iG,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aW3pY,bZ0mod,byfTOb,cKRgNd,cephkf,db7dHd,dsBBae,duFQFc,e5qFLc,ebZ3mb,gIl2M,gychg,h4ilFc,hKSk3e,hc6Ubd,hhhU8,i8oNZb,iJmdtd,kjKdXe,lazG7b,ld80Uc,lsjVmc,lwddkf,mI3LFb,mUxuKd,mdR7q,n73qwf,o2G9me,p3hmRc,p8L0ob,pjICDe,pw70Gc,q0xTif,ri2s0b,sI9bWe,sOXFj,sQ8PT,tw4SJc,uoEu0c,w9C4d,w9hDv,ws9Tlc,xQtZb,xUdipf,zKiH5d,zbML3c,zr1jrb/excm=_b,_tp,itemdetailview/ed=1/wt=2/ujg=1/rs=AEP720LAa0JpeW0E8YNx_mnwLYia4jQ_-w/ee=EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;LBgRLc:SdcwHb;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Pjplud:EEDORb;QGR0gd:Mlhmy;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;Uvc8o:VDovNc;YIZmRd:A1yn5d;a56pNe:JEfCwb;cEt90b:ws9Tlc;dIoSBb:SpsfSb;dowIGb:ebZ3mb;eBAeSb:zbML3c;iFQyKf:QIhFr;lOO0Vd:OTA3Ae;oGtAuc:sOXFj;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qafBPd:yDVVkb;qddgKe:xQtZb;wR5FRb:YA1iG;xqZiqf:BBI74;yEQyxe:p8L0ob;yxTchf:KUM7Z;zxnPse:duFQFc/dti=1/m=qUYJve",
 					"sessionTime": 2000031137,
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -4099,7 +3570,7 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "feedback-pa.clients6.google.com",
+					"referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.gapi.en.drdv2eaOuoE.O%2Fd%3D1%2Frs%3DAHpOoo9QpDB4BZxPNyi-IhgNVED-jgfZ-w%2Fm%3D__features__",
 					"oddHeaders": {
 						"X-Referer": "https://chromewebstore.google.com",
 						"X-Goog-Encode-Response-If-Executable": "base64",
@@ -4109,8 +3580,7 @@
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Requested-With": "XMLHttpRequest",
 						"X-Goog-Api-Key": "AIzaSyA0vwca3tL87eYFZub4l3oBUxBL9Em8QVQ",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.gapi.en.drdv2eaOuoE.O%2Fd%3D1%2Frs%3DAHpOoo9QpDB4BZxPNyi-IhgNVED-jgfZ-w%2Fm%3D__features__"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -4128,10 +3598,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4149,10 +3618,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4180,19 +3648,13 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
-					"oddHeaders": {
-						"Referer": "https://chromewebstore.google.com/"
-					}
+					"referer": "https://chromewebstore.google.com/"
 				},
 				{
 					"domain": "clients2.googleusercontent.com",
 					"path": "/crx/blobs/Aa54OTDytoxM7dGyTK9jh2gv7qqyyzRXJHYZ2S7m8hF28Wt4ZdG5rsxU-UqVnT8yXi3d7Sbw3znopIrF1g4ewbPjtPab7Mq273VrNtxRcK_IkCf4qMQyx3Xvb0SXerLmnozIAMZSmuU1dL30StAPcxD2izvaPegWrgT4yA/ACMACODKJBDGMOLEEBOLMDJONILKDBCH_0_93_78_0.crx",
 					"sessionTime": 2000034252,
-					"refererDomain": "chromewebstore.google.com",
-					"oddHeaders": {
-						"Referer": "https://chromewebstore.google.com/"
-					}
+					"referer": "https://chromewebstore.google.com/"
 				},
 				{
 					"domain": "android.clients.google.com",
@@ -4252,10 +3714,9 @@
 						"_et": "8358",
 						"tfd": "19589"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4306,10 +3767,9 @@
 						"_et": "2",
 						"tfd": "19595"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4326,13 +3786,12 @@
 						"__Secure-ENID": "31.SE=TL8bErGcxhf-EMXEiP20i7ZeoJ7LSDuPqvytDci4TkshQa-eFHZIzXlL7hgrqE3nnjDl64_bcbMKR1QuhMzzn3kRm_od-Htr5BGiEy7VH9VbM7FiZgrUCUKDjRbKWUTiOSsUcr4BmdHj5oUXIE5iHRR1cG7FmiFJaT_J11yigzWJ8sCSmz53z2Z9CT9e2e8V_L6DgWwEmwGaAg",
 						"NID": "529=MsIfWnMMKnIJQF8qRRaSqoN1_6gBqLYMrNSESm-S74IFdv4EpKKOSPWqW0nXXOM9H9z_N1HMKWA3Yhdr86IaeaMe7qNdYB6aF8sVqgdEmswJDwTldT607QxDQ4qMzAcY8Omrk8EQuoaUh6Q3V_T0olOTQHwFeckI-YAzxNGo5qsBOV7c76aOZ49pM4Xf-kNwrzeErnqdk20p"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
 						"Content-Encoding": "gzip",
 						"sec-ch-ua-form-factors": "\"Desktop\"",
 						"X-Goog-AuthUser": "0",
-						"X-Client-Data": "CND2ygE=",
-						"Referer": "https://chromewebstore.google.com/"
+						"X-Client-Data": "CND2ygE="
 					}
 				},
 				{
@@ -4378,10 +3837,9 @@
 						"_et": "10",
 						"tfd": "19614"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4399,10 +3857,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4420,10 +3877,9 @@
 						"tid": "G-KHZNC1Q6K0",
 						"dl": "https://chromewebstore.google.com?"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4696,10 +4152,9 @@
 						"_et": "1",
 						"tfd": "25223"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				},
 				{
@@ -4779,10 +4234,9 @@
 						"_et": "1235",
 						"tfd": "29637"
 					},
-					"refererDomain": "chromewebstore.google.com",
+					"referer": "https://chromewebstore.google.com/",
 					"oddHeaders": {
-						"sec-ch-ua-form-factors": "\"Desktop\"",
-						"Referer": "https://chromewebstore.google.com/"
+						"sec-ch-ua-form-factors": "\"Desktop\""
 					}
 				}
 			]
@@ -24503,262 +23957,175 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/index.CftfC75P.css",
 					"sessionTime": 8000022390,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/7702.DfwfbZno.css",
 					"sessionTime": 8000022432,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/_attrGroupId_.DQHqQIVL.css",
 					"sessionTime": 8000022538,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CDGfc0hd.js",
 					"sessionTime": 8000022659,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/logo-light.svg",
 					"sessionTime": 8000023000,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ambire.svg",
 					"sessionTime": 8000023036,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/bitget.svg",
 					"sessionTime": 8000023048,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/daimo.svg",
 					"sessionTime": 8000023053,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-600-normal.UVxSCcoG.woff2",
 					"sessionTime": 8000023120,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-400-normal.BLhwKU8k.woff2",
 					"sessionTime": 8000023419,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/NavigationItems.BbYGon2H.js",
 					"sessionTime": 8000023426,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-800-normal.axpkC1rd.woff2",
 					"sessionTime": 8000023433,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/client.svelte.D2QNYKdy.js",
 					"sessionTime": 8000023437,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/robot.png",
 					"sessionTime": 8000023514,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-700-normal.BdjcYUrC.woff2",
 					"sessionTime": 8000023752,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-500-normal.DRFEGfly.woff2",
 					"sessionTime": 8000023804,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/elytro.svg",
 					"sessionTime": 8000023815,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/WalletTable.D_B7h76B.js",
 					"sessionTime": 8000024149,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/if.GtjUisOQ.js",
 					"sessionTime": 8000024498,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/branches.BCyzjDba.js",
 					"sessionTime": 8000024628,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/attributes.5MVf_pH0.js",
 					"sessionTime": 8000024630,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/html.CiXffbtJ.js",
 					"sessionTime": 8000024632,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/map.C-Om5nrl.js",
 					"sessionTime": 8000024644,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/universal.Drhptu0S.js",
 					"sessionTime": 8000024811,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/render.D7Qjdc4E.js",
 					"sessionTime": 8000025063,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/snippet.BYQIWRJV.js",
 					"sessionTime": 8000025065,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/props.BWkcySxF.js",
 					"sessionTime": 8000025069,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/ScoreBadge.CTVIKauh.js",
 					"sessionTime": 8000025072,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/Tooltip.DWqSWgoj.js",
 					"sessionTime": 8000025072,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "content-autofill.googleapis.com",
@@ -24777,346 +24144,238 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/set.CX3IssyG.js",
 					"sessionTime": 8000025218,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/Typography.BAroiiaW.js",
 					"sessionTime": 8000025430,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/EipDetails.CYReKU-y.js",
 					"sessionTime": 8000025447,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/preload-helper.BlTxHScW.js",
 					"sessionTime": 8000025457,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/family.svg",
 					"sessionTime": 8000025811,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/frame.svg",
 					"sessionTime": 8000025812,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/gemwallet.svg",
 					"sessionTime": 8000025834,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/imtoken.svg",
 					"sessionTime": 8000025840,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/metamask.svg",
 					"sessionTime": 8000025844,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/mtpelerin.svg",
 					"sessionTime": 8000025846,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/nufi.svg",
 					"sessionTime": 8000026190,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/okx.png",
 					"sessionTime": 8000026232,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/phantom.svg",
 					"sessionTime": 8000026234,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/pillarx.svg",
 					"sessionTime": 8000026244,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/rabby.svg",
 					"sessionTime": 8000026244,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/floating-ui.dom.Bk6kFv_j.js",
 					"sessionTime": 8000026574,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/Tooltip.DWqSWgoj.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/Tooltip.DWqSWgoj.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/rainbow.svg",
 					"sessionTime": 8000026620,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/safe.svg",
 					"sessionTime": 8000026623,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/zerion.svg",
 					"sessionTime": 8000026638,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/zeus.svg",
 					"sessionTime": 8000026640,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/bitbox.svg",
 					"sessionTime": 8000026766,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/cypherock.svg",
 					"sessionTime": 8000026970,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/firefly.jpg",
 					"sessionTime": 8000027013,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/gridplus.svg",
 					"sessionTime": 8000027031,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/imkey.svg",
 					"sessionTime": 8000027033,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/keycard-shell.svg",
 					"sessionTime": 8000027338,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/keystone.svg",
 					"sessionTime": 8000027342,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ledger.svg",
 					"sessionTime": 8000027350,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ngrave.svg",
 					"sessionTime": 8000027399,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/onekey.svg",
 					"sessionTime": 8000027422,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/trezor.svg",
 					"sessionTime": 8000027428,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 8000029796,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/favicon.ico",
 					"sessionTime": 8000030196,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/news",
 					"sessionTime": 8000032607,
-					"refererDomain": "beta.walletbeat.eth.limo",
+					"referer": "https://beta.walletbeat.eth.limo/",
 					"oddHeaders": {
-						"Sec-Purpose": "prefetch",
-						"Referer": "https://beta.walletbeat.eth.limo/"
+						"Sec-Purpose": "prefetch"
 					}
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/news/",
 					"sessionTime": 8000033149,
-					"refererDomain": "beta.walletbeat.eth.limo",
+					"referer": "https://beta.walletbeat.eth.limo/",
 					"oddHeaders": {
-						"Sec-Purpose": "prefetch",
-						"Referer": "https://beta.walletbeat.eth.limo/"
+						"Sec-Purpose": "prefetch"
 					}
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/test",
 					"sessionTime": 8000033249,
-					"refererDomain": "beta.walletbeat.eth.limo",
+					"referer": "https://beta.walletbeat.eth.limo/",
 					"oddHeaders": {
-						"Sec-Purpose": "prefetch",
-						"Referer": "https://beta.walletbeat.eth.limo/"
+						"Sec-Purpose": "prefetch"
 					}
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/test/",
 					"sessionTime": 8000033980,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/index.BfjqBpA7.css",
 					"sessionTime": 8000034507,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "android.clients.google.com",
@@ -25131,37 +24390,25 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/WalletTest.CVfD560V.js",
 					"sessionTime": 8000035610,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 8000035654,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/test/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/test/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 8000036027,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/test/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/test/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/WalletTest.BdLqSbWp.js",
 					"sessionTime": 8000036166,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTest.CVfD560V.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTest.CVfD560V.js"
 				},
 				{
 					"domain": "o4507018303438848.ingest.us.sentry.io",
@@ -26422,244 +25669,163 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/index.CftfC75P.css",
 					"sessionTime": 9000010177,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/7702.DfwfbZno.css",
 					"sessionTime": 9000010180,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/_attrGroupId_.DQHqQIVL.css",
 					"sessionTime": 9000010187,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CDGfc0hd.js",
 					"sessionTime": 9000010191,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/logo-light.svg",
 					"sessionTime": 9000010630,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ambire.svg",
 					"sessionTime": 9000010636,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/bitget.svg",
 					"sessionTime": 9000010672,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/daimo.svg",
 					"sessionTime": 9000010933,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-600-normal.UVxSCcoG.woff2",
 					"sessionTime": 9000011000,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-400-normal.BLhwKU8k.woff2",
 					"sessionTime": 9000011009,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/elytro.svg",
 					"sessionTime": 9000011053,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/family.svg",
 					"sessionTime": 9000011256,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/frame.svg",
 					"sessionTime": 9000011293,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/gemwallet.svg",
 					"sessionTime": 9000011298,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-800-normal.axpkC1rd.woff2",
 					"sessionTime": 9000011430,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-700-normal.BdjcYUrC.woff2",
 					"sessionTime": 9000011756,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/montserrat-latin-500-normal.DRFEGfly.woff2",
 					"sessionTime": 9000011764,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/index.CftfC75P.css"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/NavigationItems.BbYGon2H.js",
 					"sessionTime": 9000011767,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/client.svelte.D2QNYKdy.js",
 					"sessionTime": 9000011770,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/robot.png",
 					"sessionTime": 9000011823,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/WalletTable.D_B7h76B.js",
 					"sessionTime": 9000012130,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/imtoken.svg",
 					"sessionTime": 9000012169,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/if.GtjUisOQ.js",
 					"sessionTime": 9000012314,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/branches.BCyzjDba.js",
 					"sessionTime": 9000012315,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/attributes.5MVf_pH0.js",
 					"sessionTime": 9000012559,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/html.CiXffbtJ.js",
 					"sessionTime": 9000012568,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/map.C-Om5nrl.js",
 					"sessionTime": 9000012581,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "content-autofill.googleapis.com",
@@ -26678,19 +25844,13 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/universal.Drhptu0S.js",
 					"sessionTime": 9000012688,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/NavigationItems.BbYGon2H.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/render.D7Qjdc4E.js",
 					"sessionTime": 9000012691,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
 				},
 				{
 					"domain": "api.rabby.io",
@@ -26746,317 +25906,214 @@
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/snippet.BYQIWRJV.js",
 					"sessionTime": 9000012963,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/client.svelte.D2QNYKdy.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/props.BWkcySxF.js",
 					"sessionTime": 9000012970,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/ScoreBadge.CTVIKauh.js",
 					"sessionTime": 9000012972,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/Tooltip.DWqSWgoj.js",
 					"sessionTime": 9000013052,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/set.CX3IssyG.js",
 					"sessionTime": 9000013064,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/Typography.BAroiiaW.js",
 					"sessionTime": 9000013121,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/EipDetails.CYReKU-y.js",
 					"sessionTime": 9000013326,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/preload-helper.BlTxHScW.js",
 					"sessionTime": 9000013368,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/WalletTable.D_B7h76B.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/metamask.svg",
 					"sessionTime": 9000013749,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/mtpelerin.svg",
 					"sessionTime": 9000013754,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/nufi.svg",
 					"sessionTime": 9000013757,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/okx.png",
 					"sessionTime": 9000013757,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/phantom.svg",
 					"sessionTime": 9000013758,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/pillarx.svg",
 					"sessionTime": 9000014059,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/rabby.svg",
 					"sessionTime": 9000014153,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/rainbow.svg",
 					"sessionTime": 9000014165,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/safe.svg",
 					"sessionTime": 9000014173,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/zerion.svg",
 					"sessionTime": 9000014174,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/zeus.svg",
 					"sessionTime": 9000014175,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/_astro/floating-ui.dom.Bk6kFv_j.js",
 					"sessionTime": 9000014521,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/_astro/Tooltip.DWqSWgoj.js"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/_astro/Tooltip.DWqSWgoj.js"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/bitbox.svg",
 					"sessionTime": 9000014525,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/cypherock.svg",
 					"sessionTime": 9000014532,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/firefly.jpg",
 					"sessionTime": 9000014547,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/gridplus.svg",
 					"sessionTime": 9000014550,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/imkey.svg",
 					"sessionTime": 9000014912,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/keycard-shell.svg",
 					"sessionTime": 9000014938,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/keystone.svg",
 					"sessionTime": 9000014943,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ledger.svg",
 					"sessionTime": 9000014944,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/ngrave.svg",
 					"sessionTime": 9000014957,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/onekey.svg",
 					"sessionTime": 9000015261,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/wallets/trezor.svg",
 					"sessionTime": 9000015396,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 9000019012,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/faq/",
 					"sessionTime": 9000024865,
-					"refererDomain": "beta.walletbeat.eth.limo",
+					"referer": "https://beta.walletbeat.eth.limo/",
 					"oddHeaders": {
-						"Sec-Purpose": "prefetch",
-						"Referer": "https://beta.walletbeat.eth.limo/"
+						"Sec-Purpose": "prefetch"
 					}
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 9000027254,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/test/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/test/"
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
 					"path": "/images/icon.png",
 					"sessionTime": 9000027619,
-					"refererDomain": "beta.walletbeat.eth.limo",
-					"oddHeaders": {
-						"Referer": "https://beta.walletbeat.eth.limo/test/"
-					}
+					"referer": "https://beta.walletbeat.eth.limo/test/"
 				},
 				{
 					"domain": "api.rabby.io",

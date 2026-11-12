@@ -19,7 +19,7 @@ them. The italicized text under each heading is the form's own prompt for that f
 
 ## Contact information
 
-- **Email**: walletbeat@proton.me
+- **Email**: <walletbeat@proton.me>
 - **Company**: Walletbeat
 - **Profile type**: Organization
 - **Website**: [walletbeat.eth.limo](https://walletbeat.eth.limo/)
@@ -162,7 +162,7 @@ Walletbeat pushes wallet teams to adopt ecosystem initiatives like clear signing
 and many others.
 
 See the
-[impact log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md).
+[impact log](/resources/docs/impact/impact.md).
 
 ## Measured impact
 
@@ -179,12 +179,12 @@ _Depending on the stage of this project, provide metrics for the project's curre
   for bringing the issue to their attention.
 - **2026-08**: We point out that flagging IPFS gateways such as `.eth.limo` discourages apps
   from moving to IPFS, which would make them more secure and censorship-resistant. Ambire
-  unflagged them: https://x.com/borislavItskovv/status/2090563980549042476 and
-  https://x.com/ambire/status/2090483593407529375
+  unflagged them: <https://x.com/borislavItskovv/status/2090563980549042476> and
+  <https://x.com/ambire/status/2090483593407529375>
 - **2026-08**: We show how wallets handle unlimited token approvals that cost a user ~$500k:
-  https://x.com/0xMattmatt/status/2089770628828237918. Ambire pushed an update flagging
+  <https://x.com/0xMattmatt/status/2089770628828237918>. Ambire pushed an update flagging
   unlimited approvals to untrusted contracts and credited Walletbeat's research:
-  https://x.com/borislavItskovv/status/2090566092808982840
+  <https://x.com/borislavItskovv/status/2090566092808982840>
 
 ### Ecosystem adoption and presence
 
@@ -196,9 +196,9 @@ _Depending on the stage of this project, provide metrics for the project's curre
   session at the Neocypherpunk Summit, a CROPS-in-wallets talk on Ethereum Day, and a Dappcon
   workshop on ERC-7730 and ERC-8213. We also ran a Brew workshop teaching attendees to
   capture wallet network traffic and find privacy leaks. Recordings and slides are public:
-  https://github.com/walletbeat/walletbeat/tree/beta/resources/talks
+  <https://github.com/walletbeat/walletbeat/tree/beta/resources/talks>
 - Social proof log:
-  https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md
+  <https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md>
 
 ## Success metrics
 
@@ -223,8 +223,8 @@ aligned values.
 
 _What domain expert or community feedback have you received for this project?_
 
-- [Impact log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md)
-- [Social proof log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md)
+- [Impact log](/resources/docs/impact/impact.md)
+- [Social proof log](/resources/docs/social-proof/social-proof.md)
 
 ## Open source license
 

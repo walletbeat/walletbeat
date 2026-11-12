@@ -6,7 +6,7 @@ import {
 } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { setContains } from '@/types/utils/non-empty'
+import { nonEmptySetFromArray, setContains } from '@/types/utils/non-empty'
 
 /**
  * Get the primary stage and ladder evaluation for a wallet.
@@ -39,20 +39,19 @@ function canonicalizeLadderEvaluation(
 		return ladderEvaluation
 	}
 
-	if (!isStage(ladderEvaluation.stage)) {
-		return {
-			...ladderEvaluation,
-			ladder,
-		}
-	}
-
-	const evaluatedStage = ladderEvaluation.stage
-	const stage = ladder.stages.find(ladderStage => ladderStage.id === evaluatedStage.id)
+	const canonicalStage = (stage: WalletStage<string>): WalletStage<string> =>
+		ladder.stages.find(ladderStage => ladderStage.id === stage.id) ?? stage
 
 	return {
 		...ladderEvaluation,
 		ladder,
-		stage: stage ?? ladderEvaluation.stage,
+		stage: isStage(ladderEvaluation.stage)
+			? canonicalStage(ladderEvaluation.stage)
+			: ladderEvaluation.stage,
+		highestClearedStage:
+			ladderEvaluation.highestClearedStage === null
+				? null
+				: canonicalStage(ladderEvaluation.highestClearedStage),
 	}
 }
 
@@ -71,12 +70,18 @@ function getCanonicalLadderEvaluation(
 	return ladder ? evaluateWalletOnLadder(wallet, ladder) : undefined
 }
 
-export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
-	stage: WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+export function getWalletStageAndLadder(
+	wallet: RatedWalletStageSlice,
+	walletType?: WalletType,
+): {
+	stage: WalletLadderEvaluation<string>['stage'] | null
 	ladderEvaluation: WalletLadderEvaluation<string> | null
 	ladderType: WalletLadderType | null
 } {
-	if (wallet.types === undefined) {
+	if (
+		wallet.types === undefined ||
+		(walletType !== undefined && !setContains(wallet.types, walletType))
+	) {
 		return {
 			stage: null,
 			ladderEvaluation: null,
@@ -84,8 +89,18 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 		}
 	}
 
+	const acceptsType = (ladderType: WalletLadderType): boolean =>
+		walletType === undefined ||
+		allWalletLadders[ladderType].applicableTo({
+			...wallet,
+			types: nonEmptySetFromArray([walletType]),
+		})
+
 	// Prioritize SOFTWARE ladder if the wallet is a software wallet
-	if (setContains<WalletType>(wallet.types, WalletType.SOFTWARE)) {
+	if (
+		setContains<WalletType>(wallet.types, WalletType.SOFTWARE) &&
+		acceptsType(WalletLadderType.SOFTWARE)
+	) {
 		const softwareLadder = getCanonicalLadderEvaluation(wallet, WalletLadderType.SOFTWARE)
 
 		if (softwareLadder && softwareLadder.stage !== 'NOT_APPLICABLE') {
@@ -99,6 +114,10 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 
 	// Otherwise, return the first applicable ladder evaluation
 	for (const ladderType of Object.values(WalletLadderType)) {
+		if (!acceptsType(ladderType)) {
+			continue
+		}
+
 		const ladderEvaluation = getCanonicalLadderEvaluation(wallet, ladderType)
 
 		if (ladderEvaluation === undefined || ladderEvaluation.stage === 'NOT_APPLICABLE') {
@@ -117,4 +136,17 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 		ladderEvaluation: null,
 		ladderType: null,
 	}
+}
+
+/**
+ * Whether the wallet cleared at least Stage 0 on its applicable ladder.
+ *
+ * Stage 0 requires public source availability. Wallets that did not qualify
+ * (`QUALIFIED_FOR_NO_STAGES`) cannot be independently verified for many
+ * attributes, so they should not be ranked with Stage 0+ wallets.
+ */
+export function walletQualifiesForStageZero(wallet: RatedWalletStageSlice): boolean {
+	const { ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+	return ladderEvaluation !== null && ladderEvaluation.highestClearedStage !== null
 }

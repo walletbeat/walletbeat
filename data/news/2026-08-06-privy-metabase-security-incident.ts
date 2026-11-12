@@ -10,7 +10,7 @@ export default {
 	slug: 'privy-metabase-security-incident',
 	type: NewsType.DATA_BREACH,
 	ref: {
-		label: 'Privy Blog: Post mortem on August 6th, 2026 Metabase security incident',
+		label: 'Privy Blog: Postmortem on August 6th, 2026 Metabase security incident',
 		url: 'https://privy.dev/blog/post-mortem-on-august-6-2026-metabase-security-incident',
 	},
 	impact: {

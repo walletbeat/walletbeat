@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import path from 'node:path'
 
 import {
 	CollectionPolicy,
@@ -8,8 +7,8 @@ import {
 	dataCollectionPurpose,
 } from '@/schema/features/privacy/data-collection'
 import { type AtLeastOneTrueVariant } from '@/schema/variants'
-import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary } from '@/tests/utils/grammar'
+import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -18,6 +17,7 @@ import {
 	nonEmptySetFromArray,
 	setItems,
 } from '@/types/utils/non-empty'
+import { escapeRegExp } from '@/utils/codebase'
 import {
 	expectArray,
 	expectOptionalString,
@@ -26,6 +26,7 @@ import {
 	isSameJson,
 } from '@/utils/json'
 
+import { writeFileAtomically } from './read-only'
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
@@ -37,6 +38,7 @@ export interface EncodedWalletRequestMatcher {
 	domain: string
 	path?: string
 	method?: string
+	refererDomain?: string
 	purposes?: NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	policy?: CollectionPolicy
 }
@@ -93,6 +95,7 @@ export class WalletRequestMatcher {
 	private readonly domain: string
 	private readonly path: string | null
 	private readonly method: string | null
+	private readonly refererDomain: string | null
 	public readonly isGlobal: boolean
 	public readonly purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 	public readonly policy: CollectionPolicy | null
@@ -102,12 +105,14 @@ export class WalletRequestMatcher {
 			domain,
 			path,
 			method,
+			refererDomain,
 			purposes,
 			policy,
 		}: {
 			domain: string
 			path: string | null
 			method: string | null
+			refererDomain: string | null
 			purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 			policy: CollectionPolicy | null
 		},
@@ -133,6 +138,7 @@ export class WalletRequestMatcher {
 
 		this.path = path
 		this.method = method
+		this.refererDomain = refererDomain
 		this.purposes = purposes
 		this.policy = policy
 	}
@@ -140,6 +146,19 @@ export class WalletRequestMatcher {
 	public matches(request: WalletRequest): boolean {
 		if (!domainMatches(this.domain, request.domain)) {
 			return false
+		}
+
+		// If a referer domain selector is provided, require a referer header domain match.
+		if (this.refererDomain !== null) {
+			const requestRefererDomain = request.refererDomain()
+
+			if (requestRefererDomain === null) {
+				return false
+			}
+
+			if (!domainMatches(this.refererDomain, requestRefererDomain)) {
+				return false
+			}
 		}
 
 		if (!optionalGlobMatches(this.path, request.path)) {
@@ -173,6 +192,7 @@ export class WalletRequestMatcher {
 					}),
 			...(this.path === null ? {} : { path: this.path }),
 			...(this.method === null ? {} : { method: this.method }),
+			...(this.refererDomain === null ? {} : { refererDomain: this.refererDomain }),
 			...(this.policy === null ? {} : { policy: this.policy }),
 		}
 	}
@@ -199,14 +219,30 @@ export class WalletCaptureAnnotations {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
 
 			if (raw !== '') {
-				const parsed: unknown = JSON.parse(raw)
+				let parsed: unknown
+
+				try {
+					parsed = JSON.parse(raw) as unknown
+				} catch (e) {
+					throw new Error(`Invalid JSON in annotations file ${pathStr}: ${getErrorMessage(e)}`, {
+						cause: e,
+					})
+				}
 
 				data = WalletCaptureAnnotations.parseEncoded(parsed, '$')
 			}
 		}
 
 		const globalRaw = fs.readFileSync(globalPath, 'utf8').trim()
-		const global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw), 'global$')
+		let global: EncodedWalletCaptureAnnotations
+
+		try {
+			global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw) as unknown, 'global$')
+		} catch (e) {
+			throw new Error(`Invalid JSON in annotations file ${globalPath}: ${getErrorMessage(e)}`, {
+				cause: e,
+			})
+		}
 
 		return new WalletCaptureAnnotations(pathStr, globalPath, data, global)
 	}
@@ -232,6 +268,7 @@ export class WalletCaptureAnnotations {
 			const domain = expectString(obj.domain, `${matcherAt}.domain`)
 			const pathOpt = expectOptionalString(obj.path, `${matcherAt}.path`)
 			const methodOpt = expectOptionalString(obj.method, `${matcherAt}.method`)
+			const refererDomainOpt = expectOptionalString(obj.refererDomain, `${matcherAt}.refererDomain`)
 
 			const purposes = (():
 				NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | undefined => {
@@ -266,6 +303,7 @@ export class WalletCaptureAnnotations {
 				domain,
 				path: pathOpt,
 				method: methodOpt,
+				refererDomain: refererDomainOpt,
 				purposes,
 				policy: policyOpt === undefined ? undefined : collectionPolicyEnum.assert(policyOpt),
 			}
@@ -300,6 +338,7 @@ export class WalletCaptureAnnotations {
 					domain: m.domain,
 					path: m.path ?? null,
 					method: m.method ?? null,
+					refererDomain: m.refererDomain ?? null,
 					purposes:
 						m.purposes === undefined
 							? null
@@ -395,10 +434,6 @@ export class WalletCaptureAnnotations {
 			throw new Error('WalletCaptureAnnotations built without a path; cannot save.')
 		}
 
-		const dir = path.dirname(this.path)
-
-		await fs.promises.mkdir(dir, { recursive: true })
-
 		const content = JSON.stringify(this.toJSON(false), null, '\t') + '\n'
 
 		// Check if content differs from what's on disk
@@ -427,18 +462,12 @@ export class WalletCaptureAnnotations {
 			}
 		} else {
 			if (needsWrite) {
-				const tmp = `${this.path}.tmp`
-
-				await fs.promises.writeFile(tmp, content, 'utf8')
-				await fs.promises.rename(tmp, this.path)
+				await writeFileAtomically(this.path, content)
 				changed.push(this.path)
 			}
 
 			if (globalNeedsWrite) {
-				const tmp = `${this.globalPath}.tmp`
-
-				await fs.promises.writeFile(tmp, globalContent, 'utf8')
-				await fs.promises.rename(tmp, this.globalPath)
+				await writeFileAtomically(this.globalPath, globalContent)
 				changed.push(this.globalPath)
 			}
 		}

@@ -3,6 +3,7 @@ import * as crypto from 'node:crypto'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import { env } from 'node:process'
 import { promisify } from 'node:util'
 
 import { format, resolveConfig } from 'prettier'
@@ -18,14 +19,20 @@ import {
 	RASTER_EXTENSIONS,
 } from '@/tools/image-integrity/image-integrity-lib'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
-import { isSameJson } from '@/utils/json'
-
+import {
+	hasSamePixels,
+	isWorthRecompressing,
+	parsePngChunks,
+	readPngHeader,
+	recompressPng,
+} from '@/tools/image-integrity/png-optimizer-lib'
 import {
 	CodebaseEntryType,
 	crawlCodebase,
 	getRepositoryRoot,
 	GitIgnoredFiles,
-} from './utils/codebase'
+} from '@/utils/codebase'
+import { isSameJson } from '@/utils/json'
 
 /**
  * Path to the JSON whitelist of image files already verified as passing every
@@ -73,6 +80,21 @@ interface CleanImageEntry {
  */
 const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
+	'resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg',
+	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
+	// Same photo, reused in a later thread.
+	'resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg',
+	// Converted from a lossy AVIF source (no higher-quality source available); the
+	// blockiness artifacts are already baked into the pixel data before PNG re-encoding.
+	'resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png',
+	// Slide graphics with a dark gradient background; the blockiness is baked into
+	// the pixel data from the export pipeline (no higher-quality source available).
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/fee_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/funding.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/open_source_license.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/orderflow_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/release_process_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/source_availability.png',
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
@@ -249,6 +271,35 @@ const SVG_OPTIMIZED_TEST: ImageTest = {
 			return {
 				pass: false,
 				detail: `${originalSize} -> ${optimizedSize} bytes (${originalSize - optimizedSize} can be saved)`,
+			}
+		}
+
+		return { pass: true }
+	},
+}
+
+/**
+ * Detect PNGs that a lossless re-encode can make noticeably smaller (see
+ * `isWorthRecompressing` for the thresholds).
+ *
+ * The re-encode (see `recompressPng`) keeps every pixel value, the bit depth,
+ * and the chunks that affect rendering such as ICC profiles; it only changes
+ * how the pixel data is compressed. Fix failing files in place with
+ * `pnpm tsx src/tools/image-integrity/png-optimizer.ts <file.png>...`.
+ */
+const PNG_OPTIMIZED_TEST: ImageTest = {
+	name: 'png-optimized',
+	requiresInkscape: false,
+	appliesTo: entry =>
+		extensionOf(entry.filePath) === '.png' && detectImageFormat(entry.raw) === 'png',
+	run: async entry => {
+		const originalSize = entry.raw.length
+		const optimizedSize = (await recompressPng(entry.raw)).length
+
+		if (isWorthRecompressing(originalSize, optimizedSize)) {
+			return {
+				pass: false,
+				detail: `${originalSize} -> ${optimizedSize} bytes (${originalSize - optimizedSize} can be saved losslessly)`,
 			}
 		}
 
@@ -578,6 +629,7 @@ const FILE_FORMAT_TEST: ImageTest = {
 const IMAGE_TESTS: ImageTest[] = [
 	BLOCKINESS_TEST,
 	FILE_FORMAT_TEST,
+	PNG_OPTIMIZED_TEST,
 	SVG_OPTIMIZED_TEST,
 	SVG_VECTOR_TEST,
 	WBICON_SQUARE_TEST,
@@ -690,6 +742,13 @@ async function serializeCleanImageHashes(
 	})
 }
 
+/** Narrow an error to one carrying a `code` string property (e.g. Node fs errors). */
+function hasErrorCode(error: unknown): error is { code: string } {
+	return (
+		typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string'
+	)
+}
+
 /**
  * Persist the whitelist to disk, atomically, with sorted keys.
  */
@@ -711,7 +770,22 @@ async function saveCleanImageHashes(whitelist: Record<string, CleanImageEntry>):
 	const tmpPath = `${WHITELIST_PATH}.tmp`
 
 	await fs.writeFile(tmpPath, json, 'utf8')
-	await fs.rename(tmpPath, WHITELIST_PATH)
+
+	try {
+		await fs.rename(tmpPath, WHITELIST_PATH)
+	} catch (error) {
+		// Windows cannot atomically `rename` over an existing destination file
+		// (it throws EPERM/EACCES when the destination already exists), unlike
+		// POSIX where `rename(2)` replaces it. Fall back to removing the
+		// destination first, then renaming the temp file into place. Genuine
+		// errors (e.g. ENOENT, disk full) are rethrown rather than masked.
+		if (!hasErrorCode(error) || (error.code !== 'EPERM' && error.code !== 'EACCES')) {
+			throw error
+		}
+
+		await fs.rm(WHITELIST_PATH, { force: true })
+		await fs.rename(tmpPath, WHITELIST_PATH)
+	}
 }
 
 /** Generate a photo-like raw RGB image used as the basis for JPEG-derived fixtures. */
@@ -776,8 +850,89 @@ describe('image integrity', () => {
 		})
 	})
 
+	describe('PNG recompression', () => {
+		it('shrinks a poorly compressed PNG without changing its pixels', async () => {
+			const raw = makePhotoLikeRaw(256, 256, 3, 7)
+			const original = await sharp(raw, { raw: { width: 256, height: 256, channels: 3 } })
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(recompressed.length).toBeLessThan(original.length)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps 16-bit samples', async () => {
+			const raw = Buffer.alloc(64 * 64 * 3 * 2)
+
+			for (let i = 0; i < raw.length; i += 2) {
+				raw.writeUInt16LE((i * 257) % 65536, i)
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 3 } })
+				.toColourspace('rgb16')
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(original)).bitDepth).toBe(16)
+			expect(readPngHeader(parsePngChunks(recompressed)).bitDepth).toBe(16)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps the ICC profile', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 3, 11)
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 3 } })
+				.withIccProfile('p3')
+				.png({ compressionLevel: 0 })
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+			const iccChunk = (png: Buffer): Buffer | undefined =>
+				parsePngChunks(png).find(chunk => chunk.type === 'iCCP')?.bytes
+
+			expect(iccChunk(original)).toBeDefined()
+			expect(iccChunk(recompressed)).toEqual(iccChunk(original))
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('drops a fully opaque alpha channel', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 4, 13)
+
+			for (let i = 3; i < raw.length; i += 4) {
+				raw[i] = 255
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 4 } })
+				.png()
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(original)).colorType).toBe(6)
+			expect(readPngHeader(parsePngChunks(recompressed)).colorType).toBe(2)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+
+		it('keeps a partially transparent alpha channel', async () => {
+			const raw = makePhotoLikeRaw(64, 64, 4, 17)
+
+			for (let i = 3; i < raw.length; i += 4) {
+				raw[i] = (i >> 2) % 256
+			}
+
+			const original = await sharp(raw, { raw: { width: 64, height: 64, channels: 4 } })
+				.png()
+				.toBuffer()
+			const recompressed = await recompressPng(original)
+
+			expect(readPngHeader(parsePngChunks(recompressed)).colorType).toBe(6)
+			expect(await hasSamePixels(original, recompressed)).toBe(true)
+		})
+	})
+
 	describe('repository images', async () => {
-		inkscapeTestsEnabled = process.env.WALLETBEAT_ENV === 'CI' || (await isInkscapeAvailable())
+		const isCi = env.WALLETBEAT_ENV === 'CI'
+
+		inkscapeTestsEnabled = isCi || (await isInkscapeAvailable())
 
 		// The whitelist is mutated in place as the scan discovers clean, new,
 		// changed, or removed images, then written back to disk.
@@ -791,6 +946,12 @@ describe('image integrity', () => {
 		// Only these are eligible for the whitelist; entries for anything else
 		// (deleted, or excluded from every test) are pruned below.
 		const trackedFiles: Set<string> = new Set()
+		// Paths whose whitelist entries were pruned because the image is no
+		// longer tracked (deleted, or excluded from every integrity test).
+		const prunedFiles: string[] = []
+		// Serialized snapshot of the whitelist as loaded from disk, used to
+		// detect whether the scan mutated it (i.e. the committed cache is stale).
+		const loadedWhitelistJson = await serializeCleanImageHashes(whitelist)
 
 		await crawlCodebase({
 			ignore: [
@@ -897,13 +1058,25 @@ describe('image integrity', () => {
 		for (const key of Object.keys(whitelist)) {
 			if (!trackedFiles.has(key)) {
 				delete whitelist[key]
+				prunedFiles.push(key)
 			}
 		}
 
-		// Persist the self-updated whitelist. If this write fails, the test
-		// fails, which is the intended "succeed only if the JSON update succeeds"
-		// contract.
-		await saveCleanImageHashes(whitelist)
+		// Whether the scan changed the whitelist relative to what was committed
+		// on disk. A changed whitelist means the verified-clean cache is stale
+		// (a new, changed, removed, or newly-testable image).
+		const updatedWhitelistJson = await serializeCleanImageHashes(whitelist)
+		const whitelistChanged = !isSameJson(loadedWhitelistJson, updatedWhitelistJson)
+
+		// In CI the whitelist is a committed artifact: silently regenerating it
+		// would let a stale cache pass. When the cache is stale, persist nothing
+		// and let the CI check below fail with a regeneration message.
+		if (!isCi || !whitelistChanged) {
+			// Persist the self-updated whitelist. If this write fails, the test
+			// fails, which is the intended "succeed only if the JSON update succeeds"
+			// contract.
+			await saveCleanImageHashes(whitelist)
+		}
 
 		it('found image files to check', () => {
 			const total = scannedFiles.length + skippedFiles.length
@@ -925,7 +1098,8 @@ describe('image integrity', () => {
 							return `  ${f.filePath}\n    test: ${f.test}${score}${detail}`
 						})
 						.join('\n\n') +
-					'\n\nFix these images (re-encode at higher quality or optimize the SVG).\n'
+					'\n\nFix these images (re-encode at higher quality, optimize the SVG, or run\n' +
+					'`pnpm tsx src/tools/image-integrity/png-optimizer.ts <file.png>` for PNGs).\n'
 
 				console.error(message)
 				expect(
@@ -951,7 +1125,36 @@ describe('image integrity', () => {
 			}
 		})
 
+		it.runIf(isCi)('verified-clean cache is up to date in CI', () => {
+			if (!whitelistChanged) {
+				return
+			}
+
+			const changes = [
+				...scannedFiles.map(filePath => `  + ${filePath} (needs re-verification)`),
+				...prunedFiles.map(filePath => `  - ${filePath} (no longer tracked)`),
+			]
+
+			const message =
+				'\n`verified-clean-images.json` is out of date:\n\n' +
+				changes.join('\n') +
+				'\n\n' +
+				'The verified-clean cache is a committed artifact. Re-run the tests ' +
+				'locally to regenerate it, then commit the updated ' +
+				'`tests/image-integrity/verified-clean-images.json` file alongside the ' +
+				'image changes.\n'
+
+			expect(whitelistChanged, message).toBe(false)
+		})
+
 		it('whitelist was persisted and reflects the repository', async () => {
+			// In CI the whitelist is not persisted when stale (the dedicated
+			// cache-freshness check reports that instead), so there is nothing to
+			// round-trip against on disk.
+			if (isCi && whitelistChanged) {
+				return
+			}
+
 			// Round-trip: the file on disk must parse and match the in-memory
 			// whitelist that was just written, confirming the self-update worked.
 			const persisted = parseCleanImageHashes(await fs.readFile(WHITELIST_PATH, 'utf8'))
