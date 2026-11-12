@@ -1755,6 +1755,50 @@
 		"hash": "2179a16f6cf9e2d0bb81348617afccb0222ae9d8e4d41e307225d3a8f88c6c6f",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/account-recovery.png": {
+		"hash": "4dc53830c8fdd4c6aafb1cec76a24f35c7b1ed533cada42b2ffb71a94eb7193e",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/clear-signing.png": {
+		"hash": "0bc2f386672693938c804e18325c5d8f9ef1f75a1a4fc13a7175b925d8eab0ae",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/duress-resistance.png": {
+		"hash": "9216c226a94fdc09ef77feb0334a76cd189aa060b42fe94c5b9b83e5644f9257",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/hardware-wallet-support.png": {
+		"hash": "e98045c34c9f35c3bce5cee062182eb27e529d5f1a87902e6447056f053494a3",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/scam-alerting.png": {
+		"hash": "244a96ba49e49ea9bf76431a3a916fdf12232cd0f0bf8fde158d36fc0dd9dd3d",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/security-attribute.png": {
+		"hash": "700c2e6fa73113acea4810c33fdb223a86ffd38f261a21a0e278db9caa55a614",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/security-audits.png": {
+		"hash": "d6172593ff297e5ac5593b35c54c58aff65b3fd347b20ce63ad14cb53de3e28e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/security-best-practices.png": {
+		"hash": "98964339ebce3460d1cbdd14616d274459373bfb8f981aa234ec2b2a94787ef6",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/transaction-legibility.png": {
+		"hash": "4a463f30f0f1d4cb212a12a28213f0d308199e744b5e52d92a02a55f5b5dfc29",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/walletbeat-cta.png": {
+		"hash": "f1ddda183db99a4b6342a841bfb9e6cd788ee6fc2c6518f8e8312fd0049f750a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/walletbeat-five-categories.png": {
+		"hash": "3c973d5186410ebfc075e28dd8445ee8568ad231c4bf117d91278b44141d71ee",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-09-17 - Minimal Data Collection Meme/minimal-data-collection.png": {
 		"hash": "140f949d356383e75d9ee4589a42aa8e235a739ec3d6731d10ac15473d836569",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
