@@ -1,7 +1,7 @@
 {
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"manifest_version": 3,
-	"version": "2.19.19",
+	"version": "2.21.12",
 	"name": "__MSG_appName__",
 	"short_name": "Bitget Wallet",
 	"description": "__MSG_appDescription__",
@@ -28,7 +28,7 @@
 		}
 	},
 	"content_security_policy": {
-		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';  frame-ancestors 'none';"
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; frame-ancestors 'none';"
 	},
 	"background": {
 		"service_worker": "static/js/background.js"
@@ -36,12 +36,12 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["static/js/contentscript.js", "static/js/bundle.js"],
+			"js": ["static/js/contentscript.js"],
 			"run_at": "document_start",
 			"all_frames": true
 		}
 	],
-	"host_permissions": ["http://localhost/*", "*://*/*"],
+	"host_permissions": ["http://*/*", "https://*/*"],
 	"permissions": [
 		"storage",
 		"activeTab",
@@ -53,9 +53,9 @@
 		"sidePanel",
 		"contextMenus"
 	],
+	"optional_permissions": ["clipboardRead", "clipboardWrite"],
 	"externally_connectable": {
-		"matches": ["https://bitkeep.com/*", "https://web3.bitget.com/"],
-		"ids": ["*"]
+		"matches": ["https://bitkeep.com/*", "https://web3.bitget.com/"]
 	},
 	"minimum_chrome_version": "88",
 	"side_panel": {
