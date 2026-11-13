@@ -1,0 +1,89 @@
+{
+	"highlightRanges": [
+		{
+			"first": 73,
+			"last": 132
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum MoveChecks {"
+			],
+			"startLine": 20
+		},
+		{
+			"lines": [
+				"    }",
+				"",
+				"    // MARK: - OFAC's list",
+				"",
+				"    static let sanctionsURL = \"https://raw.githubusercontent.com/0xB10C/ofac-sanctioned-digital-currency-addresses/lists/sanctioned_addresses_ETH.json\"",
+				"    /// The bundled starting copy's date: the list's own commit, 2026-10-01.",
+				"    static let bundledDate = Date(timeIntervalSince1970: 1_790_838_911)",
+				"",
+				"    private static var keptURL: URL? {",
+				"        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?",
+				"            .appendingPathComponent(\"ofac-sanctioned-eth.json\")",
+				"    }",
+				"",
+				"    /// When the kept copy was written: the day it was read.",
+				"    private static var keptDate: Date? {",
+				"        keptURL.flatMap { try? FileManager.default.attributesOfItem(atPath: $0.path)[.modificationDate] as? Date }",
+				"    }",
+				"",
+				"    /// The kept copy, else the bundled one: the addresses and the copy's date.",
+				"    static func sanctions() -> (addresses: Set<String>, date: Date)? {",
+				"        if let url = keptURL, let data = try? Data(contentsOf: url), let list = MoveWarnings.ofacList(data) {",
+				"            return (Set(list), keptDate ?? bundledDate)",
+				"        }",
+				"        guard let url = Bundle.main.url(forResource: \"OFACSanctionedETH\", withExtension: \"json\"),",
+				"              let data = try? Data(contentsOf: url), let list = MoveWarnings.ofacList(data) else { return nil }",
+				"        return (Set(list), bundledDate)",
+				"    }",
+				"",
+				"    /// Once a day on the foreground sweep, with an account on this phone:",
+				"    /// the whole list, kept only if it parses and is not sharply smaller",
+				"    /// than the copy it replaces. It names no wallet.",
+				"    static func refreshSanctionsIfDue() {",
+				"        guard YourAccountKey.address != nil, !DemoMode.isActive else { return }",
+				"        if let last = keptDate, Date.now.timeIntervalSince(last) < 86_400 { return }",
+				"        Task.detached(priority: .utility) {",
+				"            guard let url = URL(string: sanctionsURL),",
+				"                  let (data, http) = await IngestSupport.sendRequest(URLRequest(url: url), service: service),",
+				"                  http.statusCode == 200 else { return }",
+				"            let fresh = MoveWarnings.ofacList(data)",
+				"            guard MoveWarnings.accepts(fresh, over: sanctions()?.addresses.count ?? 0), let keptURL else {",
+				"                #if DEBUG",
+				"                NSLog(\"moveChecks| sanctions refused: %d addresses\", fresh?.count ?? -1)",
+				"                #endif",
+				"                return",
+				"            }",
+				"            try? FileManager.default.createDirectory(at: keptURL.deletingLastPathComponent(), withIntermediateDirectories: true)",
+				"            try? data.write(to: keptURL, options: .atomic)",
+				"        }",
+				"    }",
+				"",
+				"    // MARK: - GoPlus and Blockscout (through Tor)",
+				"",
+				"    private static let cache = Cache()",
+				"",
+				"    /// GoPlus's report on `address` on `chainId`; nil when it did not answer.",
+				"    static func report(_ address: String, chainId: Int) async -> MoveWarnings.Report? {",
+				"        let key = \"\\(chainId)|\\(address.lowercased())\"",
+				"        if let hit = await cache.report(key) { return hit }",
+				"        guard let url = URL(string: \"https://api.gopluslabs.io/api/v1/address_security/\\(address.lowercased())?chain_id=\\(chainId)\"),",
+				"              let (data, http) = await IngestSupport.sendRequest(URLRequest(url: url), service: service),",
+				"              http.statusCode == 200, let r = MoveWarnings.report(data) else { return nil }",
+				"        await cache.put(report: r, key)",
+				"        return r",
+				"    }",
+				"",
+				"    /// The explorer each network's creation dates are read from.",
+				"    static func explorer(_ chainId: Int) -> String? {",
+				"        switch chainId {"
+			],
+			"startLine": 69
+		}
+	]
+}

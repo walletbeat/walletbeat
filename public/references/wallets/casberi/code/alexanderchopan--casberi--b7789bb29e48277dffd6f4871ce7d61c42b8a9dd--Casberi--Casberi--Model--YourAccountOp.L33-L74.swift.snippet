@@ -1,0 +1,77 @@
+{
+	"highlightRanges": [
+		{
+			"first": 33,
+			"last": 74
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountOp {"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    struct Network: Equatable, Identifiable, Sendable {"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"        let isTest: Bool",
+				"        var id: Int { chainId }",
+				"    }",
+				"",
+				"    static let base = Network(",
+				"        name: \"Base\", chainId: 8453,",
+				"        rpcs: [\"https://mainnet.base.org\", \"https://base-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/8453/rpc\", \"https://api.candide.dev/public/v3/8453\"],",
+				"        dollar: \"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913\", isTest: false)",
+				"    static let ethereum = Network(",
+				"        name: \"Ethereum\", chainId: 1,",
+				"        rpcs: [\"https://rpc.mevblocker.io\", \"https://ethereum-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/1/rpc\", \"https://api.candide.dev/public/v3/1\"],",
+				"        dollar: \"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\", isTest: false)",
+				"    /// Robinhood Chain, back with every feature (prd §1454, amending",
+				"    /// §1449): every contract the account and its spend limit use is there,",
+				"    /// Safe's adapter published at its own address (§1447 item 18); Pimlico's",
+				"    /// public bundler serves it, Candide's does not.",
+				"    static let robinhood = Network(",
+				"        name: \"Robinhood\", chainId: 4663, // one word in every sentence (prd §1479 item 4)",
+				"        rpcs: [\"https://rpc.mainnet.chain.robinhood.com\", \"https://robinhood-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/4663/rpc\"],",
+				"        dollar: \"0x5fc5360d0400a0fd4f2af552add042d716f1d168\", dollarSymbol: \"USDG\", isTest: false)",
+				"    /// The network behind one of this app's own chain names (\"base-mainnet\",",
+				"    /// the approvals' and receipts' spelling), when the account can act there.",
+				"    static func network(appName: String) -> Network? {",
+				"        switch appName {",
+				"        case \"base-mainnet\": base",
+				"        case \"eth-mainnet\": ethereum",
+				"        case \"robinhood-mainnet\": robinhood",
+				"        default: nil",
+				"        }",
+				"    }",
+				"",
+				"    static let baseSepolia = Network(",
+				"        name: \"Base Sepolia\", chainId: 84532,",
+				"        rpcs: [\"https://sepolia.base.org\", \"https://base-sepolia-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/84532/rpc\", \"https://api.candide.dev/public/v3/84532\"],",
+				"        dollar: \"0x036CbD53842c5426634e7929541eC2318f3dCF7e\", isTest: true)",
+				"",
+				"    /// The account's networks, the same in every build: Base, Ethereum and",
+				"    /// Robinhood Chain (prd §1454), each with send, receive, swap, round-ups",
+				"    /// and the spend limit. Base Sepolia is in none, DEBUG included (prd",
+				"    /// §1441a, user: \"we got rid of sepolia\"); its constant stays for the",
+				"    /// dry-run probe alone.",
+				"    static let networks: [Network] = [base, ethereum, robinhood]",
+				"",
+				"    #if DEBUG",
+				"    /// What the throwaway probes may name: the account's networks.",
+				"    static var probeNetworks: [Network] { networks }"
+			],
+			"startLine": 29
+		}
+	]
+}

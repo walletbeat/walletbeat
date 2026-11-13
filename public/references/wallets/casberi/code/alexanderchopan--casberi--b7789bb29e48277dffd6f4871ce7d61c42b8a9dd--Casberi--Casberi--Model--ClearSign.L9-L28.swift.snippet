@@ -1,0 +1,43 @@
+{
+	"highlightRanges": [
+		{
+			"first": 9,
+			"last": 28
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"///",
+				"/// **Where the words come from.** ERC-7730 is the open format a protocol uses",
+				"/// to describe its calls to a person, and the registry every wallet in the",
+				"/// Ethereum Foundation's clear-signing coalition reads (Ledger, Trezor, …) is",
+				"/// `ethereum/clear-signing-erc7730-registry`, CC0. A pinned snapshot of it is",
+				"/// BUNDLED (`Resources/ClearSignRegistry.json`, built by",
+				"/// `scripts/clearsign-registry.py`, which resolves includes, `$ref`s and",
+				"/// constants so this file does not have to). Nothing here touches the network:",
+				"/// a lookup at signing time would tell a host which contract this phone is",
+				"/// about to sign for.",
+				"///",
+				"/// **What this adds and what it never replaces.** The sign block's own readers",
+				"/// (`SafeCalldata.read`) keep priority — they are the reason a Safe proposal",
+				"/// can be signed here at all, and they say exactly what they read. This is",
+				"/// asked only where they would have said \"Casberi can't read what this does\",",
+				"/// so a transaction with no descriptor reads exactly as it did before.",
+				"///",
+				"/// **The bytes are decoded HERE, never taken from a service's `dataDecoded`.**",
+				"/// A descriptor supplies the function's types and the words; the arguments",
+				"/// come out of the calldata on this device, by the same subtraction-only",
+				"/// bounds `SafeCalldata.batchCalls` keeps, because a proposal's calldata is",
+				"/// written by anyone who can propose. Anything that does not decode cleanly,",
+				"/// or any `mustMatch` rule that fails, returns nil — no reading, never a",
+				"/// partial one.",
+				"///",
+				"/// Foundation-only (plus `Keccak256`/`EIP55`), so `clearsign-selftest.sh`",
+				"/// compiles it whole and runs the registry's OWN test vectors through it.",
+				"enum ClearSign {"
+			],
+			"startLine": 5
+		}
+	]
+}

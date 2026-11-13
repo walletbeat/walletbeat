@@ -59,6 +59,10 @@
 		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/casberi.svg": {
+		"hash": "b07bf6e6a8c7ccf3a11517d95870b0d5c55a8520a37afff7ae136bc1ffc35f2c",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/cloakedTechnologies.png": {
 		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -201,6 +205,10 @@
 	},
 	"public/images/wallets/bitget.svg": {
 		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/casberi.svg": {
+		"hash": "b07bf6e6a8c7ccf3a11517d95870b0d5c55a8520a37afff7ae136bc1ffc35f2c",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/cloaked.png": {
