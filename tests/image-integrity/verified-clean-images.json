@@ -1995,6 +1995,30 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/eip-tracker-upgrade.jpg": {
+		"hash": "ce2697ecad458523d4351c0ba6e0104159dd23a6de6f66f751eaf1f845165bd5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/eip-tracker-upgrade1.jpg": {
+		"hash": "65228f9a6dad0ce983ab4de9a7c823e329538054c06776e076dd9af38850370e",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/october_cover.png": {
+		"hash": "fb58261e37173c505101369dffbe6274a9e37acad23143f297ca90df05e69d60",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october-1.jpg": {
+		"hash": "556b4a78f24bfe6badf16e71149ef025c4ed157498f47e2b8e1ee26dfd4b3d2b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october-2.jpg": {
+		"hash": "ee3ff82cde1bfcea45ea8e2d8d3b08aac427c8818e2cefc54e592d3daae5d112",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october.jpg": {
+		"hash": "ad1fb1198e946571676002cfebcffdba8bb940f5277761262d5d5d01ccb3e439",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
