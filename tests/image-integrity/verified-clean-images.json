@@ -1923,6 +1923,18 @@
 		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/access_layer.png": {
+		"hash": "2c652ac9807cc36c6689f34ddad170c9c0b03970467b77b84942636dea48a8af",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/beyond_clear_signing.jpg": {
+		"hash": "0b24eb51371401942b963fce22b8d316680cce1f6d947c824472275419cb4dbe",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-09 - Matt Devcon Talk/walletbeat.png": {
+		"hash": "f1ddda183db99a4b6342a841bfb9e6cd788ee6fc2c6518f8e8312fd0049f750a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
 		"hash": "4c5dba25da216e8258202e358bf35c259052506c4d4c015e3a7f34aba1df1450",
 		"passedTests": ["blockiness", "file-format"]
