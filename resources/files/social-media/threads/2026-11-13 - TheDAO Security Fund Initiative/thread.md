@@ -8,6 +8,8 @@ Clear signing ratings, fixes and ecosystem adoption for hardware and software wa
 
 Walletbeat will rate hardware and software wallets on clear signing support and publish the results on our website. We'll work with teams to fix the checks they fail and expand clear signing support across the ecosystem.
 
+https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosystem-adoption-for-hardw
+
 ---
 
 Why it needs funding:
