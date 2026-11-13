@@ -37,31 +37,43 @@ To test wallets on this, we will:
 
 - The repo's dependencies installed (use `pnpm i`)
 - A wallet with a funded test address (some Ether and at least one ERC-20 token such as USDC)
+- An Ethereum Mainnet JSON-RPC URL. Any public endpoint works, as does one from your own RPC provider account.
 
 ### Step 1: Start the L1 Lying RPC Proxy
 
 ```bash
-pnpm l1-lying-rpc-proxy --upstream https://eth.llamarpc.com
+export UPSTREAM_RPC='<your_ethereum_rpc_url>'
+pnpm l1-lying-rpc-proxy
 ```
 
 You should see:
 
 ```
 [l1-lying-rpc-proxy] Listening on http://localhost:8545
-[l1-lying-rpc-proxy] Upstream: https://eth.llamarpc.com
+[l1-lying-rpc-proxy] Upstream: <origin_of_your_rpc_url>
 [l1-lying-rpc-proxy] ERC-20 balance multiplier: ×1000000
-[l1-lying-rpc-proxy] Press Ctrl-C to stop.
 ```
 
-Leave this running in a dedicated terminal for the duration of the test.
+The proxy shows only the origin of the upstream URL, so that API keys in the URL path do not appear in screenshots of the terminal.
+
+Leave this running in a dedicated terminal for the duration of the test. The proxy prints one line for each JSON-RPC call it receives, each balance it inflates, and each error:
+
+```
+[l1-lying-rpc-proxy] Request: eth_blockNumber
+[l1-lying-rpc-proxy] Request: eth_call
+[l1-lying-rpc-proxy] LYING: balanceOf on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 changed 1000 to 1000000000
+[l1-lying-rpc-proxy] Upstream responded with HTTP 525
+```
+
+> **Note:** If the upstream responds with an HTTP error or is unreachable, choose a different RPC URL.
 
 **Flags:**
 
-| Flag           | Default      | Description                                  |
-| -------------- | ------------ | -------------------------------------------- |
-| `--upstream`   | _(required)_ | Real upstream Ethereum JSON-RPC URL          |
-| `--port`       | `8545`       | Local port to listen on                      |
-| `--multiplier` | `1000000`    | Factor by which ERC-20 balances are inflated |
+| Flag           | Environment variable | Default      | Description                                  |
+| -------------- | -------------------- | ------------ | -------------------------------------------- |
+| `--upstream`   | `UPSTREAM_RPC`       | _(required)_ | Real upstream Ethereum JSON-RPC URL          |
+| `--port`       | `PROXY_PORT`         | `8545`       | Local port to listen on                      |
+| `--multiplier` |                      | `1000000`    | Factor by which ERC-20 balances are inflated |
 
 ### Step 2: Verify the proxy is lying (sanity check)
 
@@ -70,7 +82,7 @@ Pick any Ethereum address that holds a known ERC-20 token. The example below use
 **Query the real upstream directly:**
 
 ```bash
-curl -s -X POST https://eth.llamarpc.com \
+curl -s -X POST "$UPSTREAM_RPC" \
   -H 'Content-Type: application/json' \
   -d '{
     "jsonrpc": "2.0",
@@ -105,13 +117,12 @@ curl -s -X POST http://localhost:8545 \
   }' | python3 -m json.tool
 ```
 
-The two responses should differ. The proxy log will also print a line such as:
+The two responses should differ. The proxy log also prints the original and inflated balances:
 
 ```
-[proxy] LYING: ERC-20 balanceOf result changed 0x000...000 → 0x000...f4240 (×1000000)
+[l1-lying-rpc-proxy] Request: eth_call
+[l1-lying-rpc-proxy] LYING: balanceOf on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 changed <real_balance> to <inflated_balance>
 ```
-
-If both responses are identical, confirm the wallet is sending `eth_call` traffic to the proxy and not a cached or default endpoint.
 
 ### Step 3: Create a dedicated browser or device for wallet testing
 
@@ -125,7 +136,7 @@ Install the wallet as normal. Navigate to the wallet's **Settings → Networks**
 http://localhost:8545
 ```
 
-Save the setting and switch to that network.
+Save the setting and switch to that network. The proxy terminal then shows `Request:` lines for the calls that the wallet makes. If no lines appear, the wallet does not use the proxy.
 
 ### Step 5: Import a funded account
 
