@@ -1,0 +1,89 @@
+{
+	"highlightRanges": [
+		{
+			"first": 73,
+			"last": 132
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export const ChangeEstimatedFeeForm = ({ estimatedFeeParams, txDetails }: ChangeEstimatedFeeFormProps) => {"
+			],
+			"startLine": 28
+		},
+		{
+			"lines": [
+				"  const willFail = Boolean(estimatedFeeParams.gasLimitError)",
+				"",
+				"  return (",
+				"    <FormProvider {...form}>",
+				"      <View width=\"100%\" gap=\"$3\">",
+				"        <View>",
+				"          <Text color=\"$colorSecondary\" fontSize=\"$5\" marginBottom=\"$3\">",
+				"            Max. fee (gwei)",
+				"          </Text>",
+				"          <Controller",
+				"            control={control}",
+				"            name=\"maxFeePerGas\"",
+				"            render={({ field: { onChange, onBlur, value } }) => (",
+				"              <SafeInput",
+				"                value={value}",
+				"                onBlur={onBlur}",
+				"                onChangeText={(text) => onChange(sanitizeDecimalInput(text))}",
+				"                keyboardType=\"decimal-pad\"",
+				"                testID=\"input-max-fee-gwei\"",
+				"                error={errors.maxFeePerGas?.message}",
+				"              />",
+				"            )}",
+				"          />",
+				"        </View>",
+				"",
+				"        <View>",
+				"          <Text color=\"$colorSecondary\" fontSize=\"$5\" marginBottom=\"$3\">",
+				"            Max priority fee (gwei)",
+				"          </Text>",
+				"          <Controller",
+				"            control={control}",
+				"            name=\"maxPriorityFeePerGas\"",
+				"            render={({ field: { onChange, onBlur, value } }) => (",
+				"              <SafeInput",
+				"                value={value}",
+				"                onBlur={onBlur}",
+				"                onChangeText={(text) => onChange(sanitizeDecimalInput(text))}",
+				"                keyboardType=\"decimal-pad\"",
+				"                testID=\"input-max-priority-fee-gwei\"",
+				"                error={errors.maxPriorityFeePerGas?.message}",
+				"              />",
+				"            )}",
+				"          />",
+				"        </View>",
+				"",
+				"        <View>",
+				"          <Text color=\"$colorSecondary\" fontSize=\"$5\" marginBottom=\"$3\">",
+				"            Gas limit",
+				"          </Text>",
+				"          <Controller",
+				"            control={control}",
+				"            name=\"gasLimit\"",
+				"            render={({ field: { onChange, onBlur, value } }) => (",
+				"              <SafeInput",
+				"                value={value}",
+				"                onBlur={onBlur}",
+				"                onChangeText={(text) => onChange(sanitizeDecimalInput(text))}",
+				"                keyboardType=\"decimal-pad\"",
+				"                testID=\"input-gas-limit\"",
+				"                error={errors.gasLimit?.message}",
+				"              />",
+				"            )}",
+				"          />",
+				"        </View>",
+				"",
+				"        <View>",
+				"          <Text color=\"$colorSecondary\" fontSize=\"$5\" marginBottom=\"$3\">",
+				"            Nonce"
+			],
+			"startLine": 69
+		}
+	]
+}
