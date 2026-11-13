@@ -515,6 +515,10 @@
 		"hash": "80fb0d18ed344f3c9227951cc02e13e5dd71316660b85a224bd7ab9bfd058e08",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-aave-supply.png": {
+		"hash": "f06a2d866394cae119cd36b31cff07909973697ef0d46a4d712908bba70d4185",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-connect-wallet-picker.png": {
 		"hash": "948d648ef635e17223f40a8bceedf94ff979ace4d57f2b9ba8ffcadd7d7fb2fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -525,6 +529,58 @@
 	},
 	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-app-isolation-uniswap-reconnect-default.png": {
 		"hash": "3931c40a31a2680e2a92aa1807981e754d1ac5e4b4c1bd6fff046bbc4161bdee",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eip712-details.png": {
+		"hash": "488c65a5a0353691270d28356fd541a74aa06b3c7ac5b5d9240e78bdbbca453d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eip712-request.png": {
+		"hash": "7875d2d7b0c3cc33157aff761f308a23eda3ed6490bf236db4aa0d4d23d4add2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc1155-transfer.png": {
+		"hash": "95d5388c95768c375926831fc41f8e9fbb2b0b94fc93bdef7352586a6872ccb9",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc20-transfer-request.png": {
+		"hash": "67029a7445e7389f6417e0abb7a0ce2391fc22fec591433543b3110bb0e7e2b6",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc721-transfer.png": {
+		"hash": "322f8c3bb8e3e8c5b2c2910fe4ebacc729fd05b67d16a10f5f5eb62689e41570",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eth-transfer-request.png": {
+		"hash": "5d8b82547d4d23cecf71697fa8457aaa9b2cc204713e531bf0e37c4a16bc6f77",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-failed-transaction.png": {
+		"hash": "7518aa8274b85fee05e1e812ce7a784d85c1565d5db984fc3e84403438d5a693",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-nondeterministic-transaction.png": {
+		"hash": "dea9812f865235fae634d898990e0454c0d8b2d771102dad4e6f9de8fa1f7969",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-aave-supply.png": {
+		"hash": "f92fd7e4cc297fa80c393ee33beccf97834f5aaa733f0dc03618b62cf79b9a14",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-batch-approve-supply.png": {
+		"hash": "4b3d53f8ab99e62d7b62cf9c59650d433922aeb4073b002ebdb3f2ed7adbf11e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-siwe-domain-mismatch.png": {
+		"hash": "7666f888be5c46263659b4d32d77a220a2cbabfc205eff431868a864335de029",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-siwe.png": {
+		"hash": "0716bea63b1d8264e06e6806cee9075de001ad3b8f2952bbb8cd6cc24afec0f3",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-usdc-approval.png": {
+		"hash": "6e1a98567ca5a92c93750e07f0a699fcbcbdd1632a0da9b7561b8ce39b2799f0",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
@@ -1879,6 +1935,10 @@
 		"hash": "94075e76caa8c5b0bc8548a104d6d57e0a6b045982f82344d7851e9a7306930e",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-19 - Supply Chain Security Talk/polymutex_talk.jpg": {
+		"hash": "edfea5db7f2da18a12803b6049bf668bd21ca3c66e83c1912e4943815bdd74f1",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/apoorv_walletchan.png": {
 		"hash": "006a8e5e4c41856f5e06be3adf4653ba847072f063a22d8ec9faa2adad86d25a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -1901,6 +1961,10 @@
 	},
 	"resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/seth_cake_wallet.png": {
 		"hash": "fbe22dd94e175ed4380d7520dbbaf049ed9d1f7c0cc454f21a92304ff1bcdb1c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-10-28 - Booth Activities/booth_banner.png": {
+		"hash": "612751db87fcfe038e5f7325c4177d6592067cac3ef12cfcbf167c027b4ae12d",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-10-29 - Devcon Overview/darryl_lightning_talk.jpg": {
