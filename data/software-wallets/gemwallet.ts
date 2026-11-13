@@ -748,7 +748,7 @@ export const gemwallet: SoftwareWallet = {
 							label: 'Gem request for a Safe{Wallet} batched approve and supply',
 						},
 						{
-							explanation: "Gem doesn't accept batched requests from apps.",
+							explanation: "Gem doesn't accept EIP-5792 batch requests from apps.",
 							label: 'WalletConnect method identifiers',
 							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/core/crates/primitives/src/wallet_connector.rs#L21-L38',
 						},
