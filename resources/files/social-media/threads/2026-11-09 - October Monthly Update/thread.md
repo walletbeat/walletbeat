@@ -38,19 +38,24 @@ https://x.com/walletbeat/status/2109464589813567974
 
 Three new wallets joined the database 👇
 
+@TrustWallet (browser extension and mobile)
+@WalletChan_
+@anondotinc Wallet
+
 ---
 
-@TrustWallet (browser extension and mobile)
+@TrustWallet is a self-custody crypto wallet available as a mobile app and browser extension. It is backed by @binance.    
 https://walletbeat.eth.limo/trust-wallet/
 
 ---
 
-@WalletChan_
+@WalletChan_, made by the solo developer @apoorveth, is an open-source Ethereum wallet focused on improving UX and bringing Ethereum's CROPS values to users through their wallets.
+ 
 https://walletbeat.eth.limo/walletchan/
 
 ---
 
-@anondotinc Wallet, a Railgun-based private wallet.
+@anondotinc Wallet is a Railgun-based private wallet.
 https://walletbeat.eth.limo/anon-wallet/
 
 ---
@@ -127,14 +132,14 @@ https://beta.walletbeat.eth.limo/news/
 
 Devcon prep took over the second half of the month.
 
-We announced our talks, our contributor workshop, our booth, the Cypherpunk Congress panel on privacy's last-mile problem, and more! 👇
+We prepared our talks, our booth programming, the panel on privacy's last-mile problem, and more! 
 
-https://x.com/walletbeat/status/2114847240002933005
-https://x.com/walletbeat/status/2116181349140979995
 https://x.com/walletbeat/status/2115851446381957211
 
 ---
 
-Wallets are one of the most critical layers of the crypto ecosystem. We keep watching 🫡
+October in short: we broke down Ambire’s ratings, redesigned Wallet Stages' page, onboarded new wallets, captured real wallet network traffic, and added new supply chain security data, all while getting ready for @EFDevcon.
+
+We keep watching 🫡
 
 Until next month! 🌸
