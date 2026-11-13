@@ -1835,6 +1835,38 @@
 		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/fee_transparency.png": {
+		"hash": "87c8aebb4622fb80115fa62296b6355f093052f3402cebde8bfc5d47fa1fa446",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/funding.png": {
+		"hash": "77c18f08b28cb912f674a7cf200cf84f2ac1c469c49c18829e461ccd4066a184",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/open_source_license.png": {
+		"hash": "dc7bf71e28a74db3046e08073b7382feba5788569a50b939d2905b790c81eb0b",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/orderflow_transparency.png": {
+		"hash": "c6184def31946d8cb7205529759832d8431cbf17d740fa5d803dc4303bc94680",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/release_process_transparency.png": {
+		"hash": "2f2fcfdc016b41f50d8360913b51b697ad5a832081cbde0b16a37c76894c1e60",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/source_availability.png": {
+		"hash": "cc0413a16ebe09442b59a46a1d7076246a1f57f55a089013933a850015225a20",
+		"passedTests": ["file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/wallet_transparency.png": {
+		"hash": "e9ec890327cea0d89080b4b57c32e5bcb705998f9683d2f8fc3792b4100e093b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-21 - Transparency Attribute/walletbeat_cta.png": {
+		"hash": "f1ddda183db99a4b6342a841bfb9e6cd788ee6fc2c6518f8e8312fd0049f750a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-09-22 - UX Meme/ux-meme.png": {
 		"hash": "c62df172e7875f9610733efe545927d7c662f150bb3e291c5b2d89754c183087",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
