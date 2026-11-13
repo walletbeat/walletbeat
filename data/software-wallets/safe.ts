@@ -23,10 +23,63 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display' // for level
+import {
+	FeeDisplayLevel,
+	FeeType,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { type LooseReference, refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { nonEmptySet } from '@/types/utils/non-empty'
+
+const safeTransactionFeesArticleRef: LooseReference = {
+	explanation: 'Safe states that transaction fees go to the blockchain network and not to Safe.',
+	label: 'Safe help center article on transaction fees',
+	url: 'https://help.safe.global/articles/1896549699-transaction-fees',
+}
+
+const webEstimatedFeeRef: LooseReference = {
+	explanation:
+		'By default, the execution screen of the web app shows a single "Estimated fee" figure in the native token of the chain, with no itemized breakdown.',
+	label: 'Safe web app "Estimated fee" row',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/components/tx/GasParams/index.tsx#L104-L131',
+}
+
+const webGasBreakdownRef: LooseReference = {
+	explanation:
+		'One click on the "Estimated fee" row expands it to show the gas limit, the maximum priority fee, and the maximum fee.',
+	label: 'Safe web app network fee breakdown',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/components/tx/GasParams/index.tsx#L142-L173',
+}
+
+const webAppTransactionRequestRef: LooseReference = {
+	explanation:
+		'Transaction requests from apps connected through WalletConnect open the standard transaction flow of the web app. The Uniswap fee is part of the swap price, so it is not itemized.',
+	label: 'Safe web app transaction requests from connected apps',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/services/safe-wallet-provider/useSafeWalletProvider.tsx#L164-L183',
+}
+
+const mobileEstimatedFeeRef: LooseReference = {
+	explanation:
+		'By default, the execution screen of the mobile app shows a single estimated network fee figure in the native token of the chain, with no itemized breakdown.',
+	label: 'Safe mobile app estimated network fee row',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/ExecuteTx/components/EstimatedNetworkFee/EstimatedNetworkFee.tsx#L43-L67',
+}
+
+const mobileGasBreakdownRef: LooseReference = {
+	explanation:
+		'One tap on the fee opens a sheet that shows the maximum fee, the maximum priority fee, and the gas limit.',
+	label: 'Safe mobile app network fee sheet',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/ChangeEstimatedFeeSheet/components/ChangeEstimatedFeeForm/ChangeEstimatedFeeForm.tsx#L73-L132',
+}
+
+const mobileAppTransactionRequestRef: LooseReference = {
+	explanation:
+		'When the user reviews a transaction request from an app connected through WalletConnect, the mobile app makes a Safe transaction and opens the confirmation screen. The Uniswap fee is part of the swap price, so it is not itemized.',
+	label: 'Safe mobile app transaction requests from connected apps',
+	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/WalletConnect/Wallet/hooks/useTxRequestActions.ts#L54-L81',
+}
 
 export const safe: SoftwareWallet = {
 	metadata: {
@@ -36,7 +89,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-11-13',
 		urls: {
 			docs: ['https://docs.safe.global/'],
 			repositories: ['https://github.com/safe-fndn'],
@@ -294,78 +347,175 @@ export const safe: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported({
-					ref: refTodo,
-					fees: {
-						feesInvolved: {
-							[FeeType.NETWORK_FEE]: true,
-							[FeeType.ONCHAIN_APP_FEE]: true,
-							[FeeType.WALLET_FEE]: true,
+				[Variant.BROWSER]: {
+					builtInErc20Swap: supported({
+						ref: [
+							{
+								explanation:
+									'Before the user confirms a swap, the embedded swap widget lists the widget fee, any protocol fee, and the network costs as separate rows. Each row shows a token amount and, when a price is available, its value in dollars.',
+								label: 'Swap widget fee rows on the review screen',
+								url: 'https://github.com/cowprotocol/cowswap/blob/19660ed68e507d30df4b81494d8df5575c506ec3/apps/cowswap-frontend/src/modules/trade/containers/TradeFeesAndCosts/index.tsx#L52-L89',
+							},
+							{
+								explanation: 'The widget fee row shows the fee percentage next to the fee name.',
+								label: 'Swap widget fee row',
+								url: 'https://github.com/cowprotocol/cowswap/blob/19660ed68e507d30df4b81494d8df5575c506ec3/apps/cowswap-frontend/src/modules/trade/pure/PartnerFeeRow/index.tsx#L46-L75',
+							},
+							{
+								explanation:
+									'Safe calculates the fee for each trade from its fee tiers. It gives this fee to the swap widget, together with the Safe fee recipient address.',
+								label: 'Safe swap fee for each trade',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/features/swap/components/SwapWidget/index.tsx#L150-L173',
+							},
+							{
+								explanation:
+									'The Safe transaction review shows the widget fee of the swap order as a percentage.',
+								label: 'Safe swap order widget fee row',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/features/swap/components/SwapOrderConfirmationView/OrderFeeConfirmationView.tsx#L23-L46',
+							},
+							{
+								explanation:
+									'Safe lists the widget fee tiers. It states that the fee percentage is always visible in the interface, and that part of the fee goes to the Safe Foundation.',
+								label: 'Safe help center article on the native swap widget fee',
+								url: 'https://help.safe.global/articles/9969629388-how-does-the-widget-fee-work-for-native-swaps',
+							},
+						],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.FIAT,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.FIAT,
+								),
+							},
 						},
-						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+					}),
+					erc20L1Transfer: supported({
+						ref: [webEstimatedFeeRef, webGasBreakdownRef, safeTransactionFeesArticleRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+					}),
+					ethL1Transfer: supported({
+						ref: [webEstimatedFeeRef, webGasBreakdownRef, safeTransactionFeesArticleRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-					},
-				}),
-				erc20L1Transfer: supported({
-					ref: refTodo,
-					fees: {
-						feesInvolved: {
-							[FeeType.NETWORK_FEE]: true,
-							[FeeType.ONCHAIN_APP_FEE]: false,
-							[FeeType.WALLET_FEE]: false,
+					}),
+					uniswapUSDCToEtherSwap: supported({
+						ref: [webAppTransactionRequestRef, webEstimatedFeeRef, webGasBreakdownRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+					}),
+				},
+				[Variant.MOBILE]: {
+					builtInErc20Swap: notSupported,
+					erc20L1Transfer: supported({
+						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+					}),
+					ethL1Transfer: supported({
+						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: false,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-					},
-				}),
-				ethL1Transfer: supported({
-					ref: refTodo,
-					fees: {
-						feesInvolved: {
-							[FeeType.NETWORK_FEE]: true,
-							[FeeType.ONCHAIN_APP_FEE]: false,
-							[FeeType.WALLET_FEE]: false,
+					}),
+					uniswapUSDCToEtherSwap: supported({
+						ref: [mobileAppTransactionRequestRef, mobileEstimatedFeeRef, mobileGasBreakdownRef],
+						fees: {
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: false,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							},
 						},
-						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
-						},
-						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
-						},
-					},
-				}),
-				uniswapUSDCToEtherSwap: supported({
-					ref: refTodo,
-					fees: {
-						feesInvolved: {
-							[FeeType.NETWORK_FEE]: true,
-							[FeeType.ONCHAIN_APP_FEE]: true,
-							[FeeType.WALLET_FEE]: false,
-						},
-						shownAfterSingleAction: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
-						},
-						shownByDefault: {
-							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
-						},
-					},
-				}),
+					}),
+				},
 			},
 			orderflowPractices: null,
 			releaseTransparency: {

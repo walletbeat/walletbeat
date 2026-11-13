@@ -1,0 +1,56 @@
+{
+	"highlightRanges": [
+		{
+			"first": 46,
+			"last": 75
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}: PartnerFeeRowProps): ReactNode {"
+			],
+			"startLine": 37
+		},
+		{
+			"lines": [
+				"  if (!partnerFeeAmount || !partnerFeeBps || partnerFeeAmount.equalTo(0)) {",
+				"    return <FreeFeeRow withTimelineDot={false} loading={loading} detailRowStyle={detailRowStyle} testId={testId} />",
+				"  }",
+				"",
+				"  const label = volumeFeeTooltip.label",
+				"",
+				"  return (",
+				"    <ReviewOrderModalAmountRow",
+				"      withTimelineDot={withTimelineDot}",
+				"      amount={minPartnerFeeAmount}",
+				"      fiatAmount={partnerFeeUsd}",
+				"      tooltip={",
+				"        volumeFeeTooltip.content ? (",
+				"          <WidgetMarkdownContent>{volumeFeeTooltip.content}</WidgetMarkdownContent>",
+				"        ) : (",
+				"          <Trans>",
+				"            This fee helps pay for maintenance & improvements to the trade experience.",
+				"            <br />",
+				"            <br />",
+				"            The fee is {partnerFeeBps} BPS ({feeAsPercent}%), applied only if the trade is executed.",
+				"          </Trans>",
+				"        )",
+				"      }",
+				"      label={",
+				"        <>",
+				"          {t`${label}`} {!loading && ` (${feeAsPercent}%)`}",
+				"        </>",
+				"      }",
+				"      isLast={isLast}",
+				"      loading={loading}",
+				"      detailRowStyle={detailRowStyle}",
+				"      testId={testId}",
+				"    />",
+				"  )",
+				"}"
+			],
+			"startLine": 42
+		}
+	]
+}

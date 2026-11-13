@@ -1,0 +1,64 @@
+{
+	"highlightRanges": [
+		{
+			"first": 52,
+			"last": 89
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export function TradeFeesAndCosts(props: TradeFeesAndCostsProps): ReactNode {"
+			],
+			"startLine": 24
+		},
+		{
+			"lines": [
+				"",
+				"  const hasNetworkCosts = networkFeeAmount?.greaterThan(0)",
+				"  const hasAccountRent = accountRentFee?.greaterThan(0)",
+				"",
+				"  return (",
+				"    <>",
+				"      <TradeFees",
+				"        partnerFeeAmount={partnerFeeAmount}",
+				"        partnerFeeUsd={partnerFeeUsd}",
+				"        partnerFeeBps={partnerFeeBps}",
+				"        protocolFeeAmount={protocolFeeAmount}",
+				"        protocolFeeUsd={protocolFeeUsd}",
+				"        protocolFeeBps={protocolFeeBps}",
+				"        volumeFeeTooltip={volumeFeeTooltip}",
+				"        withTimelineDot={withTimelineDot}",
+				"        isLast={!hasNetworkCosts && !hasAccountRent}",
+				"        testId={feeTestId}",
+				"      />",
+				"",
+				"      {hasAccountRent && accountRentFee && (",
+				"        <AccountRentRow",
+				"          rentAmount={accountRentFee}",
+				"          rentAmountUsd={accountRentFeeUsd}",
+				"          buyTokenSymbol={receiveAmountInfo?.beforeAllFees.buyAmount.currency.symbol}",
+				"          withTimelineDot={withTimelineDot}",
+				"          isLast={!hasNetworkCosts}",
+				"        />",
+				"      )}",
+				"",
+				"      {hasNetworkCosts && networkFeeAmount && (",
+				"        <NetworkCostsRow",
+				"          networkFeeAmount={networkFeeAmount}",
+				"          networkFeeAmountUsd={networkFeeAmountUsd}",
+				"          withTimelineDot={withTimelineDot}",
+				"          amountSuffix={networkCostsSuffix}",
+				"          tooltipSuffix={networkCostsTooltipSuffix}",
+				"          isLast",
+				"          testId={networkCostsTestId}",
+				"        />",
+				"      )}",
+				"    </>",
+				"  )",
+				"}"
+			],
+			"startLine": 48
+		}
+	]
+}

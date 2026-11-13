@@ -1,0 +1,58 @@
+{
+	"highlightRanges": [
+		{
+			"first": 43,
+			"last": 67
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}: EstimatedNetworkFeeProps) => {"
+			],
+			"startLine": 27
+		},
+		{
+			"lines": [
+				"  const onPress = () => {",
+				"    router.push({"
+			],
+			"startLine": 36
+		},
+		{
+			"lines": [
+				"      params: { txId },",
+				"    })",
+				"  }",
+				"",
+				"  return (",
+				"    <View flexDirection=\"row\" justifyContent=\"space-between\" gap=\"$2\" alignItems=\"center\" minHeight=\"$10\">",
+				"      <Text color=\"$textSecondaryLight\" fontSize=\"$4\">",
+				"        Est. network fee",
+				"      </Text>",
+				"",
+				"      {isLoadingFees || isLoadingRelays ? (",
+				"        <SafeSkeleton height={16} width={100} />",
+				"      ) : executionMethod === ExecutionMethod.WITH_RELAY ? (",
+				"        <RelayFee",
+				"          willFail={willFail}",
+				"          onFailTextPress={onPress}",
+				"          isLoadingRelays={isLoadingRelays}",
+				"          relaysRemaining={relaysRemaining}",
+				"        />",
+				"      ) : (",
+				"        <SignerFee",
+				"          totalFee={totalFee}",
+				"          willFail={willFail}",
+				"          currencySymbol={chain?.nativeCurrency.symbol}",
+				"          onPress={onPress}",
+				"        />",
+				"      )}",
+				"    </View>",
+				"  )",
+				"}"
+			],
+			"startLine": 39
+		}
+	]
+}

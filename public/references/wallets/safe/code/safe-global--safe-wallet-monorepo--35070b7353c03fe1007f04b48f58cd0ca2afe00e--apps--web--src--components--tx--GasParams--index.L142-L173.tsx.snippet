@@ -1,0 +1,77 @@
+{
+	"highlightRanges": [
+		{
+			"first": 142,
+			"last": 173
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}: GasParamsProps & { chain?: Chain }): ReactElement => {"
+			],
+			"startLine": 57
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <div className={classnames(css.container, { [css.error]: gasLimitError })}>",
+				"      <Accordion onValueChange={onChangeExpand}>",
+				"        <AccordionItem value=\"gas-params\" className=\"border-b-0\">",
+				"          <AccordionTrigger className={classnames(accordionCss.accordion, 'items-center px-4')}>"
+			],
+			"startLine": 99
+		},
+		{
+			"lines": [
+				"            ) : ("
+			],
+			"startLine": 134
+		},
+		{
+			"lines": [
+				"              </span>",
+				"            )}",
+				"          </AccordionTrigger>",
+				"",
+				"          <AccordionContent className=\"px-4 pt-4\">",
+				"            {nonce !== undefined && (",
+				"              <GasDetail isLoading={false} name=\"Safe account transaction nonce\" value={nonce.toString()} />",
+				"            )}",
+				"",
+				"            {safeTxGas !== undefined && <GasDetail isLoading={false} name=\"safeTxGas\" value={safeTxGas.toString()} />}",
+				"",
+				"            {isExecution && (",
+				"              <>",
+				"                {userNonce !== undefined && (",
+				"                  <GasDetail isLoading={false} name=\"Wallet nonce\" value={userNonce.toString()} />",
+				"                )}",
+				"",
+				"                <GasDetail",
+				"                  isLoading={isLoading}",
+				"                  name=\"Gas limit\"",
+				"                  value={isError ? 'Cannot estimate' : gasLimitString}",
+				"                />",
+				"",
+				"                {isEIP1559 ? (",
+				"                  <>",
+				"                    <GasDetail isLoading={isLoading} name=\"Max priority fee (Gwei)\" value={maxPrioGasGwei} />",
+				"                    <GasDetail isLoading={isLoading} name=\"Max fee (Gwei)\" value={maxFeePerGasGwei} />",
+				"                  </>",
+				"                ) : (",
+				"                  <GasDetail isLoading={isLoading} name=\"Gas price (Gwei)\" value={maxFeePerGasGwei} />",
+				"                )}",
+				"              </>",
+				"            )}",
+				"",
+				"            {onEdit && EditComponent}",
+				"          </AccordionContent>",
+				"        </AccordionItem>",
+				"      </Accordion>",
+				"    </div>",
+				"  )"
+			],
+			"startLine": 138
+		}
+	]
+}

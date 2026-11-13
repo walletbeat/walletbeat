@@ -1,0 +1,63 @@
+{
+	"highlightRanges": [
+		{
+			"first": 54,
+			"last": 81
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export const useTxRequestActions = (pending: PendingSessionRequest | null) => {"
+			],
+			"startLine": 33
+		},
+		{
+			"lines": [
+				"  const reject = useCallback(() => {"
+			],
+			"startLine": 47
+		},
+		{
+			"lines": [
+				"    }",
+				"    dispatch(rejectPending(pending))",
+				"  }, [pending, dispatch])",
+				"",
+				"  const review = useCallback(async () => {",
+				"    if (!pending || !activeSafe || !safe || !chain) {",
+				"      return",
+				"    }",
+				"    setComposing(true)",
+				"    try {",
+				"      const calls = extractCalls(pending.method, pending.params)",
+				"      const safeTxHash = await composeSafeTxDraft({",
+				"        calls,",
+				"        chainId: activeSafe.chainId,",
+				"        safeAddress: activeSafe.address,",
+				"        safe,",
+				"        chain,",
+				"        dispatch,",
+				"      })",
+				"      // Hand off to the confirm flow; the dApp is answered later by the propose-success listener.",
+				"      dispatch(",
+				"        setOutstandingRequest({",
+				"          safeTxHash,",
+				"          topic: pending.topic,",
+				"          id: pending.id,",
+				"          method: pending.method,",
+				"          chainId: activeSafe.chainId,",
+				"          safeAddress: activeSafe.address,",
+				"        }),",
+				"      )",
+				"      dispatch(removePending({ id: pending.id, kind: 'request' }))",
+				"      router.push({ pathname: '/confirm-transaction', params: { txId: safeTxHash } })",
+				"    } catch (e) {",
+				"      // compose throws before setDraft, so there's nothing to clean up — stay on the sheet.",
+				"      logWalletKitError('composeSafeTxDraft failed', e)",
+				"      dispatch(showToast({ message: 'Failed to build transaction', duration: 3000, variant: 'error' }))"
+			],
+			"startLine": 50
+		}
+	]
+}

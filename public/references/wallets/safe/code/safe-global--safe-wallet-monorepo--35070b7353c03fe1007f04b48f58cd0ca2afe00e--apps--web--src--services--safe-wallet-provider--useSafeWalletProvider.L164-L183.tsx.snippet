@@ -1,0 +1,75 @@
+{
+	"highlightRanges": [
+		{
+			"first": 164,
+			"last": 183
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export const useTxFlowApi = (chainId: string, safeAddress: string, fetchOwnedSafes = true): WalletSDK | undefined => {"
+			],
+			"startLine": 35
+		},
+		{
+			"lines": [
+				"  return useMemo<WalletSDK | undefined>(() => {"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"    return {"
+			],
+			"startLine": 117
+		},
+		{
+			"lines": [
+				"      async send(params: { txs: any[]; params: { safeTxGas: number } }, appInfo) {"
+			],
+			"startLine": 126
+		},
+		{
+			"lines": [
+				"        return new Promise((resolve, reject) => {",
+				"          let onClose = () => {",
+				"            reject({"
+			],
+			"startLine": 156
+		},
+		{
+			"lines": [
+				"              message: 'User rejected transaction',",
+				"            })",
+				"          }",
+				"",
+				"          const onSubmit = (txId: string, safeTxHash: string) => {",
+				"            const txHash = pendingTxs.current[txId]",
+				"            onClose = () => {}",
+				"            resolve({ safeTxHash, txHash })",
+				"          }",
+				"",
+				"          setTxFlow(",
+				"            <SafeAppsTxFlow",
+				"              data={{",
+				"                appId: undefined,",
+				"                app: appInfo,",
+				"                requestId: id,",
+				"                txs: transactions,",
+				"                params: params.params,",
+				"                ...(nestedChildTx && { nestedChildTx }),",
+				"              }}",
+				"              onSubmit={onSubmit}",
+				"            />,",
+				"            onClose,",
+				"          )",
+				"        })",
+				"      },",
+				"",
+				"      async getBySafeTxHash(safeTxHash) {"
+			],
+			"startLine": 160
+		}
+	]
+}

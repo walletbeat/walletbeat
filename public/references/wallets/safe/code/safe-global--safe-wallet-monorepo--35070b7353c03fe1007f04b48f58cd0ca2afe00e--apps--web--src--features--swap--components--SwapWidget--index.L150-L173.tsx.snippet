@@ -1,0 +1,79 @@
+{
+	"highlightRanges": [
+		{
+			"first": 150,
+			"last": 173
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"const SwapWidget = ({ sell }: Params) => {"
+			],
+			"startLine": 44
+		},
+		{
+			"lines": [
+				"  const listeners = useMemo<CowEventListeners>(() => {",
+				"    return [",
+				"      {"
+			],
+			"startLine": 98
+		},
+		{
+			"lines": [
+				"        handler: (event) => {"
+			],
+			"startLine": 102
+		},
+		{
+			"lines": [
+				"          switch (messageType) {"
+			],
+			"startLine": 106
+		},
+		{
+			"lines": [
+				"            case 'ORDER_CANCELLED':"
+			],
+			"startLine": 139
+		},
+		{
+			"lines": [
+				"              break",
+				"          }",
+				"        },",
+				"      },",
+				"      {",
+				"        event: CowEvents.ON_CHANGE_TRADE_PARAMS,",
+				"        handler: (newTradeParams: OnTradeParamsPayload) => {",
+				"          const { recipient } = newTradeParams",
+				"          const { uiOrderType: tradeType, sellAsset, buyAsset } = parseCowTradeParams(newTradeParams)",
+				"",
+				"          const newFeeBps = feeEnabled",
+				"            ? calculateFeePercentageInBps(newTradeParams, nativeCowSwapFeeV2Enabled, isEurcvBoostEnabled)",
+				"            : 0",
+				"",
+				"          setParams((params) => ({",
+				"            ...params,",
+				"            tradeType: UiOrderTypeToOrderType(tradeType),",
+				"            partnerFee: {",
+				"              recipient: SWAP_FEE_RECIPIENT,",
+				"              bps: newFeeBps,",
+				"            },",
+				"            sell: {",
+				"              asset: sellAsset,",
+				"            },",
+				"            buy: {",
+				"              asset: buyAsset,",
+				"            },",
+				"          }))",
+				"",
+				"          if (recipient) {",
+				"            setRecipientAddress(recipient)",
+				"          }"
+			],
+			"startLine": 146
+		}
+	]
+}

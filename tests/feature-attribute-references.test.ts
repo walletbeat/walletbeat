@@ -56,6 +56,13 @@ const intentionalPropagationDifferences = new Set([
 		outcomeId: 'some_non_comprehensive_fees',
 		path: 'transparency.operationFees.builtInErc20Swap.ref',
 	}),
+	// Safe's web app shows its built-in swap fee breakdown by default, while its other
+	// operations need one action to show theirs, so its built-in swap row is not cited.
+	propagationDifferenceKey({
+		attributeId: 'feeTransparency',
+		outcomeId: 'comprehensive_fees',
+		path: 'transparency.operationFees.builtInErc20Swap.ref',
+	}),
 	// Multi-address correlation cites only data collection rows that collect the account
 	// address by default. Ambire's native swap row (LI.FI) collects only the IP address.
 	propagationDifferenceKey({
