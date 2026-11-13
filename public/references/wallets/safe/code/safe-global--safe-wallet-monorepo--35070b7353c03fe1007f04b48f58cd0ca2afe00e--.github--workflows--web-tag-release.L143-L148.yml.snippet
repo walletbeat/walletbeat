@@ -1,0 +1,65 @@
+{
+	"highlightRanges": [
+		{
+			"first": 143,
+			"last": 148
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"  release-deploy:"
+			],
+			"startLine": 98
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 107
+		},
+		{
+			"lines": [
+				"      - name: Create GitHub release (draft)"
+			],
+			"startLine": 126
+		},
+		{
+			"lines": [
+				"        with:"
+			],
+			"startLine": 130
+		},
+		{
+			"lines": [
+				"          body: |"
+			],
+			"startLine": 135
+		},
+		{
+			"lines": [
+				"            https://github.com/5afe/safe-wallet-ipfs/releases/tag/v${{ needs.tag.outputs.version_number }})",
+				"        env:",
+				"          GITHUB_TOKEN: ${{ github.token }}",
+				"",
+				"      - uses: $/.github/actions/yarn",
+				"        # This job holds the OIDC deploy credentials, so it must not run files from a cache.",
+				"        with:",
+				"          cache: 'false'",
+				"",
+				"      - uses: $/.github/actions/build",
+				"        env:",
+				"          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}",
+				"          NEXT_PUBLIC_BEAMER_ID: ${{ secrets.NEXT_PUBLIC_BEAMER_ID }}",
+				"          NEXT_PUBLIC_BLOCKAID_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_BLOCKAID_CLIENT_ID }}"
+			],
+			"startLine": 139
+		}
+	]
+}

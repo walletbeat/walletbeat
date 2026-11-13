@@ -1,0 +1,75 @@
+{
+	"highlightRanges": [
+		{
+			"first": 7,
+			"last": 15
+		},
+		{
+			"first": 44,
+			"last": 61
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"{",
+				"  \"cli\": {",
+				"    \"version\": \">= 13.4.2\",",
+				"    \"appVersionSource\": \"remote\"",
+				"  },",
+				"  \"build\": {",
+				"    \"base\": {",
+				"      \"node\": \"24.22.1\",",
+				"      \"android\": {",
+				"        \"image\": \"sdk-55\"",
+				"      },",
+				"      \"ios\": {",
+				"        \"image\": \"sdk-55\"",
+				"      }",
+				"    },",
+				"    \"development\": {",
+				"      \"extends\": \"base\",",
+				"      \"environment\": \"development\",",
+				"      \"autoIncrement\": true,"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				"    \"preview\": {"
+			],
+			"startLine": 35
+		},
+		{
+			"lines": [
+				"      \"android\": {",
+				"        \"buildType\": \"apk\"",
+				"      }",
+				"    },",
+				"    \"production\": {",
+				"      \"extends\": \"base\",",
+				"      \"environment\": \"production\",",
+				"      \"autoIncrement\": true,",
+				"      \"ios\": {",
+				"        \"env\": {",
+				"          \"GOOGLE_SERVICES_FILE\": \"./GoogleService-Info.plist\"",
+				"        }",
+				"      },",
+				"      \"android\": {",
+				"        \"env\": {",
+				"          \"GOOGLE_SERVICES_FILE\": \"./google-services.json\"",
+				"        }",
+				"      },",
+				"      \"env\": {",
+				"        \"APP_VARIANT\": \"production\"",
+				"      }",
+				"    },",
+				"    \"build-and-maestro-test\": {",
+				"      \"extends\": \"base\",",
+				"      \"withoutCredentials\": true,",
+				"      \"environment\": \"development\","
+			],
+			"startLine": 40
+		}
+	]
+}
