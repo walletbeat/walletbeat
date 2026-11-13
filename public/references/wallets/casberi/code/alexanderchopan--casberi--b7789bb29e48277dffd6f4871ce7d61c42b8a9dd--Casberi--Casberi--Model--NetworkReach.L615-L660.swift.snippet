@@ -1,0 +1,81 @@
+{
+	"highlightRanges": [
+		{
+			"first": 615,
+			"last": 660
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum NetworkReach {"
+			],
+			"startLine": 39
+		},
+		{
+			"lines": [
+				"    static let shipped: [Endpoint] = ["
+			],
+			"startLine": 109
+		},
+		{
+			"lines": [
+				"        // Gnosis Chain's two public nodes, kept when the Gnosis Pay seat that",
+				"        // measured them went (prd §1318): `SafeSigner` asks a Safe on Gnosis",
+				"        // Chain for its own transaction hash through them (`GnosisChainRPC`),",
+				"        // and that is now their only use. Reach WALLET with the Safe reads.",
+				"        // Your account (prd §1424): the Move page's reads and its one send.",
+				"        // Public nodes for balances and the chain's checks, public ERC-4337",
+				"        // bundlers (Pimlico's, then Candide's: keyless) for the send. Reach",
+				"        // WALLET: the account is one of the Wallet's, and nothing is reached",
+				"        // until it exists on this phone. Base Sepolia's hosts are DEBUG's",
+				"        // only (`YourAccountOp.networks`, prd §1439a).",
+				"        Endpoint(service: \"Your account\",",
+				"                 reach: .whenConnected(bridge: \"Wallet\"),",
+				"                 purpose: \"Reads what your account holds on Base, Ethereum and Robinhood Chain, and when you tap Send, sends the transaction you signed to a public bundler that puts it on chain. A swap asks the exchanges' own contracts for a price through the same public nodes (Uniswap, and Aerodrome on Base), and this phone writes the swap itself, to those exchanges' routers only, for exactly the amount sold; the network's node simulates it and nothing is signed unless you would receive at least the quoted minimum. The tokens it offers come from Uniswap's public token list, downloaded whole once a day; a word typed on Base also searches CoinGecko's public Base list, downloaded whole once a day the same way. A swap to another network asks Across what its relayers charge for it, and this phone writes the deposit into Across's own contract itself, your account as the one who gets it and the one any refund goes back to; then it reads the other network to see it arrive. A swap set to wait for a price is a CoW Protocol order this phone builds and pre-signs: CoW's API is told the order (your account's address, the tokens, the amounts, the expiry) and must answer with the id this phone computed, then is asked where the order stands until it fills, expires or you cancel it. Receiving from another network, or a round-up's buy, asks Relay for the deposit address of that route, refused unless Relay names your account as the one that gets it. Paying a zk.money tag asks zk.money's resolver operator for a fresh deposit address for that tag, named in the request and nothing else; the address is checked on Ethereum against the proof it comes with before anything is signed. Robinhood Chain's node is also asked for Tacit's pool log whole, so a withdrawal from it to a wallet you follow lands; that read names the pool, never a wallet. A token's picture is fetched from the image address the token list gives for it (CoinGecko's), and a network's from Relay's, carrying nothing about you. Carries your account's public address, the swap and the signed transaction, nothing else about you.\",",
+				"                 hosts: [\"public.pimlico.io\", \"api.candide.dev\",",
+				"                         \"mainnet.base.org\", \"base-rpc.publicnode.com\",",
+				"                         \"rpc.mevblocker.io\", \"ethereum-rpc.publicnode.com\",",
+				"                         \"sepolia.base.org\", \"base-sepolia-rpc.publicnode.com\", \"api.relay.link\",",
+				"                         \"rpc.mainnet.chain.robinhood.com\", \"robinhood-rpc.publicnode.com\",",
+				"                         // Uniswap's token list (prd §1542): one public file,",
+				"                         // naming no wallet; answered through Tor 3 of 3",
+				"                         // (2026-10-26).",
+				"                         \"tokens.uniswap.org\",",
+				"                         // CoinGecko's Base list (prd §1665): one public file,",
+				"                         // searched by a typed word only; answered through Tor",
+				"                         // 3 of 3 (2026-11-02).",
+				"                         \"tokens.coingecko.com\",",
+				"                         // Across's fee for a swap to another network (prd",
+				"                         // §1555): asked only what its relayers charge now,",
+				"                         // naming the account as depositor and recipient;",
+				"                         // answered through Tor (2026-10-26).",
+				"                         \"app.across.to\",",
+				"                         // Token pictures the list names (prd §1534, §1542),",
+				"                         // fetched only from these, never learned by a request",
+				"                         // of their own (`TokenIconBook.listHosts`); a",
+				"                         // network's picture from Relay's own list (§1453).",
+				"                         \"coin-images.coingecko.com\", \"assets.coingecko.com\", \"assets.relay.link\",",
+				"                         // A limit order (prd §1673): posted pre-signed under the",
+				"                         // id this phone computed, then read by that id.",
+				"                         \"api.cow.fi\",",
+				"                         // Paying a zk.money tag (prd §1692): its resolver's",
+				"                         // EIP-3668 gateway, asked for one deposit address with",
+				"                         // its proof; the proof is checked on chain.",
+				"                         \"rop-v6.v6-prod.oxide.zk.money\"],",
+				"                 credentialed: false,",
+				"                 throughTor: true,",
+				"                 refusesTor: [\"api.relay.link\"]),",
+				"        // Your own node (prd §1517): an address the person types, per network,",
+				"        // reached directly (a home node is on their own network). Every",
+				"        // request names this service to `NetworkLedger`, the Logos node's rule.",
+				"        Endpoint(service: \"Your own node\",",
+				"                 reach: .whenConnected(bridge: \"Wallet\"),",
+				"                 purpose: \"When you turn on your own node, your account reads that network from the address you give it, and from nothing else, directly rather than through Tor. Your node sees your account's address and what it reads. Sending still goes through the public bundlers.\",",
+				"                 hosts: [\"the node address you give it\"],",
+				"                 credentialed: false),"
+			],
+			"startLine": 611
+		}
+	]
+}
