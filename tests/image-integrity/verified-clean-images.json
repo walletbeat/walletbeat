@@ -1923,6 +1923,18 @@
 		"hash": "4fdcf9701c061d74db156f76b864d5f9ba34d4debe3c0dac0c9a314450adbf6b",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-10-15 - Devcon Booth Announcement/origami_flower.jpg": {
+		"hash": "a8f9f755728455926db06d374d8cf68cbad53eb8e917eeb1cca1b30d9af58434",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-15 - Devcon Booth Announcement/walletbeat_booth.jpg": {
+		"hash": "c0c329c11ead04e2d257228253b09aae263b6fbd190ca5829d50cef2695cef5b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-10-15 - Devcon Booth Announcement/walletbeat_team.jpg": {
+		"hash": "bdf4f84553f6f21e952977f2409b4b92aa2814cc5460724643ba2614a49960a4",
+		"passedTests": ["file-format"]
+	},
 	"resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/devcon_workshop.jpg": {
 		"hash": "4c5dba25da216e8258202e358bf35c259052506c4d4c015e3a7f34aba1df1450",
 		"passedTests": ["blockiness", "file-format"]
