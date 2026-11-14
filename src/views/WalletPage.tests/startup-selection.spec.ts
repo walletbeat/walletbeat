@@ -79,13 +79,22 @@ for (const selection of selections) {
 		})
 
 		try {
-			await page
-				.goto(`/${selection.wallet}/?${selection.query}`, { waitUntil: 'commit' })
-				.catch(error => {
-					if (!String(error).includes('interrupted')) {
-						throw error
-					}
-				})
+			const [selectedDocument] = await Promise.all([
+				page.waitForResponse(
+					response =>
+						response.request().isNavigationRequest() &&
+						new URL(response.url()).pathname === routeURL,
+				),
+				page
+					.goto(`/${selection.wallet}/?${selection.query}`, { waitUntil: 'commit' })
+					.catch(error => {
+						if (!/interrupted|NS_BINDING_ABORTED/.test(String(error))) {
+							throw error
+						}
+					}),
+			])
+
+			expect(selectedDocument.ok()).toBe(true)
 			await expect.poll(() => held).toBe(true)
 			await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
 			await expect(page.locator('#top select')).toHaveValue(selection.value)
