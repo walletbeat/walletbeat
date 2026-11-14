@@ -2245,6 +2245,9 @@
 
 				.wallet-info {
 					block-size: auto;
+					&[data-row]:not(:popover-open) {
+						flex-wrap: wrap;
+					}
 				}
 			}
 		}
