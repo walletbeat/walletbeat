@@ -40,7 +40,7 @@ Prerequisites: §1.
 
 - **🖼️ `NestedStacks`** Nested scroll areas start their own internal sticky stack while their outer boxes still participate in the parent layout.
 
-- **🖼️ `RailBreakpoint`** At widths ≤`84rem`, content reserves no desktop TOC rail; above `84rem`, the right-hand desktop rail reservation returns with at least `44rem` for the content column. With the default initial font size, the boundary samples are `1344px` and `1345px`.
+- **🖼️ `RailBreakpoint`** Reserve a desktop TOC rail only when the central reading measure remains usable after rails and padding. Switch the shell, TOC, menu behavior, and sticky insets together. The current `84rem` threshold is a layout heuristic.
 
 - **🖼️ `RailIsolation`** Desktop rail/pie width does not overlap or widen main content; navigation and local overflow do not widen the sticky rail.
 
@@ -110,7 +110,7 @@ Prerequisites: Typography in §3 and slice geometry in §4.
 
 - **🎨 `RenderingModes`** Detailed/simple mode does not unexpectedly substitute emoji; explicitly chosen emoji variants remain supported.
 
-- **🎨 `GlyphTreatment`** Heading/TOC glyphs use the section’s accent treatment, with the intended unfiltered interaction treatment in emoji mode; pie emoji glyphs retain their translucent-white rest/unfiltered interaction treatment.
+- **🎨 `GlyphTreatment`** Heading/TOC glyphs use the section’s accent treatment, with the intended unfiltered interaction treatment in emoji mode; pie glyphs use the shared fill-derived contrast and resting filter from Pie.
 
 - **🎨 `PlainGlyphs`** Plain in-page heading glyphs have no surrounding petal, pie-slice, disk, or decorative shape.
 
