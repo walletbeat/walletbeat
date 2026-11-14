@@ -129,7 +129,13 @@ export const phantom: SoftwareWallet = {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: notSupported,
+			nameServices: {
+				ens: notSupported,
+				gwei: null,
+				hyperliquid: null,
+				mega: null,
+				wei: null,
+			},
 		},
 		chainAbstraction: {
 			bridging: {

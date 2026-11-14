@@ -351,9 +351,15 @@ export const metamask: SoftwareWallet = {
 					],
 				}),
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'CHAIN_CLIENT',
-			}),
+			nameServices: {
+				ens: supported<AddressResolutionData>({
+					medium: 'CHAIN_CLIENT',
+				}),
+				gwei: null,
+				hyperliquid: null,
+				mega: null,
+				wei: null,
+			},
 		},
 		chainAbstraction: {
 			bridging: {

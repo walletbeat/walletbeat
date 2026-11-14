@@ -75,7 +75,13 @@ export const safe: SoftwareWallet = {
 				erc7828: null,
 				erc7831: null,
 			},
-			nonChainSpecificEnsResolution: null,
+			nameServices: {
+				ens: null,
+				gwei: null,
+				hyperliquid: null,
+				mega: null,
+				wei: null,
+			},
 		},
 		chainAbstraction: null,
 		chainConfigurability: supported({

@@ -8,7 +8,7 @@ import {
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
-import { isSupported, type Support, type Supported } from '@/schema/features/support'
+import { isSupported, notSupported, type Support, type Supported } from '@/schema/features/support'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
@@ -16,12 +16,80 @@ import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } fro
 import type {
 	AddressResolution,
 	AddressResolutionData,
+	NameService,
+	NameServiceSupport,
 } from '../../features/privacy/address-resolution'
+import { nameServiceInfo, trackedNameServices } from '../../features/privacy/address-resolution'
 import { hasRefs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
 export type AddressResolutionMetadata = {
-	addressResolution?: AddressResolution<Support<AddressResolutionData>>
+	addressResolution?: AddressResolution<Support<AddressResolutionData> | null>
+}
+
+/** The minimum number of naming services a wallet must support to earn a partial rating. */
+const MINIMUM_NAME_SERVICES_FOR_PARTIAL = 2
+
+type SupportedNameService = {
+	service: NameService
+	support: Supported<AddressResolutionData>
+}
+
+function getSupportedNameServices(
+	nameServices: NameServiceSupport<Support<AddressResolutionData> | null>,
+): SupportedNameService[] {
+	const supported: SupportedNameService[] = []
+
+	for (const service of trackedNameServices.items) {
+		const support = nameServices[service]
+
+		if (support !== null && isSupported(support)) {
+			supported.push({ service, support })
+		}
+	}
+
+	return supported
+}
+
+/** @returns A comma-separated list of every tracked naming service, with its suffix. */
+function nameServiceExamplesMarkdown(): string {
+	return trackedNameServices.items
+		.map(service => {
+			const info = nameServiceInfo[service]
+
+			return `${info.displayName} (\`${info.suffix}\`)`
+		})
+		.join(', ')
+}
+
+/**
+ * Lower values are better: onchain resolution is preferred over offchain
+ * resolution, and verifiable or anonymized offchain resolution is preferred
+ * over alternatives.
+ */
+function resolutionPriority(support: Supported<AddressResolutionData>): number {
+	if (support.medium === 'CHAIN_CLIENT') {
+		return 0
+	}
+
+	const isVerifiable = support.offchainDataVerifiability === 'VERIFIABLE'
+	const isProxied = support.offchainProviderConnection === 'UNIQUE_PROXY_CIRCUIT'
+
+	if (isVerifiable) {
+		return isProxied ? 1 : 2
+	}
+
+	return isProxied ? 3 : 4
+}
+
+function nameServiceListMarkdown(supported: SupportedNameService[]): string {
+	return supported
+		.map(({ service }) => {
+			const info = nameServiceInfo[service]
+
+			return `* ${info.displayName} (\`${info.suffix}\`), such as \`${info.exampleName}\``
+		})
+		.join('\n')
 }
 
 function getOffchainProviderInfo(
@@ -68,16 +136,27 @@ function getOffchainProviderInfo(
 	}
 }
 
+const chainSpecificAddressFormats = `
+	{{WALLET_NAME}} may want to add support for sending funds to chain-specific human-readable addresses, as specified by either:
+
+	* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
+	* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
+`
+
 function evaluateAddressResolution(
 	ctx: EvaluationContext<AddressResolutionMetadata>,
-	addressResolution: AddressResolution<Support<AddressResolutionData>>,
+	addressResolution: AddressResolution<Support<AddressResolutionData> | null>,
 ): Evaluation<AddressResolutionMetadata> {
-	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
+	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData> | null, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
 
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
+		if (chainSpecificSupport === null) {
+			return unrated(ctx, { addressResolution })
+		}
+
 		if (!isSupported(chainSpecificSupport)) {
 			continue
 		}
@@ -127,7 +206,18 @@ function evaluateAddressResolution(
 		})
 	}
 
-	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
+	const supportedNameServices = getSupportedNameServices(addressResolution.nameServices)
+	const hasUnknownNameService = trackedNameServices.items.some(
+		service => addressResolution.nameServices[service] === null,
+	)
+
+	if (supportedNameServices.length === 0) {
+		if (hasUnknownNameService) {
+			return unrated(ctx, { addressResolution })
+		}
+
+		const nameServiceExamples = nameServiceExamplesMarkdown()
+
 		return ctx.build({
 			outcome: {
 				id: 'no_address_resolution',
@@ -137,76 +227,107 @@ function evaluateAddressResolution(
 					addressResolution,
 				},
 				shortExplanation: sentence(
-					'{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.',
+					`{{WALLET_NAME}} does not resolve human-readable names such as ${nameServiceExamples}.`,
 				),
 			},
 			details: paragraph(
-				'{{WALLET_NAME}} does not support resolving human-readable addresses, such as ENS (.eth) names.',
+				`{{WALLET_NAME}} does not support resolving human-readable names, such as ${nameServiceExamples}.`,
 			),
 			howToImprove: markdown(
-				'When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.',
+				`When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ${nameServiceExamples}.`,
 			),
 		})
 	}
 
-	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
+	if (supportedNameServices.length < MINIMUM_NAME_SERVICES_FOR_PARTIAL) {
+		const supportedNameService = supportedNameServices[0]
+		const supportedInfo = nameServiceInfo[supportedNameService.service]
+		const supportedNameServiceList = nameServiceListMarkdown(supportedNameServices)
+		const nameServiceExamples = nameServiceExamplesMarkdown()
+
 		return ctx.build({
 			outcome: {
-				id: 'support_plain_ens_onchain',
-				rating: Rating.PARTIAL,
-				displayName: 'Supports non-chain-specific ENS addresses',
+				id: 'support_only_one_name_service',
+				rating: Rating.FAIL,
+				displayName: `Supports only ${supportedInfo.displayName} addresses`,
 				metadata: {
 					addressResolution,
 				},
 				shortExplanation: sentence(
-					'{{WALLET_NAME}} supports sending to plain ENS addresses but not chain-specific human-readable addresses.',
+					`{{WALLET_NAME}} only supports plain ${supportedInfo.displayName} (\`${supportedInfo.suffix}\`) addresses, which is not enough for a partial rating.`,
 				),
 			},
 			details: markdown(`
-				{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`, but does not support chain-specific address formats that specify the destination chain.
+				{{WALLET_NAME}} supports sending funds to human-readable addresses from only one naming service:
 
-				It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties.
+				${supportedNameServiceList}
+
+				Walletbeat requires support for at least ${MINIMUM_NAME_SERVICES_FOR_PARTIAL} naming services to earn a partial rating, so that users are not locked into a single naming service.
 			`),
 			howToImprove: markdown(`
-				{{WALLET_NAME}} may want to add support for sending funds to chain-specific human-readable addresses, as specified by either:
-
-				* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
-				* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
+				{{WALLET_NAME}} should add support for names from at least one more naming service, such as ${nameServiceExamples}.
 			`),
 		})
 	}
 
-	const { offchainInfo, walletShould } = getOffchainProviderInfo(
-		addressResolution.nonChainSpecificEnsResolution,
+	const bestNameService = supportedNameServices.reduce((best, candidate) =>
+		resolutionPriority(candidate.support) < resolutionPriority(best.support) ? candidate : best,
 	)
+	const supportedNameServiceList = nameServiceListMarkdown(supportedNameServices)
+	const displayName = `Supports human-readable addresses from ${supportedNameServices.length} naming services`
+
+	if (bestNameService.support.medium === 'CHAIN_CLIENT') {
+		return ctx.build({
+			outcome: {
+				id: 'support_plain_name_service_onchain',
+				rating: Rating.PARTIAL,
+				displayName,
+				metadata: {
+					addressResolution,
+				},
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} supports sending to plain name service addresses but not chain-specific human-readable addresses.',
+				),
+			},
+			details: markdown(`
+				{{WALLET_NAME}} supports sending funds to human-readable addresses from the following naming services:
+
+				${supportedNameServiceList}
+
+				It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties.
+			`),
+			howToImprove: markdown(chainSpecificAddressFormats),
+		})
+	}
+
+	const { offchainInfo, walletShould } = getOffchainProviderInfo(bestNameService.support)
 
 	return ctx.build({
 		outcome: {
-			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
+			id: `support_plain_${bestNameService.support.offchainDataVerifiability.toLowerCase()}_${bestNameService.support.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
-			displayName: 'Resolves ENS addresses using an offchain service',
+			displayName,
 			metadata: {
 				addressResolution,
 			},
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} supports sending to ENS addresses but uses an offchain service for resolution.',
+				'{{WALLET_NAME}} supports sending to plain name service addresses but uses an offchain service for resolution.',
 			),
 		},
 		details: markdown(`
-			{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`.
+			{{WALLET_NAME}} supports sending funds to human-readable addresses from the following naming services:
+
+			${supportedNameServiceList}
 
 			${offchainInfo}
 		`),
 		howToImprove:
 			walletShould === undefined
-				? undefined
+				? markdown(chainSpecificAddressFormats)
 				: markdown(`
 					{{WALLET_NAME}} should use fully-onchain resolution to resolve the address, or should ${walletShould}.
 
-					{{WALLET_NAME}} may want to add support for sending funds to chain-specific human-readable addresses, as specified by either:
-
-					* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
-					* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
+					${chainSpecificAddressFormats}
 				`),
 	})
 }
@@ -218,7 +339,9 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 	wording: {
 		midSentenceName: 'address resolution',
 	},
-	question: sentence('Can you send funds to human-readable Ethereum addresses?'),
+	question: sentence(
+		'Can you send funds to human-readable names instead of hexadecimal addresses?',
+	),
 	why: markdown(`
 		Ethereum addresses are hexadecimal strings (\`0x...\`) which are
 		unreadable to humans. Phishing scams and exploits have used this to
@@ -233,8 +356,9 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		potential for mistakenly sending funds to the wrong place or the wrong
 		chain.
 
-		Address naming registries like ENS partially solve this problem by
-		allowing more human-readable names like \`username.eth\` to be
+		Address naming registries like ENS, Gwei Name Service, Wei Name
+		Service, MegaNames, and Hyperliquid Names partially solve this problem
+		by allowing more human-readable names like \`username.eth\` to be
 		automatically turned into the hexadecimal address. This is easier to
 		share and to accurately transfer by humans. Additionally, some address
 		format standards improve upon this further by including the destination
@@ -253,16 +377,35 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		Wallets are rated based on the types of addresses they support sending
 		funds to.
 
+		Walletbeat tracks names from the following naming services:
+
+		* ENS (\`.eth\`)
+		* Gwei Name Service (\`.gwei\`)
+		* Wei Name Service (\`.wei\`)
+		* MegaNames (\`.mega\`) on MegaETH
+		* Hyperliquid Names (\`.hl\`) on HyperEVM
+
+		Each naming service is tracked separately because naming services have
+		different registries, resolution methods, and privacy properties. A
+		wallet may resolve names from one naming service without resolving names
+		from another.
+
 		Walletbeat recognizes the following destination address formats:
 
-		* Plain ENS addresses (\`username.eth\`) without destination chain information
+		* Plain name service addresses without destination chain information,
+		  such as \`username.eth\`, \`username.gwei\`, \`username.wei\`,
+		  \`username.mega\`, or \`username.hl\`
 		* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 		* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 
 		Wallets receive a **pass** only if they support ${eipMarkdownLink(erc7828)} or
 		${eipMarkdownLink(erc7831)} (chain-specific human-readable addresses).
-		Wallets that support only plain ENS, with or without onchain resolution,
-		receive a **partial** rating.
+		Wallets that support plain names from two or more naming services, with
+		or without onchain resolution, receive a **partial** rating.
+		Wallets that support plain names from only one naming service, or from
+		no naming service at all, receive a **fail** rating.
+		Wallets with too little information to determine support are left
+		**unrated**.
 
 		For a pass, the mechanism used to perform the resolution must either:
 
@@ -286,6 +429,10 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		\`OffchainLookup\` details are as claimed and then perform the CCIP-Read
 		themselves, rather than trust an offchain provider to do so on their
 		behalf.
+
+		Only naming services with meaningful adoption are tracked.
+		Smaller-reach services may be added once there is an agreed inclusion
+		criterion.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -298,6 +445,13 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
+						nameServices: {
+							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
 						chainSpecificAddressing: {
 							erc7828: {
 								support: 'SUPPORTED',
@@ -306,10 +460,6 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 							erc7831: {
 								support: 'NOT_SUPPORTED',
 							},
-						},
-						nonChainSpecificEnsResolution: {
-							support: 'SUPPORTED',
-							medium: 'CHAIN_CLIENT',
 						},
 					},
 				),
@@ -321,6 +471,13 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
+						nameServices: {
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
 						chainSpecificAddressing: {
 							erc7828: {
 								support: 'NOT_SUPPORTED',
@@ -332,9 +489,6 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 								offchainProviderConnection: 'UNIQUE_PROXY_CIRCUIT',
 							},
 						},
-						nonChainSpecificEnsResolution: {
-							support: 'NOT_SUPPORTED',
-						},
 					},
 				),
 			),
@@ -342,11 +496,18 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		partial: [
 			exampleRating(
 				mdSentence(
-					'The wallet resolves non-chain-specific ENS addresses (`username.eth`) when sending tokens, using onchain data for resolution.',
+					'The wallet resolves ENS and Gwei Name Service addresses (`username.eth`, `username.gwei`) when sending tokens, using onchain data for resolution.',
 				),
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
+						nameServices: {
+							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							gwei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
 						chainSpecificAddressing: {
 							erc7828: {
 								support: 'NOT_SUPPORTED',
@@ -355,9 +516,30 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 								support: 'NOT_SUPPORTED',
 							},
 						},
-						nonChainSpecificEnsResolution: {
-							support: 'SUPPORTED',
-							medium: 'CHAIN_CLIENT',
+					},
+				),
+			),
+			exampleRating(
+				mdSentence(
+					'The wallet resolves Gwei Name Service and Wei Name Service addresses (`username.gwei`, `username.wei`) when sending tokens, using onchain data for resolution.',
+				),
+				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
+					{
+						nameServices: {
+							ens: notSupported,
+							gwei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							wei: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
 						},
 					},
 				),
@@ -369,6 +551,13 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
+						nameServices: {
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
 						chainSpecificAddressing: {
 							erc7828: {
 								support: 'SUPPORTED',
@@ -380,9 +569,6 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 								support: 'NOT_SUPPORTED',
 							},
 						},
-						nonChainSpecificEnsResolution: {
-							support: 'NOT_SUPPORTED',
-						},
 					},
 				),
 			),
@@ -393,6 +579,13 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 				evaluateAddressResolution(
 					EvaluationContext.forTest(() => addressResolution),
 					{
+						nameServices: {
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
 						chainSpecificAddressing: {
 							erc7828: {
 								support: 'SUPPORTED',
@@ -404,73 +597,85 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 								support: 'NOT_SUPPORTED',
 							},
 						},
-						nonChainSpecificEnsResolution: {
-							support: 'NOT_SUPPORTED',
+					},
+				),
+			),
+		],
+		fail: [
+			exampleRating(
+				mdSentence(
+					'The wallet resolves ENS addresses (`username.eth`) but supports no other naming service.',
+				),
+				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
+					{
+						nameServices: {
+							ens: { support: 'SUPPORTED', medium: 'CHAIN_CLIENT' },
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
+						},
+					},
+				),
+			),
+			exampleRating(
+				mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
+				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
+					{
+						nameServices: {
+							ens: notSupported,
+							gwei: notSupported,
+							wei: notSupported,
+							mega: notSupported,
+							hyperliquid: notSupported,
+						},
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
 						},
 					},
 				),
 			),
 		],
-		fail: exampleRating(
-			mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
-			evaluateAddressResolution(
-				EvaluationContext.forTest(() => addressResolution),
-				{
-					chainSpecificAddressing: {
-						erc7828: {
-							support: 'NOT_SUPPORTED',
-						},
-						erc7831: {
-							support: 'NOT_SUPPORTED',
-						},
-					},
-					nonChainSpecificEnsResolution: {
-						support: 'NOT_SUPPORTED',
-					},
-				},
-			),
-		),
 	},
 	evaluate: (
 		ctx: EvaluationContext<AddressResolutionMetadata>,
 	): Evaluation<AddressResolutionMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
 
-		if (ctx.features.addressResolution === null) {
+		const feature = ctx.features.addressResolution
+
+		if (feature === null) {
 			return unrated(ctx, {})
 		}
 
-		ctx.addRef(ctx.features.addressResolution)
+		ctx.addRef(feature)
 
 		for (const nestedResolution of [
-			ctx.features.addressResolution.nonChainSpecificEnsResolution,
-			ctx.features.addressResolution.chainSpecificAddressing.erc7828,
-			ctx.features.addressResolution.chainSpecificAddressing.erc7831,
+			...trackedNameServices.items.map(service => feature.nameServices[service]),
+			feature.chainSpecificAddressing.erc7828,
+			feature.chainSpecificAddressing.erc7831,
 		]) {
 			if (hasRefs(nestedResolution)) {
 				ctx.addRef(nestedResolution)
 			}
 		}
 
-		if (
-			ctx.features.addressResolution.nonChainSpecificEnsResolution === null ||
-			ctx.features.addressResolution.chainSpecificAddressing.erc7828 === null ||
-			ctx.features.addressResolution.chainSpecificAddressing.erc7831 === null
-		) {
-			return unrated(ctx, {})
-		}
-
-		// We've checked all the nulls, so recreate the object without nulls in
-		// the type description.
-		const resolvedResolution: AddressResolution<Support<AddressResolutionData>> = {
-			chainSpecificAddressing: {
-				erc7828: ctx.features.addressResolution.chainSpecificAddressing.erc7828,
-				erc7831: ctx.features.addressResolution.chainSpecificAddressing.erc7831,
-			},
-			nonChainSpecificEnsResolution: ctx.features.addressResolution.nonChainSpecificEnsResolution,
-		}
-
-		return evaluateAddressResolution(ctx, resolvedResolution)
+		return evaluateAddressResolution(ctx, feature)
 	},
 	aggregate: pickWorstRating<AddressResolutionMetadata>,
 }
