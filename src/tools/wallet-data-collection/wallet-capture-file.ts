@@ -2936,7 +2936,7 @@ export class WalletCaptureFlow {
 							},
 							{
 								suggestion:
-									'Declare the purpose and collection policy of this request, if the request was made by the wallet after it was installed.',
+									'Declare the purpose and collection policy of this request, if the request was made by the wallet after it was installed. The collection policy describes consent and configurability, not how often the request happens.',
 								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,... --policy=collection_policy`,
 							},
 						],
@@ -2949,7 +2949,8 @@ export class WalletCaptureFlow {
 						issue: `Request ${req.toString()} does not have any assigned purpose.`,
 						suggestions: [
 							{
-								suggestion: 'Declare the purpose of this request.',
+								suggestion:
+									'Declare the purpose and collection policy of this request. The collection policy describes consent and configurability, not how often the request happens.',
 								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED --policy=collection_policy`,
 							},
 						],

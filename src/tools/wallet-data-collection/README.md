@@ -167,7 +167,11 @@ Purposes are case-insensitive on the command line.
 
 ##### Collection policy
 
-Requests can also be assigned to a collection policy, i.e. whether the wallet makes this request with or without the user's consent.
+Requests can also be assigned to a collection policy. The policy describes
+whether the wallet makes this request with or without the user's consent, and
+whether the user can configure it. It does **not** describe how often the
+request happens: a request sent once per session can be `ALWAYS`, and a
+request sent on every page load can be `OPT_IN`.
 Valid policy options are:
 
 - `OPT_IN`: The wallet only makes this request if the user has actively configured the wallet to do so, and this configuration wasn't part of the regular wallet onboarding flow.
@@ -247,6 +251,31 @@ pnpm wallet-data-collection agent 'Classify network traffic for metamask browser
 After the initial instruction runs, the harness keeps reading further prompts from the terminal until you quit with `/quit`.
 The harness is instructed to make _some_ forward progress only, not to complete classification. Classifying an entire wallet's worth of data usually runs past the context window of even frontier models as of 2026. Encouraging models to complete this task as a whole makes them take shortcuts by doing aggressive bulk-matching of requests. Therefore, you should not push them to classify entire swaths of requests at once. Be ready instead to run many separate sessions that each make some forward progress.
 
+#### Decision checkpoints
+
+The agent must not ask about purposes or collection policies one request at a
+time. When the capture and the wallet's UI, source code, or documentation do
+not establish an answer, the agent should keep a list of unresolved decisions.
+It should ask about them together at a checkpoint, such as the end of a batch
+of up to 10 issues.
+
+When only one item is unresolved, ask it with a single `question`. Otherwise,
+use one `ask_user` call with a `questions` batch of 2–4 questions. When more
+than four items are unresolved, split them across consecutive batches. Each
+item should include:
+
+- The request context: flow, request ID, exact URL, method, and relevant
+  headers.
+- The proposed purpose or purposes, and why they fit.
+- The proposed `CollectionPolicy`, with its explanation.
+- The evidence used, and which evidence is missing.
+- Alternative purposes or policies that remain plausible.
+
+The agent must present inferred classifications as proposals and wait for an
+explicit answer before saving them. A default option, silence, or a previously
+accepted proposal is not confirmation. If the evidence cannot establish a
+purpose or policy, the request should stay unresolved rather than be guessed.
+
 ## Workflow
 
 - Human:
@@ -276,9 +305,11 @@ The harness is instructed to make _some_ forward progress only, not to complete 
 - Agent:
   - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
     - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
-    - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes and collection policies. If unsure about the collection policy, ask the human user about it.
+    - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes and collection policies.
+      - When a purpose or collection policy cannot be established from the capture and available evidence, collect the unresolved decisions and ask about them together at a decision checkpoint (see above). Include the request context, candidate classification, and evidence for each item.
+      - Show inferred classifications as proposals and wait for explicit confirmation before saving them. Do not treat a suggested default as a verified choice.
       - Hint: All requests during the `IDLE_PRE_INSTALL` are obviously `NOT_WALLET_INITIATED`, so you should create matchers that cover them; this will quiesce similar requests in other flows that we want to ignore since they're not the wallet's doing. Additionally, most of the requests in `INSTALL` are also likely `NOT_WALLET_INITIATED`, as the capture covers the requests needed to download and install the wallet before any of the wallet's code runs. For example, this includes requests to the Chrome Web Store, the Android Play Store, etc. which are not the wallet's doing.
-    - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send. If you are not sure, pause and ask your human operator for assistance.
+    - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send. If you are not sure, pause and ask your human operator for assistance at the next decision checkpoint.
     - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
     - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
   - Once the `check` subcommand is successful, you are done!
