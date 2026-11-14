@@ -33,6 +33,15 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	BasicBenchmarkTransactions,
+	CallDataDisplay,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
+} from '@/schema/features/security/transaction-legibility'
+import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
@@ -643,7 +652,207 @@ export const gemwallet: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 			},
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: [
+					{
+						explanation:
+							"Gem doesn't show the recipient or the nonce when an app asks to send ETH.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eth-transfer-request.png',
+						label: 'Gem request from an app to send ETH',
+					},
+					{
+						explanation: "Gem doesn't show the recipient when an app asks to send USDC.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc20-transfer-request.png',
+						label: 'Gem request from an app to send USDC',
+					},
+					{
+						explanation: "Gem doesn't show the NFT or the recipient when sending an ERC-721 token.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc721-transfer.png',
+						label: 'Gem request for an ERC-721 transfer',
+					},
+					{
+						explanation:
+							"Gem doesn't show the token or the recipient when sending an ERC-1155 token.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-erc1155-transfer.png',
+						label: 'Gem request for an ERC-1155 transfer',
+					},
+					{
+						explanation: "Gem shows the amount and the spender's address when approving USDC.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-usdc-approval.png',
+						label: 'Gem request for a USDC approval',
+					},
+					{
+						explanation: "Gem doesn't show which address the Aave deposit is credited to.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-aave-supply.png',
+						label: 'Gem request for an Aave supply',
+					},
+					{
+						explanation: "Gem doesn't show the Aave deposit when it runs through a Safe{Wallet}.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-aave-supply.png',
+						label: 'Gem request for a Safe{Wallet} Aave supply',
+					},
+					{
+						explanation:
+							"Gem doesn't show the approval or the Aave deposit when they run as a Safe{Wallet} batch.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-batch-approve-supply.png',
+						label: 'Gem request for a Safe{Wallet} batched approve and supply',
+					},
+					{
+						explanation: "Gem warns that a transaction will fail and doesn't let you confirm it.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-failed-transaction.png',
+						label: 'Gem request for a failing transaction',
+					},
+					{
+						explanation:
+							"Gem doesn't show an outcome when the result depends on when the transaction is mined.",
+						file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-nondeterministic-transaction.png',
+						label: 'Gem request for a nondeterministic transaction',
+					},
+				],
+				erc4361: supported({
+					ref: [
+						{
+							explanation:
+								'Gem shows the domain and address when an app asks you to sign in with Ethereum.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-siwe.png',
+							label: 'Gem sign-in request for an ERC-4361 message',
+						},
+						{
+							explanation: "Gem blocks a sign-in request when the domain doesn't match the app.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-siwe-domain-mismatch.png',
+							label: 'Gem sign-in request with a mismatched domain',
+						},
+					],
+				}),
+				erc7730: supported({
+					ref: [
+						{
+							explanation: 'Gem shows the method, spender, and amount when approving USDC.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-usdc-approval.png',
+							label: 'Gem request for a USDC approval',
+						},
+						{
+							explanation: "Gem doesn't show the method or its details when depositing in Aave.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-aave-supply.png',
+							label: 'Gem request for an Aave supply',
+						},
+						{
+							explanation: "Gem doesn't show the Aave deposit inside a Safe{Wallet} transaction.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-aave-supply.png',
+							label: 'Gem request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								"Gem doesn't show the approval or the Aave deposit inside a Safe{Wallet} batch.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-safe-batch-approve-supply.png',
+							label: 'Gem request for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation: "Gem doesn't accept EIP-5792 batch requests from apps.",
+							label: 'WalletConnect method identifiers',
+							url: 'https://github.com/gemwalletcom/wallet/blob/8bfc0aded1d86fdf7d98897afbe5d1ae44e15062/core/crates/primitives/src/wallet_connector.rs#L21-L38',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				erc8213: supported({
+					ref: [
+						{
+							explanation: "Gem doesn't show an EIP-712 message's fields until you tap Details.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eip712-request.png',
+							label: 'Gem signature request for an EIP-712 message',
+						},
+						{
+							explanation:
+								"Gem doesn't show the domain hash, message hash, or digest when signing an EIP-712 message.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-eip712-details.png',
+							label: 'Gem details of an EIP-712 signature request',
+						},
+						{
+							explanation:
+								'Gem shows the method, spender, and amount when approving USDC, but not the raw calldata.',
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-usdc-approval.png',
+							label: 'Gem request for a USDC approval',
+						},
+						{
+							explanation:
+								"Gem doesn't show the raw calldata, a copy button, or a calldata digest when depositing in Aave.",
+							file: 'public/references/wallets/gemwallet/screenshots/2026-11-05-gemwallet-aave-supply.png',
+							label: 'Gem request for an Aave supply',
+						},
+					],
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.NOT_IN_UI,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'NO_OUTCOME_SHOWN' as const,
+					},
+				}),
+			},
 		},
 		selfSovereignty: {
 			permissionsManagement: {
