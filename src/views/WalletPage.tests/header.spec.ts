@@ -172,6 +172,7 @@ for (const width of [390, 1440]) {
 
 					return {
 						labels,
+						scrollTop: layout.scrollTop,
 						visibleIdentity,
 						title: rectData(identityBox),
 						compositionBox: rectData(compositionBox),
@@ -282,13 +283,22 @@ for (const width of [390, 1440]) {
 			}
 			const root = page.locator('#layout')
 			const wheel = async (delta: number, state: typeof flow) => {
-				const point = state.labels.find(label => label.top >= 0 && label.bottom <= 900)
+				const label = state.labels.find(label => label.top >= 0 && label.bottom <= 900)
+				const point = label
+					? { x: label.x + label.width / 2, y: label.y + label.height / 2 }
+					: await root.evaluate(element => {
+							const { left, top, width, height } = element.getBoundingClientRect()
+							const x = left + width / 2
+							const y = top + height * 0.75
 
-				if (!point) {
-					throw new Error('The real header has no visible wheel-input point')
-				}
+							if (!element.contains(document.elementFromPoint(x, y))) {
+								throw new Error('The page scroll owner has no wheel target at the test point')
+							}
 
-				await page.mouse.move(point.x + point.width / 2, point.y + point.height / 2)
+							return { x, y }
+						})
+
+				await page.mouse.move(point.x, point.y)
 				const before = await root.evaluate(element => {
 					element.setAttribute('data-test-scrollend', 'pending')
 					element.addEventListener(
@@ -313,25 +323,41 @@ for (const width of [390, 1440]) {
 				await expect(root).toHaveAttribute('data-test-scrollend', 'complete')
 			}
 
+			const nativeCompaction = await page.evaluate(qualifyNativeBreadcrumbClock)
+
 			await wheel(600, flow)
 			const compact = await observe()
 
-			checkTitle(compact)
-			const compactEdges = [
-				compact.visibleIdentity,
-				...compact.controls.flatMap(control =>
-					control.hits.map(point => ({ left: point.x, right: point.x })),
-				),
-			]
-			const occupiedCompactWidth =
-				Math.max(...compactEdges.map(edge => edge.right)) -
-				Math.min(...compactEdges.map(edge => edge.left))
+			if (nativeCompaction.applicable) {
+				checkTitle(compact)
+				const compactEdges = [
+					compact.visibleIdentity,
+					...compact.controls.flatMap(control =>
+						control.hits.map(point => ({ left: point.x, right: point.x })),
+					),
+				]
+				const occupiedCompactWidth =
+					Math.max(...compactEdges.map(edge => edge.right)) -
+					Math.min(...compactEdges.map(edge => edge.left))
 
-			expect(
-				compact.reservedCompactInlineSize,
-				'The compact reservation covers actual title paint and every native control hit region',
-			).toBeGreaterThanOrEqual(occupiedCompactWidth - 1)
-			await wheel(-600, compact)
+				expect(
+					compact.reservedCompactInlineSize,
+					'The compact reservation covers actual title paint and every native control hit region',
+				).toBeGreaterThanOrEqual(occupiedCompactWidth - 1)
+			} else {
+				expect(compact.controls).toHaveLength(flow.controls.length)
+				const travel = compact.scrollTop - flow.scrollTop
+				const boxes = [compact.title, ...compact.controls.map(control => control.box)]
+				const original = [flow.title, ...flow.controls.map(control => control.box)]
+
+				for (const [index, box] of boxes.entries()) {
+					expect(box.width).toBeCloseTo(original[index].width)
+					expect(box.height).toBeCloseTo(original[index].height)
+					expect(Math.abs(box.top - original[index].top + travel)).toBeLessThanOrEqual(1)
+				}
+			}
+
+			await wheel(-Math.max(600, Math.ceil(compact.scrollTop) + 1), compact)
 			const reversed = await observe()
 
 			await info.attach(`header-reversed-${fixture}-${width}`, {
