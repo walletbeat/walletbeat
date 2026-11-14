@@ -1019,6 +1019,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	</section>
 	</div>
 
+	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
+
 	<aside
 		style:---pie-rotation-states={pieRotation.animations}
 		style:---pie-rotation-ranges={pieRotation.ranges}
@@ -1174,7 +1176,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			>
 		</footer>
 	{/if}
-	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
 </div>
 {@html peerBootstrapMarkup()}
 
