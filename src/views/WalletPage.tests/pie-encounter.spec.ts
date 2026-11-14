@@ -51,6 +51,17 @@ for (const open of [true, false]) {
 
 				element.style.scrollSnapType = 'none'
 			})
+			const compactPieSupported = await page.evaluate(() =>
+				[
+					'clip-path: shape(from 0 0, line to 1px 1px, close)',
+					'animation-timeline: scroll()',
+					'animation-range: 0% 100%',
+					'width: anchor-size(--breadcrumb-source inline)',
+					'timeline-scope: --breadcrumb-size',
+					'color: if(style(---breadcrumb-wrap: 1): red)',
+				].every(feature => CSS.supports(feature)),
+			)
+
 			const owner = open
 				? page.locator('article .attribute-group').first()
 				: page.locator('article section:has(> details[name="wallet-stages"])').first()
@@ -65,6 +76,41 @@ for (const open of [true, false]) {
 
 				element.open = desired
 			}, open)
+
+			if (!compactPieSupported) {
+				const pie = page.locator('.pie-navigation-geometry')
+				const root = page.locator('#layout')
+				const initial = await pie.boundingBox()
+
+				expect(initial).not.toBeNull()
+				expect(initial!.height).toBeGreaterThan(0)
+				expect(initial!.y).toBeGreaterThanOrEqual(0)
+				expect(initial!.y).toBeLessThan(900)
+				await page.mouse.move(20, 700)
+				await page.mouse.wheel(0, 900)
+				await expect.poll(() => root.evaluate(element => element.scrollTop)).toBeGreaterThan(600)
+				await expect
+					.poll(async () => {
+						const box = await pie.boundingBox()
+
+						return box ? box.y + box.height : Infinity
+					})
+					.toBeLessThanOrEqual(0)
+				await page.mouse.wheel(0, -1200)
+				await expect.poll(async () => (await pie.boundingBox())?.y ?? -Infinity).toBeGreaterThan(0)
+				const restored = await pie.evaluate(
+					element =>
+						element.getBoundingClientRect().top + document.querySelector('#layout')!.scrollTop,
+				)
+
+				expect(restored).toBeCloseTo(initial!.y, 0)
+				await info.attach('ordinary-flow-pie', {
+					body: JSON.stringify({ initial, restored }),
+					contentType: 'application/json',
+				})
+
+				return
+			}
 
 			if (open) {
 				const ownership = await details.evaluate(element => {
