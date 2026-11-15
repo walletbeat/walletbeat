@@ -80,7 +80,7 @@ for (const javaScriptEnabled of [true, false]) {
 											return
 										}
 
-										element.removeEventListener('toggle', onClose)
+										element.removeEventListener('toggle', onClose, true)
 
 										try {
 											if (
@@ -98,7 +98,7 @@ for (const javaScriptEnabled of [true, false]) {
 										}
 									}
 
-									element.addEventListener('toggle', onClose)
+									element.addEventListener('toggle', onClose, true)
 								}),
 							}),
 							readLayout,
