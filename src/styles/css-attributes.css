@@ -3781,6 +3781,12 @@ ol {
 					---breadcrumb-itemWidth: inherit;
 					---breadcrumb-itemHeight: inherit;
 					---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
+					&::before,
+					&::after,
+					> [data-sticky-breadcrumb~="flow"]::before {
+						content: none;
+						view-timeline-name: none;
+					}
 				}
 				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
 
@@ -3794,12 +3800,6 @@ ol {
 					}
 				}
 
-				&::before,
-				&::after,
-				> [data-sticky-breadcrumb~="flow"]::before {
-					content: none;
-					view-timeline-name: none;
-				}
 				> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"] {
 					/* Exit-crossing at local zero reads native dimensions independently of rounded scrollport bounds. */
 					direction: ltr;
