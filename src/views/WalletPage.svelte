@@ -1395,7 +1395,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 									></span>
 									<span>{attribute.displayName}</span>
 								</a>
-							</h3>
+							</svelte:element>
 							<span data-sticky-breadcrumb="size-export size-source" aria-hidden="true"></span>
 						</div>
 						<div
