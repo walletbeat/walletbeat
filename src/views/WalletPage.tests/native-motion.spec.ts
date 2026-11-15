@@ -48,17 +48,17 @@ async function readPaint(buffer: Buffer) {
 		}
 	}
 
-	return (region: Region | null): Paint => {
+	return (regions: Region[] | null): Paint => {
 		let left = Infinity,
 			top = Infinity,
 			right = -Infinity,
 			bottom = -Infinity
-		const mask = region
+		const mask = regions
 			? orange.filter(pixel => {
 					const x = pixel % info.width,
 						y = Math.floor(pixel / info.width)
 
-					if (x < region.left || x > region.right || y < region.top || y > region.bottom) {
+					if (!regions.some(r => r.left <= x && x <= r.right && r.top <= y && y <= r.bottom)) {
 						return false
 					}
 
@@ -205,7 +205,7 @@ test.describe('native paint during main-thread stalls', () => {
 				const style = document.createElement('style')
 
 				style.textContent =
-					'#layout{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none!important}#native-motion-ruler{position:fixed;top:850px;left:10px;width:12px;height:12px;background:rgb(0,0,255);z-index:2147483647;animation:native-motion-ruler auto linear both;pointer-events:none}@keyframes native-motion-ruler{from{transform:translateX(0)}to{transform:translateX(200px)}}'
+					'#layout{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none!important}#native-motion-ruler{position:fixed;top:850px;left:10px;width:12px;height:12px;background:rgb(0,0,255);z-index:2147483647;animation:native-motion-ruler auto linear both;pointer-events:none}@keyframes native-motion-ruler{from{transform:translateX(0)}to{transform:translateX(600px)}}'
 				document.head.append(style)
 				const ruler = document.createElement('span')
 
@@ -327,6 +327,19 @@ test.describe('native paint during main-thread stalls', () => {
 			evidence.interval = { start, end, range }
 			const calibration = []
 
+			const path: Region[] = []
+
+			for (let top = start; top <= end; top += 0.5) {
+				await seek(top)
+				const box = await page.locator('img.wallet-icon').boundingBox()
+
+				if (!box) {
+					throw new Error('Image must remain rendered throughout the native journey')
+				}
+
+				path.push(regionFor(box))
+			}
+
 			for (const fraction of [0.1, 0.5, 0.9]) {
 				const actual = await seek(start + range * fraction)
 				const native = await probe.evaluate(({ image, imageMotion }) => {
@@ -355,13 +368,13 @@ test.describe('native paint during main-thread stalls', () => {
 
 				const region = regionFor(imageBox),
 					visibleBuffer = await page.screenshot()
-				const visible = (await readPaint(visibleBuffer))(region)
+				const visible = (await readPaint(visibleBuffer))(path)
 
 				await probe.evaluate(({ image }) => {
 					image.style.visibility = 'hidden'
 				})
 				const hiddenBuffer = await page.screenshot(),
-					hidden = (await readPaint(hiddenBuffer))(region)
+					hidden = (await readPaint(hiddenBuffer))(path)
 
 				await probe.evaluate(({ image }) => {
 					image.style.removeProperty('visibility')
@@ -405,17 +418,64 @@ test.describe('native paint during main-thread stalls', () => {
 				region: Region
 			})[] = []
 
-			for (let top = start; top <= end + 1; top += 1) {
-				const actual = await seek(Math.min(top, end)),
+			let frames: Frame[] = []
+
+			cdp.on('Page.screencastFrame', event => {
+				frames.push(event)
+				void cdp.send('Page.screencastFrameAck', { sessionId: event.sessionId })
+			})
+			const screencast = { format: 'png' as const, everyNthFrame: 1, maxWidth: 690, maxHeight: 900 }
+
+			await cdp.send('Page.startScreencast', screencast)
+			await expect.poll(() => frames.length).toBeGreaterThan(0)
+
+			let previousRulerPixel: number | undefined
+
+			for (let top = start; top <= end; top += 0.5) {
+				const previousFrame = frames.length
+				const actual = await seek(top),
 					imageBox = await page.locator('img.wallet-icon').boundingBox()
 
 				if (!imageBox) {
 					throw new Error('Image must remain rendered throughout the native journey')
 				}
 
-				const region = regionFor(imageBox),
-					buffer = await page.screenshot(),
-					paint = (await readPaint(buffer))(region)
+				if (references.at(-1)?.actual === actual) {
+					continue
+				}
+
+				const region = regionFor(imageBox)
+				const x = await page
+					.locator('#native-motion-ruler')
+					.evaluate(el => Math.round(el.getBoundingClientRect().left))
+				let buffer: Buffer = Buffer.alloc(0)
+				let paint: Paint = { blue: null, box: null, mask: [] }
+
+				await expect
+					.poll(
+						async () => {
+							if (frames.length <= previousFrame) {
+								return Infinity
+							}
+
+							buffer = Buffer.from(frames.at(-1)!.data, 'base64')
+							paint = (await readPaint(buffer))(path)
+
+							if (
+								paint.blue === null ||
+								(x !== previousRulerPixel && paint.blue === references.at(-1)?.blue)
+							) {
+								return Infinity
+							}
+
+							return Math.abs(paint.blue - x)
+						},
+						{
+							timeout: 3000,
+							message: 'The captured ruler must match the requested reference pose',
+						},
+					)
+					.toBeLessThanOrEqual(2)
 
 				if (paint.blue === null || !paint.box) {
 					await attachImage('reference-reader-failure', buffer)
@@ -424,14 +484,10 @@ test.describe('native paint during main-thread stalls', () => {
 				expect(paint.blue, 'Each ordinary reference has a native ruler position').not.toBeNull()
 				expect(paint.box, 'Each ordinary reference has image paint').not.toBeNull()
 				references.push({ requested: top, actual, imageBox, region, ...paint })
+				previousRulerPixel = x
 			}
 			evidence.references = references
-			let frames: Frame[] = []
-
-			cdp.on('Page.screencastFrame', event => {
-				frames.push(event)
-				void cdp.send('Page.screencastFrameAck', { sessionId: event.sessionId })
-			})
+			await cdp.send('Page.stopScreencast')
 			const runs = []
 
 			for (const mode of ['blocked', ...(localImageVaries ? ['frozen-image'] : []), 'frozen-row']) {
@@ -507,7 +563,7 @@ test.describe('native paint during main-thread stalls', () => {
 					state.root.addEventListener('scroll', block)
 				})
 				frames = []
-				await cdp.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
+				await cdp.send('Page.startScreencast', screencast)
 				let cancelBinding: (() => void) | undefined
 				const started = new Promise<{ name: string; payload: string }>((resolve, reject) => {
 					const listener = (event: { name: string; payload: string }) => {
@@ -572,8 +628,8 @@ test.describe('native paint during main-thread stalls', () => {
 					}
 
 					const buffer = Buffer.from(frame.data, 'base64'),
-						paintAt = await readPaint(buffer),
-						{ blue } = paintAt(null)
+						paint = (await readPaint(buffer))(path),
+						{ blue } = paint
 					const near = references.filter(
 						reference =>
 							blue !== null && reference.blue !== null && Math.abs(reference.blue - blue) <= 1,
@@ -581,8 +637,6 @@ test.describe('native paint during main-thread stalls', () => {
 					const comparisons = []
 
 					for (const reference of near) {
-						const paint = paintAt(reference.region)
-
 						comparisons.push({
 							referenceBlue: reference.blue,
 							region: reference.region,
