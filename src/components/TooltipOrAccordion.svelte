@@ -125,6 +125,7 @@
 
 	onMount(() => {
 		const mountedDisclosure = disclosure
+
 		// Untouched peers must not reset a shared controller's adopted native state.
 		if (mountedDisclosure.open !== initialExpanded) isExpanded = mountedDisclosure.open
 
