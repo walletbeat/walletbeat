@@ -668,7 +668,10 @@
 						${(item === group ? [group] : [group, item]).map(related => `#top .page-navigation [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
 						.pie-navigation-geometry { ---pie-hasRelevant: 1; }
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
-						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] { --pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline}; }
+						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] {
+							--pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline};
+							animation-name: var(---link-currentAnimationName), wallet-pie-contact, wallet-pie-contact;
+						}
 						.pie-navigation a[href="${item.href}"] {
 							---link-current-source: var(--link-current-sources);
 						}
@@ -2123,7 +2126,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			scale: calc(1 + var(---pie-highlightTo) * (var(--hover-scale) - 1));
 		}
 	}
-	@keyframes wallet-pie-contact {
+	@keyframes -global-wallet-pie-contact {
 		from { ---pie-contact: 0; }
 		to { ---pie-contact: 1; }
 	}
@@ -2133,8 +2136,8 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			.pie-navigation :global(:is(li, details)[data-pressable-name]) {
 				animation:
 					var(---link-currentAnimationName) auto linear both,
-					wallet-pie-contact auto linear forwards,
-					wallet-pie-contact auto linear reverse forwards;
+					auto linear forwards none,
+					auto linear reverse forwards none;
 				animation-timeline: var(--link-current, none), var(--pie-contactTimeline), var(--pie-contactTimeline);
 				animation-range: normal, cover 0% cover 0%, cover 100% cover 100%;
 			}
