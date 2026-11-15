@@ -182,7 +182,7 @@
 		return current
 	}
 
-	let retainLanding = true
+	let retainLanding = $state(true)
 
 	function navigateAdjacentSection(control: HTMLButtonElement, direction: -1 | 1) {
 		const current = currentNavigationLink(control)
@@ -317,6 +317,7 @@
 		}
 		const invalidateLanding = (event: Event) => {
 			if (!event.isTrusted) return
+			if (event.target instanceof Element && event.target.closest('#wallet-toc, [popovertarget="wallet-toc"]')) return
 			if (event instanceof KeyboardEvent &&
 				!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return
 			retainLanding = false
@@ -350,7 +351,7 @@
 				if (active && !event.defaultPrevented) retainLanding = true
 			})
 		}
-		restoreHashLanding()
+		untrack(restoreHashLanding)
 		globalThis.addEventListener('hashchange', openHashDetails)
 		if (navigation) navigation.addEventListener('currententrychange', restoreTraversedEntry)
 		else globalThis.addEventListener('popstate', restoreHashLanding)
@@ -570,7 +571,7 @@
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
 		const styles: string[] = [`
 			${[...attributeDestinations.keys()].map(href => `#top .page-navigation [data-pressable-name="${href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: none; }
-			@container wallet-pie-current style(---pie-currentIndex: 0) {
+			@container wallet-pie-current style(---toc-currentIndex: 0) {
 				#wallet-toc > .navigation-items > menu:first-of-type > li:first-child {
 					---navigation-snapAlign: start;
 				}
@@ -675,6 +676,11 @@
 						.pie-navigation a[href="${item.href}"] {
 							---link-current-source: var(--link-current-sources);
 						}
+					}
+					#top:has(#${item.href.slice(1)}:target) .page-navigation[data-retain-fragment] {
+						---toc-currentIndex: ${index};
+					}
+					@container wallet-pie-current style(---toc-currentIndex: ${index}) {
 						#wallet-toc ${item.children?.length ? `li:has(> details[data-pressable-name="${item.href}"])` : `li[data-pressable-name="${item.href}"]:not(details:not([open]) li)`} {
 							${item.children?.length ? '---navigation-snapAlign' : 'scroll-snap-align'}: center;
 						}
@@ -1028,6 +1034,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		style:---pie-rotation-states={pieRotation.animations}
 		style:---pie-rotation-ranges={pieRotation.ranges}
 		class="page-navigation"
+		data-retain-fragment={retainLanding || undefined}
 		data-scroll-item="inline-detached"
 		data-sticky-container
 		data-row="center align-start"
@@ -1743,6 +1750,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		.page-navigation {
 			container-name: wallet-pie-current;
+			---toc-currentIndex: var(---pie-currentIndex);
 			@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 				animation: var(---pie-rotation-states);
 				animation-timeline: var(---pie-rotation-timelines);
