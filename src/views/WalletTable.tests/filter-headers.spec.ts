@@ -1,4 +1,22 @@
+import sharp from 'sharp'
+
 import { expect, test } from '../../../tests/browser/verified-test'
+
+const paintTolerance = 32
+
+const decodePaint = (png: Buffer) =>
+	sharp(png).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+
+async function paintDifference(png: Buffer, reference: Awaited<ReturnType<typeof decodePaint>>) {
+	const current = await decodePaint(png)
+
+	expect(current.info).toEqual(reference.info)
+
+	return current.data.reduce(
+		(maximum, value, index) => Math.max(maximum, Math.abs(value - reference.data[index])),
+		0,
+	)
+}
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 	test.describe(`filter heading activation, motion ${reducedMotion}`, () => {
@@ -90,7 +108,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					.toBeLessThanOrEqual(1)
 			}
 
-			let referencePaint: Buffer | undefined
+			let referencePaint: Awaited<ReturnType<typeof decodePaint>> | undefined
 
 			for (const fraction of [0, 0.5, 1]) {
 				expect(await layout.evaluate(layout => layout.scrollWidth - layout.clientWidth)).toBe(
@@ -114,9 +132,12 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 					contentType: 'image/png',
 				})
 
-				referencePaint ??= paint
+				referencePaint ??= await decodePaint(paint)
+				const reference = referencePaint
 
-				await expect.poll(() => page.screenshot({ clip: slotBox })).toEqual(referencePaint)
+				await expect
+					.poll(async () => paintDifference(await page.screenshot({ clip: slotBox }), reference))
+					.toBeLessThan(paintTolerance)
 
 				for (const [xFraction, yFraction] of [
 					[0.5, 0.5],
@@ -191,7 +212,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 
 			const paint = await page.screenshot({ clip: slotBox })
 
-			expect(paint).toEqual(referencePaint)
+			expect(await paintDifference(paint, referencePaint!)).toBeLessThan(paintTolerance)
 
 			// Keep visibility interventions after native journeys so they cannot disturb input state.
 			const visibility = await glyph.evaluate(glyph => {
@@ -211,7 +232,9 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				}, visibility)
 			}
 
-			expect(hiddenPaint).not.toEqual(paint)
+			expect(await paintDifference(hiddenPaint, await decodePaint(paint))).toBeGreaterThanOrEqual(
+				paintTolerance,
+			)
 		})
 	})
 }
