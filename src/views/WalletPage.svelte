@@ -1180,7 +1180,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 {@html peerBootstrapMarkup()}
 
 {#snippet sectionHeader(id: string, label: string, icon: WBIconID, description?: Snippet, end?: Snippet)}
-	<header data-column="span-start" data-icon-metrics={icon} data-sticky-breadcrumb="position" data-sticky="block block-start backdrop-after backdrop-stuck" data-scroll-item="inline-detached" style:--column-spanSize={description ? undefined : 'calc(1.5lh * 1.1)'}>
+	<header data-column="span-start" data-icon-metrics={icon} data-sticky-breadcrumb="position" data-sticky="block block-start backdrop-none" data-scroll-item="inline-detached" style:--column-spanSize={description ? undefined : 'calc(1.5lh * 1.1)'}>
 		<div data-sticky="block block-start backdrop-before backdrop-stuck">
 			<div data-row="start wrap" {...destinationState(`#${id}`)}>
 				<div data-sticky-breadcrumb="source" data-row-item="flexible">
