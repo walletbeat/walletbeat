@@ -670,7 +670,7 @@
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
 						#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"] {
 							--pie-contactTimeline: ${attributeDestinations.get(item.href)!.contactTimeline};
-							animation-name: var(---link-currentAnimationName), wallet-pie-contact, wallet-pie-contact;
+							animation-name: var(---link-currentAnimationName), wallet-pie-contact;
 						}
 						.pie-navigation a[href="${item.href}"] {
 							---link-current-source: var(--link-current-sources);
@@ -2127,8 +2127,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 	}
 	@keyframes -global-wallet-pie-contact {
-		from { ---pie-contact: 0; }
-		to { ---pie-contact: 1; }
+		from, to { ---pie-contact: 1; }
 	}
 
 	@supports (animation-timeline: scroll()) and (timeline-scope: --link) and (color: if(style(---link-active: 1): red)) {
@@ -2136,10 +2135,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			.pie-navigation :global(:is(li, details)[data-pressable-name]) {
 				animation:
 					var(---link-currentAnimationName) auto linear both,
-					auto linear forwards none,
-					auto linear reverse forwards none;
-				animation-timeline: var(--link-current, none), var(--pie-contactTimeline), var(--pie-contactTimeline);
-				animation-range: normal, cover 0% cover 0%, cover 100% cover 100%;
+					none;
+				animation-timeline: var(--link-current, none), var(--pie-contactTimeline);
+				animation-range: normal, cover 0% cover 100%;
 			}
 			.pie-navigation {
 				:global(.navigation-items summary > a),
