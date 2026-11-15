@@ -92,7 +92,7 @@
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
-		"@playwright/test": "1.63.0",
+		"@playwright/test": "1.64.1",
 		"@types/node": "^22.20.4",
 		"@types/prompts": "^2.4.9",
 		"@types/semver": "^7.8.0",
