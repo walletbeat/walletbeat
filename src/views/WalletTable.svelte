@@ -2060,7 +2060,7 @@
 				inline-size: max-content;
 				margin-inline: 0.5rem;
 
-				@media (height <= 18rem) {
+				@media (height <= 22rem) {
 					position-area: none;
 					inset: 0.5rem;
 					margin: auto;
