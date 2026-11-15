@@ -570,7 +570,7 @@
 		const states: { id: string; index: number; animation: string; timeline: string }[] = []
 		const styles: string[] = [`
 			${[...attributeDestinations.keys()].map(href => `#top .page-navigation [data-pressable-name="${href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: none; }
-			@container style(---pie-currentIndex: 0) {
+			@container wallet-pie-current style(---pie-currentIndex: 0) {
 				#wallet-toc > .navigation-items > menu:first-of-type > li:first-child {
 					---navigation-snapAlign: start;
 				}
@@ -624,7 +624,7 @@
 				@keyframes ${name} {
 					from, to { ---pie-currentIndex: ${index}; }
 				}
-				@container style(---pie-currentIndex: ${index}) {
+				@container wallet-pie-current style(---pie-currentIndex: ${index}) {
 					.pie-navigation-geometry { ---pie-hasRelevant: ${selected.length > 0 ? 1 : 0}; }
 					${selected.length > 0 ? `${selected.map(item => `#top .pie-navigation :is(li, details)[data-pressable-name="${item.href}"]`).join(', ')} {
 						---pie-relevant: 1;
@@ -649,7 +649,7 @@
 					@keyframes ${name}-approach {
 						from, to { ---pie-approachIndex: ${index}; }
 					}
-					@container style(---pie-approachIndex: ${index}) {
+					@container wallet-pie-approach style(---pie-approachIndex: ${index}) {
 						.pie-navigation .navigation-items {
 							---pie-turn: ${name};
 							---pie-turn-timeline: --${item.href.slice(1)}-approach;
@@ -664,7 +664,7 @@
 					@keyframes ${name}-current {
 						from, to { ---pie-currentIndex: ${index}; }
 					}
-					@container style(---pie-currentIndex: ${index}) {
+					@container wallet-pie-current style(---pie-currentIndex: ${index}) {
 						${(item === group ? [group] : [group, item]).map(related => `#top .page-navigation [data-pressable-name="${related.href}"]:not([data-pressable-current="inherit"])`).join(', ')} { ---link-currentAnimationName: link-current; }
 						.pie-navigation-geometry { ---pie-hasRelevant: 1; }
 						${[group, ...(group.children ?? [])].map(related => `#top .pie-navigation :is(li, details)[data-pressable-name="${related.href}"]`).join(', ')} { ---pie-relevant: 1; }
@@ -1742,6 +1742,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 
 		.page-navigation {
+			container-name: wallet-pie-current;
 			@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 				animation: var(---pie-rotation-states);
 				animation-timeline: var(---pie-rotation-timelines);
@@ -2051,13 +2052,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	@property ---pie-approachIndex {
 		syntax: '<integer>';
-		inherits: true;
+		inherits: false;
 		initial-value: 0;
 	}
 
 	@property ---pie-currentIndex {
 		syntax: '<integer>';
-		inherits: true;
+		inherits: false;
 		initial-value: 0;
 	}
 
@@ -2201,6 +2202,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			---pie-opacityAnimation: none;
 		}
 
+		container-name: wallet-pie-approach;
 		---pie-turn-timeline: none;
 		---pie-turnRange: exit-crossing -100% exit-crossing 0%;
 		---pie-hasRelevant: 0;
