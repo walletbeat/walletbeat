@@ -4646,7 +4646,7 @@ ol {
 					inset: 0;
 					border-radius: inherit;
 				}
-				&:is([data-sticky-breadcrumb~="position"], :is([data-sticky-breadcrumb~="position"][data-column~="span-start"]:has(> [data-sticky~="backdrop-before"]), summary:is([data-column~="span-start"], :has(> [data-sticky-breadcrumb~="support"]))) > [data-sticky])[data-sticky~="backdrop-stuck"]:not(details:not([open]) *) {
+				&:is([data-sticky-breadcrumb~="position"]:not(:where(:not(summary)[data-column~="span-start"]:has(> [data-sticky~="backdrop-before"]))), :is([data-sticky-breadcrumb~="position"][data-column~="span-start"]:has(> [data-sticky~="backdrop-before"]), summary:is([data-column~="span-start"], :has(> [data-sticky-breadcrumb~="support"]))) > [data-sticky])[data-sticky~="backdrop-stuck"]:not(details:not([open]) *) {
 					---breadcrumb-surfaceBlockStart: var(---breadcrumb-blockStart);
 					&:is(:is([data-sticky-breadcrumb~="position"][data-column~="span-start"]:has(> [data-sticky~="backdrop-before"]), summary:is([data-column~="span-start"], :has(> [data-sticky-breadcrumb~="support"]))) > [data-sticky]) {
 						---breadcrumb-surfaceBlockStart: var(--sticky-insetBlockStart);
