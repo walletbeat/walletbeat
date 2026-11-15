@@ -2810,6 +2810,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		details {
 			overflow: visible;
 
+			&[open] > summary[data-sticky~="backdrop-before"]::before {
+				backdrop-filter: var(---sticky-backdropFilter);
+			}
+
 			summary {
 				@media (prefers-reduced-transparency: reduce) {
 					&[data-sticky~="backdrop-before"]:not(details:not([open]) *) {
