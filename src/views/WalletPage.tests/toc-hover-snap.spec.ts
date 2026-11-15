@@ -471,9 +471,21 @@ for (const width of [1400, 690]) {
 							state.seekStarted = performance.now()
 							root.style.scrollSnapType = 'none'
 							root.style.scrollBehavior = 'auto'
-							document
-								.querySelector('#l1-provider-independence')!
-								.scrollIntoView({ block: 'start', behavior: 'instant' })
+							const heading = document.querySelector<HTMLElement>(
+								'#l1-provider-independence summary > header[data-sticky~="block-start"]',
+							)!
+							const inset = Number.parseFloat(getComputedStyle(heading).insetBlockStart)
+
+							if (!Number.isFinite(inset)) {
+								throw Error('The leaf sticky inset must resolve')
+							}
+
+							root.scrollTop +=
+								heading.getBoundingClientRect().top -
+								root.getBoundingClientRect().top -
+								root.clientTop -
+								inset +
+								2
 						},
 						returnToTop: () => {
 							state.returnStarted = performance.now()
