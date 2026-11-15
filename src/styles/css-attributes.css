@@ -5175,6 +5175,13 @@ details {
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 	(color: if(style(---breadcrumb-wrap: 1): red)) {
 		@container style(--collapsible-markerMotion: clearance) {
+			@container not style(---collapsible-markerSupported: 1) {
+				details:not([open]) > summary [data-sticky-breadcrumb~="end"] {
+					animation: var(--collapsible-markerAnimation);
+					animation-timeline: var(--collapsible-markerTimeline);
+					animation-range: var(--collapsible-markerRange);
+				}
+			}
 			@container style(---collapsible-markerSupported: 1) {
 				:is(details, [data-collapsible]) > summary:not(:has(
 					> [data-row] > [data-row-item~="wrap-end"],
