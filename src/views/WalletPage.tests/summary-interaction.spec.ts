@@ -105,8 +105,17 @@ for (const width of [390, 1440]) {
 			})
 		})
 
+		const enhanced = await page.evaluate(
+			() =>
+				CSS.supports('animation-timeline: scroll()') &&
+				CSS.supports('animation-range: 0% 100%') &&
+				CSS.supports('timeline-scope: --breadcrumb-size') &&
+				CSS.supports('width: anchor-size(--breadcrumb-source inline)') &&
+				CSS.supports('color: if(style(---breadcrumb-wrap: 1): red)'),
+		)
+
 		for (const owner of owners) {
-			for (const phase of ['natural', 'sticky']) {
+			for (const phase of enhanced ? ['natural', 'sticky'] : ['natural']) {
 				const summary = page.locator(owner.summary)
 				const delegated = await summary.evaluate(element =>
 					element.matches('[data-sticky-breadcrumb~="position"]:has(> header > [data-row])'),
@@ -808,6 +817,25 @@ for (const width of [390, 1440]) {
 				await expect
 					.poll(() => pressOwner.evaluate(element => Number(getComputedStyle(element).opacity)))
 					.toBe(1)
+				await expect
+					.poll(() =>
+						summary.evaluate(async element => {
+							const root = document.querySelector('#layout')!
+							const scroll = root.scrollTop
+							const top = element.getBoundingClientRect().top
+
+							for (let frame = 0; frame < 8; frame++) {
+								await new Promise(requestAnimationFrame)
+
+								if (root.scrollTop !== scroll || element.getBoundingClientRect().top !== top) {
+									return false
+								}
+							}
+
+							return true
+						}),
+					)
+					.toBe(true)
 				const closedPoint = await summary.evaluate(element => {
 					const box = element.getBoundingClientRect()
 					const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
@@ -886,6 +914,17 @@ for (const width of [390, 1440]) {
 				})
 
 				await page.mouse.move(closedPoint.x, closedPoint.y)
+				expect(
+					await summary.evaluate((element, { x, y }) => {
+						const hit = document.elementFromPoint(x, y)
+
+						return (
+							hit?.closest('summary') === element &&
+							!hit.closest('a,button,select,input,label,[role="button"],[data-pressable]')
+						)
+					}, closedPoint),
+					'Pointer movement retains the bare-summary hit',
+				).toBe(true)
 				await page.mouse.down()
 
 				try {
@@ -1049,6 +1088,8 @@ for (const width of [390, 1440]) {
 
 						link.href = element.querySelector<HTMLAnchorElement>(':scope > header a[href]')!.href
 						link.setAttribute('data-native-summary-support-control', '')
+						// A non-replaced inline box cannot display the scale under test.
+						link.style.display = 'inline-block'
 						text.parentNode!.replaceChild(link, text)
 						link.append(text)
 					})
