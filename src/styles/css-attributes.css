@@ -2268,7 +2268,7 @@ ol {
 	}
 	@function --breadcrumb-clearance-end-animation(--gap <length>: var(--stickyBreadcrumb-clearanceGap, 0px)) {
 		result: if(style(--gap: 0px): breadcrumb-clearance-inline auto --breadcrumb-clearance-flow-easing() both,
-			var(---breadcrumb-clearance-postAnimation),
+			var(---breadcrumb-clearance-postAnimation, breadcrumb-clearance-post-inline auto --breadcrumb-clearance-post-easing() forwards),
 			breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both; else:
 			breadcrumb-clearance-inline auto --breadcrumb-clearance-end-easing() both,
 			breadcrumb-clearance-block auto var(---breadcrumb-endPaintEasing) both);
@@ -3759,8 +3759,6 @@ ol {
 						---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(--stickyBreadcrumb-clearanceGap, 0px));
 						@media (prefers-reduced-motion: no-preference) {
 							---breadcrumb-endPaintEasing: var(--transition-easeInOutExpo);
-							---breadcrumb-clearance-postEasing: --breadcrumb-clearance-post-easing();
-							---breadcrumb-clearance-postAnimation: breadcrumb-clearance-post-inline auto var(---breadcrumb-clearance-postEasing) forwards;
 						}
 						@media (prefers-reduced-motion: reduce) {
 							---breadcrumb-clearance-finalInline: calc(-1 * var(---inlineDirection) * --breadcrumb-clearance-final() * 1px);
