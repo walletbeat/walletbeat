@@ -1834,8 +1834,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 
 			@media (width <= 84rem) {
+				---wallet-toc-flowBasis: 22rem;
+				---wallet-navigation-gap: 1rem;
 				flex-flow: row wrap;
-				gap: 1rem;
+				gap: var(---wallet-navigation-gap);
 				z-index: auto;
 				position: static;
 				background: none;
@@ -1998,7 +2000,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			@media (width <= 84rem) {
 				> #wallet-toc:not(:popover-open):not([data-closing]),
 				&::after {
-					flex: 0 1 22rem;
+					flex: 0 1 var(---wallet-toc-flowBasis);
 					max-inline-size: 100%;
 					block-size: var(---pie-size, var(---wallet-page-navigation-inline-size));
 				}
@@ -2475,6 +2477,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				flex: 1 1 auto;
 				max-inline-size: 32rem;
 				inline-size: min(100%, var(---pie-size));
+
+				/* Grow on its own line, where the flower can stay centered inside its source box. */
+				flex-grow: max(0, sign(calc(
+					var(---pie-size) + var(---wallet-toc-flowBasis) + var(---wallet-navigation-gap) -
+					var(--sticky-sizeInline) + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd)
+				)));
 
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
