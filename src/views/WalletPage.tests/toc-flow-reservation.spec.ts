@@ -53,6 +53,40 @@ for (const javaScriptEnabled of [true, false]) {
 
 				if (flow.shapeSupported && flow.pieVisible) {
 					expect(flow.wrapped).toBe(width === 390)
+					const geometry = await panel.evaluate(toc => {
+						const row = toc.closest('.page-navigation')!
+						const source = row.querySelector('.pie-navigation')!
+						const petal = source.querySelector('.pie-navigation-geometry summary > a')!
+						const rowBox = row.getBoundingClientRect()
+						const sourceBox = source.getBoundingClientRect()
+						const flowerBox = petal.getBoundingClientRect()
+						const tocBox = toc.getBoundingClientRect()
+
+						return {
+							rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
+							sourceWidth: sourceBox.width,
+							flowerCenter: (flowerBox.left + flowerBox.right) / 2,
+							tocCenter: (tocBox.left + tocBox.right) / 2,
+							rowCenter: (rowBox.left + rowBox.right) / 2,
+							groupCenter:
+								(Math.min(flowerBox.left, tocBox.left) + Math.max(flowerBox.right, tocBox.right)) /
+								2,
+							gap:
+								tocBox.top >= sourceBox.bottom - 1
+									? tocBox.top - sourceBox.bottom
+									: Math.max(tocBox.left - flowerBox.right, flowerBox.left - tocBox.right),
+						}
+					})
+
+					expect(geometry.sourceWidth).toBeLessThanOrEqual(32 * geometry.rem + 1)
+					expect(Math.abs(geometry.gap - geometry.rem)).toBeLessThanOrEqual(1)
+
+					if (flow.wrapped) {
+						expect(Math.abs(geometry.flowerCenter - geometry.rowCenter)).toBeLessThanOrEqual(1)
+						expect(Math.abs(geometry.tocCenter - geometry.rowCenter)).toBeLessThanOrEqual(1)
+					} else {
+						expect(Math.abs(geometry.groupCenter - geometry.rowCenter)).toBeLessThanOrEqual(1)
+					}
 				}
 
 				const check = async (phase: string, sample?: Awaited<ReturnType<typeof observe>>) => {
