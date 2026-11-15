@@ -2013,6 +2013,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					overflow-y: auto;
 					content-visibility: auto;
 					inline-size: max-content;
+					padding: 0;
 					position: relative;
 					inset: auto;
 					background: none;
