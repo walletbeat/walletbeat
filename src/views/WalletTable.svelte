@@ -2055,9 +2055,16 @@
 			&:popover-open {
 				/* The visible panel can use viewport space beyond its anchor's side. */
 				position-area: block-end span-inline-end;
+				position-try-fallbacks: flip-block;
 				inset-inline: auto;
 				inline-size: max-content;
 				margin-inline: 0.5rem;
+
+				@media (height <= 18rem) {
+					position-area: none;
+					inset: 0.5rem;
+					margin: auto;
+				}
 			}
 		}
 
