@@ -3773,7 +3773,6 @@ ol {
 				---breadcrumb-parentInlineEnd: 0px;
 				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
-				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
 				&:has(> [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="item-size"]) {
 					---breadcrumb-sizeAnimationNames: column-inline-size;
 					---breadcrumb-sizeTimelines: var(---breadcrumb-rowInlineTimeline);
@@ -3782,6 +3781,8 @@ ol {
 					---breadcrumb-itemWidth: inherit;
 					---breadcrumb-itemHeight: inherit;
 					---column-blockFraction: calc(100vw / (100vw + var(---breadcrumb-naturalItemHeight)));
+				}
+				---breadcrumb-sourceRowHeight: var(---breadcrumb-itemHeight);
 
 				/* A bounded entry flow owns the start snap; the content scope spans the page. */
 				&:has(> [data-sticky-breadcrumb~="flow"]) {
@@ -3806,10 +3807,13 @@ ol {
 					overflow: hidden;
 					view-timeline-name: none;
 					&::before,
-					&::after,
-					> [data-sticky-breadcrumb~="flow"]::before {
-						content: none;
-						view-timeline-name: none;
+					&::after {
+						box-sizing: content-box;
+						position: absolute;
+						inset: 0 auto auto 0;
+						padding: 0;
+						border: 0;
+						margin: 0;
 					}
 					&::before {
 						content: '';
@@ -3825,32 +3829,11 @@ ol {
 							view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
 						}
 						&::after {
-							box-sizing: content-box;
-							position: absolute;
-							inset: 0 auto auto 0;
-							padding: 0;
-							border: 0;
-							margin: 0;
-						}
-						&::before {
 							content: '';
-							inset-inline-start: -100%;
-							inline-size: calc(100% + 100vw);
-							view-timeline-name: var(---breadcrumb-rowInlineTimeline);
-						}
-						&[data-sticky-breadcrumb~="item-size"] {
-							inline-size: anchor-size(--breadcrumb-compact inline, 0px);
-							block-size: anchor-size(--breadcrumb-source block, 0px);
-							&::before {
-								view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
-							}
-							&::after {
-								content: '';
-								inline-size: 1px;
-								inset-block-start: -100%;
-								block-size: calc(100% + 100vw);
-								view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
-							}
+							inline-size: 1px;
+							inset-block-start: -100%;
+							block-size: calc(100% + 100vw);
+							view-timeline: var(--stickyBreadcrumb-itemBlockTimeline) block;
 						}
 					}
 				}
