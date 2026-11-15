@@ -2008,6 +2008,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				> #wallet-toc:not(:popover-open):not([data-closing]) {
 					display: flex;
 					overflow-y: auto;
+					content-visibility: auto;
 					inline-size: max-content;
 					position: relative;
 					inset: auto;
