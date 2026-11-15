@@ -56,10 +56,10 @@ for (const javaScriptEnabled of [true, false]) {
 					const geometry = await panel.evaluate(toc => {
 						const row = toc.closest('.page-navigation')!
 						const source = row.querySelector('.pie-navigation')!
-						const petal = source.querySelector('.pie-navigation-geometry summary > a')!
+						const flower = source.querySelector('.pie-navigation-geometry > .navigation-items')!
 						const rowBox = row.getBoundingClientRect()
 						const sourceBox = source.getBoundingClientRect()
-						const flowerBox = petal.getBoundingClientRect()
+						const flowerBox = flower.getBoundingClientRect()
 						const tocBox = toc.getBoundingClientRect()
 
 						return {
@@ -67,6 +67,8 @@ for (const javaScriptEnabled of [true, false]) {
 							sourceWidth: sourceBox.width,
 							flowerCenter: (flowerBox.left + flowerBox.right) / 2,
 							tocCenter: (tocBox.left + tocBox.right) / 2,
+							verticalCenterDelta:
+								(flowerBox.top + flowerBox.bottom - tocBox.top - tocBox.bottom) / 2,
 							rowCenter: (rowBox.left + rowBox.right) / 2,
 							groupCenter:
 								(Math.min(flowerBox.left, tocBox.left) + Math.max(flowerBox.right, tocBox.right)) /
@@ -86,6 +88,7 @@ for (const javaScriptEnabled of [true, false]) {
 						expect(Math.abs(geometry.tocCenter - geometry.rowCenter)).toBeLessThanOrEqual(1)
 					} else {
 						expect(Math.abs(geometry.groupCenter - geometry.rowCenter)).toBeLessThanOrEqual(1)
+						expect(Math.abs(geometry.verticalCenterDelta)).toBeLessThanOrEqual(1)
 					}
 				}
 
