@@ -183,6 +183,7 @@
 	}
 
 	let retainLanding = $state(true)
+	let landingId = $state<string | null | undefined>(undefined)
 
 	function navigateAdjacentSection(control: HTMLButtonElement, direction: -1 | 1) {
 		const current = currentNavigationLink(control)
@@ -194,6 +195,7 @@
 		if (!next || !target) return
 		revealTargetDetails(target)
 		globalThis.history.pushState(null, '', next.href)
+		landingId = target.id
 		retainLanding = true
 		target.scrollIntoView({ block: 'start' })
 	}
@@ -305,7 +307,9 @@
 		}
 		const openHashDetails = () => {
 			retainLanding = true
-			revealTargetDetails(localHashTarget(globalThis.location.hash))
+			const target = localHashTarget(globalThis.location.hash)
+			landingId = target?.id ?? null
+			revealTargetDetails(target)
 		}
 		const restoreHashLanding = () => {
 			openHashDetails()
@@ -348,7 +352,10 @@
 			const panel = anchor.closest('#wallet-toc')
 			if (panel instanceof HTMLElement && panel.matches(':popover-open')) panel.hidePopover()
 			queueMicrotask(() => {
-				if (active && !event.defaultPrevented) retainLanding = true
+				if (active && !event.defaultPrevented && target === localHashTarget(globalThis.location.hash)) {
+					landingId = target.id
+					retainLanding = true
+				}
 			})
 		}
 		untrack(restoreHashLanding)
@@ -578,6 +585,7 @@
 			}
 		`]
 		const peerStyles: string[] = []
+		const fragmentStyles: string[] = []
 		const turns: { animation: string; timeline: string }[] = []
 		const prefix = `wallet-pie-${wallet.metadata.id.replace(/[^a-z0-9-]/gi, '-')}`
 		for (const group of pieNavigationItems) {
@@ -677,9 +685,6 @@
 							---link-current-source: var(--link-current-sources);
 						}
 					}
-					#top:has(#${item.href.slice(1)}:target) .page-navigation[data-retain-fragment] {
-						---toc-currentIndex: ${index};
-					}
 					@container wallet-pie-current style(---toc-currentIndex: ${index}) {
 						#wallet-toc ${item.children?.length ? `li:has(> details[data-pressable-name="${item.href}"])` : `li[data-pressable-name="${item.href}"]:not(details:not([open]) li)`} {
 							${item.children?.length ? '---navigation-snapAlign' : 'scroll-snap-align'}: center;
@@ -687,6 +692,7 @@
 						${item === group ? '' : `#wallet-toc li:has(> details[data-pressable-name="${group.href}"]:not([open])) { ---navigation-snapAlign: center; }`}
 					}
 				`)
+				fragmentStyles.push(`#top:has(${item.href}:target) .page-navigation { ---toc-currentIndex: ${index}; }`)
 				states.push({ id: item.href.slice(1), index, animation: `${name}-current auto steps(1, end) forwards`, timeline })
 				turns.push({ animation: `${name}-approach auto steps(1, end) forwards`, timeline: `--${item.href.slice(1)}-approach` })
 				previousAngle = angle
@@ -720,10 +726,15 @@
 			animations: states.map(state => state.animation).join(', ') || 'none',
 			ranges: states.map(() => 'exit-crossing -1px exit-crossing -1px').join(', ') || 'normal',
 			styles: styles.join('\n'),
+			fragmentStyles: fragmentStyles.join('\n'),
 			peerStyles: peerStyles.join('\n'),
 			timelines: states.map(state => state.timeline).join(', ') || undefined,
 		}
 	})
+
+	const landingTocIndex = $derived(retainLanding && landingId && attributeDestinations.has(`#${landingId}`)
+		? pieRotation.states.find(state => state.id === landingId)?.index
+		: undefined)
 
 	const peerFallbackStyles = $derived.by(() => {
 		const identities = new Set([...attributeDestinations.keys(), '#top', '#stages', '#security-news', ...(primaryStage.ladderEvaluation?.ladder.stages ?? []).map(stage => `#${stage.id}`)])
@@ -869,6 +880,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 
 {@html stylesheetMarkup(pieRotation.styles)}
+{#if landingId === undefined}
+	<svelte:element this={'style'}>{pieRotation.fragmentStyles}</svelte:element>
+{/if}
 <!-- The no-JavaScript stylesheet payload is server-only; client mounting keeps an inert placeholder. -->
 <!-- svelte-ignore hydration_html_changed -->
 {@html import.meta.env.SSR ? stylesheetMarkup(peerFallbackStyles, true) : '<noscript hidden></noscript>'}
@@ -1034,7 +1048,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		style:---pie-rotation-states={pieRotation.animations}
 		style:---pie-rotation-ranges={pieRotation.ranges}
 		class="page-navigation"
-		data-retain-fragment={retainLanding || undefined}
+		style:---toc-currentIndex={landingTocIndex}
 		data-scroll-item="inline-detached"
 		data-sticky-container
 		data-row="center align-start"
