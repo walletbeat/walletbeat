@@ -1703,6 +1703,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		---wallet-group-heading-font-size: 1.8rem;
 		---wallet-compact-icon-size: 32px;
 		---pie-compactSize: 128px;
+		---pie-dodgeRadius: calc(var(---pie-compactSize) / 2 + 1rem);
 		---pie-compactInset: 8px;
 		---pie-compactCenterInline: calc(100vw - var(---pie-compactInset) - var(---pie-compactSize) / 2);
 		---pie-compactBlockInset: 20px;
@@ -2943,7 +2944,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);
 				:global(article) {
 					--collapsible-markerMotion: clearance;
-					--collapsible-markerClearanceRadius: calc(var(---pie-compactSize) / 2);
+					--collapsible-markerClearanceRadius: var(---pie-dodgeRadius);
 					--collapsible-markerClearanceCenterInline: var(---pie-compactCenterInline);
 					--collapsible-markerClearanceCenterBlock: var(---pie-compactCenterBlock);
 				--collapsible-markerAnimation: pie-clearance auto linear both;
@@ -3045,7 +3046,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				[data-sticky-breadcrumb~="root"] :global([data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="clearance"]) {
 					--stickyBreadcrumb-clearanceCenterBlock: var(---pie-compactCenterBlock);
 					> :global(*) {
-					--stickyBreadcrumb-clearanceRadius: calc(var(---pie-compactSize) / 2 * var(---pie-radiusRatio));
+					--stickyBreadcrumb-clearanceRadius: var(---pie-dodgeRadius);
 					--stickyBreadcrumb-clearanceInlineOffset: calc(-1 * var(---pie-compactSize) / 2 + var(---breadcrumb-sourceRowWidth) - var(---pie-inlineSpace));
 				}
 				}
