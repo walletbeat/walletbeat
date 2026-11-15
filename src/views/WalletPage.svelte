@@ -3211,6 +3211,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					--stickyBreadcrumb-iconScale: calc(
 						var(---wallet-compact-icon-size) / var(--wallet-icon-size)
 					);
+					@media (prefers-reduced-motion: no-preference) {
+						will-change: transform;
+					}
 				}
 			}
 		}
