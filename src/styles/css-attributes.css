@@ -3799,7 +3799,7 @@ ol {
 
 			display: grid;
 			---breadcrumb-sourcePrefixBlockSize: calc(var(---breadcrumb-sourceRowHeight) + var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-sourceGap));
-			grid-template: var(---breadcrumb-sourcePrefixBlockSize) auto auto / minmax(0, 1fr);
+			grid-template: minmax(max-content, var(---breadcrumb-sourcePrefixBlockSize)) auto auto / minmax(0, 1fr);
 
 			> [data-column]:not(details, [data-sticky-breadcrumb~="position"]) {
 				grid-area: 3 / 1 / 4 / 2;
