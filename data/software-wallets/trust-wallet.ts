@@ -210,7 +210,13 @@ export const trustWallet: SoftwareWallet = {
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://trustwallet.com/privacy-notice',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
