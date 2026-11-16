@@ -3359,6 +3359,7 @@ ol {
 					var(--stickyBreadcrumb-minBlockSize)
 				);
 				&[data-sticky-breadcrumb~="approach"] {
+					view-timeline-name: if(style(---breadcrumb-compactItemHeight: 0px): none; else: var(--stickyBreadcrumb-approachTimeline));
 					block-size: var(---breadcrumb-compactItemHeight);
 				}
 				---breadcrumb-inlineWidth: calc(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap));
