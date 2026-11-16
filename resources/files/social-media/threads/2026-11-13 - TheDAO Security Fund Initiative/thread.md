@@ -4,6 +4,8 @@ Get to know our initiative:
 
 Clear signing ratings, fixes and ecosystem adoption for hardware and software wallets. 🧵👇
 
+![Our Initiative](./our-initiative-thedaofund.jpg)
+
 ---
 
 Walletbeat will rate hardware and software wallets on clear signing support and publish the results on our website. We'll work with teams to fix the checks they fail and expand clear signing support across the ecosystem.
@@ -25,15 +27,6 @@ What your donation pays for:
 - One device per rated hardware wallet, bought at retail (about 2,500 USD total).
 - Retests of new releases, with results in the public impact log.
 - Working with wallet teams to drive adoption.
-
----
-
-You’re backing work that already exists:
-
-- A live transaction legibility rating, with a written methodology and benchmark transactions covering transactions of varying complexity (from simple token approvals to complex nested Safe multisend batch transactions).
-- A public test page applying the benchmarks to any wallet: https://beta.walletbeat.eth.limo/test
-- Six software wallets already tested for clear signing.
-- A track record of wallet impact: https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
 
 ---
 
