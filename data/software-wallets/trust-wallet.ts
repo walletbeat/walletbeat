@@ -109,7 +109,46 @@ export const trustWallet: SoftwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: supported({
+				ref: [
+					{
+						explanation:
+							'FlexGas uses EIP-7702 to let an EOA act as a smart account for a transaction, so that gas can be paid in TWT, USDT or USDC. It is opt-in.',
+						label: 'Trust Wallet FlexGas announcement',
+						url: 'https://trustwallet.com/blog/company/flex-gas-pay-for-gas-with-twt-usdt-or-bnb',
+					},
+				],
+				contract: 'UNKNOWN',
+			}),
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							'The recovery phrase can be shown from the wallet settings. Private key export is hidden by default and must first be turned on in the developer settings.',
+						label: 'Trust Wallet guide to recovery phrase backup and private key export',
+						url: 'https://trustwallet.com/blog/guides/how-to-backup-your-recovery-phrase-and-export-private-keys-in-trust-wallet',
+					},
+					{
+						explanation:
+							"Trust Wallet Core derives Ethereum accounts from a BIP39 mnemonic with the standard BIP44 path m/44'/60'/0'/0/0.",
+						label: 'Trust Wallet Core registry entry for Ethereum',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/registry.json#L481-L493',
+					},
+				],
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
