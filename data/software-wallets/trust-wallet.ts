@@ -98,9 +98,9 @@ export const trustWallet: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
 		},
 		licensing: {
