@@ -257,7 +257,7 @@ export const trustWallet: SoftwareWallet = {
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: securityAudits,
