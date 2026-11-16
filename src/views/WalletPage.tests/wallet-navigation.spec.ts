@@ -502,7 +502,7 @@ test('mobile TOC shares one native panel with its readable in-flow rail', async 
 				const navigation = element.parentElement!
 				const navigationStyle = getComputedStyle(navigation)
 				const navigationBox = navigation.getBoundingClientRect()
-				const paintedPie = pie.querySelector('.navigation-items')
+				const paintedPie = pie.querySelector('.navigation-items > menu')
 
 				if (!paintedPie) {
 					throw new Error('The real pie paint owner is required')
@@ -608,20 +608,22 @@ test('mobile TOC shares one native panel with its readable in-flow rail', async 
 				)
 			})
 			expect(await toc.evaluate(element => element.getBoundingClientRect().bottom)).toBeLessThan(0)
-			const compact = await page.locator('.pie-navigation .navigation-items').evaluate(element => {
-				const box = element.getBoundingClientRect()
+			const compact = await page
+				.locator('.pie-navigation .navigation-items > menu')
+				.evaluate(element => {
+					const box = element.getBoundingClientRect()
 
-				return {
-					x: box.x,
-					y: box.y,
-					width: box.width,
-					height: box.height,
-					top: box.top,
-					right: box.right,
-					bottom: box.bottom,
-					left: box.left,
-				}
-			})
+					return {
+						x: box.x,
+						y: box.y,
+						width: box.width,
+						height: box.height,
+						top: box.top,
+						right: box.right,
+						bottom: box.bottom,
+						left: box.left,
+					}
+				})
 
 			expect(
 				Math.abs(direction === 'ltr' ? width - compact.right - 8 : compact.left - 8),
