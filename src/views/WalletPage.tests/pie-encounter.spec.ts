@@ -852,6 +852,15 @@ for (const [width, direction, scenario] of [
 							const style = getComputedStyle(pie)
 							const maximum = Number.parseFloat(style.getPropertyValue('--pie-maxR'))
 							const padding = Number.parseFloat(style.getPropertyValue('--pie-padding'))
+							const backdrop = getComputedStyle(
+								pie.querySelector('.pie-navigation-geometry')!,
+								'::before',
+							)
+							const backdropRadius = /^circle\(([\d.]+)px\)$/.exec(backdrop.clipPath)
+							const backdropFraction =
+								backdrop.visibility === 'visible' && Number(backdrop.opacity) > 0 && backdropRadius
+									? (2 * Number(backdropRadius[1])) / Number.parseFloat(backdrop.height)
+									: 0
 
 							const rawGap =
 								pseudo.getPropertyValue('--stickyBreadcrumb-clearanceGap').trim() ||
@@ -886,7 +895,7 @@ for (const [width, direction, scenario] of [
 								visibility: pseudo.visibility,
 								width: Number.parseFloat(pseudo.width),
 								height: Number.parseFloat(pseudo.height),
-								pieRadiusFraction: maximum / (maximum + padding),
+								pieRadiusFraction: Math.max(maximum / (maximum + padding), backdropFraction),
 							}
 						})
 
@@ -918,7 +927,7 @@ for (const [width, direction, scenario] of [
 							'Orthogonal painted pie basis',
 						).toBeLessThan(0.001)
 						expect(pose.pieRadiusFraction).toBeGreaterThan(0)
-						expect(pose.pieRadiusFraction).toBeLessThanOrEqual(1)
+						expect(pose.pieRadiusFraction * sides[0]).toBeLessThanOrEqual(sides[0] + 0.01)
 						const circle = {
 							x: pieQuad.points.reduce((sum, point) => sum + point.x, 0) / 4,
 							y: pieQuad.points.reduce((sum, point) => sum + point.y, 0) / 4,
