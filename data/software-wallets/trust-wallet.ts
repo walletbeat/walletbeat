@@ -282,7 +282,10 @@ export const trustWallet: SoftwareWallet = {
 				}),
 			},
 		},
-		walletCall: null,
+		walletCall: {
+			[Variant.BROWSER]: notSupported,
+			[Variant.MOBILE]: null,
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,
