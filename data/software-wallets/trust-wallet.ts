@@ -33,6 +33,10 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
+import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -56,7 +60,6 @@ import { mattmatt } from '../contributors/0xmattmatt'
 import { certik } from '../entities/certik'
 import { cure53 } from '../entities/cure53'
 import trustWalletRawExtManifest from './manifests/trustWallet/egjidjbpglichdcondbcbdnbeeppgdph.manifest.json'
-import { SpendingApprovalsControl, BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 
 // Trust Wallet's smart contract and library audits don't cover the app or extension code.
 const securityAudits: SecurityAudit[] = [
