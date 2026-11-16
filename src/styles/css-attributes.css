@@ -1937,8 +1937,8 @@ ol {
 	@function --breadcrumb-clearance-cap-stop(--u <number>, --edge <number>, --projection <custom-ident>: stop) {
 		result: --breadcrumb-clearance-flow-point(
 			calc(var(---breadcrumb-clearance-joinInline) / 1px * pow(var(--u), 2)),
-			calc(var(---breadcrumb-clearance-contact) + var(--stickyBreadcrumb-clearanceGap, 0px) -
-				var(--stickyBreadcrumb-clearanceGap, 0px) * var(--u) -
+			calc(var(---breadcrumb-clearance-contact) + var(---breadcrumb-clearance-capGap, var(--stickyBreadcrumb-clearanceGap, 0px)) -
+				var(---breadcrumb-clearance-capGap, var(--stickyBreadcrumb-clearanceGap, 0px)) * var(--u) -
 				(var(---breadcrumb-clearance-contact) - var(---breadcrumb-clearance-joinBlock)) * pow(var(--u), 2)),
 			var(--edge)
 		, var(--projection));
@@ -5256,6 +5256,8 @@ details {
 							---breadcrumb-clearance-cubicInline: calc(-1 * var(---inlineDirection) * (var(---breadcrumb-clearance-arc-inlineRadius) + var(---breadcrumb-clearance-inlineOffset)));
 							---breadcrumb-clearance-cubicDistance: calc(var(---breadcrumb-clearance-arc-radius) + var(--stickyBreadcrumb-clearanceGap, 0px));
 							---breadcrumb-clearance-markerAnimation: if(style(---breadcrumb-clearance-cubicEligible: 1): breadcrumb-clearance-cubic-in auto cubic-bezier(var(---breadcrumb-clearance-cubicX1), 0, var(---breadcrumb-clearance-cubicX2), 1) both, breadcrumb-clearance-cubic-out auto cubic-bezier(calc(1 - var(---breadcrumb-clearance-cubicX2)), 0, calc(1 - var(---breadcrumb-clearance-cubicX1)), 1) both; else: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none);
+							---breadcrumb-clearance-capGap: if(style(---breadcrumb-clearance-inlineOffset < 0px): min(var(--stickyBreadcrumb-clearanceGap, 0px), max(0px, calc(var(---breadcrumb-clearance-arc-radius) - var(---breadcrumb-clearance-contact)))); else: var(--stickyBreadcrumb-clearanceGap, 0px));
+							---breadcrumb-clearance-viewPadding: if(style(---breadcrumb-clearance-inlineOffset < 0px): 0px; else: var(--stickyBreadcrumb-clearanceGap, 0px));
 							---breadcrumb-clearance-markerTimeline: view(
 								block
 									calc(
@@ -5318,13 +5320,13 @@ details {
 					---breadcrumb-clearance-inlineOffset: calc(var(---collapsible-markerInlineEnd) - var(--collapsible-markerClearanceCenterInline));
 					---breadcrumb-clearance-arc-centerY: var(--collapsible-markerClearanceCenterBlock);
 					---breadcrumb-clearance-flow-height: var(---breadcrumb-clearance-arc-height);
-					---breadcrumb-clearance-view-size: calc(2 * (var(---breadcrumb-clearance-arc-radius) + var(--stickyBreadcrumb-clearanceGap, 0px)));
+					---breadcrumb-clearance-view-size: calc(2 * (var(---breadcrumb-clearance-arc-radius) + var(---breadcrumb-clearance-viewPadding, var(--stickyBreadcrumb-clearanceGap, 0px))));
 					---breadcrumb-clearance-native-a: calc(
 						var(---breadcrumb-clearance-arc-centerY) + var(---breadcrumb-clearance-view-size) / 2
 					);
 					---breadcrumb-clearance-contact: --breadcrumb-clearance-contact();
-					---breadcrumb-clearance-joinBlock: --breadcrumb-clearance-join(0, var(--stickyBreadcrumb-clearanceGap, 0px));
-					---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(--stickyBreadcrumb-clearanceGap, 0px));
+					---breadcrumb-clearance-joinBlock: --breadcrumb-clearance-join(0, var(---breadcrumb-clearance-capGap, var(--stickyBreadcrumb-clearanceGap, 0px)));
+					---breadcrumb-clearance-joinInline: --breadcrumb-clearance-join(1, var(---breadcrumb-clearance-capGap, var(--stickyBreadcrumb-clearanceGap, 0px)));
 					---breadcrumb-clearance-flowEasing: if(style(---breadcrumb-clearance-cubicEligible: 1): linear; else: --breadcrumb-clearance-flow-easing());
 				}
 				details:not([open]) > summary [data-sticky-breadcrumb~="end"] {
