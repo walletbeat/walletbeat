@@ -59,6 +59,12 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 			root.style.scrollSnapType = 'none'
 			const pie = document.querySelector<HTMLElement>('.pie-navigation')!
 			const geometry = pie.querySelector<HTMLElement>('.navigation-items')!
+			const menu = geometry.querySelector<HTMLElement>(':scope > menu')!
+			const rotation = (element: Element) => {
+				const value = getComputedStyle(element).rotate
+
+				return value === 'none' ? 0 : parseFloat(value)
+			}
 			const links = [...pie.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')]
 			const destinations = links.flatMap(link => {
 				const target = document.getElementById(decodeURIComponent(link.hash.slice(1)))
@@ -83,7 +89,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 				)
 			}
 			const observe = () => {
-				const style = getComputedStyle(geometry)
+				const angle = rotation(geometry) + rotation(menu)
 
 				return {
 					scroll: root.scrollTop,
@@ -98,7 +104,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 								item.querySelector<HTMLAnchorElement>(':scope > a, :scope > details > summary > a')
 									?.hash,
 						),
-					angle: parseFloat(style.rotate),
+					angle,
 					icons: [group, attribute].map(({ href }) => {
 						const link = links.find(candidate => candidate.hash === href)
 						const icon = link?.querySelector('.pie-navigation-icon')
@@ -108,20 +114,17 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 						}
 
 						const slice = new DOMMatrix(getComputedStyle(link).transform)
-						const iconRotate = getComputedStyle(icon).rotate
-						const angle =
-							parseFloat(style.rotate) +
-							(Math.atan2(slice.b, slice.a) * 180) / Math.PI +
-							(iconRotate === 'none' ? 0 : parseFloat(iconRotate))
+						const iconAngle =
+							angle + (Math.atan2(slice.b, slice.a) * 180) / Math.PI + rotation(icon)
 
-						if (!Number.isFinite(angle)) {
+						if (!Number.isFinite(iconAngle)) {
 							throw new Error('Icon rotation must resolve')
 						}
 
 						return {
 							href,
 							visible: icon.checkVisibility(),
-							uprightError: Math.abs(((((angle + 180) % 360) + 360) % 360) - 180),
+							uprightError: Math.abs(((((iconAngle + 180) % 360) + 360) % 360) - 180),
 						}
 					}),
 				}
