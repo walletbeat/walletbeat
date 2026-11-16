@@ -122,3 +122,10 @@ Date	From	To	Amount	Purpose	ID
 2026-10-14	treasury	treasury	0.769923444195461423 WETH → 1926.475685 USDC	CoW Swap from WETH to USDC	0xf023b9b61c02eed72ab269d3e9d9bb964dcde769024b3cdd3b91fcf4e9628924
 2026-10-14	treasury	lucilajuliana.shefi.eth	1550 USDC [labor:comms] + 2557 USDC [expense:travel]	Payment for September work and travel reimbursement	0x8ea2a4cd673dbd3d0cdc7fc93d6d8d170f235ff4c3bd5f7a0e7ea439e7c2654c
 2026-10-14	treasury	lucilajuliana.shefi.eth	200 USDC [labor:comms]	Payment for extra September work	0xd3b3781261444a1ee6a676ec8ed73d6582e69e29c91bb5d243e5aaa628644d59
+2026-11-09	ef_grants	treasury	0.000001 ETH [test]	Test transaction	0xcc8d5ba091cac5462e5f17424a6f8b492a2043048d055fbb9c722613718e7c69
+2026-11-12	ef_grants	treasury	9.72762645914 ETH [grant]	EF grant funds	0x0841a6a90f9273c3e5174626e40db0dc43cd8b14ea9dc36fbb5ff7f60846915f
+2026-11-16	treasury	treasury	9.5 ETH → 9.5 WETH	Wrapping ETH to WETH	0xbdeb93f9a3925e4e55435a5e4d60c6562227d526ea333937e96bfa083e8f7a20
+2026-11-16	treasury	treasury	0	CoW Swap order creation	0x220b9f2699d9d85cce8cc0eff9f9ed7b89522100ba72860869243bafd5b94ced
+2026-11-16	treasury	treasury	4.5 WETH → 8188.902317 USDC	CoW Swap from WETH to USDC	0x5ca7d03eeea4c2c5d756dcbd0d521433ab513afa6b6f71c6d8c190c595e226a5
+2026-11-16	treasury	mattmatt_sablier	5,571.43 USDC [labor:dev]	Top-up of Sablier stream	0x44e4b58d5860172596740047d8ccb71e4271b590c8315fb33a814ecbc62b2053
+2026-11-16	treasury	mattmatt3	1182 USDC [expense:travel]	Travel reimbursement	0xab54ced65649511b8a0bc5c06082a84fc5a0f281285eea5c7aeebd5eab1223f6

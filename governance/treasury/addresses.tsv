@@ -28,3 +28,4 @@ eth:0x74216046d9aB2eF5439AA8092fEA3BdcF5328E7D	mattpereira	Matt Pereira	EOA owne
 eth:0xEc9EAa201fdC68F968De3d935c428B4744a1A9Ee	darrylyeo	darrylyeo	EOA owned by Darryl Yeo
 eth:0xb18C812F4b853D536E882b826606Ff70DdE053A7	4everland_eoa	Any contributor as needed	EOA used to deposit to 4everland
 eth:0xE663E0E3f9b034E9911d4746760efE00115D11E5	4everland	4everland	Contract used by 4everland to deposit funds
+eth:0x9eE457023bB3De16D51A003a247BaEaD7fce313D	ef_grants	Ethereum Foundation	EOA used by the Ethereum Foundation to send grant funds
