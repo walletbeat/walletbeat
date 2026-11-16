@@ -1039,10 +1039,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</a>
 			{/if}
 		</nav>
+		<span data-scroll-item="snap-block-start" aria-hidden="true" hidden></span>
 	</section>
 	</div>
 
-	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span><span data-scroll-item="snap-block-start"></span></span>
+	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span><span data-sticky-breadcrumb="measure item-size"></span></span>
 
 	<aside
 		style:---pie-rotation-states={pieRotation.animations}
@@ -3154,14 +3155,6 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					margin-inline-start: calc(-1 * (var(---wallet-flow-gap) + var(--navigation-controlInsetInline)));
 				}
 			}
-			& > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"] {
-				display: block;
-				inline-size: 1px;
-				block-size: 1px;
-				position: absolute;
-				inset-block-start: 100%;
-				inset-inline-start: 0;
-			}
 			---wallet-compactFontSize: var(---wallet-compact-h1);
 			--stickyBreadcrumb-scale: calc(var(---wallet-compactFontSize) / var(---wallet-name-flow-font-size));
 			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
@@ -3273,6 +3266,16 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				flex-basis: 100%;
 
 				margin-block-start: 0.5rem;
+
+				> [data-scroll-item~="snap-block-start"] {
+					position: absolute;
+					inset-block-start: 100%;
+					inset-inline-start: 0;
+					display: block;
+					inline-size: 1px;
+					block-size: 1px;
+					pointer-events: none;
+				}
 			}
 		}
 	}

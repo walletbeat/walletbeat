@@ -67,7 +67,7 @@ export async function runNativeKeyboard(config, qualifyNativeBreadcrumbClock) {
 		const root = document.querySelector('#layout')
 		const content = document.querySelector('#content')
 		const marker = document.querySelector(
-			'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
+			'#top .wallet-overview > [data-scroll-item~="snap-block-start"]',
 		)
 
 		assert(

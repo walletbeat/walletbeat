@@ -74,7 +74,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			const initialSource = source.getBoundingClientRect()
 			const contact = root.scrollTop + initialSource.top - safeTop()
 			const arrival = document.querySelector<HTMLElement>(
-				'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
+				'#top .wallet-overview > [data-scroll-item~="snap-block-start"]',
 			)
 
 			if (!arrival || getComputedStyle(arrival).scrollSnapAlign !== 'start') {

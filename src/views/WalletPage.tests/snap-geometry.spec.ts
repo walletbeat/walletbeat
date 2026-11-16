@@ -812,9 +812,7 @@ for (const width of [390, 690, 1440]) {
 		await page.goto('/__wallet-page/credits/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
-		const endpoint = page.locator(
-			'#top > [data-sticky-breadcrumb~="flow"] > [data-scroll-item~="snap-block-start"]',
-		)
+		const endpoint = page.locator('#top .wallet-overview > [data-scroll-item~="snap-block-start"]')
 
 		if (!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable) {
 			await expectKeyboardTravel(page, info)
