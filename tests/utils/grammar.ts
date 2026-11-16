@@ -35,7 +35,7 @@ const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
  * different capitalization (e.g. it wants "debank", "simplex", or title-case "Zeus" even
  * though the lowercase forms here appear only in repo paths and the proper forms are brands).
  */
-const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
+const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['CoW', 'DeBank', 'SimpleX', 'zeus'])
 
 let vocabulary: string[] | null = null
 

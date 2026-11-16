@@ -21,7 +21,7 @@ You may edit only these files:
 - `governance/treasury/addresses.tsv`
 - Files that the tools generate: `governance/treasury/price-data.tsv`, `governance/treasury/treasury-transparency.md`, `governance/treasury/*.svg` and `tests/image-integrity/verified-clean-images.json`.
 
-Do not edit source code, tests or config, even if a tool fails. If a step fails, show the error to the user and stop.
+Do not edit source code, tests, or configuration files, even if a tool fails. If a step fails, show the error to the user and stop.
 
 ## Files
 
@@ -72,7 +72,7 @@ curl -s --max-time 30 "https://eth.blockscout.com/api/v2/addresses/$T/token-tran
 
 ## Step 3: Check that the addresses are registered
 
-For each counterparty address, search `addresses.tsv` without case sensitivity. If an address is not there, use `AskUserQuestion` to ask who controls it. Include the address, the amounts and the dates in the question. Give your best guesses as options. Use the address's history on Blockscout to make the guesses (for example, "sends test transfer then large ETH amount → grant funder"). Then add a row with a short snake_case `Name`, the `Control` and a one-line `Description`. Follow the style of the rows that are there.
+For each counterparty address, search `addresses.tsv` without case sensitivity. If an address is not there, use `AskUserQuestion` to ask who controls it. Include the address, the amounts, and the dates in the question. Give your best guesses as options. Use the address's history on Blockscout to make the guesses (for example, "sends test transfer then large ETH amount → grant funder"). Then add a row with a short snake_case `Name`, the `Control` and a one-line `Description`. Follow the style of the rows that are there.
 
 ## Step 4: Get the category and the purpose
 
@@ -100,7 +100,7 @@ This gets the missing prices from CoinGecko into `price-data.tsv` and regenerate
 pnpm check:all
 ```
 
-Run it once, after you write all the rows. Write the output to a log file in the scratchpad and read the end of the file. It can update `tests/image-integrity/verified-clean-images.json` because the SVGs changed. This is expected, and CI needs this change. If it fails, show the error and stop.
+Run it once, after you write all the rows. Write the output to a file in the scratchpad and read the end of the file. It can update `tests/image-integrity/verified-clean-images.json` because the SVGs changed. This is expected, and CI needs this change. If it fails, show the error and stop.
 
 ## Report
 
