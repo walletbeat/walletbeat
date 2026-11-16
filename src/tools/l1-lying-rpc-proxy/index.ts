@@ -150,6 +150,19 @@ function forwardToUpstream(
 		req.end()
 	})
 }
+/**
+ * Describe why the upstream request failed.
+ * Node.js reports a refused connection to a dual-stack host (e.g. `localhost`)
+ * as an `AggregateError` whose message is empty and whose `code` is set on the
+ * error itself rather than on its cause, so fall back to that code.
+ */
+function describeUpstreamError(err: unknown): string {
+	if (err instanceof Error && err.message === '' && 'code' in err && typeof err.code === 'string') {
+		return err.code
+	}
+
+	return getErrorMessage(err)
+}
 // Main request handler
 function respondWithError(res: http.ServerResponse, statusCode: number, message: string): void {
 	log(`Error: ${message}`)
@@ -214,7 +227,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 		try {
 			upstreamResult = await forwardToUpstream(upstream, rawBody)
 		} catch (err: unknown) {
-			respondWithError(res, 502, `Upstream unreachable (${getErrorMessage(err)})`)
+			respondWithError(res, 502, `Upstream unreachable (${describeUpstreamError(err)})`)
 
 			return
 		}

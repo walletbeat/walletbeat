@@ -1,35 +1,18 @@
-/**
- * Get the error message, including a network error code carried by the
- * error itself or hidden in its cause.
- * Node.js system errors may carry their code with an empty message (e.g. an
- * `AggregateError` when every address of a dual-stack host refuses the
- * connection), so the code alone is used as the message in that case.
- */
+/** Get the error message, including a network error code hidden in its cause. */
 export function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
 		const cause = error.cause
-		let code: string | null = null
 
-		if ('code' in error && typeof error.code === 'string') {
-			code = error.code
-		} else if (
+		if (
 			typeof cause === 'object' &&
 			cause !== null &&
 			'code' in cause &&
 			typeof cause.code === 'string'
 		) {
-			code = cause.code
+			return `${error.message} (${cause.code})`
 		}
 
-		if (error.message === '') {
-			return code ?? '<unknown error>'
-		}
-
-		if (code === null || error.message.includes(code)) {
-			return error.message
-		}
-
-		return `${error.message} (${code})`
+		return error.message
 	}
 
 	if (typeof error === 'string') {
