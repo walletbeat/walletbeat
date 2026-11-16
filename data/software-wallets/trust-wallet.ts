@@ -1,5 +1,11 @@
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { amplitude } from '@/data/entities/amplitude'
+import { sentry } from '@/data/entities/sentry'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import type { WalletAnalytics } from '@/schema/features'
+import { AccountType } from '@/schema/features/account-support'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -8,13 +14,34 @@ import {
 	CoverageBreadth,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -25,6 +52,7 @@ import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
+import { mattmatt } from '../contributors/0xmattmatt'
 import { certik } from '../entities/certik'
 import { cure53 } from '../entities/cure53'
 import trustWalletRawExtManifest from './manifests/trustWallet/egjidjbpglichdcondbcbdnbeeppgdph.manifest.json'
@@ -59,9 +87,9 @@ export const trustWallet: SoftwareWallet = {
 		displayName: 'Trust Wallet',
 		tableName: 'Trust Wallet',
 		coinspectId: 'trust-wallet',
-		contributors: [minimalsm],
+		contributors: [minimalsm, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-18',
+		lastUpdated: '2026-11-16',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],
 			extensions: [
