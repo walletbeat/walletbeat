@@ -4,7 +4,9 @@ import path from 'node:path'
 
 import { chromium, firefox, webkit } from '@playwright/test'
 
+import { Rating } from '@/schema/attributes'
 import { wbIconEmojiSequences } from '@/styles/wbicons'
+import { slugifyCamelCase } from '@/types/utils/text'
 import { getWalletStageAndLadder } from '@/utils/stage'
 
 import { semanticOutline } from '../../src/views/WalletPage.tests/fixtures/semantic-outline.mjs'
@@ -14,7 +16,7 @@ import {
 	isWalletFixture,
 	walletFixtureAttributeTree,
 	walletFixtures,
-} from './fixtures/wallet-fixtures'
+} from './fixtures/wallet-fixtures.ts'
 import { presentationStyles } from './presentation-styles.mjs'
 
 /**
@@ -27,7 +29,7 @@ import { presentationStyles } from './presentation-styles.mjs'
  * @typedef {{href: string|null, targetExists: boolean, focused: boolean, box: CaptureBox, landing?: SkipLanding}} SkipCapture
  * @typedef {{icon: string|null, point: CapturePoint, box: CaptureBox, pointInGlyph: boolean, expected: string|null|undefined, actual: string|null, hit: string|null, hitGlyph: boolean}} GlyphCapture
  * @typedef {{before: number, available: number, pointerInHeader: boolean, after: number}} HeaderCapture
- * @typedef {{open: boolean, descendants: {tag: string, boxes: number}[]}} DisclosureCapture
+ * @typedef {{open: boolean, descendants: {tag: string, rendered: boolean}[]}} DisclosureCapture
  * @typedef {ReturnType<typeof observeMenuState>} MenuState
  * @typedef {{before: MenuState, open?: MenuState, search?: MenuState, wide?: MenuState, closedWide?: boolean, after?: MenuState}} MenuCapture
  * @typedef {{width: number, initial: InitialCapture, transitions: ReturnType<typeof observeTransition>[], presentation: ReturnType<typeof presentationStyles>[], skipLink?: SkipCapture|null, walletAspect?: {intrinsic: number, rendered: number}, headingGlyphTargets?: GlyphCapture[], headerScroll?: HeaderCapture, disclosure?: DisclosureCapture|null, footerFlow?: ReturnType<typeof observeFooterFlow>, menu?: MenuCapture, complete?: true}} Observation
@@ -259,7 +261,7 @@ function observeInitial() {
 				open: element instanceof HTMLDetailsElement ? element.open : false,
 			})),
 		snapType: getComputedStyle(document.querySelector('#layout')).scrollSnapType,
-		pageTopLinks: [...root.querySelectorAll('a[href^="#top"]')].map(element =>
+		pageTopLinks: [...root.querySelectorAll(':scope > header h1 a')].map(element =>
 			element.getAttribute('href'),
 		),
 		viewportHeight: innerHeight,
@@ -533,6 +535,7 @@ if (
 }
 
 const fixtureName = new URL(url).pathname.match(/^\/__wallet-page\/([^/]+)\/?$/)?.[1]
+/** @type {import('@/schema/wallet').RatedWallet<string> | null} */
 const fixtureWallet =
 	fixtureName && isWalletFixture(fixtureName) ? walletFixtures[fixtureName]() : null
 const fixtureLadder = fixtureWallet ? getWalletStageAndLadder(fixtureWallet).ladderEvaluation : null
@@ -541,11 +544,37 @@ const nextStageIndex = fixtureLadder?.highestClearedStage
 			stage => stage.id === fixtureLadder.highestClearedStage.id,
 		) + 1
 	: 0
+/** @type {import('@/schema/attribute-groups').AttributeGroup<string>[]} */
+const fixtureGroups = fixtureWallet
+	? Object.values(walletFixtureAttributeTree(fixtureName, fixtureWallet))
+	: []
 const fixture = fixtureWallet
 	? {
 			name: fixtureName,
 			types: Object.keys(fixtureWallet.types),
-			expectedGroups: Object.keys(walletFixtureAttributeTree(fixtureName, fixtureWallet)).length,
+			expectedGroups: fixtureGroups.length,
+			destinationIds: fixtureGroups
+				.flatMap(group => {
+					const ratings = fixtureWallet.overall[group.id]
+					const attributes = group.attributes.flatMap(({ attribute }) => {
+						const rating = ratings?.[attribute.id]?.evaluation.outcome.rating
+
+						return rating === undefined || rating === Rating.EXEMPT
+							? []
+							: [slugifyCamelCase(attribute.id)]
+					})
+					const groupId = slugifyCamelCase(group.id)
+
+					return attributes.length
+						? [
+								group.attributes.some(({ attribute }) => attribute.id === group.id)
+									? `${groupId}-overview`
+									: groupId,
+								...attributes,
+							]
+						: []
+				})
+				.sort(),
 			expectedStages: fixtureLadder?.ladder.stages.length ?? 0,
 			typeStages: Object.keys(fixtureWallet.types).map(type => {
 				const { stage, ladderEvaluation } = getWalletStageAndLadder(fixtureWallet, type)
@@ -947,7 +976,10 @@ try {
 				open: element instanceof HTMLDetailsElement ? element.open : false,
 				descendants: [...element.querySelectorAll('h1,h2,h3,h4,[data-icon]')]
 					.filter(item => !element.querySelector(':scope > summary')?.contains(item))
-					.map(item => ({ tag: item.tagName, boxes: item.getClientRects().length })),
+					.map(item => ({
+						tag: item.tagName,
+						rendered: item.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
+					})),
 			}))
 
 			await page.keyboard.press('Space')
@@ -1359,21 +1391,18 @@ const checks = {
 		'Actual root scroll-snap-type is block-axis proximity.',
 	],
 	TopTarget: [
-		all(
-			o =>
-				o.initial.pageTopLinks.length > 0 && o.initial.pageTopLinks.every(href => href === '#top'),
-		),
-		'All observed page-top links use #top; independent control identification and activation remain unverified.',
+		all(o => o.initial.pageTopLinks.length === 1 && o.initial.pageTopLinks[0] === '#top'),
+		'The unique link in the wallet H1 targets #top; native activation and its final landing are checked separately.',
 		false,
 	],
-	ClosedDescendants: observations.some(o => o.disclosure)
+	ClosedDescendants: observations.some(o => o.disclosure?.descendants.length)
 		? [
 				all(
 					o =>
 						!o.disclosure ||
-						(!o.disclosure.open && o.disclosure.descendants.every(item => item.boxes === 0)),
+						(!o.disclosure.open && o.disclosure.descendants.every(item => !item.rendered)),
 				),
-				'Native summary keyboard closure removes descendant heading and glyph boxes. Animation, collision reservation and current-state exclusions still require their own observations.',
+				'Native summary keyboard closure hides sampled descendant headings and glyphs. Animation, collision reservation and current-state exclusions are assessed separately.',
 				false,
 			]
 		: null,
@@ -1390,6 +1419,7 @@ const checks = {
 				.sort()
 
 			return (
+				(!fixture || JSON.stringify(ids) === JSON.stringify(fixture.destinationIds)) &&
 				!o.initial.duplicateIds.length &&
 				o.initial.links.every(link => link.destination) &&
 				sections.every(section => section.permalinks === 1) &&
@@ -1398,7 +1428,8 @@ const checks = {
 				JSON.stringify(ids) === JSON.stringify(first)
 			)
 		}),
-		'The complete real group/attribute navigation tree has one heading permalink and one shared unique target per owner; pie and TOC enumerate exactly that same tree, and its IDs remain identical across every responsive width. Other local fragments must also resolve.',
+		'The rated fixture and its attribute tree supply the expected destination IDs independently of the rendered page. Each observed heading has one permalink, pie and TOC share exactly its destinations across widths, and all other local fragments resolve.',
+		fixture !== null,
 	],
 	AttributeDefaults: observations.some(o => o.initial.details.length)
 		? [all(o => o.initial.details.every(Boolean)), 'All observed attribute details initially open.']
