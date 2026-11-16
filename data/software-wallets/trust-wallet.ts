@@ -162,8 +162,22 @@ export const trustWallet: SoftwareWallet = {
 		multiAddress: null,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: refTodo,
+						entity: sentry,
+						policy: CollectionPolicy.BY_DEFAULT,
+					}),
+					[Variant.MOBILE]: null,
+				},
+				usage: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: refTodo,
+						entity: amplitude,
+						policy: CollectionPolicy.BY_DEFAULT,
+					}),
+					[Variant.MOBILE]: null,
+				},
 			},
 			appIsolation: null,
 			dataCollection: null,
