@@ -762,24 +762,33 @@ for (const [width, direction, scenario] of [
 						)
 
 					expect(
-						properties,
-						'The selected ordinary pseudo exercises both native motion properties',
-					).toEqual(expect.arrayContaining(['transform', 'translate']))
+						properties.some(property => property === 'transform' || property === 'translate'),
+						'The selected ordinary pseudo has native motion to isolate',
+					).toBe(true)
 				}
 
-				const principal = await quad(selector)
-				const actual = await page.locator(selector).boundingBox()
+				let principal!: Awaited<ReturnType<typeof quad>>
 
-				if (!actual) {
-					throw new Error('Observable native marker owner required')
-				}
+				await expect
+					.poll(
+						async () => {
+							const current = await quad(selector)
+							const actual = await page.locator(selector).boundingBox()
 
-				expect(
-					Math.abs(Math.min(...principal.points.map(point => point.x)) - actual.x),
-				).toBeLessThan(0.5)
-				expect(
-					Math.abs(Math.min(...principal.points.map(point => point.y)) - actual.y),
-				).toBeLessThan(0.5)
+							if (!actual) {
+								return Infinity
+							}
+
+							principal = current
+
+							return Math.max(
+								Math.abs(Math.min(...current.points.map(point => point.x)) - actual.x),
+								Math.abs(Math.min(...current.points.map(point => point.y)) - actual.y),
+							)
+						},
+						{ message: 'The painted quad and locator agree at the encounter start' },
+					)
+					.toBeLessThan(0.5)
 				const clocks = await page
 					.locator(selector)
 					.evaluateHandle(element => element.getAnimations({ subtree: true }))
@@ -1088,7 +1097,10 @@ for (const [width, direction, scenario] of [
 							).toBeLessThan(1)
 						}
 
-						expect(clearance, `${owner.kind} native pseudo border quad`).toBeGreaterThanOrEqual(-1)
+						expect(
+							clearance,
+							`${owner.kind} painted clearance includes the configured gap`,
+						).toBeGreaterThanOrEqual(pose.gap - 1)
 						passed =
 							nativeDisplacement < 1 &&
 							(direction > 0

@@ -2971,7 +2971,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				--stickyBreadcrumb-clearanceGap: var(--stickyBreadcrumb-gap, 1rem);
 				:global(article) {
 					--collapsible-markerMotion: clearance;
-					--collapsible-markerClearanceRadius: var(---pie-dodgeRadius);
+					--collapsible-markerClearanceRadius: calc(var(---pie-compactSize) / 2);
 					--collapsible-markerClearanceCenterInline: var(---pie-compactCenterInline);
 					--collapsible-markerClearanceCenterBlock: var(---pie-compactCenterBlock);
 				--collapsible-markerAnimation: pie-clearance auto linear both;

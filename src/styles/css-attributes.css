@@ -2371,6 +2371,105 @@ ol {
 		inherits: false;
 		initial-value: 0;
 	}
+	@property ---breadcrumb-clearance-stickyEncounter {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@keyframes breadcrumb-clearance-marker-entry {
+		from {
+			transform: translateX(0px);
+		}
+		to {
+			transform: translateX(var(---breadcrumb-clearance-stickyInline));
+		}
+	}
+	@function --breadcrumb-clearance-marker-exit(--t <number>,
+		--origin <length>: var(---breadcrumb-clearance-stickyInline),
+		--blockDirection <number>: 1,
+		--r <number>: calc(var(---breadcrumb-clearance-arc-radius) / 1px),
+		--offset <number>: calc(var(---breadcrumb-clearance-inlineOffset) / 1px),
+		--end <number>: calc(var(--r) + 0.5),
+		--y <number>: calc(var(--t) * var(--end)),
+		--start <number>: calc(0.55 * var(--end)),
+		--arcLength <number>: calc(0.3 * var(--end)),
+		--tailLength <number>: calc(0.15 * var(--end)),
+		--u <number>: clamp(0, calc((var(--y) - var(--start)) / var(--arcLength)), 1),
+		--v <number>: clamp(0, calc((var(--t) - 0.85) / 0.15), 1),
+		--startAngle <angle>: asin(clamp(0, calc(var(--start) / var(--r)), 1)),
+		--arcAngle <angle>: calc(
+			var(--startAngle) + (90deg - var(--startAngle)) * pow(var(--u), 2) * (3 - 2 * var(--u)) +
+			1rad * var(--arcLength) / (var(--r) * cos(var(--startAngle))) * var(--u) * pow(1 - var(--u), 2) -
+			1rad * 2 * var(--offset) * var(--arcLength) / (var(--tailLength) * var(--r)) * pow(var(--u), 2) * (1 - var(--u))
+		),
+		--paintY <number>: if(style(--t <= 0.55): var(--y); style(--t <= 0.85): calc(var(--r) * sin(var(--arcAngle))); else: calc(var(--r) + 0.5 * pow(var(--v), 2) * (3 - 2 * var(--v)))),
+		--dodge <number>: if(style(--t <= 0.55): calc(sqrt(max(0, pow(var(--r), 2) - pow(var(--y), 2))) + var(--offset)); style(--t <= 0.85): calc(var(--r) * cos(var(--arcAngle)) + var(--offset)); else: calc(var(--offset) * pow(1 - var(--v), 2)))
+	) {
+		result: calc(-1 * var(--origin) - var(---inlineDirection) * var(--dodge) * 1px) calc(var(--blockDirection) * (var(--y) - var(--paintY)) * 1px);
+	}
+	@function --breadcrumb-clearance-marker-flow(--t <number>,
+		--end <number>: calc(var(---breadcrumb-clearance-arc-radius) / 1px + 0.5),
+		--height <number>: calc(var(---breadcrumb-clearance-arc-height) / 1px),
+		--relative <number>: calc(var(--t) * (2 * var(--end) + var(--height)) - var(--end)),
+		--separation <number>: max(0, calc(-1 * var(--relative)), calc(var(--relative) - var(--height))),
+		--side <number>: if(style(--relative < 0): -1; else: 1)
+	) {
+		result: --breadcrumb-clearance-marker-exit(clamp(0, calc(var(--separation) / var(--end)), 1), 0px, var(--side));
+	}
+	@function --breadcrumb-clearance-marker-travel(--progress <number>,
+ --r <number>: calc(var(---breadcrumb-clearance-arc-radius) / 1px),
+ --height <number>: calc(var(---breadcrumb-clearance-arc-height) / 1px),
+ --sticky <number>: calc(var(---breadcrumb-clearance-stickyBlock) / 1px),
+ --travel <number>: calc(var(--sticky) + var(--height) + var(--r) + .5),
+ --relative <number>: calc(var(--progress) * var(--travel) - var(--sticky)),
+ --before <number>: max(0, calc(-1 * var(--relative))),
+ --after <number>: max(0, calc(var(--relative) - var(--height))),
+ --x <number>: sqrt(max(0, calc(pow(var(--r),2) - pow(var(--before),2))))
+) {
+ result: if(style((---breadcrumb-clearance-markerFlows: 1) and (---breadcrumb-clearance-inlineOffset >= 0px)): --breadcrumb-clearance-marker-flow(var(--progress)); style(--progress: 0): 0px 0px; style(--relative <= var(--height)): calc(-1 * var(---inlineDirection) * (var(--x) * 1px + var(---breadcrumb-clearance-inlineOffset)) - var(---breadcrumb-clearance-stickyInline)) 0px; else: --breadcrumb-clearance-marker-exit(clamp(0, calc(var(--after) / (var(--r) + .5)), 1)));
+}
+@keyframes breadcrumb-clearance-marker-exit {
+0% {translate: --breadcrumb-clearance-marker-travel(0);}
+2.5% {translate: --breadcrumb-clearance-marker-travel(0.025);}
+5% {translate: --breadcrumb-clearance-marker-travel(0.05);}
+7.5% {translate: --breadcrumb-clearance-marker-travel(0.075);}
+10% {translate: --breadcrumb-clearance-marker-travel(0.1);}
+12.5% {translate: --breadcrumb-clearance-marker-travel(0.125);}
+15% {translate: --breadcrumb-clearance-marker-travel(0.15);}
+17.5% {translate: --breadcrumb-clearance-marker-travel(0.175);}
+20% {translate: --breadcrumb-clearance-marker-travel(0.2);}
+22.5% {translate: --breadcrumb-clearance-marker-travel(0.225);}
+25% {translate: --breadcrumb-clearance-marker-travel(0.25);}
+27.5% {translate: --breadcrumb-clearance-marker-travel(0.275);}
+30% {translate: --breadcrumb-clearance-marker-travel(0.3);}
+32.5% {translate: --breadcrumb-clearance-marker-travel(0.325);}
+35% {translate: --breadcrumb-clearance-marker-travel(0.35);}
+37.5% {translate: --breadcrumb-clearance-marker-travel(0.375);}
+40% {translate: --breadcrumb-clearance-marker-travel(0.4);}
+42.5% {translate: --breadcrumb-clearance-marker-travel(0.425);}
+45% {translate: --breadcrumb-clearance-marker-travel(0.45);}
+47.5% {translate: --breadcrumb-clearance-marker-travel(0.475);}
+50% {translate: --breadcrumb-clearance-marker-travel(0.5);}
+52.5% {translate: --breadcrumb-clearance-marker-travel(0.525);}
+55% {translate: --breadcrumb-clearance-marker-travel(0.55);}
+57.5% {translate: --breadcrumb-clearance-marker-travel(0.575);}
+60% {translate: --breadcrumb-clearance-marker-travel(0.6);}
+62.5% {translate: --breadcrumb-clearance-marker-travel(0.625);}
+65% {translate: --breadcrumb-clearance-marker-travel(0.65);}
+67.5% {translate: --breadcrumb-clearance-marker-travel(0.675);}
+70% {translate: --breadcrumb-clearance-marker-travel(0.7);}
+72.5% {translate: --breadcrumb-clearance-marker-travel(0.725);}
+75% {translate: --breadcrumb-clearance-marker-travel(0.75);}
+77.5% {translate: --breadcrumb-clearance-marker-travel(0.775);}
+80% {translate: --breadcrumb-clearance-marker-travel(0.8);}
+82.5% {translate: --breadcrumb-clearance-marker-travel(0.825);}
+85% {translate: --breadcrumb-clearance-marker-travel(0.85);}
+87.5% {translate: --breadcrumb-clearance-marker-travel(0.875);}
+90% {translate: --breadcrumb-clearance-marker-travel(0.9);}
+92.5% {translate: --breadcrumb-clearance-marker-travel(0.925);}
+95% {translate: --breadcrumb-clearance-marker-travel(0.95);}
+97.5% {translate: --breadcrumb-clearance-marker-travel(0.975);}
+100% {translate: --breadcrumb-clearance-marker-travel(1);}}
 	@keyframes breadcrumb-clearance-cubic-in {
 		from {
 			transform: translateX(0px);
@@ -5129,6 +5228,16 @@ details {
 						}
 		}
 
+					&:is(details[open] > summary[data-sticky~="block-start"]) {
+						---breadcrumb-clearance-stickyMarker: 1;
+					}
+
+					@media (prefers-reduced-motion: no-preference) {
+						&:is(details:not([open]) > summary[data-sticky~="block-start"]) {
+							---breadcrumb-clearance-markerFlows: 1;
+						}
+					}
+
 					&::after {
 						animation: var(--collapsible-markerAnimation);
 						animation-timeline: var(--collapsible-markerTimeline);
@@ -5146,8 +5255,8 @@ details {
 							---breadcrumb-clearance-cubicX2: calc((var(---breadcrumb-clearance-cubicGap) + min(var(---breadcrumb-clearance-cubicGap) / 4, 0.08) - 4 * var(---breadcrumb-clearance-cubicOffset) / 9) / (1 + var(---breadcrumb-clearance-cubicGap)));
 							---breadcrumb-clearance-cubicInline: calc(-1 * var(---inlineDirection) * (var(---breadcrumb-clearance-arc-inlineRadius) + var(---breadcrumb-clearance-inlineOffset)));
 							---breadcrumb-clearance-cubicDistance: calc(var(---breadcrumb-clearance-arc-radius) + var(--stickyBreadcrumb-clearanceGap, 0px));
-							animation: if(style(---breadcrumb-clearance-cubicEligible: 1): breadcrumb-clearance-cubic-in auto cubic-bezier(var(---breadcrumb-clearance-cubicX1), 0, var(---breadcrumb-clearance-cubicX2), 1) both, breadcrumb-clearance-cubic-out auto cubic-bezier(calc(1 - var(---breadcrumb-clearance-cubicX2)), 0, calc(1 - var(---breadcrumb-clearance-cubicX1)), 1) both; else: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none);
-							animation-timeline: view(
+							---breadcrumb-clearance-markerAnimation: if(style(---breadcrumb-clearance-cubicEligible: 1): breadcrumb-clearance-cubic-in auto cubic-bezier(var(---breadcrumb-clearance-cubicX1), 0, var(---breadcrumb-clearance-cubicX2), 1) both, breadcrumb-clearance-cubic-out auto cubic-bezier(calc(1 - var(---breadcrumb-clearance-cubicX2)), 0, calc(1 - var(---breadcrumb-clearance-cubicX1)), 1) both; else: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none);
+							---breadcrumb-clearance-markerTimeline: view(
 								block
 									calc(
 										var(---breadcrumb-clearance-arc-centerY) -
@@ -5158,9 +5267,24 @@ details {
 											var(---breadcrumb-clearance-view-size) / 2
 									)
 							);
-							animation-range:
+							---breadcrumb-clearance-markerRange:
 								if(style(---breadcrumb-clearance-cubicEligible: 1): exit-crossing calc(100% - 2 * var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-arc-height)) exit-crossing calc(100% - var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-arc-height)), exit-crossing calc(100% - var(---breadcrumb-clearance-cubicDistance)) exit-crossing 100%; else: exit-crossing calc(100% - 2 * (var(---breadcrumb-clearance-view-size) + var(---breadcrumb-clearance-flow-height)))
 								exit-crossing 100%);
+							---breadcrumb-clearance-stickyBlock: max(0px, calc(var(--sticky-insetBlockStart) + (var(---breadcrumb-itemHeight) - var(---breadcrumb-clearance-arc-height)) / 2 - var(---breadcrumb-clearance-arc-centerY)));
+							---breadcrumb-clearance-stickyRadius: calc(var(---breadcrumb-clearance-arc-radius) / 1px);
+							---breadcrumb-clearance-stickyY: calc(var(---breadcrumb-clearance-stickyBlock) / 1px);
+							---breadcrumb-clearance-stickyX: sqrt(max(0, pow(var(---breadcrumb-clearance-stickyRadius), 2) - pow(var(---breadcrumb-clearance-stickyY), 2)));
+							---breadcrumb-clearance-stickyInline: calc(-1 * var(---inlineDirection) * round(up, max(0px, var(---breadcrumb-clearance-stickyX) * 1px + var(---breadcrumb-clearance-inlineOffset)), 1px));
+							---breadcrumb-clearance-stickyEncounter: calc(clamp(0, sign(var(---breadcrumb-clearance-arc-radius) - var(---breadcrumb-clearance-stickyBlock)), 1) * var(---breadcrumb-clearance-cubicEligible) * var(---breadcrumb-clearance-stickyMarker, 0));
+							animation: if(style(---breadcrumb-clearance-stickyEncounter: 1):
+								breadcrumb-clearance-marker-entry auto cubic-bezier(0.2, 0, 0.43, 1) both,
+								breadcrumb-clearance-marker-exit auto linear forwards;
+								style((---breadcrumb-clearance-markerFlows: 1) and (---breadcrumb-clearance-inlineOffset >= 0px)): breadcrumb-clearance-marker-exit auto linear none; else: var(---breadcrumb-clearance-markerAnimation));
+							animation-timeline: var(---breadcrumb-clearance-markerTimeline);
+							animation-range: if(style(---breadcrumb-clearance-stickyEncounter: 1):
+								cover 0px cover max(1px, calc(var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-stickyBlock))),
+								exit-crossing calc(100% - var(---breadcrumb-clearance-cubicDistance) - var(---breadcrumb-clearance-arc-height) - var(---breadcrumb-clearance-stickyBlock)) exit-crossing calc(100% - var(--stickyBreadcrumb-clearanceGap, 0px) + 0.5px);
+								style((---breadcrumb-clearance-markerFlows: 1) and (---breadcrumb-clearance-inlineOffset >= 0px)): cover calc(var(--stickyBreadcrumb-clearanceGap, 0px) - 0.5px) cover calc(100% - var(--stickyBreadcrumb-clearanceGap, 0px) + 0.5px); else: var(---breadcrumb-clearance-markerRange));
 							@media (prefers-reduced-motion: reduce) {
 								---breadcrumb-clearance-cubicEligible: 0;
 							}
@@ -5189,7 +5313,7 @@ details {
 				:is(details, [data-collapsible]) > summary > [data-row] > [data-row-item~="wrap-end"]:not([data-sticky-breadcrumb~="end"])::after,
 				:is(details, [data-collapsible]) > summary > :is([data-column~="span-start"], header) > [data-row] > [data-row-item~="wrap-end"]:not([data-sticky-breadcrumb~="end"])::after,
 				details:not([open]) > summary [data-sticky-breadcrumb~="end"] {
-					---breadcrumb-clearance-arc-inlineRadius: calc(var(--collapsible-markerClearanceRadius) / cos(1.40625deg));
+					---breadcrumb-clearance-arc-inlineRadius: calc((var(--collapsible-markerClearanceRadius) + var(--stickyBreadcrumb-clearanceGap, 0px)) / cos(1.40625deg));
 					---breadcrumb-clearance-arc-radius: var(---breadcrumb-clearance-arc-inlineRadius);
 					---breadcrumb-clearance-inlineOffset: calc(var(---collapsible-markerInlineEnd) - var(--collapsible-markerClearanceCenterInline));
 					---breadcrumb-clearance-arc-centerY: var(--collapsible-markerClearanceCenterBlock);
