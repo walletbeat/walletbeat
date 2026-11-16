@@ -607,8 +607,8 @@ for (const [width, direction, scenario] of [
 		)
 		const cdp = await page.context().newCDPSession(page)
 		const evidence = []
+		const { root } = await cdp.send('DOM.getDocument')
 		const quad = async (selector: string, pseudo = false) => {
-			const { root } = await cdp.send('DOM.getDocument')
 			const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector })
 
 			if (!nodeId) {
@@ -693,7 +693,7 @@ for (const [width, direction, scenario] of [
 					).toBe(false)
 				}
 
-				await page.locator(selector).evaluate(async (element, closed) => {
+				const traversalDistance = await page.locator(selector).evaluate(async (element, closed) => {
 					const changed: HTMLDetailsElement[] = []
 
 					for (
@@ -742,6 +742,8 @@ for (const [width, direction, scenario] of [
 					await new Promise<void>(resolve =>
 						requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 					)
+
+					return flow.getBoundingClientRect().height + root.clientHeight
 				}, closed)
 
 				if (scenario === 'ordinary') {
@@ -829,17 +831,21 @@ for (const [width, direction, scenario] of [
 				const initialInline = localInline(initialMarker, principal)
 				let ordinarySamples = 0
 
+				await page.mouse.move(20, 700)
+
 				for (const direction of [1, -1]) {
 					let delivered = 0
 					let encounters = 0
 					let requiredDodges = 0
 					let passed = false
 
-					for (let step = 0; step < (ordinaryOnly ? 96 : 24); step++) {
+					const wheelStep = ordinaryOnly ? 12 : 48
+					const maxSteps = Math.ceil(traversalDistance / wheelStep)
+
+					for (let step = 0; step < maxSteps; step++) {
 						const before = await page.locator('#layout').evaluate(element => element.scrollTop)
 
-						await page.mouse.move(20, 700)
-						await page.mouse.wheel(0, direction * (ordinaryOnly ? 12 : 48))
+						await page.mouse.wheel(0, direction * wheelStep)
 						await page.evaluate(
 							() =>
 								new Promise<void>(resolve =>
@@ -903,9 +909,11 @@ for (const [width, direction, scenario] of [
 							expect(pose.gap, 'Public gap override reached the actual pseudo').toBe(0)
 						}
 
-						const marker = await quad(selector, true)
-						const parent = await quad(selector)
-						const pieQuad = await quad('.pie-navigation-geometry > .navigation-items > menu')
+						const [marker, parent, pieQuad] = await Promise.all([
+							quad(selector, true),
+							quad(selector),
+							quad('.pie-navigation-geometry > .navigation-items > menu'),
+						])
 						const sides = pieQuad.points.map((a, index) => {
 							const b = pieQuad.points[(index + 1) % 4]
 
@@ -1085,9 +1093,9 @@ for (const [width, direction, scenario] of [
 							nativeDisplacement < 1 &&
 							(direction > 0
 								? Math.max(...painted.flatMap(box => box.points.map(point => point.y))) <
-									circle.y - circle.radius - 1
+									circle.y - circle.radius - pose.gap - 1
 								: Math.min(...painted.flatMap(box => box.points.map(point => point.y))) >
-									circle.y + circle.radius + 1)
+									circle.y + circle.radius + pose.gap + 1)
 
 						if (delivered > 500 && passed) {
 							break
