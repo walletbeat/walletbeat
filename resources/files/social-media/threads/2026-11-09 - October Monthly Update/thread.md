@@ -85,7 +85,7 @@ Also on supply chain security: dependency sandboxing is now filled in for four w
 
 Does the wallet isolate its dependencies from each other and from its own code at runtime, so a compromised dependency can't reach beyond what its policy grants?
 
-It is supported on Ambire and unsupported on Uniswap Wallet, Rabby, and Zerion's extension.
+It is supported on @ambire and unsupported on @Uniswap Wallet, @Rabby_io, and @zerion's extension.
 
 ---
 
@@ -138,8 +138,9 @@ https://x.com/walletbeat/status/2115851446381957211
 
 ---
 
-October in short: we broke down Ambire’s ratings, redesigned Wallet Stages' page, onboarded new wallets, captured real wallet network traffic, and added new supply chain security data, all while getting ready for @EFDevcon.
+October in short: fully rated wallets, onboarded new wallets, added new features to track, all while getting ready for @EFDevcon.
 
 We keep watching 🫡
 
 Until next month! 🌸
+https://walletbeat.eth.limo/
