@@ -1,6 +1,44 @@
 import { qualifyNativeBreadcrumbClock } from '../../../tests/browser/sticky-observation.mjs'
 import { expect, test } from '../../../tests/browser/verified-test'
 
+test('in-flow wallet metadata shares the title edges and centers when it fits', async ({
+	page,
+}) => {
+	test.skip(
+		!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
+		'The unenhanced header has separate coverage',
+	)
+
+	await page.setViewportSize({ width: 1034, height: 900 })
+	await page.goto('/metamask/selection/browser--all/')
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+
+	for (const direction of ['ltr', 'rtl']) {
+		const layout = await page.evaluate(direction => {
+			document.documentElement.dir = direction
+			const element = document.querySelector('#top > .wallet-header-flow')!
+			const title = document.querySelector('#top .wallet-title-row')!.getBoundingClientRect()
+			const stage = element.querySelector(':scope > div a[href^="#stage"]')!.getBoundingClientRect()
+			const tags = element.querySelector('.wallet-overview > div')!.getBoundingClientRect()
+			const links = element.querySelector('.wallet-overview > nav')!.getBoundingClientRect()
+			const width = document.querySelector('#layout')!.clientWidth
+			const start = (rect: DOMRect) => (direction === 'ltr' ? rect.left : width - rect.right)
+			const end = (rect: DOMRect) => (direction === 'ltr' ? width - rect.right : rect.left)
+
+			return {
+				stageCenterError: Math.abs((stage.top + stage.bottom - title.top - title.bottom) / 2),
+				tagStartError: Math.abs(start(tags) - start(title)),
+				linkEndError: Math.abs(end(links) - start(title)),
+				stageEndError: Math.abs(end(stage) - start(title)),
+			}
+		}, direction)
+
+		for (const [edge, distance] of Object.entries(layout)) {
+			expect(distance, `${direction} ${edge}`).toBeLessThanOrEqual(1)
+		}
+	}
+})
+
 for (const width of [390, 1440]) {
 	for (const fixture of ['software', 'longName', 'multipleTypes']) {
 		test(`real header composition and native input at ${width}px: ${fixture}`, async ({

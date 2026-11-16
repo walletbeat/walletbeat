@@ -3106,16 +3106,21 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 			@media (width <= 84rem) {
 				---wallet-flow-gap: 1rem;
+				---wallet-header-paddingBlock: clamp(
+					var(---wallet-content-inline-padding),
+					(var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2,
+					var(--scrollItem-inlineDetached-maxPaddingMatchStart)
+				);
 				display: flex;
 				flex-wrap: wrap;
 				align-content: start;
 				align-items: start;
 				gap: var(---wallet-flow-gap);
-				padding-block-start: var(---wallet-content-inline-padding);
+				padding-block-start: var(---wallet-header-paddingBlock);
 
 				> [data-sticky-breadcrumb~="position"] {
 					flex: 0 1 auto;
-					margin-block-start: calc(-1 * var(---wallet-content-inline-padding));
+					margin-block-start: calc(-1 * var(---wallet-header-paddingBlock));
 
 					&[data-scroll-item~="inline-detached"] {
 						inline-size: max-content;
@@ -3134,12 +3139,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					> [data-sticky-breadcrumb~="support"]:first-child {
 						align-self: center;
 						margin-inline-start: auto;
-						padding-inline-end: var(---wallet-content-inline-padding);
+						padding-inline-end: var(--scrollItem-paddingInlineMatch);
 					}
 					> .wallet-overview {
 						flex: 0 0 100%;
 						max-inline-size: 100%;
-						padding-inline: var(---wallet-content-inline-padding);
+						padding-inline: var(--scrollItem-paddingInlineMatch);
 						anchor-name: --wallet-header-end;
 					}
 				}
@@ -3173,9 +3178,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				--stickyBreadcrumb-exit: 0;
 			}
 			> [data-sticky-breadcrumb~="position"] {
-				--stickyBreadcrumb-sourcePaddingBlock: min(
-					var(--scrollItem-paddingInlineMatch),
-					var(--scrollItem-inlineDetached-maxPaddingMatchStart)
+				--stickyBreadcrumb-sourcePaddingBlock: var(
+					---wallet-header-paddingBlock,
+					min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchStart))
 				);
 				--stickyBreadcrumb-sourcePaddingInline: 0px;
 				align-self: start;
