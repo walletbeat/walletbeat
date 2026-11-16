@@ -73,7 +73,7 @@
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.6.5",
-		"astro": "7.4.4",
+		"astro": "7.4.5",
 		"autoprefixer": "^10.5.4",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.6",
