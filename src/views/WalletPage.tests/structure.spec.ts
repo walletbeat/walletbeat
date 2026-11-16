@@ -247,6 +247,17 @@ for (const width of [390, 768, 1344, 1345, 1440]) {
 
 test.describe('native page without JavaScript', () => {
 	test.use({ javaScriptEnabled: false })
+	test('WalletPage starts at the top without a fragment, script, or input', async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: 900 })
+		await page.goto('/metamask/', { waitUntil: 'domcontentloaded' })
+		await expect(page.getByRole('heading', { level: 1, name: 'MetaMask' })).toBeVisible()
+		expect(
+			await page.locator('#layout').evaluate(element => ({
+				fragment: window.location.hash,
+				scrollTop: element.scrollTop,
+			})),
+		).toEqual({ fragment: '', scrollTop: 0 })
+	})
 	test('♿ NoScript: semantic destinations remain readable and reachable', async ({
 		page,
 		browserName,

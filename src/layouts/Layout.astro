@@ -140,6 +140,7 @@ import Footer from '@/views/Footer.astro'
 			data-scroll-container
 			data-sticky-container
 		>
+			<span class='page-start-snap' aria-hidden='true' hidden></span>
 			<a class='skip-link' href='#content' data-astro-reload data-badge='large' data-row>
 				<span data-icon={String.fromCodePoint(0x21b5)}></span>
 				<span>Skip to main content</span>
@@ -292,6 +293,19 @@ import Footer from '@/views/Footer.astro'
 		}
 	}
 	#layout:has([data-sticky-breadcrumb~="root"]) {
+		position: relative;
+
+		> .page-start-snap {
+			position: absolute;
+			inset-block-start: 0;
+			inset-inline-start: 0;
+			display: block;
+			inline-size: 1px;
+			block-size: 1px;
+			scroll-snap-align: start;
+			pointer-events: none;
+		}
+
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-compact-h1: 1.5rem;
 		--stickyBreadcrumb-markerSize: 1.25rem;
