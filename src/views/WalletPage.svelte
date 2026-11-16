@@ -3275,6 +3275,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					inline-size: 1px;
 					block-size: 1px;
 					pointer-events: none;
+					@media (width <= 84rem) {
+						/* Allow travel through the wrapped navigation before the next section snaps. */
+						block-size: calc(100vh + 2 * var(---wallet-page-navigation-inline-size));
+					}
 				}
 			}
 		}
