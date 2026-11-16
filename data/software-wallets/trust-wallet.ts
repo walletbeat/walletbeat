@@ -159,7 +159,7 @@ export const trustWallet: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
 				crashReports: {
