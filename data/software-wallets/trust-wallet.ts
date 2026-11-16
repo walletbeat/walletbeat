@@ -56,6 +56,7 @@ import { mattmatt } from '../contributors/0xmattmatt'
 import { certik } from '../entities/certik'
 import { cure53 } from '../entities/cure53'
 import trustWalletRawExtManifest from './manifests/trustWallet/egjidjbpglichdcondbcbdnbeeppgdph.manifest.json'
+import { SpendingApprovalsControl, BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 
 // Trust Wallet's smart contract and library audits don't cover the app or extension code.
 const securityAudits: SecurityAudit[] = [
@@ -399,7 +400,15 @@ export const trustWallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: {
+				ref: refTodo,
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
