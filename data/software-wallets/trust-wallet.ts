@@ -298,9 +298,81 @@ export const trustWallet: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
-			hardwareWalletSupport: null,
-			keysHandling: null,
+			duressResistance: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'App Lock is a toggle in the security settings. It locks the app with a 6-digit passcode, and Face ID can be added as a lock method.',
+								label: 'Trust Wallet support article on setting up a security PIN',
+								url: 'https://support.trustwallet.com/en/support/solutions/articles/67000734571-setting-up-or-resetting-a-security-pin-on-trust-wallet',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
+			},
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'The browser extension supports Ledger devices connected by USB. Ledger support is not available in the mobile app.',
+							label: 'Trust Wallet guide to using the extension with a Ledger',
+							url: 'https://community.trustwallet.com/t/how-to-use-the-trust-wallet-browser-extension-with-a-ledger-hardware-wallet/680725',
+						},
+						{
+							label: 'Trust Wallet Ledger FAQ',
+							url: 'https://community.trustwallet.com/t/using-trust-wallet-with-your-ledger-hardware-wallet-frequently-asked-questions-faq/680818',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation: 'Ledger support is only available in the browser extension.',
+							label: 'Trust Wallet Ledger FAQ',
+							url: 'https://community.trustwallet.com/t/using-trust-wallet-with-your-ledger-hardware-wallet-frequently-asked-questions-faq/680818',
+						},
+					],
+					wallets: {},
+				},
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'Trust Wallet "generates a secret recovery phrase on your device". The phrase and the private keys derived from it never leave the phone or browser extension, and are never stored on Trust Wallet servers.',
+						label: 'Trust Wallet article on wallet safety',
+						url: 'https://trustwallet.com/blog/security/is-trust-wallet-safe',
+					},
+					{
+						explanation:
+							'Trust Wallet Core creates a wallet by generating one complete BIP39 mnemonic locally. No key shares are involved.',
+						label: 'Trust Wallet Core mnemonic generation',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/src/HDWallet.cpp#L64-L75',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: notSupported,
 			},
