@@ -401,7 +401,14 @@ export const trustWallet: SoftwareWallet = {
 		},
 		selfSovereignty: {
 			permissionsManagement: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'The Approvals tab lists ERC-20 token approvals with the spender and the approved amount, including unlimited approvals.',
+						file: 'public/references/wallets/trust-wallet/screenshots/2026-11-16-trust-wallet-erc20-approvals.png',
+						label: 'Trust Wallet Approvals tab',
+					},
+				],
 				approvalsManagement: supported({
 					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
 					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
