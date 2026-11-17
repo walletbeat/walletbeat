@@ -23,12 +23,14 @@ type Props = {
 	 * Only enable on pages that render complex icons above the fold.
 	 */
 	preloadComplexIcons?: boolean
+	preloadSpecialHeadingFont?: boolean
 }
 
 const {
 	metadata,
 	rewriteUrlTo,
 	preloadComplexIcons = false,
+	preloadSpecialHeadingFont = false,
 	showContributionCallToAction = true,
 } = Astro.props
 
@@ -48,7 +50,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
-		<Font cssVariable='--fontFamily-spMonorium' />
+		<Font cssVariable='--fontFamily-spMonorium' preload={preloadSpecialHeadingFont} />
 		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
