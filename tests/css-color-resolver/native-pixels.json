@@ -1,0 +1,96 @@
+{
+	"engine": "Chromium155.0.8059.12",
+	"colorSpace": "sRGB",
+	"cases": [
+		{
+			"rating": "FAIL",
+			"color": "var(--rating-fail)",
+			"background": "white",
+			"rgb": [255, 129, 152]
+		},
+		{
+			"rating": "FAIL",
+			"color": "var(--rating-fail)",
+			"background": "var(--background-primary)",
+			"rgb": [255, 129, 152]
+		},
+		{
+			"rating": "FAIL",
+			"color": "var(--rating-fail)",
+			"background": "var(--accent-backgroundColor)",
+			"rgb": [255, 129, 152]
+		},
+		{
+			"rating": "PARTIAL",
+			"color": "var(--rating-partial)",
+			"background": "white",
+			"rgb": [255, 197, 77]
+		},
+		{
+			"rating": "PARTIAL",
+			"color": "var(--rating-partial)",
+			"background": "var(--background-primary)",
+			"rgb": [255, 197, 77]
+		},
+		{
+			"rating": "PARTIAL",
+			"color": "var(--rating-partial)",
+			"background": "var(--accent-backgroundColor)",
+			"rgb": [255, 197, 77]
+		},
+		{
+			"rating": "PASS",
+			"color": "var(--rating-pass)",
+			"background": "white",
+			"rgb": [164, 236, 132]
+		},
+		{
+			"rating": "PASS",
+			"color": "var(--rating-pass)",
+			"background": "var(--background-primary)",
+			"rgb": [164, 236, 132]
+		},
+		{
+			"rating": "PASS",
+			"color": "var(--rating-pass)",
+			"background": "var(--accent-backgroundColor)",
+			"rgb": [164, 236, 132]
+		},
+		{
+			"rating": "UNRATED",
+			"color": "var(--rating-unrated)",
+			"background": "white",
+			"rgb": [214, 219, 224]
+		},
+		{
+			"rating": "UNRATED",
+			"color": "var(--rating-unrated)",
+			"background": "var(--background-primary)",
+			"rgb": [210, 209, 224]
+		},
+		{
+			"rating": "UNRATED",
+			"color": "var(--rating-unrated)",
+			"background": "var(--accent-backgroundColor)",
+			"rgb": [212, 200, 217]
+		},
+		{
+			"rating": "EXEMPT",
+			"color": "var(--rating-neutral)",
+			"background": "white",
+			"rgb": [150, 159, 165]
+		},
+		{
+			"rating": "EXEMPT",
+			"color": "var(--rating-neutral)",
+			"background": "var(--background-primary)",
+			"rgb": [150, 159, 165]
+		},
+		{
+			"rating": "EXEMPT",
+			"color": "var(--rating-neutral)",
+			"background": "var(--accent-backgroundColor)",
+			"rgb": [150, 159, 165]
+		}
+	]
+}
