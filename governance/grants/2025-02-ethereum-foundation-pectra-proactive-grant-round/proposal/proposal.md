@@ -7,7 +7,7 @@ Project-category: Other
 Grant-recipient: polymutex (Individual)
 Fiat-currency: USD
 Amount: 577.02
-How-did-you-hear-about-this-grant-round: Other - Farcaster - https://warpcast.com/ef-esp/0xbe473fa9
+How-did-you-hear-about-this-grant-round: Other - Farcaster - https://farcaster.xyz/ef-esp/0xbe473fa9
 Twitter-handle: polymutex
 Website: https://beta.walletbeat.eth.limo/
 Farcaster: '@polymutex.eth'
@@ -42,21 +42,21 @@ _Following template_: [`https://notes.ethereum.org/@BOR4/HJVaegyByl`](https://no
 
 ### Project Team
 
-- **polymutex**: Lead on this EIP-7702-specific project; [`@polymutex.eth` on Farcaster](https://warpcast.com/polymutex.eth). Currently revamping Walletbeat (referred to as "Walletbeat beta" in this proposal). EIP-7702 is a part of this revamping effort. Roles: designing EIP-7702 readiness and features criteria, reviewing wallets, and coordination with other potential contributors on this project.
+- **polymutex**: Lead on this EIP-7702-specific project; [`@polymutex.eth` on Farcaster](https://farcaster.xyz/polymutex.eth). Currently revamping Walletbeat (referred to as "Walletbeat beta" in this proposal). EIP-7702 is a part of this revamping effort. Roles: designing EIP-7702 readiness and features criteria, reviewing wallets, and coordination with other potential contributors on this project.
 - Other contributors may also take part in this project, for purpose of specific per-wallet research or for providing feedback on the EIP-7702-related criteria. Walletbeat beta is open-source and everyone is free to contribute on GitHub.
 
 ### Background
 
 Walletbeat is a public good, [open-source](https://github.com/fluidkey/walletbeat) MIT-licensed project that brings transparency to the Ethereum wallet ecosystem. As L2BEAT has done for Ethereum Layer 2s, Walletbeat aims to do the same for Ethereum wallets.
 
-Walletbeat was kicked off by [Fluidkey](https://fluidkey.com/) at [https://walletbeat.fyi](https://walletbeat.fyi) - but currently mostly in maintenance mode. However, in recent months, polymutex has kicked off an effort to revamp it from scratch (referred to as "Walletbeat beta" in this proposal) which goes deeper into each wallet and change the way wallets are evaluated to align with Ethereum values. See [Ethereum Magicians thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). This effort has been a building-in-public endeavor, with week-by-week progress posted on the [`/walletbeat` Farcaster channel](https://warpcast.com/~/channel/walletbeat).
+Walletbeat was kicked off by [Fluidkey](https://www.fluidkey.com/) at [https://walletbeat.fyi](https://walletbeat.fyi) - but currently mostly in maintenance mode. However, in recent months, polymutex has kicked off an effort to revamp it from scratch (referred to as "Walletbeat beta" in this proposal) which goes deeper into each wallet and change the way wallets are evaluated to align with Ethereum values. See [Ethereum Magicians thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). This effort has been a building-in-public endeavor, with week-by-week progress posted on the [`/walletbeat` Farcaster channel](https://farcaster.xyz/~/channel/walletbeat.
 
 This grant is _not_ intended to represent a grant from the Ethereum Foundation to Fluidkey. While currently part of Fluidkey, Walletbeat beta aims to decentralize away from it, but does not yet have a large enough credibly-decentralized contributor set at this time to make such a move practically meaningful. As such, for the purposes of this grant, polymutex (as an individual unaffiliated with the Fluidkey organization) is the sole intended recipient.
 
 EIP-7702 readiness is one of the planned attributes for wallets listed on Walletbeat beta. EIP-7702 has massive potential for improved security and user experience for wallets, but these benefits are only realized if wallets adopt such features. However, there are adoption challenges, and concerns over the lack of adoption has been raised as a problem:
 
 - [https://x.com/tyneslol/status/1885830752891228500](https://x.com/tyneslol/status/1885830752891228500)
-- [https://warpcast.com/chaskin.eth/0xd81f324f](https://warpcast.com/chaskin.eth/0xd81f324f)
+- [https://farcaster.xyz/chaskin.eth/0xd81f324f](https://farcaster.xyz/chaskin.eth/0xd81f324f)
 
 ### Related Pectra EIP
 
@@ -88,9 +88,9 @@ This grant covers two broad categories of work:
 
 ### Methodology
 
-Walletbeat beta is built as an open-source static frontend hosted on IPFS. Development is done in the open on GitHub and discussion on the [`/walletbeat` Farcaster channel](https://warpcast.com/~/channel/walletbeat). Technologies used include Astro, Material UI, TypeScript, etc. The Walletbeat beta dashboard is public and accessible to all web browser users.
+Walletbeat beta is built as an open-source static frontend hosted on IPFS. Development is done in the open on GitHub and discussion on the [`/walletbeat` Farcaster channel](https://farcaster.xyz/~/channel/walletbeat. Technologies used include Astro, Material UI, TypeScript, etc. The Walletbeat beta dashboard is public and accessible to all web browser users.
 
-EIP-7702 readiness and features criteria will be determined by discussion and issues on GitHub and Farcaster. Wallet data updates will be conducted by GitHub pull requests, as a result of wallet testing and wallet code review. Review research tasks may be posted to [Bountycaster](https://warpcast.com/~/channel/bounties) to shard out the work.
+EIP-7702 readiness and features criteria will be determined by discussion and issues on GitHub and Farcaster. Wallet data updates will be conducted by GitHub pull requests, as a result of wallet testing and wallet code review. Review research tasks may be posted to [Bountycaster](https://farcaster.xyz/~/channel/bounties) to shard out the work.
 
 This grant proposal itself is part of the [Walletbeat beta repository](https://github.com/walletbeat/walletbeat) as part of the intention to keep governance for Walletbeat as a project fully public and transparent.
 

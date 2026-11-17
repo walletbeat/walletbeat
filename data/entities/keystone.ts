@@ -16,7 +16,7 @@ export const keystone: CorporateEntity & WalletDeveloper = {
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/kesytone',
-	farcaster: 'https://warpcast.com/keystonewallet',
+	farcaster: 'https://farcaster.xyz/keystonewallet',
 	icon: {
 		extension: 'svg',
 	},

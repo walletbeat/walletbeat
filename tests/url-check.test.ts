@@ -1,0 +1,203 @@
+import { execSync } from 'child_process'
+import { existsSync } from 'fs'
+import path from 'path'
+import { describe, expect, it } from 'vitest'
+
+import { allWallets } from '@/data/wallets'
+import { collectAllRefs } from '@/schema/reference'
+import { getUrl, type Url } from '@/schema/url'
+import { fetchUrl } from '@/tests/utils/fetch-url'
+import {
+	isCheckableUrl,
+	type KnownValidUrl,
+	knownValidUrls,
+	serializeKnownValidUrl,
+	urlHash,
+} from '@/tests/utils/known-urls'
+import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
+import { today } from '@/types/date'
+import { getRepositoryRoot } from '@/utils/codebase'
+
+const newValidUrls: KnownValidUrl[] = []
+
+const verifiedUrls: KnownValidUrl[] = []
+
+/** Core validation logic, shared by `checkValidUrl` (wallet-data `Url`s) and the built-HTML scan below (plain hrefs). */
+async function checkValidHref(href: string): Promise<void> {
+	if (!isCheckableUrl(href)) {
+		return
+	}
+
+	const digest = urlHash(href)
+	const existing = knownValidUrls.find(knownValidUrl => knownValidUrl.urlHash === digest)
+
+	if (existing !== undefined) {
+		verifiedUrls.push(existing)
+
+		return
+	}
+
+	if (newValidUrls.some(newValidUrl => href === newValidUrl.url)) {
+		return
+	}
+
+	const outcome = await fetchUrl(href)
+
+	expect(outcome.ok, `Request to ${href} failed (${outcome.detail})`).toBe(true)
+	newValidUrls.push({ url: href, urlHash: digest, retrieved: today() })
+}
+
+/** Thin wrapper over `checkValidHref` for wallet-data references, which carry a `Url` rather than a plain string. */
+async function checkValidUrl(url: Url): Promise<void> {
+	await checkValidHref(getUrl(url))
+}
+
+/**
+ * `pnpm validate-urls` populates known-urls.json from both wallet-data
+ * references and every external link found in the built site's HTML (e.g.
+ * hardcoded links in markdown attribute descriptions or components). This
+ * test file must scan the same built HTML, or those entries would always
+ * appear as "extraneous" below, since nothing else in this file would ever
+ * visit them.
+ */
+function getDistDir(): string {
+	const distDir = process.env.DIST_DIR ?? path.join(getRepositoryRoot(), 'dist')
+
+	if (!existsSync(distDir)) {
+		execSync('pnpm run build', { cwd: getRepositoryRoot(), stdio: 'inherit' })
+	}
+
+	return distDir
+}
+
+describe('reference URLs', () => {
+	const refsByWallet = Map.groupBy(
+		collectAllRefs(allWallets).filter(collected => collected.fullyQualifiedRefs.length > 0),
+		collected => collected.walletName,
+	)
+
+	for (const [walletName, wallet] of Object.entries(allWallets)) {
+		describe(`wallet ${wallet.metadata.displayName}`, () => {
+			it('has valid websites', async () => {
+				for (const website of wallet.metadata.urls?.websites ?? []) {
+					await checkValidUrl(website)
+				}
+			})
+			it('has valid docs', async () => {
+				for (const doc of wallet.metadata.urls?.docs ?? []) {
+					await checkValidUrl(doc)
+				}
+			})
+			it('has valid repositories', async () => {
+				for (const repository of wallet.metadata.urls?.repositories ?? []) {
+					await checkValidUrl(repository)
+				}
+			})
+			it('has valid extensions', async () => {
+				for (const extension of wallet.metadata.urls?.extensions ?? []) {
+					await checkValidUrl(extension)
+				}
+			})
+			it('has valid androidManifestXml', async () => {
+				if (wallet.metadata.urls?.androidManifestXml !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.androidManifestXml)
+				}
+			})
+			it('has valid iosInfoPlist', async () => {
+				if (wallet.metadata.urls?.iosInfoPlist !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.iosInfoPlist)
+				}
+			})
+			it('has valid socials', async () => {
+				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
+					if (social === undefined) {
+						continue
+					}
+
+					await checkValidUrl(social)
+				}
+			})
+			it('has valid others', async () => {
+				for (const other of wallet.metadata.urls?.others ?? []) {
+					await checkValidUrl(other)
+				}
+			})
+
+			for (const collected of refsByWallet.get(walletName) ?? []) {
+				describe(collected.fieldPath, () => {
+					for (const qualRef of collected.fullyQualifiedRefs) {
+						for (const qualRefUrl of qualRef.urls) {
+							describe(qualRefUrl.url, () => {
+								it('is valid URL', async () => {
+									await checkValidUrl(qualRefUrl)
+								})
+							})
+						}
+					}
+				})
+			}
+		})
+	}
+})
+
+describe('built site external URLs', () => {
+	const distDir = getDistDir()
+
+	for (const [href, firstFile] of findExternalUrlsInDist(distDir)) {
+		describe(href, () => {
+			it(`is valid URL (found in ${firstFile})`, async () => {
+				await checkValidHref(href)
+			})
+		})
+	}
+})
+
+describe('already-known valid URLs set', () => {
+	it('is exhaustive', () => {
+		expect(null).toSatisfy(
+			() => newValidUrls.length === 0,
+			(newValidUrls.length === 1
+				? 'A new valid URL was detected, and needs to be added to the known-valid URL list to avoid re-fetching it on every run.'
+				: 'New valid URLs were detected, and need to be added to the known-valid URL list to avoid re-fetching them on every run.') +
+				'\n\nRun `pnpm validate-urls` to add them automatically, or add the following to tests/utils/known-urls.json:\n\n' +
+				newValidUrls.map(serializeKnownValidUrl).join('\n'),
+		)
+	})
+	it('has no extraneous entries', () => {
+		expect(null).toSatisfy(
+			() =>
+				knownValidUrls.every(knownValidUrl =>
+					verifiedUrls.some(verifiedUrl => knownValidUrl.urlHash === verifiedUrl.urlHash),
+				),
+			'URLs were removed; run `pnpm validate-urls` or remove them from tests/utils/known-urls.json as well:\n\n' +
+				knownValidUrls
+					.filter(knownValidUrl =>
+						verifiedUrls.every(verifiedUrl => knownValidUrl.urlHash !== verifiedUrl.urlHash),
+					)
+					.map(verifiedUrl => `- ${verifiedUrl.url}`)
+					.join('\n'),
+		)
+	})
+	it('has no duplicate entries', () => {
+		for (const knownValidUrl1 of knownValidUrls) {
+			expect(null).toSatisfy(
+				() =>
+					knownValidUrls.filter(
+						knownValidUrl2 =>
+							knownValidUrl1.url === knownValidUrl2.url ||
+							knownValidUrl1.urlHash === knownValidUrl2.urlHash,
+					).length === 1,
+				`URL '${knownValidUrl1.url}' is duplicated.`,
+			)
+		}
+	})
+	describe('has valid hashes', () => {
+		for (const knownValidUrl of knownValidUrls) {
+			describe(knownValidUrl.url, () => {
+				it('has valid hash', () => {
+					expect(knownValidUrl.urlHash).toEqual(urlHash(knownValidUrl.url))
+				})
+			})
+		}
+	})
+})

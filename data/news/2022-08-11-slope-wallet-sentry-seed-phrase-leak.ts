@@ -12,7 +12,7 @@ export default {
 	ref: [
 		{
 			label: 'Slope Finance Investigation by auditor OtterSec',
-			url: 'https://osec.io/reports/slope-investigation-report.pdf',
+			url: 'https://web.archive.org/web/20240226112518/https://osec.io/reports/slope-investigation-report.pdf',
 		},
 		{
 			label: 'Analysis of Slope Finance hack by auditor SlowMist',

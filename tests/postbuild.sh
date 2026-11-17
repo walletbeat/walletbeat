@@ -5,6 +5,7 @@ set -euo pipefail
 TESTS=(
 	postbuild/links_test.sh
 	postbuild/filesize_test.sh
+	postbuild/external_urls_test.sh
 )
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export REPO_DIR="$(dirname "$SCRIPT_DIR")"
