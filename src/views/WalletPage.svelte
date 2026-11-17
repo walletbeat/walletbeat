@@ -649,8 +649,12 @@
 				const angle = -90 - item.sliceStyle.midAngle
 				const index = states.length + 1
 				const name = `${prefix}-${index}`
-				const timeline = `--${item.href.slice(1)}-entry`
+				const timeline = `--${item.href.slice(1)}-current`
 				styles.push(`
+					#top > article ${item.href}[data-sticky-breadcrumb~="scope"] {
+						view-timeline-name: var(---breadcrumb-exitTimeline, none), ${timeline};
+						view-timeline-inset: 0px, var(---scrollItem-snapOffsetBlockStart) 0px;
+					}
 					@keyframes ${name} {
 						from { rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${previousAngle}deg); }
 						to { rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${angle}deg); }
