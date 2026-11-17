@@ -6,7 +6,7 @@ test('in-flow wallet metadata shares the title edges and centers when it fits', 
 }) => {
 	test.skip(
 		!(await page.evaluate(qualifyNativeBreadcrumbClock)).applicable,
-		'The unenhanced header has separate coverage',
+		'The baseline header has separate coverage',
 	)
 
 	await page.setViewportSize({ width: 1034, height: 900 })
