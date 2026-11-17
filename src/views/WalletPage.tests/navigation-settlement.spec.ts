@@ -29,40 +29,63 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 		const settle = async (id: string, label: string) => {
 			await expect.poll(() => new URL(page.url()).hash).toBe(`#${id}`)
 			await page.evaluate(() => document.fonts.ready)
-			let previous = await sample()
+			const index = id === detailId ? 3 : 2
+			const measure = async () => {
+				const observed = await sample()
+				const preceding = observed.rows
+					.slice(0, index)
+					.filter(
+						row => row.opacity > 0.01 && row.headingBox.bottom > 0 && row.headingBox.top < 450,
+					)
+				const pieBottom = await page.evaluate(observeFixedPieBottom)
+				const contact = Math.max(
+					observed.siteBottom,
+					pieBottom,
+					...preceding.map(row => row.occupiedRow.bottom),
+				)
+
+				return { observed, target: observed.rows[index], preceding, pieBottom, contact }
+			}
+			let result = await measure()
 			let stable = 0
 
-			await expect
-				.poll(
-					async () => {
-						const current = await sample()
+			try {
+				await expect
+					.poll(
+						async () => {
+							const previous = result
 
-						stable = Math.abs(current.scroll - previous.scroll) < 0.25 ? stable + 1 : 0
-						previous = current
+							result = await measure()
+							const { observed, target, contact } = result
+							const arrived =
+								target.headingBox.bottom > 0 &&
+								target.headingBox.top < observed.viewport.height &&
+								Math.abs(target.scopeBox.top - contact) <= 3
+							const stationary =
+								Math.abs(observed.scroll - previous.observed.scroll) < 0.25 &&
+								Math.abs(target.scopeBox.top - previous.target.scopeBox.top) < 0.25 &&
+								Math.abs(contact - previous.contact) < 0.25
 
-						return stable
-					},
-					{ message: `${label}: native scrolling must settle`, intervals: [100, 100, 100] },
-				)
-				.toBeGreaterThanOrEqual(3)
-			const observed = await sample()
-			const index = id === detailId ? 3 : 2
-			const target = observed.rows[index]
-			const preceding = observed.rows
-				.slice(0, index)
-				.filter(row => row.opacity > 0.01 && row.headingBox.bottom > 0 && row.headingBox.top < 450)
-			const pieBottom = await page.evaluate(observeFixedPieBottom)
-			const contact = Math.max(
-				observed.siteBottom,
-				pieBottom,
-				...preceding.map(row => row.occupiedRow.bottom),
-			)
+							stable = arrived && stationary ? stable + 1 : 0
+
+							return stable
+						},
+						{
+							message: `${label}: destination lands and settles at the painted stack`,
+							intervals: [100],
+						},
+					)
+					.toBeGreaterThanOrEqual(3)
+			} finally {
+				await info.attach(`settlement-${label}`, {
+					body: JSON.stringify({ id, ...result }),
+					contentType: 'application/json',
+				})
+			}
+
+			const { observed, preceding, pieBottom, contact } = result
 
 			records.push({ label, id, observed, pieBottom, contact })
-			await info.attach(`settlement-${label}`, {
-				body: JSON.stringify({ id, observed, pieBottom, contact }),
-				contentType: 'application/json',
-			})
 
 			for (const row of preceding) {
 				for (const end of row.endBoxes) {
@@ -79,18 +102,6 @@ for (const width of [390, 864, 1344, 1345, 1440]) {
 					}
 				}
 			}
-			expect(
-				target.headingBox.bottom,
-				`${label}: real destination heading stays visible`,
-			).toBeGreaterThan(0)
-			expect(
-				target.headingBox.top,
-				`${label}: real destination is in the usable viewport`,
-			).toBeLessThan(900)
-			expect(
-				Math.abs(target.scopeBox.top - contact),
-				`${label}: actual destination container clears the preceding sticky stack and fixed pie`,
-			).toBeLessThanOrEqual(3)
 			expect(await page.locator(chain[index].heading).count()).toBe(1)
 
 			return observed
