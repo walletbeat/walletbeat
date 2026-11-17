@@ -116,16 +116,17 @@ test('native Stage accordions preserve every applicable ladder hierarchy', async
 				await expect(groupDetail).toHaveCount(1)
 				const criteria = groupDetail.locator(':scope > div > ul > li[data-stage-criterion-rating]')
 
-				await expect(criteria).toHaveCount(group.criteria.length)
-				expect(
-					await criteria.evaluateAll(elements =>
-						elements.every(element => element.textContent?.trim()),
-					),
-				).toBe(true)
+				const criterionText = await criteria.evaluateAll(elements =>
+					elements.map(element => (element.textContent ?? '').replace(/\s+/g, ' ').trim()),
+				)
+
+				expect(criterionText).toHaveLength(group.criteria.length)
 
 				for (const [index, criterion] of group.criteria.entries()) {
-					expect(criterion.text.trim()).not.toBe('')
-					await expect(criteria.nth(index)).toContainText(criterion.text)
+					const expectedText = criterion.text.replace(/\s+/g, ' ').trim()
+
+					expect(expectedText).not.toBe('')
+					expect(criterionText[index]).toContain(expectedText)
 				}
 
 				if (group.criteria.length > 0) {
@@ -159,17 +160,18 @@ test('native Stage accordions preserve every applicable ladder hierarchy', async
 						id: element.id,
 						stage: element.parentElement?.closest('details[name="wallet-stages"]')?.parentElement
 							?.id,
+						criteria: element.querySelectorAll(
+							':scope > div > ul > li[data-stage-criterion-rating]',
+						).length,
 					})),
 				),
-			).toEqual(stage.groups.map(group => ({ id: group.id, stage: stage.id })))
-
-			for (const group of stage.groups) {
-				await expect(
-					page.locator(
-						`[id=${JSON.stringify(group.id)}] > div > ul > li[data-stage-criterion-rating]`,
-					),
-				).toHaveCount(group.criteria.length)
-			}
+			).toEqual(
+				stage.groups.map(group => ({
+					id: group.id,
+					stage: stage.id,
+					criteria: group.criteria.length,
+				})),
+			)
 			observations.push({
 				stage: stage.id,
 				groups: stage.groups,
