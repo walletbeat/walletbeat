@@ -1050,6 +1050,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		style:---pie-rotation-states={pieRotation.animations}
 		style:---pie-rotation-ranges={pieRotation.ranges}
 		class="page-navigation"
+		hidden={attributeNavigationItems.length === 0}
 		style:---toc-currentIndex={landingTocIndex}
 		data-scroll-item="inline-detached"
 		data-sticky-container
@@ -1749,7 +1750,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
 			--scrollItem-inlineDetached-paddingEnd: var(---wallet-content-inline-padding);
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-			--sticky-marginInlineEnd: var(---wallet-page-navigation-inline-size);
+			@media (width > 84rem) {
+				&:has(> .page-navigation:not([hidden])) {
+					--sticky-marginInlineEnd: var(---wallet-page-navigation-inline-size);
+				}
+			}
 			isolation: auto;
 		}
 
@@ -1766,6 +1771,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 
 		.page-navigation {
+			&[hidden] {
+				display: none;
+			}
+
 			container-name: wallet-pie-current;
 			---toc-currentIndex: var(---pie-currentIndex);
 			@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
@@ -2047,7 +2056,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				--sticky-marginInlineStart: 0px;
 				--sticky-marginInlineEnd: 0px;
 			}
-			grid-template: 'Header' 'Overview' 'Nav' 'Content' / minmax(0, 1fr);
+			grid-template: 'Header' 'Overview' 'Content' / minmax(0, 1fr);
+			&:has(> .page-navigation:not([hidden])) {
+				grid-template-areas: 'Header' 'Overview' 'Nav' 'Content';
+			}
 		}
 
 		> [data-sticky-breadcrumb~="position"] {
