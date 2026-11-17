@@ -2144,6 +2144,16 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		from { scale: calc(1 + var(---pie-highlightFrom) * (var(--hover-scale) - 1)); }
 		to { scale: calc(1 + var(---pie-highlightTo) * (var(--hover-scale) - 1)); }
 	}
+	@keyframes -global-wallet-pie-pose {
+		from {
+			opacity: var(---pie-opacityFrom, 1);
+			scale: calc(1 + var(---pie-highlightFrom) * (var(--hover-scale) - 1));
+		}
+		to {
+			opacity: var(---pie-opacityTo, 1);
+			scale: calc(1 + var(---pie-highlightTo) * (var(--hover-scale) - 1));
+		}
+	}
 	@keyframes -global-wallet-pie-highlight {
 		from {
 			opacity: var(---pie-highlightFrom);
@@ -2172,16 +2182,20 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 					animation:
 						var(---link-currentAnimationName) auto linear both,
-						if(style(---pie-turn-timeline: none): none; else: var(---pie-opacityAnimation, none)) auto var(--transition-easeInOutExpo),
-						if(style(---pie-interacting: 1): none; else: wallet-pie-scale) auto var(--transition-easeInOutExpo);
-					animation-timeline: var(--link-current, none), var(---pie-turn-timeline, none), var(---pie-turn-timeline, none);
-					animation-range: normal, var(---pie-turnRange), var(---pie-turnRange);
+						if(
+							style(---pie-turn-timeline: none): none;
+							style(---pie-interacting: 1): var(---pie-opacityAnimation, none);
+							style(---pie-opacityAnimation: wallet-pie-opacity): wallet-pie-pose;
+							else: wallet-pie-scale
+						) auto var(--transition-easeInOutExpo);
+					animation-timeline: var(--link-current, none), var(---pie-turn-timeline, none);
+					animation-range: normal, var(---pie-turnRange);
 					@media (prefers-reduced-motion: reduce) {
-						animation-timing-function: linear, steps(1, end), steps(1, end);
+						animation-timing-function: linear, steps(1, end);
 					}
 				}
 				.pie-navigation-highlight {
-					animation: if(style(---pie-interacting: 1): none; else: wallet-pie-highlight) auto var(--transition-easeInOutExpo);
+					animation: if(style((---pie-turn-timeline: none) or (---pie-interacting: 1)): none; else: wallet-pie-highlight) auto var(--transition-easeInOutExpo);
 					animation-timeline: var(---pie-turn-timeline, none);
 					animation-range: var(---pie-turnRange);
 					@media (prefers-reduced-motion: reduce) {

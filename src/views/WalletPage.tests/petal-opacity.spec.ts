@@ -503,9 +503,12 @@ for (const id of ['transparency', 'open-source']) {
 								.filter(
 									animation =>
 										animation instanceof CSSAnimation &&
-										['wallet-pie-opacity', 'wallet-pie-scale', 'wallet-pie-highlight'].includes(
-											animation.animationName,
-										),
+										[
+											'wallet-pie-opacity',
+											'wallet-pie-scale',
+											'wallet-pie-highlight',
+											'wallet-pie-pose',
+										].includes(animation.animationName),
 								)
 								.map(clock)
 
@@ -587,8 +590,7 @@ for (const id of ['transparency', 'open-source']) {
 
 				expect(effects.map(effect => effect.name).sort()).toEqual([
 					'wallet-pie-highlight',
-					'wallet-pie-opacity',
-					'wallet-pie-scale',
+					'wallet-pie-pose',
 				])
 
 				for (const effect of effects) {
