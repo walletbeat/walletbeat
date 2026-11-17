@@ -53,6 +53,7 @@
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
 	import { mergeRefs, toFullyQualified } from '@/schema/reference'
+	import { supportedHardwareWalletBrandIds } from '@/utils/supported-hardware-wallets'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { setItems } from '@/types/utils/non-empty'
@@ -135,7 +136,7 @@
 
 		if (queryString !== undefined && queryString !== globalThis.location.search.slice(1))
 			globalThis.history.replaceState(
-				null,
+				globalThis.history.state,
 				'',
 				`${globalThis.location.pathname}${queryString ? `?${queryString}` : ''}${globalThis.location.hash}`,
 			)
@@ -403,16 +404,30 @@
 	let selectedModel = $state<string>()
 	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
 
-	onMount(() => {
+	function restoreQuerySelection() {
 		const params = new SvelteURLSearchParams(globalThis.location.search)
-		const variant = params.get('variant') as Variant | null
+		// Native fragment history can dispatch popstate without changing the report query.
+		if (queryParams?.toString() === params.toString()) return
+		const variant = Object.values(Variant).find(value => value === params.get('variant'))
 
 		selectedVariant =
 			variant && variant in wallet.variants && !hasSingleVariant(wallet.variants)
 				? variant
 				: undefined
-		selectedModel = params.get('model') ?? undefined
+		const models = Variant.HARDWARE in wallet.variants ? brandModels : allHardwareModels
+		selectedModel = models.find(model => model.modelId === params.get('model'))?.modelId
 		queryParams = params
+	}
+
+	onMount(() => {
+		const walletPath = globalThis.location.pathname
+		const restoreWalletHistorySelection = () => {
+			// ClientRouter keeps this wallet mounted while it prepares a different page.
+			if (globalThis.location.pathname === walletPath) restoreQuerySelection()
+		}
+
+		restoreQuerySelection()
+		globalThis.addEventListener('popstate', restoreWalletHistorySelection)
 		const root = document.querySelector('#top')!
 		const panel = root.querySelector('#wallet-toc')
 		tocStateOwners = [root.closest('#layout'), root.querySelector('.page-navigation'), root.querySelector('.pie-navigation')].filter((owner): owner is Element => owner !== null)
@@ -427,6 +442,7 @@
 		}
 		root.addEventListener('toggle', revealClosedDisclosure, true)
 		return () => {
+			globalThis.removeEventListener('popstate', restoreWalletHistorySelection)
 			root.removeEventListener('toggle', revealClosedDisclosure, true)
 			tocClosing = null
 			for (const owner of tocStateOwners) owner.removeAttribute('data-wallet-toc-state')
@@ -1258,6 +1274,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
+	{@const supportedBrands =
+		attribute.id === 'hardwareWalletSupport' && 'metadata' in evalAttr.evaluation.outcome
+			? supportedHardwareWalletBrandIds(evalAttr.evaluation.outcome.metadata)
+			: []}
 
 	{@const howToImprove =
 		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove}
@@ -1505,11 +1525,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					/>
 				{/if}
 
-				{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
-					{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
-
+				{#if supportedBrands.length > 0}
 					{@const supportedModels = allHardwareModels.filter(m =>
-						supportedBrands.includes(m.brandId.toUpperCase()),
+						supportedBrands.includes(m.brandId),
 					)}
 
 					<div class="supported-hardware-wallets" data-card="secondary padding-6">
