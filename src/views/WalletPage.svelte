@@ -2286,7 +2286,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				var(---pie-approach-states, none), var(---pie-sourceInlineMeasurement, none),
 				var(---pie-entryAnimation, none);
 			animation-timeline: var(---pie-approach-timelines, none), --wallet-pie-source-inline, --wallet-entry;
-			animation-range: var(---pie-approach-ranges, normal), cover 0% cover 100%, var(--stickyBreadcrumb-entryRange, normal);
+			animation-range: var(---pie-approach-ranges, normal), cover 0% cover 100%, contain 100% contain 100%;
 		}
 
 		:global {
@@ -2423,9 +2423,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			}
 
 			:global(.navigation-items details > menu) {
-				opacity: if(style(---breadcrumb-entry: 1): var(---link-active, 0); else: 1);
+				---pie-menuCompact: var(---pie-menuDocked, var(---breadcrumb-entry));
+				opacity: if(style(---pie-menuCompact: 1): var(---link-active, 0); else: 1);
 				visibility: if(
-					(not style(---breadcrumb-entry: 1)) or style(---link-active: 1): visible; else: hidden
+					(not style(---pie-menuCompact: 1)) or style(---link-active: 1): visible; else: hidden
 				);
 				transition-property: opacity, visibility;
 			}
@@ -2539,8 +2540,9 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					z-index: auto;
 					container-type: inline-size;
 					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear if(style(---inlineDirection: -1): reverse; else: normal) both;
-					---pie-entryAnimation: breadcrumb-entry auto steps(1, end) forwards;
-					---pie-fixed: var(---breadcrumb-entry);
+					---pie-entryAnimation: wallet-pie-dock auto steps(1, end) forwards;
+					---pie-fixed: var(---pie-docked);
+					---pie-menuDocked: var(---pie-docked);
 
 					view-timeline-name: --wallet-pie-source, --wallet-pie-source-inline;
 					view-timeline-axis: block, inline;
@@ -2895,6 +2897,18 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 	}
 
+
+	@property ---pie-docked {
+		syntax: '<integer>';
+		inherits: false;
+		initial-value: 0;
+	}
+
+	@keyframes -global-wallet-pie-dock {
+		from, to {
+			---pie-docked: 1;
+		}
+	}
 
 	@property ---pie-sourceInlineOffset {
 		syntax: '<length-percentage>';
