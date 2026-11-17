@@ -80,7 +80,7 @@
 		}
 		@keyframes -global-select-compact-tail {
 			from { translate: 0px; }
-			to { translate: calc((-100% + var(---select-compactSize)) * var(---inlineDirection, 1)); }
+			to { translate: calc((-100% + var(---select-compactWidth)) * var(---inlineDirection, 1)); }
 		}
 		@keyframes -global-select-compact-bridge {
 			from { scale: 1 var(---select-expandedScaleY); translate: 0px; }
@@ -98,7 +98,7 @@
 		@keyframes -global-select-compact-picker {
 			from { translate: 0px; opacity: var(---select-opacity); }
 			to {
-				translate: calc((var(---select-compactSize) / 2 - 100% + var(---select-naturalPadding) + 0.375em) * var(---inlineDirection, 1));
+				translate: calc((var(---select-compactSize) / 2 + var(---select-compactStrip) - 100% + var(---select-naturalPadding) + 0.375em) * var(---inlineDirection, 1));
 				opacity: var(---select-pickerEndOpacity, var(---select-opacity));
 			}
 		}
@@ -112,6 +112,8 @@
 			cursor: pointer;
 			---select-compactSize: calc(var(--icon-size, 2rem) / var(--select-compactScale, 1));
 			---select-timeline: var(--select-compactTimeline, none);
+			---select-compactStrip: 0px;
+			---select-compactWidth: calc(var(---select-compactSize) + var(---select-compactStrip));
 			---select-easing: var(--select-compactEasing, var(--transition-easeInOutExpo));
 			---select-naturalPadding: calc(0.66em + 1px);
 			---select-expandedScaleY: min(1, calc((1lh + 2 * var(---select-naturalPadding)) / var(---select-compactSize)));
@@ -158,9 +160,11 @@
 			}
 			&::after {
 				transform-origin: right center;
-				background-position: right center;
-				clip-path: circle(calc(var(---select-compactSize) / 2) at calc(100% - var(---select-compactSize) / 2) 50%);
-				background-image: radial-gradient(circle at calc(100% - var(---select-compactSize) / 2) 50%, var(--background-primary) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-compactSize) / 2 - var(---select-borderWidth)) calc(var(---select-compactSize) / 2), transparent calc(var(---select-compactSize) / 2));
+				---select-capRadius: calc(var(---select-compactSize) / 2);
+				clip-path: if(style(---select-compactStrip: 0px): circle(var(---select-capRadius) at calc(100% - var(---select-capRadius)) 50%); else: inset(0 0 0 calc(100% - var(---select-capRadius) - var(---select-compactStrip)) round 0 var(---select-capRadius) var(---select-capRadius) 0));
+				background:
+					radial-gradient(circle at calc(100% - var(---select-capRadius)) 50%, var(--background-primary) calc(var(---select-capRadius) - var(---select-borderWidth)), var(---select-borderColor) calc(var(---select-capRadius) - var(---select-borderWidth)) var(---select-capRadius), transparent var(---select-capRadius)) right center / var(---select-capRadius) 100% no-repeat,
+					linear-gradient(var(---select-borderColor) var(---select-borderWidth), var(--background-primary) var(---select-borderWidth) calc(100% - var(---select-borderWidth)), var(---select-borderColor) calc(100% - var(---select-borderWidth))) right var(---select-capRadius) top 0 / var(---select-compactStrip) 100% no-repeat;
 				animation: if(style(---select-timeline: none): none; else: select-compact-tail auto var(---select-easing) both, select-compact-height auto var(---select-easing) both);
 				animation-timeline: var(---select-timeline);
 				animation-range: var(--select-compactRange, contain 0% contain 100%);
@@ -175,7 +179,7 @@
 					position: absolute;
 					pointer-events: none;
 					visibility: hidden;
-					inline-size: var(---select-compactSize);
+					inline-size: var(---select-compactWidth);
 					block-size: var(---select-compactSize);
 					anchor-name: var(--select-visual-anchor, none);
 				}
@@ -243,7 +247,10 @@
 			}
 			&:dir(rtl) > button::before { mask-position: var(---select-naturalPadding) center; transform-origin: calc(var(---select-naturalPadding) + 0.375em) 50%; }
 			&:has(selectedcontent .select-icon:not(:empty)) {
-				---select-pickerEndOpacity: 0;
+				---select-compactStrip: if(style(--select-compactGlyphGap): calc((0.875em + var(--select-compactGlyphGap)) / var(--select-compactScale, 1)); else: 0px);
+				> button::before {
+					---select-pickerEndOpacity: if(style(--select-compactGlyphGap): var(---select-opacity); else: 0);
+				}
 			}
 			@media (prefers-reduced-motion: reduce) {
 				&::before,

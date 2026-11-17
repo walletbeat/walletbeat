@@ -300,6 +300,11 @@ for (const width of [390, 1440]) {
 				mobile.icon.y + mobile.icon.height / 2 - (mobile.circle.y + mobile.circle.height / 2),
 			),
 		).toBeLessThanOrEqual(2)
+		expect(
+			Number(mobile.picker.opacity),
+			'Compact selected variant retains its chevron',
+		).toBeGreaterThan(0)
+		expect(mobile.hitSelect, 'The invisible label tail cannot open the picker').toBe(false)
 		await picker.evaluate(select => select.blur())
 		const idlePaint = await picker.evaluate(select => {
 			const button = select.querySelector('button')
@@ -385,5 +390,12 @@ for (const width of [390, 1440]) {
 				'Compact focus paint must not outline the invisible natural-width rectangle',
 			).toBe('none')
 		}
+		await page.mouse.click(
+			focusPose.circle.x + focusPose.circle.width + 3,
+			focusPose.circle.y + focusPose.circle.height / 2,
+		)
+		await expect.poll(() => picker.evaluate(select => select.matches(':open'))).toBe(true)
+		await page.keyboard.press('Escape')
+		await expect.poll(() => picker.evaluate(select => select.matches(':open'))).toBe(false)
 	})
 }

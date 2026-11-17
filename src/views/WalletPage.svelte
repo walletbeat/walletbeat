@@ -952,6 +952,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							bind:value={selectedVariant}
 							defaultValue={initialVariant}
 							aria-label="Wallet version"
+							style="--select-compactGlyphGap: 0.25em"
 							options={[
 								{
 									value: undefined,
