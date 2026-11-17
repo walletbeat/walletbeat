@@ -3,6 +3,7 @@ import { expect, test } from '../../../tests/browser/verified-test'
 type Frame = {
 	direction: number
 	scroll: number
+	witnessOffset: { top: number; bottom: number }
 	circle: { x: number; y: number; radius: number; valid: boolean }
 	controls: {
 		box: {
@@ -297,19 +298,19 @@ for (const open of [true, false]) {
 							throw new Error('Natural source window must fit the scroll range')
 						}
 
-						root.scrollTo({ top: start, behavior: 'instant' })
-
-						return { span, steps: Math.ceil(span / 48) + 1 }
+						return { start, span, steps: Math.ceil(span / 48) + 1 }
 					}, encounter)
 
-					await page.evaluate(
-						() =>
-							new Promise<void>(resolve =>
-								requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-							),
-					)
-
 					for (const direction of [1, -1]) {
+						await page.evaluate(
+							async top => {
+								document.querySelector('#layout')!.scrollTo({ top, behavior: 'instant' })
+								await new Promise<void>(resolve =>
+									requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+								)
+							},
+							placement.start + (direction < 0 ? placement.span : 0),
+						)
 						await page.evaluate(
 							({ direction, targetId }) => {
 								const root = document.querySelector('#layout')!
@@ -404,7 +405,16 @@ for (const open of [true, false]) {
 												control.box.left < innerWidth,
 										)
 
-									capture.frames.push({ direction, scroll: root.scrollTop, circle, controls })
+									const witness = window.__walletPieSources!.get(window.__walletPieWitness!)!
+									const top = witness.scope.getBoundingClientRect().top + witness.offset
+
+									capture.frames.push({
+										direction,
+										scroll: root.scrollTop,
+										circle,
+										controls,
+										witnessOffset: { top, bottom: top + witness.height },
+									})
 
 									if (capture.active && capture.frames.length < 600) {
 										requestAnimationFrame(frame)
@@ -465,6 +475,23 @@ for (const open of [true, false]) {
 						movement * direction,
 						'Native input traverses the requested direction',
 					).toBeGreaterThan(0)
+					const startSide = frames.findIndex(frame =>
+						direction > 0
+							? frame.witnessOffset.top >= frame.circle.y + frame.circle.radius
+							: frame.witnessOffset.bottom <= frame.circle.y - frame.circle.radius,
+					)
+					const endSide = frames.findIndex(
+						(frame, index) =>
+							index > startSide &&
+							(direction > 0
+								? frame.witnessOffset.bottom <= frame.circle.y - frame.circle.radius
+								: frame.witnessOffset.top >= frame.circle.y + frame.circle.radius),
+					)
+
+					expect(startSide, 'Witness starts outside the pie band').toBeGreaterThanOrEqual(0)
+					expect(endSide, 'Witness exits the opposite side of the pie band').toBeGreaterThan(
+						startSide,
+					)
 					const encounters = frames.flatMap(frame =>
 						frame.controls.filter(
 							control =>
