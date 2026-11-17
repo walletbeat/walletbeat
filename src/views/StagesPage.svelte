@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
+
 	// Types/constants
 	import { softwareWalletLadder } from '@/schema/stages/software-wallet-stages'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
@@ -8,6 +10,113 @@
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
+
+	let article: HTMLElement
+
+	onMount(() => {
+		const navigation = window.navigation
+
+		const historyEntryKey = (): unknown => history.state?.walletbeatStagesEntryKey
+		const entryKey = () => {
+			const fallback = historyEntryKey()
+
+			return navigation?.currentEntry?.key ?? (typeof fallback === 'string' ? fallback : undefined)
+		}
+		const initialKey = entryKey()
+
+		if (!initialKey) return
+
+		const { pathname, search } = location
+		let articleEntryKey = initialKey
+		const offsets = new Map<string, [number, number]>()
+		const layout = article.closest<HTMLElement>('#layout')
+		const storageKey = (key: string) => `walletbeat:stages-scroll:${key}`
+		const save = () => {
+			if (articleEntryKey === pendingKey || !article.isConnected) return
+
+			const offset: [number, number] = [article.scrollTop, layout?.scrollTop ?? 0]
+
+			offsets.set(articleEntryKey, offset)
+
+			try {
+				sessionStorage.setItem(storageKey(articleEntryKey), JSON.stringify(offset))
+			} catch {
+				// The mounted article still retains its own history.
+			}
+		}
+		const restore = (key: string) => {
+			let offset: unknown = offsets.get(key)
+
+			if (offset === undefined) {
+				try {
+					offset = JSON.parse(sessionStorage.getItem(storageKey(key)) ?? 'null')
+				} catch {
+					return
+				}
+			}
+
+			if (!Array.isArray(offset) || offset.length !== 2) return
+
+			const [articleTop, layoutTop]: unknown[] = offset
+
+			if (typeof articleTop !== 'number' || !Number.isFinite(articleTop) ||
+				typeof layoutTop !== 'number' || !Number.isFinite(layoutTop)) return
+
+			pendingKey = key
+			frame = requestAnimationFrame(() => {
+				pendingKey = undefined
+
+				if (!article.isConnected || entryKey() !== key) return
+
+				layout?.scrollTo({ top: layoutTop, behavior: 'instant' })
+				article.scrollTo({ top: articleTop, behavior: 'instant' })
+			})
+		}
+		let frame = 0
+		let pendingKey: string | undefined
+		const listeners = new AbortController()
+		const options = { signal: listeners.signal }
+
+		const state: unknown = history.state
+
+		if (navigation?.currentEntry && state && typeof state === 'object' && historyEntryKey() !== initialKey) {
+			try {
+				history.replaceState({ ...state, walletbeatStagesEntryKey: initialKey }, '')
+			} catch {
+				// The Navigation entry still identifies this article.
+			}
+		}
+
+		navigation?.addEventListener('navigate', () => {
+			save()
+			cancelAnimationFrame(frame)
+			pendingKey = undefined
+		}, options)
+		document.addEventListener('astro:before-swap', save, options)
+		window.addEventListener('pagehide', save, options)
+
+		navigation?.addEventListener('currententrychange', event => {
+			const entry = navigation?.currentEntry
+
+			if (!entry?.url || !entry.sameDocument || event.from.key !== articleEntryKey) return
+
+			const destination = new URL(entry.url)
+
+			if (destination.pathname !== pathname || destination.search !== search) return
+
+			articleEntryKey = entry.key
+
+			if (event.navigationType === 'traverse') restore(entry.key)
+		}, options)
+
+
+		restore(initialKey)
+
+		return () => {
+			listeners.abort()
+			cancelAnimationFrame(frame)
+		}
+	})
 </script>
 
 
@@ -16,6 +125,7 @@
 	data-sticky-container
 >
 	<article
+		bind:this={article}
 		data-scroll-container="block"
 		data-column="gap-8"
 	>
@@ -59,23 +169,18 @@
 
 				<div
 					data-scroll-item="inline-detached padding-match-end"
-					data-column="gap-0"
+					data-column="gap-5"
 					style:--accent={stageColor}
 				>
-					<div
-						class="stage-card"
-						data-card="radius-6 padding-6"
-						data-column="gap-0"
-					>
-						{#if isTypographicContent(stage.description)}
-							<div class="stage-description">
-								<Typography content={stage.description} />
-							</div>
-						{/if}
+					{#if isTypographicContent(stage.description)}
+						<div class="stage-description">
+							<Typography content={stage.description} />
+						</div>
+					{/if}
 
+					<div data-card="radius-6 padding-6">
 						{#each stage.criteriaGroups as criteriaGroup (criteriaGroup.id)}
 							<details
-								class="criteria-group"
 								open
 							>
 								<summary>
@@ -149,6 +254,11 @@
 		line-height: 1.6;
 
 		article {
+			&[data-scroll-container] {
+				overscroll-behavior-block: auto;
+				scroll-behavior: auto;
+			}
+
 			max-height: 100dvh;
 			overflow: auto;
 			padding-block-end: 4rem;
@@ -165,8 +275,10 @@
 	}
 
 	section > header {
-		--sticky-backgroundColor: var(--background-primary);
-		--sticky-backdropFilter: none;
+		&[data-sticky] {
+			--sticky-backgroundColor: var(--background-primary);
+			--sticky-backdropFilter: none;
+		}
 
 		padding-block: 0.75rem;
 	}
@@ -178,38 +290,8 @@
 		line-height: 1.5;
 	}
 
-	.stage-card {
-		border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
-		box-shadow:
-			0 1px 2px rgb(19 10 43 / 0.04),
-			0 12px 32px -16px rgb(19 10 43 / 0.12);
-	}
-
 	.stage-description {
-		padding-block-end: 1.25rem;
 		color: var(--text-secondary);
-
-		:global(p) {
-			margin: 0;
-		}
-	}
-
-	/* Criteria groups are divided rows inside the stage card, not cards of their own. */
-	.criteria-group {
-		border-block-start: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
-
-		> summary {
-			padding-block: 1rem;
-		}
-
-		> :not(summary) {
-			padding-block-end: 1.25rem;
-		}
-
-		/* The card's own padding closes the last group. */
-		&:last-child > :not(summary) {
-			padding-block-end: 0;
-		}
 	}
 
 	.criteria-group-title {
@@ -234,16 +316,4 @@
 		--list-marker-fontFamily: var(--fontFamily-wbicons-simple);
 	}
 
-	li {
-		list-style: none;
-
-		strong {
-			display: block;
-		}
-
-		.criterion-rationale {
-			display: block;
-			margin-top: 0.2rem;
-		}
-	}
 </style>
