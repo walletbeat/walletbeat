@@ -1071,7 +1071,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	<article data-column="gap-8">
 		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
-			<SecurityNews news={walletNews} {allNewsResolved} heading={sectionHeader} />
+			<SecurityNews parentHeadingLevel={2} news={walletNews} {allNewsResolved} heading={sectionHeader} />
 		{/if}
 
 		{#if showStage && primaryStage.ladderEvaluation !== null}
@@ -1110,7 +1110,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />
-			<SecurityNews news={walletNews} {allNewsResolved} heading={sectionHeader} />
+			<SecurityNews parentHeadingLevel={2} news={walletNews} {allNewsResolved} heading={sectionHeader} />
 		{/if}
 
 		{#if attributeNavigationItems.length}
@@ -1446,15 +1446,15 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							{:else if renderData.component === 'PrivateTransfersDetails'}
 								<PrivateTransfersDetails {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...renderData.componentProps} {wallet} refs={references} />
+								<ChainVerificationDetails parentHeadingLevel={3} {...renderData.componentProps} {wallet} refs={references} />
 							{:else if renderData.component === 'ScamAlertDetails'}
-								<ScamAlertDetails {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
+								<ScamAlertDetails parentHeadingLevel={3} {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
 							{:else if renderData.component === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+								<SecurityAuditsDetails references={references ?? []} parentHeadingLevel={3} {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
 							{:else if renderData.component === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'FundingDetails'}
-								<FundingDetails {...renderData.componentProps} {wallet} />
+								<FundingDetails parentHeadingLevel={3} {...renderData.componentProps} {wallet} />
 							{:else if renderData.component === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
 							{:else if renderData.component === 'AccountUnruggabilityDetails'}
@@ -1500,6 +1500,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				{#if evalAttr.evaluation.references?.length && (isTypographicContent(evalAttr.evaluation.details) || !(// Custom components that render their own reference links
 							['ChainVerificationDetails', 'FundingDetails', 'ScamAlertDetails', 'SecurityAuditsDetails'].includes(evalAttr.evaluation.details.component.component)))}
 					<ReferenceLinks
+						parentHeadingLevel={3}
 						references={toFullyQualified(evalAttr.evaluation.references)}
 						cardBackground="secondary"
 					/>

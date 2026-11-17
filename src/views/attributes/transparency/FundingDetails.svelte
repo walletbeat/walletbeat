@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { ParentHeadingLevel } from '@/types/heading'
 	import {
 		type Monetization,
 		monetizationStrategies,
@@ -13,8 +14,10 @@
 	// Props
 	const {
 		wallet,
+		parentHeadingLevel,
 		monetization,
 	}: {
+		parentHeadingLevel: ParentHeadingLevel
 		wallet: { metadata: WalletMetadata }
 		monetization: Monetization | undefined
 	} = $props()
@@ -49,6 +52,6 @@
 {#if monetization}
 	{@const references = refs(monetization)}
 	{#if references.length > 0}
-		<ReferenceLinks references={references} />
+		<ReferenceLinks {parentHeadingLevel} references={references} />
 	{/if}
 {/if}
