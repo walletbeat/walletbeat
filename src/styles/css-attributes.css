@@ -3223,7 +3223,8 @@ ol {
 				position: absolute;
 				pointer-events: none;
 				inset-inline-start: 0;
-				inset-block-start: calc(-1 * (var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceBorderWidth)));
+				/* Allow a CSS pixel for native scroll position rounding. */
+				inset-block-start: calc(-1 * (var(---scrollItem-snapOffsetBlockStart) + var(---breadcrumb-sourceBorderWidth) + 1px));
 				inline-size: 1px;
 				block-size: max(calc(anchor-size(--breadcrumb-source block) * var(--stickyBreadcrumb-scale)), var(--stickyBreadcrumb-minBlockSize));
 				view-timeline: var(--stickyBreadcrumb-approachTimeline) block;

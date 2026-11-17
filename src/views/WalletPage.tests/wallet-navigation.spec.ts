@@ -11,7 +11,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 	}, info) => {
 		await page.emulateMedia({ reducedMotion: reducedMotion ? 'reduce' : 'no-preference' })
 		await page.setViewportSize({ width, height: 900 })
-		await page.goto('/metamask/?variant=BROWSER')
+		await page.goto('/metamask/selection/browser--all/', { waitUntil: 'domcontentloaded' })
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		test.skip(
 			!(await page.evaluate(
@@ -22,14 +22,19 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 			'Shared semantic current styling and native scroll animation have separate fallback coverage',
 		)
 
+		const disclosure = page.locator('#security-audits-and-bounties > details')
+
+		await expect(disclosure).toHaveAttribute('open', '')
+
 		if (closed) {
-			await page.locator('#security-audits-and-bounties > details').evaluate(element => {
+			await disclosure.evaluate(element => {
 				if (!(element instanceof HTMLDetailsElement)) {
 					throw new Error('Expected native details')
 				}
 
 				element.open = false
 			})
+			await expect(disclosure).not.toHaveAttribute('open')
 			await expect
 				.poll(() =>
 					page.evaluate(
@@ -141,22 +146,23 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 				}
 
 				await seek(0)
-				const world =
-					root.scrollTop +
-					destination.target.getBoundingClientRect().top -
-					root.getBoundingClientRect().top
-				const boundary = parseFloat(
-					getComputedStyle(destination.target).getPropertyValue('---breadcrumb-parentBlockEnd'),
+				root.style.removeProperty('scroll-snap-type')
+				destination.target.scrollIntoView({ block: 'start', behavior: 'instant' })
+				await new Promise<void>(resolve =>
+					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 				)
+				const landing = root.scrollTop
 
-				if (!Number.isFinite(boundary)) {
-					throw new Error('Canonical destination must publish its cumulative sticky boundary')
+				root.style.scrollSnapType = 'none'
+
+				if (landing <= 0) {
+					throw new Error('Native destination alignment did not move the root scrollport')
 				}
 
 				const samples = []
 
-				for (const delta of [-100, -20, -1, 1, 20, 1, -1, -20, -100]) {
-					const requested = world - boundary + delta
+				for (const delta of [-100, -20, -1, 0, 1, 20, 1, 0, -1, -20, -100]) {
+					const requested = landing + delta
 
 					await seek(requested)
 					samples.push({
@@ -166,7 +172,7 @@ for (const { width, closed, reducedMotion } of [390, 1440].flatMap(width =>
 						...observe(),
 					})
 				}
-				cases.push({ href: destination.href, boundary, expected: -90 - midAngle, samples })
+				cases.push({ href: destination.href, landing, expected: -90 - midAngle, samples })
 			}
 			// Find the real shared-current handoff without forcing a destination state.
 			await seek(0)
