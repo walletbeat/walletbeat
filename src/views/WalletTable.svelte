@@ -82,8 +82,6 @@
 		new SvelteSet<FilterChoice<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>()
 	)
 
-	let stageModalWalletId = $state<string>()
-	const stageModalWallet = $derived(wallets.find(wallet => wallet.metadata.id === stageModalWalletId))
 
 	// (Derived)
 	const stageFilterDefinitions = $derived(
@@ -756,7 +754,6 @@
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Modal from '@/components/Modal.svelte'
 	import Pie from '@/components/Pie.svelte'
 	import {
 		overallRatingPieLevels,
@@ -769,7 +766,6 @@
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import EipDetails from '@/views/EipDetails.svelte'
-	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
 
 	import WalletAttributeGroupSummary, { WalletAttributeGroupSummaryType } from '@/views/WalletAttributeGroupSummary.svelte'
@@ -822,13 +818,6 @@
 				data-link="camouflaged"
 				data-pressable={fillCell ? 'to-containing' : ''}
 				aria-label={`View ${wallet.metadata.displayName} stage explanation`}
-				aria-haspopup={interactive ? 'dialog' : undefined}
-				onclick={event => {
-					if (!interactive || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-					event.preventDefault()
-					event.stopPropagation()
-					stageModalWalletId = wallet.metadata.id
-				}}
 			>
 				<span data-pressable="paint">
 					<WalletStageBadge {stage} {ladderEvaluation} {size} />
@@ -1927,20 +1916,6 @@
 			{/snippet}
 		</Table>
 	</div>
-
-	<Modal
-		isOpen={stageModalWallet !== undefined}
-		title={stageModalWallet ? `${stageModalWallet.metadata.displayName} stage` : 'Stage'}
-		onClose={() => { stageModalWalletId = undefined }}
-	>
-		{#if stageModalWallet}
-			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(stageModalWallet)}
-			<WalletStageSummary wallet={stageModalWallet} {stage} {ladderEvaluation} />
-		{/if}
-		{#snippet footer()}
-			<button type="button" data-pressable onclick={() => { stageModalWalletId = undefined }}>Close</button>
-		{/snippet}
-	</Modal>
 </section>
 
 

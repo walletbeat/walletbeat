@@ -192,7 +192,7 @@ for (const width of [1280, 768, 390]) {
 	test.describe(`wallet qualification and information at ${width}`, () => {
 		test.use({ viewport: { width, height: 900 } })
 
-		test('Stage explanations preserve filters while header choices own qualification', async ({
+		test('Stage links navigate and header choices own qualification', async ({
 			page,
 		}) => {
 			await page.goto('/wallet/summary/')
@@ -208,41 +208,6 @@ for (const width of [1280, 768, 390]) {
 			await expectMatching(page, qualifiedNames)
 			const initialOrder = await orderedWallets(page)
 			const foreignChoices = await selectedForeignChoices(page)
-
-			for (const walletName of [qualifiedNames[0], unqualifiedNames[0]].filter(
-				(name): name is string => name !== undefined,
-			)) {
-				const row = page.locator('.wallet-table tbody tr').filter({
-					has: page.getByRole('heading', {
-						level: 3,
-						name: walletName,
-						exact: true,
-						includeHidden: true,
-					}),
-				})
-				const stageLink = row.getByRole('link', {
-					name: `View ${walletName} stage explanation`,
-					exact: true,
-				})
-				const stageNode = await stageLink.elementHandle()
-
-				if (!stageNode) {
-					throw new Error('Missing Stage information action')
-				}
-
-				await stageLink.press('Enter')
-				const dialog = page.getByRole('dialog', { name: `${walletName} stage`, exact: true })
-
-				await expect(dialog).toBeVisible()
-				await expectMatching(page, qualifiedNames)
-				expect(page.url()).toBe(initialUrl)
-				await page.keyboard.press('Escape')
-				await expect(dialog).not.toBeVisible()
-				await expect(stageLink).toBeFocused()
-				expect(
-					await stageNode.evaluate(node => node.isConnected && document.activeElement === node),
-				).toBe(true)
-			}
 
 			const qualification = await showQualification(page)
 			const all = qualification.locator('input[value=""]')
@@ -276,6 +241,16 @@ for (const width of [1280, 768, 390]) {
 			await expectStablePartition(page, unfilteredOrder, qualifiedNames)
 			await expect(qualification.locator('input[value="stage-qualified"]')).toBeChecked()
 			expect(await selectedForeignChoices(page)).toEqual(foreignChoices)
+
+			const stageLink = page.getByRole('link', {
+				name: 'View Ambire stage explanation',
+				exact: true,
+			})
+
+			await expect(stageLink).not.toHaveAttribute('aria-haspopup')
+			await stageLink.press('Enter')
+			await expect(page).toHaveURL(/\/ambire\/#stages$/)
+			await expect(page.locator('#stages')).toBeAttached()
 		})
 
 		test.describe('without JavaScript', () => {
