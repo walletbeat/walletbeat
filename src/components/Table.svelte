@@ -1012,7 +1012,7 @@
 
 			@container (width < 48rem) {
 				&[data-sticky] {
-					position: static !important;
+					position: relative !important;
 
 					&:before {
 						content: none !important;
