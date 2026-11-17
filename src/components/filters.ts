@@ -60,16 +60,16 @@ export const applyFilterSets = <Item>(
 		activeBySet.set(set, [...(activeBySet.get(set) ?? []), choice])
 	}
 
+	const prepared = [...activeBySet].flatMap(([set, selected]) => {
+		const predicates = selected.flatMap(choice => (choice.matches ? [choice.matches] : []))
+
+		return predicates.length > 0 ? [{ match: set.match, predicates }] : []
+	})
+
 	return items.filter(item => {
-		for (const [set, selected] of activeBySet) {
-			const predicates = selected.flatMap(choice => (choice.matches ? [choice.matches] : []))
-
-			if (predicates.length === 0) {
-				continue
-			}
-
+		for (const { match, predicates } of prepared) {
 			const passes =
-				set.match === 'union'
+				match === 'union'
 					? predicates.some(matches => matches(item))
 					: predicates.every(matches => matches(item))
 
