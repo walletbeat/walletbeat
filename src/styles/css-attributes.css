@@ -1754,6 +1754,7 @@ ol {
 [data-sticky-breadcrumb~="scope"] {
 	--sticky-position: relative;
 	--sticky-offset: auto;
+	---sticky-stuckBackdropFallback: none;
 	---breadcrumb-itemActive: 0;
 	&[data-sticky-container],
 	:is(
@@ -1797,6 +1798,7 @@ ol {
 	[data-sticky-breadcrumb~="scope"] {
 		--sticky-position: sticky;
 		--sticky-offset: initial;
+		---sticky-stuckBackdropFallback: initial;
 	}
 	/* Scope descendant clocks above their animation targets. Local clocks derive unique names from their arrival identity. */
 	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
@@ -4002,6 +4004,18 @@ ol {
 				> summary[data-sticky~="block-start"] {
 					anchor-name: --sticky-start;
 				}
+				@supports not (container-type: scroll-state) {
+					view-timeline-name: --sticky-disclosure;
+					view-timeline-inset: var(---breadcrumb-parentBlockEnd) 0px;
+
+					> summary[data-sticky~="backdrop-stuck"][data-sticky~="backdrop-before"]::before {
+						opacity: 0;
+						animation: breadcrumb-surface auto step-start;
+						animation-timeline: --sticky-disclosure;
+						animation-range: exit-crossing 0% exit-crossing
+							calc(100% - var(---breadcrumb-itemHeight));
+					}
+				}
 				&::before {
 					content: '';
 					position: fixed;
@@ -4725,8 +4739,8 @@ ol {
 					&:where([data-sticky~="backdrop-before"])::before,
 					&:where([data-sticky~="backdrop-after"])::after {
 						@supports not (container-type: scroll-state) {
-							background: var(---sticky-background);
-							backdrop-filter: var(---sticky-backdropFilter);
+							background: var(---sticky-stuckBackdropFallback, var(---sticky-background));
+							backdrop-filter: var(---sticky-stuckBackdropFallback, var(---sticky-backdropFilter));
 						}
 						@container not scroll-state(stuck: none) {
 							background: var(---sticky-background);
