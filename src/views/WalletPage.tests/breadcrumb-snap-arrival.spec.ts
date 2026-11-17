@@ -166,7 +166,7 @@ for (const { width, destinations } of arrivals) {
 		page,
 	}) => {
 		await page.setViewportSize({ width, height: 900 })
-		await page.goto('/metamask/?variant=BROWSER')
+		await page.goto('/metamask/selection/browser--all/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
 		test.skip(
@@ -256,7 +256,7 @@ for (const direction of ['ltr', 'rtl']) {
 	test(`attribute arrival geometry follows the first content landing across wrapping in ${direction}`, async ({
 		page,
 	}) => {
-		await page.goto('/metamask/?variant=BROWSER')
+		await page.goto('/metamask/selection/browser--all/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
 		test.skip(
@@ -283,54 +283,71 @@ for (const direction of ['ltr', 'rtl']) {
 					requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
 				)
 			})
-			const rows = await page.evaluate(() => {
-				const root = document.querySelector<HTMLElement>('#layout')!
-				const rootTop = root.getBoundingClientRect().top
-				const padding = parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0
+			const rows = await page.evaluate(async () => {
+				const measure = () => {
+					const root = document.querySelector<HTMLElement>('#layout')!
+					const rootTop = root.getBoundingClientRect().top
+					const padding = parseFloat(getComputedStyle(root).scrollPaddingBlockStart) || 0
 
-				return [...document.querySelectorAll<HTMLElement>('.attribute')].map(section => {
-					const card = section.querySelector<HTMLElement>(
-						':scope > details > .attribute-content > .attribute-rating-details',
-					)!
-					const flow = section.querySelector<HTMLElement>(
-						':scope > [data-sticky-breadcrumb~="flow"]',
-					)!
-					const item = section.querySelector(
-						':scope > details > summary [data-sticky-breadcrumb~="item"]',
-					)!
-					const animation = item
-						.getAnimations()
-						.find(
-							effect =>
-								effect instanceof CSSAnimation && effect.animationName === 'breadcrumb-arrival',
+					return [...document.querySelectorAll<HTMLElement>('.attribute')].map(section => {
+						const card = section.querySelector<HTMLElement>(
+							':scope > details > .attribute-content > .attribute-rating-details',
+						)!
+						const flow = section.querySelector<HTMLElement>(
+							':scope > [data-sticky-breadcrumb~="flow"]',
+						)!
+						const item = section.querySelector(
+							':scope > details > summary [data-sticky-breadcrumb~="item"]',
+						)!
+						const animation = item
+							.getAnimations()
+							.find(
+								effect =>
+									effect instanceof CSSAnimation && effect.animationName === 'breadcrumb-arrival',
+							)
+
+						if (!(animation?.timeline instanceof ViewTimeline) || !animation.timeline.subject) {
+							throw new Error('Missing attribute arrival timeline: ' + section.id)
+						}
+
+						const timeline = animation.timeline
+						const length = timeline.subject.getBoundingClientRect().height
+						const end = Math.max(
+							timeline.startOffset.to('px').value + length,
+							timeline.endOffset.to('px').value - length,
 						)
+						const style = getComputedStyle(card)
+						const landing =
+							root.scrollTop +
+							card.getBoundingClientRect().top -
+							rootTop -
+							parseFloat(style.scrollMarginBlockStart) -
+							padding
 
-					if (!(animation?.timeline instanceof ViewTimeline) || !animation.timeline.subject) {
-						throw new Error('Missing attribute arrival timeline: ' + section.id)
+						return {
+							id: section.id,
+							end,
+							landing,
+							alignment: style.scrollSnapAlign,
+							flowAlignment: getComputedStyle(flow).scrollSnapAlign,
+						}
+					})
+				}
+				let previous = ''
+
+				for (let frame = 0; frame < 12; frame++) {
+					await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+					const result = measure()
+					const geometry = JSON.stringify(result)
+
+					if (geometry === previous) {
+						return result
 					}
 
-					const timeline = animation.timeline
-					const length = timeline.subject.getBoundingClientRect().height
-					const end = Math.max(
-						timeline.startOffset.to('px').value + length,
-						timeline.endOffset.to('px').value - length,
-					)
-					const style = getComputedStyle(card)
-					const landing =
-						root.scrollTop +
-						card.getBoundingClientRect().top -
-						rootTop -
-						parseFloat(style.scrollMarginBlockStart) -
-						padding
+					previous = geometry
+				}
 
-					return {
-						id: section.id,
-						end,
-						landing,
-						alignment: style.scrollSnapAlign,
-						flowAlignment: getComputedStyle(flow).scrollSnapAlign,
-					}
-				})
+				throw new Error('Attribute arrival geometry did not settle after resize')
 			})
 
 			expect(rows.length).toBeGreaterThan(0)
@@ -348,7 +365,7 @@ for (const direction of ['ltr', 'rtl']) {
 	test(`text Stage arrivals finish at the first eligible native landing in ${direction}`, async ({
 		page,
 	}) => {
-		await page.goto('/metamask/?variant=BROWSER')
+		await page.goto('/metamask/selection/browser--all/')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
 		await page.evaluate(() => document.fonts.ready)
 		test.skip(
