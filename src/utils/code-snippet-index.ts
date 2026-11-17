@@ -1,3 +1,5 @@
+import { getContext, setContext } from 'svelte'
+
 import {
 	type CodeSnippetSource,
 	isSnippetSource,
@@ -20,65 +22,23 @@ export interface ResolvedCodeSnippet {
 }
 
 /**
- * All stored snippet files, syntax-highlighted and bundled at build time
- * (each module's default export is an array of HTML strings, one per line —
- * see vite-plugin-code-snippet-highlight.mjs).
- * Keyed by snippet filename only (the wallet ID segment is dropped): the
- * filename fully encodes org, repo, commit, path, and line range, so the same
- * URL always maps to identical content no matter which wallet stored it.
- * This lets references resolve snippets without knowing the wallet they
- * belong to.
+ * Stored snippet rows keyed by snippet filename (see `snippetFileName`).
+ * The filename fully encodes org, repo, commit, path, and line range, so the
+ * same URL always maps to identical content no matter which wallet stored it.
+ *
+ * Pages build the subset they render with code-snippet-store.ts (build time
+ * only) and hand it to their island, which provides it to `ReferenceLinks`
+ * via `setCodeSnippetContext`.
  */
-const snippetsByFileName = new Map<string, SnippetRow[]>()
-
-function isSnippetRow(row: unknown): row is SnippetRow {
-	if (typeof row !== 'object' || row === null || !('type' in row)) {
-		return false
-	}
-
-	if (row.type === 'gap') {
-		return true
-	}
-
-	return (
-		row.type === 'line' &&
-		'number' in row &&
-		typeof row.number === 'number' &&
-		'html' in row &&
-		typeof row.html === 'string' &&
-		'highlighted' in row &&
-		typeof row.highlighted === 'boolean'
-	)
-}
-
-for (const [modulePath, rows] of Object.entries(
-	import.meta.glob('/public/references/wallets/*/code/*.snippet', {
-		eager: true,
-		import: 'default',
-	}),
-)) {
-	if (!Array.isArray(rows) || !rows.every(isSnippetRow)) {
-		throw new Error(`Snippet file did not import as an array of snippet rows: ${modulePath}`)
-	}
-
-	const fileName = modulePath.split('/').pop()
-
-	if (fileName === undefined) {
-		throw new Error(`Cannot extract filename from snippet module path: ${modulePath}`)
-	}
-
-	snippetsByFileName.set(fileName, rows)
-}
+export type CodeSnippetIndex = Record<string, SnippetRow[]>
 
 /**
- * Resolve the stored code snippet for a reference URL, or null when the URL
- * is not a commit-pinned line-anchored GitHub blob URL, is a malformed
- * attempt at one (rendering shouldn't crash over a data problem the
- * `code-snippets-integrity` check already surfaces), or has no snippet stored
- * under `public/references/wallets/<wallet-id>/code/`
- * (run `pnpm collect:snippets -- all` to fetch missing ones).
+ * The snippet filename a reference URL maps to, or null when the URL is not
+ * a commit-pinned line-anchored GitHub blob URL, or is a malformed attempt at
+ * one (rendering shouldn't crash over a data problem the
+ * `code-snippets-integrity` check already surfaces).
  */
-export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
+export function codeSnippetSourceForUrl(url: string): CodeSnippetSource | null {
 	let source: ReturnType<typeof parseGitHubBlobUrl>
 
 	try {
@@ -87,15 +47,51 @@ export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
 		return null
 	}
 
-	if (!isSnippetSource(source)) {
+	return isSnippetSource(source) ? source : null
+}
+
+/**
+ * Resolve the stored code snippet for a reference URL from `index`, or null
+ * when the URL is not a snippet source (see `codeSnippetSourceForUrl`) or has
+ * no snippet in `index` (run `pnpm collect:snippets -- all` to fetch missing
+ * ones).
+ */
+export function resolveCodeSnippet(
+	index: CodeSnippetIndex,
+	url: string,
+): ResolvedCodeSnippet | null {
+	const source = codeSnippetSourceForUrl(url)
+
+	if (source === null) {
 		return null
 	}
 
-	const rows = snippetsByFileName.get(snippetFileName(source))
+	const rows = index[snippetFileName(source)] as SnippetRow[] | undefined
 
 	if (rows === undefined) {
 		return null
 	}
 
 	return { rows, source }
+}
+
+const codeSnippetContextKey = Symbol('codeSnippets')
+
+/**
+ * Provide the code snippets an island renders to its descendant components.
+ * Call during component initialization in the island's root component.
+ */
+export function setCodeSnippetContext(getIndex: () => CodeSnippetIndex): void {
+	setContext(codeSnippetContextKey, getIndex)
+}
+
+/**
+ * Get a lookup resolving reference URLs to the code snippets provided by the
+ * nearest `setCodeSnippetContext` ancestor. URLs resolve to null when no
+ * ancestor provides snippets. Call during component initialization.
+ */
+export function getCodeSnippetLookup(): (url: string) => ResolvedCodeSnippet | null {
+	const getIndex = getContext<(() => CodeSnippetIndex) | undefined>(codeSnippetContextKey)
+
+	return url => resolveCodeSnippet(getIndex?.() ?? {}, url)
 }

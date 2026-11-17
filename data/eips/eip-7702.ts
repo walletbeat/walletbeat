@@ -5,6 +5,8 @@ export const eip7702: Eip = {
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
 	formalTitle: 'Set EOA account code',
 	appliesTo: variantEnum.set,
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/e17d216b4e8b359703ddfbc84499d592d65281fb
+	finalizedDate: '2025-06-03',
 	icon: 'ICON_FILE_CODE',
 	number: '7702',
 	prefix: EipPrefix.EIP,

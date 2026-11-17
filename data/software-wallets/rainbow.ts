@@ -3,7 +3,9 @@ import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
+import { cloudinary } from '@/data/entities/cloudinary'
 import { rainbow as rainbowEntity } from '@/data/entities/rainbow'
+import { rudderstack } from '@/data/entities/rudderstack'
 import { sentry } from '@/data/entities/sentry'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { rainbowCaliburContract } from '@/data/wallet-contracts/rainbow-calibur'
@@ -14,7 +16,16 @@ import {
 	ExposedAccountsBehavior,
 	type ExposedAccountSet,
 } from '@/schema/features/privacy/app-isolation'
-import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
@@ -48,10 +59,6 @@ import {
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import {
-	type ChainConfigurability,
-	RpcEndpointConfiguration,
-} from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -64,12 +71,13 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	type FeeDisplay,
 	FeeDisplayLevel,
+	FeeType,
+	type OperationFeeDisplay,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -78,6 +86,66 @@ import { nonEmptySet } from '@/types/utils/non-empty'
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
 import rainbowIosParsed from './manifests/rainbow/ios.parsed.json'
 import rainbowRawExtManifest from './manifests/rainbow/opfgelmcmbiajamepnmloijbpoleiama.manifest.json'
+
+const dataLeakReferences: Record<string, References> = {
+	alphabet: [
+		{
+			explanation:
+				'The extension is installed from the Chrome Web Store, and registers a Firebase installation under the `rainbow-me` Firebase project, which returns a persistent installation ID.',
+			url: [
+				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+				'https://firebaseinstallations.googleapis.com/v1/projects/rainbow-me/installations',
+			],
+		},
+	],
+	cloudinary: [
+		{
+			explanation: "Network and token icons are loaded from Rainbow's Cloudinary bucket.",
+			url: 'https://rainbowme-res.cloudinary.com',
+		},
+	],
+	rainbow: [
+		{
+			explanation:
+				"All RPC traffic for default chains goes through Rainbow's RPC proxy, including `eth_call` lookups that contain the account address and `eth_sendRawTransaction` broadcasts.",
+			url: 'https://rpc.rainbow.me',
+		},
+		{
+			explanation:
+				"Rainbow's platform API fetches assets, balances, and transaction history for the active address.",
+			url: 'https://platform.p.rainbow.me',
+		},
+		{
+			explanation:
+				'The address summary endpoint receives every address in the wallet in a single request.',
+			url: 'https://addys.p.rainbow.me/v3/summary',
+		},
+		{
+			explanation:
+				'Gas prices, token metadata, token search, swap quotes and proxied images are fetched from Rainbow services.',
+			url: [
+				'https://metadata.p.rainbow.me',
+				'https://token-search.rainbow.me',
+				'https://swap.p.rainbow.me',
+				'https://img.p.rainbow.me',
+			],
+		},
+	],
+	rudderstack: [
+		{
+			explanation:
+				'Product analytics events are sent to RudderStack with a persistent `userId`, a `walletAddressHash` for the active wallet, the screens viewed, the actions taken (including send and swap amounts), and the domain of connected apps. This can be turned off in the Privacy Settings.',
+			url: 'https://rainbowjiumask.dataplane.rudderstack.com/v1/batch',
+		},
+	],
+	sentry: [
+		{
+			explanation:
+				'Sentry receives session reports with a persistent session ID. Performance traces include the URLs of API calls, which contain account addresses. Sentry reporting continues even when analytics is turned off in the Privacy Settings.',
+			url: 'https://o331974.ingest.sentry.io',
+		},
+	],
+}
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -124,8 +192,8 @@ export const rainbow: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Both clients execute EIP-7702 (type-4) delegation as part of swap/send-calls flows via the @rainbow-me/delegation SDK; `willExecuteDelegation` decides per (address, chainId) whether the next operation delegates.',
-						url: 'https://github.com/rainbow-me/rainbow/blob/a6caacc07ddad0d40554d647dc4414945c9ebb81/src/features/delegation/willDelegate.ts',
+							'Both clients execute EIP-7702 (type-4) delegation as part of swap/send-calls flows via the @rainbow-me/delegation SDK. The `willExecuteDelegation` function decides per (address, chainId) whether the next operation delegates.',
+						url: 'https://github.com/rainbow-me/rainbow/blob/a6caacc07ddad0d40554d647dc4414945c9ebb81/src/features/delegation/willDelegate.ts#not-line-specific',
 					},
 				],
 				contract: rainbowCaliburContract,
@@ -188,10 +256,54 @@ export const rainbow: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation: 'Rainbow supports sending funds to ENS names using onchain data.',
+				url: [
+					{
+						label: 'Browser extension looking up a recipient name',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/hooks/send/useSendState.ts#L48-L50',
+					},
+					{
+						label: 'Browser extension uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/hooks/useEnsAddress.ts#L21',
+					},
+					{
+						label: 'Mobile app looking up a recipient name',
+						url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/features/transfer/screens/SendSheet.tsx#L389',
+					},
+					{
+						label: 'Mobile app uses the Ethereum RPC to look up ENS names',
+						url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L468-L469',
+					},
+				],
+			},
 			chainSpecificAddressing: {
-				erc7828: notSupported,
-				erc7831: notSupported,
+				erc7828: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rainbow doesn't support ERC-7828 names.",
+							file: 'public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7828-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7828 name',
+						},
+						{
+							file: 'public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7828-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7828 name',
+						},
+					],
+				}),
+				erc7831: notSupportedWithRef({
+					ref: [
+						{
+							explanation: "Rainbow doesn't support ERC-7831 names.",
+							file: 'public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-browser-erc7831-unresolved.png',
+							label: 'Browser extension fails to resolve an ERC-7831 name',
+						},
+						{
+							file: 'public/references/wallets/rainbow/screenshots/2026-10-04-rainbow-mobile-erc7831-unresolved.png',
+							label: 'Mobile app fails to resolve an ERC-7831 name',
+						},
+					],
+				}),
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
@@ -224,15 +336,31 @@ export const rainbow: SoftwareWallet = {
 									'Rainbow browser extension "Rainbow Fee" note disclosing the bridge fee as 0.25%',
 								lastRetrieved: '2026-07-03',
 							},
+							{
+								explanation:
+									'The Rainbow browser extension "Review & Bridge" panel for a 1 USDC bridge lists the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" of 0.0025 USDC.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-browser.png',
+								label: 'Rainbow browser extension bridge Review panel for a 1 USDC bridge',
+								lastRetrieved: '2026-06-26',
+							},
 						],
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(
-								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-								WalletServiceFeeDisplayUnit.PERCENTAGE,
-							),
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -312,13 +440,22 @@ export const rainbow: SoftwareWallet = {
 							},
 						],
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.AGGREGATED,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(
-								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-								WalletServiceFeeDisplayUnit.PERCENTAGE,
-							),
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: nonEmptySet(
+									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+									WalletServiceFeeDisplayUnit.PERCENTAGE,
+								),
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -367,23 +504,42 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: refTodo,
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-				withNoConnectivityExceptL1RPCEndpoint: {
-					accountCreation: featureSupported,
-					accountImport: featureSupported,
-					erc20BalanceLookup: featureSupported,
-					erc20TokenSend: featureSupported,
-					etherBalanceLookup: featureSupported,
+		chainConfigurability: {
+			[Variant.BROWSER]: notSupportedWithRef({
+				ref: {
+					explanation:
+						"The extension lets you set a custom RPC, but sends its traffic through Rainbow's servers unless the node runs on the same computer at port 8545.",
+					url: [
+						{
+							label: 'Browser extension lets you add a custom RPC to a network',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/pages/settings/customChain/AddRpcForm.tsx#L41-L51',
+						},
+						{
+							label:
+								"Browser extension routes custom RPCs through Rainbow's servers except for a few local addresses",
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
+						},
+						{
+							label:
+								'Browser extension can only reach the computer it runs on and a fixed list of servers run by Rainbow and other companies',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
+						},
+						{
+							label:
+								'Browser extension tells the browser to block any server not on its allowed list, including a node on your home network',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
+						},
+					],
 				},
 			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: {
+					explanation: 'The mobile app has no custom RPC setting.',
+					label: "Mobile app only uses Rainbow's default RPC outside developer mode",
+					url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L137-L156',
+				},
 			}),
-		}),
+		},
 		ecosystem: {
 			// Delegation is never offered at EOA creation or import; it is applied lazily,
 			// bundled into the first operation (e.g. a swap) that benefits from it.
@@ -443,7 +599,7 @@ export const rainbow: SoftwareWallet = {
 					{
 						explanation: 'Rainbow uses the GPL-3.0 license for its source code',
 						label: 'Rainbow License File',
-						url: 'https://github.com/rainbow-me/rainbow/blob/c26561eefb4251146db71e5b39f6f0b7233fa647/LICENSE',
+						url: 'https://github.com/rainbow-me/rainbow/blob/c26561eefb4251146db71e5b39f6f0b7233fa647/LICENSE#not-line-specific',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -497,17 +653,17 @@ export const rainbow: SoftwareWallet = {
 						{
 							explanation:
 								'Both Rainbow clients integrate Sentry for crash and error reporting. In the mobile app, `initSentry` runs in all production builds (disabled only for dev/test sessions).',
-							url: 'https://github.com/rainbow-me/rainbow/blob/903d96e1075054ede51a721f5430b09c530fedf9/src/logger/sentry.ts',
+							url: 'https://github.com/rainbow-me/rainbow/blob/903d96e1075054ede51a721f5430b09c530fedf9/src/logger/sentry.ts#not-line-specific',
 						},
 						{
 							explanation:
-								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`; it does not stop Sentry crash reporting.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`. It does not stop Sentry crash reporting.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx#not-line-specific',
 						},
 						{
 							explanation:
 								'In the browser extension, `initializeSentry` runs in all non-dev builds and is not gated by the analytics opt-out, so the user cannot disable crash reporting.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/566dbc30d057e007a6f05ca2694cc600683e4ae8/src/core/sentry/index.ts',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/566dbc30d057e007a6f05ca2694cc600683e4ae8/src/core/sentry/index.ts#not-line-specific',
 						},
 						{
 							explanation:
@@ -525,18 +681,18 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app collects product usage analytics via RudderStack; analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
+								'The mobile app collects product usage analytics via RudderStack. Analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts#not-line-specific',
 						},
 						{
 							explanation:
 								'The browser extension also collects usage analytics via RudderStack, enabled by default (gated by the `analyticsDisabled` setting).',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/b5da91cd683f1b9cdd2eb4a43b3b8314986cf1af/src/analytics/index.ts',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/b5da91cd683f1b9cdd2eb4a43b3b8314986cf1af/src/analytics/index.ts#not-line-specific',
 						},
 						{
 							explanation:
 								'Usage analytics can be disabled by the user via the in-app Analytics toggle (Settings > Privacy), which calls `analytics.disable()` and sets `doNotTrack`.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx#not-line-specific',
 						},
 						{
 							explanation:
@@ -562,7 +718,7 @@ export const rainbow: SoftwareWallet = {
 					createInAppConnectionFlow: notSupportedWithRef({
 						ref: {
 							explanation:
-								'The Rainbow browser extension connection dialog only offers a "Switch Wallets" picker over existing accounts; it provides no option to create a new address as part of connecting to an app.',
+								'The Rainbow browser extension connection dialog only offers a "Switch Wallets" picker over existing accounts. It provides no option to create a new address as part of connecting to an app.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-wallet-picker.png',
 							label:
 								'Rainbow browser extension connect dialog showing only an existing-wallet picker, no create option',
@@ -591,7 +747,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow browser extension connection dialog: the "Wallet" field is a single-select "Switch Wallets" picker that defaults to the currently active account. Connecting exposes only that one account; tested against the Walletbeat test page, eth_accounts returned exactly the single selected account.',
+									'Rainbow browser extension connection dialog: the "Wallet" field is a single-select "Switch Wallets" picker that defaults to the currently active account. Connecting exposes only that one account. When tested against the Walletbeat test page, eth_accounts returned exactly the single selected account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-eth-accounts-single.png',
 								label:
 									'Walletbeat test page showing Rainbow eth_accounts returning a single account',
@@ -642,7 +798,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
+									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow. The connection can only be completed by selecting an existing account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg',
 								label:
 									'Rainbow mobile connection sheet account picker expanded, showing the "+ Add" option among existing accounts',
@@ -714,7 +870,398 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
-			dataCollection: null,
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS,
+									bestChain: {
+										length: 1,
+										weakestEdge: { gapMs: 0, kind: 'ipTime', strength: 1800000 },
+									},
+									destination: 'SAME_FOR_ALL',
+									proxy: 'NONE',
+									timing: 'SIMULTANEOUS',
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.SWAP_QUOTE,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.cloudinary,
+							byEntity: cloudinary,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.rainbow,
+							byEntity: rainbowEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.rudderstack,
+							byEntity: rudderstack,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.USER_ACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.sentry,
+							byEntity: sentry,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: dataLeakReferences.cloudinary,
+							byEntity: cloudinary,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: null,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+			},
 			privacyPolicy: 'https://rainbow.me/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -806,7 +1353,7 @@ export const rainbow: SoftwareWallet = {
 						ref: {
 							explanation: 'The extension is unlocked with a password.',
 							label: 'Extension unlock screen source code',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx#not-line-specific',
 						},
 						mechanisms: {
 							[BasicUnlockMechanism.PIN]: notSupported,
@@ -1142,11 +1689,11 @@ export const rainbow: SoftwareWallet = {
 						{
 							explanation:
 								'The browser extension encrypts its keychain "vault" with a user-chosen password using `@metamask/browser-passworder` (PBKDF2, 600k iterations) before persisting it. The decrypted keychains live in memory only while unlocked.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts#not-line-specific',
 						},
 						{
 							explanation:
-								"When creating a new browser-extension wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `@scure/bip39`, at the library's default 128-bit entropy (12 words). `@scure/bip39` draws that entropy from `@noble/hashes`, whose `randomBytes` calls the browser-provided `crypto.getRandomValues` and throws rather than returning bytes if no secure provider is available. The extension pins `@scure/bip39` 1.6.0, which requires `@noble/hashes` `~1.8.0`; its lockfile resolves that to 1.8.0.",
+								"When creating a new browser-extension wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `@scure/bip39`, at the library's default 128-bit entropy (12 words). `@scure/bip39` draws that entropy from `@noble/hashes`, whose `randomBytes` calls the browser-provided `crypto.getRandomValues` and throws rather than returning bytes if no secure provider is available. The extension pins `@scure/bip39` 1.6.0, which requires `@noble/hashes` `~1.8.0`, resolved to 1.8.0 by its lockfile.",
 							lastRetrieved: '2026-08-02',
 							url: [
 								{
@@ -1178,11 +1725,11 @@ export const rainbow: SoftwareWallet = {
 						{
 							explanation:
 								'The mobile app stores the seed phrase in `react-native-keychain`, gated by biometrics or device passcode (iOS `USER_PRESENCE`, Android `BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE`) wrapped by an RSA key held in OS keystore. The secret cannot be extracted by other software.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts',
+							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts#not-line-specific',
 						},
 						{
 							explanation:
-								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, which the React Native bundler resolves to its browser build under the default `react-native, browser, main` field precedence; that build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup; it returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
+								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, which the React Native bundler resolves to its browser build under the default `react-native, browser, main` field precedence. That build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup. The provider returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
 							lastRetrieved: '2026-08-02',
 							url: [
 								{
@@ -1235,31 +1782,31 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rainbow does not decode a USDC approval; it only shows the simulated approval amount, without the spender.',
+								'Rainbow does not decode a USDC approval. It only shows the simulated approval amount, without the spender.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-usdc-approval.png',
 							label: 'Rainbow transaction request for a USDC approval',
 						},
 						{
 							explanation:
-								'Rainbow does not decode an Aave supply; it only shows the simulated amount sent.',
+								'Rainbow does not decode an Aave supply. It only shows the simulated amount sent.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-aave-supply.png',
 							label: 'Rainbow transaction request for an Aave supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction; the simulation shows no changes detected.',
+								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction. The simulation shows no changes detected.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-aave-supply.png',
 							label: 'Rainbow transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; the simulation shows no changes detected.',
+								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply. The simulation shows no changes detected.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-batch-approve-supply.png',
 							label: 'Rainbow transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
-								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA; it only shows the simulated amounts sent and approved.',
+								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA. It only shows the simulated amounts sent and approved.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-batch-approve-supply.png',
 							label: 'Rainbow batch request for a batched approve and supply',
 						},
@@ -1414,7 +1961,7 @@ export const rainbow: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: {
 						explanation:
-							"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 						url: [
 							{
 								label: "Browser extension sends transactions through the network's RPC",
@@ -1433,13 +1980,13 @@ export const rainbow: SoftwareWallet = {
 			operationFees: {
 				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// Corrects an earlier questionnaire-sourced NONE: the default swap
-				// screen already shows a network fee (so byDefault is AGGREGATED, not
+				// screen already shows a network fee (so shownByDefault is AGGREGATED, not
 				// NONE), and tapping "Review" (one action) reveals a comprehensive
 				// breakdown including an itemized "Included Rainbow Fee" line, shown as
 				// a token amount (ETH); tapping that fee line (mobile) or its info icon
 				// (browser) reveals the rate as a percentage (0.85%), so the unit set
 				// is {TOKEN_AMOUNT, PERCENTAGE}.
-				builtInErc20Swap: supported<WithRef<FeeDisplay>>({
+				builtInErc20Swap: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1474,21 +2021,32 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-04',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(
-						WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
-						WalletServiceFeeDisplayUnit.PERCENTAGE,
-					),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// For all three flows below, the transaction screen shows a single
 				// aggregate "Estimated fee" figure by default, and one tap on the gas
 				// control opens a sheet itemizing base fee / miner tip / max
 				// transaction fee. None of these flows carry a Rainbow platform fee,
-				// so walletServiceFeeDisplayUnits is NOT_APPLICABLE.
-				erc20L1Transfer: supported<WithRef<FeeDisplay>>({
+				// so WALLET_FEE is false.
+				erc20L1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1507,12 +2065,23 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
-				ethL1Transfer: supported<WithRef<FeeDisplay>>({
+				ethL1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
@@ -1531,19 +2100,30 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
-				uniswapUSDCToEtherSwap: supported<WithRef<FeeDisplay>>({
+				uniswapUSDCToEtherSwap: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
 								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default, alongside the simulated result. The Uniswap protocol fee is reflected in the simulated receive amount, not itemized separately.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png',
 							label:
-								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded; the fee is the single aggregate "Estimated fee"',
+								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded. The fee is the single aggregate "Estimated fee".',
 							lastRetrieved: '2026-07-03',
 						},
 						{
@@ -1555,45 +2135,58 @@ export const rainbow: SoftwareWallet = {
 							lastRetrieved: '2026-07-03',
 						},
 					],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'The browser extension CI runs `yarn install --immutable` and a dedicated `yarn check-lockfile` step, failing the build if yarn.lock is out of sync.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'The mobile wallet Android release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'The mobile wallet iOS release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml#not-line-specific',
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{
 							explanation:
 								'The browser extension runs `yarn audit:ci` (audit-ci) as a CI step, failing the build on vulnerable dependencies.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'The mobile wallet runs `yarn audit-ci` as a CI step, failing the build on vulnerable dependencies.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml',
+							url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml#not-line-specific',
 						},
 					],
 				}),
@@ -1616,17 +2209,17 @@ export const rainbow: SoftwareWallet = {
 						{
 							explanation:
 								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and reruns `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'The mobile wallet Android release build runs `yarn install --immutable && yarn setup` and resolves Gradle dependencies while assembling the release, fetching build inputs from the network.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'The mobile wallet iOS build runs `yarn install --immutable && yarn setup` and `fastlane match`, which fetches signing certificates from a remote git repository during the build, fetching build inputs from the network.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml#not-line-specific',
 						},
 					],
 				}),

@@ -603,6 +603,7 @@ class WalletRequest:
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
             review=data.get("review"),
+            proxy=data.get("proxy"),
             response_status=data.get("responseStatus"),
             response_headers=_decode_str_multidict("responseOddHeaders") or None,
             response_payload=_decode_if_set("responsePayload"),
@@ -668,6 +669,7 @@ class WalletRequest:
         odd_trailers: dict[str, tuple[str, ...]],
         session_time: int,
         review: object | None,
+        proxy: dict | None = None,
         response_status: int | None = None,
         response_headers: dict[str, tuple[str, ...]] | None = None,
         response_payload: str | None = None,
@@ -686,6 +688,7 @@ class WalletRequest:
         self._odd_trailers = odd_trailers
         self._session_time = session_time
         self._review = review
+        self._proxy = proxy
         self._response_status: int | None = response_status
         self._response_headers: dict[str, tuple[str, ...]] = (
             response_headers if response_headers is not None else {}
@@ -803,6 +806,9 @@ class WalletRequest:
 
         if self._review is not None:
             data["review"] = self._review
+
+        if self._proxy is not None:
+            data["proxy"] = self._proxy
 
         return data
 

@@ -78,7 +78,7 @@ Please read [`/resources/docs/contribute/ui/ui.md`](/resources/docs/contribute/u
 
 ### I want to learn more about Walletbeat
 
-Please read the [About page](/src/pages/about/about.md).
+Please read the [About page](/src/pages/about/_about.md).
 
 ### I am a coding agent and I am looking for documentation on the codebase's structure
 

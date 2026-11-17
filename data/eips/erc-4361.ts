@@ -5,6 +5,8 @@ export const erc4361: Eip = {
 	friendlyName: 'Sign-In with Ethereum',
 	formalTitle: 'Sign-In with Ethereum',
 	appliesTo: variantEnum.set,
+	// "Move to Final" commit: https://github.com/ethereum/ERCs/commit/faa49e076526bade48318f0d6e04d9a73f82c131
+	finalizedDate: '2025-08-05',
 	icon: 'ICON_LOG_IN',
 	number: '4361',
 	prefix: EipPrefix.ERC,
