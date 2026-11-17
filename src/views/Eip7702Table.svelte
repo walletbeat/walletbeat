@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
+
 	// Types/constants
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
@@ -21,12 +23,8 @@
 
 
 	// State
-	let activeFilters: Filters<Eip7702Row>['$$prop_def']['activeFilters'] = $state(
-		new Set()
-	)
-
 	let filteredRows: Eip7702Row[] = $state(
-		[]
+		untrack(() => rows)
 	)
 
 
@@ -96,7 +94,6 @@
 					],
 				},
 			]}
-			bind:activeFilters
 			bind:filteredItems={filteredRows}
 			bind:toggleFilter
 			bind:toggleFilterById
@@ -146,12 +143,8 @@
 
 						<span class="wallet-icon" data-icon="shadow">
 							<img
-								src={`/images/wallets/${row.id}.svg`}
+								src={`/images/wallets/${row.id}.${row.iconExtension}`}
 								alt=""
-								onerror={event => {
-									if (event.currentTarget instanceof HTMLImageElement)
-										event.currentTarget.src = '/images/wallets/default.svg'
-								}}
 							/>
 						</span>
 
