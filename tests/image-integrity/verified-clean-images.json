@@ -1995,6 +1995,10 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-11-18 - TheDAO Round 2/grant_page.jpg": {
+		"hash": "a81155968964b47420e1f9c4e5c8c814ce69b5bd3494608dcb6c93f1a14bfb3e",
+		"passedTests": ["file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
