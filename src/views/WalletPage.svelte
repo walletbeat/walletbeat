@@ -2278,9 +2278,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		display: none;
 
 		@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
-			animation: var(---pie-approach-states, none), var(---pie-sourceInlineMeasurement, none);
-			animation-timeline: var(---pie-approach-timelines, none), --wallet-pie-source-inline;
-			animation-range: var(---pie-approach-ranges, normal), cover 0% cover 100%;
+			animation:
+				var(---pie-approach-states, none), var(---pie-sourceInlineMeasurement, none),
+				var(---pie-entryAnimation, none);
+			animation-timeline: var(---pie-approach-timelines, none), --wallet-pie-source-inline, --wallet-entry;
+			animation-range: var(---pie-approach-ranges, normal), cover 0% cover 100%, var(--stickyBreadcrumb-entryRange, normal);
 		}
 
 		:global {
@@ -2533,12 +2535,20 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					z-index: auto;
 					container-type: inline-size;
 					---pie-sourceInlineMeasurement: wallet-pie-source-inline auto linear if(style(---inlineDirection: -1): reverse; else: normal) both;
+					---pie-entryAnimation: breadcrumb-entry auto steps(1, end) forwards;
+					---pie-fixed: var(---breadcrumb-entry);
 
 					view-timeline-name: --wallet-pie-source, --wallet-pie-source-inline;
 					view-timeline-axis: block, inline;
 					view-timeline-inset: var(---pie-compactBlockStart) 0, 0;
 
-					&:is(:global([data-wallet-toc-state="open"]), :global([data-wallet-toc-state="closing"])) {
+					&:is(
+						:global([data-wallet-toc-state="open"]),
+						:global([data-wallet-toc-state="closing"]),
+						:has(+ #wallet-toc:popover-open)
+					) {
+						---pie-fixed: 1;
+
 						.pie-navigation-geometry > :global(.navigation-items),
 						.pie-navigation-geometry::before {
 							animation-name: none;
@@ -2546,18 +2556,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					}
 
 					.pie-navigation-geometry {
-						---pie-sourceInlineOffset: inherit;
-						position: fixed;
-						position-visibility: always;
-						inset-block-start: var(---pie-compactBlockStart);
-						inset-inline-start: auto;
-						inset-inline-end: var(---pie-compactInset);
-						inline-size: var(---pie-compactSize);
-						block-size: var(---pie-compactSize);
-						margin: 0;
-						overflow: visible;
-						container-type: scroll-state;
-						z-index: 3;
+						inline-size: 100%;
 
 						&::before {
 							display: block;
@@ -2570,42 +2569,67 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 						> :global(.navigation-items),
 						&::before {
-							---pie-sourceInlineOffset: inherit;
 							position: absolute;
-							inset-block: 0 auto;
-							inset-inline-start: calc(var(---pie-compactSize) + var(---pie-compactInset) - 100vw);
-							inset-inline-end: auto;
-							inline-size: 100cqi;
+							inset: 0;
+							inline-size: 100%;
 							block-size: var(---pie-size);
 							margin: 0;
-							---pie-sourceInlineCompensation: calc(var(---inlineDirection) * var(---pie-sourceInlineOffset));
-							translate: var(---pie-sourceInlineCompensation) 0;
+							translate: none;
 							rotate: none;
 							scale: none;
-							transform: translateX(
-								calc(
-									var(---inlineDirection) * (
-										100vw - var(---pie-sourceInlineOffset) - 100% - var(---pie-compactInset) +
-										(100% - var(---pie-size)) / 2 * var(---pie-compactSize) / var(---pie-size)
+							animation: var(---pie-backdropAnimation, none);
+							animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+							animation-range: var(--stickyBreadcrumb-entryRange);
+						}
+
+						@container wallet-pie-approach style(---pie-fixed: 1) {
+							---pie-sourceInlineOffset: inherit;
+							position: fixed;
+							position-visibility: always;
+							inset-block-start: var(---pie-compactBlockStart);
+							inset-inline-start: auto;
+							inset-inline-end: var(---pie-compactInset);
+							inline-size: var(---pie-compactSize);
+							block-size: var(---pie-compactSize);
+							margin: 0;
+							overflow: visible;
+							container-type: scroll-state;
+							z-index: 3;
+
+							> :global(.navigation-items),
+							&::before {
+									---pie-sourceInlineOffset: inherit;
+									inset-block: 0 auto;
+									inset-inline-start: calc(var(---pie-compactSize) + var(---pie-compactInset) - 100vw);
+									inset-inline-end: auto;
+									inline-size: 100cqi;
+									---pie-sourceInlineCompensation: calc(var(---inlineDirection) * var(---pie-sourceInlineOffset));
+									translate: var(---pie-sourceInlineCompensation) 0;
+									transform: translateX(
+										calc(
+											var(---inlineDirection) * (
+												100vw - var(---pie-sourceInlineOffset) - 100% - var(---pie-compactInset) +
+												(100% - var(---pie-size)) / 2 * var(---pie-compactSize) / var(---pie-size)
+											)
+										)
 									)
-								)
-							)
-								scale(calc(var(---pie-compactSize) / var(---pie-size)));
-							transform-origin: calc(50% + 50% * var(---inlineDirection)) 0;
-							animation:
-								wallet-pie-source auto linear both,
-								wallet-pie-compact auto var(--transition-easeInOutExpo) both,
-								var(---pie-backdropAnimation, none);
-							animation-timeline:
-								--wallet-pie-source, --wallet-pie-source,
-								var(--stickyBreadcrumb-entryTimeline);
-							animation-range:
-								cover 0% exit-crossing 0%,
-								exit-crossing calc(var(---pie-compactBlockStart) - var(---breadcrumb-blockEnd) - var(---wallet-section-gap))
-								exit-crossing calc(var(---pie-size) - var(---pie-compactSize)),
-								var(--stickyBreadcrumb-entryRange);
-							@media (prefers-reduced-motion: reduce) {
-								animation-timing-function: linear, steps(1, end), linear;
+										scale(calc(var(---pie-compactSize) / var(---pie-size)));
+									transform-origin: calc(50% + 50% * var(---inlineDirection)) 0;
+									animation:
+										wallet-pie-source auto linear both,
+										wallet-pie-compact auto var(--transition-easeInOutExpo) both,
+										var(---pie-backdropAnimation, none);
+									animation-timeline:
+										--wallet-pie-source, --wallet-pie-source,
+										var(--stickyBreadcrumb-entryTimeline);
+									animation-range:
+										cover 0% exit-crossing 0%,
+										exit-crossing calc(var(---pie-compactBlockStart) - var(---breadcrumb-blockEnd) - var(---wallet-section-gap))
+										exit-crossing calc(var(---pie-size) - var(---pie-compactSize)),
+										var(--stickyBreadcrumb-entryRange);
+									@media (prefers-reduced-motion: reduce) {
+										animation-timing-function: linear, steps(1, end), linear;
+									}
 							}
 						}
 
@@ -2617,13 +2641,11 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 								scale: var(---pie-scale);
 								transform-origin: center;
 								rotate: calc(-1 * var(---slice-mid-angle, 0deg));
-								animation:
-									breadcrumb-entry auto steps(1, end) forwards,
-									var(---pie-turn, none) auto var(--transition-easeInOutExpo) both;
-								animation-timeline: --wallet-entry, var(---pie-turn-timeline, none);
-								animation-range: var(--stickyBreadcrumb-entryRange), var(---pie-turnRange);
+								animation: var(---pie-turn, none) auto var(--transition-easeInOutExpo) both;
+								animation-timeline: var(---pie-turn-timeline, none);
+								animation-range: var(---pie-turnRange);
 								@media (prefers-reduced-motion: reduce) {
-									animation-range: var(--stickyBreadcrumb-entryRange), exit-crossing 0% exit-crossing 0%;
+									animation-range: exit-crossing 0% exit-crossing 0%;
 								}
 							}
 						}

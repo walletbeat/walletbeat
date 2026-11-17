@@ -26,23 +26,7 @@
 					display: flex;
 				}
 			}
-			> .pie-navigation[data-sticky][data-sticky] {
-				@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 
-					@media (width <= 84rem) {
-
-						@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-							(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
-							and (color: if(style(---breadcrumb-wrap: 1): red)) {
-
-							&:has(+ #wallet-toc:is(:popover-open, [data-closing])) .pie-navigation-geometry,
-							&:has(+ #wallet-toc:is(:popover-open, [data-closing]))::before {
-								animation-name: none;
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 

@@ -240,9 +240,17 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 			).toBeLessThanOrEqual(1)
 			expect(sample.overflow).toBeLessThanOrEqual(1)
 			expect(sample.occupancySticky, 'The physical occupancy has a native sticky owner').toBe(true)
-			expect(sample.occupancyPosition).toBe('fixed')
-			expect(Math.abs(sample.occupancy.width - 128)).toBeLessThanOrEqual(0.125)
-			expect(Math.abs(sample.occupancy.height - 128)).toBeLessThanOrEqual(0.125)
+
+			if (sample.scroll < observations.start - 0.5) {
+				expect(sample.occupancyPosition).not.toBe('fixed')
+				expect(Math.abs(sample.pie.top - sample.source.top)).toBeLessThanOrEqual(0.125)
+				expect(Math.abs(sample.pie.left - sample.source.left)).toBeLessThanOrEqual(0.125)
+				expect(Math.abs(sample.pie.width - sample.source.width)).toBeLessThanOrEqual(0.125)
+			} else if (sample.scroll > observations.start + 0.5) {
+				expect(Math.abs(sample.occupancy.width - 128)).toBeLessThanOrEqual(0.125)
+				expect(Math.abs(sample.occupancy.height - 128)).toBeLessThanOrEqual(0.125)
+			}
+
 			expect(
 				Math.abs(sample.stability.pie.height - sample.pie.height),
 				'Native endpoint delivery is stable',
