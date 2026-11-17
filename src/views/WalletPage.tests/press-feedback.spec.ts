@@ -25,7 +25,7 @@ test('native nested press feedback survives enhancement and overlapping input', 
 				})
 			}
 
-			await page.goto('/metamask/?variant=BROWSER', { waitUntil: 'domcontentloaded' })
+			await page.goto('/metamask/selection/browser--all/', { waitUntil: 'domcontentloaded' })
 
 			if (mode === 'hydrated') {
 				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
@@ -36,38 +36,15 @@ test('native nested press feedback survives enhancement and overlapping input', 
 				await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(1)
 			}
 
-			const handoff = await page.evaluate(() => {
-				let count = 0
-				const visit = (rules: CSSRuleList) => {
-					for (const rule of rules) {
-						if (
-							rule instanceof CSSStyleRule &&
-							rule.selectorText.includes('data-pressable-descendant-active')
-						) {
-							count++
-						}
+			const island = page.locator('astro-island:has(#top)')
+			if (mode === 'no-js') {
+				await expect(island).not.toHaveAttribute('data-pressable-local', '')
+			} else {
+				await expect(island).toHaveAttribute('data-pressable-local', '')
+			}
 
-						if ('cssRules' in rule && rule.cssRules instanceof CSSRuleList) {
-							visit(rule.cssRules)
-						}
-					}
-				}
-
-				for (const sheet of document.styleSheets) {
-					visit(sheet.cssRules)
-				}
-
-				return count
-			})
-
-			expect(handoff, `${mode}: exercise the intended native or enhanced rule`).toBe(
-				mode === 'no-js' ? 0 : 1,
-			)
-			await page.evaluate(() => {
-				const background = document.createElement('style')
-
-				background.textContent = 'body > :not(#native-press-fixture) { display: none !important; }'
-				document.head.append(background)
+			await island.evaluate(owner => {
+				owner.querySelector<HTMLElement>('#top')!.style.setProperty('display', 'none', 'important')
 				const box = document.createElement('div')
 
 				box.id = 'native-press-fixture'
@@ -76,7 +53,7 @@ test('native nested press feedback survives enhancement and overlapping input', 
 					'position:fixed;top:250px;left:20px;width:400px;height:200px;background:black;z-index:2147483647'
 				box.innerHTML =
 					'<button id="nested" type="button">Nested</button><label id="label"><input id="check" type="checkbox"><span id="label-text">Toggle label</span></label><label id="button-label"><button id="labeled-button" type="button">Label button</button></label>'
-				document.body.append(box)
+				owner.append(box)
 			})
 			const fixture = page.locator('#native-press-fixture')
 			const snapshot = async () => {

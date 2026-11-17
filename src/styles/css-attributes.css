@@ -347,7 +347,8 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 
 	&:is(:active, summary[data-sticky-breadcrumb~="position"]:active:where(:not(:has(:where([data-pressable], [role="button"], summary, a, select, option, button, input, label:has(> input:is([type="checkbox"], [type="radio"]), button)):active))) > header > [data-row]):is(
 			label:has(> input:is([type="checkbox"], [type="radio"]), button),
-			:not(
+			:where([data-pressable-local] *):not([data-pressable-descendant-active]),
+			:not(:where([data-pressable-local] *)):not(
 				:has(
 					:where(
 						[data-pressable],
