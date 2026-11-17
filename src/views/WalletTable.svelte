@@ -675,12 +675,26 @@
 				event.preventDefault()
 				return
 			}
-			const compact = getComputedStyle(node).getPropertyValue('---wallet-identity-compact').trim() === '1'
+			const style = getComputedStyle(node)
+			const compact = style.getPropertyValue('---wallet-identity-compact').trim() === '1'
 			if (compact && owner && event.source === identitySource) {
 				const bounds = owner.getBoundingClientRect()
+				const rank = node.querySelector('.row-count')?.getBoundingClientRect()
+				const logo = node.querySelector('.wallet-icon')?.getBoundingClientRect()
+
+				if (!rank || !logo) {
+					event.preventDefault()
+					return
+				}
+
+				const inlineOffset = (box: DOMRect) => style.direction === 'rtl'
+					? bounds.right - box.right
+					: box.left - bounds.left
 
 				owner.style.setProperty('--wallet-identity-flowInlineSize', `${bounds.width}px`)
 				owner.style.setProperty('--wallet-identity-flowBlockSize', `${bounds.height}px`)
+				owner.style.setProperty('--wallet-identity-rankInlineOffset', `${inlineOffset(rank)}px`)
+				owner.style.setProperty('--wallet-identity-logoInlineOffset', `${inlineOffset(logo)}px`)
 				return
 			}
 			event.preventDefault()
@@ -719,6 +733,8 @@
 			motion.destroy()
 			owner?.style.removeProperty('--wallet-identity-flowInlineSize')
 			owner?.style.removeProperty('--wallet-identity-flowBlockSize')
+			owner?.style.removeProperty('--wallet-identity-rankInlineOffset')
+			owner?.style.removeProperty('--wallet-identity-logoInlineOffset')
 		}
 	}
 
@@ -2540,8 +2556,8 @@
 					position-visibility: no-overflow;
 					margin: 0;
 				}
-				.row-count { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding))); }
-				.wallet-icon { inset-inline-start: max(calc(anchor(--wallet-identity-cell start) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap)), calc(var(--sticky-insetInlineStart) + var(--table-cell-padding) + var(---wallet-identity-rankSize) + var(---wallet-identity-gap))); }
+				.row-count { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--wallet-identity-rankInlineOffset)); }
+				.wallet-icon { inset-inline-start: calc(anchor(--wallet-identity-cell start) + var(--wallet-identity-logoInlineOffset)); }
 			}
 		}
 
