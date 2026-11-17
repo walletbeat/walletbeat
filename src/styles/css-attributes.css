@@ -5332,9 +5332,9 @@ details {
 				details:not([open]) > summary [data-sticky-breadcrumb~="end"] {
 					---collapsible-markerInlineEnd: var(---breadcrumb-endViewportInlineEnd);
 					---breadcrumb-clearance-arc-height: var(---breadcrumb-endHeight);
-					--stickyBreadcrumb-endPaintAnimation: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none;
-					--stickyBreadcrumb-endPaintTimeline: var(---breadcrumb-endFlowTimeline);
-					--stickyBreadcrumb-endPaintRange:
+					animation: breadcrumb-clearance-inline auto var(---breadcrumb-clearance-flowEasing) none;
+					animation-timeline: var(---breadcrumb-endFlowTimeline);
+					animation-range:
 						exit-crossing calc(100% - 2 * (var(---breadcrumb-clearance-view-size) + var(---breadcrumb-clearance-flow-height)))
 						exit-crossing 100%;
 					view-timeline-name: var(---breadcrumb-endPositionTimeline), var(---breadcrumb-endFlowTimeline);
@@ -5342,11 +5342,6 @@ details {
 					view-timeline-inset: 0,
 						calc(var(---breadcrumb-clearance-arc-centerY) - var(---breadcrumb-clearance-view-size) / 2)
 						calc(100vh - var(---breadcrumb-clearance-arc-centerY) - var(---breadcrumb-clearance-view-size) / 2);
-					&:not(:where([data-sticky-breadcrumb~="contents"])),
-					&[data-sticky-breadcrumb~="contents"] > :not([data-sticky-breadcrumb~="size-export"]),
-					&[data-sticky-breadcrumb~="contents"]:not(:has(> [data-collapsible-marker]))::after {
-						transform: translateX(0px);
-					}
 				}
 			}
 		}
