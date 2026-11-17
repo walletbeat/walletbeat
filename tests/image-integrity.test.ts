@@ -91,6 +91,7 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	'resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/crops_talk_devcon.jpg',
 ])
 
 /** A single image file discovered by the crawler. */

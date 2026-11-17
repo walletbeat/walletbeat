@@ -1939,6 +1939,10 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/crops_talk_devcon.jpg": {
+		"hash": "01df680537bf574ef7606d8b9144434ae76a130fa3efcc2507f3a1f7f2c3e91d",
+		"passedTests": ["file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
