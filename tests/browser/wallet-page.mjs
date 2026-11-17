@@ -1115,7 +1115,8 @@ const checks = {
 					state.prose.every(role => /Avenir/.test(role.family)),
 			),
 		),
-		'Native computed families are checked for every heading, badge, navigation link and ordinary paragraph at flow and every captured group/stage transition; code/pre descendants retain their independent monospace role.',
+		'Computed families are checked for sampled headings, badges, navigation links and paragraphs. Loaded font faces, monospace roles and apparent H4 size require separate evidence.',
+		false,
 	],
 	UnmaskedSurfaces: [
 		all(o =>
@@ -1227,14 +1228,19 @@ const checks = {
 				'The real rendered Stage Progress section is compared with the fixture’s applicable native ladder evaluation, including unknown criteria.',
 			]
 		: null,
-	StageDefault: fixture?.nextUnclearedStage
+	StageDefault: fixture
 		? [
-				all(o =>
-					o.initial.stageDetails.some(
-						stage => stage.id === fixture.nextUnclearedStage && stage.open,
-					),
-				),
-				'The first stage after the native highest cleared stage is initially open, including when no stage has cleared because criteria are unknown. A wholly cleared ladder has no next-stage obligation.',
+				all(o => {
+					const open = o.initial.stageDetails.filter(stage => stage.open)
+					const next = fixture.nextUnclearedStage
+
+					return (
+						o.initial.stageDetails.length === fixture.expectedStages &&
+						(next ? open.length === 1 && open[0].id === next : open.length === 0)
+					)
+				}),
+				'After hydration, only the first uncleared stage is open. Fully cleared or absent ladders have no open stage. Parser state is checked separately.',
+				false,
 			]
 		: null,
 	Skiplink: [
