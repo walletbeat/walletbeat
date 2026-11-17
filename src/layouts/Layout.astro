@@ -336,6 +336,9 @@ import Footer from '@/views/Footer.astro'
 		}
 		@media (width <= 84rem) {
 			#layout:has([data-sticky-breadcrumb~="root"]) {
+				animation: breadcrumb-item-block auto linear reverse both;
+				animation-timeline: --wallet-item-block;
+				animation-range: exit-crossing 0% exit-crossing 100%;
 				---navigation-controlsInlineSize: calc(
 					2 * var(--navigation-controlSize) + var(--navigation-controlGap)
 				);
@@ -401,9 +404,13 @@ import Footer from '@/views/Footer.astro'
 				---breadcrumb-height: var(---breadcrumb-compactItemHeight);
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header {
-				animation: breadcrumb-end-inline auto linear both;
-				animation-timeline: --wallet-end-inline;
-				---breadcrumb-itemWidth: inherit;
+				animation:
+					breadcrumb-end-inline auto linear both,
+					breadcrumb-item-inline auto linear reverse both;
+				animation-timeline: --wallet-end-inline, --wallet-item-inline;
+				animation-range:
+					normal,
+					exit-crossing 0% exit-crossing 100%;
 				---breadcrumb-endWidth: round(
 					up,
 					calc(100vw * (1/var(---breadcrumb-endInline) - 1)),
@@ -414,7 +421,12 @@ import Footer from '@/views/Footer.astro'
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
-				[data-sticky-breadcrumb~="source"] {
+				> [data-sticky-breadcrumb~="source"] {
+				---breadcrumb-itemWidth: round(
+					up,
+					calc(100vw * (1 / var(---breadcrumb-itemInline) - 1)),
+					0.0625px
+				);
 				---wallet-chainWrap: clamp(
 					0,
 					sign(
@@ -431,6 +443,15 @@ import Footer from '@/views/Footer.astro'
 					),
 					1
 				);
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				> [data-sticky-breadcrumb~="source"] {
+				animation: breadcrumb-item-inline auto linear reverse both;
+				animation-timeline: --wallet-item-inline;
+				animation-range: exit-crossing 0% exit-crossing 100%;
+				---breadcrumb-width: var(---breadcrumb-itemWidth);
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav {
 				--sticky-zIndex: 2;

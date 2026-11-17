@@ -2562,6 +2562,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					.pie-navigation-geometry {
 						inline-size: 100%;
 
+						@container wallet-pie-approach not style(---pie-fixed: 1) {
+							:global(.navigation-items details > menu) {
+								opacity: 1;
+								visibility: visible;
+								transition-property: none;
+							}
+						}
+
 						&::before {
 							display: block;
 							clip-path: circle(calc(var(---pie-size) / 2));
