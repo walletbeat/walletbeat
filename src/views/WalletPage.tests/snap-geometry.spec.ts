@@ -11,7 +11,7 @@ for (const width of [390, 934, 1440]) {
 		await page.setViewportSize({ width, height: 900 })
 
 		for (const wallet of ['rainbow', 'metamask']) {
-			await page.goto(`/${wallet}/#top`)
+			await page.goto(`/${wallet}/#top`, { waitUntil: 'domcontentloaded' })
 			const root = page.locator('#layout')
 			const start = page.locator('#top')
 			const quiet = await root.evaluateHandle(element => {

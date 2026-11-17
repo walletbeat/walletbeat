@@ -3,8 +3,9 @@ import { expect, test } from '../../../tests/browser/verified-test'
 for (const width of [390, 690]) {
 	test(`compact pie hit targets follow group visibility at ${width}`, async ({ page }, info) => {
 		await page.setViewportSize({ width, height: 900 })
-		await page.goto('/metamask/?variant=BROWSER')
-		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+		await page.goto('/metamask/selection/browser--all/', { waitUntil: 'domcontentloaded' })
+		await expect(page.locator('astro-island:has(#top)')).toHaveCount(1)
+		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 90_000 })
 		await page.evaluate(() => document.fonts.ready)
 		test.skip(
 			!(await page.evaluate(
