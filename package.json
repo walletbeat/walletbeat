@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"packageManager": "pnpm@11.19.0",
 	"engines": {
-		"node": ">=22.22.0"
+		"node": ">=22.23.4"
 	},
 	"scripts": {
 		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
@@ -72,7 +72,7 @@
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.6.5",
-		"astro": "7.4.0",
+		"astro": "7.4.3",
 		"autoprefixer": "^10.5.4",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.6",
