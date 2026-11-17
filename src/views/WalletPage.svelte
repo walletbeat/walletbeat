@@ -3058,7 +3058,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				}
 				[data-sticky-breadcrumb~="root"]
 					:global(:is(.attribute-group, .attribute, #stages, #stages section)[data-sticky-breadcrumb~="scope"]) {
-					timeline-scope: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
+					timeline-scope: var(---wallet-localTimelines), var(---pie-inlineTimeline);
 					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 						timeline-scope: none;
 					}
@@ -3284,8 +3284,12 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		}
 
 		:global(:is(.attribute-group, .attribute, #stages, #stages section)[data-sticky-breadcrumb~="scope"]) {
-			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
-			timeline-scope: var(---breadcrumb-sizeTimelines);
+			/* Stage arrival also drives the pie, so its clock is scoped at the wallet page. */
+			---wallet-localTimelines: var(---breadcrumb-sizeTimelines);
+			&:global(:is(.attribute-group, .attribute)) {
+				---wallet-localTimelines: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
+			}
+			timeline-scope: var(---wallet-localTimelines);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				timeline-scope: none;
 			}
