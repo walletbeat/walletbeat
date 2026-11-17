@@ -91,6 +91,9 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	// Screenshot of a grant page; the blockiness artifacts are already baked
+	// into the pixel data and persist across re-encoding.
+	'resources/files/social-media/threads/2026-11-18 - TheDAO Round 2/grant_page.jpg',
 ])
 
 /** A single image file discovered by the crawler. */
