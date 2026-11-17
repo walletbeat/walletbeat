@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	applyFilterSets,
 	changeFilterChoice,
+	countFilterChoice,
 	type FilterChoice,
 	type FilterSet,
 	filterSetIsAvailable,
@@ -64,6 +65,49 @@ describe('filter-set selection semantics', () => {
 			expect(changeFilterChoice(sets, selected, eoa)).toEqual(new Set([browser, smart]))
 		},
 	)
+
+	it.each(['inclusive', 'exclusive'] as const)(
+		'counts union choices alone for %s selection',
+		cardinality => {
+			const platform: FilterSet<Item> =
+				cardinality === 'exclusive'
+					? exclusive
+					: {
+							id: 'platform',
+							label: 'Platform',
+							match: 'union',
+							cardinality,
+							choices: [browser, mobile],
+						}
+
+			expect(
+				countFilterChoice(items, [platform, account], new Set([browser, eoa]), platform, mobile),
+			).toBe(2)
+		},
+	)
+
+	it('preserves checked intersection choices in checkbox counts', () => {
+		const platform: FilterSet<Item> = {
+			id: 'platform',
+			label: 'Platform',
+			cardinality: 'inclusive',
+			match: 'intersection',
+			choices: [browser, mobile],
+		}
+
+		expect(countFilterChoice(items, [platform], new Set([browser]), platform, mobile)).toBe(1)
+		expect(
+			countFilterChoice(items, [platform], new Set([browser, mobile]), platform, browser),
+		).toBe(1)
+	})
+
+	it('replaces an exclusive intersection choice while keeping other sets', () => {
+		const platform: FilterSet<Item> = { ...exclusive, match: 'intersection' }
+
+		expect(
+			countFilterChoice(items, [platform, account], new Set([browser, smart]), platform, mobile),
+		).toBe(1)
+	})
 
 	it('composes independent sets regardless of their owning panel', () => {
 		expect(

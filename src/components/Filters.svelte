@@ -15,6 +15,7 @@
 	import {
 		applyFilterSets,
 		changeFilterChoice,
+		countFilterChoice,
 		filterSetIsAvailable,
 		resetFilterSets,
 		type FilterChoice,
@@ -77,11 +78,6 @@
 		filterSetIsAvailable(items, set, activeChoices)
 	)))
 
-	const choiceCount = (set: FilterSet<Item>, choice: FilterChoice<Item>) => {
-		const setChoices = new Set(set.choices)
-		return filtered(activeChoices.difference(setChoices).union(new Set([choice]))).length
-	}
-
 	const reset = (sets = filterSets.filter(set => !visibleSetIds || visibleSetIds.includes(set.id))) => {
 		updateFilters(() => {
 			activeChoices = resetFilterSets(sets, activeChoices)
@@ -124,7 +120,7 @@
 						{@const navigates = !interactive && choice.href !== undefined}
 						{@const checked = activeChoices.has(choice) || (set.cardinality === 'exclusive' && choice.id === '' && !set.choices.some(candidate => activeChoices.has(candidate)))}
 						{@const activeIndex = activeInSet.indexOf(choice)}
-						{@const count = choiceCount(set, choice)}
+						{@const count = countFilterChoice(items, contextFilterSets, activeChoices, set, choice)}
 						{@const choiceAnchor = `--${viewTransitionName('filter-choice', instanceId, set.id, choice.id)}`}
 						<svelte:element
 							this={navigates ? 'a' : 'label'}

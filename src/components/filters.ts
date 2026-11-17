@@ -82,6 +82,30 @@ export const applyFilterSets = <Item>(
 	})
 }
 
+export const countFilterChoice = <Item>(
+	items: Item[],
+	sets: FilterSet<Item>[],
+	activeChoices: Set<FilterChoice<Item>>,
+	set: FilterSet<Item>,
+	choice: FilterChoice<Item>,
+): number => {
+	const selected = new Set([choice])
+
+	if (set.match === 'union') {
+		return applyFilterSets(items, [set], selected).length
+	}
+
+	if (set.cardinality === 'inclusive') {
+		return applyFilterSets(items, sets, activeChoices.union(selected)).length
+	}
+
+	return applyFilterSets(
+		items,
+		sets,
+		activeChoices.difference(new Set(set.choices)).union(selected),
+	).length
+}
+
 /** A sole represented choice can still exclude items with unknown or uncovered values. */
 export const filterSetIsAvailable = <Item>(
 	items: Item[],
