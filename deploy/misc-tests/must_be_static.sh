@@ -2,8 +2,9 @@
 
 set -euo pipefail
 
-if ! grep -q "output: 'static'" astro.config.mjs; then
-	echo "This site is intended to be fully static." >&2
-	echo "Must set \`output: 'static'\` in \`astro.config.mjs\`." >&2
-	exit 1
-fi
+node --import tsx --input-type=module <<'JS'
+import assert from 'node:assert/strict'
+import config from './astro.config.mjs'
+
+assert.equal(config.output, 'static', 'Walletbeat requires static Astro output.')
+JS

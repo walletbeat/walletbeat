@@ -54,19 +54,22 @@ describe('ratedWalletJsonExport', () => {
 				expect(payload.stage).toBe(stageToExportString(stage))
 			})
 
-			it('stageBreakdown is null when stage is null or NOT_APPLICABLE, matches ladder length, and passedCount <= totalCount per item', () => {
+			it('publishes the applicable ladder in stage order with valid criterion counts', () => {
 				const { ladderEvaluation } = getWalletStageAndLadder(wallet)
+				const breakdown = payload.stageBreakdown
 
-				if (payload.stage === null || payload.stage === 'NOT_APPLICABLE') {
-					expect(payload.stageBreakdown).toBeNull()
+				if (ladderEvaluation === null) {
+					expect(breakdown).toBeNull()
+
+					return
 				}
 
-				if (payload.stageBreakdown !== null) {
-					expect(payload.stageBreakdown.length).toBe(ladderEvaluation?.ladder.stages.length ?? 0)
+				expect(breakdown?.map(item => item.stageId)).toEqual(
+					ladderEvaluation.ladder.stages.map(item => item.id),
+				)
 
-					for (const item of payload.stageBreakdown) {
-						expect(item.passedCount).toBeLessThanOrEqual(item.totalCount)
-					}
+				for (const item of breakdown ?? []) {
+					expect(item.passedCount).toBeLessThanOrEqual(item.totalCount)
 				}
 			})
 

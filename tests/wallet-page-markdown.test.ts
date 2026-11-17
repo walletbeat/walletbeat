@@ -23,6 +23,7 @@ import {
 } from '@/schema/reference'
 import { getUrl, isUrl } from '@/schema/url'
 import { getWalletStageAndLadder } from '@/utils/stage'
+import { allCriteriaInStage } from '@/utils/stage-attributes'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
@@ -203,27 +204,33 @@ describe('walletPageMarkdown', () => {
 				}
 			})
 
-			it('contains Stage section when wallet has a concrete stage', () => {
-				const { stage } = getWalletStageAndLadder(wallet)
+			it('publishes criteria with ratings for every applicable Stage', () => {
+				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+				const stageSection = md.split(/^## /m).find(section => section.startsWith('Stage\n'))
 
-				if (typeof stage === 'object' && stage !== null) {
-					expect(md).toContain('## Stage')
-					expect(md).toContain(
+				if (stage === null || stage === 'NOT_APPLICABLE' || ladderEvaluation === null) {
+					expect(stageSection).toBeUndefined()
+
+					return
+				}
+
+				expect(stageSection).toBeDefined()
+				const [summary, ...sections] = (stageSection ?? '').split(/^### /m)
+
+				if (typeof stage === 'object') {
+					expect(summary).toContain(
 						`[${stage.label}](${SITE_URL}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`,
 					)
 				}
-			})
 
-			it('contains stage criteria (subheadings and ratings) when wallet has a concrete stage', () => {
-				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+				expect(sections.map(section => section.split('\n', 1)[0])).toEqual(
+					ladderEvaluation.ladder.stages.map(item => item.label),
+				)
 
-				if (typeof stage === 'object' && stage !== null && ladderEvaluation !== null) {
-					expect(md).toMatch(`### ${stage.label}`)
+				for (const [index, item] of ladderEvaluation.ladder.stages.entries()) {
+					const ratings = [...sections[index].matchAll(/^- .+: [✅❌➖❔]$/gm)]
 
-					const hasRatingIcon = /[✅❌➖❔]/.test(md)
-					const hasCriteriaPassed = /criteria passed/.test(md)
-
-					expect(hasRatingIcon || hasCriteriaPassed).toBe(true)
+					expect(ratings, item.label).toHaveLength(allCriteriaInStage(item).length)
 				}
 			})
 
