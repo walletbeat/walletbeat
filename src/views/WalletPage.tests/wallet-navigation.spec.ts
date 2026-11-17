@@ -1182,15 +1182,29 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/metamask/?variant=BROWSER')
 		await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
-		test.skip(
-			!(await page.evaluate(
-				() =>
-					CSS.supports('scroll-snap-type: block mandatory') &&
-					CSS.supports('width: anchor-size(--source inline)') &&
-					CSS.supports('color: if(style(--a: 1): red)'),
-			)),
-			'Enhanced current-only TOC snapping requires native snap, anchor sizing and style queries',
+		const enhanced = await page.evaluate(
+			() =>
+				CSS.supports('scroll-snap-type: block mandatory') &&
+				CSS.supports('width: anchor-size(--source inline)') &&
+				CSS.supports('color: if(style(--a: 1): red)'),
 		)
+		const toc = page.locator('#wallet-toc')
+
+		if (width === 390) {
+			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
+		}
+
+		if (!enhanced) {
+			await page.mouse.move(0, 0)
+			await expect(toc).toHaveCSS('scroll-snap-type', 'block mandatory')
+			await toc.hover()
+			await expect(toc).toHaveCSS('scroll-snap-type', 'none')
+			await page.mouse.move(0, 0)
+			await expect(toc).toHaveCSS('scroll-snap-type', 'block mandatory')
+			observations.push({ width, enhanced })
+			continue
+		}
+
 		await page.evaluate(() => document.fonts.ready)
 		await page.locator('#layout').evaluate(element => {
 			if (!(element instanceof HTMLElement)) {
@@ -1199,12 +1213,6 @@ test('native current-only TOC snapping yields to hover and resumes automatically
 
 			element.style.scrollSnapType = 'none'
 		})
-		const toc = page.locator('#wallet-toc')
-
-		if (width === 390) {
-			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
-		}
-
 		await page.mouse.move(0, 0)
 		const seek = async (id: string) =>
 			page.evaluate(async id => {
