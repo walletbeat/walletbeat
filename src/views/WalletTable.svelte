@@ -2463,6 +2463,18 @@
 		}
 	}
 
+	@property ---wallet-identity-gap {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+
+	@property ---wallet-identity-compactInlineSize {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+
 	@position-try --wallet-identity-dock {
 		inset-block: auto var(--tooltip-drawerMargin, 0.75rem);
 		inset-inline: var(--tooltip-drawerMargin, 0.75rem);
@@ -2538,9 +2550,11 @@
 				@media (hover: hover) and (pointer: fine) {
 					@container wallet-table (width >= 48rem) {
 						.wallet-table:has(.wallet-info[popover]) {
-							--wallet-identity-retainedInlineSize: 6.25rem;
-
-							&:has(td[data-table-column="wallet"]) { --wallet-identity-retainedInlineSize: 8rem; }
+							---wallet-identity-compactInlineSize: calc(
+								var(---wallet-identity-rankSize) + var(---wallet-identity-gap) +
+								var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding)
+							);
+							--wallet-identity-retainedInlineSize: var(---wallet-identity-compactInlineSize);
 
 							td:is([data-table-column="wallet"], [data-table-column="displayName"]) {
 								container-name: wallet-identity-cell;
@@ -2568,10 +2582,17 @@
 									position: absolute;
 									inset-block: calc((100% - var(---wallet-identity-blockSize)) / 2);
 									inset-inline-start: calc(-1 * var(--table-cell-padding));
-									inline-size: calc(var(---wallet-identity-rankSize) + var(---wallet-identity-gap) + var(---wallet-identity-logoSize) + 2 * var(--table-cell-padding));
+									inline-size: var(--wallet-identity-retainedInlineSize);
 									background: var(--table-backgroundColor);
 									z-index: -1;
 								}
+							}
+
+							.wallet-info-details .wallet-info:not(:popover-open) {
+								/* Let the sticky logo use the cell space reserved for the summary marker.
+								 * Balance the margin on the following item to preserve their flow positions. */
+								> .wallet-icon { margin-inline-end: calc(-1 * var(---wallet-identity-gap)); }
+								> .wallet-icon + .name-and-tags { margin-inline-start: var(---wallet-identity-gap); }
 							}
 
 							tr:nth-of-type(odd) .wallet-info:not(:popover-open) > .row-count::after {
