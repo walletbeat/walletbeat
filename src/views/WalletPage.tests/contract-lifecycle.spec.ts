@@ -9,8 +9,9 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 	page,
 	browserName,
 }, info) => {
-	await page.goto('/__wallet-page/software/')
-	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0)
+	await page.goto('/__wallet-page/software/', { waitUntil: 'domcontentloaded' })
+	await expect(page.locator('astro-island:has(#top)')).toHaveCount(1)
+	await expect(page.locator('astro-island[ssr]:has(#top)')).toHaveCount(0, { timeout: 90_000 })
 	await page.evaluate(() => document.fonts.ready)
 	const original = await page.locator('#top').evaluateHandle(root => ({
 		root,
@@ -43,6 +44,7 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 				const site = document.querySelector('#nav')!
 				const footer = content.querySelector(':scope > footer')!
 				const bounds = footer.getBoundingClientRect()
+				const mainBounds = main.getBoundingClientRect()
 				const column = content.getBoundingClientRect()
 
 				return {
@@ -72,7 +74,10 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 						!site.contains(main) &&
 						!main.contains(site) &&
 						site.getBoundingClientRect().width > 0 &&
-						main.getBoundingClientRect().width > 0,
+						mainBounds.width > 0,
+					mainScroll: main.scrollTop,
+					mainOverflow: getComputedStyle(main).overflowY,
+					footerClearance: bounds.top - mainBounds.bottom,
 					footer: {
 						position: getComputedStyle(footer).position,
 						blockStart: getComputedStyle(footer).insetBlockStart,
@@ -95,6 +100,9 @@ test('real semantic owners survive scroll, reversal and both responsive crossing
 			expect(state.sameArticle).toBe(true)
 			expect(state.asideBeforeStage).toBe(true)
 			expect(state.distinctFrame).toBe(true)
+			expect(state.mainScroll).toBe(0)
+			expect(state.mainOverflow).not.toMatch(/^(auto|scroll|hidden)$/)
+			expect(state.footerClearance).toBeGreaterThanOrEqual(-2)
 			expect(['static', 'relative', 'sticky']).toContain(state.footer.position)
 
 			if (state.footer.position === 'sticky') {
