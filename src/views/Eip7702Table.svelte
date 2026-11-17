@@ -172,6 +172,7 @@
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
 						<Tooltip
 							placement="inline-end"
+							buttonTriggerPlacement="behind"
 						>
 							<button
 								data-tag="eip"
@@ -192,6 +193,7 @@
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
 							<Tooltip
 								placement="inline-end"
+								buttonTriggerPlacement="behind"
 							>
 								<button
 									data-tag="eip"
