@@ -221,7 +221,7 @@ for (const width of [390, 1440]) {
 						direction: getComputedStyle(titleRow).direction,
 						pie: rectData(piePaint.getBoundingClientRect()),
 						reservedCompactInlineSize: Number.parseFloat(
-							getComputedStyle(root).getPropertyValue('---breadcrumb-itemWidth'),
+							getComputedStyle(titleRow.parentElement!, '::before').width,
 						),
 						overflow: {
 							document: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -966,7 +966,7 @@ for (const [fixture, width] of [
 	})
 }
 
-test('wallet intrinsic measurements resolve at their shared layout owner across breakpoints', async ({
+test('wallet intrinsic measurements stay local to the rows that consume them in the compact layout', async ({
 	page,
 }, info) => {
 	await page.goto('/metamask/?variant=BROWSER')
@@ -992,6 +992,8 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 				const root = document.getElementById('top')!
 				const navigation = document.querySelector('#nav > header')!
 				const source = root.querySelector('.wallet-title-source')!
+				const compact = matchMedia('(width <= 84rem)').matches
+				const clockOwners = compact ? [layout, source, navigation] : [layout]
 				const borderBox = (axis: 'width' | 'height') => {
 					const style = getComputedStyle(source)
 					const edges =
@@ -1015,7 +1017,7 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 					{
 						property: '---breadcrumb-itemWidth',
 						expected: Number.parseFloat(getComputedStyle(source, '::before').width),
-						owners: [layout, root, navigation],
+						owners: compact ? [source, navigation] : [layout, root, navigation],
 					},
 					{
 						property: '---breadcrumb-naturalItemHeight',
@@ -1040,15 +1042,15 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 						measured: value(owner, property),
 					})),
 				}))
-				const clocks = layout
-					.getAnimations()
+				const clocks = clockOwners
+					.flatMap(owner => owner.getAnimations())
 					.filter(animation => {
 						const timeline = animation.timeline
 
 						return (
 							animation instanceof CSSAnimation &&
 							animation.effect instanceof KeyframeEffect &&
-							animation.effect.target === layout &&
+							clockOwners.includes(animation.effect.target as Element) &&
 							!animation.effect.pseudoElement &&
 							timeline instanceof ViewTimeline &&
 							timeline.source !== null &&
@@ -1064,6 +1066,7 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 
 						return {
 							axis: timeline instanceof ViewTimeline ? timeline.axis : null,
+							atLayout: (clock.effect as KeyframeEffect).target === layout,
 							local: local !== null && local !== document.scrollingElement && root.contains(local),
 							ownSubject: origin === local,
 							progress: clock.effect?.getComputedTiming().progress ?? null,
@@ -1071,7 +1074,7 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 						}
 					})
 
-				return { width: innerWidth, facts, clocks }
+				return { width: innerWidth, compact, facts, clocks }
 			})
 
 		await expect
@@ -1079,7 +1082,12 @@ test('wallet intrinsic measurements resolve at their shared layout owner across 
 				const observed = await read()
 
 				return (
-					['inline', 'block'].every(axis => observed.clocks.some(clock => clock.axis === axis)) &&
+					observed.clocks.some(clock => clock.axis === 'block' && clock.atLayout) &&
+					observed.clocks.some(
+						clock => clock.axis === 'inline' && clock.atLayout !== observed.compact,
+					) &&
+					(!observed.compact ||
+						!observed.clocks.some(clock => clock.axis === 'inline' && clock.atLayout)) &&
 					observed.clocks.every(
 						clock =>
 							clock.local &&
