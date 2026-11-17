@@ -5009,3 +5009,24 @@ details {
 		}
 	}
 }
+
+/**
+ * Reading line height, list indentation, and wrapping within the prose column.
+ *
+ * ### Examples
+ * - A prose body:
+ *   ```html
+ *   <div data-prose><p>Paragraph</p></div>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+ */
+[data-prose] {
+	line-height: 1.8;
+	overflow-wrap: anywhere;
+
+	:is(ul, ol) {
+		padding-inline-start: 1.5em;
+	}
+}

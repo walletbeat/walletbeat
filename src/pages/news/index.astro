@@ -1,6 +1,5 @@
 ---
 // Types/constants
-import { defaultNavigationItems } from '@/constants/navigation'
 import { allWalletSecurityNews } from '@/data/news'
 import { getWalletMetadataById } from '@/data/wallets'
 import { impactCategories, incidentStatuses, newsTypes, severities } from '@/types/content/news'
@@ -16,201 +15,173 @@ const formatDate = (dateString: string) =>
 	})
 
 // Layouts
-import Layout from '@/layouts/Layout.astro'
+import ContentPage from '@/layouts/ContentPage.astro'
 
 // Components
-import Navigation from '@/views/Navigation.astro'
 import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 ---
 
-<Layout
+<ContentPage
 	metadata={{
 		title: 'Wallet Security News',
 		keywordsAfter: ['news', 'security', 'incidents'],
 	}}
+	description='Security incidents, vulnerabilities, and data breaches affecting Ethereum wallets'
+	data-column-item='flexible'
 >
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<hr />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-4'>
-				<h1>Wallet Security News</h1>
-				<p>Security incidents, vulnerabilities, and data breaches affecting Ethereum wallets</p>
-			</hgroup>
-		</header>
+	{
+		allWalletSecurityNews.map(news => (
+			<>
+				<article id={news.slug} data-scroll-item='inline-detached'>
+					<details data-card='padding-6' data-column='gap-6'>
+						<summary data-row='wrap wrap-first-last'>
+							{news.wallets.length > 0 && (
+								<div data-row-item='basis-full' data-row='start wrap gap-2'>
+									{news.wallets.map(walletId => {
+										const wallet = getWalletMetadataById(walletId)
 
-		<hr />
-
-		{
-			allWalletSecurityNews.map(news => (
-				<>
-					<div data-scroll-item='inline-detached'>
-						<article id={news.slug}>
-							<details data-card='padding-6' data-column='gap-6'>
-								<summary data-row='wrap wrap-first-last'>
-									{news.wallets.length > 0 && (
-										<div
-											class='wallet-links'
-											data-row-item='basis-full'
-											data-row='start wrap gap-2'
-										>
-											{news.wallets.map(walletId => {
-												const wallet = getWalletMetadataById(walletId)
-
-												return wallet ? (
-													<a
-														class='wallet-link'
-														href={`/${wallet.id}`}
-														data-link='camouflaged'
-														data-badge='medium'
-													>
-														<img
-															src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`}
-															alt={wallet.displayName}
-														/>
-														<span>{wallet.displayName}</span>
-													</a>
-												) : null
-											})}
-										</div>
-									)}
-
-									<h2 data-row-item='flexible basis-3'>{news.title}</h2>
-
-									<div
-										class='metadata-dates'
-										data-row-item='wrap-end flexible basis-3'
-										data-row='end wrap gap-1'
-									>
-										<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
-
-										{news.publishedAt !== news.updatedAt && (
-											<small class='gap-1'>
-												<span>・</span>
-												<span>
-													Updated{' '}
-													<time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time>
-												</span>
-											</small>
-										)}
-									</div>
-								</summary>
-
-								<div class='article-content' data-column='gap-5'>
-									<hr />
-
-									<dl class='metadata' data-row='start wrap gap-6'>
-										<div data-column='gap-2'>
-											<dt>Type</dt>
-											<dd>
-												<span class='type-badge' data-badge='medium'>
-													{newsTypes[news.type].label}
-												</span>
-											</dd>
-										</div>
-
-										<div data-column='gap-2'>
-											<dt>Severity</dt>
-											<dd>
-												<span
-													class='severity-badge'
-													data-badge='medium'
-													style={`--severity-color: ${severities[news.severity].color}`}
-												>
-													{severities[news.severity].label}
-												</span>
-											</dd>
-										</div>
-
-										<div data-column='gap-2'>
-											<dt>Status</dt>
-											<dd>
-												<span
-													class='status-badge'
-													data-badge='medium'
-													style={`--status-color: ${incidentStatuses[news.status].color}`}
-												>
-													<span set:html={incidentStatuses[news.status].icon} />
-													{incidentStatuses[news.status].label}
-												</span>
-											</dd>
-										</div>
-									</dl>
-
-									<p>{news.summary}</p>
-
-									<div data-card='secondary padding-4 radius-4' data-column='gap-3'>
-										<h4>Impact</h4>
-										<ul>
-											<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
-											<li>Category: {impactCategories[news.impact.category].label}</li>
-										</ul>
-									</div>
-
-									<hr />
-
-									{refs(news).length > 0 && (
-										<footer data-column='gap-3'>
-											<h4>Sources</h4>
-											<ul>
-												{refs(news).map(ref =>
-													ref.urls.map(url => (
-														<li>
-															<a href={url.url} target='_blank' rel='noopener noreferrer'>
-																{url.label}
-																<span set:html={ExternalLinkIcon} />
-															</a>
-														</li>
-													)),
-												)}
-											</ul>
-										</footer>
-									)}
+										return wallet ? (
+											<a
+												class='wallet-link'
+												href={`/${wallet.id}`}
+												data-link='camouflaged'
+												data-badge='medium'
+											>
+												<img src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`} alt='' />
+												<span>{wallet.displayName}</span>
+											</a>
+										) : null
+									})}
 								</div>
-							</details>
-						</article>
-					</div>
+							)}
 
-					<hr />
-				</>
-			))
-		}
+							<h2 data-row-item='flexible basis-3'>{news.title}</h2>
 
-		<section data-scroll-item='inline-detached padding-match-end' data-column='gap-5'>
-			<p>
-				Know about a security incident affecting a wallet? Please help by <a
-					href='https://github.com/walletbeat/walletbeat'
-					target='_blank'
-					rel='noopener noreferrer'>contributing to our repository</a
-				>!
-			</p>
-		</section>
-	</main>
-</Layout>
+							<div
+								class='metadata-dates'
+								data-row-item='wrap-end flexible basis-3'
+								data-row='end wrap gap-1'
+							>
+								<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
 
-<style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 52rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
+								{news.publishedAt !== news.updatedAt && (
+									<small>
+										<span>・</span>
+										<span>
+											Updated <time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time>
+										</span>
+									</small>
+								)}
+							</div>
+						</summary>
 
-		line-height: 1.4;
+						<div data-prose data-column='gap-5'>
+							<hr />
 
-		hgroup p {
-			font-size: 1.1rem;
-			color: var(--text-secondary);
-			opacity: 0.85;
-		}
+							<dl class='metadata' data-row='start wrap gap-6'>
+								<div data-column='gap-2'>
+									<dt>Type</dt>
+									<dd>
+										<span class='type-badge' data-badge='medium'>
+											{newsTypes[news.type].label}
+										</span>
+									</dd>
+								</div>
+
+								<div data-column='gap-2'>
+									<dt>Severity</dt>
+									<dd>
+										<span
+											class='severity-badge'
+											data-badge='medium'
+											style={{ '--badge-backgroundColor': severities[news.severity].color }}
+										>
+											{severities[news.severity].label}
+										</span>
+									</dd>
+								</div>
+
+								<div data-column='gap-2'>
+									<dt>Status</dt>
+									<dd>
+										<span
+											class='status-badge'
+											data-badge='medium'
+											style={{ '--badge-backgroundColor': incidentStatuses[news.status].color }}
+										>
+											<span set:html={incidentStatuses[news.status].icon} />
+											{incidentStatuses[news.status].label}
+										</span>
+									</dd>
+								</div>
+							</dl>
+
+							<p>{news.summary}</p>
+
+							<div data-card='secondary' data-column='gap-3'>
+								<h3>Impact</h3>
+								<ul>
+									<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
+									<li>Category: {impactCategories[news.impact.category].label}</li>
+								</ul>
+							</div>
+
+							<hr />
+
+							{refs(news).length > 0 && (
+								<footer data-column='gap-3'>
+									<h3>Sources</h3>
+									<ul>
+										{refs(news).map(ref =>
+											ref.urls.map(url => (
+												<li>
+													<a href={url.url} target='_blank' rel='noopener noreferrer'>
+														{url.label}
+														<span aria-hidden='true' set:html={ExternalLinkIcon} />
+													</a>
+												</li>
+											)),
+										)}
+									</ul>
+								</footer>
+							)}
+						</div>
+					</details>
+				</article>
+
+				<hr />
+			</>
+		))
 	}
 
+	<section data-scroll-item='inline-detached padding-match-end' data-column='gap-5'>
+		<p>
+			Know about a security incident affecting a wallet? Please help by <a
+				href='https://github.com/walletbeat/walletbeat'
+				target='_blank'
+				rel='noopener noreferrer'>contributing to our repository</a
+			>!
+		</p>
+	</section>
+</ContentPage>
+
+<style>
 	article {
-		.wallet-link {
-			&[data-badge] {
+		[data-badge] {
+			--badge-borderColor: transparent;
+
+			&:is(.wallet-link, .type-badge) {
 				--badge-backgroundColor: var(--background-secondary);
-				--badge-borderColor: transparent;
-				--badge-textColor: currentColor;
+			}
+
+			&.type-badge {
+				--badge-textColor: var(--text-secondary);
+			}
+
+			&:is(.severity-badge, .status-badge) {
+				--badge-textColor: white;
 			}
 		}
 
@@ -220,8 +191,8 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 			color: var(--text-secondary);
 		}
 
-		.article-content {
-			line-height: 1.75;
+		h3 {
+			font-size: 1em;
 		}
 
 		dl.metadata {
@@ -234,34 +205,6 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 				color: var(--text-secondary);
 				opacity: 0.8;
 			}
-
-			.type-badge {
-				&[data-badge] {
-					--badge-backgroundColor: var(--background-secondary);
-					--badge-borderColor: transparent;
-					--badge-textColor: var(--text-secondary);
-				}
-			}
-
-			.severity-badge {
-				&[data-badge] {
-					--badge-backgroundColor: var(--severity-color, var(--text-secondary));
-					--badge-borderColor: transparent;
-					--badge-textColor: white;
-				}
-			}
-
-			.status-badge {
-				&[data-badge] {
-					--badge-textColor: white;
-					--badge-borderColor: transparent;
-					--badge-backgroundColor: var(--status-color);
-				}
-			}
-		}
-
-		ul {
-			padding-inline-start: 1.5em;
 		}
 	}
 </style>

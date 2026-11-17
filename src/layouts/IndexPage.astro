@@ -18,143 +18,70 @@ type Props = {
 const { metadata, entries, parentUrl } = Astro.props
 
 // Layouts
-import Layout from '@/layouts/Layout.astro'
-import Navigation from '@/views/Navigation.astro'
-import { defaultNavigationItems } from '@/constants/navigation'
+import ContentPage from '@/layouts/ContentPage.astro'
 ---
 
-<Layout metadata={metadata}>
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+<ContentPage
+	metadata={metadata}
+	description={metadata.description}
+	style={{ '--scrollItem-inlineDetached-maxSize': '72rem' }}
+>
+	{
+		parentUrl && (
+			<nav data-scroll-item='inline-detached padding-match-start'>
+				<a href={parentUrl}>← Back</a>
+			</nav>
+		)
+	}
 
-	<main data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-4'>
-				<h1>{metadata.title}</h1>
+	{
+		entries.length > 0 ? (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<div class='index-grid'>
+					{entries.map(entry => (
+						<a
+							data-card='secondary padding-5'
+							data-row='align-start'
+							data-link='camouflaged'
+							href={entry.path}
+						>
+							<div data-row-item='flexible' data-column='gap-1'>
+								<h2>{entry.title}</h2>
 
-				{metadata.description && <p>{metadata.description}</p>}
-			</hgroup>
-		</header>
+								{entry.description && <p>{entry.description}</p>}
+							</div>
 
-		{
-			parentUrl && (
-				<nav data-scroll-item='inline-detached padding-match-start'>
-					<a href={parentUrl}>← Back</a>
-				</nav>
-			)
-		}
-
-		{
-			entries.length > 0 ? (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<div class='index-grid'>
-						{entries.map(entry => (
-							<a class='index-card' href={entry.path}>
-								<div class='index-card-content'>
-									<h2>{entry.title}</h2>
-
-									{entry.description && <p>{entry.description}</p>}
-								</div>
-
-								<span class='index-card-arrow' aria-hidden='true'>
-									→
-								</span>
-							</a>
-						))}
-					</div>
+							<span aria-hidden='true'>→</span>
+						</a>
+					))}
 				</div>
-			) : (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<p>No pages in this directory.</p>
-				</div>
-			)
-		}
-	</main>
-</Layout>
+			</div>
+		) : (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<p>No pages in this directory.</p>
+			</div>
+		)
+	}
+</ContentPage>
 
 <style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 72rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
-
-		h1,
-		h2,
-		h3 {
-			font-family: var(--fontFamily-spMonorium);
-		}
-
-		nav a {
-			font-size: 0.875rem;
-			color: var(--text-secondary);
-			text-decoration: none;
-
-			&:hover {
-				color: var(--text-primary);
-			}
-		}
+	nav a {
+		font-size: 0.875rem;
 	}
 
 	.index-grid {
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
 	}
 
-	.index-card {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 1.25rem 1.5rem;
-		border: 1px solid var(--border);
-		border-radius: 0.5rem;
-		text-decoration: none;
-		color: var(--text-primary);
-		transition:
-			border-color 0.15s ease,
-			background-color 0.15s ease;
-
-		&:hover {
-			border-color: var(--accent);
-			background-color: var(--bg-secondary);
+	a[data-card] {
+		h2 {
+			font-size: 1.125rem;
 		}
-	}
 
-	.index-card-content {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.index-card-content h2 {
-		margin: 0 0 0.25rem;
-		font-size: 1.125rem;
-	}
-
-	.index-card-content p {
-		margin: 0;
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-
-	.index-card-arrow {
-		flex-shrink: 0;
-		font-size: 1.25rem;
-		color: var(--text-secondary);
-		transition: color 0.15s ease;
-	}
-
-	.index-card:hover .index-card-arrow {
-		color: var(--accent);
+		p {
+			font-size: 0.875rem;
+		}
 	}
 </style>
