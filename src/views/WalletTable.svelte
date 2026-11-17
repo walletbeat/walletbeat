@@ -591,9 +591,28 @@
 	let identityInterestAvailable = $state(false)
 	let transitionRoot: HTMLElement | undefined = $state()
 	type TransitionKind = 'sort' | 'columns' | 'filters' | 'disclosure'
+	let keyboardFocusNavigation = false
+	const dismissInterestedWallets = new Set<() => void>()
+
 	onMount(() => {
 		interactive = true
 		identityInterestAvailable = 'popover' in HTMLElement.prototype
+		if (!identityInterestAvailable) return
+
+		const lifetime = new AbortController()
+		const options = { signal: lifetime.signal, capture: true }
+
+		document.addEventListener('keydown', event => {
+			keyboardFocusNavigation = event.isTrusted && event.key === 'Tab'
+			if (event.key === 'Escape') {
+				for (const dismiss of dismissInterestedWallets) dismiss()
+			}
+		}, options)
+		document.addEventListener('keyup', event => {
+			if (event.key === 'Tab') keyboardFocusNavigation = false
+		}, options)
+
+		return () => lifetime.abort()
 	})
 
 	const walletIdentityId = (walletId: string) => viewTransitionName(viewId, 'wallet-identity', walletId)
@@ -610,7 +629,6 @@
 		const identitySource = summary ?? owner
 		let redirect: ReturnType<typeof setTimeout> | undefined
 		let dismissed = false
-		let keyboardFocusNavigation = false
 		const cancelRedirect = () => {
 			clearTimeout(redirect)
 			redirect = undefined
@@ -631,13 +649,9 @@
 				if (!node.matches(':hover, :focus-within')) dismissed = false
 			})
 		}
-		const keydown = (event: KeyboardEvent) => {
-			keyboardFocusNavigation = event.isTrusted && event.key === 'Tab'
-			if (event.key === 'Escape' && (node.matches(':hover, :focus-within, :popover-open')
-				|| disclosure?.querySelector(':scope > [popover]:popover-open'))) dismiss()
-		}
-		const keyup = (event: KeyboardEvent) => {
-			if (event.key === 'Tab') keyboardFocusNavigation = false
+		const dismissIfInterested = () => {
+			if (node.matches(':hover, :focus-within, :popover-open')
+				|| disclosure?.querySelector(':scope > [popover]:popover-open')) dismiss()
 		}
 		const activateDisclosure = (event: KeyboardEvent) => {
 			if (event.key === 'Enter' || event.key === ' ') dismiss()
@@ -692,13 +706,13 @@
 		node.addEventListener('pointerleave', endInterest, listenerOptions)
 		node.addEventListener('focusout', endInterest, listenerOptions)
 		node.addEventListener('loseinterest', endInterest, listenerOptions)
-		node.ownerDocument.addEventListener('keydown', keydown, { ...listenerOptions, capture: true })
-		node.ownerDocument.addEventListener('keyup', keyup, { ...listenerOptions, capture: true })
+		dismissInterestedWallets.add(dismissIfInterested)
 		disclosure?.addEventListener('toggle', toggleDisclosure, listenerOptions)
 		summary?.addEventListener('focus', focusSummary, listenerOptions)
 		summary?.addEventListener('click', dismiss, { ...listenerOptions, capture: true })
 		summary?.addEventListener('keydown', activateDisclosure, { ...listenerOptions, capture: true })
 		return () => {
+			dismissInterestedWallets.delete(dismissIfInterested)
 			cancelRedirect()
 			lifetime.abort()
 			registration?.destroy()
