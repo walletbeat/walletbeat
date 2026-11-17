@@ -10,6 +10,7 @@ import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
 
 type Props = {
+	showContributionCallToAction?: boolean
 	metadata: ComponentProps<typeof Metadata>['metadata']
 
 	/**
@@ -24,11 +25,17 @@ type Props = {
 	preloadComplexIcons?: boolean
 }
 
-const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
+const {
+	metadata,
+	rewriteUrlTo,
+	preloadComplexIcons = false,
+	showContributionCallToAction = true,
+} = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
+import ContributionCallToAction from '@/views/ContributionCallToAction.astro'
 import Footer from '@/views/Footer.astro'
 ---
 
@@ -41,6 +48,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
+		<Font cssVariable='--fontFamily-spMonorium' />
 		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
@@ -140,11 +148,63 @@ import Footer from '@/views/Footer.astro'
 			<slot name='nav' />
 			<div id='content' tabindex='-1' data-column='gap-0' data-sticky-container>
 				<slot />
+				{showContributionCallToAction && <ContributionCallToAction />}
 				<Footer />
 			</div>
 		</div>
 	</body>
 </html>
+
+<script>
+	const compact = matchMedia('(width <= 1024px)')
+	document.addEventListener('focusin', event => {
+		const link = event.target
+		if (!(link instanceof HTMLAnchorElement) || !link.matches(':focus-visible')) {
+			return
+		}
+		if (!compact.matches) {
+			return
+		}
+		const layout = link.closest<HTMLElement>('#layout')
+		const contribution = layout?.querySelector(
+			'#content > section[aria-labelledby="contribution-heading"]',
+		)
+		const footer = layout?.querySelector('#content > footer')
+		if (!layout || !contribution) {
+			return
+		}
+		if (!contribution.contains(link) && !footer?.contains(link)) {
+			return
+		}
+
+		requestAnimationFrame(() => {
+			if (!compact.matches || link !== document.activeElement) {
+				return
+			}
+			const header = layout.querySelector('#nav > header')
+			if (!header) {
+				return
+			}
+			const fragments = Array.from(link.getClientRects()).filter(rect => rect.width && rect.height)
+			if (!fragments.length) {
+				return
+			}
+
+			const bounds = layout.getBoundingClientRect()
+			const top = Math.max(bounds.top, header.getBoundingClientRect().bottom)
+			const bottom = Math.min(bounds.bottom, window.innerHeight)
+			const first = Math.min(...fragments.map(rect => rect.top))
+			const last = Math.max(...fragments.map(rect => rect.bottom))
+			if (last - first > bottom - top) {
+				return
+			}
+			const delta = first < top ? Math.floor(first - top) : Math.max(0, Math.ceil(last - bottom))
+			if (delta) {
+				layout.scrollBy({ top: delta, behavior: 'instant' })
+			}
+		})
+	})
+</script>
 
 <style>
 	/* Fixed metric timelines use viewport coordinates; content retains its native direction. */
