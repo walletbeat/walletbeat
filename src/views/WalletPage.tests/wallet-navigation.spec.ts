@@ -367,7 +367,44 @@ test('local stage criterion clicks retain the wallet variant and native page ide
 			),
 		])
 	})
-	await criterion.click()
+	const scrollCompletion = await criterion.evaluateHandle((element, href) => {
+		const root = document.querySelector('#layout')!
+		let cleanup = () => {}
+		const finished = new Promise<{ scroll: number; elapsed: number }>(resolve => {
+			const onClick = () => {
+				const start = performance.now()
+				const initial = root.scrollTop
+				const onEnd = () => {
+					if (location.hash === href && Math.abs(root.scrollTop - initial) > 1) {
+						cleanup()
+						resolve({ scroll: root.scrollTop, elapsed: performance.now() - start })
+					}
+				}
+				const timeout = setTimeout(() => {
+					cleanup()
+					resolve({ scroll: NaN, elapsed: performance.now() - start })
+				}, 7000)
+
+				cleanup = () => {
+					clearTimeout(timeout)
+					root.removeEventListener('scrollend', onEnd)
+				}
+				root.addEventListener('scrollend', onEnd)
+			}
+			cleanup = () => element.removeEventListener('click', onClick, true)
+			element.addEventListener('click', onClick, { capture: true, once: true })
+		})
+		return { finished, cleanup: () => cleanup() }
+	}, destination.href)
+
+	let stability: { scroll: number; elapsed: number }
+	try {
+		await criterion.click()
+		stability = await scrollCompletion.evaluate(value => value.finished)
+	} finally {
+		await scrollCompletion.evaluate(value => value.cleanup())
+		await scrollCompletion.dispose()
+	}
 	await expect.poll(() => new URL(page.url()).hash).toBe(destination.href)
 	expect(new URL(page.url()).search).toBe(search)
 	expect(
@@ -407,41 +444,18 @@ test('local stage criterion clicks retain the wallet variant and native page ide
 		return { target, occupiedBottom: Math.max(...bottoms), scroll: observed.scroll }
 	}
 
-	let previous: Awaited<ReturnType<typeof landing>> | undefined,
-		stable = 0
+	const result = await landing()
 
-	try {
-		await expect
-			.poll(
-				async () => {
-					const current = await landing()
-					const { target, occupiedBottom } = current
-
-					stable =
-						previous &&
-						Math.abs(previous.scroll - current.scroll) < 0.25 &&
-						Math.abs(previous.target.top - target.top) < 0.25
-							? stable + 1
-							: 0
-					previous = current
-
-					return (
-						stable >= 2 &&
-						target.height > 0 &&
-						target.top >= occupiedBottom - 1 &&
-						target.headingTop >= occupiedBottom - 1 &&
-						target.headingBottom < target.viewport
-					)
-				},
-				{ timeout: 7000 },
-			)
-			.toBe(true)
-	} finally {
-		await info.attach('criterion-native-landing', {
-			body: JSON.stringify({ previous, stable }),
-			contentType: 'application/json',
-		})
-	}
+	await info.attach('criterion-native-landing', {
+		body: JSON.stringify({ result, stability }),
+		contentType: 'application/json',
+	})
+	expect(Number.isFinite(stability.scroll), 'The root scroll emits native completion').toBe(true)
+	expect(result.scroll).toBeCloseTo(stability.scroll, 0)
+	expect(result.target.height).toBeGreaterThan(0)
+	expect(result.target.top).toBeGreaterThanOrEqual(result.occupiedBottom - 1)
+	expect(result.target.headingTop).toBeGreaterThanOrEqual(result.occupiedBottom - 1)
+	expect(result.target.headingBottom).toBeLessThan(result.target.viewport)
 })
 
 test('mobile TOC shares one native panel with its readable in-flow rail', async ({
