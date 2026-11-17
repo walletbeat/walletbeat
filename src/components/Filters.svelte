@@ -8,7 +8,9 @@
 	import { viewTransitionName, type TransitionUpdate } from '@/utils/view-transition'
 	import { SvelteSet } from 'svelte/reactivity'
 	type FiltersTransitionUpdate = TransitionUpdate<'filters'>
-	const directTransitionUpdate: FiltersTransitionUpdate = update => update()
+	const directTransitionUpdate: FiltersTransitionUpdate = update => {
+		flushSync(update)
+	}
 	const instanceId = $props.id()
 	let interactive = $state(false)
 	onMount(() => { interactive = true })
@@ -53,7 +55,7 @@
 	const defaultChoices = $derived(resetFilterSets(filterSets, new Set()))
 
 	const updateFilters = (update: () => void) => {
-		transitionUpdate(() => flushSync(update), 'filters')
+		transitionUpdate(update, 'filters')
 	}
 
 	const _toggleFilter = (choice: FilterChoice<Item>, exclusive = false) => {
