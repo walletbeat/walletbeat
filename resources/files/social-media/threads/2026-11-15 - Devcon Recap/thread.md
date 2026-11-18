@@ -1,6 +1,8 @@
 We took Walletbeat to @EFDevcon Week 🌸
 Talks, workshops, panels, and our own booth. Here's our recap 🧵👇
-![Devcon Recap Video](./DEVCON_RECAP.mov)
+
+Video coming soon.
+
 ---
 
 Cypherpunk Congress, organized by @web3privacy
@@ -52,7 +54,7 @@ https://youtu.be/qP0u2WPQjs8?si=DcHsx_vcUrQMqINs
 
 Workshop "Help watch the wallets: Building the CROPS-legible dataset"
 
-@0xMattmatt showed how to contribute one wallet attribute end to end, with the help of AI and a human in the loop for verification . He shared best practices for capturing evidence, write the entry and open the PR.
+@0xMattmatt showed how to contribute one wallet attribute end to end, with the help of AI and a human in the loop for verification. He shared best practices for capturing evidence, write the entry and open the PR.
  
 https://x.com/walletbeat/status/2118664152504009178
 
@@ -61,7 +63,7 @@ https://x.com/walletbeat/status/2118664152504009178
 
 Why Everything Matters for Wallet Security by @0xMattmatt
 
-Matt took the stage at the Security Hub and shared why privacy, self-sovereignty, transparency and ecosystem alignment matter for wallet security, and how getting one wrong can put users at risk.
+Matt took the stage at the Security Hub and shared why privacy, self-sovereignty, transparency, and ecosystem alignment matter for wallet security, and how getting one wrong can put users at risk.
 
 ![Security Hub Talk](./security_hub.jpg)
 ![Security Hub Talk](./security_hub1.jpg)
@@ -72,6 +74,10 @@ Last but not least, our booth was very packed during the whole conference. It wa
 
 We shared how wallets get rated, what the data means, and what wallets have changed because of it 🌸
 ![Devcon's Wallpaper](./wallpaper_devcon.jpg)
+![Walletbeat's Booth](./devcon-booth.jpg)
+![Walletbeat's Booth](./devcon-booth1.jpg)
+![Walletbeat's Booth](./devcon-booth2.jpg)
+![Walletbeat's Booth](./devcon-booth3.jpg)
 
 
 ---

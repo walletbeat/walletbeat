@@ -1159,22 +1159,6 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-custom-rpc.png": {
-		"hash": "1fdd584db782f90054ac02aa8cd21a67741425f837a0117b07c24097c1511257",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-fake-usdc-balance.png": {
-		"hash": "85af1353fe1756857694ec83c58c07e61f69cf43b1d223d9b73d3f7632d12631",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-lying-proxy-log.png": {
-		"hash": "f4bc386b829cf02e78968370c64103cade69b14271377532b87a5357956246d5",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-send-fake-usdc.png": {
-		"hash": "537d52c068ea54b664796f7285dcdf29c5e279f782e80e17172dc61b66524a8e",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "5b5321fdcb41c07a239d25c121e1985308346d30862bfcdc7fa5fc745e0ba9e2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -2147,28 +2131,36 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/eip-tracker-upgrade.jpg": {
-		"hash": "ce2697ecad458523d4351c0ba6e0104159dd23a6de6f66f751eaf1f845165bd5",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg": {
+		"hash": "a7e79245a137e4d641ef4e5eec3826278e20addeeeee486776dfd7df947eb2ef",
+		"passedTests": ["file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/eip-tracker-upgrade1.jpg": {
-		"hash": "65228f9a6dad0ce983ab4de9a7c823e329538054c06776e076dd9af38850370e",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg": {
+		"hash": "c7a49f988d45a1b2d9390dd7aa8e0ae7dd14b4c6f81f7606971bf4c416e0ed35",
+		"passedTests": ["file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/october_cover.png": {
-		"hash": "fb58261e37173c505101369dffbe6274a9e37acad23143f297ca90df05e69d60",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg": {
+		"hash": "14c0e9e4d3c432a7aff3ddafe24941dfeb64010c85b69f745292de09cc417821",
+		"passedTests": ["file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october-1.jpg": {
-		"hash": "556b4a78f24bfe6badf16e71149ef025c4ed157498f47e2b8e1ee26dfd4b3d2b",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg": {
+		"hash": "95fa8013e1a20932d13340aba103b98c4fc8efd78839e38b23953c65029ed7e1",
+		"passedTests": ["file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october-2.jpg": {
-		"hash": "ee3ff82cde1bfcea45ea8e2d8d3b08aac427c8818e2cefc54e592d3daae5d112",
-		"passedTests": ["blockiness", "file-format"]
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg": {
+		"hash": "c53b42cfcffe964da21de7b0e0499f0fc8b2387bf9e962acdb4b7effe90678d3",
+		"passedTests": ["file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october.jpg": {
-		"hash": "ad1fb1198e946571676002cfebcffdba8bb940f5277761262d5d5d01ccb3e439",
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg": {
+		"hash": "c84cb9b7c84766d1717665fded19cd8f5f5c2c030e420dc0f09a463af5fd7e16",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg": {
+		"hash": "6a31acf539e1a5b50de44d16bfea30993fc1b94e0de3455a1851a17ec1c27ed9",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/wallpaper_devcon.jpg": {
+		"hash": "b318cd25bbae02ab63d6ba3192c8bfca613d85e0507a52e5572e4a73b511c27c",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {

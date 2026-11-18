@@ -91,6 +91,13 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg',
 ])
 
 /** A single image file discovered by the crawler. */
