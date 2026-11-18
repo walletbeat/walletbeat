@@ -22,15 +22,19 @@ Scam Alerting is the ability of wallets to show users if they're signing a possi
 
 Clear Signing is the ability of wallets to show human readable transactions. For example, this is a safe wallet transaction with clear signing. 
 
-![Clear Signing](./scam_alerting.jpg)
+Instead of seeing hexadecimal data, you can now clearly understand what you're about to do. 
+
+![Clear Signing](./clear_signing_example.jpg)
 
 ---
 
-Transaction simulations is the ability of wallets to simulate the result of a transaction. 
+Transaction simulation is the ability of wallets to simulate the result of a transaction. 
 
 The thing about transaction simulation is that it simulates what might happen and not what will happen. 
 
 For example, when doing swaps, you can still get the worst price from a sandwich attack. 
+
+![Transaction Simulation](./transaction_simulation.jpg)
 
 ---
 
@@ -38,7 +42,9 @@ This is where transaction assertions come in.
 
 They let wallets set condition on what a transaction can do. 
 
-And if those conditions are not met, the transaction reverts.
+And if those conditions are not met, the transaction reverts. But keep in mind that transactions assertions is still in research.
+
+![Transaction Assertions](./transaction_assertions.jpg)
 
 ---
 
@@ -63,4 +69,4 @@ https://walletbeat.eth.limo/
 
 @0xMattmatt is a Walletbeat core contributor, focused on wallet attributes research and pushing CROPS values into Ethereum's access layer.
 
-![Matt's Picture](./matt-picture.jpg)
+![Matt's Picture](./matt_picture.jpg)
