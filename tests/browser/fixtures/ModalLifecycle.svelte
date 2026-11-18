@@ -3,6 +3,7 @@
 	import { createConfig, http } from '@wagmi/core'
 	import { mainnet } from '@wagmi/core/chains'
 	import { mock } from 'wagmi/connectors'
+	import ErrorComponent from '@/components/ErrorComponent.svelte'
 	import Modal from '@/components/Modal.svelte'
 	import ChainSwitchModal from '@/components/Modals/ChainSwitchModal.svelte'
 	import ConnectorModal from '@/components/Modals/ConnectorModal.svelte'
@@ -17,6 +18,7 @@
 	let closes = $state(0)
 	let actions = $state(0)
 	let invokerPresent = $state(true)
+	let error = $state<string | null>(null)
 	const config = createConfig({
 		chains: [mainnet],
 		connectors: [mock({ accounts: ['0x0000000000000000000000000000000000000001'] })],
@@ -61,6 +63,9 @@
 			<button id="modal-action" disabled={mode === 'disabled'} onclick={() => { actions++ }}>Run action</button>
 		{/if}
 		{#if mode === 'basic'}
+			<label><input type="checkbox" /> Acknowledgement</label>
+			<label>Message <input type="text" /></label>
+			<button onclick={() => { error = 'Fixture error' }}>Show error</button>
 			<button popovertarget="modal-help">Open help</button>
 			<div id="modal-help" popover="auto">Nested help <button popovertarget="modal-help" popovertargetaction="hide">Close help</button></div>
 			<button id="modal-reopen" onclick={() => { flushSync(() => { isOpen = false }); flushSync(() => { isOpen = true }) }}>Close and reopen</button>
@@ -81,6 +86,7 @@
 	</Modal>
 {/if}
 
+<ErrorComponent {error} onClose={() => { error = null }} />
 <ConnectorModal isOpen={['connector', 'empty-connector', 'connector-busy'].includes(consumer)} connectors={consumer === 'empty-connector' ? [] : config.connectors} isConnecting={consumer === 'connector-busy'} onClose={close} onConnect={() => { actions++ }} />
 <ChainSwitchModal isOpen={consumer === 'chain' || consumer === 'busy'} isSwitching={consumer === 'busy'} currentChainId={10} onClose={close} onSwitch={() => { actions++ }} />
 <EIPResultsModal isOpen={consumer === 'results'} overallPassed={true} hasPartialResults={false} stepResults={results} onClose={close} />
