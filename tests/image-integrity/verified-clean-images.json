@@ -1995,8 +1995,28 @@
 		"hash": "1ce5615822c6ad5fb74394a199433f61fa2b3fd576c56ef7034eb3097d1b845e",
 		"passedTests": ["file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/matt-picture.jpg": {
-		"hash": "a785a908795d2af0a5409502b9a5f4b5b44f5292d298bf6f699b4429a8d1fc4e",
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/clear_signing_example.jpg": {
+		"hash": "e5c78c3d0e13e6ca691a04cb7b374d13394a50fd5273a263a50a1bc692aedd0e",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/easier_transaction_verification.jpg": {
+		"hash": "4007d98eafb342810fc74aa76220981b8bff6b67f3a33672744267222528bca7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/matt_picture.jpg": {
+		"hash": "e2531dac5689611d8c29492e2cc56a9720420cff664fb76dd6635fe35f4e48b0",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/scam_alerting.jpg": {
+		"hash": "5d393237d80ea2308f99cd03ef08a8f9f01db84d8699da294801db560161111b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/transaction_assertions.jpg": {
+		"hash": "1a51095ff11f43d63735eb4cff701ebb3deb79aafb8c3062011f263a4c0130d7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-17 - Matts Talk Video/transaction_simulation.jpg": {
+		"hash": "04f7d522b362a4f02845a0458fd25555392595737d82946a3df497c9837cebe0",
 		"passedTests": ["file-format"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {

@@ -50,9 +50,9 @@ And if those conditions are not met, the transaction reverts. But keep in mind t
 
 And lastly, another thing that wallets can do is make hardware wallet transaction verification easier.
 
-What we're used to currently is verifying pages of hexadimal data and hope that we don't make a single mistake. 
+What we're used to currently is verifying pages of hexadecimal data and hope that we don't make a single mistake. 
 
-And thanks to ERC-8213, call data digest compresses pages of hexodimal data into a single 32-byte digest.
+And thanks to ERC-8213, call data digest compresses pages of hexadecimal data into a single 32-byte digest.
 
 ![Easier Transaction Verification](./easier_transaction_verification.jpg)
 
