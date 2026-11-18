@@ -7,6 +7,10 @@ const fixtures = {
 	hooks: {
 		'astro:config:setup': ({ injectRoute }) => {
 			injectRoute({
+				pattern: '/__modal-keyboard',
+				entrypoint: './tests/browser/fixtures/modal-keyboard.astro',
+			})
+			injectRoute({
 				pattern: '/__wallet-page/[fixture]',
 				entrypoint: './tests/browser/fixtures/fixture.astro',
 			})
