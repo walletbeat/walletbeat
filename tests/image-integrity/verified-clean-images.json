@@ -1099,6 +1099,34 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-erc20-send-fee-default.png": {
+		"hash": "51f318e42f731afc3b8890c9c027676b2cce72cd54f3b89d9276f5e076dcd3d8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-erc20-send-fee-expanded.png": {
+		"hash": "4c475267a7dd8b39aae6008f65c8e6d9bb6d0ee75ff70e49046053dabebff43c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-eth-send-fee-default.png": {
+		"hash": "33bd0492c11e7dda4fa6d8ac337ef57966ecc3f4755b1807a58a489915752554",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-eth-send-fee-expanded.png": {
+		"hash": "49f562525ed2b421bfd3c25f752b7aea0a897bd10e15932ffa7f66c8ca58cf44",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-fee-default.png": {
+		"hash": "dfc18debf17a9d987e7ae80a0081179395194d08f7b238193f2f2512e257182f",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-fee-expanded.png": {
+		"hash": "23805ab9cbde720a3e913054e690c5acbd0977221ebdb2fb715653494132d178",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-request.png": {
+		"hash": "b25213f69e601d94cce175256419df5d00cfd33fa01cae314946538392c96b65",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-erc20-send-fee-default.png": {
 		"hash": "3d79ac69737ce0257b8ca91a2d4e7e99b0a0b4060bf52ec831451a40c07e3c56",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

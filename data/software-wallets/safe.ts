@@ -40,27 +40,6 @@ const safeTransactionFeesArticleRef: LooseReference = {
 	url: 'https://help.safe.global/articles/1896549699-transaction-fees',
 }
 
-const mobileEstimatedFeeRef: LooseReference = {
-	explanation:
-		'By default, the execution screen of the mobile app shows a single estimated network fee figure in the native token of the chain, with no itemized breakdown.',
-	label: 'Safe mobile app estimated network fee row',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/ExecuteTx/components/EstimatedNetworkFee/EstimatedNetworkFee.tsx#L43-L67',
-}
-
-const mobileGasBreakdownRef: LooseReference = {
-	explanation:
-		'One tap on the fee opens a sheet that shows the maximum fee, the maximum priority fee, and the gas limit.',
-	label: 'Safe mobile app network fee sheet',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/ChangeEstimatedFeeSheet/components/ChangeEstimatedFeeForm/ChangeEstimatedFeeForm.tsx#L73-L132',
-}
-
-const mobileAppTransactionRequestRef: LooseReference = {
-	explanation:
-		'When the user reviews a transaction request from an app connected through WalletConnect, the mobile app makes a Safe transaction and opens the confirmation screen. The Uniswap fee is part of the swap price, so it is not itemized.',
-	label: 'Safe mobile app transaction requests from connected apps',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/src/features/WalletConnect/Wallet/hooks/useTxRequestActions.ts#L54-L81',
-}
-
 export const safe: SoftwareWallet = {
 	metadata: {
 		id: 'safe',
@@ -495,7 +474,23 @@ export const safe: SoftwareWallet = {
 				[Variant.MOBILE]: {
 					builtInErc20Swap: notSupported,
 					erc20L1Transfer: supported<OperationFeeDisplay>({
-						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
+						ref: [
+							{
+								explanation:
+									'By default, the USDC send screen of the Android app shows a single estimated network fee in ETH, with no breakdown. It also shows that Safe charges no execution fee.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-erc20-send-fee-default.png',
+								label: 'Safe Android app USDC send screen with the estimated network fee',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One tap on the network fee opens a sheet that shows the maximum fee, the maximum priority fee, and the gas limit.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-erc20-send-fee-expanded.png',
+								label: 'Safe Android app network fee sheet for the USDC send',
+								lastRetrieved: '2026-11-18',
+							},
+							safeTransactionFeesArticleRef,
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
@@ -513,7 +508,23 @@ export const safe: SoftwareWallet = {
 						},
 					}),
 					ethL1Transfer: supported<OperationFeeDisplay>({
-						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
+						ref: [
+							{
+								explanation:
+									'By default, the ETH send screen of the Android app shows a single estimated network fee in ETH, with no breakdown. It also shows that Safe charges no execution fee.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-eth-send-fee-default.png',
+								label: 'Safe Android app ETH send screen with the estimated network fee',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One tap on the network fee opens a sheet that shows the maximum fee, the maximum priority fee, and the gas limit.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-eth-send-fee-expanded.png',
+								label: 'Safe Android app network fee sheet for the ETH send',
+								lastRetrieved: '2026-11-18',
+							},
+							safeTransactionFeesArticleRef,
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
@@ -531,7 +542,29 @@ export const safe: SoftwareWallet = {
 						},
 					}),
 					uniswapUSDCToEtherSwap: supported<OperationFeeDisplay>({
-						ref: [mobileAppTransactionRequestRef, mobileEstimatedFeeRef, mobileGasBreakdownRef],
+						ref: [
+							{
+								explanation:
+									'The request from Uniswap shows the Ethereum network, three actions, and the USDC and ETH balance changes. Its fee section shows that Safe charges no execution fee. The Uniswap fee is part of the swap price, so it is not itemized.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-request.png',
+								label: 'Safe Android app request from Uniswap for a USDC to ETH swap',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'By default, the execution screen for the swap shows a single estimated network fee in ETH, with no breakdown.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-fee-default.png',
+								label: 'Safe Android app execution screen for the Uniswap swap',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One tap on the network fee opens a sheet that shows the maximum fee, the maximum priority fee, and the gas limit.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-android-uniswap-swap-fee-expanded.png',
+								label: 'Safe Android app network fee sheet for the Uniswap swap',
+								lastRetrieved: '2026-11-18',
+							},
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
