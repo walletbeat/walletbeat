@@ -1,5 +1,11 @@
 import { minimalsm } from '@/data/contributors/minimalsm'
+import { amplitude } from '@/data/entities/amplitude'
+import { sentry } from '@/data/entities/sentry'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import type { WalletAnalytics } from '@/schema/features'
+import { AccountType } from '@/schema/features/account-support'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -8,13 +14,38 @@ import {
 	CoverageBreadth,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -25,6 +56,7 @@ import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
+import { mattmatt } from '../contributors/0xmattmatt'
 import { certik } from '../entities/certik'
 import { cure53 } from '../entities/cure53'
 import trustWalletRawExtManifest from './manifests/trustWallet/egjidjbpglichdcondbcbdnbeeppgdph.manifest.json'
@@ -59,9 +91,9 @@ export const trustWallet: SoftwareWallet = {
 		displayName: 'Trust Wallet',
 		tableName: 'Trust Wallet',
 		coinspectId: 'trust-wallet',
-		contributors: [minimalsm],
+		contributors: [minimalsm, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-18',
+		lastUpdated: '2026-11-16',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],
 			extensions: [
@@ -81,7 +113,51 @@ export const trustWallet: SoftwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: supported({
+				ref: [
+					{
+						explanation:
+							'FlexGas uses EIP-7702 to let an EOA act as a smart account for a transaction, so that gas can be paid in TWT, USDT or USDC. It is opt-in.',
+						label: 'Trust Wallet FlexGas announcement',
+						url: 'https://trustwallet.com/blog/company/flex-gas-pay-for-gas-with-twt-usdt-or-bnb',
+					},
+				],
+				contract: 'UNKNOWN',
+			}),
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							'The recovery phrase can be shown from the wallet settings. Private key export is hidden by default and must first be turned on in the developer settings.',
+						label: 'Trust Wallet guide to recovery phrase backup and private key export',
+						url: 'https://trustwallet.com/blog/product/how-to-backup-your-recovery-phrase-and-export-private-keys-in-trust-wallet',
+					},
+					{
+						explanation:
+							"Trust Wallet Core derives Ethereum accounts with the standard BIP44 path m/44'/60'/0'/0/0.",
+						label: 'Trust Wallet Core registry entry for Ethereum',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/registry.json#L481-L493',
+					},
+					{
+						explanation: 'Trust Wallet Core initializes HD wallets from a BIP39 mnemonic.',
+						label: 'Trust Wallet Core HD wallet header',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/src/HDWallet.h#L59-L61',
+					},
+				],
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
@@ -98,9 +174,9 @@ export const trustWallet: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
 		},
 		licensing: {
@@ -159,16 +235,60 @@ export const trustWallet: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation: 'The extension sends error reports directly to Sentry.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-sentry-requests.png',
+								label: 'Captured Sentry requests from the Trust Wallet extension',
+							},
+							{
+								explanation:
+									'The "Share error reports" checkbox is checked by default on the first onboarding screen.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-onboarding-telemetry-consent.png',
+								label: 'Trust Wallet extension onboarding screen',
+							},
+						],
+						entity: sentry,
+						policy: CollectionPolicy.BY_DEFAULT,
+					}),
+					[Variant.MOBILE]: null,
+				},
+				usage: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation: 'The extension sends product analytics events directly to Amplitude.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-amplitude-requests.png',
+								label: 'Captured Amplitude requests from the Trust Wallet extension',
+							},
+							{
+								explanation:
+									'The "Share anonymous product analytics" checkbox is checked by default on the first onboarding screen.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-onboarding-telemetry-consent.png',
+								label: 'Trust Wallet extension onboarding screen',
+							},
+						],
+						entity: amplitude,
+						policy: CollectionPolicy.BY_DEFAULT,
+					}),
+					[Variant.MOBILE]: null,
+				},
 			},
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://trustwallet.com/privacy-notice',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
@@ -211,13 +331,81 @@ export const trustWallet: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
-			hardwareWalletSupport: null,
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
+			duressResistance: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'App Lock is a toggle in the security settings. It locks the app with a 6-digit passcode, and Face ID can be added as a lock method.',
+								label: 'Trust Wallet support article on setting up a security PIN',
+								url: 'https://support.trustwallet.com/en/articles/717163-setting-up-or-resetting-a-security-pin-on-trust-wallet',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
 			},
-			passkeyVerification: null,
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation: 'The browser extension connects to a Ledger plugged into the computer.',
+							label: 'Trust Wallet guide to hardware and software wallets',
+							url: 'https://trustwallet.com/blog/academy/hardware-wallets-vs-software-wallets-whats-the-real-difference',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'The "Add wallet" screen of the iPhone app only offers to create a new wallet or restore one from a secret phrase, private key or iCloud. There is no option to connect a hardware wallet.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-mobile-add-wallet.jpg',
+							label: 'Trust Wallet iPhone app "Add wallet" screen',
+						},
+					],
+					wallets: {},
+				},
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'Trust Wallet "generates a secret recovery phrase on your device". The phrase and the private keys derived from it never leave the phone or browser extension, and are never stored on Trust Wallet servers.',
+						label: 'Trust Wallet article on wallet safety',
+						url: 'https://trustwallet.com/blog/security/is-trust-wallet-safe',
+					},
+					{
+						explanation:
+							'Trust Wallet Core creates a wallet by generating one complete BIP39 mnemonic locally. No key shares are involved.',
+						label: 'Trust Wallet Core mnemonic generation',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/src/HDWallet.cpp#L64-L75',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
+			lightClient: {
+				ethereumL1: notSupported,
+			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: securityAudits,
 			scamAlerts: null,
 			securityBestPractices: {
@@ -240,7 +428,22 @@ export const trustWallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'The Approvals tab lists ERC-20 token approvals with the spender and the approved amount, including unlimited approvals.',
+						file: 'public/references/wallets/trust-wallet/screenshots/2026-11-16-trust-wallet-erc20-approvals.png',
+						label: 'Trust Wallet Approvals tab',
+					},
+				],
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -248,8 +451,10 @@ export const trustWallet: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
@@ -282,7 +487,10 @@ export const trustWallet: SoftwareWallet = {
 				}),
 			},
 		},
-		walletCall: null,
+		walletCall: {
+			[Variant.BROWSER]: notSupported,
+			[Variant.MOBILE]: null,
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,

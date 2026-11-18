@@ -1099,6 +1099,26 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-16-trust-wallet-erc20-approvals.png": {
+		"hash": "2e9934f67da7d559db3386d1d16fb87d34601063f0eee76129dc0a557817fcdf",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-amplitude-requests.png": {
+		"hash": "27b4f6b211d8295e60ed1d5576d6974e42318e012aee2fc152444efa46690857",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-mobile-add-wallet.jpg": {
+		"hash": "eb4f14facc184321b2c98ec5642b6736360dddee5b48843a8a586e00ae141753",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-onboarding-telemetry-consent.png": {
+		"hash": "c44ba6f17f8808c404d0458effd06d0ef8bde716128297804a0c21d517e250d4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-sentry-requests.png": {
+		"hash": "cb0b4eeb21447739b3ede8a227e7a960ff70dca43e79a0a11524efcce93160b6",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "5b5321fdcb41c07a239d25c121e1985308346d30862bfcdc7fa5fc745e0ba9e2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

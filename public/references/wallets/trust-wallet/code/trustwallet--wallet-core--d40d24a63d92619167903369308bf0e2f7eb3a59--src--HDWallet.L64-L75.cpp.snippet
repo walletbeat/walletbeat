@@ -1,0 +1,41 @@
+{
+	"highlightRanges": [
+		{
+			"first": 64,
+			"last": 75
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"void HDWallet<seedSize>::updateSeedAndEntropy([[maybe_unused]] bool check) {"
+			],
+			"startLine": 50
+		},
+		{
+			"lines": [
+				"    // copy to truncate",
+				"    entropy = data(entropyRaw.data(), entropyBytes);",
+				"    assert(!check || entropy.size() > 10);",
+				"}",
+				"",
+				"template <std::size_t seedSize>",
+				"HDWallet<seedSize>::HDWallet(int strength, const std::string& passphrase)",
+				"    : passphrase(passphrase) {",
+				"    char buf[MnemonicBufLength];",
+				"    const char* mnemonic_chars = mnemonic_generate(strength, buf, MnemonicBufLength);",
+				"    if (mnemonic_chars == nullptr) {",
+				"        throw std::invalid_argument(\"Invalid strength\");",
+				"    }",
+				"    mnemonic = mnemonic_chars;",
+				"    TW::memzero(buf, MnemonicBufLength);",
+				"    updateSeedAndEntropy();",
+				"}",
+				"",
+				"template <std::size_t seedSize>",
+				"HDWallet<seedSize>::HDWallet(const std::string& mnemonic, const std::string& passphrase, const bool check)"
+			],
+			"startLine": 60
+		}
+	]
+}
