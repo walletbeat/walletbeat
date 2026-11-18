@@ -1,7 +1,6 @@
 We took Walletbeat to @EFDevcon Week 🌸
 Talks, workshops, panels, and our own booth. Here's our recap 🧵👇
-
-![Devcon's Impact Project](./impact-project.jpg)
+![Devcon Recap Video](./DEVCON_RECAP.mov)
 ---
 
 Cypherpunk Congress, organized by @web3privacy
@@ -60,14 +59,23 @@ https://x.com/walletbeat/status/2118664152504009178
 
 ---
 
-➡️ Why Everything Matters for Wallet Security by @0xMattmatt
+Why Everything Matters for Wallet Security by @0xMattmatt
+
+Matt took the stage at the Security Hub and shared why privacy, self-sovereignty, transparency and ecosystem alignment matter for wallet security, and how getting one wrong can put users at risk.
+
+![Security Hub Talk](./security_hub.jpg)
+![Security Hub Talk](./security_hub1.jpg)
  
-📍 Security Hub
+---
+
+Last but not least, our booth was very packed during the whole conference. It was very rewarding to engage with the community and spread the word about our mission. 
+
+We shared how wallets get rated, what the data means, and what wallets have changed because of it 🌸
+![Devcon's Wallpaper](./wallpaper_devcon.jpg)
+
 
 ---
-Last but not least, our booth was very packed
-4 photos
 
----
-it was a great opportunity to connect and engage
+Thank you so much to the @EFDevcon organizers for selecting Walletbeat as an Impact Project. 
 ![Devcon's Impact Project](./impact-project.jpg)
+![Devcon's Wallpaper](./wallpaper_devcon.jpg)
