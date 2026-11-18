@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import {
 		connect,
 		getAccount,
@@ -294,31 +294,57 @@ Issued At: ${new Date().toISOString()}`;
 	}
 
 	// Chain switch handlers
+	let chainSwitchIntent = 0
+
+	onDestroy(() => {
+		chainSwitchIntent++
+	})
+
 	function openChainSwitchModal(tx: TestTransaction) {
+		chainSwitchIntent++
 		chainState.pendingTransaction = tx
 		chainState.isModalOpen = true
+		chainState.isSwitching = false
+		chainState.error = ''
+	}
+
+	function closeChainSwitchModal() {
+		chainSwitchIntent++
+		chainState.isModalOpen = false
+		chainState.pendingTransaction = null
+		chainState.isSwitching = false
 		chainState.error = ''
 	}
 
 	async function handleSwitchChain() {
-		if (!chainState.pendingTransaction) return
+		const tx = chainState.pendingTransaction
+
+		if (!tx || chainState.isSwitching) return
+
+		const intent = chainSwitchIntent
 
 		chainState.isSwitching = true
 		chainState.error = ''
 
 		try {
 			await switchChain(config, { chainId: mainnet.id });
-			await new Promise(resolve => setTimeout(resolve, 500));
-			account = getAccount(config)
-			const tx = chainState.pendingTransaction;
 
+			if (intent !== chainSwitchIntent) return
+
+			await new Promise(resolve => setTimeout(resolve, 500));
+
+			if (intent !== chainSwitchIntent) return
+
+			account = getAccount(config)
 			chainState.isModalOpen = false
 			chainState.pendingTransaction = null
 			await sendTransactionInternal(tx)
 		} catch (error) {
-			chainState.error = error instanceof Error ? error.message : 'Failed to switch to mainnet';
+			if (intent === chainSwitchIntent) {
+				chainState.error = error instanceof Error ? error.message : 'Failed to switch to mainnet';
+			}
 		} finally {
-			chainState.isSwitching = false
+			if (intent === chainSwitchIntent) chainState.isSwitching = false
 		}
 	}
 
@@ -1036,11 +1062,7 @@ Issued At: ${new Date().toISOString()}`;
 		isOpen={chainState.isModalOpen}
 		isSwitching={chainState.isSwitching}
 		currentChainId={account?.chainId}
-		onClose={() => {
-			chainState.isModalOpen = false
-			chainState.pendingTransaction = null
-			chainState.error = ''
-		}}
+		onClose={closeChainSwitchModal}
 		onSwitch={handleSwitchChain}
 	/>
 
