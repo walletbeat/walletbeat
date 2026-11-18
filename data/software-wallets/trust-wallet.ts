@@ -132,7 +132,7 @@ export const trustWallet: SoftwareWallet = {
 						explanation:
 							'The recovery phrase can be shown from the wallet settings. Private key export is hidden by default and must first be turned on in the developer settings.',
 						label: 'Trust Wallet guide to recovery phrase backup and private key export',
-						url: 'https://trustwallet.com/blog/guides/how-to-backup-your-recovery-phrase-and-export-private-keys-in-trust-wallet',
+						url: 'https://trustwallet.com/blog/product/how-to-backup-your-recovery-phrase-and-export-private-keys-in-trust-wallet',
 					},
 					{
 						explanation:
@@ -235,7 +235,20 @@ export const trustWallet: SoftwareWallet = {
 			analytics: {
 				crashReports: {
 					[Variant.BROWSER]: supported<WalletAnalytics>({
-						ref: refTodo,
+						ref: [
+							{
+								explanation:
+									'Opening the extension popup sends error reporting data directly to Sentry.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-sentry-requests.png',
+								label: 'Captured Sentry requests from the Trust Wallet extension',
+							},
+							{
+								explanation:
+									'The "Share error reports" checkbox is checked by default on the first onboarding screen.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-onboarding-telemetry-consent.png',
+								label: 'Trust Wallet extension onboarding screen',
+							},
+						],
 						entity: sentry,
 						policy: CollectionPolicy.BY_DEFAULT,
 					}),
@@ -243,7 +256,19 @@ export const trustWallet: SoftwareWallet = {
 				},
 				usage: {
 					[Variant.BROWSER]: supported<WalletAnalytics>({
-						ref: refTodo,
+						ref: [
+							{
+								explanation: 'The extension sends product analytics events directly to Amplitude.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-amplitude-requests.png',
+								label: 'Captured Amplitude requests from the Trust Wallet extension',
+							},
+							{
+								explanation:
+									'The "Share anonymous product analytics" checkbox is checked by default on the first onboarding screen.',
+								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-onboarding-telemetry-consent.png',
+								label: 'Trust Wallet extension onboarding screen',
+							},
+						],
 						entity: amplitude,
 						policy: CollectionPolicy.BY_DEFAULT,
 					}),
@@ -311,7 +336,7 @@ export const trustWallet: SoftwareWallet = {
 								explanation:
 									'App Lock is a toggle in the security settings. It locks the app with a 6-digit passcode, and Face ID can be added as a lock method.',
 								label: 'Trust Wallet support article on setting up a security PIN',
-								url: 'https://support.trustwallet.com/en/support/solutions/articles/67000734571-setting-up-or-resetting-a-security-pin-on-trust-wallet',
+								url: 'https://support.trustwallet.com/en/articles/717163-setting-up-or-resetting-a-security-pin-on-trust-wallet',
 							},
 						],
 						mechanisms: {
@@ -333,13 +358,9 @@ export const trustWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension supports Ledger devices connected by USB. Ledger support is not available in the mobile app.',
-							label: 'Trust Wallet guide to using the extension with a Ledger',
-							url: 'https://community.trustwallet.com/t/how-to-use-the-trust-wallet-browser-extension-with-a-ledger-hardware-wallet/680725',
-						},
-						{
-							label: 'Trust Wallet Ledger FAQ',
-							url: 'https://community.trustwallet.com/t/using-trust-wallet-with-your-ledger-hardware-wallet-frequently-asked-questions-faq/680818',
+								'The browser extension connects to a Ledger plugged into the computer.',
+							label: 'Trust Wallet guide to hardware and software wallets',
+							url: 'https://trustwallet.com/blog/academy/hardware-wallets-vs-software-wallets-whats-the-real-difference',
 						},
 					],
 					wallets: {
@@ -351,9 +372,10 @@ export const trustWallet: SoftwareWallet = {
 				[Variant.MOBILE]: {
 					ref: [
 						{
-							explanation: 'Ledger support is only available in the browser extension.',
-							label: 'Trust Wallet Ledger FAQ',
-							url: 'https://community.trustwallet.com/t/using-trust-wallet-with-your-ledger-hardware-wallet-frequently-asked-questions-faq/680818',
+							explanation:
+								'The "Add wallet" screen of the iPhone app only offers to create a new wallet or restore one from a secret phrase, private key or iCloud. There is no option to connect a hardware wallet.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-mobile-add-wallet.jpg',
+							label: 'Trust Wallet iPhone app "Add wallet" screen',
 						},
 					],
 					wallets: {},
