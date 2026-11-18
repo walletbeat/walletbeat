@@ -1,0 +1,49 @@
+{
+	"highlightRanges": [
+		{
+			"first": 3,
+			"last": 30
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"import Foundation",
+				"",
+				"/// **YOUR ACCOUNT'S SWAP, STRAIGHT TO THE EXCHANGES (prd §1539, §1542;",
+				"/// replacing §1440's Relay).** No middleman: the phone asks every pool it",
+				"/// knows on the network itself — Uniswap v3 on Base, Ethereum and Robinhood",
+				"/// Chain; Uniswap v4 on Ethereum (§1678); Aerodrome's Slipstream and v2 pools",
+				"/// on Base; Sushi on Robinhood — through the account's",
+				"/// own node, takes the best output, and writes the swap's calls itself. The",
+				"/// account signs those calls in its own operation, beside any sends, so Add",
+				"/// and Sweep batch swaps as before.",
+				"///",
+				"/// The phone builds every byte now, so the rules are the builder's and are",
+				"/// checked again before anything is signed (`checked`):",
+				"///",
+				"/// 1. **Where it goes.** Every call goes to an exchange router pinned below",
+				"///    (each address read on chain 2026-10-26: code there, its `factory()` and",
+				"///    `WETH9()` the ones named here, its quoter on the same factory), or is",
+				"///    the sold token's own `approve` naming that router.",
+				"/// 2. **How much.** ETH sent is exactly the amount sold; a token approved is",
+				"///    exactly the amount sold, to exactly the router that spends it.",
+				"/// 3. **What comes back.** The swap's own minimum is the quote less the",
+				"///    network's slippage limit (`Book.slippageBps`), written into the call,",
+				"///    and proven by `YourAccountChain` before Face ID: the whole operation is",
+				"///    simulated (`eth_simulateV1`) and refused unless every swap pays the",
+				"///    account at least that minimum.",
+				"/// 4. **When.** Every router call carries a deadline (`deadlineSeconds`), so",
+				"///    an operation that sat unsent cannot fill at a stale price later.",
+				"///",
+				"/// ETH is swapped as WETH by the routers' own wrapping: ETH sold is sent with",
+				"/// the call and wrapped by the router; ETH bought is paid to the router and",
+				"/// unwrapped to the account in the same call (`unwrapWETH9`, or Aerodrome",
+				"/// v2's `swapExactTokensForETH`).",
+				"///",
+				"/// Pure (Foundation, `SafeABI`, `YourAccount`'s encoders): the requests are"
+			],
+			"startLine": 1
+		}
+	]
+}
