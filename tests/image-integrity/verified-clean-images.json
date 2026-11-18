@@ -1099,6 +1099,46 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-erc20-send-fee-default.png": {
+		"hash": "3d79ac69737ce0257b8ca91a2d4e7e99b0a0b4060bf52ec831451a40c07e3c56",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-erc20-send-fee-expanded.png": {
+		"hash": "24d46724ebd723dbdbfc8971922a0d639dc63c49e8b043a3014ccf4ec7ced814",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-eth-send-fee-default.png": {
+		"hash": "b79660501a5d5a894e93919678fd293a0be7d364b1519985fe8615504b29570b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-eth-send-fee-expanded.png": {
+		"hash": "ce12ed6f4982abd87ce170d1e6c6b3d46f418e212f3082015c2de0ac082e5385",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-default.png": {
+		"hash": "17ab0642a5883d8489d209275cbc7cf3d3755def4b1ec9f4d37554ecd2b0fec1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-fees-expanded.png": {
+		"hash": "e072ad9ef455d349ef6b863d399799506fe856f2ed18dd544bf0a1251da0044c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-order-review.png": {
+		"hash": "21f4d0a1d7b0470ba0ef036e6b9ec64ef58affe1706149cc54a621b1e03d0092",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-fee-default.png": {
+		"hash": "84fcfa63aea010bd306eb5d2c2047299566395d402560cd3c434b120e2d4e0e8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-fee-expanded.png": {
+		"hash": "5351d992bb115ed243d468ef1bdd49c545814fc7e367f2888ee377c71143af96",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-request.png": {
+		"hash": "f52702a0eecce26c0fe9ce7458e1a86264298966a93efb3deb69a854c32ff337",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "5b5321fdcb41c07a239d25c121e1985308346d30862bfcdc7fa5fc745e0ba9e2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

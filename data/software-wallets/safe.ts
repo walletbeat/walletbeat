@@ -26,6 +26,7 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import {
 	FeeDisplayLevel,
 	FeeType,
+	type OperationFeeDisplay,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
@@ -37,27 +38,6 @@ const safeTransactionFeesArticleRef: LooseReference = {
 	explanation: 'Safe states that transaction fees go to the blockchain network and not to Safe.',
 	label: 'Safe help center article on transaction fees',
 	url: 'https://help.safe.global/articles/1896549699-transaction-fees',
-}
-
-const webEstimatedFeeRef: LooseReference = {
-	explanation:
-		'By default, the execution screen of the web app shows a single "Estimated fee" figure in the native token of the chain, with no itemized breakdown.',
-	label: 'Safe web app "Estimated fee" row',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/components/tx/GasParams/index.tsx#L104-L131',
-}
-
-const webGasBreakdownRef: LooseReference = {
-	explanation:
-		'One click on the "Estimated fee" row expands it to show the gas limit, the maximum priority fee, and the maximum fee.',
-	label: 'Safe web app network fee breakdown',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/components/tx/GasParams/index.tsx#L142-L173',
-}
-
-const webAppTransactionRequestRef: LooseReference = {
-	explanation:
-		'Transaction requests from apps connected through WalletConnect open the standard transaction flow of the web app. The Uniswap fee is part of the swap price, so it is not itemized.',
-	label: 'Safe web app transaction requests from connected apps',
-	url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/services/safe-wallet-provider/useSafeWalletProvider.tsx#L164-L183',
 }
 
 const mobileEstimatedFeeRef: LooseReference = {
@@ -89,7 +69,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
-		lastUpdated: '2026-11-13',
+		lastUpdated: '2026-11-18',
 		urls: {
 			docs: ['https://docs.safe.global/'],
 			repositories: ['https://github.com/safe-fndn'],
@@ -348,30 +328,28 @@ export const safe: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				[Variant.BROWSER]: {
-					builtInErc20Swap: supported({
+					builtInErc20Swap: supported<OperationFeeDisplay>({
 						ref: [
 							{
 								explanation:
-									'Before the user confirms a swap, the embedded swap widget lists the widget fee, any protocol fee, and the network costs as separate rows. Each row shows a token amount and, when a price is available, its value in dollars.',
-								label: 'Swap widget fee rows on the review screen',
-								url: 'https://github.com/cowprotocol/cowswap/blob/19660ed68e507d30df4b81494d8df5575c506ec3/apps/cowswap-frontend/src/modules/trade/containers/TradeFeesAndCosts/index.tsx#L52-L89',
-							},
-							{
-								explanation: 'The widget fee row shows the fee percentage next to the fee name.',
-								label: 'Swap widget fee row',
-								url: 'https://github.com/cowprotocol/cowswap/blob/19660ed68e507d30df4b81494d8df5575c506ec3/apps/cowswap-frontend/src/modules/trade/pure/PartnerFeeRow/index.tsx#L46-L75',
+									'When the swap widget first opens, it shows one cost figure in dollars next to the exchange rate. It does not itemize the widget fee or the network costs.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-default.png',
+								label: 'Safe web app swap widget for a swap from USDC, as it first opens',
+								lastRetrieved: '2026-11-18',
 							},
 							{
 								explanation:
-									'Safe calculates the fee for each trade from its fee tiers. It gives this fee to the swap widget, together with the Safe fee recipient address.',
-								label: 'Safe swap fee for each trade',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/features/swap/components/SwapWidget/index.tsx#L150-L173',
+									'One click on the exchange rate row opens the fee details. They show the widget fee as a percentage, and the widget fee and the network costs as token amounts with their value in dollars.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-fees-expanded.png',
+								label: 'Safe web app swap widget with the fee details opened',
+								lastRetrieved: '2026-11-18',
 							},
 							{
 								explanation:
-									'The Safe transaction review shows the widget fee of the swap order as a percentage.',
-								label: 'Safe swap order widget fee row',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/web/src/features/swap/components/SwapOrderConfirmationView/OrderFeeConfirmationView.tsx#L23-L46',
+									'The Safe transaction review for the swap order shows the widget fee as a percentage. The network costs of the order are part of the minimum amount received, so they are not itemized.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-swap-order-review.png',
+								label: 'Safe web app review of the swap order with the widget fee row',
+								lastRetrieved: '2026-11-18',
 							},
 							{
 								explanation:
@@ -395,17 +373,32 @@ export const safe: SoftwareWallet = {
 								),
 							},
 							shownByDefault: {
-								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								comprehensiveness: FeeDisplayLevel.AGGREGATED,
 								units: nonEmptySet(
 									WalletServiceFeeDisplayUnit.PERCENTAGE,
-									WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
 									WalletServiceFeeDisplayUnit.FIAT,
 								),
 							},
 						},
 					}),
-					erc20L1Transfer: supported({
-						ref: [webEstimatedFeeRef, webGasBreakdownRef, safeTransactionFeesArticleRef],
+					erc20L1Transfer: supported<OperationFeeDisplay>({
+						ref: [
+							{
+								explanation:
+									'By default, the USDC send screen shows a single "Estimated fee" figure in ETH, with no breakdown.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-erc20-send-fee-default.png',
+								label: 'Safe web app USDC send screen with the "Estimated fee" row closed',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One click on the "Estimated fee" row opens it. It shows the gas limit, the maximum priority fee, and the maximum fee.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-erc20-send-fee-expanded.png',
+								label: 'Safe web app USDC send screen with the "Estimated fee" row opened',
+								lastRetrieved: '2026-11-18',
+							},
+							safeTransactionFeesArticleRef,
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
@@ -422,8 +415,24 @@ export const safe: SoftwareWallet = {
 							},
 						},
 					}),
-					ethL1Transfer: supported({
-						ref: [webEstimatedFeeRef, webGasBreakdownRef, safeTransactionFeesArticleRef],
+					ethL1Transfer: supported<OperationFeeDisplay>({
+						ref: [
+							{
+								explanation:
+									'By default, the ETH send screen shows a single "Estimated fee" figure in ETH, with no breakdown.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-eth-send-fee-default.png',
+								label: 'Safe web app ETH send screen with the "Estimated fee" row closed',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One click on the "Estimated fee" row opens it. It shows the gas limit, the maximum priority fee, and the maximum fee.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-eth-send-fee-expanded.png',
+								label: 'Safe web app ETH send screen with the "Estimated fee" row opened',
+								lastRetrieved: '2026-11-18',
+							},
+							safeTransactionFeesArticleRef,
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
@@ -440,8 +449,32 @@ export const safe: SoftwareWallet = {
 							},
 						},
 					}),
-					uniswapUSDCToEtherSwap: supported({
-						ref: [webAppTransactionRequestRef, webEstimatedFeeRef, webGasBreakdownRef],
+					uniswapUSDCToEtherSwap: supported<OperationFeeDisplay>({
+						ref: [
+							{
+								explanation:
+									'The request from Uniswap shows the USDC approval, the `Permit2` approval, and the Uniswap router call. Its fee section shows that Safe charges no execution fee, and shows a single maximum gas fee in ETH. The Uniswap fee is part of the swap price, so it is not itemized.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-request.png',
+								label: 'Safe web app request from Uniswap for a USDC to ETH swap',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'By default, the execution screen for the swap shows a single "Estimated fee" figure in ETH, with no breakdown.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-fee-default.png',
+								label:
+									'Safe web app execution screen for the Uniswap swap with the "Estimated fee" row closed',
+								lastRetrieved: '2026-11-18',
+							},
+							{
+								explanation:
+									'One click on the "Estimated fee" row opens it. It shows the gas limit, the maximum priority fee, and the maximum fee.',
+								file: 'public/references/wallets/safe/screenshots/2026-11-18-safe-web-uniswap-swap-fee-expanded.png',
+								label:
+									'Safe web app execution screen for the Uniswap swap with the "Estimated fee" row opened',
+								lastRetrieved: '2026-11-18',
+							},
+						],
 						fees: {
 							feesInvolved: {
 								[FeeType.NETWORK_FEE]: true,
@@ -461,7 +494,7 @@ export const safe: SoftwareWallet = {
 				},
 				[Variant.MOBILE]: {
 					builtInErc20Swap: notSupported,
-					erc20L1Transfer: supported({
+					erc20L1Transfer: supported<OperationFeeDisplay>({
 						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
 						fees: {
 							feesInvolved: {
@@ -479,7 +512,7 @@ export const safe: SoftwareWallet = {
 							},
 						},
 					}),
-					ethL1Transfer: supported({
+					ethL1Transfer: supported<OperationFeeDisplay>({
 						ref: [mobileEstimatedFeeRef, mobileGasBreakdownRef, safeTransactionFeesArticleRef],
 						fees: {
 							feesInvolved: {
@@ -497,7 +530,7 @@ export const safe: SoftwareWallet = {
 							},
 						},
 					}),
-					uniswapUSDCToEtherSwap: supported({
+					uniswapUSDCToEtherSwap: supported<OperationFeeDisplay>({
 						ref: [mobileAppTransactionRequestRef, mobileEstimatedFeeRef, mobileGasBreakdownRef],
 						fees: {
 							feesInvolved: {
