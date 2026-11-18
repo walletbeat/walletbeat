@@ -136,9 +136,14 @@ export const trustWallet: SoftwareWallet = {
 					},
 					{
 						explanation:
-							"Trust Wallet Core derives Ethereum accounts from a BIP39 mnemonic with the standard BIP44 path m/44'/60'/0'/0/0.",
+							"Trust Wallet Core derives Ethereum accounts with the standard BIP44 path m/44'/60'/0'/0/0.",
 						label: 'Trust Wallet Core registry entry for Ethereum',
 						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/registry.json#L481-L493',
+					},
+					{
+						explanation: 'Trust Wallet Core initializes HD wallets from a BIP39 mnemonic.',
+						label: 'Trust Wallet Core HD wallet header',
+						url: 'https://github.com/trustwallet/wallet-core/blob/d40d24a63d92619167903369308bf0e2f7eb3a59/src/HDWallet.h#L59-L61',
 					},
 				],
 				canExportPrivateKey: true,
@@ -237,8 +242,7 @@ export const trustWallet: SoftwareWallet = {
 					[Variant.BROWSER]: supported<WalletAnalytics>({
 						ref: [
 							{
-								explanation:
-									'Opening the extension popup sends error reporting data directly to Sentry.',
+								explanation: 'The extension sends error reports directly to Sentry.',
 								file: 'public/references/wallets/trust-wallet/screenshots/2026-11-18-trust-wallet-sentry-requests.png',
 								label: 'Captured Sentry requests from the Trust Wallet extension',
 							},
@@ -357,8 +361,7 @@ export const trustWallet: SoftwareWallet = {
 				[Variant.BROWSER]: {
 					ref: [
 						{
-							explanation:
-								'The browser extension connects to a Ledger plugged into the computer.',
+							explanation: 'The browser extension connects to a Ledger plugged into the computer.',
 							label: 'Trust Wallet guide to hardware and software wallets',
 							url: 'https://trustwallet.com/blog/academy/hardware-wallets-vs-software-wallets-whats-the-real-difference',
 						},
