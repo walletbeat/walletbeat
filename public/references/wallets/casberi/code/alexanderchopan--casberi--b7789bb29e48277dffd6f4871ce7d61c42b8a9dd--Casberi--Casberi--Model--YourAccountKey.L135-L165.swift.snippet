@@ -1,0 +1,60 @@
+{
+	"highlightRanges": [
+		{
+			"first": 135,
+			"last": 165
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountKey {"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"    /// exists (the app was killed between storing a key and recording it, or",
+				"    /// reinstalled, which keeps the Keychain), that key — never a duplicate",
+				"    /// error that would stop every send, and never a deletion of a key the",
+				"    /// account might answer to.",
+				"    private static func make(index: Int, biometric: Bool) throws -> [UInt8] {",
+				"        try make(item(index), domain: domainKey(index), biometric: biometric)",
+				"    }",
+				"",
+				"    private static func make(_ item: [String: Any], domain: String, biometric: Bool) throws -> [UInt8] {",
+				"        if let existing = stored(item) { return existing }",
+				"        guard SecureEnclave.isAvailable else { throw Failure.noEnclave }",
+				"        var flags: SecAccessControlCreateFlags = [.privateKeyUsage]",
+				"        if biometric { flags.insert(.biometryCurrentSet) }",
+				"        guard let control = SecAccessControlCreateWithFlags(",
+				"            nil, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, flags, nil) else {",
+				"            throw Failure.keychainRefused(errSecParam)",
+				"        }",
+				"        let key: SecureEnclave.P256.Signing.PrivateKey",
+				"        do { key = try SecureEnclave.P256.Signing.PrivateKey(accessControl: control) }",
+				"        catch { throw Failure.enclaveRefused }",
+				"        var add = item",
+				"        add[kSecValueData as String] = key.dataRepresentation",
+				"        add[kSecAttrAccessible as String] = kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly",
+				"        add[kSecAttrSynchronizable as String] = false",
+				"        let status = SecItemAdd(add as CFDictionary, nil)",
+				"        guard status == errSecSuccess else { throw Failure.keychainRefused(status) }",
+				"        let context = LAContext()",
+				"        if biometric, context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil),",
+				"           let state = context.domainState.biometry.stateHash {",
+				"            UserDefaults.standard.set(state, forKey: domain)",
+				"        }",
+				"        let xy = [UInt8](key.publicKey.rawRepresentation)",
+				"        guard xy.count == 64 else { throw Failure.noKey }",
+				"        return xy",
+				"    }",
+				"",
+				"    // MARK: - The record a reinstall reads",
+				"",
+				"    /// Which account this phone's keys belong to, and the key its address"
+			],
+			"startLine": 131
+		}
+	]
+}
