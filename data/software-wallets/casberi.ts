@@ -1,9 +1,21 @@
 import { alexanderchopan } from '@/data/contributors/alexanderchopan'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { refTodo } from '@/schema/reference'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+
+const source =
+	'https://github.com/alexanderchopan/casberi/blob/b7789bb29e48277dffd6f4871ce7d61c42b8a9dd'
 
 export const casberi: SoftwareWallet = {
 	metadata: {
@@ -26,15 +38,53 @@ export const casberi: SoftwareWallet = {
 	features: {
 		accountSupport: null,
 		addressResolution: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'A typed ENS name is resolved onchain through the ENS Universal Resolver with `eth_call`. An offchain gateway is asked only for names that answer with `OffchainLookup`.',
+					label: 'ENS resolution on chain first',
+					url: `${source}/Casberi/Casberi/Model/ENS.swift#L49-L70`,
+				},
+			],
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: [
+				{
+					explanation:
+						'The Nodes page takes one RPC address per network for Ethereum, Base and Robinhood Chain. The address must answer eth_chainId for that network. A node that is set is used directly and alone, with no fallback. The page is reached after the account exists.',
+					label: 'Own node per network',
+					url: `${source}/Casberi/Casberi/Model/OwnNode.swift#not-line-specific`,
+				},
+				{
+					explanation:
+						'User operations are always sent to the public Pimlico and Candide bundlers, also when an own node is set.',
+					label: 'Default RPC nodes and bundlers per network',
+					url: `${source}/Casberi/Casberi/Model/YourAccountOp.swift#L33-L74`,
+				},
+			],
+			customChainRpcEndpoint: notSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: notSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: notSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},
@@ -93,14 +143,30 @@ export const casberi: SoftwareWallet = {
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					ref: [
+						{
+							explanation:
+								'Transactions from the account are ERC-4337 user operations sent to the public Pimlico and Candide bundlers.',
+							label: 'Bundlers used per network',
+							url: `${source}/Casberi/Casberi/Model/YourAccountOp.swift#L33-L74`,
+						},
+					],
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'The account sends on Ethereum, Base and Robinhood Chain. It does not send on Arbitrum.',
+							label: 'Networks the account sends on',
+							url: `${source}/Casberi/Casberi/Model/YourAccountOp.swift#L33-L74`,
+						},
+					],
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
