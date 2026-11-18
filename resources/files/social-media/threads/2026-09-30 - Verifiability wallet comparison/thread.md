@@ -1,12 +1,11 @@
-Ethereum prides itself on being verifiable.
-
-For wallets, that starts with one question: can you see the source code?
+Ethereum Wallet Verifiability Tier List: Can you verify your wallet's source code?
 
 At @walletbeat, public source code is a Stage 0 requirement.
 
-So, how do the top Ethereum wallets stack up? 🧵
+Here's how current wallets rank 🧵
 
 BONUS: Are they fully open source?
+![Tier List](./verifiability-tier-list.png)
 
 ---
 
