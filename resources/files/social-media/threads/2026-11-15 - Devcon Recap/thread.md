@@ -1,7 +1,7 @@
 We took Walletbeat to @EFDevcon Week 🌸
 Talks, workshops, panels, and our own booth. Here's our recap 🧵👇
 
-Video coming soon.
+[ATTACHED VIDEO COMES HERE]
 
 ---
 
