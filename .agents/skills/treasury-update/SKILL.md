@@ -17,8 +17,8 @@ The hashes to record are: **$ARGUMENTS**. If this is blank, look for bare hashes
 
 You may edit only these files:
 
-- `governance/treasury/treasury-operations.tsv`
-- `governance/treasury/addresses.tsv`
+- `governance/treasury/treasury-operations.tsv` (append only)
+- `governance/treasury/addresses.tsv` (append only)
 - Files that the tools generate: `governance/treasury/price-data.tsv`, `governance/treasury/treasury-transparency.md`, `governance/treasury/*.svg` and `tests/image-integrity/verified-clean-images.json`.
 
 Do not edit source code, tests, or configuration files, even if a tool fails. If a step fails, show the error to the user and stop.
@@ -72,27 +72,27 @@ curl -s --max-time 30 "https://eth.blockscout.com/api/v2/addresses/$T/token-tran
 
 ## Step 3: Check that the addresses are registered
 
-For each counterparty address, search `addresses.tsv` without case sensitivity. If an address is not there, use `AskUserQuestion` to ask who controls it. Include the address, the amounts, and the dates in the question. Give your best guesses as options. Use the address's history on Blockscout to make the guesses (for example, "sends test transfer then large ETH amount → grant funder"). Then add a row with a short snake_case `Name`, the `Control` and a one-line `Description`. Follow the style of the rows that are there.
+For each counterparty address, search `addresses.tsv` without case sensitivity. If an address is not there, ask the user who controls it. Include the address, the amounts, and the dates in the question. Give your best guesses as options. Use the address's history on Blockscout to make the guesses (for example, "sends test transfer then large ETH amount → grant funder"). Then add a row with a short snake_case `Name`, the `Control` and a one-line `Description`. Follow the style of the rows that are there. If the controller can have more than one address, put a number at the end of the `Name` (`ef_grants1`, `chainflip2`).
 
 ## Step 4: Get the category and the purpose
 
-Copy the category and the purpose from earlier rows when the pattern is clear. For example: Sablier top-ups to `mattmatt_sablier` are `[labor:dev]` / `Top-up of Sablier stream`, and wraps, CoW swaps and test transfers have fixed text. For one-off payments, or if you are not sure, ask the user with `AskUserQuestion`. Use your best guesses from earlier payments to the same recipient as options.
+Copy the category and the purpose from earlier rows when the pattern is clear. For example: Sablier top-ups to `mattmatt_sablier` are `[labor:dev]` / `Top-up of Sablier stream`, and wraps, CoW swaps and test transfers have fixed text. For one-off payments, or if you are not sure, ask the user. Use your best guesses from earlier payments to the same recipient as options.
 
 ## Step 5: Write the rows
 
 Replace the bare hashes (if there are any) with complete rows. Put the rows in date order and keep the order in which the transactions happened. Format the rows as follows:
 
 - Separate the columns with tabs and end the file with a newline.
-- Write amounts with full precision and no trailing zeros (`9.72762645914 ETH`). The only exception is when earlier rows of the same recurring type use a rounded amount; in that case use the same rounding (Sablier: `5,571.43 USDC`). If you round an amount, tell the user.
+- Write amounts with full precision and no trailing zeros (`9.72762645914 ETH`). Never round an amount.
 - Use `A [cat] + B [cat]` for a transaction that has more than one expense, and `X ASSET → Y ASSET` for a swap.
 
 ## Step 6: Generate
 
 ```bash
-pnpm run check:treasury:markdown
+pnpm fix
 ```
 
-This gets the missing prices from CoinGecko into `price-data.tsv` and regenerates `treasury-transparency.md` and the SVG charts. If it fails, show the error and stop (see Edit scope).
+This runs the treasury Markdown generator, which gets the missing prices from CoinGecko into `price-data.tsv` and regenerates `treasury-transparency.md` and the SVG charts. If it fails, show the error and stop (see Edit scope).
 
 ## Step 7: Verify
 
@@ -108,7 +108,7 @@ Give the user:
 
 - A table of the rows that you added. Mark the hashes that the user gave you, and show which hashes you found.
 - New `addresses.tsv` labels.
-- Items that you skipped (spam tokens) and amounts that you rounded.
+- Items that you skipped (spam tokens).
 - The result of `pnpm check:all` and the list of changed files (`git status --short`).
 
 Do not commit unless the user tells you to.
