@@ -1,0 +1,73 @@
+{
+	"highlightRanges": [
+		{
+			"first": 240,
+			"last": 277
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum NetworkReach {"
+			],
+			"startLine": 39
+		},
+		{
+			"lines": [
+				"    static let shipped: [Endpoint] = ["
+			],
+			"startLine": 109
+		},
+		{
+			"lines": [
+				"        // an interpolation, the audit's literal scan never saw one, and only",
+				"        // `api.g.alchemy.com` — the one host written out in full — was ever",
+				"        // disclosed. Listed one by one rather than as a bare `g.alchemy.com`",
+				"        // so the row names the chains it really talks to.",
+				"        Endpoint(service: \"Wallet\",",
+				"                 reach: .whenConnected(bridge: \"Wallet\"),",
+				"                 purpose: \"Reads the public onchain activity, balances, approvals, and DeFi positions of the accounts you follow — across Ethereum, Base, Arbitrum, Optimism, Polygon, HyperEVM, Monad, World Chain and Solana. Each request carries only a public address you chose to follow. Before you sign a Safe transaction, the call it would make is simulated here from the Safe's public address, to show what it does to the Safe's balances. Block explorers open in your browser, not from here.\",",
+				"                 hosts: [\"api.g.alchemy.com\", \"eth-mainnet.g.alchemy.com\",",
+				"                         \"base-mainnet.g.alchemy.com\", \"arb-mainnet.g.alchemy.com\",",
+				"                         \"opt-mainnet.g.alchemy.com\", \"matic-mainnet.g.alchemy.com\",",
+				"                         // HyperEVM (Alchemy names it `hyperliquid-mainnet`)",
+				"                         // and Monad, 2026-08-28.",
+				"                         \"hyperliquid-mainnet.g.alchemy.com\", \"monad-mainnet.g.alchemy.com\",",
+				"                         // World Chain, 2026-09-16 (prd §785) — a chain you",
+				"                         // switch on, off by default until it is measured.",
+				"                         \"worldchain-mainnet.g.alchemy.com\",",
+				"                         // World Chain's approval logs (prd §797): its public",
+				"                         // RPCs cap eth_getLogs at 100 blocks, so the owner-",
+				"                         // filtered log read rides World Chain's Blockscout.",
+				"                         \"worldchain-mainnet.explorer.alchemy.com\",",
+				"                         // Arc, 2026-09-17 (prd §808): the transfer and",
+				"                         // NFT sync, and the Portfolio fallback.",
+				"                         \"arc-mainnet.g.alchemy.com\",",
+				"                         \"solana-mainnet.g.alchemy.com\", \"robinhood-mainnet.g.alchemy.com\",",
+				"                         \"api.zerion.io\",",
+				"                         // Token pictures the positions read names (prd §931):",
+				"                         // fetched only from Zerion's own CDN, never learned",
+				"                         // by a request of their own.",
+				"                         \"cdn.zerion.io\", \"coins.llama.fi\",",
+				"                         // A pool price for a token that trades only on a DEX",
+				"                         // (`DexPrices`, 2026-09-28): carries the token's",
+				"                         // contract, never your address.",
+				"                         \"api.geckoterminal.com\",",
+				"                         \"rpc.mevblocker.io\", \"mainnet.base.org\", \"mainnet.optimism.io\",",
+				"                         \"arb1.arbitrum.io\",",
+				"                         // The keyless fallbacks since OnFinality went to",
+				"                         // \"apply an API key\" (2026-10-14): Tenderly's public",
+				"                         // gateway for Ethereum, Polygon and Base, publicnode",
+				"                         // for Base's recent logs.",
+				"                         \"gateway.tenderly.co\", \"base-rpc.publicnode.com\"],",
+				"                 throughTor: true,",
+				"                 refusesTor: [\"mainnet.optimism.io\", \"gateway.tenderly.co\", \"api.geckoterminal.com\"]),",
+				"        // World ID (2026-09-16, prd §785). ITS OWN HOST, and that is a fix",
+				"        // rather than a preference (`/code-review`, same day). This read",
+				"        // happens whether or not you watch a wallet — opening an address card",
+				"        // or a person's room is what buys it — so it needs its own row here,"
+			],
+			"startLine": 236
+		}
+	]
+}
