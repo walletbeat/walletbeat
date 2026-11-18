@@ -2,7 +2,10 @@
 	// Types/constants
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { getCodeSnippetLookup, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { getReferenceImageDimensions } from '@/utils/reference-image-context'
 	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
+
+	const imageDimensions = getReferenceImageDimensions()
 
 	// Stored code snippets for this page, provided by the island's root component.
 	const codeSnippetForUrl = getCodeSnippetLookup()
@@ -260,6 +263,7 @@
 					{/each}
 
 					{#if inlineImage !== undefined}
+						{@const dimensions = imageDimensions(inlineImage.url)}
 						<figure class="inline-image" data-column="start gap-1">
 							<a
 								href={inlineImage.url}
@@ -271,6 +275,9 @@
 							>
 								<img
 									src={inlineImage.url}
+									{...dimensions}
+									style:--referenceImage-ratio={dimensions.width / dimensions.height}
+									decoding="async"
 									alt={inlineImage.label}
 									loading="lazy"
 								/>
@@ -336,8 +343,7 @@
 										<img
 											src={image.url}
 											alt={image.label}
-											width="128"
-											height="96"
+											{...imageDimensions(image.url)}
 											loading="lazy"
 											decoding="async"
 										/>
@@ -373,6 +379,8 @@
 
 <style>
 	.references {
+		--referenceImage-border-width: 1px;
+
 		font-size: 0.875em;
 		line-height: 1.7;
 	}
@@ -418,10 +426,14 @@
 
 		img {
 			display: block;
-			max-inline-size: 100%;
-			max-block-size: 20em;
+			box-sizing: content-box;
+			block-size: auto;
+			max-inline-size: min(
+				100% - 2 * var(--referenceImage-border-width),
+				(20em - 2 * var(--referenceImage-border-width)) * var(--referenceImage-ratio)
+			);
 
-			border: 1px solid var(--border-color);
+			border: var(--referenceImage-border-width) solid var(--border-color);
 			border-radius: 0.5em;
 		}
 	}
@@ -542,13 +554,11 @@
 
 		img {
 			display: block;
-			/* Every thumbnail occupies the same fixed box regardless of
-			   the underlying image's aspect ratio. */
-			inline-size: 8em;
-			block-size: 6em;
+			box-sizing: content-box;
+			inline-size: calc(8em - 2 * var(--referenceImage-border-width));
+			block-size: auto;
 
-			object-fit: cover;
-			border: 1px solid var(--border-color);
+			border: var(--referenceImage-border-width) solid var(--border-color);
 			border-radius: 0.5em;
 		}
 	}
