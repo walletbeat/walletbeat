@@ -1155,11 +1155,11 @@ describe('image integrity', () => {
 		})
 	})
 
-	describe('whitelist never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThis = 9 // If you ever find yourself wanting to increase this, you are doing something wrong. Find or produce a higher-quality version of the image instead.
+	describe('whitelist almost never grows', () => {
+		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 9 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
 
 		it('has the expected size', () => {
-			expect(BLOCKY_ALLOWED_FILES.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)
+			expect(BLOCKY_ALLOWED_FILES.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded)
 		})
 	})
 })
