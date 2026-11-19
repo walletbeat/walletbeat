@@ -27,13 +27,13 @@ describe('refersToAddress', () => {
 
 	it('matches truncated forms', () => {
 		expect(refersToAddress('0xEeeeeEeeeEeEeeE...', ETH)).toBe(true)
-		expect(refersToAddress('0xa0b8...eb48', USDC)).toBe(true)
-		expect(refersToAddress('0xA0b869…', USDC)).toBe(true)
+		expect(refersToAddress('0xa0b8...', USDC)).toBe(true)
 	})
 
 	it('does not match other strings', () => {
-		expect(refersToAddress('0xA0b8...eb49', USDC)).toBe(false)
+		expect(refersToAddress('0xA0b9...', USDC)).toBe(false)
 		expect(refersToAddress('0xa0b...', USDC)).toBe(false)
+		expect(refersToAddress('A0b86991...', USDC)).toBe(false)
 		expect(refersToAddress('0xa0b86991', USDC)).toBe(false)
 		expect(refersToAddress(`${USDC}00`, USDC)).toBe(false)
 		expect(refersToAddress('0x52908400098527886E0F7030069857D2E4169EE7', USDC)).toBe(false)
@@ -46,13 +46,13 @@ describe('WalletCaptureAnnotations global contract addresses', () => {
 	it('treats well-known contract addresses as benign', () => {
 		expect(annotations.isBenign(USDC.toLowerCase())).toBe(true)
 		expect(annotations.isBenign('0xEeeeeEeeeEeEeeEeEeE...')).toBe(true)
-		expect(annotations.globalContractAddressOf('0xa0b8...eb48')).toBe(USDC)
+		expect(annotations.globalContractAddressOf('0xa0b869...')).toBe(USDC)
 		expect(annotations.isBenign('0x52908400098527886E0F7030069857D2E4169EE7')).toBe(false)
 	})
 
 	it('does not treat user asset addresses as benign', () => {
 		expect(annotations.isBenign(USDC.toLowerCase(), [USDC])).toBe(false)
-		expect(annotations.isBenign('0xa0b8...eb48', [USDC])).toBe(false)
+		expect(annotations.isBenign('0xa0b869...', [USDC])).toBe(false)
 		expect(annotations.isBenign(ETH, [USDC])).toBe(true)
 	})
 

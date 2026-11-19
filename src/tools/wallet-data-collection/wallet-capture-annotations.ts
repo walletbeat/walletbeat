@@ -94,12 +94,14 @@ const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
 ]
 
 /**
- * A full Ethereum address (with or without "0x"), or a UI-truncated form of one
- * such as "0xA0b8...eB48" or "0xEeeeeEeeeEeEeeE...".
+ * A full Ethereum address (with or without "0x"), or the start of one cut off
+ * with "..." such as "0xEeeeeEeeeEeEeeE...". The Sentry JavaScript SDK cuts
+ * long string values in error reports this way, so a request URL
+ * that ends in a token address can end in a truncated address.
  * Truncated forms must keep at least 4 hex characters after "0x".
  */
 const FULL_ADDRESS_REGEXP = /^(?:0x)?([0-9a-f]{40})$/i
-const TRUNCATED_ADDRESS_REGEXP = /^0x([0-9a-f]{4,39})(?:\.\.\.|…)([0-9a-f]{0,36})$/i
+const TRUNCATED_ADDRESS_REGEXP = /^0x([0-9a-f]{4,39})\.\.\.$/i
 
 /**
  * @returns Whether `str` refers to `address`, either in full (in any letter case)
@@ -119,14 +121,7 @@ export function refersToAddress(str: string, address: Erc55Address): boolean {
 		return false
 	}
 
-	const prefix = truncated[1].toLowerCase()
-	const suffix = truncated[2].toLowerCase()
-
-	return (
-		prefix.length + suffix.length < addressHex.length &&
-		addressHex.startsWith(prefix) &&
-		addressHex.endsWith(suffix)
-	)
+	return addressHex.startsWith(truncated[1].toLowerCase())
 }
 
 export interface SaveOptions {
