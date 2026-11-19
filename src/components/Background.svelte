@@ -133,17 +133,9 @@
 		}
 	}
 
-	/*
-	 * Each blob layer animates between its `from` and `to` values. With
-	 * reduced motion, the animations stay paused on their first frame, so the
-	 * background keeps its look but nothing moves or has to be re-composited.
-	 */
+	/* Each blob layer animates between its `from` and `to` values. */
 	.background-blob .opacity {
 		animation: blob-opacity var(--opacity-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-opacity {
 		from {
@@ -156,10 +148,6 @@
 
 	.background-blob .translation-x {
 		animation: blob-translation-x var(--translation-x-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-translation-x {
 		from {
@@ -172,10 +160,6 @@
 
 	.background-blob .translation-y {
 		animation: blob-translation-y var(--translation-y-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-translation-y {
 		from {
@@ -188,10 +172,6 @@
 
 	.background-blob .rotation {
 		animation: blob-rotation var(--rotation-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-rotation {
 		from {
@@ -204,10 +184,6 @@
 
 	.background-blob .scale-x {
 		animation: blob-scale-x var(--scale-x-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-scale-x {
 		from {
@@ -220,10 +196,6 @@
 
 	.background-blob .scale-y {
 		animation: blob-scale-y var(--scale-y-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-scale-y {
 		from {
@@ -236,10 +208,6 @@
 
 	.background-blob .hue {
 		animation: blob-hue var(--hue-duration) var(--transition-blob) 0s alternate infinite;
-
-		@media (prefers-reduced-motion: reduce) {
-			animation-play-state: paused;
-		}
 	}
 	@keyframes blob-hue {
 		from {
@@ -248,6 +216,15 @@
 		to {
 			filter: hue-rotate(var(--hue-to));
 		}
+	}
+
+	/*
+	 * The blob animations stay paused on their first frame. A moving
+	 * full-viewport background has to be re-composited on every frame, together
+	 * with every `backdrop-filter` above it. Remove this rule to let the blobs drift.
+	 */
+	.background-blob :is(.opacity, .translation-x, .translation-y, .rotation, .scale-x, .scale-y, .hue) {
+		animation-play-state: paused;
 	}
 
 	.background-blob .blob {

@@ -1,14 +1,23 @@
-import { fullCommitHashRegExp, lineFragmentRegExp } from './url'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
+import {
+	formatLineRanges,
+	fullCommitHashRegExp,
+	type LineRange,
+	lineRangesProblem,
+	parseLineFragment,
+} from './url'
 
 /**
  * The source location of a locally stored code snippet: a file in a GitHub
- * repository pinned to a specific commit, plus an inclusive 1-based line range.
+ * repository pinned to a specific commit, plus one or more line ranges.
  *
  * Snippets are stored as flat files under
  * `public/references/wallets/<wallet-id>/code/`, named
- * `<org>--<repo>--<commit>--<path with '/' as '--'>.L<first>[-L<last>].<ext>.snippet`
- * (the source file's extension is kept right before `.snippet` so the language
- * remains identifiable when rendered).
+ * `<org>--<repo>--<commit>--<path with '/' as '--'>.<line ranges>.<ext>.snippet`,
+ * where `<line ranges>` is the URL's line anchor (e.g. `L12-L34` or
+ * `L53,L340-L353`). The source file's extension is kept right before
+ * `.snippet` so the language remains identifiable when rendered.
  */
 export interface CodeSnippetSource {
 	org: string
@@ -17,10 +26,16 @@ export interface CodeSnippetSource {
 	commit: string
 	/** Repository-relative file path, using forward slashes, percent-decoded. */
 	path: string
-	/** 1-based first line of the snippet, inclusive. */
-	firstLine: number
-	/** 1-based last line of the snippet, inclusive. */
-	lastLine: number
+	/** Referenced line ranges, valid per `lineRangesProblem`. */
+	ranges: NonEmptyArray<LineRange>
+}
+
+/** Whether two lists of line ranges are identical. */
+export function lineRangesEqual(a: LineRange[], b: LineRange[]): boolean {
+	return (
+		a.length === b.length &&
+		a.every((range, i) => range.first === b[i].first && range.last === b[i].last)
+	)
 }
 
 /** A contiguous run of source lines stored in a `.snippet` file. */
@@ -31,16 +46,15 @@ export interface StoredSnippetSegment {
 }
 
 /**
- * The JSON content of a `.snippet` file: the referenced range
- * (`highlightFirstLine`-`highlightLastLine`, matching a `CodeSnippetSource`'s
- * `firstLine`/`lastLine`) plus the surrounding-context and scope-header
- * segments built around it. Segments are ordered by `startLine` and are never
- * adjacent or overlapping (adjacent runs are merged into one segment), so a
- * gap between two segments always means source lines were omitted there.
+ * The JSON content of a `.snippet` file: the referenced ranges
+ * (`highlightRanges`, matching the `CodeSnippetSource` line ranges) plus the
+ * surrounding-context and scope-header segments built around them. Segments
+ * are ordered by `startLine` and are never adjacent or overlapping (adjacent
+ * runs are merged into one segment), so a gap between two segments always
+ * means source lines were omitted there.
  */
 export interface StoredSnippetContent {
-	highlightFirstLine: number
-	highlightLastLine: number
+	highlightRanges: NonEmptyArray<LineRange>
 	segments: StoredSnippetSegment[]
 }
 
@@ -71,15 +85,6 @@ export function isSnippetRow(row: unknown): row is SnippetRow {
 		'highlighted' in row &&
 		typeof row.highlighted === 'boolean'
 	)
-}
-
-/** The `L123` / `L123-L456` filename and URL-fragment suffix for a snippet. */
-function snippetLineSuffix(source: CodeSnippetSource): string {
-	if (source.firstLine === source.lastLine) {
-		return `L${source.firstLine}`
-	}
-
-	return `L${source.firstLine}-L${source.lastLine}`
 }
 
 export type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
@@ -138,28 +143,23 @@ export function parseGitHubBlobUrl(url: string): CodeSnippetSource | NotASnippet
 		throw new Error(`GitHub blob URL is pinned to "${ref}", not a 40-character commit hash: ${url}`)
 	}
 
-	const lineMatch = lineFragmentRegExp.exec(parsed.hash.replace(/^#/, ''))
+	const ranges = parseLineFragment(parsed.hash.replace(/^#/, ''))
 
-	if (lineMatch?.groups === undefined) {
+	if (ranges === null) {
 		return 'NO_LINE_ANCHOR'
 	}
 
-	const firstLine = parseInt(lineMatch.groups.first, 10)
-	const lastLine =
-		lineMatch.groups.last === undefined ? firstLine : parseInt(lineMatch.groups.last, 10)
+	const problem = lineRangesProblem(ranges)
 
-	if (firstLine < 1 || lastLine < firstLine) {
-		throw new Error(
-			`GitHub blob URL has an invalid line range (L${firstLine}-L${lastLine}): ${url}`,
-		)
+	if (problem !== null) {
+		throw new Error(`GitHub blob URL has ${problem}: ${url}`)
 	}
 
 	return {
 		commit: ref,
-		firstLine,
-		lastLine,
 		org,
 		path: pathSegments.join('/'),
+		ranges,
 		repo,
 	}
 }
@@ -190,7 +190,7 @@ export function describeNotASnippetUrl(reason: NotASnippetUrl): string {
 		case 'NOT_BLOB_URL':
 			return 'not a /blob/ URL'
 		case 'NO_LINE_ANCHOR':
-			return 'missing a line anchor (#L<first>[-L<last>])'
+			return 'missing a line anchor (#L<first>[-L<last>][,L<first>[-L<last>]...])'
 		default:
 			throw new Error(`Unhandled NotASnippetUrl: ${String(reason)}`)
 	}
@@ -202,7 +202,7 @@ export function describeNotASnippetUrl(reason: NotASnippetUrl): string {
  * anchors, so this may differ textually from the URL a source was parsed from.
  */
 export function gitHubBlobUrl(source: CodeSnippetSource): string {
-	return `https://github.com/${source.org}/${source.repo}/blob/${source.commit}/${source.path}#${snippetLineSuffix(source)}`
+	return `https://github.com/${source.org}/${source.repo}/blob/${source.commit}/${source.path}#${formatLineRanges(source.ranges)}`
 }
 
 /** The raw.githubusercontent.com URL serving the full file a snippet is cut from. */
@@ -237,7 +237,7 @@ export function snippetFileName(source: CodeSnippetSource): string {
 	const extension = lastDot <= 0 ? '' : fileName.slice(lastDot)
 	const flattenedPath = `${directory}${stem}`.replaceAll('/', '--')
 
-	return `${source.org}--${source.repo}--${source.commit}--${flattenedPath}.${snippetLineSuffix(source)}${extension}.snippet`
+	return `${source.org}--${source.repo}--${source.commit}--${flattenedPath}.${formatLineRanges(source.ranges)}${extension}.snippet`
 }
 
 /** Repository-relative path of the stored snippet file for a source. */
