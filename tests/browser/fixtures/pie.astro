@@ -1,0 +1,121 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Pie from '@/components/Pie.svelte'
+import {
+	computePieSlices,
+	pieMaxRadius,
+	slicePathData,
+	PieLayout,
+	overallRatingPieLevels,
+	type LevelConfig,
+	type Slice,
+} from '@/components/pie-geometry'
+
+const radius = 80
+const padding = 8
+const corners = [
+	{ outer: 0, inner: 0 },
+	{ outer: 12, inner: 0 },
+	{ outer: 0, inner: 8 },
+	{ outer: 12, inner: 8 },
+]
+const cases: { id: string; slices: Slice[]; levels: LevelConfig[] }[] = []
+for (const count of [1, 2, 3, 4, 5, 8, 16]) {
+	for (const [index, corner] of corners.entries()) {
+		const id = `pie-${count}-${index}`
+		cases.push({
+			id,
+			slices: Array.from({ length: count }, (_, slice) => ({
+				id: `${id}-${slice}`,
+				href: `#${id}`,
+				color: 'teal',
+				weight: 1,
+				arcLabel: 'x',
+				ariaLabel: `Slice ${slice + 1}`,
+			})),
+			levels: [
+				{
+					outerRadiusFraction: 1,
+					innerRadiusFraction: 0.2,
+					gap: 4,
+					outerCornerRadius: corner.outer,
+					innerCornerRadius: corner.inner,
+				},
+			],
+		})
+	}
+}
+const id = 'flower'
+cases.push({
+	id,
+	slices: Array.from({ length: 5 }, (_, group) => ({
+		id: `${id}-${group}`,
+		href: `#${id}`,
+		color: 'teal',
+		gradient: {
+			colors: ['var(--rating-unrated)', 'var(--rating-fail)', 'var(--rating-pass)'],
+			transparentStopColor: 'var(--rating-unrated)',
+		},
+		weight: 1,
+		arcLabel: 'x',
+		ariaLabel: `Group ${group + 1}`,
+		children: Array.from({ length: group + 3 }, (_, child) => ({
+			id: `${id}-${group}-${child}`,
+			href: `#${id}`,
+			color: ['var(--rating-unrated)', 'var(--rating-fail)', 'var(--rating-pass)'][child % 3],
+			weight: 1,
+			arcLabel: 'x',
+			ariaLabel: `Child ${child + 1}`,
+		})),
+	})),
+	levels: overallRatingPieLevels(),
+})
+const models = cases.map(candidate => {
+	const origin = pieMaxRadius(radius, candidate.levels) + padding
+	const computed = computePieSlices({
+		slices: candidate.slices,
+		radius,
+		levels: candidate.levels,
+		layout: PieLayout.FullTop,
+		centerFirstSlice: true,
+	})
+	const flatten = (slices: typeof computed): typeof computed =>
+		slices.flatMap(slice => [slice, ...flatten(slice.children ?? [])])
+	return {
+		id: candidate.id,
+		origin,
+		width: origin * 2,
+		slices: flatten(computed).map(slice => ({
+			id: slice.id,
+			...slice.computed,
+			path: slicePathData(slice.computed, { x: origin, y: origin }),
+		})),
+	}
+})
+---
+
+<Layout metadata={{ title: 'Canonical pie geometry fixtures' }}>
+	<main data-column='gap-6'>
+		<h1>Canonical pie geometry</h1>
+		{
+			cases.map(candidate => (
+				<section
+					id={candidate.id}
+					data-card='padding-4'
+					data-column='gap-3'
+					style='max-inline-size: 20rem'
+				>
+					<h2>{candidate.id}</h2>
+					<Pie
+						slices={candidate.slices}
+						levels={candidate.levels}
+						{radius}
+						{padding}
+						layout={PieLayout.FullTop}
+					/>
+				</section>
+			))
+		}
+	</main>
+	<script is:inline type='application/json' id='pie-models' set:html={JSON.stringify(models)} />
+</Layout>

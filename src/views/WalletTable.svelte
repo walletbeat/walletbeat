@@ -17,8 +17,6 @@
 	import type { Column } from '@/components/Table.svelte'
 	import type { Ladders } from '@/schema/ladders'
 	import { variants } from '@/constants/variants'
-	import { eip7702 } from '@/data/eips/eip-7702'
-	import { erc4337 } from '@/data/eips/erc-4337'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import type { AttributeTree } from '@/schema/attribute-groups'
 	import { type Attribute, type OutcomeMetadata, Rating, ratingIcons } from '@/schema/attributes'
@@ -381,48 +379,30 @@
 
 	import Filters from '@/components/Filters.svelte'
 	import Pie from '@/components/Pie.svelte'
+	import { attributeGroupFlowerGradient } from '@/components/pie-fill'
 	import {
 		overallRatingPieLevels,
 		overallRatingPiePadding,
 		overallRatingPieRadius,
 		PieLayout,
-		type Slice,
 	} from '@/components/pie-geometry'
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
-	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
 	import Typography from '@/components/Typography.svelte'
 
-	import EipDetails from '@/views/EipDetails.svelte'
 	import WalletAttributeGroupSummary, { WalletAttributeGroupSummaryType } from '@/views/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary, { WalletAttributeSummaryType } from '@/views/WalletAttributeSummary.svelte'
 	import WalletOverallSummary, { WalletSummaryType } from '@/views/WalletOverallSummary.svelte'
 	import WalletStageBadge from './WalletStageBadge.svelte'
+	import WalletTags from './WalletTags.svelte'
 
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
 	import type { WBIconID } from '@/styles/wbicons'
 
-
-	// Flower visualization helpers
-	const attributeGroupFlowerGradient: NonNullable<Slice['gradient']> = {
-		areaRadiusStops: [
-			0.000000, 0.038097, 0.075252, 0.111402, 0.146585, 0.180353, 0.213312, 0.245668, 0.277513,
-			0.308937, 0.339923, 0.370813, 0.401695, 0.432635, 0.463538, 0.494531, 0.525379, 0.555836,
-			0.586127, 0.616255, 0.646222, 0.676031, 0.705683, 0.735183, 0.764631, 0.793975, 0.823297,
-			0.852492, 0.881757, 0.911014, 0.940339, 0.969777, 1.000000,
-		],
-		colors: [
-			ratingToColor(Rating.UNRATED),
-			ratingToColor(Rating.FAIL),
-			ratingToColor(Rating.PARTIAL),
-			ratingToColor(Rating.PASS),
-		],
-		transparentStopColor: ratingToColor(Rating.UNRATED),
-	}
 </script>
 
 
@@ -910,7 +890,6 @@
 					{/if}
 				{:else if column.id === 'displayName'}
 					{@const displayName = wallet.metadata.displayName}
-					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
 					{@const supportedVariants = (
 						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
 							.filter(variant => variant in wallet.variants)
@@ -979,72 +958,7 @@
 								</div>
 
 								<div class="tags" data-row="start gap-1 wrap">
-									{#each (
-										[
-											// Wallet type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Hardware',
-												filterId: 'walletType-hardware',
-												type: 'wallet-type',
-											},
-											!hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Software',
-												filterId: 'walletType-software',
-												type: 'wallet-type',
-											},
-											// Manufacture type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
-												label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
-												filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
-												type: 'manufacture-type',
-											},
-											// Account type tags
-											...(
-												accountTypes !== null ?
-													[
-														AccountType.eoa in accountTypes && {
-															label: 'EOA',
-															filterId: 'accountType-eoa',
-															type: 'account-type',
-														},
-														AccountType.rawErc4337 in accountTypes && {
-															label: `#${erc4337.number}`,
-															filterId: 'accountType-erc4337',
-															type: 'eip',
-														},
-														AccountType.eip7702 in accountTypes && {
-															label: `#${eip7702.number}`,
-															filterId: 'accountType-eip7702',
-															type: 'eip',
-														},
-														AccountType.safe in accountTypes && {
-															label: 'Safe',
-															filterId: 'accountType-safe',
-															type: 'safe',
-														},
-														AccountType.mpc in accountTypes && {
-															label: 'MPC',
-															filterId: 'accountType-mpc',
-															type: 'account-type',
-														},
-													]
-												:
-													[]
-											),
-										]
-											.filter(tag => tag !== false && tag !== undefined)
-									) as tag (tag.label)}
-										<button
-											data-tag={tag.type}
-											aria-label="Filter by {tag.label}"
-											onclick={event => {
-												event.stopPropagation()
-												toggleFilterById!(tag.filterId)
-											}}
-										>
-											{tag.label}
-										</button>
-									{/each}
+									<WalletTags {wallet} {selectedVariant} onFilter={id => toggleFilterById!(id)} />
 								</div>
 							</div>
 
@@ -1956,10 +1870,6 @@
 
 	:global(.wallet-attribute-rating-pie) {
 		margin-inline: -1em;
-	}
-
-	.eip-tooltip-content {
-		width: 34rem;
 	}
 
 	.pie-center-dot {
