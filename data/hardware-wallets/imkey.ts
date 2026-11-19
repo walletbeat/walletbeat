@@ -16,7 +16,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -190,17 +190,39 @@ export const imkeyWallet: HardwareWallet = {
 				builtInErc20Swap: notSupported,
 				erc20L1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: notSupported,
 			},
