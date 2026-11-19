@@ -156,6 +156,12 @@ export const defaultNavigationItems = [
 		icon: 'wallet_software',
 		children: [
 			{
+				id: 'software-wallet-finder',
+				title: 'Find a wallet',
+				icon: 'ICON_WALLET',
+				href: '/wallet/find/',
+			},
+			{
 				id: 'software-by-rating',
 				title: 'By Rating',
 				icon: 'ICON_CHART_PIE',
