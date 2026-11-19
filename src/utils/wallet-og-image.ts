@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import type { ImageMetadata } from 'astro'
+import { imageMetadata } from 'astro/assets/utils'
 import { create as createFont, type Font } from 'fontkitten'
 import sharp from 'sharp'
 
@@ -68,6 +70,19 @@ const sliceIconOpacity = 0.5
 
 const repositoryFile = (...pathParts: string[]): Buffer =>
 	readFileSync(join(getAstroBuildTimeRepositoryRoot(), ...pathParts))
+
+/** Intrinsic wallet icon dimensions shared by the page and its compact header. */
+export async function getWalletIcon(
+	metadata: RatedWallet<string>['metadata'],
+): Promise<ImageMetadata> {
+	const fileName = `${metadata.id}.${metadata.iconExtension}`
+	const src = `/images/wallets/${fileName}`
+
+	return {
+		src,
+		...(await imageMetadata(repositoryFile('public', 'images', 'wallets', fileName), src)),
+	}
+}
 
 const dataUri = (mimeType: string, data: Buffer): string =>
 	`data:${mimeType};base64,${data.toString('base64')}`
