@@ -13,6 +13,7 @@ import {
 import { CodebaseEntryType, crawlCodebase, GitIgnoredFiles } from '@/utils/codebase'
 
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
+import { GrammarTextKind } from './utils/linter'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(currentDir, '..')
@@ -138,7 +139,11 @@ describe('reference integrity', () => {
 					it('explanation fields pass grammar lint', async () => {
 						for (const fq of fqRefs) {
 							if (fq.explanation) {
-								await grammarLint(fq.explanation)
+								await grammarLint(
+									fq.explanation,
+									{ language: 'markdown' },
+									GrammarTextKind.REFERENCE_EXPLANATION,
+								)
 							}
 						}
 					})
@@ -147,7 +152,11 @@ describe('reference integrity', () => {
 						for (const fq of fqRefs) {
 							for (const urlEntry of fq.urls) {
 								if (urlEntry.label) {
-									await grammarLint(urlEntry.label)
+									await grammarLint(
+										urlEntry.label,
+										{ language: 'markdown' },
+										GrammarTextKind.REFERENCE_LABEL,
+									)
 								}
 							}
 						}

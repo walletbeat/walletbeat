@@ -307,46 +307,47 @@ function evaluateExternallyConnectable(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	manifest: BrowserExtensionManifest,
 ): Evaluation<SecurityBestPracticesValue> {
-	if (manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE') {
-		return ctx.build({
-			outcome: {
-				id: 'externally_connectable_pass',
-				rating: Rating.PASS,
-				displayName: 'No external message connections',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} does not expose a direct message channel to web pages or other extensions.',
-				),
-			},
-			details: mdParagraph(
-				'{{WALLET_NAME}} does not declare `externally_connectable`, so no web page or external extension can send it messages directly.',
-			),
-		})
-	}
+	// When `externally_connectable` is absent, browsers let any installed extension (but no web
+	// page) connect, which is the same as declaring `"ids": ["*"]`, so both are rated the same.
+	const { extensionIds, pageMatches } =
+		manifest.externallyConnectable === 'NOT_DECLARED'
+			? { extensionIds: ExternalExtensionIdScope.ANY, pageMatches: HostPermissionScope.NONE }
+			: manifest.externallyConnectable
 
-	const { extensionIds, pageMatches } = manifest.externallyConnectable
-
-	if (
-		extensionIds === ExternalExtensionIdScope.ANY ||
-		pageMatches === HostPermissionScope.UNRESTRICTED
-	) {
+	if (pageMatches === HostPermissionScope.UNRESTRICTED) {
 		return ctx.build({
 			outcome: {
 				id: 'externally_connectable_fail',
 				rating: Rating.FAIL,
 				displayName: 'Unrestricted external message connections',
 				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} allows any extension or web page to send it wallet messages directly.',
+					'{{WALLET_NAME}} allows any web page to send it wallet messages directly.',
 				),
 			},
 			details: mdParagraph(
-				`{{WALLET_NAME}}'s \`externally_connectable\` is open to ${
-					extensionIds === ExternalExtensionIdScope.ANY
-						? 'any installed extension'
-						: 'all origins including non-web schemes'
-				}, allowing malicious actors to send it wallet requests directly.`,
+				"{{WALLET_NAME}}'s `externally_connectable` is open to all origins including non-web schemes, allowing malicious actors to send it wallet requests directly.",
 			),
 			howToImprove: mdParagraph(
-				'{{WALLET_NAME}} should restrict `externally_connectable` to specific trusted extension IDs and HTTPS origins only.',
+				'{{WALLET_NAME}} should restrict `externally_connectable` page matches to HTTPS origins only.',
+			),
+		})
+	}
+
+	if (extensionIds === ExternalExtensionIdScope.ANY) {
+		return ctx.build({
+			outcome: {
+				id: 'externally_connectable_any_extension',
+				rating: Rating.FAIL,
+				displayName: 'External connections allowed from any extension',
+				shortExplanation: mdSentence(
+					'{{WALLET_NAME}} allows any other installed extension to send it messages directly.',
+				),
+			},
+			details: mdParagraph(
+				'{{WALLET_NAME}} does not restrict which extensions may connect to it, either by omitting `externally_connectable` (the browser default) or by declaring `"ids": ["*"]`. A malicious extension could open a direct message channel to the wallet.',
+			),
+			howToImprove: mdParagraph(
+				'{{WALLET_NAME}} should declare `"ids": []` in `externally_connectable`, or list only the specific extension IDs it trusts.',
 			),
 		})
 	}
@@ -370,6 +371,13 @@ function evaluateExternallyConnectable(
 		})
 	}
 
+	const pages =
+		pageMatches === HostPermissionScope.NONE ? 'blocks all web pages' : 'allows only HTTPS pages'
+	const extensions =
+		extensionIds === ExternalExtensionIdScope.SPECIFIC
+			? 'allows only specific named extensions'
+			: 'blocks all other extensions'
+
 	return ctx.build({
 		outcome: {
 			id: 'externally_connectable_pass',
@@ -380,7 +388,7 @@ function evaluateExternallyConnectable(
 			),
 		},
 		details: mdParagraph(
-			'{{WALLET_NAME}} restricts `externally_connectable` to specific named extension IDs and HTTPS origins, limiting who can send it direct messages.',
+			`{{WALLET_NAME}}'s \`externally_connectable\` ${pages} and ${extensions}.`,
 		),
 	})
 }
@@ -401,12 +409,16 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
 	// Same as above but also applies to host-matched pages, used when rules must cover specific app domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	// Loads site icons from the browser's favicon cache, used to show which app is connected or requesting a signature.
+	[BrowserExtensionPermission.FAVICON]: Rating.PASS,
 	// Firebase Cloud Messaging for push notifications, used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
 	// OAuth2 token retrieval via the browser's identity API, used for optional social login flows.
 	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
 	// Retrieves the user's Google account email alongside the OAuth token, used when email is needed for account linking.
 	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
+	// Reports whether the system is active, idle, or locked, used to auto-lock the wallet or refresh state when the user returns.
+	[BrowserExtensionPermission.IDLE]: Rating.PASS,
 	// Displays desktop notifications, used for transaction confirmations and security alerts.
 	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
 	// Creates an off-screen document for DOM operations without a visible window, used for background cryptographic work.
@@ -605,6 +617,16 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
 	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
 	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
+	// Foreground services show a persistent notification while they run, e.g. while a wallet syncs
+	// or submits a transaction in the background. No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE]: Rating.PASS,
+	// Foreground service type for data transfers such as wallet sync (Android 14+). No access to user data.
+	[AndroidPermission.FOREGROUND_SERVICE_DATA_SYNC]: Rating.PASS,
+	// Keeps the processor awake until background work finishes. No access to user data.
+	[AndroidPermission.WAKE_LOCK]: Rating.PASS,
+	// Lets the app start when the device boots, e.g. to reschedule background work after a reboot.
+	// No access to user data, and no UI over other apps.
+	[AndroidPermission.RECEIVE_BOOT_COMPLETED]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -846,7 +868,7 @@ function evaluateKeysHandling(
 
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
-	icon: 'security_best_practices',
+	icon: 'checklist',
 	displayName: 'Security best practices',
 	wording: {
 		midSentenceName: null,
@@ -885,7 +907,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.NONE,
 						webAccessibleResources: WebAccessibleResourcesScope.NONE,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.NONE,
+							pageMatches: HostPermissionScope.NONE,
+						},
 						permissions: [],
 					},
 				),
@@ -923,7 +948,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.NONE,
 						webAccessibleResources: WebAccessibleResourcesScope.HTTPS_ONLY,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.NONE,
+							pageMatches: HostPermissionScope.NONE,
+						},
 						permissions: [],
 					},
 				),
@@ -958,7 +986,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 						hostPermissions: HostPermissionScope.HTTP_AND_HTTPS,
 						webAccessibleResources: WebAccessibleResourcesScope.HTTP_AND_HTTPS,
 						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						externallyConnectable: 'NOT_DECLARED',
 						permissions: [],
 					},
 				),

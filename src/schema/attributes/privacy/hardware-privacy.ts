@@ -16,7 +16,7 @@ export type HardwarePrivacyMetadata = {
 export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: 'user_privacy',
-	displayName: 'Hardware Privacy',
+	displayName: 'Hardware privacy',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
@@ -98,7 +98,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 			outcome: {
 				id: 'hardware_privacy',
 				rating,
-				displayName: 'Hardware Privacy',
+				displayName: 'Hardware privacy',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
 				metadata: {
 					phoningHome: hwPrivacy.phoningHome,

@@ -1,3 +1,8 @@
+import InfoIcon from 'lucide-static/icons/info.svg?raw'
+import ShieldAlertIcon from 'lucide-static/icons/shield-alert.svg?raw'
+import ShieldCheckIcon from 'lucide-static/icons/shield-check.svg?raw'
+import TriangleAlertIcon from 'lucide-static/icons/triangle-alert.svg?raw'
+
 import type { WithRef } from '@/schema/reference'
 
 import type { CalendarDate } from '../date'
@@ -19,22 +24,22 @@ export enum IncidentStatus {
 export const incidentStatuses = {
 	[IncidentStatus.RESOLVED]: {
 		label: 'Resolved',
-		icon: (await import('lucide-static/icons/shield-check.svg?raw')).default,
+		icon: ShieldCheckIcon,
 		color: '#10b981',
 	},
 	[IncidentStatus.MITIGATED]: {
 		label: 'Mitigated',
-		icon: (await import('lucide-static/icons/shield-alert.svg?raw')).default,
+		icon: ShieldAlertIcon,
 		color: '#f59e0b',
 	},
 	[IncidentStatus.ONGOING]: {
 		label: 'Ongoing',
-		icon: (await import('lucide-static/icons/triangle-alert.svg?raw')).default,
+		icon: TriangleAlertIcon,
 		color: '#ef4444',
 	},
 	[IncidentStatus.DISPUTED]: {
 		label: 'Disputed',
-		icon: (await import('lucide-static/icons/info.svg?raw')).default,
+		icon: InfoIcon,
 		color: '#6b7280',
 	},
 } as const satisfies Record<
