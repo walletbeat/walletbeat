@@ -27,7 +27,7 @@ export type UserSafetyMetadata = {
 export const userSafety: Attribute<UserSafetyMetadata> = {
 	id: 'userSafety',
 	icon: 'scam_prevention',
-	displayName: 'User Safety',
+	displayName: 'User safety',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's user safety evaluated?",
@@ -187,7 +187,7 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 			outcome: {
 				id: 'user_safety',
 				rating,
-				displayName: 'User Safety',
+				displayName: 'User safety',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
 				metadata: {
 					readableAddress: userSafetyFeature.readableAddress,
