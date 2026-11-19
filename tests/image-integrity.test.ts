@@ -98,6 +98,11 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg',
 	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg',
 	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit3.jpg',
 ])
 
 /** A single image file discovered by the crawler. */
