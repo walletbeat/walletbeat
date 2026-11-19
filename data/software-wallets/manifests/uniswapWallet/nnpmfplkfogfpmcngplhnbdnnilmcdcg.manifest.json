@@ -3,7 +3,7 @@
 	"manifest_version": 3,
 	"name": "Uniswap Extension",
 	"description": "The Uniswap Extension is a self-custody crypto wallet that's built for swapping.",
-	"version": "1.81.0.3",
+	"version": "1.86.0.1",
 	"icons": {
 		"16": "assets/icon16.png",
 		"32": "assets/icon32.png",
