@@ -1,4 +1,4 @@
-Ethereum Wallet Verifiability Tier List: Can you verify your wallet's source code?
+Ethereum Wallet Source Availability Tier List: Can you inspect your wallet's source code?
 
 At @walletbeat, public source code is a Stage 0 requirement.
 
@@ -13,18 +13,27 @@ Why does source availability matter?
 
 Your wallet holds your private keys.
 
-If you can't inspect the code running your wallet, you can't check what it does. You're trusting the wallet provider's word.
+Without access to your wallet's source code, you can't independently inspect how it's designed to handle your keys, transactions, and data.
 
 Source-available wallets should be the default.
 
 ---
-Taking it a step further, wallets should raise the bar and do FOSS. What does that mean?
 
-Source available means anyone can inspect a wallet's code.
+Source availability is a major part of wallet verifiability, but it's not enough on its own.
 
-FOSS goes further: users can freely use, modify, and distribute the code.
+Reproducible builds help verify that the software you're running matches the public source code.
 
-This enables more collaboration, transparency, and security research.
+Transparency around external dependencies also matters in understanding how your wallet behaves.
+
+---
+
+Taking it a step further, wallets should strive to be Free & Open Source Software (FOSS).
+
+What's the difference?
+
+Source availability lets anyone inspect a wallet's code.
+
+FOSS goes further: anyone can freely use, modify, and redistribute the code under its license.
 
 ---
 
@@ -36,9 +45,9 @@ This enables more collaboration, transparency, and security research.
 
 ---
 
-@baseapp
+@coinbasewallet
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![Base App license](./base-app-license.png)
 
@@ -46,7 +55,7 @@ This enables more collaboration, transparency, and security research.
 
 @BitgetWallet
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![Bitget Wallet license](./bitget-license.png)
 
@@ -62,7 +71,7 @@ This enables more collaboration, transparency, and security research.
 
 @imTokenOfficial
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 Core code is open source under Apache 2.0, but the app itself is proprietary.
 
@@ -82,7 +91,7 @@ Core packages are MIT, but the extension and mobile app use a proprietary licens
 
 @mtpelerin (Bridge Wallet)
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![Bridge Wallet license](./bridge-wallet-license.png)
 
@@ -90,7 +99,7 @@ Core packages are MIT, but the extension and mobile app use a proprietary licens
 
 @nufiwallet
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![NuFi license](./nufi-license.png)
 
@@ -98,7 +107,7 @@ Core packages are MIT, but the extension and mobile app use a proprietary licens
 
 @wallet (OKX Wallet)
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![OKX Wallet license](./okx-license.png)
 
@@ -106,7 +115,7 @@ Core packages are MIT, but the extension and mobile app use a proprietary licens
 
 @phantom
 
-❌ Not open source (Proprietary)
+❌ Closed source (Proprietary)
 
 ![Phantom license](./phantom-license.png)
 
@@ -140,7 +149,7 @@ Core: ⚠️ rabby-api package is unlicensed
 
 ---
 
-@safe
+@SafeLabs_
 
 ✅ Uses Free & Open Source license (Under GPL-3.0)
 
@@ -158,7 +167,7 @@ Core: ⚠️ rabby-api package is unlicensed
 
 @zerion
 
-⚠️ Partially open source
+⚠️ Source available, but not fully FOSS
 
 Browser extension: ✅ GPL-3.0
 Mobile app: ❌ Proprietary (only the wallet core is open source, under Apache 2.0)
@@ -167,7 +176,7 @@ Mobile app: ❌ Proprietary (only the wallet core is open source, under Apache 2
 
 ---
 
-@ZeusLN
+Zeus Wallet by @mikemolfetas1
 
 ✅ Uses Free & Open Source license (Under MIT)
 
@@ -175,9 +184,9 @@ Mobile app: ❌ Proprietary (only the wallet core is open source, under Apache 2
 
 ---
 
-15/18 wallets are source available.
+10/17 wallets are source available.
 
-Of those, only 8/15 are fully Free & Open Source.
+Of those, only 7/10 are fully Free & Open Source.
 
 Source availability should be a basic requirement for any Ethereum wallet.
 
@@ -189,19 +198,17 @@ Why source availability matters:
 
 Your wallet holds your keys. If the code is closed, you're trusting the provider's word on what it does.
 
-Public source code lets anyone inspect how the wallet works, so security researchers and users can spot bugs or shady behavior.
-
-But it only lets you read the code. Without a FOSS license, you can't fork, fix, or ship your own version.
-
-![Why it matters](./why-it-matters.png)
+Public source code lets anyone read the code and spot bugs. But without a FOSS license, you can't fork, fix, or ship your own version.
 
 ---
 
 Why FOSS should be the standard:
 
-Anyone can audit, modify, and redistribute the code. Users avoid lock-in, researchers can freely find and report bugs, and other teams can build on it.
+Anyone can audit, modify, and redistribute the code. Users avoid lock-in, and other teams can build on it.
 
 That turns a wallet into a public good, which is what Ethereum is about.
+
+![Why it matters](./why-it-matters.png)
 
 ---
 
@@ -209,7 +216,7 @@ If your wallet's source code isn't available, you can't see what it does with yo
 
 Is it really an Ethereum wallet?
 
-Ethereum is built on openness, transparency, and not having to trust anyone. Those values should land on wallets too, where users actually touch Ethereum.
+Ethereum is built on openness, transparency, and not having to trust intermediaries. Those values should land on wallets too, where users actually touch Ethereum.
 
 ---
 
@@ -221,5 +228,5 @@ Wallets listen to their users.
 
 ---
 
-Check out how your wallets stack up 👇
+Check out how your wallet stacks up 👇
 https://beta.walletbeat.eth.limo/
