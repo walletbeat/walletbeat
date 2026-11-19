@@ -15,7 +15,7 @@
 			"512": "static/images/icon-512.png"
 		},
 		"default_title": "__MSG_wallet_intro_product_name__",
-		"default_popup": "popup-init.html"
+		"default_popup": ""
 	},
 	"commands": {
 		"_execute_action": {
@@ -51,7 +51,7 @@
 			"css": ["scripts/lib/x.css"],
 			"js": ["scripts/lib/x.js"],
 			"run_at": "document_end",
-			"all_frames": true
+			"all_frames": false
 		},
 		{
 			"matches": ["*://solscan.io/*"],
@@ -94,7 +94,8 @@
 		"system.cpu",
 		"offscreen",
 		"gcm",
-		"alarms"
+		"alarms",
+		"identity"
 	],
 	"optional_permissions": ["management"],
 	"side_panel": {
@@ -112,7 +113,7 @@
 			"matches": ["<all_urls>"]
 		},
 		{
-			"resources": ["static/fonts/HarmonyOS_Sans_Web/*"],
+			"resources": ["static/fonts/harmony-os-sans-web/*"],
 			"matches": ["<all_urls>"]
 		},
 		{
@@ -128,7 +129,7 @@
 			"matches": ["https://*/*"]
 		}
 	],
-	"version": "3.99.0",
+	"version": "4.23.0",
 	"sandbox": {
 		"pages": ["sandbox.html", "ses.html", "ses-sandbox.html"]
 	},

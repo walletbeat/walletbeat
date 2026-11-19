@@ -44,7 +44,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -148,10 +148,19 @@ export const baseApp: SoftwareWallet = {
 					builtInBridging: supported({
 						ref: refTodo,
 						feesLargerThan1bps: {
-							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-							byDefault: FeeDisplayLevel.COMPREHENSIVE,
-							fullySponsored: false,
-							walletServiceFeeDisplayUnits: null,
+							feesInvolved: {
+								[FeeType.NETWORK_FEE]: true,
+								[FeeType.ONCHAIN_APP_FEE]: true,
+								[FeeType.WALLET_FEE]: true,
+							},
+							shownAfterSingleAction: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
+							shownByDefault: {
+								comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+								units: null,
+							},
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
