@@ -229,4 +229,4 @@ Wallets listen to their users.
 ---
 
 Check out how your wallet stacks up 👇
-https://beta.walletbeat.eth.limo/
+https://walletbeat.eth.limo/
