@@ -26,7 +26,6 @@ import {
 	type Supported,
 	supported,
 } from '@/schema/features/support'
-import { fullySponsoredFees } from '@/schema/features/transparency/fee-display'
 import { refNotNecessary } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
@@ -1798,7 +1797,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 								type: 'LOCALLY',
 							},
 							userLabeling: notSupported,
-							fees: fullySponsoredFees,
+							fees: 'NO_FEES_CHARGED',
 						}),
 					),
 				),
@@ -1843,7 +1842,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 								ref: refNotNecessary,
 								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
 							}),
-							fees: fullySponsoredFees,
+							fees: 'NO_FEES_CHARGED',
 						}),
 					),
 				),
@@ -1887,7 +1886,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 								ref: refNotNecessary,
 								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
 							}),
-							fees: fullySponsoredFees,
+							fees: 'NO_FEES_CHARGED',
 						}),
 					),
 				),
@@ -1932,7 +1931,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 								ref: refNotNecessary,
 								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
 							}),
-							fees: fullySponsoredFees,
+							fees: 'NO_FEES_CHARGED',
 						}),
 					),
 				),
@@ -1982,7 +1981,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 								ref: refNotNecessary,
 								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
 							}),
-							fees: fullySponsoredFees,
+							fees: 'NO_FEES_CHARGED',
 						}),
 					),
 				),
