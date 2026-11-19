@@ -2,10 +2,9 @@ name: Check
 
 on:
   push:
-    # Pushes to PR branches are already covered by the `synchronize` event
-    # below; only the trunk needs its own push trigger.
     branches:
       - beta
+      - master
   pull_request:
     types:
       - opened
