@@ -248,10 +248,27 @@ function observeActor({ root, actor, row, header }: ActorState) {
 		Math.ceil(Math.max(a.right, (sourceBox?.left ?? a.left) + sourceWidth) + guard),
 	)
 
+	const subject = motion.timeline.subject
+
+	if (!subject) {
+		throw Error('Native arrival subject required')
+	}
+
+	const viewStart = motion.timeline.startOffset.to('px').value
+	const viewLength = motion.timeline.endOffset.to('px').value - viewStart
+	const subjectLength = subject.getBoundingClientRect().height
+	const visibleLength = viewLength - subjectLength
+	const begin = viewStart + visibleLength
+	const end = viewStart + Math.max(subjectLength, visibleLength)
+	const progress =
+		end > begin
+			? Math.max(0, Math.min(1, (root.scrollTop - begin) / (end - begin)))
+			: Number(root.scrollTop >= begin)
+
 	return {
 		scroll: root.scrollTop,
 		maximum: root.scrollHeight - root.clientHeight,
-		progress: motion.effect.getComputedTiming().progress ?? null,
+		progress,
 		source: motion.timeline.source.id,
 		row: { transform: rs.transform, translate: rs.translate },
 		interaction: { row: interaction(row), actor: interaction(actor) },

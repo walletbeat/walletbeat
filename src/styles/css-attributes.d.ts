@@ -15,6 +15,7 @@ declare global {
 		 * - `--badge-backgroundColor`
 		 * - `--badge-borderColor`
 		 * - `--badge-textColor`
+		 * - `--badge-backdropFilter`: optional surface filter; defaults to `none` and is disabled for reduced transparency.
 		 *
 		 * ### Examples
 		 * - Default (inherited text size, no added padding):
@@ -198,6 +199,27 @@ declare global {
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column-item]`
 		 */
 		'data-column-item'?: string | boolean
+
+		/**
+		 * ## [data-content-page]
+		 *
+		 * Content-page typography and detached content bounds. Set page-specific widths on the sticky container.
+		 *
+		 * ### Placement
+		 * - On a page's main content container, with its title and optional description in a direct header.
+		 *
+		 * ### Examples
+		 * - A content page with a title and description:
+		 *   ```html
+		 *   <main data-content-page data-sticky-container data-column="gap-8">
+		 *     <header><hgroup><h1>Title</h1><p>Description</p></hgroup></header>
+		 *   </main>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-content-page]`
+		 */
+		'data-content-page'?: string | boolean
 
 		/**
 		 * ## [data-icon]
@@ -527,6 +549,22 @@ declare global {
 		'data-pressable-targets'?: string | boolean
 
 		/**
+		 * ## [data-prose]
+		 *
+		 * Reading line height for prose content.
+		 *
+		 * ### Examples
+		 * - A prose body:
+		 *   ```html
+		 *   <div data-prose><p>Paragraph</p></div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+		 */
+		'data-prose'?: string | boolean
+
+		/**
 		 * ## [data-row], [data-badge]
 		 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>` without an explicit `[data-column]`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
 		 *
@@ -818,6 +856,8 @@ declare global {
 		 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
 		 * - `--stickyBreadcrumb-approachTimeline`: unique view timeline for an optional approach marker; `exit-crossing -100% exit-crossing 0%` spans one heading row before contact
 		 * - `--stickyBreadcrumb-endPaintAnimation`, `--stickyBreadcrumb-endPaintTimeline`, `--stickyBreadcrumb-endPaintRange`: end paint motion; `contents` directs it to existing children and marker while retaining native cluster size and timeline ownership
+		 * - `--stickyBreadcrumb-motionRange`: visual attachment range for contain-based motion; defaults to the entry range. Entry-state timing remains on `--stickyBreadcrumb-entryRange`.
+		 * - `--stickyBreadcrumb-motionFill`: visual motion fill; defaults to `both`. Use `forwards` with an extended trailing attachment range to retain the authored initial paint before entry.
 		 * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% contain 100%`
 		 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 		 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights

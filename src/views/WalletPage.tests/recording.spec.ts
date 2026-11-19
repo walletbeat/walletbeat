@@ -148,7 +148,7 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 		for (const [index, type] of ['toc', 'heading', 'pie', 'toc', 'heading', 'pie'].entries()) {
 			if (
 				type === 'toc' &&
-				width <= 1024 &&
+				width <= 1344 &&
 				!(await page.locator('#wallet-toc').evaluate(element => element.matches(':popover-open')))
 			) {
 				await page.locator('[popovertarget="wallet-toc"]').click()
@@ -230,7 +230,7 @@ test('recording native journey', async ({ page, browserName, browser, source }, 
 
 			if (
 				type === 'toc' &&
-				width <= 1024 &&
+				width <= 1344 &&
 				(await page.locator('#wallet-toc').evaluate(element => element.matches(':popover-open')))
 			) {
 				await page.keyboard.press('Escape')

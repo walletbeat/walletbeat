@@ -59,23 +59,18 @@
 
 				<div
 					data-scroll-item="inline-detached padding-match-end"
-					data-column="gap-0"
+					data-column="gap-5"
 					style:--accent={stageColor}
 				>
-					<div
-						class="stage-card"
-						data-card="radius-6 padding-6"
-						data-column="gap-0"
-					>
-						{#if isTypographicContent(stage.description)}
-							<div class="stage-description">
-								<Typography content={stage.description} />
-							</div>
-						{/if}
+					{#if isTypographicContent(stage.description)}
+						<div class="stage-description">
+							<Typography content={stage.description} />
+						</div>
+					{/if}
 
+					<div data-card="radius-6 padding-6">
 						{#each stage.criteriaGroups as criteriaGroup (criteriaGroup.id)}
 							<details
-								class="criteria-group"
 								open
 							>
 								<summary>
@@ -165,8 +160,10 @@
 	}
 
 	section > header {
-		--sticky-backgroundColor: var(--background-primary);
-		--sticky-backdropFilter: none;
+		&[data-sticky] {
+			--sticky-backgroundColor: var(--background-primary);
+			--sticky-backdropFilter: none;
+		}
 
 		padding-block: 0.75rem;
 	}
@@ -178,38 +175,8 @@
 		line-height: 1.5;
 	}
 
-	.stage-card {
-		border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
-		box-shadow:
-			0 1px 2px rgb(19 10 43 / 0.04),
-			0 12px 32px -16px rgb(19 10 43 / 0.12);
-	}
-
 	.stage-description {
-		padding-block-end: 1.25rem;
 		color: var(--text-secondary);
-
-		:global(p) {
-			margin: 0;
-		}
-	}
-
-	/* Criteria groups are divided rows inside the stage card, not cards of their own. */
-	.criteria-group {
-		border-block-start: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
-
-		> summary {
-			padding-block: 1rem;
-		}
-
-		> :not(summary) {
-			padding-block-end: 1.25rem;
-		}
-
-		/* The card's own padding closes the last group. */
-		&:last-child > :not(summary) {
-			padding-block-end: 0;
-		}
 	}
 
 	.criteria-group-title {
@@ -234,16 +201,4 @@
 		--list-marker-fontFamily: var(--fontFamily-wbicons-simple);
 	}
 
-	li {
-		list-style: none;
-
-		strong {
-			display: block;
-		}
-
-		.criterion-rationale {
-			display: block;
-			margin-top: 0.2rem;
-		}
-	}
 </style>

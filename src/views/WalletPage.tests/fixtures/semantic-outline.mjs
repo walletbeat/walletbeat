@@ -1,7 +1,7 @@
 /** Resolve heading depth from real semantic containers, including deeper subsections. */
 /** @param {Element} root */
 export function semanticOutline(root) {
-	const scopes = 'section,details,article'
+	const scopes = 'section,details,article,aside'
 	const headings = 'h1,h2,h3,h4,h5,h6'
 	/** @param {Element} owner */
 	const firstOwned = owner =>

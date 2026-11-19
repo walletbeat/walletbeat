@@ -61,7 +61,7 @@ This means its evaluation criteria methodology is applied consistently _across_ 
 **This does not mean Walletbeat is neutral**. Walletbeat is opinionated in its decision of _which_ criteria to use.
 Walletbeat aims to follow Ethereum's ethos and cypherpunk values as a guiding principle.
 See [Vitalik Buterin's blog post on wallets](https://vitalik.eth.limo/general/2024/12/03/wallets.html)
-and the [Walletbeat FAQ page](../faq/) for more details.
+and the [Walletbeat FAQ page](/src/pages/faq/) for more details.
 
 ## Commitment to transparency
 
