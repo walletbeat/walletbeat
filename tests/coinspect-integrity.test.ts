@@ -29,7 +29,6 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 	'one-key',
 	'token-pocket',
 	'tomo',
-	'trust-wallet',
 	'unstoppable-wallet',
 	'zengo',
 ])

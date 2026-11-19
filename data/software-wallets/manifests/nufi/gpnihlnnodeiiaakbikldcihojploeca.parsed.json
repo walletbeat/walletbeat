@@ -1,6 +1,6 @@
 {
 	"contentScripts": "UNRESTRICTED",
-	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"externallyConnectable": "NOT_DECLARED",
 	"hostPermissions": "HTTPS_ONLY",
 	"permissions": ["storage", "tabs", "alarms", "cookies", "offscreen"],
 	"webAccessibleResources": "UNRESTRICTED"
