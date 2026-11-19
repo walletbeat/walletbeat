@@ -202,6 +202,28 @@ export type HardwareWalletSupport = WithRef<{
 }>
 
 /**
+ * Build an identifier for the set of supported hardware wallets and their
+ * connection types, for use in evaluation outcome IDs.
+ */
+export function supportedHardwareWalletsId(hardwareWalletSupport: HardwareWalletSupport): string {
+	const wallets = hardwareWalletType.fullRecord(hardwareWalletSupport.wallets, notSupported)
+
+	return hardwareWalletType
+		.recordKeys(wallets)
+		.flatMap(w => {
+			const support = wallets[w]
+
+			return isSupported(support)
+				? [
+						`${w}_${nonEmptyDedup(hardwareWalletConnectionEnum.reorderNonEmpty(support.connectionTypes)).join('_')}`,
+					]
+				: []
+		})
+		.join('__')
+		.toLowerCase()
+}
+
+/**
  * Build a Markdown string that represents the set of supported hardware wallets,
  * and whether this is directly or through WalletConnect.
  */

@@ -1,0 +1,164 @@
+[
+	{
+		"engine": "chromium",
+		"width": 390,
+		"height": 844,
+		"scenario": "linear",
+		"wallet": "ambire",
+		"theme": "light",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "chromium",
+		"width": 390,
+		"height": 844,
+		"scenario": "alternating",
+		"wallet": "rabby",
+		"theme": "dark",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "chromium",
+		"width": 768,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "metamask",
+		"theme": "dark",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "chromium",
+		"width": 768,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "uniswap-wallet",
+		"theme": "light",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "chromium",
+		"width": 1440,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "trezor",
+		"theme": "light",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "chromium",
+		"width": 1440,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "rainbow",
+		"theme": "dark",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "firefox",
+		"width": 390,
+		"height": 844,
+		"scenario": "linear",
+		"wallet": "bitbox",
+		"theme": "dark",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "firefox",
+		"width": 390,
+		"height": 844,
+		"scenario": "alternating",
+		"wallet": "base-app",
+		"theme": "light",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "firefox",
+		"width": 768,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "daimo",
+		"theme": "light",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "firefox",
+		"width": 768,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "frame",
+		"theme": "dark",
+		"transparency": "reduce"
+	},
+	{
+		"engine": "firefox",
+		"width": 1440,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "zerion",
+		"theme": "dark",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "firefox",
+		"width": 1440,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "cypherock",
+		"theme": "light",
+		"transparency": "no-preference"
+	},
+	{
+		"engine": "webkit",
+		"width": 390,
+		"height": 844,
+		"scenario": "linear",
+		"wallet": "ledger",
+		"theme": "light",
+		"transparency": "unavailable"
+	},
+	{
+		"engine": "webkit",
+		"width": 390,
+		"height": 844,
+		"scenario": "alternating",
+		"wallet": "gemwallet",
+		"theme": "dark",
+		"transparency": "unavailable"
+	},
+	{
+		"engine": "webkit",
+		"width": 768,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "imtoken",
+		"theme": "dark",
+		"transparency": "unavailable"
+	},
+	{
+		"engine": "webkit",
+		"width": 768,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "phantom",
+		"theme": "light",
+		"transparency": "unavailable"
+	},
+	{
+		"engine": "webkit",
+		"width": 1440,
+		"height": 900,
+		"scenario": "linear",
+		"wallet": "keystone",
+		"theme": "light",
+		"transparency": "unavailable"
+	},
+	{
+		"engine": "webkit",
+		"width": 1440,
+		"height": 900,
+		"scenario": "alternating",
+		"wallet": "safe",
+		"theme": "dark",
+		"transparency": "unavailable"
+	}
+]
