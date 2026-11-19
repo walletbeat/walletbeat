@@ -1,0 +1,39 @@
+{
+	"highlightRanges": [
+		{
+			"first": 83,
+			"last": 91
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"pub fn default_nodes(chain: Chain) -> Vec<Node> {",
+				"    NodeRegion::all()"
+			],
+			"startLine": 75
+		},
+		{
+			"lines": [
+				"        .chain(node_config::get_nodes_for_chain(chain).into_iter().map(config_node))",
+				"        .collect()",
+				"}",
+				"",
+				"pub fn node_url(input: &str) -> Option<String> {",
+				"    let input = input.trim().trim_end_matches('/');",
+				"    let candidate = match input.contains(\"://\") {",
+				"        true => input.to_string(),",
+				"        false => format!(\"{NODE_URL_SCHEME}://{input}\"),",
+				"    };",
+				"    let url = Url::parse(&candidate).ok()?;",
+				"    (url.scheme() == NODE_URL_SCHEME && url.host_str().is_some_and(|host| host.contains('.'))).then_some(candidate)",
+				"}",
+				"",
+				"pub fn websocket_url(url: &str) -> String {",
+				"    let base = url.trim_end_matches('/');",
+				"    let base = match base.strip_prefix(\"http\") {"
+			],
+			"startLine": 79
+		}
+	]
+}
