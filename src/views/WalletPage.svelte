@@ -957,7 +957,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		</div>
 
 	<section class="wallet-overview" data-sticky-breadcrumb="support" data-row="wrap align-start">
-		<div data-row-item="flexible" data-row="start gap-1 wrap">
+		<div class="wallet-overview-tags" data-row-item="flexible" data-row="start gap-1 wrap">
 			<WalletTags {wallet} {selectedVariant} />
 		</div>
 		<nav data-row="gap-2 start wrap" data-row-item="wrap-end">
@@ -2578,6 +2578,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 
 	.wallet-overview {
 		font-size: 0.9rem;
+	}
+
+	.wallet-overview-tags :global([data-tag]:not([popover] *)) {
+		overflow-wrap: normal;
 	}
 
 	:global([data-sticky-breadcrumb~="scope"]) > header:has(h2) {

@@ -1693,8 +1693,7 @@ summary:where(:not([data-column])) {
 /**
  * Compact category labels using shared theme surfaces and text. Category tokens identify content; the theme roles and public overrides supply paint. Native buttons and tagged links use shared input typography and padding. Native wrappers retain their own interaction geometry.
  *
- * ### Tokens
- * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
+ * Tokens: `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
  *
  * ### CSS Variables
  * - `--tag-backgroundColor`
@@ -1742,18 +1741,6 @@ summary:where(:not([data-column])) {
 	overflow-wrap: anywhere;
 
 	transition-property: background-color, border-color, color;
-
-	&[data-tag~="wallet-type"] {
-		--tag-textColor: var(--text-secondary);
-	}
-
-	&[data-tag~="account-type"],
-	&[data-tag~="eoa"],
-	&[data-tag~="eip"],
-	&[data-tag~="eip-status"],
-	&[data-tag~="manufacture-type"] {
-		--tag-backgroundColor: var(--accent-backgroundColor);
-	}
 
 	&:not(button, a[href]) {
 		padding: 0.4em 0.66em;
