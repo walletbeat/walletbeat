@@ -12,9 +12,11 @@
 	const {
 		references,
 		cardBackground = 'primary',
+		headingLevel = 4,
 	}: {
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
+		headingLevel?: 2 | 3 | 4 | 5 | 6
 	} = $props()
 
 
@@ -29,6 +31,7 @@
 	// (Derived)
 	const isCollapsible = $derived(references.length > collapsedCount + 1)
 	const isCollapsed = $derived(isCollapsible && !showAll)
+	const shownReferences = $derived(isCollapsed ? references.slice(0, collapsedCount) : references)
 
 	// Only repo-hosted images are rendered inline or as thumbnails;
 	// rendering an externally-hosted image would leak visitor traffic to
@@ -160,15 +163,15 @@
 		class="references"
 		data-card={cardBackground}
 	>
-		<h4>
+		<svelte:element this={`h${headingLevel}`} class="sources-heading">
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
 				({totalUrls})
 			{/if}
-		</h4>
+		</svelte:element>
 
-		<ul class="references-list" data-list="gap-2">
-			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
+		<ul class="references-list" data-list="gap-2" data-scroll-item="snap-prose">
+			{#each shownReferences as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
 				{@const refSnippets = codeSnippetEntries(ref.urls)}
@@ -205,13 +208,13 @@
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
 
-						<p class="explanation">
+						<div class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
 								<br>
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</p>
+						</div>
 					{/if}
 
 					{#if linkUrls.length === 1}
@@ -312,10 +315,7 @@
 					{/if}
 				{/snippet}
 
-				<li
-					data-list-item="gap-2"
-					hidden={isCollapsed && index >= collapsedCount}
-				>
+				<li data-list-item="gap-2">
 					{#if imageUrls.length > 1 && refImages.length > 0}
 						<div data-row="start gap-4 align-start">
 							<div data-row-item="flexible" data-column="gap-2">
@@ -377,7 +377,7 @@
 		line-height: 1.7;
 	}
 
-	h4 {
+	.sources-heading {
 		font-size: 1em;
 	}
 
@@ -485,10 +485,6 @@
 			display: block;
 			inline-size: max-content;
 			min-inline-size: 100%;
-
-			font-family:
-				ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-				'Courier New', monospace;
 		}
 
 		.row {
@@ -530,10 +526,6 @@
 		.line-content {
 			flex: 1;
 		}
-	}
-
-	.references-list > li[hidden] {
-		display: none;
 	}
 
 	.references-toggle {

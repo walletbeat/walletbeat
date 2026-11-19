@@ -1,0 +1,39 @@
+{
+	"highlightRanges": [
+		{
+			"first": 203,
+			"last": 212
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl GemWalletConnectService {"
+			],
+			"startLine": 67
+		},
+		{
+			"lines": [
+				"    pub fn application_metadata(&self, name: String, description: String, url: String, icons: Vec<String>) -> ApplicationMetadata {",
+				"        rules::application_metadata(name, description, url, icons)",
+				"    }",
+				"",
+				"    pub fn session_approval(&self, wallet: Wallet) -> GemSessionApproval {",
+				"        let chains = rules::session_chains(&wallet, &rules::supported_chains());",
+				"        let accounts = wallet.accounts.into_iter().filter(|account| chains.contains(&account.chain)).collect();",
+				"        GemSessionApproval {",
+				"            chains,",
+				"            accounts,",
+				"            methods: rules::session_methods(),",
+				"            events: rules::session_events(),",
+				"        }",
+				"    }",
+				"",
+				"    pub fn session(&self, topic: String, accounts: Vec<String>, expire_at: i64, metadata: ApplicationMetadata) -> Result<WalletConnectionSession, GemServiceError> {",
+				"        let chains = rules::account_chains(&accounts);",
+				"        let expire_at = DateTime::<Utc>::from_timestamp(expire_at, 0).ok_or_else(|| GemServiceError::InvalidInput {"
+			],
+			"startLine": 199
+		}
+	]
+}
