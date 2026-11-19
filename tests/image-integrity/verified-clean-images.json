@@ -1951,6 +1951,10 @@
 		"hash": "6a53e88b5cd28117393eb706d307fa80832c756b0897bb43128e3e9f8c8b6650",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/verifiability-tier-list.png": {
+		"hash": "a9ce07ea6b99c70552998ca6d42823328e617793b1b85a0d822fd539a62a6f4a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/why-it-matters.png": {
 		"hash": "1e437b77013aa966285a5d37fb4f67e252a3476b6a3de98063cdb16ce54f9b71",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
