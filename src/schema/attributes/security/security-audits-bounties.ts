@@ -436,7 +436,7 @@ const sampleSecurityAudit: SecurityAudit = {
 export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAuditsAndBounties',
 	icon: 'security_audits',
-	displayName: 'Security Audits & Bounties',
+	displayName: 'Security audits & bounties',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How are a wallet's security audits and bug bounty program evaluated?",
