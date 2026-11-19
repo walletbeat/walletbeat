@@ -37,7 +37,6 @@
 				"evmAsk.js",
 				"evmPhantom.js",
 				"evmMetamask.js",
-				"btc.js",
 				"sui.js",
 				"phantom.js"
 			],
@@ -45,7 +44,7 @@
 		}
 	],
 	"content_security_policy": {
-		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; worker-src 'self'"
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-elem http://127.0.0.1:53099 'self' 'wasm-unsafe-eval'; object-src 'none'; worker-src 'self'"
 	},
 	"permissions": [
 		"activeTab",
@@ -76,6 +75,6 @@
 	"side_panel": {
 		"default_path": "popup.html"
 	},
-	"version": "26.11.0",
+	"version": "26.38.1",
 	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjcmb0xbGzvg9N2018hVht6y7J6bJjiYtYuw2Mtxrr2vcKXKImxmrryTY9ksBV/00PdqWCHr0DOF6H9gofmTCyOIFGJ37+XejfmWjbkB6qWJHCH1zxiKGCG7TAoGN/Ony4jgsseIZlOmLDOR1+iiNz8dqdth7twRZ4dp+HqjG7e6M7Nj0tRnUscYSdxJCa0pz8V9F442QbzEh/41O3zAo/gP0dqVk3LYqX7xalXPNsTUm9MG1wZcL1jQHi96Oc5nUPQY32gAMDv+CrBr5ylAsDB36cgQSEKdQzFXgVRDq0DJ+Z93CAQ4tHcWNm8jd2YQtp0KuNmwgUec0cAM0UATW6QIDAQAB"
 }
