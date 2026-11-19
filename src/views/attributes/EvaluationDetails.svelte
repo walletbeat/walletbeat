@@ -42,7 +42,7 @@
 	{@const renderData = evaluationDetailRenderData(evaluation.details.component, evaluation.outcome)}
 	{@const references = evaluation.references && toFullyQualified(evaluation.references)}
 
-	<div data-column>
+	<div data-column data-scroll-item="snap-prose">
 		{#if renderData.component === 'AddressCorrelationDetails'}
 			<AddressCorrelationDetails {...renderData.componentProps} {wallet} />
 		{:else if renderData.component === 'PrivateTransfersDetails'}

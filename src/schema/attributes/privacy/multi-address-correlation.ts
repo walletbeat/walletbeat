@@ -10,12 +10,13 @@ import {
 	collectedByDefault,
 	type DataCollectionByEntity,
 	dataCollectionForAllSupportedFlows,
-	type Endpoint,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
-	PersonalInfo,
 	type QualifiedDataCollection,
 	qualifiedDataCollectionWithEndpoint,
+	SIMULTANEOUS_WINDOW_MS,
+	userInfoCorrelatableAcrossEntities,
+	userInfoEnums,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { isSupported } from '@/schema/features/support'
@@ -59,26 +60,52 @@ const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 		),
 	})
 
-const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+const activeAddressOnlyWithCorrelatableUserInfo: (typeof multiAddressCorrelation)['evaluate'] =
+	ctx =>
+		ctx.build({
+			outcome: {
+				id: 'active_address_only_with_correlatable_user_info',
+				rating: Rating.FAIL,
+				displayName: 'Multiple addresses are correlatable by a shared identifier',
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} only makes requests about one active address at a time, but sends a user identifier across requests allowing addresses to be correlated over time.',
+				),
+			},
+			details: paragraph(`
+			{{WALLET_NAME}} only has one active address at a time, and all outgoing RPC requests are only about that address.
+			However, requests contain a shared user identifier (e.g. a tracking cookie), which lets the external provider
+			correlate requests that belong to the same user. This allows the external provider to correlate the user's
+			addresses.
+		`),
+			impact: paragraph(
+				'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
+			),
+			howToImprove: paragraph(
+				'{{WALLET_NAME}} should stop sending correlatable user identifiers from the requests it makes.',
+			),
+		})
+
+const correlatableUserInfoCorrelation: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
-			id: 'active_address_only_with_tracking_identifier',
+			id: 'correlatable_user_info_correlation',
 			rating: Rating.FAIL,
-			displayName: 'Multiple addresses are correlatable by a tracking cookie',
+			displayName: 'Multiple addresses are correlatable by a shared user identifier',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} only makes requests about one active address at a time, but uses a tracking cookie across requests allowing addresses to be correlated over time.',
+				'{{WALLET_NAME}} makes requests about different addresses that share a user identifier, allowing an external provider to correlate them.',
 			),
 		},
 		details: paragraph(`
-			{{WALLET_NAME}} only has one active address at a time, and all outgoing RPC requests are only about that address.
-			However, requests contain a tracking identifier or cookie, which lets the external provider correlate requests
-			that belong to the same user. This allows the external provider to correlate the user's addresses.
-		`),
+When configured with multiple addresses, {{WALLET_NAME}} makes requests about each address
+separately, but these requests carry a user identifier that is shared across them (either
+directly or through a chain of requests). This lets an external provider link the requests
+back to the same user and therefore correlate the user's addresses.
+`),
 		impact: paragraph(
 			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by an external provider. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should strip all tracking identifiers from the RPCs it makes.',
+			'{{WALLET_NAME}} should strip all correlatable user identifiers from the requests it makes.',
 		),
 	})
 
@@ -150,37 +177,19 @@ const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 		),
 	})
 
-const separateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+const uncorrelatedRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
-			id: 'separate_circuits',
-			rating: Rating.PARTIAL,
-			displayName: 'Requests for multiple addresses use separate proxies',
-			shortExplanation: sentence(
-				'{{WALLET_NAME}} uses distinct proxies to make requests about multiple addresses, which makes it harder to correlate your addresses.',
-			),
-		},
-		details: paragraph(
-			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IP addresses from the perspective of the endpoint. This provides an imperfect degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. However, since these requests are all made together simultaneously, the endpoint is still able to correlate them by grouping them across time.',
-		),
-		howToImprove: paragraph(
-			'{{WALLET_NAME}} should add randomized delays between refreshes of separate addresses in order to reduce time-based correlatability of addresses by the RPC endpoint.',
-		),
-	})
-
-const staggeredAndSeparateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
-	ctx.build({
-		outcome: {
-			id: 'staggered_and_separate_circuits',
+			id: 'uncorrelated_requests',
 			rating: Rating.PASS,
 			icon: '\u{26d3}', // Broken chain
 			displayName: 'Requests for multiple addresses are uncorrelated',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} uses distinct proxies and staggers requests about multiple addresses over time, which makes it harder to correlate your addresses.',
+				'{{WALLET_NAME}} makes requests about multiple addresses that cannot be linked together, so they are not correlatable.',
 			),
 		},
 		details: paragraph(
-			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IP addresses from the perspective of the endpoint, and they are staggered over time. This provides a good degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. From the perspective of the endpoint, these requests come in from random IP addresses at random times, avoiding both IP-based and time-based correlation.',
+			'When configured with multiple addresses, {{WALLET_NAME}} makes requests about each address that are not linked by any shared user identifier and do not occur close enough in time from the same IP to be correlated. As a result, an external provider cannot correlate these addresses.',
 		),
 	})
 
@@ -208,69 +217,61 @@ function isQualifiedDataCollectionWithMultiAddress(
 	return dataCollection.multiAddress != null
 }
 
-function rateHandling(
-	dataCollection: QualifiedDataCollectionWithMultiAddress,
-	endpoint: Endpoint,
-): number {
+/**
+ * Whether the given data collection sends any correlatable `UserInfo` value
+ * by default. A correlatable `UserInfo` is one whose identical string value
+ * across two requests forms a correlation edge (see
+ * {@link userInfoCorrelatableAcrossEntities}).
+ *
+ * The account address and mempool transactions are excluded: their values vary
+ * per address, so they are the correlation target rather than a correlation
+ * signal.
+ */
+function anyCorrelatableUserInfoCollectedByDefault(
+	dataCollection: QualifiedDataCollection,
+): boolean {
+	return userInfoEnums.items.some(userInfo => {
+		if (userInfo === WalletInfo.ACCOUNT_ADDRESS || userInfo === WalletInfo.MEMPOOL_TRANSACTIONS) {
+			return false
+		}
+
+		return (
+			userInfoCorrelatableAcrossEntities(userInfo) && collectedByDefault(dataCollection[userInfo])
+		)
+	})
+}
+
+// Edge strengths produced by the classifier are on a bounded scale (shared
+// UserInfo edges are offset well above IP-time edges). The length multiplier is
+// far larger than any such strength so that chain length is the primary
+// ordering when ranking which entity is worst for the user.
+const CHAIN_LENGTH_WEIGHT = 1_000_000_000
+const NO_CHAIN_SCORE = 1_000_000_000_000
+
+function rateHandling(dataCollection: QualifiedDataCollectionWithMultiAddress): number {
 	if (
 		dataCollection.multiAddress.type === MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES
 	) {
 		return 0
 	}
 
-	if (collectedByDefault(dataCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-		return 0
-	}
-
 	switch (dataCollection.multiAddress.type) {
 		case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-			return 1000
+			return anyCorrelatableUserInfoCollectedByDefault(dataCollection) ? 0 : 1000
 		case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
-			const destinationScore =
-				{ SAME_FOR_ALL: 0, ISOLATED: 1 }[dataCollection.multiAddress.destination] * 1000
-			const enclaveScore =
-				(() => {
-					switch (endpoint.type) {
-						case 'REGULAR':
-							return 0
-						case 'SECURE_ENCLAVE':
-							switch (endpoint.externalLogging.type) {
-								case 'UNKNOWN':
-									return 0
-								case 'YES':
-									return 0
-								case 'NO':
-									switch (endpoint.endToEndEncryption.type) {
-										case 'NONE':
-											return 0
-										case 'TERMINATED_OUT_OF_ENCLAVE':
-											return 0
-										case 'TERMINATED_INSIDE_ENCLAVE':
-											if (
-												!endpoint.verifiability.sourceAvailable ||
-												!endpoint.verifiability.reproducibleBuilds
-											) {
-												// Server can be running anything, so all bets are off.
-												return 0
-											}
+			const chain = dataCollection.multiAddress.bestChain
 
-											switch (endpoint.verifiability.clientVerification.type) {
-												case 'NOT_VERIFIED':
-													return 1
-												case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
-													return 2
-												case 'VERIFIED':
-													return 3
-											}
-									}
-							}
-					}
-				})() * 100
-			const proxyScore =
-				{ NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[dataCollection.multiAddress.proxy] * 10
-			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[dataCollection.multiAddress.timing]
+			if (chain !== null) {
+				// A stronger chain (shorter, then higher weakest-edge strength)
+				// is worse for the user, so it scores lower.
+				return chain.length * CHAIN_LENGTH_WEIGHT - chain.weakestEdge.strength
+			}
 
-			return 1 + destinationScore + enclaveScore + proxyScore + timingScore
+			// No correlation chain links two distinct addresses, so the
+			// addresses are not correlatable by this entity.
+			return (
+				NO_CHAIN_SCORE + { SAME_FOR_ALL: 0, ISOLATED: 1 }[dataCollection.multiAddress.destination]
+			)
 		}
 	}
 }
@@ -301,6 +302,11 @@ export const multiAddressCorrelation: Attribute = {
 		  the receiving endpoint to learn that all of these addresses belong to
 		  the same user. Similar correlations are also possible by IP and/or
 			time-based correlation of requests that each contain one wallet address.
+		- Requests about different wallet addresses carrying a common
+		  correlatable user identifier (e.g. cookies, unique HTTP headers, UUIDs),
+			either directly or transitively through a chain of requests that each
+			share such an identifier. This lets the receiving endpoint link requests
+			back to the same user and therefore correlate the user's addresses.
 
 		Walletbeat determines this by inspecting the network requests made by the
 		wallet. See the [data collection guide](${withBasePath('/docs/wallet-testing/data-collection/')})
@@ -341,9 +347,15 @@ export const multiAddressCorrelation: Attribute = {
 				paragraph(
 					'The wallet only refreshes the currently-active wallet address balances, but such requests carry an identifier or cookie which can identify the same user across requests for different wallet addresses.',
 				),
-				activeAddressOnlyWithTrackingIdentifier(
+				activeAddressOnlyWithCorrelatableUserInfo(
 					EvaluationContext.forTest(() => multiAddressCorrelation),
 				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet refreshes each wallet address in a separate request, but the requests carry a tracking identifier shared across them, allowing an external provider to correlate the addresses.',
+				),
+				correlatableUserInfoCorrelation(EvaluationContext.forTest(() => multiAddressCorrelation)),
 			),
 			exampleRating(
 				paragraph(
@@ -355,12 +367,6 @@ export const multiAddressCorrelation: Attribute = {
 		partial: [
 			exampleRating(
 				paragraph(
-					"The wallet makes multiple simultaneous requests about each of the user's wallet balances, proxying each of them through a different proxy circuit (e.g. Tor with unique circuits for each wallet address). The receiving endpoint may still correlate these addresses through time-based correlation.",
-				),
-				separateCircuits(EvaluationContext.forTest(() => multiAddressCorrelation)),
-			),
-			exampleRating(
-				paragraph(
 					"The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation. The receiving endpoint may still correlate these addresses through IP-address-based correlation.",
 				),
 				staggeredRequests(EvaluationContext.forTest(() => multiAddressCorrelation)),
@@ -369,9 +375,9 @@ export const multiAddressCorrelation: Attribute = {
 		pass: [
 			exampleRating(
 				paragraph(
-					"The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation, and using unique proxy circuits for each wallet address to avoid IP-address-based correlation.",
+					"The wallet makes requests about each of the user's wallet balances that share no user identifier and are spaced far enough apart in time from the same IP that an external provider cannot link them together.",
 				),
-				staggeredAndSeparateCircuits(EvaluationContext.forTest(() => multiAddressCorrelation)),
+				uncorrelatedRequests(EvaluationContext.forTest(() => multiAddressCorrelation)),
 			),
 			exampleRating(
 				paragraph(
@@ -426,7 +432,7 @@ export const multiAddressCorrelation: Attribute = {
 			}
 
 			ctx.addRef(collected)
-			const score = rateHandling(dataCollection, dataCollection.endpoint)
+			const score = rateHandling(dataCollection)
 
 			if (worstHandling === null || score < worstHandlingScore) {
 				worstHandling = collected
@@ -448,8 +454,8 @@ export const multiAddressCorrelation: Attribute = {
 
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-				if (collectedByDefault(worstCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-					return activeAddressOnlyWithTrackingIdentifier(ctx)
+				if (anyCorrelatableUserInfoCollectedByDefault(worstCollection)) {
+					return activeAddressOnlyWithCorrelatableUserInfo(ctx)
 				}
 
 				// If the wallet has a concept of a singular "active address" and only
@@ -460,38 +466,38 @@ export const multiAddressCorrelation: Attribute = {
 				// If the wallet makes a single request with multiple addresses,
 				// they are clearly correlatable.
 				return bulkRequests(ctx)
-			case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS:
-				if (collectedByDefault(worstCollection[PersonalInfo.TRACKING_IDENTIFIER])) {
-					return activeAddressOnlyWithTrackingIdentifier(ctx)
+			case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
+				const chain = handling.bestChain
+
+				if (chain !== null) {
+					switch (chain.weakestEdge.kind) {
+						case 'userInfo':
+							// The strongest correlation link is a shared user identifier.
+							return correlatableUserInfoCorrelation(ctx)
+
+						case 'ipTime':
+							if (chain.weakestEdge.gapMs < SIMULTANEOUS_WINDOW_MS) {
+								// Requests for distinct addresses occur close together in
+								// time from the same IP, so they are correlatable.
+								return correlatableRequests(ctx)
+							}
+
+							// The weakest link is an IP-time link that is staggered beyond
+							// the simultaneous window, so correlation is weaker.
+							return staggeredRequests(ctx)
+					}
 				}
 
-				if (handling.destination === 'ISOLATED') {
-					// The wallet makes requests to different endpoints for each
-					// address, so they are not correlatable.
-					return uniqueDestinations(ctx)
+				switch (handling.destination) {
+					case 'ISOLATED':
+						// The wallet makes requests to different endpoints for each
+						// address, so they are not correlatable.
+						return uniqueDestinations(ctx)
+					case 'SAME_FOR_ALL':
+						// No request-correlation chain links any two distinct addresses.
+						return uncorrelatedRequests(ctx)
 				}
-
-				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
-					// The wallet mitigates correlation both at the network level and by
-					// time. Not correlated.
-					return staggeredAndSeparateCircuits(ctx)
-				}
-
-				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing !== 'STAGGERED') {
-					// Requests not staggered, but coming from different IPs.
-					// Better than nothing.
-					return separateCircuits(ctx)
-				}
-
-				if (handling.proxy !== 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
-					// Requests staggered, but coming from the same IP.
-					// Better than nothing.
-					return staggeredRequests(ctx)
-				}
-
-				// Requests not staggered, and all coming from the same IP.
-				// That is correlated.
-				return correlatableRequests(ctx)
+			}
 		}
 	},
 	aggregate: pickWorstRating,
