@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
@@ -71,6 +72,7 @@ import {
 } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -95,7 +97,7 @@ import ambireRawExtManifest from './manifests/ambire/ehgjhhccekdedpbkifaojjaefeo
 
 const v2Audits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md#not-line-specific',
 		auditDate: '2024-01-26',
 		auditor: pashov,
 		codeSnapshot: {
@@ -107,7 +109,7 @@ const v2Audits: SecurityAudit[] = [
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf#binary-file',
 		auditDate: '2025-02-20',
 		auditor: hunterSecurity,
 		codeSnapshot: {
@@ -192,7 +194,7 @@ const scamAlertsAndSendTxWarningRefs: WithRef<{}>['ref'] = [
 		urls: [
 			{
 				label: 'Implementation',
-				url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
+				url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts#not-line-specific',
 			},
 		],
 	},
@@ -213,9 +215,9 @@ export const ambire: SoftwareWallet = {
 		displayName: 'Ambire',
 		tableName: 'Ambire',
 		coinspectId: 'ambire',
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-22',
+		lastUpdated: '2026-10-08',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -288,7 +290,7 @@ export const ambire: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation: 'Ambire supports ERC-4337 smart contract wallets',
-					url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol#not-line-specific',
 				},
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -354,10 +356,19 @@ export const ambire: SoftwareWallet = {
 					},
 					feesLargerThan1bps: {
 						ref: [],
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -397,9 +408,9 @@ export const ambire: SoftwareWallet = {
 					explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 					label: 'List of RPCs Ambire uses for default chains',
 					url: [
-						'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts#not-line-specific',
+						'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts#not-line-specific',
+						'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts#not-line-specific',
 					],
 				},
 				{
@@ -441,7 +452,7 @@ export const ambire: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: {
-					url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
+					url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts#not-line-specific',
 				},
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -451,7 +462,7 @@ export const ambire: SoftwareWallet = {
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
-				ref: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE',
+				ref: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE#not-line-specific',
 				license: FOSSLicense.GPL_3_0,
 			},
 		},
@@ -506,17 +517,17 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'Ambire integrates Sentry for anonymous crash/error reporting in the web extension context.',
-							url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts#not-line-specific',
 						},
 						{
 							explanation:
 								'Sentry is initialized in the background service worker, and events are only sent when crash analytics are enabled.',
-							url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts#not-line-specific',
 						},
 						{
 							explanation:
 								'Ambire provides a user toggle for enabling/disabling crash analytics in settings.',
-							url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+							url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx#not-line-specific',
 						},
 					],
 					entity: sentry,
@@ -548,6 +559,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
 							role: EntityRole.OPERATOR,
@@ -738,6 +750,7 @@ export const ambire: SoftwareWallet = {
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
+								multiAddress: null,
 							},
 							purposes: [
 								DataCollectionPurpose.UPDATE_CHECKING,
@@ -819,7 +832,7 @@ export const ambire: SoftwareWallet = {
 					{
 						explanation:
 							'Ambire additionally supports the Keystone and Keycard hardware wallets via QR-code signing through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
-						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
+						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts#not-line-specific',
 					},
 					{
 						file: 'public/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png',
@@ -896,7 +909,7 @@ export const ambire: SoftwareWallet = {
 						urls: [
 							{
 								label: 'Implementation',
-								url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts#not-line-specific',
 							},
 						],
 					},
@@ -1119,7 +1132,7 @@ export const ambire: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+								"Arbitrum and OP Stack transactions only go to the network's sequencer. The app has no way to submit them via Ethereum.",
 							url: [
 								{
 									label: "Browser extension sends the signed transaction through the network's RPC",
@@ -1137,50 +1150,120 @@ export const ambire: SoftwareWallet = {
 			operationFees: {
 				builtInErc20Swap: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+					},
 				}),
 				erc20L1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				ethL1Transfer: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [],
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: null,
+						},
+					},
 				}),
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
+				dependencyAgeGate: null,
 				dependencyLocking: supported({
 					ref: [
 						{
 							explanation:
 								'The `setup:ci` script enforces lockfile sync with `yarn install --frozen-lockfile`.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/package.json',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/package.json#not-line-specific',
 						},
 						{
 							explanation: 'CI workflows execute `yarn setup:ci` before builds.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml#not-line-specific',
 						},
 					],
 				}),
-				dependencySandboxing: null,
+				dependencySandboxing: supported({
+					ref: [
+						{
+							explanation:
+								'The production extension runs each code library in a LavaMoat sandbox. A library can only reach what its policy allows.',
+							label: 'LavaMoat setup in the extension build',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L146-L169',
+						},
+						{
+							explanation: 'The policy lists what each library is allowed to use.',
+							label: 'LavaMoat policy',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/lavamoat/webpack/policy.json#L1-L36',
+						},
+						{
+							explanation:
+								'LavaMoat is on for production builds for Chrome and Safari. The Firefox build runs without it.',
+							label: 'Builds that use LavaMoat',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/shared.js#L70',
+						},
+						{
+							explanation: 'The scripts that the extension adds to web pages run without LavaMoat.',
+							label: 'Scripts that run without LavaMoat',
+							url: 'https://github.com/AmbireTech/extension/blob/ce1c5b032b2cbceac8139d00cc908ed5db49dcaf/webpack/extension.js#L19-L35',
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',
@@ -1190,22 +1273,22 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'The release build workflow updates git submodules during build execution, requiring network access rather than using a fully pre-fetched offline input set.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'Android build workflow runs `yarn setup:ci` during build, so JavaScript dependencies are resolved/fetched at build time.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-android.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-android.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'iOS build workflow runs `bundle exec pod install`, which performs dependency resolution/fetching during the build job.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-ios.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-ios.yml#not-line-specific',
 						},
 						{
 							explanation:
 								'Gecko ARM64 release build pulls base images and installs Alpine packages (`apk add`) at runtime, indicating non-hermetic networked build inputs.',
-							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extension-gecko.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extension-gecko.yml#not-line-specific',
 						},
 					],
 				}),

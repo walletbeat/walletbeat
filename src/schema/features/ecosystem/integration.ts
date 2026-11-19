@@ -11,7 +11,7 @@ export type BrowserIntegrationEip = '1193' | '2700' | '6963'
  * Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser
  * version.
  *
- * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
+ * Use the Walletbeat test page to verify support: https://walletbeat.eth.limo/test/
  * It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
  */
 export type WalletBrowserIntegration =
@@ -26,7 +26,7 @@ export interface WalletIntegration {
 	 * Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser
 	 * version.
 	 *
-	 * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
+	 * Use the Walletbeat test page to verify support: https://walletbeat.eth.limo/test/
 	 * It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
 	 */
 	browser: WalletBrowserIntegration
