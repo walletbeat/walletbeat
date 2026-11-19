@@ -7,6 +7,8 @@ export const eip6963: Eip = {
 	formalTitle: 'Multi Injected Provider Discovery',
 	// Browser providers are only implemented by browser extension wallets.
 	appliesTo: nonEmptySet(Variant.BROWSER),
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/bb1ca48969d6b4347c79f2119212c08cf1734c93
+	finalizedDate: '2023-10-11',
 	icon: 'ICON_RADAR',
 	noteMarkdown: `
 		EIP-6963 has largely superseded EIP-1193, as it provides better

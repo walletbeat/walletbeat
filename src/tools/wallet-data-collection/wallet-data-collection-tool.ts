@@ -1,7 +1,10 @@
 /**
  * Wallet data collection CLI utility. See README.md for usage information.
- *
  */
+import { spawn, spawnSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+
 import cac from 'cac'
 
 import { allEntities } from '@/data/entities'
@@ -14,11 +17,13 @@ import {
 import { variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 import { recordedFlow } from './wallet-capture-file'
 import {
 	actorEnvSuffixFromEnv,
 	actorFlagFromArgv,
+	agentOptions,
 	captureOptions,
 	checkOptions,
 	DataCollectionActor,
@@ -31,6 +36,7 @@ import {
 	handleCheck,
 	handleDeleteCapture,
 	handleExplainRequest,
+	handleJustify,
 	handleLintFix,
 	handleListWalletIds,
 	handleMarkDomain,
@@ -39,7 +45,9 @@ import {
 	handleMarkString,
 	handleReviewRequests,
 	handleReviewStrings,
+	handleRollback,
 	handleSearch,
+	justifyOptions,
 	markDomainOptions,
 	markDomainUpdateOptions,
 	markFlowUnsupportedOptions,
@@ -364,6 +372,119 @@ cli
 	.example(getCommand('list-wallet-ids', { walletIdFlags: false }))
 	.action(() => {
 		handleListWalletIds()
+	})
+
+// The `justify` and `rollback` subcommands are only visible to the agent harness (which
+// sets WALLETBEAT_ENV=AGENT); they are hidden from humans and CI.
+if (process.env.WALLETBEAT_ENV === DataCollectionActor.AGENT) {
+	cli
+		.command(
+			'justify',
+			'Justify the impact of an open-mutation classification change on up to 16 requests',
+		)
+		.option('--request-id <ids>', 'Comma-separated walletId:walletVariant:sessionTime request IDs')
+		.option('--url <url>', 'Exact URL (domain + path + query) of the request(s) being justified')
+		.option('--rationale <rationale>', 'A non-empty string or a LooseReference JSON object')
+		.example(
+			"  $ pnpm wallet-data-collection:agent justify --request-id='metamask:BROWSER:123456789012345' --url='https://infura.io/v3/abc123?key=val' --rationale='Detected as TRACKING_IDENTIFIER'",
+		)
+		.action(async options => {
+			await handleJustify(justifyOptions.process(options))
+		})
+
+	cli
+		.command('rollback', 'Roll back the current open-mutation classification change')
+		.example('  $ pnpm wallet-data-collection:agent rollback')
+		.action(async () => {
+			await handleRollback()
+		})
+}
+
+cli
+	.command('agent [prompt...]', 'Run the wallet-data-collection agent harness')
+	.usage(
+		'agent [<prompt>]\n\n' +
+			trimWhitespacePrefix(`
+				Run the wallet-data-collection agent harness.
+			`),
+	)
+	.example(
+		"  $ pnpm wallet-data-collection agent 'Classify network traffic for the MetaMask browser extension'",
+	)
+	.action((...args) => {
+		if (process.env.WALLETBEAT_ENV === 'AGENT') {
+			throw new Error('Cannot run this command while already running as agent.')
+		}
+
+		const options = agentOptions.process(args[1] ?? {})
+		// Forward every positional argument that follows the `agent` subcommand to the
+		// harness. The harness uses them as Pi's initial prompt.
+		const forwardedArgs = cli.args
+		const repoRoot = getRepositoryRoot()
+		const agentDir = path.join(repoRoot, 'src/tools/wallet-data-collection/agent')
+		const piPkgDir = path.join(agentDir, 'node_modules', '@earendil-works', 'pi-coding-agent')
+
+		// Forward the wallet options to the harness as environment variables so it can add
+		// wallet context to the system prompt.
+		if (options.id) {
+			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_ID = options.id
+		}
+
+		if (options.variant) {
+			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_VARIANT = options.variant
+		}
+
+		if (options.type) {
+			process.env.WALLETBEAT_WALLET_DATA_COLLECTION_TYPE = options.type
+		}
+
+		if (!existsSync(path.join(piPkgDir, 'package.json'))) {
+			process.stderr.write(
+				'[wallet-data-collection-agent] Installing Pi harness dependencies (first run)...\n',
+			)
+			const install = spawnSync(
+				'pnpm',
+				['install', '--filter', '@walletbeat/wallet-data-collection-agent'],
+				{ cwd: repoRoot, stdio: 'inherit' },
+			)
+
+			if (install.status !== 0) {
+				process.stderr.write(
+					'[wallet-data-collection-agent] Failed to install Pi harness dependencies.\n',
+				)
+				process.exitCode = 1
+
+				return
+			}
+		}
+
+		// Run the TypeScript harness through the `tsx` loader.
+		const child = spawn(
+			process.execPath,
+			['--import', 'tsx', path.join(agentDir, 'agent.ts'), ...forwardedArgs],
+			{
+				stdio: 'inherit',
+				env: process.env,
+			},
+		)
+
+		child.on('error', error => {
+			process.stderr.write(
+				`[wallet-data-collection] Failed to launch agent harness: ${error.message}\n`,
+			)
+			process.exitCode = 1
+		})
+
+		child.on('exit', (code, signal) => {
+			if (signal) {
+				// Re-raise the signal so the parent sees the same termination reason.
+				process.kill(process.pid, signal)
+
+				return
+			}
+
+			process.exitCode = code ?? 0
+		})
 	})
 
 // Help and version

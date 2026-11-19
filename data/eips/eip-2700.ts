@@ -7,6 +7,8 @@ export const eip2700: Eip = {
 	formalTitle: 'JavaScript Provider Event Emitter',
 	// Browser providers are only implemented by browser extension wallets.
 	appliesTo: nonEmptySet(Variant.BROWSER),
+	// "Move to Final" commit: https://github.com/ethereum/EIPs/commit/69b5432d3704dc312782134da6a8169a56360450
+	finalizedDate: '2020-07-11',
 	icon: 'ICON_BELL',
 	number: '2700',
 	prefix: EipPrefix.EIP,

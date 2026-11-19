@@ -491,7 +491,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 			exampleRating(
 				paragraph(`
 					The wallet does not implement any account recovery feature.
-					If the user forgets or
+					If the user forgets or loses their seed phrase,
 					they lose access to their account.
 				`),
 				evaluateAccountRecovery(
