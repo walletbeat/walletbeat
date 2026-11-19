@@ -1,0 +1,29 @@
+{
+	"highlightRanges": [
+		{
+			"first": 21,
+			"last": 26
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"use gem_client::Client;",
+				"",
+				"#[cfg(feature = \"rpc\")]",
+				"#[async_trait]",
+				"impl<C: Client + Clone> ChainTransactionBroadcast for EthereumProvider<C> {",
+				"    async fn transaction_broadcast(&self, data: String, _options: BroadcastOptions) -> Result<String, Box<dyn Error + Sync + Send>> {",
+				"        let data = map_transaction_broadcast_request(&data);",
+				"        let response = self.broadcast_transaction(&data).await?;",
+				"        Ok(response)",
+				"    }",
+				"}",
+				"",
+				"impl ChainTransactionDecode for BroadcastProvider {",
+				"    fn decode_transaction_broadcast(&self, _request: &[u8], response: &str) -> Result<String, Box<dyn Error + Sync + Send>> {"
+			],
+			"startLine": 17
+		}
+	]
+}
