@@ -223,7 +223,7 @@ export const nufi: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'NuFi shows the token and the amount of a USDC approval. It does not name the action or say who may spend the tokens.',
+								'NuFi labels a USDC approval as a token access approval and shows the token and the amount. It does not say who may spend the tokens.',
 							file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval.png',
 							label: 'NuFi transaction request for a USDC approval',
 						},
