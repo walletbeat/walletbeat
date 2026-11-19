@@ -36,21 +36,20 @@ const blockElements = new Set([
 
 /** Extract report prose, including custom evaluation components and security news. */
 export function walletPageProse(html: string): string {
-	function findArticle(
-		node: HastNode,
-		inReport = false,
-	): Extract<HastNode, { type: 'element' }> | null {
-		if (node.type === 'element') {
-			inReport ||= node.properties.id === 'wallet-page'
-
-			if (inReport && node.tagName === 'article') {
-				return node
+	function findArticle(node: HastNode): Extract<HastNode, { type: 'element' }> | null {
+		if (node.type === 'element' && node.properties.id === 'top') {
+			for (const child of node.children) {
+				if (child.type === 'element' && child.tagName === 'article') {
+					return child
+				}
 			}
+
+			return null
 		}
 
 		if (node.type === 'root' || node.type === 'element') {
 			for (const child of node.children) {
-				const article = findArticle(child, inReport)
+				const article = findArticle(child)
 
 				if (article !== null) {
 					return article
