@@ -1090,7 +1090,7 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 		issues.length > 10
 	) {
 		log(
-			'REMINDER: As an agent, you do not need to solve every issue at once. You only need to make *some* amount of forward progress. Tackle one issue at a time.',
+			'REMINDER: As an agent, you do not need to solve every issue at once. You only need to make *some* amount of forward progress. Tackle one issue at a time. If you cannot determine a purpose or collection policy from the capture and available evidence, collect those unresolved decisions and ask the user about them together at a decision checkpoint instead of asking one-off questions.',
 		)
 	}
 
@@ -1761,6 +1761,17 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 
 	for (const req of matched) {
 		log(`  - ${req.toString()}`)
+	}
+
+	const purposes =
+		opts.purposes === 'NOT_WALLET_INITIATED'
+			? 'NOT_WALLET_INITIATED'
+			: setItems(opts.purposes).map(dataCollectionPurposeToText).join(', ')
+
+	log(`   Purposes: ${purposes}`)
+
+	if (opts.policy !== null) {
+		log(`   Collection policy: ${opts.policy} (${collectionPolicyExplanation(opts.policy)})`)
 	}
 }
 
@@ -2915,7 +2926,8 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				const manualPolicyResponse = await prompts({
 					type: 'select',
 					name: 'value',
-					message: 'Pick the appropriate collection policy.',
+					message:
+						'Pick the appropriate collection policy (consent and configurability, not request frequency).',
 					choices: possiblePolicies.map(p => ({
 						title: collectionPolicyExplanation(p),
 						description: p.toString(),
