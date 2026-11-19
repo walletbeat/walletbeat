@@ -76,7 +76,7 @@ export const pillarx: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'PillarX is licensed under the MIT license',
-						url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE',
+						url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE#not-line-specific',
 					},
 				],
 				license: FOSSLicense.MIT,
