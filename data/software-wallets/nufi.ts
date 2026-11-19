@@ -40,7 +40,7 @@ export const nufi: SoftwareWallet = {
 		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-16',
+		lastUpdated: '2026-11-19',
 		urls: {
 			docs: ['https://nufi.gitbook.io/'],
 			extensions: [
@@ -202,6 +202,12 @@ export const nufi: SoftwareWallet = {
 						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-raw.png',
 						label: 'NuFi raw data view of an ETH transfer request',
 					},
+					{
+						explanation:
+							'For an Aave supply, NuFi shows only the ETH amounts and the fee. A note says that only the amount of ETH sent is shown, and that a transaction to a smart contract may have other effects. NuFi shows the same note for Safe{Wallet} transactions and for bundled transactions.',
+						file: 'public/references/wallets/nufi/screenshots/2026-10-16-nufi-aave-supply.png',
+						label: 'NuFi transaction request for an Aave supply',
+					},
 				],
 				erc4361: notSupportedWithRef({
 					ref: [
@@ -304,15 +310,23 @@ export const nufi: SoftwareWallet = {
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: null,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: null,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: null,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						null,
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: null,
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: null,
 				}),
