@@ -296,9 +296,28 @@
 		}
 	}
 
+	div[data-scroll-item~="inline-attached"] {
+		max-inline-size: var(--sticky-sizeInline);
+		grid-template-columns: fit-content(100%);
+
+		:global(table) {
+			inline-size: auto;
+		}
+	}
+
+	.wallet-info,
+	.contract-info {
+		overflow-wrap: anywhere;
+	}
+
 	.wallet-info {
-		gap: 0.85em;
+		gap: clamp(0.4em, 1vi, 0.85em);
 		padding: 0.5em 0;
+
+		.row-count,
+		.wallet-icon {
+			flex-shrink: 0;
+		}
 
 		.row-count {
 			width: 1.25em;
