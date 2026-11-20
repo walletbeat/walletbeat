@@ -12,6 +12,8 @@
 		type Connector,
 	} from '@wagmi/core'
 	import { mainnet } from '@wagmi/core/chains'
+	import { SvelteMap } from 'svelte/reactivity'
+	import type { Eip1193Provider } from '@/types/eip'
 	import config from '../lib/wagmi-config'
 	import { getBaseUrl } from '../base-url'
 	import { testSignatures, testTransactions } from '../constants/test-transactions-signatures'
@@ -203,9 +205,12 @@
 		if (scamAlertTests.length > 0) uiState.selectedScamAlertId = scamAlertTests[0].id
 
 		// Discover EIP-6963 providers for step 1
-		discoverProviders()
+		const stopDiscovery = discoverProviders()
 
-		return unwatch
+		return () => {
+			stopDiscovery()
+			unwatch()
+		}
 	})
 
 	// Helper functions
@@ -515,60 +520,72 @@ Issued At: ${new Date().toISOString()}`;
 		}
 	}
 
-	// Capture the 'connect' event as early as possible (at provider-discovery
-	// time, i.e. page load), since it typically fires long before the user
-	// reaches step 2 - a listener attached only when step 2 runs would miss it.
-	function attachEarlyConnectListener(provider: unknown) {
-		if (typeof provider !== 'object' || provider === null) return
-
-		const candidate = provider as { on?: (event: string, listener: (...args: unknown[]) => void) => unknown }
-
-		if (typeof candidate.on !== 'function') return
-
-		try {
-			candidate.on('connect', (info: unknown) => {
-				if (!stepTestState.earlyConnectEventFired) {
-					stepTestState.earlyConnectEventFired = true
-					stepTestState.earlyConnectEventData = info
-				}
-			})
-		} catch {
-			// Provider doesn't support event subscription
-		}
-	}
-
-	// EIP Support Testing
+	// Capture connect events during discovery, before the user reaches the event test.
 	function discoverProviders() {
-		if (typeof window === 'undefined') return
+		let mounted = true
+		const subscriptions = new SvelteMap<object, () => void>()
 
-		// Listen for EIP-6963 provider announcements
-		window.addEventListener('eip6963:announceProvider', (event: Event) => {
-			// Type guard for EIP-6963 announce provider event
+		function attachEarlyConnectListener(provider: unknown) {
+			if (typeof provider !== 'object' || provider === null || subscriptions.has(provider)) return
+
+			try {
+				const candidate = provider as Pick<Eip1193Provider, 'on' | 'removeListener'>
+				const { on, removeListener } = candidate
+
+				if (typeof on !== 'function' || typeof removeListener !== 'function') return
+
+				let active = true
+				const onConnect = (info: unknown) => {
+					if (mounted && active && !stepTestState.earlyConnectEventFired) {
+						stepTestState.earlyConnectEventFired = true
+						stepTestState.earlyConnectEventData = info
+					}
+				}
+
+				subscriptions.set(provider, () => {
+					active = false
+
+					try {
+						removeListener.call(candidate, 'connect', onConnect)
+						subscriptions.delete(provider)
+					} catch {
+						// Keep failed removals available for cleanup on unmount.
+					}
+				})
+
+				on.call(candidate, 'connect', onConnect)
+			} catch {
+				subscriptions.get(provider)?.()
+			}
+		}
+
+		function onAnnouncement(event: Event) {
 			if (!isEip6963AnnounceProviderEvent(event)) return
 
-			const { info, provider } = event.detail;
+			const { info, provider } = event.detail
 
-			// Check if we already have this provider
-			const exists = stepTestState.discoveredProviders.some(provider => provider.uuid === info.uuid);
+			if (stepTestState.discoveredProviders.some(entry => entry.uuid === info.uuid)) return
 
-			if (!exists) {
-				stepTestState.discoveredProviders.push({
-					uuid: info.uuid,
-					name: info.name,
-					icon: info.icon,
-					rdns: info.rdns,
-					provider,
-				})
-				attachEarlyConnectListener(provider)
-			}
-		})
+			stepTestState.discoveredProviders.push({
+				uuid: info.uuid,
+				name: info.name,
+				icon: info.icon,
+				rdns: info.rdns,
+				provider,
+			})
+			attachEarlyConnectListener(provider)
+		}
 
-		// Request providers to announce themselves
-		window.dispatchEvent(new Event('eip6963:requestProvider'));
-
-		// Fallback: also listen on window.ethereum directly for wallets that
-		// don't implement EIP-6963 discovery.
+		window.addEventListener('eip6963:announceProvider', onAnnouncement)
+		window.dispatchEvent(new Event('eip6963:requestProvider'))
 		attachEarlyConnectListener(getProvider())
+
+		return () => {
+			mounted = false
+			window.removeEventListener('eip6963:announceProvider', onAnnouncement)
+
+			for (const unsubscribe of subscriptions.values()) unsubscribe()
+		}
 	}
 
 	// Step-based EIP testing functions
