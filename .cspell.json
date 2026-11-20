@@ -138,6 +138,7 @@
 		"codegen",
 		"codepoint",
 		"coinbase",
+		"CoinGecko",
 		"Coinkite",
 		"CoinList",
 		"Coinspect",
@@ -819,7 +820,8 @@
 		"Zirkus",
 		"ZKID",
 		"ZKSync",
-		"zooko"
+		"zooko",
+		"zsh"
 	],
 	"flagWords": [],
 	"ignorePaths": [
