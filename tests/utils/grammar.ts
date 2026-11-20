@@ -503,6 +503,33 @@ export async function grammarLintMessages(
 		return true
 	})
 
+	// Ignore "Prefer the hyphenated compound" lints when the compound is already hyphenated
+	// right after the match (e.g. "...also in built-in swaps..." — Harper's span stops at
+	// "in built" without noticing the "-in" that already follows it).
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Punctuation') {
+			return true
+		}
+
+		const match = /^Prefer the hyphenated compound `([\w-]+)`\.$/.exec(lint.message())
+
+		if (match === null) {
+			return true
+		}
+
+		const [, compound] = match
+		const hyphenIndex = compound.indexOf('-')
+
+		if (hyphenIndex === -1) {
+			return true
+		}
+
+		const secondHalf = compound.slice(hyphenIndex)
+		const after = trimmedText.slice(lint.span().end, lint.span().end + secondHalf.length)
+
+		return after !== secondHalf
+	})
+
 	// Ignore QuiteQuiet false positives: Harper flags "quite" (meaning "rather") as a possible
 	// typo for "quiet", but it is used correctly in our content (e.g. "quite enough", "quite a small").
 	lints = lints.filter(
