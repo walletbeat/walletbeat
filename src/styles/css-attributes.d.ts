@@ -992,8 +992,7 @@ declare global {
 		 *
 		 * Compact category labels using shared theme surfaces and text. Category tokens identify content; the theme roles and public overrides supply paint. Native buttons and tagged links use shared input typography and padding. Native wrappers retain their own interaction geometry.
 		 *
-		 * ### Tokens
-		 * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
+		 * Tokens: `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
 		 *
 		 * ### CSS Variables
 		 * - `--tag-backgroundColor`
