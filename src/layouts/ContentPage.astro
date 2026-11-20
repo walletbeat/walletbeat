@@ -1,0 +1,44 @@
+---
+import type { ComponentProps, HTMLAttributes } from 'astro/types'
+
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+
+type Props = HTMLAttributes<'main'> & {
+	metadata: ComponentProps<typeof Layout>['metadata']
+	heading?: string
+	description?: string
+}
+
+const { metadata, heading = metadata.title, description, ...attributes } = Astro.props
+---
+
+<Layout {metadata}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main {...attributes} data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>{heading}</h1>
+				{description && <p>{description}</p>}
+			</hgroup>
+		</header>
+
+		<slot />
+	</main>
+</Layout>
+
+<style>
+	[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 58rem;
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+		--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+
+		line-height: 1.4;
+	}
+
+	hgroup p {
+		color: var(--text-secondary);
+	}
+</style>

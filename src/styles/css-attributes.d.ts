@@ -527,6 +527,22 @@ declare global {
 		'data-pressable-targets'?: string | boolean
 
 		/**
+		 * ## [data-prose]
+		 *
+		 * Reading line height, list indentation, and wrapping within the prose column.
+		 *
+		 * ### Examples
+		 * - A prose body:
+		 *   ```html
+		 *   <div data-prose><p>Paragraph</p></div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+		 */
+		'data-prose'?: string | boolean
+
+		/**
 		 * ## [data-row], [data-badge]
 		 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>` without an explicit `[data-column]`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
 		 *
