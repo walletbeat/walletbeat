@@ -82,6 +82,8 @@ describe('theme preference lifecycle', () => {
 
 					if (!early) {
 						run('ready()')
+						expect(run("document.documentElement.style.getPropertyValue('---theme-dark')")).toBe('')
+						expect(run('document.documentElement.style.colorScheme')).toBe('')
 					}
 
 					run('click(); ready()')
