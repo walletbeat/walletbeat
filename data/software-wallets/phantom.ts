@@ -43,6 +43,7 @@ import {
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
@@ -57,14 +58,14 @@ import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhp
 
 const securityAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf#binary-file',
 		auditDate: '2021-05-07',
 		auditor: kudelskiSecurity,
 		unpatchedFlaws: 'ALL_FIXED',
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf',
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf#binary-file',
 		auditDate: '2024-06-07',
 		auditor: leastAuthority,
 		codeSnapshot: {
@@ -149,10 +150,19 @@ export const phantom: SoftwareWallet = {
 								label: 'Phantom swap fee hover breakdown',
 							},
 						],
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
-						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: true,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.AGGREGATED,
+							units: null,
+						},
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -201,12 +211,12 @@ export const phantom: SoftwareWallet = {
 				},
 				{
 					explanation:
-						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021; it skipped a seed round.",
+						"Phantom's first fundraising round was a $9M Series A led by a16z in July 2021. It skipped a seed round.",
 					url: 'https://www.theblock.co/post/111249/defi-wallet-solana-phantom-9-million-series-a-a16z',
 				},
 				{
 					explanation:
-						'Phantom charges a 0.85% fee on most swaps; users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
+						'Phantom charges a 0.85% fee on most swaps. Users "review the quoted amount you\'ll receive, price impact, and fees" before confirming.',
 					url: 'https://help.phantom.com/hc/en-us/articles/5985106844435-Swap-tokens-in-Phantom',
 				},
 			],
@@ -363,7 +373,7 @@ export const phantom: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Phantom does not decode an Aave supply; it only shows the simulated balance change.',
+								'Phantom does not decode an Aave supply. It only shows the simulated balance change.',
 							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-aave-supply.png',
 							label: 'Phantom transaction confirmation for an Aave supply',
 						},
