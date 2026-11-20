@@ -141,7 +141,7 @@
 		>
 			{#snippet Cell({ row, column, value }: { row: Eip7702Row; column: Column<Eip7702Row>; value: unknown })}
 				{#if column.id === 'wallet'}
-					<div class="wallet-info" data-row>
+					<div class="wallet-info" data-row="wrap">
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
@@ -294,6 +294,20 @@
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 		}
+	}
+
+	div[data-scroll-item~="inline-attached"] {
+		max-inline-size: var(--sticky-sizeInline);
+		grid-template-columns: fit-content(100%);
+
+		:global(table) {
+			inline-size: auto;
+		}
+	}
+
+	.wallet-info,
+	.contract-info {
+		overflow-wrap: anywhere;
 	}
 
 	.wallet-info {
