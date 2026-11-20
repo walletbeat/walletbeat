@@ -1,72 +1,77 @@
 Is understanding your transactions enough or should your wallets do more to protect you?
 
-In this @EFDevcon talk, @0xMattmatt talks about what should wallets do, beyond Clear Signing 👇
+In this @EFDevcon talk, @0xMattmatt talks about 4 things wallets should do beyond Clear Signing 👇
 
 https://youtu.be/3olBJDDRp7E?si=EFwX9oDay6O5Ssbn
 
 ---
 
-Clear signing is an important step toward safer wallet interactions, but it's only one piece of the puzzle.
+Clear signing 
 
-This talk looks at other ways wallets can protect user intent: from scam alerting and transaction simulation, to emerging work on enforceable transaction constraints. 
+Wallets show human readable transactions instead of hexadecimal data. 
 
-If you're a wallet developer, implement this. If you're a wallet user, ask for this 👇
-
----
-
-Scam Alerting is the ability of wallets to show users if they're signing a possible scam transaction. Your wallet should flag these types of transactions 👇
-
-![Scam Alerting](./scam_alerting.jpg)
-
----
-
-Clear Signing is the ability of wallets to show human readable transactions. For example, this is a safe wallet transaction with clear signing. 
-
-Instead of seeing hexadecimal data, you can now clearly understand what you're about to do. 
+For example, this is a safe wallet transaction with clear signing. You can clearly understand what you're about to do. 
 
 ![Clear Signing](./clear_signing_example.jpg)
 
 ---
 
-Transaction simulation is the ability of wallets to simulate the result of a transaction. 
+1. Scam alerting 
 
-The thing about transaction simulation is that it simulates what might happen and not what will happen. 
+Wallets warn users if they're signing a possible scam transaction. Your wallet should flag these types of scams 👇
 
-For example, when doing swaps, you can still get the worst price from a sandwich attack. 
+![Scam Alerting](./scam_alerting.jpg)
+
+---
+
+2. Transaction simulation
+
+Wallets preview the result of a transaction. 
+
+The catch is that it simulates what might happen, not what will happen. 
+
+For example, when doing swaps, a sandwich attack can still give you the worst price.
 
 ![Transaction Simulation](./transaction_simulation.jpg)
 
 ---
 
-This is where transaction assertions come in. 
+3. Transaction assertions
 
-They let wallets set condition on what a transaction can do. 
+The wallet sets conditions on what a transaction can do. And if those conditions are not met, the transaction reverts. 
 
-And if those conditions are not met, the transaction reverts. But keep in mind that transactions assertions is still in research.
+It is still in research 👇
 
 ![Transaction Assertions](./transaction_assertions.jpg)
 
 ---
 
-And lastly, another thing that wallets can do is make hardware wallet transaction verification easier.
+4. Easier hardware wallet transaction verification 
 
-What we're used to currently is verifying pages of hexadecimal data and hope that we don't make a single mistake. 
+Today we're used to check pages of hexadecimal data and hope we didn't make a single mistake. 
 
-And thanks to ERC-8213, call data digest compresses pages of hexadecimal data into a single 32-byte digest.
+But with ERC-8213, a call data digest compresses all of it into a single 32-byte digest.
 
 ![Easier Transaction Verification](./easier_transaction_verification.jpg)
 
 ---
-The problem is wallets typically don't implement this altogether. They implement one but not the other. This is where Walletbeat comes in. 
 
-We evaluate and push wallets to uphold Ethereum values such as privacy, security, transparency, self-sovereignity, and ecosystem alignment.
+The problem: wallets usually ship one of these, not all of them.
 
-We give wallets actionable feedback and push them to improve.
+If you're a wallet developer, implement this. If you're a wallet user, ask for this.
+ 
+---
+
+That's where Walletbeat comes in. 
+
+Walletbeat rates wallets on privacy, security, transparency, self-sovereignty, and ecosystem alignment.
+
+We give them actionable feedback to improve.
 
 https://walletbeat.eth.limo/
 
 ---
 
-@0xMattmatt is a Walletbeat core contributor, focused on wallet attributes research and pushing CROPS values into Ethereum's access layer.
+@0xMattmatt is a Walletbeat core contributor. He focuses on wallet attributes research and pushing CROPS values into Ethereum's access layer.
 
 ![Matt's Picture](./matt_picture.jpg)
