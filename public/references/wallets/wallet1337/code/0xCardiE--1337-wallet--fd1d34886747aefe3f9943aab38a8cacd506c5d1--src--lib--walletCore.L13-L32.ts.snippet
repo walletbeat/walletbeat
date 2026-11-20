@@ -1,0 +1,43 @@
+{
+	"highlightRanges": [
+		{
+			"first": 13,
+			"last": 32
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"} from 'viem/accounts';",
+				"",
+				"const PK_LEN = 66; // 0x + 64 hex",
+				"",
+				"export function generateNewPrivateKey(): `0x${string}` {",
+				"  return generatePrivateKey();",
+				"}",
+				"",
+				"export function generateNewMnemonic(): string {",
+				"  return generateMnemonic(english);",
+				"}",
+				"",
+				"export function accountFromPrivateKey(",
+				"  privateKey: `0x${string}`,",
+				"): PrivateKeyAccount {",
+				"  return privateKeyToAccount(privateKey);",
+				"}",
+				"",
+				"export function ethDerivationPath(addressIndex: number): string {",
+				"  if (!Number.isInteger(addressIndex) || addressIndex < 0) {",
+				"    throw new Error('Address index must be a non-negative integer.');",
+				"  }",
+				"  return `m/44'/60'/0'/0/${addressIndex}`;",
+				"}",
+				"",
+				"/**",
+				" * Normalise a BIP-39 phrase: trim, collapse whitespace, lowercase.",
+				" */"
+			],
+			"startLine": 9
+		}
+	]
+}

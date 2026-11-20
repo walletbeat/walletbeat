@@ -1,0 +1,55 @@
+{
+	"highlightRanges": [
+		{
+			"first": 28,
+			"last": 53
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				"  },",
+				"  \"background\": {",
+				"    \"service_worker\": \"background.js\"",
+				"  },",
+				"  \"content_scripts\": [",
+				"    {",
+				"      \"matches\": [\"<all_urls>\"],",
+				"      \"js\": [\"inpage.js\"],",
+				"      \"run_at\": \"document_start\",",
+				"      \"world\": \"MAIN\",",
+				"      \"all_frames\": true",
+				"    },",
+				"    {",
+				"      \"matches\": [\"<all_urls>\"],",
+				"      \"js\": [\"content.js\"],",
+				"      \"run_at\": \"document_start\",",
+				"      \"all_frames\": true",
+				"    },",
+				"    {",
+				"      \"matches\": [\"https://connect.trezor.io/*\"],",
+				"      \"js\": [\"vendor/trezor-content-script.js\"],",
+				"      \"all_frames\": true,",
+				"      \"run_at\": \"document_start\"",
+				"    }",
+				"  ],",
+				"  \"permissions\": [\"storage\", \"sidePanel\", \"scripting\"],",
+				"  \"host_permissions\": [\"<all_urls>\"],",
+				"  \"externally_connectable\": {",
+				"    \"matches\": [\"https://*.trezor.io/*\", \"https://connect.trezor.io/*\"]",
+				"  },",
+				"  \"content_security_policy\": {",
+				"    \"extension_pages\": \"script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; img-src 'self' https: http: data: blob:;\"",
+				"  }",
+				"}"
+			],
+			"startLine": 24
+		}
+	]
+}

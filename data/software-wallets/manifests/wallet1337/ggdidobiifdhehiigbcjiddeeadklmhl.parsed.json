@@ -1,0 +1,7 @@
+{
+	"contentScripts": "UNRESTRICTED",
+	"externallyConnectable": { "extensionIds": "NONE", "pageMatches": "HTTPS_ONLY" },
+	"hostPermissions": "UNRESTRICTED",
+	"permissions": ["storage", "sidePanel", "scripting"],
+	"webAccessibleResources": "NONE"
+}

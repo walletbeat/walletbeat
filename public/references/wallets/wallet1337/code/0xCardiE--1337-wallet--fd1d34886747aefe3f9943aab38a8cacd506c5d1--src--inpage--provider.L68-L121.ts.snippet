@@ -1,0 +1,89 @@
+{
+	"highlightRanges": [
+		{
+			"first": 68,
+			"last": 121
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"class Provider1337 {"
+			],
+			"startLine": 28
+		},
+		{
+			"lines": [
+				"  private dispatchPending(res: ProviderResponse): void {"
+			],
+			"startLine": 60
+		},
+		{
+			"lines": [
+				"    if (res.ok) p.resolve(res.result);",
+				"    else p.reject(new ProviderRpcError(res.error.code, res.error.message));",
+				"  }",
+				"",
+				"  private handleEvent(ev: WindowProviderEvent): void {",
+				"    if (ev.type === 'chainChanged') {",
+				"      this.chainId = ev.chainId;",
+				"      this.networkVersion = String(Number.parseInt(ev.chainId, 16) || 1);",
+				"      this.emit('chainChanged', ev.chainId);",
+				"    } else if (ev.type === 'accountsChanged') {",
+				"      this.selectedAddress = ev.accounts[0] ?? null;",
+				"      this.emit('accountsChanged', ev.accounts);",
+				"      if (ev.accounts.length > 0) {",
+				"        this.emit('connect', { chainId: this.chainId });",
+				"      } else {",
+				"        this.emit('disconnect', new ProviderRpcError(4900, 'Disconnected'));",
+				"      }",
+				"    } else if (ev.type === 'connect') {",
+				"      this.chainId = ev.chainId;",
+				"      this.networkVersion = String(Number.parseInt(ev.chainId, 16) || 1);",
+				"      this.emit('connect', { chainId: ev.chainId });",
+				"    } else if (ev.type === 'disconnect') {",
+				"      this.selectedAddress = null;",
+				"      this.emit('disconnect', new ProviderRpcError(4900, 'Disconnected'));",
+				"      this.emit('accountsChanged', []);",
+				"    }",
+				"  }",
+				"",
+				"  isConnected(): boolean {",
+				"    return this.selectedAddress != null;",
+				"  }",
+				"",
+				"  on(event: string, listener: Listener): this {",
+				"    if (!this.listeners.has(event)) this.listeners.set(event, new Set());",
+				"    this.listeners.get(event)!.add(listener);",
+				"    return this;",
+				"  }",
+				"",
+				"  addListener(event: string, listener: Listener): this {",
+				"    return this.on(event, listener);",
+				"  }",
+				"",
+				"  once(event: string, listener: Listener): this {",
+				"    const wrap: Listener = (...args) => {",
+				"      this.removeListener(event, wrap);",
+				"      listener(...args);",
+				"    };",
+				"    return this.on(event, wrap);",
+				"  }",
+				"",
+				"  removeListener(event: string, listener: Listener): this {",
+				"    this.listeners.get(event)?.delete(listener);",
+				"    return this;",
+				"  }",
+				"",
+				"  off(event: string, listener: Listener): this {",
+				"    return this.removeListener(event, listener);",
+				"  }",
+				"",
+				"  removeAllListeners(event?: string): this {",
+				"    if (event) this.listeners.delete(event);",
+				"    else this.listeners.clear();"
+			],
+			"startLine": 64
+		}
+	]
+}

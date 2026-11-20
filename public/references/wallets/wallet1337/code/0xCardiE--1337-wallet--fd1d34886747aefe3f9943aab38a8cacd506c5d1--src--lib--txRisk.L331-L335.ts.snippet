@@ -1,0 +1,44 @@
+{
+	"highlightRanges": [
+		{
+			"first": 331,
+			"last": 335
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export function classifyRequest(",
+				"  request: ProviderRequest,",
+				"  opts: { chainId: number; origin?: string; highValueNative?: number },",
+				"): TxRiskReport {"
+			],
+			"startLine": 308
+		},
+		{
+			"lines": [
+				"  if (method === 'eth_sendTransaction') {"
+			],
+			"startLine": 317
+		},
+		{
+			"lines": [
+				"    if (value > 0n && value >= threshold) {",
+				"      report.highValueWei = value;",
+				"      hits.add('highValue');",
+				"    }",
+				"",
+				"    const approval = decodeTokenApproval(tx);",
+				"    if (approval) {",
+				"      report.tokenApproval = approval;",
+				"      if (approval.unlimited) hits.add('unlimitedApproval');",
+				"    } else {",
+				"      const selector = selectorFromCalldata(tx.data);",
+				"      const creating = tx.to == null || tx.to === '';",
+				"      if (creating) {",
+				"        report.unknownSelector = 'contract-creation';"
+			],
+			"startLine": 326
+		}
+	]
+}

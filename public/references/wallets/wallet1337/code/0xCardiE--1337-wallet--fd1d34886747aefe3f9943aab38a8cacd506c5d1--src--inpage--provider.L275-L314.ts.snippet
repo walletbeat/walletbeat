@@ -1,0 +1,69 @@
+{
+	"highlightRanges": [
+		{
+			"first": 275,
+			"last": 314
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"function defaultInjectConfig(): ProviderInjectConfig {"
+			],
+			"startLine": 264
+		},
+		{
+			"lines": [
+				"  };",
+				"}",
+				"",
+				"let lastAnnounce: (() => void) | null = null;",
+				"let eip6963Listening = false;",
+				"",
+				"function announceEip6963(provider: Provider1337, config: ProviderInjectConfig): void {",
+				"  const announceDetail = (info: {",
+				"    uuid: string;",
+				"    name: string;",
+				"    icon: string;",
+				"    rdns: string;",
+				"  }) => {",
+				"    const detail = Object.freeze({",
+				"      info: Object.freeze(info),",
+				"      provider,",
+				"    });",
+				"    window.dispatchEvent(new CustomEvent('eip6963:announceProvider', { detail }));",
+				"  };",
+				"",
+				"  const announce = () => {",
+				"    if (config.announceAs1337) {",
+				"      announceDetail({",
+				"        uuid: PROVIDER_INFO_1337.uuid,",
+				"        name: PROVIDER_INFO_1337.name,",
+				"        icon: PROVIDER_INFO_1337.icon,",
+				"        rdns: PROVIDER_INFO_1337.rdns,",
+				"      });",
+				"    }",
+				"    if (config.announceAsMetaMask) {",
+				"      announceDetail({",
+				"        uuid: '1337-metamask-dropin-2026',",
+				"        name: 'MetaMask',",
+				"        icon: PROVIDER_INFO_1337.icon,",
+				"        rdns: 'io.metamask',",
+				"      });",
+				"    }",
+				"  };",
+				"",
+				"  lastAnnounce = announce;",
+				"  announce();",
+				"  if (!eip6963Listening) {",
+				"    eip6963Listening = true;",
+				"    window.addEventListener('eip6963:requestProvider', () => lastAnnounce?.());",
+				"    for (const ms of [0, 50, 200, 500, 1000, 2000]) {",
+				"      window.setTimeout(() => lastAnnounce?.(), ms);",
+				"    }",
+				"  }"
+			],
+			"startLine": 271
+		}
+	]
+}

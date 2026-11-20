@@ -1,0 +1,25 @@
+{
+	"highlightRanges": [
+		{
+			"first": 22,
+			"last": 23
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"",
+				"| Done | P | Item | Source | Effort | Notes |",
+				"|------|---|------|--------|--------|-------|",
+				"| [x] | P1 | Risk-gated Instant mode | 1337 + Rabby | Medium | Pauses on unlimited approvals, unknown contracts, high value, permit, EIP-712 chain mismatch, SIWE mismatch. Fully ungate or per-gate in Settings. `instantGates.ts`, `txRisk.ts`, `txConfirmMode.ts` |",
+				"| [ ] | P0 | LavaMoat unsafe-layer for content/inpage scripts | Ambire | Low | Formalize webpack `unsafe` layer so inpage/content stay outside LavaMoat wrapping without ad-hoc exclusions. See `webpack.config.cjs`, `webpack.content.config.cjs`, `lavamoat/` |",
+				"| [ ] | P0 | CI LavaMoat policy drift check | Ambire | Low | Fail PRs when `lavamoat/webpack/policy.json` changes without explicit commit after `npm run build:policy` |",
+				"| [ ] | P0 | Document security invariants | Rabby | Low | Consent resets on lock/unlock/account/chain switch; fail-closed signing; no implicit consent via broadcasts. Add to `docs/wallet-security.md` or `docs/security-invariants.md` |",
+				"| [ ] | P0 | RPC middleware refactor (`@APPROVAL`-style) | Rabby | Medium | Replace inline branching in `src/lib/providerRpc.ts` with metadata-driven middleware (unlock → connect → approve → execute) |",
+				"| [x] | P1 | Action-type approval components | Rabby | Medium | Approve / Permit / Send / Swap / Unknown cards in `TxApprovalSheet`. |",
+				"| [~] | P1 | Opt-in tx simulation / balance preview | Rabby | Medium | Local `eth_call` pass/fail/revert/gas on confirm (`txSimulate.ts`). Full asset-diff needs a sim API — **not planned** as default (signer.md) |"
+			],
+			"startLine": 18
+		}
+	]
+}

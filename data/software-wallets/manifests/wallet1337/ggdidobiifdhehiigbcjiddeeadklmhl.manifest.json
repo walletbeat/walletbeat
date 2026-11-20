@@ -1,0 +1,79 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"name": "1337 Wallet",
+	"version": "2.2.4",
+	"description": "An EVM wallet for hackers. Privacy and power. No analytics. No 1337 server.",
+	"icons": {
+		"16": "icons/icon-16.png",
+		"32": "icons/icon-32.png",
+		"48": "icons/icon-48.png",
+		"128": "icons/icon-128.png"
+	},
+	"action": {
+		"default_title": "1337",
+		"default_icon": {
+			"16": "icons/icon-16.png",
+			"32": "icons/icon-32.png",
+			"48": "icons/icon-48.png",
+			"128": "icons/icon-128.png"
+		},
+		"default_popup": "index.html"
+	},
+	"side_panel": {
+		"default_path": "index.html"
+	},
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"inpage.js"
+			],
+			"run_at": "document_start",
+			"world": "MAIN",
+			"all_frames": true
+		},
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"content.js"
+			],
+			"run_at": "document_start",
+			"all_frames": true
+		},
+		{
+			"matches": [
+				"https://connect.trezor.io/*"
+			],
+			"js": [
+				"vendor/trezor-content-script.js"
+			],
+			"all_frames": true,
+			"run_at": "document_start"
+		}
+	],
+	"permissions": [
+		"storage",
+		"sidePanel",
+		"scripting"
+	],
+	"host_permissions": [
+		"<all_urls>"
+	],
+	"externally_connectable": {
+		"matches": [
+			"https://*.trezor.io/*",
+			"https://connect.trezor.io/*"
+		]
+	},
+	"content_security_policy": {
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; img-src 'self' https: http: data: blob:;"
+	}
+}

@@ -1,0 +1,51 @@
+{
+	"highlightRanges": [
+		{
+			"first": 400,
+			"last": 417
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"function transactionSections(",
+				"  request: ProviderRequest,",
+				"  chainId: number,",
+				"  walletAddress?: string,",
+				"): ApprovalDetailSection[] {"
+			],
+			"startLine": 384
+		},
+		{
+			"lines": [
+				"  const overview: ApprovalDetailField[] = [",
+				"    field('RPC method', request.method, { mono: true }),",
+				"    field('Chain ID', String(chainId)),",
+				"  ];",
+				"",
+				"  const from =",
+				"    typeof tx.from === 'string' && isAddress(tx.from)",
+				"      ? getAddress(tx.from)",
+				"      : walletAddress",
+				"        ? getAddress(walletAddress)",
+				"        : undefined;",
+				"  if (from) overview.push(field('From', from, { mono: true, copyable: true }));",
+				"",
+				"  if (typeof tx.to === 'string' && isAddress(tx.to)) {",
+				"    overview.push(field('To', getAddress(tx.to), { mono: true, copyable: true }));",
+				"  } else if (tx.to == null || tx.to === '') {",
+				"    overview.push(field('To', '(contract creation)', { warn: true }));",
+				"  } else {",
+				"    overview.push(field('To', String(tx.to ?? '—'), { mono: true }));",
+				"  }",
+				"",
+				"  overview.push(field('Value', formatNative(value, chainId)));",
+				"  if (value === 0n) {",
+				"    overview.push(field('Native transfer', 'No — contract call or empty value'));",
+				"  }",
+				""
+			],
+			"startLine": 396
+		}
+	]
+}

@@ -1,0 +1,45 @@
+{
+	"highlightRanges": [
+		{
+			"first": 51,
+			"last": 64
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {"
+			],
+			"startLine": 6
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <div className=\"unlock-screen\">",
+				"      <div className=\"unlock-brand\">",
+				"        <Brand1337 className=\"unlock-brand-stack\" />",
+				"      </div>",
+				"",
+				"      <form className=\"unlock-form\" onSubmit={e => void submit(e)}>",
+				"        <label htmlFor=\"unlock-pw\" className=\"unlock-label\">",
+				"          Password",
+				"        </label>",
+				"        <input",
+				"          id=\"unlock-pw\"",
+				"          type=\"password\"",
+				"          className=\"unlock-input\"",
+				"          autoComplete=\"current-password\"",
+				"          value={password}",
+				"          placeholder=\"Enter your password\"",
+				"          onChange={e => setPassword(e.target.value)}",
+				"          autoFocus",
+				"          data-testid=\"unlock-password\"",
+				"        />",
+				"        {err ? <p className=\"unlock-error\">{err}</p> : null}",
+				"        <button",
+				"          type=\"submit\""
+			],
+			"startLine": 45
+		}
+	]
+}

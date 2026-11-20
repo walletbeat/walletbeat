@@ -27,6 +27,7 @@ import { safe } from './software-wallets/safe'
 import { trustWallet } from './software-wallets/trust-wallet'
 import { uniswapWallet } from './software-wallets/uniswap-wallet'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
+import { wallet1337 } from './software-wallets/wallet1337'
 import { walletchan } from './software-wallets/walletchan'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
@@ -88,6 +89,7 @@ export const softwareWallets = {
 	safe,
 	trustWallet,
 	uniswapWallet,
+	wallet1337,
 	walletchan,
 	zerion,
 	zeus,
