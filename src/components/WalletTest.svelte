@@ -618,12 +618,13 @@ Issued At: ${new Date().toISOString()}`;
 
 		stepActionOrigin = null
 		queueMicrotask(() => {
-			if (origin?.isConnected && !origin.disabled) origin.focus({ preventScroll: true })
+			if (document.activeElement === document.body && origin?.isConnected && !origin.disabled) {
+				origin.focus({ preventScroll: true })
+			}
 		})
 	}
 
 	async function runCurrentStep(event: MouseEvent) {
-		stepActionOrigin = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : null
 		const step = getCurrentStep()
 
 		if (!canRunStep(stepTestState.currentStepIndex)) {
@@ -631,6 +632,8 @@ Issued At: ${new Date().toISOString()}`;
 
 			return
 		}
+
+		stepActionOrigin = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : null
 
 		stepTestState.overallStatus = 'in_progress'
 		stepTestState.error = ''
