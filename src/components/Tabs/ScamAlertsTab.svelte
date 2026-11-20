@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Modal from '../Modal.svelte'
 	import type { ScamAlertTest } from '../../constants/test-scam-alerts'
 
 	let {
@@ -7,6 +8,7 @@
 		disclaimerAccepted,
 		account,
 		onAcceptDisclaimer,
+		onDismissDisclaimer,
 		onSendScamAlert,
 		onSignScamAlert,
 		onOpenInExplorer,
@@ -21,6 +23,7 @@
 		disclaimerAccepted: boolean
 		account: { address?: string } | null
 		onAcceptDisclaimer: () => void
+		onDismissDisclaimer: () => void
 		onSendScamAlert: (test: ScamAlertTest) => void
 		onSignScamAlert: (test: ScamAlertTest) => void
 		onOpenInExplorer: (txHash: string) => void
@@ -29,6 +32,10 @@
 	let checkboxChecked = $state(false)
 	let customAddress = $state('')
 	let customAddressError = $state('')
+
+	$effect(() => {
+		if (!disclaimerAccepted) checkboxChecked = false
+	})
 
 	const isActive = $derived(
 		selectedTest && scamAlertState.activeId === selectedTest.id
@@ -74,43 +81,40 @@
 	}
 </script>
 
-{#if !disclaimerAccepted}
-	<div class="disclaimer-fullscreen">
-		<div class="disclaimer-overlay" data-card="radius-8 padding-5">
-			<div class="disclaimer-content" data-column="gap-4">
-				<div class="disclaimer-icon">&#9888;</div>
-				<h3 class="disclaimer-title">Scam Alert Testing</h3>
-				<div class="disclaimer-warnings" data-column="gap-3">
-					<p class="disclaimer-rule">
-						Every transaction on this tab should be treated as a <strong>SCAM</strong> transaction.
-					</p>
-					<p class="disclaimer-rule">
-						Do <strong>NOT</strong> send real funds &mdash; nothing should ever be sent.
-					</p>
-					<p class="disclaimer-rule">
-						Use only <strong>disposable wallets</strong> with no real assets.
-					</p>
-				</div>
-				<label class="disclaimer-checkbox">
-					<input
-						type="checkbox"
-						bind:checked={checkboxChecked}
-					/>
-					<span>I understand the risks and will only use disposable wallets for testing</span>
-				</label>
-				<button
-					type="button"
-					class="disclaimer-button"
-					data-pressable
-					disabled={!checkboxChecked}
-					onclick={onAcceptDisclaimer}
-				>
-					I Understand
-				</button>
-			</div>
+<Modal isOpen={!disclaimerAccepted} title="Scam Alert Testing" onClose={onDismissDisclaimer}>
+	<div class="disclaimer-content" data-column="center gap-4">
+		<div class="disclaimer-icon">&#9888;</div>
+		<div class="disclaimer-warnings" data-column="gap-3">
+			<p class="disclaimer-rule">
+				Every transaction on this tab should be treated as a <strong>SCAM</strong> transaction.
+			</p>
+			<p class="disclaimer-rule">
+				Do <strong>NOT</strong> send real funds &mdash; nothing should ever be sent.
+			</p>
+			<p class="disclaimer-rule">
+				Use only <strong>disposable wallets</strong> with no real assets.
+			</p>
 		</div>
+		<label class="disclaimer-checkbox">
+			<input
+				type="checkbox"
+				bind:checked={checkboxChecked}
+			/>
+			<span>I understand the risks and will only use disposable wallets for testing</span>
+		</label>
+		<button
+			type="button"
+			class="disclaimer-button"
+			data-pressable
+			disabled={!checkboxChecked}
+			onclick={onAcceptDisclaimer}
+		>
+			I Understand
+		</button>
 	</div>
-{:else if selectedTest}
+</Modal>
+
+{#if disclaimerAccepted && selectedTest}
 	<div class="scam-zone">
 		<div class="scam-ticker" aria-hidden="true">
 			<span class="scam-ticker-inner">
@@ -269,30 +273,7 @@
 {/if}
 
 <style>
-	.disclaimer-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 9999;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(0, 0, 0, 0.7);
-		backdrop-filter: blur(4px);
-	}
-
-	.disclaimer-overlay {
-		border: 2px solid var(--rating-fail);
-		background: var(--background-primary);
-		max-width: 36rem;
-		width: 90%;
-		max-height: 90vh;
-		overflow-y: auto;
-	}
-
 	.disclaimer-content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 		text-align: center;
 		max-width: 32rem;
 		margin: 0 auto;
@@ -301,13 +282,6 @@
 	.disclaimer-icon {
 		font-size: 3rem;
 		color: var(--rating-fail-text);
-	}
-
-	.disclaimer-title {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--rating-fail-text);
-		margin: 0;
 	}
 
 	.disclaimer-warnings {
