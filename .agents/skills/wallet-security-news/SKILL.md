@@ -111,13 +111,7 @@ Two gotchas when adding a word:
 
 ## Testing and verification
 
-Run the project checks after creating the entry:
-
-```bash
-pnpm check:all
-```
-
-This **must pass** before the change is considered complete. Common failures specific to news entries:
+Follow the [contributor verification steps](../../../resources/docs/contribute/setup/setup.md#verify-and-sign-changes). Common failures specific to news entries:
 
 - **Spelling** — the `check:spelling` step flags unknown proper nouns. Fix by adding the term to `.cspell.json`.
 - **Type errors** — the default export must satisfy `WalletSecurityNews`. Missing fields, wrong enum values, or a `slug` mismatch between the filename and the `slug` field will fail to compile.
@@ -130,4 +124,3 @@ This **must pass** before the change is considered complete. Common failures spe
 - **`wallets: []` is valid.** An incident is still worth recording when it does not map to a tracked wallet — use an empty `wallets` array rather than an invented ID.
 - **Dates are `YYYY-MM-DD` strings.** `publishedAt` is the incident/disclosure date; `updatedAt` is the last-known-update date.
 - **Always provide a `ref`.** The news entry must cite the incident source — no `refTodo`.
-- **Run `pnpm check:all`** before opening a PR — it must pass.

@@ -6,6 +6,8 @@ Thanks for your interest in contributing to Walletbeat!
 
 Please read [`/resources/docs/contribute/setup/setup.md`](/resources/docs/contribute/setup/setup.md).
 
+Read the [authoring principles](/resources/docs/contribute/authoring/authoring.md) before making a change.
+
 ## Choose your adventure
 
 ### I want to add or update wallet data to the site
@@ -19,7 +21,3 @@ Please read [`/resources/docs/contribute/ui/ui.md`](/resources/docs/contribute/u
 ### I want to learn more about Walletbeat
 
 Please read the top-level [`README.md`](/README.md).
-
-### I am a coding agent and I am looking for documentation on the codebase's structure
-
-Please read all the guides in `/resources/docs/contribute`.

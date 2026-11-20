@@ -88,6 +88,8 @@ _There is also a directory of wallet icons at `/public/images/wallets`._
 
 ### How `/data` fields are encoded
 
+Bare `YYYY-MM-DD` dates are UTC, matching the treasury and wallet data collection tools.
+
 Fields in `/data` must be **written down**. When you add a new property to a wallet, entity, or contributor type, it must be required — not omitted, not `undefined`, and not marked optional with `?`.
 
 Use these three states:
@@ -241,17 +243,9 @@ For the wallet to be shown on the site, it needs to be listed in `/data/software
 
 ### **Step 2**: Get the website up and running with the new wallet displayed
 
-You have now added the wallet to Walletbeat's database. You can now run:
+Follow the [contributor verification steps](../setup/setup.md#verify-and-sign-changes). Then run the site locally.
 
 ```bash
-# Apply consistent formatting:
-$ pnpm fix
-
-# Verify that you did everything right:
-$ pnpm check:all
-# If it complains, fix it until it passes.
-
-# Finally, run the site locally:
 $ pnpm dev
 # [...]
  astro  v5.15.2 ready in 1655 ms
@@ -589,7 +583,7 @@ After you have populated this data, you should see attributes that rely on this 
 
 ### **Step 4**: Send a PR to Walletbeat and get it merged
 
-Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. See the corresponding section on the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide for instructions on this.
+Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. Follow the [contribution workflow](../setup/setup.md#contribution-workflow).
 
 Once the PR is merged, you are done!
 
