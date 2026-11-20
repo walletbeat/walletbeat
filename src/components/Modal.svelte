@@ -1,7 +1,19 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte'
+
 	const titleId = $props.id()
 	let dialog = $state<HTMLDialogElement>()
 	let returnDisclosure: HTMLDetailsElement | null = null
+	let suspendedDialog: HTMLDialogElement | null = null
+
+	const restoreDialog = () => {
+		if (!suspendedDialog) return
+
+		suspendedDialog.inert = false
+		suspendedDialog = null
+	}
+
+	onDestroy(restoreDialog)
 
 	let {
 		isOpen,
@@ -22,9 +34,33 @@
 
 		if (isOpen && !dialog.open) {
 			returnDisclosure = document.activeElement?.closest('details') ?? null
+			const previousDialog = document.activeElement?.closest('dialog')
+
+			dialog.inert = false
 			dialog.showModal()
+
+			for (
+				let owner = dialog.parentElement?.closest<HTMLElement>('[data-scroll-container]');
+				owner;
+				owner = owner.parentElement?.closest<HTMLElement>('[data-scroll-container]')
+			) {
+				owner.scrollTo({ top: owner.scrollTop, left: owner.scrollLeft, behavior: 'instant' })
+			}
+
+			if (
+				previousDialog instanceof HTMLDialogElement &&
+				previousDialog !== dialog &&
+				previousDialog.matches(':modal') &&
+				!previousDialog.inert
+			) {
+				suspendedDialog = previousDialog
+				previousDialog.inert = true
+			}
 		}
-		else if (!isOpen && dialog.open) dialog.close()
+		else if (!isOpen && dialog.open) {
+			restoreDialog()
+			dialog.close()
+		}
 	})
 
 </script>
@@ -35,8 +71,13 @@
 	class="modal-dialog"
 	aria-labelledby={titleId}
 	closedby="any"
+	onbeforetoggle={event => {
+		if ((event as ToggleEvent).newState === 'closed') restoreDialog()
+	}}
 	onclose={() => {
 		if (dialog?.open) return
+
+		restoreDialog()
 
 		const disclosure = returnDisclosure
 
@@ -98,6 +139,7 @@
 
 	:global([data-scroll-container]:has(dialog.modal-dialog:modal)) {
 		overflow: hidden;
+		scroll-behavior: auto;
 	}
 
 	.modal-content {

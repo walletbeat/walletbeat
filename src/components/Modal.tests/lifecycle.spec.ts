@@ -101,7 +101,24 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 				expect(Math.abs(box.y + box.height / 2 - 450)).toBeLessThanOrEqual(1)
 				await expect(page.locator('#modal-action')).toBeFocused()
 				await page.keyboard.press('Enter')
+				await expect(page.locator('#modal-counts')).toHaveText('Actions: 1; closes: 0')
 				await page.keyboard.press('Space')
+				await expect(page.locator('#modal-counts')).toHaveText('Actions: 2; closes: 0')
+
+				const checkbox = dialog.getByRole('checkbox', { name: 'Acknowledgement' })
+
+				await nativeTabTo(page, checkbox, browserName)
+				await page.keyboard.press('Space')
+				await expect(checkbox).toBeChecked()
+				await expect(dialog).toBeVisible()
+
+				const message = dialog.getByRole('textbox', { name: 'Message' })
+
+				await nativeTabTo(page, message, browserName)
+				await page.keyboard.press('Enter')
+				await page.keyboard.press('Space')
+				await expect(message).toHaveValue(' ')
+				await expect(dialog).toBeVisible()
 				await expect(page.locator('#modal-counts')).toHaveText('Actions: 2; closes: 0')
 
 				for (const key of [
@@ -141,6 +158,21 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
 							.toBe(true)
 					}
 				}
+
+				const showError = dialog.getByRole('button', { name: 'Show error' })
+
+				await nativeTabTo(page, showError, browserName)
+				await page.keyboard.press('Enter')
+
+				const error = page.getByRole('dialog', { name: 'Error' })
+
+				await expect(error.getByRole('alert')).toHaveText('Fixture error')
+				await expect(page.locator('dialog:modal')).toHaveCount(2)
+				await page.keyboard.press('Escape')
+				await expect(error).not.toBeVisible()
+				await expect(page.locator('dialog:modal')).toHaveCount(1)
+				await expect(showError).toBeFocused()
+
 				await page.getByRole('button', { name: 'Open help', exact: true }).click()
 				await expect(page.locator('#modal-help')).toBeVisible()
 				await page.keyboard.press('Escape')
