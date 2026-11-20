@@ -42,6 +42,6 @@ https://initiatives.thedao.fund/initiative/clear-signing-ratings-fixes-and-ecosy
 
 Thank you @thedaofund for supporting security initiatives in the Ethereum ecosystem.
 
-Walletbeat aims to raise the bar and push the wallet ecosystem forward.
+Help us raise the bar and push the wallet ecosystem forward.
 
 https://walletbeat.eth.limo/
