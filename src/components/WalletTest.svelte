@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import {
 		connect,
 		getAccount,
@@ -295,6 +295,10 @@ Issued At: ${new Date().toISOString()}`;
 
 	// Chain switch handlers
 	let chainSwitchIntent = 0
+
+	onDestroy(() => {
+		chainSwitchIntent++
+	})
 
 	function openChainSwitchModal(tx: TestTransaction) {
 		chainSwitchIntent++
