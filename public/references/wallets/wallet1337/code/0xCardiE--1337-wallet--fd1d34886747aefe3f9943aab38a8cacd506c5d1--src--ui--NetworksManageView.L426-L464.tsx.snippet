@@ -1,0 +1,68 @@
+{
+	"highlightRanges": [
+		{
+			"first": 426,
+			"last": 464
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 55
+		},
+		{
+			"lines": [
+				"  };",
+				"",
+				"  const title =",
+				"    panel === 'add'",
+				"      ? 'Add chain'",
+				"      : panel === 'detail' && selected",
+				"        ? selected.name",
+				"        : 'Networks';",
+				"",
+				"  return (",
+				"    <div className=\"wallet-shell w1337 w1337--networks-manage\">",
+				"      <ScreenHeader title={title} onClose={headerBack} />",
+				"      <div className=\"screen-body w1337-body w1337-networks\">",
+				"        {panel === 'list' ? (",
+				"          <>",
+				"            <p className=\"muted w1337-networks__lead\">",
+				"              Manage chains and RPC endpoints. Drag to put the ones you use at the top.",
+				"            </p>",
+				"",
+				"            <div className=\"w1337-networks__toolbar\">",
+				"              <div className=\"w1337-networks__filters\" role=\"group\" aria-label=\"Filter chains\">",
+				"                {(",
+				"                  [",
+				"                    ['mainnet', 'Mainnets'],",
+				"                    ['testnet', 'Testnets'],",
+				"                  ] as const",
+				"                ).map(([value, label]) => (",
+				"                  <button",
+				"                    key={value}",
+				"                    type=\"button\"",
+				"                    className={",
+				"                      filter === value",
+				"                        ? 'w1337-networks__chip w1337-networks__chip--on'",
+				"                        : 'w1337-networks__chip'",
+				"                    }",
+				"                    onClick={() => setFilter(value)}",
+				"                  >",
+				"                    {label}",
+				"                  </button>",
+				"                ))}",
+				"              </div>",
+				"              <button type=\"button\" className=\"ghost w1337-networks__add-btn\" onClick={openAdd}>",
+				"                Add chain",
+				"              </button>",
+				"            </div>",
+				"",
+				"            <ul"
+			],
+			"startLine": 422
+		}
+	]
+}

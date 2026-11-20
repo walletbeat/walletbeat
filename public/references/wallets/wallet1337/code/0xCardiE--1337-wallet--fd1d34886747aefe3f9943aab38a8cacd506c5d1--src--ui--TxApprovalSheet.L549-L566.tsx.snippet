@@ -1,0 +1,47 @@
+{
+	"highlightRanges": [
+		{
+			"first": 549,
+			"last": 566
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 538
+		},
+		{
+			"lines": [
+				"  );",
+				"}",
+				"",
+				"function SiweWarnBanner({ risk }: { risk: TxRiskReport }) {",
+				"  const siwe = risk.siwe;",
+				"  if (!siwe) return null;",
+				"  if (!siwe.domainMismatch && !siwe.uriMismatch && !siwe.chainMismatch && !siwe.addressMismatch) {",
+				"    return null;",
+				"  }",
+				"  const parts: string[] = [];",
+				"  if (siwe.domainMismatch) {",
+				"    parts.push(`This login claims to be from ${siwe.domain}, which does not match this page.`);",
+				"  }",
+				"  if (siwe.uriMismatch && siwe.uri) {",
+				"    parts.push(`URI ${siwe.uri} does not match the requesting site.`);",
+				"  }",
+				"  if (siwe.chainMismatch) {",
+				"    parts.push(`SIWE chain ID ${siwe.chainId} does not match the active network.`);",
+				"  }",
+				"  if (siwe.addressMismatch && siwe.address) {",
+				"    parts.push(`This login is for ${siwe.address}, which is not the account that would sign.`);",
+				"  }",
+				"  return <p className=\"w1337-tx-approval__danger-banner\">{parts.join(' ')} Do not sign unless you trust this.</p>;",
+				"}",
+				"",
+				"function Eip712ChainBanner({ risk }: { risk: TxRiskReport }) {"
+			],
+			"startLine": 545
+		}
+	]
+}

@@ -1,0 +1,76 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1170,
+			"last": 1206
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 986
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <>",
+				"      <div className=\"w1337-tx-approval__body\">",
+				"        {hostname ? (",
+				"          <p className=\"w1337-tx-approval__site\">"
+			],
+			"startLine": 1160
+		},
+		{
+			"lines": [
+				"            {pathQuery ? (",
+				"              <span className=\"w1337-tx-approval__origin muted\"> · {pathQuery}</span>",
+				"            ) : pending.origin && !isInternalWalletOrigin(pending.origin) ? (",
+				"              <span className=\"w1337-tx-approval__origin muted\"> · {pending.origin}</span>",
+				"            ) : null}",
+				"          </p>",
+				"        ) : null}",
+				"        {chain ? (",
+				"          <p className=\"w1337-tx-approval__chain muted\">",
+				"            Network · {chain.name} (chainId {pending.chainId})",
+				"          </p>",
+				"        ) : null}",
+				"",
+				"        <InstantPausedBanner hits={pausedHits} />",
+				"        <SiweWarnBanner risk={risk} />",
+				"        <Eip712ChainBanner risk={risk} />",
+				"        <ChecksumBanner issues={checksumIssues} />",
+				"",
+				"        <div className=\"w1337-tx-approval__human\">",
+				"          <p className=\"w1337-tx-approval__human-kicker\">You are about to</p>",
+				"          <p className=\"w1337-tx-approval__human-title\">{human.headline}</p>",
+				"          {human.detail ? <p className=\"w1337-tx-approval__human-detail muted\">{human.detail}</p> : null}",
+				"        </div>",
+				"",
+				"        {pending.request.method === 'eth_sendTransaction' ? (",
+				"          <p",
+				"            className={`w1337-tx-approval__sim${",
+				"              sim?.status === 'revert'",
+				"                ? ' w1337-tx-approval__sim--fail'",
+				"                : sim?.status === 'ok'",
+				"                  ? ' w1337-tx-approval__sim--ok'",
+				"                  : ''",
+				"            }`}",
+				"          >",
+				"            {!sim",
+				"              ? 'Simulating on current chain state…'",
+				"              : sim.status === 'ok'",
+				"                ? 'Simulation succeeded on the current chain state.'",
+				"                : sim.status === 'revert'",
+				"                  ? `This transaction would fail: ${sim.revertReason ?? 'reverted'}`",
+				"                  : `Could not simulate: ${sim.revertReason ?? 'RPC error'}`}",
+				"          </p>",
+				"        ) : null}",
+				"",
+				"        {hint && (hint.dangers.length > 0 || hint.proxy || hint.name || hint.owner) ? ("
+			],
+			"startLine": 1166
+		}
+	]
+}

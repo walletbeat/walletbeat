@@ -1,0 +1,48 @@
+{
+	"highlightRanges": [
+		{
+			"first": 90,
+			"last": 101
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export function Onboarding({ onReady }: { onReady: () => void }) {"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"  async function handleImport() {"
+			],
+			"startLine": 68
+		},
+		{
+			"lines": [
+				"    } finally {",
+				"      setBusy(false);",
+				"    }",
+				"  }",
+				"",
+				"  if (showBackup && (backupMnemonic || backupKey)) {",
+				"    return (",
+				"      <div className=\"wallet-shell w1337\">",
+				"        <ScreenHeader title=\"1337\" />",
+				"        <div className=\"screen-body\">",
+				"          <h2 style={{ fontSize: '1.1rem', marginBottom: 8 }}>",
+				"            {backupMnemonic ? 'Back up your seed phrase' : 'Back up your key'}",
+				"          </h2>",
+				"          <p className=\"muted\">",
+				"            {backupMnemonic",
+				"              ? 'Write these 12 words down offline. Anyone with this phrase can control every account derived from it. We will not show it again.'",
+				"              : 'This is the only time we show the generated private key. Store it offline. Anyone with it controls this wallet.'}",
+				"          </p>",
+				"          {backupMnemonic ? (",
+				"            <div",
+				"              className=\"mono\""
+			],
+			"startLine": 85
+		}
+	]
+}

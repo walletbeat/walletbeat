@@ -1,0 +1,27 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1,
+			"last": 8
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"/**",
+				" * Encrypts wallet private key(s) with a user password (PBKDF2 + AES-GCM).",
+				" * v1 = single key bytes; v2 = JSON map of accountId → privateKey hex.",
+				" */",
+				"",
+				"const PBKDF2_ITERATIONS = 210_000;",
+				"const SALT_LEN = 16;",
+				"const IV_LEN = 12;",
+				"",
+				"function toB64(u8: Uint8Array): string {",
+				"  let s = '';",
+				"  for (let i = 0; i < u8.length; i += 1) s += String.fromCharCode(u8[i]!);"
+			],
+			"startLine": 1
+		}
+	]
+}

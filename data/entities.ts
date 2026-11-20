@@ -19,6 +19,7 @@ import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
 import { trustWallet } from '@/data/entities/trust-wallet'
 import { uniswapLabs } from '@/data/entities/uniswap-labs'
+import { wallet1337 } from '@/data/entities/wallet1337'
 import { walletbeat } from '@/data/entities/walletbeat'
 import type { Entity } from '@/schema/entity'
 
@@ -48,6 +49,7 @@ export const allEntities = {
 	sonicLabs,
 	trustWallet,
 	uniswapLabs,
+	wallet1337,
 	walletbeat,
 }
 

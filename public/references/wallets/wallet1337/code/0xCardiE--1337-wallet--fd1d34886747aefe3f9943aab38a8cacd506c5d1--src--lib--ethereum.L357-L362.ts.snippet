@@ -1,0 +1,50 @@
+{
+	"highlightRanges": [
+		{
+			"first": 357,
+			"last": 362
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export async function sendTransactionRequest(",
+				"  chainId: number,",
+				"  tr: TransactionRequest,",
+				"): Promise<string> {"
+			],
+			"startLine": 264
+		},
+		{
+			"lines": [
+				"  } else {"
+			],
+			"startLine": 342
+		},
+		{
+			"lines": [
+				"    signed = await account.signTransaction({"
+			],
+			"startLine": 344
+		},
+		{
+			"lines": [
+				"      data: (tr.data as `0x${string}`) ?? '0x',",
+				"    });",
+				"  }",
+				"",
+				"  const txHash = await chainJsonRpcCall<string>(",
+				"    chainId,",
+				"    'eth_sendRawTransaction',",
+				"    [signed],",
+				"  );",
+				"  return txHash;",
+				"}",
+				"",
+				"async function erc20Allowance(",
+				"  chainId: number,"
+			],
+			"startLine": 353
+		}
+	]
+}

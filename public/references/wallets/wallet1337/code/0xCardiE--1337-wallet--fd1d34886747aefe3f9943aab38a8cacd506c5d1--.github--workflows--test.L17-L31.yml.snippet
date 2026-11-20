@@ -1,0 +1,51 @@
+{
+	"highlightRanges": [
+		{
+			"first": 17,
+			"last": 31
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  unit:"
+			],
+			"startLine": 8
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"      - uses: actions/setup-node@v4",
+				"        with:",
+				"          node-version: '22'",
+				"          cache: npm",
+				"      - name: Install",
+				"        run: npm ci",
+				"      - name: Unit tests",
+				"        run: npm run test:unit",
+				"",
+				"  e2e:",
+				"    runs-on: ubuntu-latest",
+				"    steps:",
+				"      - uses: actions/checkout@v4",
+				"      - uses: actions/setup-node@v4",
+				"        with:",
+				"          node-version: '22'",
+				"          cache: npm",
+				"      - name: Install",
+				"        run: npm ci",
+				"      - name: Install Pillow",
+				"        run: sudo apt-get update && sudo apt-get install -y python3-pil",
+				"      - name: Production build",
+				"        run: npm run icons && npm run build"
+			],
+			"startLine": 13
+		}
+	]
+}

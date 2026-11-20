@@ -1,0 +1,45 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1,
+			"last": 26
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"import TrezorConnect from '@trezor/connect-webextension';",
+				"import { prepareTrezorTypedData, type Eip712Payload } from './eip712Hashes';",
+				"",
+				"const TREZOR_CONNECT_SRC = 'https://connect.trezor.io/9/';",
+				"",
+				"let initPromise: Promise<void> | undefined;",
+				"",
+				"export function initTrezorConnect(): Promise<void> {",
+				"  if (!initPromise) {",
+				"    initPromise = (async () => {",
+				"      try {",
+				"        await TrezorConnect.init({",
+				"          lazyLoad: true,",
+				"          // Default `auto` probes Trezor Suite at ws://127.0.0.1:21335/connect-ws",
+				"          // and logs ERR_CONNECTION_REFUSED whenever Suite is not running.",
+				"          coreMode: 'popup',",
+				"          manifest: {",
+				"            email: '1337-wallet@proton.me',",
+				"            appName: '1337 Wallet',",
+				"            appUrl: 'https://github.com/0xCardiE/1337-wallet',",
+				"          },",
+				"          connectSrc: TREZOR_CONNECT_SRC,",
+				"          _extendWebextensionLifetime: true,",
+				"        });",
+				"      } catch (err) {",
+				"        initPromise = undefined;",
+				"        throw err;",
+				"      }",
+				"    })();",
+				"  }"
+			],
+			"startLine": 1
+		}
+	]
+}

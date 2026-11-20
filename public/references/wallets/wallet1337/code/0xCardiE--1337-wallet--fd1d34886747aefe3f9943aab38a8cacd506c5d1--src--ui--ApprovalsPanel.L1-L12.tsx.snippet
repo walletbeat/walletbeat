@@ -1,0 +1,31 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1,
+			"last": 12
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';",
+				"import { getAddress } from 'viem';",
+				"import { getActiveAccountMeta, getUnlockedAccount } from '../lib/accountSession';",
+				"import { isHardwareAccount } from '../lib/accounts';",
+				"import { chainById } from '../lib/chainCatalog';",
+				"import { chainLogoUri } from '../lib/chainLogo';",
+				"import {",
+				"  revokeErc20Approval,",
+				"  revokeNftApprovalForAll,",
+				"  revokePermit2Allowance,",
+				"  waitForChainReceipt,",
+				"} from '../lib/ethereum';",
+				"import { needsExplorerApiKey } from '../lib/explorerTxHistory';",
+				"import {",
+				"  mergeNftApprovalRows,",
+				"  refreshLiveNftApprovals,"
+			],
+			"startLine": 1
+		}
+	]
+}

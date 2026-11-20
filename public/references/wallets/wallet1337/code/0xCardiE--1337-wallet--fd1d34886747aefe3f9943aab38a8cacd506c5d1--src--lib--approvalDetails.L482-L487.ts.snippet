@@ -1,0 +1,46 @@
+{
+	"highlightRanges": [
+		{
+			"first": 482,
+			"last": 487
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"function transactionSections(",
+				"  request: ProviderRequest,",
+				"  chainId: number,",
+				"  walletAddress?: string,",
+				"): ApprovalDetailSection[] {"
+			],
+			"startLine": 384
+		},
+		{
+			"lines": [
+				"  const rawFields: ApprovalDetailField[] = [",
+				"    field('Request params', JSON.stringify(request.params, null, 2), {"
+			],
+			"startLine": 475
+		},
+		{
+			"lines": [
+				"      copyable: true,",
+				"    }),",
+				"  ];",
+				"",
+				"  return [",
+				"    { id: 'tx-overview', title: 'Overview', defaultOpen: true, fields: overview },",
+				"    { id: 'tx-gas', title: 'Gas & nonce', defaultOpen: true, fields: gasFields },",
+				"    { id: 'tx-calldata', title: 'Calldata', defaultOpen: false, fields: calldataFields },",
+				"    { id: 'tx-raw', title: 'Raw request', defaultOpen: false, fields: rawFields },",
+				"  ];",
+				"}",
+				"",
+				"export function buildApprovalDetailSections(",
+				"  request: ProviderRequest,"
+			],
+			"startLine": 478
+		}
+	]
+}

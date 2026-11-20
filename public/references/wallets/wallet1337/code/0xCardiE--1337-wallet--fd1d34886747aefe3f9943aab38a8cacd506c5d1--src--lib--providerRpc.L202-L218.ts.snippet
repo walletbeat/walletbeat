@@ -1,0 +1,70 @@
+{
+	"highlightRanges": [
+		{
+			"first": 202,
+			"last": 218
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export async function handleProviderRpc(",
+				"  pk: `0x${string}` | null,",
+				"  request: ProviderRequest,",
+				"  origin?: string,",
+				"  opts?: {",
+				"    tabId?: number;",
+				"    pageUrl?: string;",
+				"    onApprovalQueued?: () => void;",
+				"    onApprovalExpired?: () => void;",
+				"    sessionAddress?: `0x${string}`;",
+				"    hardware?: boolean;",
+				"  },",
+				"): Promise<ProviderRpcResult> {"
+			],
+			"startLine": 116
+		},
+		{
+			"lines": [
+				"  try {"
+			],
+			"startLine": 131
+		},
+		{
+			"lines": [
+				"    if (method === 'wallet_getCapabilities') {"
+			],
+			"startLine": 190
+		},
+		{
+			"lines": [
+				"      }",
+				"      return { id, ok: true, result: eip5792Capabilities(parsed.chainIds) };",
+				"    }",
+				"",
+				"    if (method === 'eth_accounts' || method === 'eth_requestAccounts') {",
+				"      if (!sessionAddr) {",
+				"        if (method === 'eth_requestAccounts') {",
+				"          throw Object.assign(new Error('1337 is locked. Unlock the extension first.'), {",
+				"            code: 4100,",
+				"          });",
+				"        }",
+				"        return { id, ok: true, result: [] };",
+				"      }",
+				"      if (method === 'eth_requestAccounts') {",
+				"        if (origin) await connectAddress(origin, sessionAddr);",
+				"        return { id, ok: true, result: [sessionAddr] };",
+				"      }",
+				"      if (origin && !(await isAddressConnected(origin, sessionAddr))) {",
+				"        return { id, ok: true, result: [] };",
+				"      }",
+				"      return { id, ok: true, result: [sessionAddr] };",
+				"    }",
+				"",
+				"    if (!sessionAddr) {",
+				"      throw Object.assign(new Error('1337 is locked. Unlock the extension first.'), {"
+			],
+			"startLine": 198
+		}
+	]
+}

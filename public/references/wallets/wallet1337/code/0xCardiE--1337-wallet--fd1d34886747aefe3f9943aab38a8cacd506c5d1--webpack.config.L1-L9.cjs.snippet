@@ -1,0 +1,28 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1,
+			"last": 9
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"// @ts-check",
+				"/** LavaMoat-protected MV3 service worker (session keys, signing, Trezor bridge). */",
+				"const path = require('node:path');",
+				"const webpack = require('webpack');",
+				"const LavaMoatPlugin = require('@lavamoat/webpack');",
+				"const {",
+				"  lockdown,",
+				"  backgroundScuttleExceptions,",
+				"} = require('./webpack/lavamoat-options.cjs');",
+				"",
+				"const isProd = process.env.NODE_ENV === 'production';",
+				"",
+				"/** @type {import('webpack').Configuration} */"
+			],
+			"startLine": 1
+		}
+	]
+}
