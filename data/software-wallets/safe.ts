@@ -419,11 +419,18 @@ export const safe: SoftwareWallet = {
 						],
 					}),
 					[Variant.MOBILE]: notSupportedWithRef({
-						ref: {
-							explanation:
-								'The production mobile build runs on the Expo build service with its default install step. No public build configuration or workflow forces a locked install for this build.',
-							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15,L44-L61',
-						},
+						ref: [
+							{
+								explanation:
+									'The base build profile sets only the Node version and the build images. It keeps the default install step of the Expo build service.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15',
+							},
+							{
+								explanation:
+									'The production build profile extends the base profile and adds no install step. No public workflow forces a locked install for this build.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L44-L61',
+							},
+						],
 					}),
 				},
 				dependencySandboxing: null,
