@@ -75,19 +75,11 @@
 			.map(({ lastRetrieved }) => lastRetrieved)
 			.filter((date): date is CalendarDate => date !== undefined)
 
-		return dates.length > 0 ? dates.toSorted().at(-1) : undefined
+		return dates.toSorted().at(-1)
 	}
 
-	const formatDate = (date: CalendarDate): string =>
-		new Date(date).toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			timeZone: 'UTC',
-		})
-
-
 	// Components
+	import DateTime from '@/components/DateTime.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
@@ -170,7 +162,7 @@
 											<div class="card-meta" data-row="wrap gap-3">
 												{#if lastVerified}
 													<span class="last-verified">
-														As of <time datetime={lastVerified}>{formatDate(lastVerified)}</time>
+														As of <DateTime datetime={lastVerified} />
 													</span>
 												{/if}
 
