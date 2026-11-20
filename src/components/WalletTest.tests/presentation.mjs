@@ -522,11 +522,12 @@ export async function checkPresentation(page, baseURL, outputDir, resultAdmissio
 				const category = categories.getByRole('button').nth(categoryIndex)
 
 				await category.click()
-				assert.equal(await category.getAttribute('aria-pressed'), 'true')
 
 				if (labels[categoryIndex].trim() === 'Scam Alerts') {
 					await acceptScamConsent(page)
 				}
+
+				assert.equal(await category.getAttribute('aria-pressed'), 'true')
 
 				const count = await cases.getByRole('button').count()
 				const categoryName = labels[categoryIndex].trim()
