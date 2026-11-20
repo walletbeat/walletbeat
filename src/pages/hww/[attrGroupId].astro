@@ -46,7 +46,11 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<HardwareWalletTable client:visible title='Hardware Wallets' />
+		<HardwareWalletTable
+			client:visible
+			title='Hardware Wallets'
+			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/hww/summary/' }}
+		/>
 	</main>
 </Layout>
 
