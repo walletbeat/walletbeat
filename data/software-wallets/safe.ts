@@ -22,7 +22,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { type ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
@@ -413,28 +418,12 @@ export const safe: SoftwareWallet = {
 							},
 						],
 					}),
-					[Variant.MOBILE]: supported({
-						ref: [
-							{
-								explanation:
-									'Safe builds the mobile app with the Expo build service. The production build profile does not set `EAS_NO_FROZEN_LOCKFILE`.',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15,L44-L61',
-							},
-							{
-								explanation: 'The mobile app uses Expo SDK 55 and React Native 0.83.',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/package.json#L97,L122',
-							},
-							{
-								explanation:
-									'The Expo build service uses a frozen lockfile for Expo SDK 53 or newer and React Native 0.79 or newer, unless the build sets `EAS_NO_FROZEN_LOCKFILE`.',
-								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/utils/packageManager.ts#L137-L164',
-							},
-							{
-								explanation:
-									'With Yarn 2 or newer, a frozen lockfile install runs `yarn install --immutable`, which fails if `yarn.lock` would change.',
-								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/common/installDependencies.ts#L43-L54',
-							},
-						],
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: {
+							explanation:
+								'The production mobile build runs on the Expo build service with its default install step. No public build configuration or workflow forces a locked install for this build.',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15,L44-L61',
+						},
 					}),
 				},
 				dependencySandboxing: null,
