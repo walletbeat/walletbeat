@@ -1,0 +1,49 @@
+#layout:not([data-wallet-toc-state]) {
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+		@media (width <= 1024px) {
+			&:has(#wallet-toc:is(:popover-open, [data-closing])) #nav > header > .logo {
+				animation-range: cover calc(0% - var(--safeArea-insetTop)) cover calc(0% - var(--safeArea-insetTop));
+			}
+			&:has(#wallet-toc:is(:popover-open, [data-closing]))
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"] {
+				:is([data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"]) {
+					---breadcrumb-entry: 1;
+				}
+				[data-sticky-breadcrumb~="item"] {
+					--stickyBreadcrumb-entryRange: cover calc(0% - var(--safeArea-insetTop)) cover calc(0% - var(--safeArea-insetTop));
+				}
+			}
+		}
+	}
+.container {
+
+		.page-navigation {
+			&:has(#wallet-toc:popover-open) {
+				> header {
+					display: flex;
+				}
+			}
+			> .pie-navigation[data-sticky][data-sticky] {
+				@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
+
+					@media (width <= 1024px) {
+
+						@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+							(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
+							and (color: if(style(---breadcrumb-wrap: 1): red)) {
+
+							&:has(+ #wallet-toc:is(:popover-open, [data-closing])) .pie-navigation-geometry,
+							&:has(+ #wallet-toc:is(:popover-open, [data-closing]))::before {
+								animation-name: none;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+}

@@ -1,3 +1,4 @@
+import { withBasePath } from '@/base-url'
 import {
 	type Attribute,
 	type Evaluation,
@@ -150,7 +151,10 @@ export const l1ProviderIndependence: Attribute = {
 		  before any request is made to that endpoint.
 		- Support basic functions (account creation/import, balance lookups,
 		  token transfers) using nothing but the self-hosted node
-			(no external services, no non-Ethereum-API calls), and whether
+			(no external services, no non-Ethereum-API calls).
+
+		See the [L1 provider independence testing guide](${withBasePath('/docs/wallet-testing/l1-provider-independence/')})
+		for how Walletbeat tests this.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
