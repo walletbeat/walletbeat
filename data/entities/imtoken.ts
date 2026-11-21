@@ -17,9 +17,7 @@ export const imToken: CorporateEntity & WalletDeveloper = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/imtoken',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Singapore',
 	linkedin: 'https://www.linkedin.com/company/imtoken',
 	privacyPolicy: 'https://token.im/tos-en.html',

@@ -17,9 +17,7 @@ export const zeusEntity: WalletDeveloper & CorporateEntity = {
 	},
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: { type: 'UNKNOWN' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },

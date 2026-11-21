@@ -17,11 +17,7 @@ export const certora: CorporateEntity & SecurityAuditor = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/certora',
 	farcaster: 'https://warpcast.com/certora',
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Israel',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: 'https://www.certora.com/privacy',
