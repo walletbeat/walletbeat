@@ -108,7 +108,10 @@
 
 		<div data-row="gap-2">
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				<Tooltip buttonTriggerPlacement="behind">
+				<Tooltip
+					buttonTriggerPlacement="behind"
+					ariaLabel={`Stage ${relevantStageLabels.join(', ')} details`}
+				>
 					<a
 						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"
