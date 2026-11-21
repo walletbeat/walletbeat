@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { attributeTree } from '@/schema/attribute-tree'
 import { ContentType, type MarkdownContent } from '@/types/content'
 import {
 	collapseToSingleLine,
 	extractProse,
 	extractUrlRanges,
+	markdownToPlainText,
+	renderTypographicContentToPlainText,
 	rewriteMarkdownURLs,
 } from '@/utils/markdown-utils'
 
@@ -86,6 +89,60 @@ describe('collapseToSingleLine', () => {
 		expect(() => collapseToSingleLine('normal line\n> blockquote')).toThrow(
 			'collapseToSingleLine does not support blockquote lines',
 		)
+	})
+})
+
+describe('markdownToPlainText', () => {
+	it.each([
+		['links', 'See [the docs](https://example.com/docs "Docs").', 'See the docs.'],
+		[
+			'EIP format-marker links',
+			'Implements [ERC-7730](https://eips.ethereum.org/EIPS/eip-7730#wb-format=short).',
+			'Implements ERC-7730.',
+		],
+		['reference links', 'See [the docs][docs].\n\n[docs]: https://example.com', 'See the docs.'],
+		['autolinks', 'Go to <https://example.com>.', 'Go to https://example.com.'],
+		[
+			'emphasis',
+			'This is **bold**, *italic* and _also italic_.',
+			'This is bold, italic and also italic.',
+		],
+		['inline code', 'Addresses look like `0x...`.', 'Addresses look like 0x....'],
+		['escaped characters', 'Not \\*emphasis\\* here.', 'Not *emphasis* here.'],
+		['character references', 'Fish &amp; chips &lt;3 &quot;yes&quot;', 'Fish & chips <3 "yes"'],
+		['raw HTML', 'Keep <b>tags</b> as text.', 'Keep <b>tags</b> as text.'],
+		[
+			'soft line breaks',
+			'One sentence\nwrapped over\nthree lines.',
+			'One sentence wrapped over three lines.',
+		],
+		['headings', '# Title\n\nBody.', 'Title\nBody.'],
+		['bullet lists', 'Intro:\n\n* **One**: first\n* Two', 'Intro:\nOne: first\nTwo'],
+		['ordered lists', '1. First\n2. Second', 'First\nSecond'],
+		['blockquotes', '> Quoted\n\nAfter.', 'Quoted\nAfter.'],
+	])('renders %s as plain text', (_name, markdown, expected) => {
+		expect(markdownToPlainText(markdown)).toBe(expected)
+	})
+
+	it('collapses whitespace in text content', () => {
+		expect(
+			renderTypographicContentToPlainText(
+				{ contentType: ContentType.TEXT, text: 'Is {{WALLET_NAME}}\nopen source?' },
+				{ WALLET_NAME: 'Wallet' },
+			),
+		).toBe('Is Wallet open source?')
+	})
+
+	it('leaves no Markdown syntax or link destinations in attribute questions and explanations', () => {
+		for (const attributeGroup of Object.values(attributeTree)) {
+			for (const { attribute } of attributeGroup.attributes) {
+				for (const content of [attribute.question, attribute.why]) {
+					const text = renderTypographicContentToPlainText(content, { WALLET_NAME: 'Wallet' })
+
+					expect(text, attribute.id).not.toMatch(/\]\(|\*\*|`|#wb-format=|\{\{|\n\n/)
+				}
+			}
+		}
 	})
 })
 
