@@ -1,0 +1,93 @@
+---
+/**
+ * Shell for standalone pages (About, docs, FAQ, news, standards…): site
+ * navigation, a centered content column and a consistent page header.
+ * Pages render their own content blocks as children; give each one
+ * `data-scroll-item='inline-detached'` (plus `padding-match-end` on the last)
+ * so it sits in the column.
+ */
+
+// Types
+import type { ComponentProps } from 'astro/types'
+
+type Props = {
+	metadata: ComponentProps<typeof Layout>['metadata']
+
+	/** Visible page title. Defaults to `metadata.title`. */
+	title?: string
+
+	/** Short summary shown under the title. */
+	description?: string
+
+	/** Link to the parent page, shown above the title. */
+	parentUrl?: string
+}
+
+const { metadata, title = metadata.title, description, parentUrl } = Astro.props
+
+// Layouts
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+---
+
+<Layout metadata={metadata}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+		<header id='top' data-scroll-item='inline-detached padding-match-start' data-column='gap-4'>
+			{
+				parentUrl && (
+					<nav aria-label='Breadcrumb'>
+						<a href={parentUrl}>← Back</a>
+					</nav>
+				)
+			}
+
+			<hgroup data-column='gap-3'>
+				<h1>{title}</h1>
+
+				{description && <p>{description}</p>}
+			</hgroup>
+		</header>
+
+		<slot />
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 52rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+	}
+
+	header {
+		nav a {
+			font-size: 0.875rem;
+			color: var(--text-secondary);
+			text-decoration: none;
+
+			&:hover {
+				color: var(--text-primary);
+			}
+		}
+
+		h1 {
+			font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+			line-height: 1.15;
+		}
+
+		p {
+			max-inline-size: 60ch;
+			font-size: 1.125rem;
+			line-height: 1.5;
+			color: var(--text-secondary);
+			text-wrap: pretty;
+		}
+	}
+</style>

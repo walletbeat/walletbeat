@@ -527,6 +527,31 @@ declare global {
 		'data-pressable-targets'?: string | boolean
 
 		/**
+		 * ## [data-prose]
+		 *
+		 * Long-form prose: rendered markdown, FAQ answers, article bodies. The global reset removes all margins, so this restores vertical rhythm (generous space above headings, tighter below, a divider before each `h2`), a readable measure for running text, and styles for links, inline code, code blocks, tables, blockquotes and images.
+		 *
+		 * ### Placement
+		 * - On the element that directly contains the prose blocks (`p`, `h2`, `ul`, `pre`…). Content inside a hydration wrapper (`astro-island`) is treated as direct.
+		 *
+		 * ### CSS Variables
+		 * - `---prose-measure` (max line length of running text, default `70ch`)
+		 *
+		 * ### Examples
+		 * - Rendered markdown:
+		 *   ```html
+		 *   <div data-prose>
+		 *     <h2>Section</h2>
+		 *     <p>Body text.</p>
+		 *   </div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-prose]`
+		 */
+		'data-prose'?: string | boolean
+
+		/**
 		 * ## [data-row], [data-badge]
 		 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>` without an explicit `[data-column]`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
 		 *
