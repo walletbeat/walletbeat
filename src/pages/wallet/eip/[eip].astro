@@ -17,6 +17,7 @@ import type { RatedWallet } from '@/schema/wallet'
 import { type CodeSnippetIndex } from '@/utils/code-snippet-index'
 import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { sortEipSupportCards } from '@/utils/eip-support-sort'
+import { referenceImageDimensions } from '@/utils/reference-image-metadata'
 import { getWalletUrl } from '@/utils/urls'
 
 // Components
@@ -82,6 +83,10 @@ function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
 	)
 }
 
+function cardImageDimensions(cards: EipStatusSupportCard[]) {
+	return referenceImageDimensions(cards.flatMap(card => card.references))
+}
+
 const softwareCards = eipStatusSupportCards(
 	softwareWalletAttributeTree,
 	Object.values(ratedSoftwareWallets),
@@ -129,6 +134,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
 					codeSnippets={cardCodeSnippets(softwareCards)}
+					imageDimensions={await cardImageDimensions(softwareCards)}
 					client:visible
 				/>
 			)
@@ -140,6 +146,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
 					codeSnippets={cardCodeSnippets(hardwareCards)}
+					imageDimensions={await cardImageDimensions(hardwareCards)}
 					client:visible
 				/>
 			)
@@ -151,6 +158,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
 					codeSnippets={cardCodeSnippets(embeddedCards)}
+					imageDimensions={await cardImageDimensions(embeddedCards)}
 					client:visible
 				/>
 			)
