@@ -27,8 +27,8 @@
 
 
 <aside
-	class="discontinued-notice"
 	aria-label="Discontinued wallet"
+	data-row-item="basis-full"
 	data-card="secondary padding-5 border-accent"
 	data-column="gap-3"
 	style:--accent="#f59e0b"
