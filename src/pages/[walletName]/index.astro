@@ -8,6 +8,7 @@ import {
 	walletOfTypeBySlug,
 } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { withoutSyntheticAnchors } from '@/schema/url'
 import { codeSnippetsForWallet } from '@/utils/code-snippet-store'
 import { getWalletIcon, walletOgImage } from '@/utils/wallet-og-image'
 
@@ -73,7 +74,7 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	<main data-column-item='flexible'>
 		<WalletPageContext
 			{walletIcon}
-			{walletOfType}
+			walletOfType={withoutSyntheticAnchors(walletOfType)}
 			hardwareModels={allHardwareModels}
 			codeSnippets={codeSnippets}
 			client:idle

@@ -137,6 +137,32 @@ export function stripSyntheticAnchor(url: string): string {
 	return url.replace(syntheticAnchorRegExp, '')
 }
 
+/**
+ * A deep copy of structured-cloneable data with `stripSyntheticAnchor` applied
+ * to every string, for data that a page embeds as-is (e.g. island props).
+ */
+export function withoutSyntheticAnchors<T>(data: T): T {
+	const copy = structuredClone(data)
+
+	const strip = (node: object): void => {
+		const entries: Array<[string, unknown]> = Object.entries(node)
+
+		for (const [key, value] of entries) {
+			if (typeof value === 'string') {
+				Reflect.set(node, key, stripSyntheticAnchor(value))
+			} else if (typeof value === 'object' && value !== null) {
+				strip(value)
+			}
+		}
+	}
+
+	if (typeof copy === 'object' && copy !== null) {
+		strip(copy)
+	}
+
+	return copy
+}
+
 /** Format a GitHub line-anchor fragment as `L123` / `L123-456` / `L53, L340-353`, or null if not one. */
 function gitHubLineRange(fragment: string): string | null {
 	const ranges = parseLineFragment(fragment)
