@@ -23,7 +23,9 @@ import {
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	DataLocation,
+	type HardwareTransactionLegibilityImplementation,
 	MessageSigningDetails,
+	type SoftwareTransactionLegibilityImplementation,
 } from '@/schema/features/security/transaction-legibility'
 import {
 	featureSupported,
@@ -280,7 +282,7 @@ describe('walletEipSupport', () => {
 					}),
 					transactionSimulations: null,
 					transactionDetailsDisplay: null,
-				},
+				} satisfies SoftwareTransactionLegibilityImplementation,
 			},
 		})
 
@@ -323,7 +325,7 @@ describe('walletEipSupport', () => {
 					erc7730: null,
 					transactionSimulations: null,
 					transactionDetailsDisplay: null,
-				},
+				} satisfies SoftwareTransactionLegibilityImplementation,
 			},
 		})
 
@@ -350,7 +352,7 @@ describe('walletEipSupport', () => {
 					}),
 					detailsDisplayed: null,
 					dataExtraction: null,
-				},
+				} satisfies HardwareTransactionLegibilityImplementation,
 			},
 		}
 	}

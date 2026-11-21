@@ -337,7 +337,6 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 		ref: refNotNecessary,
 		risksExplained: 'VISIBLE_BY_DEFAULT',
 		feesLargerThan1bps: {
-			ref: [],
 			feesInvolved: {
 				[FeeType.NETWORK_FEE]: true,
 				[FeeType.ONCHAIN_APP_FEE]: true,
@@ -519,7 +518,6 @@ export const chainAbstraction: Attribute = {
 							builtInBridging: supported({
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
-									ref: [],
 									feesInvolved: {
 										[FeeType.NETWORK_FEE]: true,
 										[FeeType.ONCHAIN_APP_FEE]: true,
