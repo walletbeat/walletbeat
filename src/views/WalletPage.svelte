@@ -1297,7 +1297,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
-		<details open data-column="gap-0">
+		<details open={evalAttr.evaluation.outcome.rating !== Rating.UNRATED} data-column="gap-0">
 			<summary
 				data-column="span-start"
 				data-icon-metrics={attribute.icon}
@@ -2685,6 +2685,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				color: var(--text-secondary);
 			}
 		}
+	}
+
+	.attribute[data-rating='unrated']:has(> details:not([open])) {
+		--card-padding: 1em;
+
+		box-shadow: none;
+		background-image: none;
+		border-style: dashed;
 	}
 
 	/*
