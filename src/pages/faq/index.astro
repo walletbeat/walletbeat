@@ -268,7 +268,7 @@ import PageLayout from '@/layouts/PageLayout.astro'
 			frequentlyAskedQuestions.map(entry => (
 				<details id={entry.anchor} data-card='padding-5 radius-4'>
 					<summary>
-						<h4>{entry.question}</h4>
+						<h2>{entry.question}</h2>
 					</summary>
 
 					<div data-prose>
@@ -307,7 +307,7 @@ import PageLayout from '@/layouts/PageLayout.astro'
 				transition-duration: 0.2s;
 			}
 
-			h4 {
+			h2 {
 				font-size: 1.2rem;
 				font-weight: 600;
 				line-height: 1.4;
