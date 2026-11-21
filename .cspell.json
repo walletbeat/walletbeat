@@ -197,6 +197,7 @@
 		"dejavu",
 		"delegatable",
 		"delegator",
+		"Dependabot",
 		"deprioritized",
 		"Devcon",
 		"Devconnect",
@@ -846,6 +847,10 @@
 	],
 	"patterns": [
 		{
+			"name": "1kx",
+			"pattern": "/\\b1kx\\b/g"
+		},
+		{
 			"name": "4everland",
 			"pattern": "/\\b4everland\\b/gi"
 		},
@@ -931,6 +936,7 @@
 		}
 	],
 	"ignoreRegExpList": [
+		"1kx",
 		"4everland",
 		"backdoor",
 		"Bitcoin addresses",
