@@ -3,6 +3,7 @@ import type { WithRef } from '@/schema/reference'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import { markdownListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 
+import { AccountManagementTooling, type PossibleAccountManagementTooling } from '../account-support'
 import type { Support } from '../support'
 
 /**
@@ -525,6 +526,44 @@ export interface GuardianRecovery {
 }
 
 /**
+ * A way to recover the account that does not rely on guardians, such as an
+ * additional user-held key that can rotate the keys controlling the account.
+ */
+export interface AlternateRecovery {
+	/**
+	 * The tooling the user needs in order to carry out the recovery.
+	 * To identify: follow the wallet's recovery documentation and note where
+	 * the recovery transaction is created and signed (e.g. a web page hosted
+	 * by the wallet developer, or an app the user can run themselves).
+	 */
+	type: PossibleAccountManagementTooling
+
+	/** The entity that maintains this tooling. */
+	entity: Entity
+}
+
+/**
+ * Verb phrase describing the tooling an alternate recovery method relies on,
+ * e.g. "requires a web app that only Example Corp hosts".
+ */
+export function alternateRecoveryToolingPhrase(alternateRecovery: AlternateRecovery): string {
+	const entityName = alternateRecovery.entity.name
+
+	switch (alternateRecovery.type) {
+		case AccountManagementTooling.RELYING_ON_EXTERNAL_API:
+			return `relies on an API operated by ${entityName}`
+		case AccountManagementTooling.USING_PROPRIETARY_STANDALONE_APP:
+			return `requires a proprietary app made by ${entityName}`
+		case AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP:
+			return `uses an open-source app maintained by ${entityName}`
+		case AccountManagementTooling.USING_PROPRIETARY_HOSTED_WEB_APP:
+			return `requires a web app that only ${entityName} hosts`
+		case AccountManagementTooling.USING_SELF_HOSTABLE_WEB_APP:
+			return `uses a web app maintained by ${entityName} that users can host themselves`
+	}
+}
+
+/**
  * How the wallet makes it possible for the user to recover their account.
  *
  * Note: account recovery features generally cannot be fully verified through
@@ -549,6 +588,17 @@ export interface AccountRecovery {
 	 * documentation and source code as described above.
 	 */
 	guardianRecovery: Support<WithRef<GuardianRecovery>>
+
+	/**
+	 * If the wallet supports a way to recover the account without guardians
+	 * (e.g. a separately-stored recovery key registered as an additional
+	 * owner of a smart account), what tooling does it rely on?
+	 * To identify: look for a "Recovery key" or similar option in the
+	 * wallet's security settings and documentation. If no such feature
+	 * exists, set to not supported.
+	 * Set to `null` if this has not been researched yet.
+	 */
+	alternateRecovery: Support<WithRef<AlternateRecovery>> | null
 
 	/**
 	 * Drills the wallet runs to ensure that users will be able to

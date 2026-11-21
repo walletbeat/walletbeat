@@ -2,7 +2,7 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { ackee } from '@/data/entities/ackee'
 import { certora } from '@/data/entities/certora'
 import type { SoftwareWallet } from '@/data/software-wallets'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountManagementTooling, AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -53,20 +53,18 @@ export const safe: SoftwareWallet = {
 				ref: refTodo,
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 			safe: supported({
 				ref: refNotNecessary,
 				canDeployNew: true,
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				keyRotationTransactionGeneration: AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					AccountManagementTooling.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 		},
 		addressResolution: {
