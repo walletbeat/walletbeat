@@ -18,7 +18,9 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
+	feeDisplayAfterSingleAction,
 	FeeDisplayLevel,
+	FeeType,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { refNotNecessary } from '@/schema/reference'
@@ -158,9 +160,14 @@ function evaluateChainAbstraction(
 		})
 	}
 
-	if (bridging.builtInBridging.feesLargerThan1bps.byDefault === FeeDisplayLevel.NONE) {
+	const bridgingFees = bridging.builtInBridging.feesLargerThan1bps
+
+	if (
+		bridgingFees !== 'NO_FEES_CHARGED' &&
+		bridgingFees.shownByDefault.comprehensiveness === FeeDisplayLevel.NONE
+	) {
 		const feesHidden =
-			bridging.builtInBridging.feesLargerThan1bps.afterSingleAction === FeeDisplayLevel.NONE
+			feeDisplayAfterSingleAction(bridgingFees).comprehensiveness === FeeDisplayLevel.NONE
 
 		return ctx.build({
 			outcome: {
@@ -331,10 +338,19 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 		risksExplained: 'VISIBLE_BY_DEFAULT',
 		feesLargerThan1bps: {
 			ref: [],
-			afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-			byDefault: FeeDisplayLevel.COMPREHENSIVE,
-			fullySponsored: false,
-			walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			feesInvolved: {
+				[FeeType.NETWORK_FEE]: true,
+				[FeeType.ONCHAIN_APP_FEE]: true,
+				[FeeType.WALLET_FEE]: true,
+			},
+			shownAfterSingleAction: {
+				comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+				units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			},
+			shownByDefault: {
+				comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+				units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+			},
 		},
 	}),
 	suggestedBridging: featureSupportedNoRef,
@@ -470,10 +486,19 @@ export const chainAbstraction: Attribute = {
 							builtInBridging: supported({
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
-									byDefault: FeeDisplayLevel.NONE,
-									afterSingleAction: FeeDisplayLevel.NONE,
-									fullySponsored: false,
-									walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+									feesInvolved: {
+										[FeeType.NETWORK_FEE]: true,
+										[FeeType.ONCHAIN_APP_FEE]: true,
+										[FeeType.WALLET_FEE]: false,
+									},
+									shownAfterSingleAction: {
+										comprehensiveness: FeeDisplayLevel.NONE,
+										units: null,
+									},
+									shownByDefault: {
+										comprehensiveness: FeeDisplayLevel.NONE,
+										units: null,
+									},
 								},
 								risksExplained: 'VISIBLE_BY_DEFAULT',
 							}),
@@ -495,10 +520,19 @@ export const chainAbstraction: Attribute = {
 								ref: refNotNecessary,
 								feesLargerThan1bps: {
 									ref: [],
-									afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-									byDefault: FeeDisplayLevel.COMPREHENSIVE,
-									fullySponsored: false,
-									walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									feesInvolved: {
+										[FeeType.NETWORK_FEE]: true,
+										[FeeType.ONCHAIN_APP_FEE]: true,
+										[FeeType.WALLET_FEE]: true,
+									},
+									shownAfterSingleAction: {
+										comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+										units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									},
+									shownByDefault: {
+										comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+										units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+									},
 								},
 								risksExplained: 'HIDDEN_BY_DEFAULT',
 							}),

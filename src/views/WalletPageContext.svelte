@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { ImageMetadata } from 'astro'
 	import type { HardwareModelSummary } from '@/data/hardware-wallets'
 	import { attributeTreeForWallet, rateWalletOfType, type WalletOfType } from '@/data/wallet-rating'
 	import { allWalletLadders } from '@/schema/ladders'
@@ -6,12 +7,14 @@
 	import WalletPage from './WalletPage.svelte'
 
 	const {
+		walletIcon,
 		walletOfType,
 		hardwareModels,
 		showStage = true,
 		showScores = false,
 		codeSnippets = {},
 	}: {
+		walletIcon: ImageMetadata,
 		walletOfType: WalletOfType,
 		hardwareModels: HardwareModelSummary[],
 		showStage?: boolean,
@@ -28,6 +31,7 @@
 </script>
 
 <WalletPage
+	{walletIcon}
 	ladders={allWalletLadders}
 	{attributeTree}
 	{wallet}
