@@ -91,6 +91,7 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	'resources/files/social-media/threads/2026-11-20 - ETHSecurity Badge Holders/our-initiative.jpg',
 ])
 
 /** A single image file discovered by the crawler. */
@@ -1156,7 +1157,7 @@ describe('image integrity', () => {
 	})
 
 	describe('whitelist almost never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 9 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
+		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 10 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
 
 		it('has the expected size', () => {
 			expect(BLOCKY_ALLOWED_FILES.size).toBe(
