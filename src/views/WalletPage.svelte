@@ -742,6 +742,16 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	})
 
 	const overallScore = $derived(calculateOverallScore(attributeTree, wallet.overall, () => true))
+
+	const unratedAttributes = $derived(
+		evaluatedAttributeGroups.flatMap(({ attributes }) =>
+			attributes
+				.filter(({ evalAttr }) => evalAttr.evaluation.outcome.rating === Rating.UNRATED)
+				.map(({ attribute }) => attribute),
+		),
+	)
+
+	let isUnratedListOpen = $state(false)
 	const allPageReferences = $derived(mergeRefs(...evaluatedAttributeGroups.flatMap(({ attributes }) =>
 		attributes.flatMap(({ evalAttr }) => toFullyQualified(evalAttr.evaluation.references)),
 	)))
@@ -989,6 +999,26 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 				</a>
 			{/if}
 		</nav>
+
+		{#if unratedAttributes.length > 0}
+			<div data-row-item="basis-full">
+				<p>
+					{unratedAttributes.length === 1 ? '1 attribute has' : `${unratedAttributes.length} attributes have`}
+					not been evaluated yet, as Walletbeat does not have the necessary information on
+					{wallet.metadata.displayName}.
+					The <a href="/docs/contribute/wallet-data/">wallet data guide</a> explains how to contribute it.
+				</p>
+
+				<details bind:open={isUnratedListOpen}>
+					<summary data-row="start gap-2">{isUnratedListOpen ? 'Collapse' : 'Expand'}</summary>
+					<p>
+						{#each unratedAttributes as attribute, i (attribute.id)}
+							{i > 0 ? ', ' : ''}<a href={`#${slugifyCamelCase(attribute.id)}`}>{attribute.displayName}</a>
+						{/each}.
+					</p>
+				</details>
+			</div>
+		{/if}
 	</section>
 	</div>
 
@@ -2693,6 +2723,24 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		box-shadow: none;
 		background-image: none;
 		border-style: dashed;
+	}
+
+	/*
+	 * Consecutive collapsed unrated cards read as one list: no gap between them,
+	 * shared dividers, and rounded corners only at the ends of the run.
+	 */
+	.attribute[data-rating='unrated']:has(> details:not([open])) {
+		&:has(+ .attribute[data-rating='unrated'] > details:not([open])) {
+			border-end-start-radius: 0;
+			border-end-end-radius: 0;
+		}
+
+		& + .attribute[data-rating='unrated']:has(> details:not([open])) {
+			/* Cancels the `gap-7` row gap of `.attributes` and overlaps the shared border. */
+			margin-block-start: calc(-1.75em - 1px);
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
+		}
 	}
 
 	/*
