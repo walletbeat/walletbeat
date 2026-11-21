@@ -10,6 +10,7 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
+	type WalletNameStrings,
 } from '@/schema/attributes'
 import {
 	type AccountSupport,
@@ -30,9 +31,12 @@ import { isSupported, notSupported, type Support, supported } from '@/schema/fea
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
+	ContentType,
 	markdown,
 	mdSentence,
 	paragraph,
+	renderTypographicContentToString,
+	type Sentence,
 	sentence,
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
@@ -82,6 +86,26 @@ function getNonRecoverableGuardianScenarios(guardianPolicy: GuardianPolicy): Arr
 	)
 }
 
+/**
+ * Explanation of a single non-recoverable scenario, naming the scenario
+ * before its outcome so that it can be understood on its own.
+ */
+function nonRecoverableOutcomeExplanation(
+	outcome: GuardianScenarioOutcome<GuardianScenarioType> & {
+		recovery: AccountRecoveryOutcomeCannotBeRecovered
+	},
+): Sentence<WalletNameStrings> {
+	const scenario = renderTypographicContentToString(outcome.scenario.description, null)
+	const { description } = outcome.recovery
+
+	switch (description.contentType) {
+		case ContentType.TEXT:
+			return { ...description, text: `${scenario}: ${description.text}` }
+		case ContentType.MARKDOWN:
+			return { ...description, markdown: `${scenario}: ${description.markdown}` }
+	}
+}
+
 function evaluateGuardianRecoveryPolicy(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	guardianPolicy: GuardianPolicy,
@@ -121,7 +145,7 @@ function evaluateGuardianRecoveryPolicy(
 				rating: Rating.FAIL,
 				displayName: 'Account may be nonrecoverable',
 				shortExplanation: typographicContentWithExtraOptionalStrings(
-					nonRecoverableOutcomes[0].recovery.description,
+					nonRecoverableOutcomeExplanation(nonRecoverableOutcomes[0]),
 				),
 				metadata: {
 					minimumGuardianPolicy: guardianPolicy,
