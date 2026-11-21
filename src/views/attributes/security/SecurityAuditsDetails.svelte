@@ -2,6 +2,7 @@
 	// Types/constants
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
+	import { dateCompare } from '@/types/date'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 
 	const securityFlawSeverities = {
@@ -59,11 +60,7 @@
 	} = $props()
 
 	const securityAudits = $derived(
-		metadata
-			.securityAudits
-			.toSorted((a, b) => (
-				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()
-			))
+		metadata.securityAudits.toSorted((a, b) => dateCompare(b.auditDate, a.auditDate))
 	)
 
 	const mostRecentAudit = $derived(
@@ -78,6 +75,7 @@
 
 
 	// Components
+	import DateTime from '@/components/DateTime.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
@@ -85,21 +83,12 @@
 </script>
 
 {#if metadata.securityAudits.length === 0}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: '**{{WALLET_NAME}}** has not undergone any security audits.',
-		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
-	/>
+	<p><strong>{wallet.metadata.displayName}</strong> has not undergone any security audits.</p>
 {:else}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
-		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
-	/>
+	<p>
+		<strong>{wallet.metadata.displayName}</strong> was last audited on
+		<DateTime datetime={mostRecentAudit.auditDate} />{auditedInLastYear ? '.' : ', which was over a year ago.'}{hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}
+	</p>
 
 	<section data-column="gap-2">
 		{#each securityAudits as audit (securityAuditId(audit))}
@@ -112,7 +101,7 @@
 				open
 			>
 				<summary>
-					<header data-row="wrap wrap-first-last">
+					<header data-row="wrap">
 						<div
 							data-row-item="flexible basis-1"
 							data-row="start wrap gap-2"
@@ -161,14 +150,12 @@
 							{/if}
 						</div>
 
-						<time datetime={audit.auditDate}>
-							{
-								Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
-									.format(
-										new Date(audit.auditDate),
-									)
-							}
-						</time>
+						<DateTime
+							datetime={audit.auditDate}
+							data-row-item="wrap-end"
+							data-row="gap-2"
+							style={`--collapsible-markerInlineTimeline: --collapsible-marker-audit-${securityAuditId(audit)}`}
+						/>
 					</header>
 				</summary>
 
@@ -210,7 +197,7 @@
 					{/if}
 
 					{#if audit.ref}
-						<ReferenceLinks references={toFullyQualified(audit.ref)} />
+						<ReferenceLinks headingLevel={5} references={toFullyQualified(audit.ref)} />
 					{/if}
 				</section>
 			</details>
