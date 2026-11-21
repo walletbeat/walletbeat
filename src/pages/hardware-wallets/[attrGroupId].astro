@@ -1,9 +1,9 @@
 ---
 // Types/constants
-import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 import { representativeWalletForType } from '@/data/wallets'
-import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
+import { WalletType } from '@/schema/wallet-types'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -13,7 +13,7 @@ import { displayedAttributeIdsForWalletType } from '@/schema/wallet-navigation'
 export const prerender = true
 
 export const getStaticPaths = () =>
-	displayedAttributeIdsForWalletType(WalletType.EMBEDDED).map(attrGroupId => ({
+	displayedAttributeIdsForWalletType(WalletType.HARDWARE).map(attrGroupId => ({
 		params: { attrGroupId },
 	}))
 
@@ -22,8 +22,8 @@ const { attrGroupId } = Astro.params
 // Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
-	embeddedWalletAttributeTree,
-	representativeWalletForType(WalletType.EMBEDDED).overall,
+	hardwareWalletAttributeTree,
+	representativeWalletForType(WalletType.HARDWARE).overall,
 )
 
 if (!attrGroup) {
@@ -33,12 +33,12 @@ if (!attrGroup) {
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
+import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 ---
 
 <Layout
 	metadata={{
-		title: `Ethereum Embedded Wallets ${attrGroup.displayName} - Walletbeat`,
+		title: `Ethereum Hardware Wallets ${attrGroup.displayName} - Walletbeat`,
 		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
 		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
@@ -46,10 +46,10 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<EmbeddedWalletTable
+		<HardwareWalletTable
 			client:visible
-			title='Embedded Wallets'
-			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/embedded/summary/' }}
+			title='Hardware Wallets'
+			focus={{ attributeGroupId: attrGroup.id, summaryHref: '/hardware-wallets/summary/' }}
 		/>
 	</main>
 </Layout>
