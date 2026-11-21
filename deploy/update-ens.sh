@@ -30,7 +30,9 @@ RPC_URLS=(
 	'https://rpc.mevblocker.io'
 )
 
-DIRECTORY_CID="$(pnpm omnipin pack --only-hash "$DEPLOY_DIRECTORY")"
+if [[ -z "${DIRECTORY_CID:-}" ]]; then
+	DIRECTORY_CID="$(pnpm omnipin pack --only-hash "$DEPLOY_DIRECTORY")"
+fi
 
 run_ens_check() {
 	local rpc_url="$1"
