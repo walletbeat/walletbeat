@@ -135,7 +135,7 @@
 
 		if (queryString !== undefined && queryString !== globalThis.location.search.slice(1))
 			globalThis.history.replaceState(
-				null,
+				globalThis.history.state,
 				'',
 				`${globalThis.location.pathname}${queryString ? `?${queryString}` : ''}${globalThis.location.hash}`,
 			)
@@ -403,16 +403,27 @@
 	let selectedModel = $state<string>()
 	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
 
-	onMount(() => {
+	function restoreQuerySelection() {
 		const params = new SvelteURLSearchParams(globalThis.location.search)
-		const variant = params.get('variant') as Variant | null
+		const variant = Object.values(Variant).find(value => value === params.get('variant'))
 
 		selectedVariant =
 			variant && variant in wallet.variants && !hasSingleVariant(wallet.variants)
 				? variant
 				: undefined
-		selectedModel = params.get('model') ?? undefined
+		selectedModel = brandModels.find(model => model.modelId === params.get('model'))?.modelId
 		queryParams = params
+	}
+
+	onMount(() => {
+		const walletPath = globalThis.location.pathname
+		const restoreWalletHistorySelection = () => {
+			// ClientRouter keeps this wallet mounted while it prepares a different page.
+			if (globalThis.location.pathname === walletPath) restoreQuerySelection()
+		}
+
+		restoreQuerySelection()
+		globalThis.addEventListener('popstate', restoreWalletHistorySelection)
 		const root = document.querySelector('#top')!
 		const panel = root.querySelector('#wallet-toc')
 		tocStateOwners = [root.closest('#layout'), root.querySelector('.page-navigation'), root.querySelector('.pie-navigation')].filter((owner): owner is Element => owner !== null)
@@ -427,6 +438,7 @@
 		}
 		root.addEventListener('toggle', revealClosedDisclosure, true)
 		return () => {
+			globalThis.removeEventListener('popstate', restoreWalletHistorySelection)
 			root.removeEventListener('toggle', revealClosedDisclosure, true)
 			tocClosing = null
 			for (const owner of tocStateOwners) owner.removeAttribute('data-wallet-toc-state')
