@@ -8,17 +8,11 @@ import { impactCategories, incidentStatuses, newsTypes, severities } from '@/typ
 // Functions
 import { refs } from '@/schema/reference'
 
-const formatDate = (dateString: string) =>
-	new Date(dateString).toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	})
-
 // Layouts
 import Layout from '@/layouts/Layout.astro'
 
 // Components
+import DateTime from '@/components/DateTime.svelte'
 import Navigation from '@/views/Navigation.astro'
 import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 ---
@@ -82,14 +76,13 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 										data-row-item='wrap-end flexible basis-3'
 										data-row='end wrap gap-1'
 									>
-										<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
+										<DateTime datetime={news.publishedAt} />
 
 										{news.publishedAt !== news.updatedAt && (
 											<small class='gap-1'>
 												<span>・</span>
 												<span>
-													Updated{' '}
-													<time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time>
+													Updated <DateTime datetime={news.updatedAt} />
 												</span>
 											</small>
 										)}

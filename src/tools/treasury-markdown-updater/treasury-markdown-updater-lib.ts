@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { loadConfig, optimize } from 'svgo'
+import { Temporal } from 'temporal-polyfill'
 
 import { assertCalendarDate, type CalendarDate } from '@/types/date'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -818,47 +819,20 @@ function formatUsd(value: number, showCurrency = false): string {
 /**
  * Collect all YYYY-MM months between two dates (inclusive).
  */
-function collectMonths(fromDate: string, toDate: string): string[] {
-	const [fromYear, fromMonth] = fromDate.substring(0, 7).split('-').map(Number)
-	const [toYear, toMonth] = toDate.substring(0, 7).split('-').map(Number)
-
+function collectMonths(fromDate: CalendarDate, toDate: CalendarDate): string[] {
+	const fromMonth = Temporal.PlainYearMonth.from(fromDate)
+	const toMonth = Temporal.PlainYearMonth.from(toDate)
 	const months: string[] = []
-	let y = fromYear
-	let m = fromMonth
 
-	while (y < toYear || (y === toYear && m <= toMonth)) {
-		months.push(`${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}`)
-		m++
-
-		if (m > 12) {
-			m = 1
-			y++
-		}
+	for (
+		let month = fromMonth;
+		Temporal.PlainYearMonth.compare(month, toMonth) <= 0;
+		month = month.add({ months: 1 })
+	) {
+		months.push(month.toString())
 	}
 
 	return months
-}
-
-/** Converts a YYYY-MM-DD date string to an integer day count (UTC). */
-function dateToDayCount(dateStr: CalendarDate): number {
-	const [year, month, day] = dateStr.split('-').map(Number)
-
-	return Date.UTC(year, month - 1, day) / 86_400_000
-}
-
-/** Converts an integer day count back to a YYYY-MM-DD date string (UTC). */
-function dayCountToDate(dayCount: number): CalendarDate {
-	const date = new Date(dayCount * 86_400_000)
-	const year = date.getUTCFullYear()
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-	const day = String(date.getUTCDate()).padStart(2, '0')
-
-	return assertCalendarDate(`${year}-${month}-${day}`)
-}
-
-/** Returns the number of days in a spread-back window (months count as 30 days). */
-function spreadTotalDays(spreadBack: SpreadBack): number {
-	return spreadBack.unit === 'mo' ? spreadBack.value * 30 : spreadBack.value
 }
 
 /**
@@ -866,31 +840,28 @@ function spreadTotalDays(spreadBack: SpreadBack): number {
  *
  * A payment on date D with a spread-back window of `totalDays` days is treated
  * as earned uniformly over the `totalDays` days immediately preceding D
- * (exclusive of D). Returns a Map of year-month → USD amount.
+ * (exclusive of D). Each month in the spread-back window counts as 30 days.
  */
 function spreadPaymentByMonth(
 	date: CalendarDate,
 	usdTotal: number,
-	totalDays: number,
-): Map<string, number> {
-	const endDay = dateToDayCount(date)
-	const startDay = endDay - totalDays
-	const daysPerMonth = new Map<string, number>()
-
-	for (let day = startDay; day < endDay; day++) {
-		const month = dayCountToDate(day).substring(0, 7)
-
-		daysPerMonth.set(month, (daysPerMonth.get(month) ?? 0) + 1)
-	}
-
+	spreadBack: SpreadBack,
+): [string, number][] {
+	const totalDays = spreadBack.unit === 'mo' ? spreadBack.value * 30 : spreadBack.value
+	const end = Temporal.PlainDate.from(date)
 	const dailyUsd = usdTotal / totalDays
-	const byMonth = new Map<string, number>()
+	const contributions: [string, number][] = []
 
-	for (const [month, days] of daysPerMonth) {
-		byMonth.set(month, days * dailyUsd)
+	for (let start = end.subtract({ days: totalDays }); Temporal.PlainDate.compare(start, end) < 0;) {
+		const month = start.toPlainYearMonth()
+		const nextMonth = month.add({ months: 1 }).toPlainDate({ day: 1 })
+		const stop = Temporal.PlainDate.compare(nextMonth, end) < 0 ? nextMonth : end
+
+		contributions.push([month.toString(), start.until(stop).days * dailyUsd])
+		start = stop
 	}
 
-	return byMonth
+	return contributions
 }
 
 interface ExpenseChartSegment {
@@ -948,7 +919,7 @@ export async function generateExpensesOverTimeChart(
 			// Spread-back payments are earned uniformly over a prior window instead
 			// of appearing as a single spike in the month they were paid.
 			const contributions: [string, number][] = spreadBack
-				? [...spreadPaymentByMonth(op.Date, usdTotal, spreadTotalDays(spreadBack))]
+				? spreadPaymentByMonth(op.Date, usdTotal, spreadBack)
 				: [[op.Date.substring(0, 7), usdTotal]]
 
 			for (const [yearMonth, usd] of contributions) {
@@ -1168,7 +1139,7 @@ function aggregateExpensesByCategory(
 			}
 
 			const normalized = normalizeAsset(asset)
-			const priceKeyStr = priceKey(assertCalendarDate(op.Date), normalized)
+			const priceKeyStr = priceKey(op.Date, normalized)
 			const priceRow = priceData.get(priceKeyStr)
 
 			if (!priceRow) {
