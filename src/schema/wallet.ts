@@ -32,6 +32,7 @@ import { type AccountType, supportedAccountTypes } from './features/account-supp
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
 import type { GithubRawUrl } from './github-raw-url'
 import type { Ladders, WalletLadderType } from './ladders'
+import type { WithRef } from './reference'
 import {
 	evaluateWalletOnLadder,
 	type StageEvaluatableWallet,
@@ -142,7 +143,24 @@ export interface WalletMetadata {
 	 * For hardware wallets, list of available models/devices
 	 */
 	hardwareWalletModels?: HardwareWalletModel[]
+
+	/**
+	 * Set when the wallet is no longer offered as a product, e.g. its apps
+	 * were removed from app stores or its repositories were archived.
+	 * Discontinued wallets keep their wallet page (with a notice) but are
+	 * hidden from the wallet tables.
+	 */
+	discontinued?: WalletDiscontinuation
 }
+
+/** Information about a wallet that is no longer offered as a product. */
+export type WalletDiscontinuation = WithRef<{
+	/**
+	 * Date on which the wallet stopped being offered, or on which its
+	 * shutdown was announced.
+	 */
+	date: CalendarDate
+}>
 
 export interface WalletUrls {
 	/** Website URL(s) for the wallet. At least one is required. */

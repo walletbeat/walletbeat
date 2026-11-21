@@ -758,6 +758,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
+	import DiscontinuedWalletNotice from '@/views/DiscontinuedWalletNotice.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
@@ -990,6 +991,13 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			{/if}
 		</nav>
 	</section>
+
+	{#if wallet.metadata.discontinued !== undefined}
+		<DiscontinuedWalletNotice
+			displayName={wallet.metadata.displayName}
+			discontinued={wallet.metadata.discontinued}
+		/>
+	{/if}
 	</div>
 
 	<aside
