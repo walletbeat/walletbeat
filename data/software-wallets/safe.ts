@@ -22,10 +22,16 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel, FeeType } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { type ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
+import { type MustRef, refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const safe: SoftwareWallet = {
@@ -36,7 +42,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
+		lastUpdated: '2026-11-13',
 		urls: {
 			docs: ['https://docs.safe.global/'],
 			repositories: ['https://github.com/safe-fndn'],
@@ -369,15 +375,100 @@ export const safe: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: {
+					[Variant.BROWSER]: supported<ArtifactSigningDetails>({
+						ref: [
+							{
+								explanation:
+									'The web release job can write attestations. It uses `actions/attest` to create a signed build provenance attestation for the release archive.',
+								label: 'Safe web release workflow',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/workflows/web-tag-release.yml#L100-L104,L214-L217',
+							},
+							{
+								explanation:
+									'GitHub publishes the attestations of the Safe repository. Each attestation is signed with the identity of the GitHub Actions workflow that built the artifact.',
+								label: 'Safe repository attestations',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/attestations',
+							},
+							{
+								explanation:
+									'The attestation for the `web-v1.105.0` release archive is in the public Sigstore transparency log.',
+								label: 'Sigstore transparency log entry',
+								url: 'https://search.sigstore.dev/?logIndex=3669618074',
+							},
+						],
+						publication: 'SIGSTORE_REKOR',
+						signer: 'BUILD_INFRA_IDENTITY',
+					}),
+					[Variant.MOBILE]: notSupported,
+				},
 				dependencyAgeGate: null,
-				dependencyLocking: null,
+				dependencyLocking: {
+					[Variant.BROWSER]: supported({
+						ref: [
+							{
+								explanation:
+									'The shared Yarn setup action installs dependencies with `yarn install --immutable`, which fails if `yarn.lock` would change.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/actions/yarn/action.yml#L65-L68',
+							},
+							{
+								explanation:
+									'The web release job uses this action to install dependencies before it builds the release.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/workflows/web-tag-release.yml#L143-L148',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The base build profile sets only the Node version and the build images. It keeps the default install step of the Expo build service.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15',
+							},
+							{
+								explanation:
+									'The production build profile extends the base profile and adds no install step. No public workflow forces a locked install for this build.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L44-L61',
+							},
+						],
+					}),
+				},
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hasPublicChangelog: {
+					[Variant.BROWSER]: supported({
+						ref: {
+							explanation: 'Safe publishes web app release notes via GitHub Releases.',
+							label: 'Safe web app releases on GitHub',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
+						},
+					}),
+					[Variant.MOBILE]: supported<MustRef<{}>>({
+						ref: [
+							{
+								explanation:
+									'The App Store version history lists release notes for each version of the Safe mobile app.',
+								label: 'Safe mobile app on the App Store',
+								url: 'https://apps.apple.com/us/app/safe-mobile/id6748754793',
+							},
+							{
+								explanation:
+									'The iOS and Android apps are built from one app configuration with one version number, so the App Store version history also covers the Android releases.',
+								label: 'Safe mobile app version',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/app.config.ts#L30-L34',
+							},
+							{
+								explanation:
+									'The Google Play listing shows the release notes of the latest Android version only.',
+								label: 'Safe mobile app on Google Play',
+								url: 'https://play.google.com/store/apps/details?id=global.safe.mobileapp',
+							},
+						],
+					}),
+				},
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({

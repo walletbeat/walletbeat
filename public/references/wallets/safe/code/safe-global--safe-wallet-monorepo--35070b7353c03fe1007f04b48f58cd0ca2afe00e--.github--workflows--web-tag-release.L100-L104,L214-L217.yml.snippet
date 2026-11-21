@@ -1,0 +1,74 @@
+{
+	"highlightRanges": [
+		{
+			"first": 100,
+			"last": 104
+		},
+		{
+			"first": 214,
+			"last": 217
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  tag:"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"      - name: Extract changelog from PR body"
+			],
+			"startLine": 79
+		},
+		{
+			"lines": [
+				"        run: |"
+			],
+			"startLine": 83
+		},
+		{
+			"lines": [
+				"          } >> $GITHUB_OUTPUT",
+				"",
+				"  release-deploy:",
+				"    needs: tag",
+				"    permissions:",
+				"      attestations: write",
+				"      contents: write",
+				"      id-token: write",
+				"      pull-requests: write",
+				"    runs-on: ubuntu-latest",
+				"",
+				"    steps:",
+				"      - name: Checkout"
+			],
+			"startLine": 96
+		},
+		{
+			"lines": [
+				"      - name: Create archive",
+				"        run: tar -czf \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}\".tar.gz out",
+				"        working-directory: apps/web",
+				"",
+				"      - name: Generate artifact attestation",
+				"        uses: actions/attest@v4.2.2",
+				"        with:",
+				"          subject-path: apps/web/${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}.tar.gz",
+				"",
+				"      - name: Create checksum",
+				"        run: sha256sum \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}\".tar.gz > \"${{ github.event.repository.name }}-${{ needs.tag.outputs.version }}-sha256-checksum.txt\"",
+				"        working-directory: apps/web"
+			],
+			"startLine": 210
+		}
+	]
+}
