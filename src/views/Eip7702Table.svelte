@@ -172,6 +172,8 @@
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
 						<Tooltip
 							placement="inline-end"
+							buttonTriggerPlacement="behind"
+							ariaLabel="EIP-7702 details"
 						>
 							<button
 								data-tag="eip"
@@ -192,6 +194,8 @@
 						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
 							<Tooltip
 								placement="inline-end"
+								buttonTriggerPlacement="behind"
+								ariaLabel="ERC-4337 details"
 							>
 								<button
 									data-tag="eip"
@@ -333,6 +337,12 @@
 		&:is(button) {
 			display: inline-flex;
 		}
+	}
+
+	/* The tooltip stacks its trigger button behind the tag; keep both as wide as the tag. */
+	:global([data-stack]):has(> [data-tag]) {
+		display: inline-grid;
+		vertical-align: middle;
 	}
 
 	.muted-text {
