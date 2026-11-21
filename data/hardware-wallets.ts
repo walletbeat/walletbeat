@@ -1,10 +1,9 @@
-import type { AttributeTree } from '@/schema/attribute-groups'
-import { AttributeGroupId, attributeTreeForIds } from '@/schema/attribute-tree'
 import type { WalletHardwareFeatures } from '@/schema/features'
 import { hardwareLadders } from '@/schema/ladders'
 import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
+import { type HardwareAttributeGroupId, hardwareWalletAttributeTree } from './attribute-trees'
 import { bitboxWallet } from './hardware-wallets/bitbox'
 import { cypherockWallet } from './hardware-wallets/cypherock'
 import { fireflyWallet } from './hardware-wallets/firefly'
@@ -18,20 +17,7 @@ import { onekeyWallet } from './hardware-wallets/onekey'
 import { trezorWallet } from './hardware-wallets/trezor'
 import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl'
 
-const hardwareWalletAttributeGroupIds = [
-	AttributeGroupId.Security,
-	AttributeGroupId.Privacy,
-	AttributeGroupId.SelfSovereignty,
-	AttributeGroupId.Transparency,
-	AttributeGroupId.Ecosystem,
-	AttributeGroupId.Maintenance,
-] as const
-
-export type HardwareAttributeGroupId = (typeof hardwareWalletAttributeGroupIds)[number]
-
-export const hardwareWalletAttributeTree = attributeTreeForIds(
-	hardwareWalletAttributeGroupIds,
-) satisfies AttributeTree<HardwareAttributeGroupId>
+export { type HardwareAttributeGroupId, hardwareWalletAttributeTree } from './attribute-trees'
 
 /**
  * The interface used to describe hardware wallets.
@@ -81,7 +67,19 @@ export const unratedHardwareWallet = rateWallet<HardwareAttributeGroupId>(
 	unratedHardwareTemplate,
 )
 
-export const allHardwareModels = Object.values(hardwareWallets)
+/** A hardware wallet model, as listed on wallet pages and in the wallet table. */
+export interface HardwareModelSummary {
+	id: string
+	brandId: string
+	brandName: string
+	iconUrl: string
+	isFlagship: boolean
+	modelId: string
+	modelName: string
+	url: string | undefined
+}
+
+export const allHardwareModels: HardwareModelSummary[] = Object.values(hardwareWallets)
 	.flatMap(
 		(wallet: HardwareWallet) =>
 			wallet.metadata.hardwareWalletModels?.map(model => ({

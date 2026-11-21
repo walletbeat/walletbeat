@@ -46,7 +46,7 @@
 	// Functions
 	import { variants, variantToName, variantToRunsOn } from '@/constants/variants'
 	import type { NavigationItem } from '@/constants/navigation'
-	import { allHardwareModels } from '@/data/hardware-wallets'
+	import type { HardwareModelSummary } from '@/data/hardware-wallets'
 	import {
 		type AttributeGroup,
 		calculateAttributeGroupScore,
@@ -69,6 +69,7 @@
 		attributeTree,
 		walletIcon,
 		wallet,
+		allHardwareModels,
 		showStage = true,
 		showScores = false,
 	}: {
@@ -76,6 +77,7 @@
 		attributeTree: AttributeTree<_AttributeGroupId>
 		walletIcon: ImageMetadata
 		wallet: RatedWallet<_AttributeGroupId>
+		allHardwareModels: HardwareModelSummary[]
 		showStage?: boolean
 		showScores?: boolean
 	} = $props()
