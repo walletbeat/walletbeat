@@ -56,7 +56,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			dataCollection: null,
 			hardwarePrivacy: null,
-			privacyPolicy: '',
+			privacyPolicy: null,
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
