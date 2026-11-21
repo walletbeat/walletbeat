@@ -34,7 +34,7 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
-import { getWalletUrl } from '@/utils/urls'
+import { getWalletAttributeUrl, getWalletUrl } from '@/utils/urls'
 
 /**
  * Generate a clean markdown page for a wallet, following the llms.txt convention
@@ -148,6 +148,8 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 					for (const criterion of groupCriteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
 						const attributeId = getCriterionAttributeId(criterion)
+						const attributeUrl =
+							attributeId !== null ? getWalletAttributeUrl(wallet, attributeId) : null
 						const descText = normalizeMarkdownBlankLines(
 							renderContentToText(criterion.description, evalStrings, { trim: true }),
 						)
@@ -157,11 +159,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 								: descText
 						const displayName = criterion.displayName
 						const attrLink =
-							attributeId !== null
-								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, {
-										attributeAnchor: slugifyCamelCase(attributeId),
-									})})`
-								: displayName
+							attributeUrl !== null ? `[${displayName}](${siteUrl}${attributeUrl})` : displayName
 						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- StageCriterionEvaluation.rating is a discriminated union; tsc requires narrowing to index stageCriterionRatings.
 						const ratingInfo = stageCriterionRatings[evaluation.rating as StageCriterionRating]
 						const bullet =
