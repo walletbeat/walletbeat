@@ -8,10 +8,15 @@ import {
 } from '@/schema/attributes'
 import { isSupported } from '@/schema/features/support'
 import { isSourcePubliclyVisible } from '@/schema/features/transparency/license'
+import {
+	isRepositoryChangeControlPresent,
+	type RepositoryChangeControl,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { mdParagraph, paragraph, sentence } from '@/types/content'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -21,6 +26,11 @@ type AdvancedGroupLevel = 'fail' | 'partial' | 'pass'
 type BasicSignals = {
 	changelog: boolean
 	locking: boolean
+	/**
+	 * Labels of the repository change controls that are not in place,
+	 * or `null` if the controls have not been assessed.
+	 */
+	missingChangeControls: string[] | null
 	pass: boolean
 }
 
@@ -30,7 +40,7 @@ type AdvancedSignals = {
 	level: AdvancedGroupLevel
 }
 
-type BasicSignalPresence = Pick<BasicSignals, 'changelog' | 'locking'>
+type BasicSignalPresence = Pick<BasicSignals, 'changelog' | 'locking' | 'missingChangeControls'>
 type AdvancedSignalPresence = Pick<AdvancedSignals, 'signing' | 'builds'>
 
 type ReleaseTransparencyFeatures =
@@ -40,18 +50,58 @@ type DependencyLocking = NonNullable<ReleaseTransparencyFeatures['dependencyLock
 type ArtifactSigning = NonNullable<ReleaseTransparencyFeatures['artifactSigning']>
 type ReproducibleBuilds = ReleaseTransparencyFeatures['reproducibleBuilds']
 type HermeticBuilds = ReleaseTransparencyFeatures['hermeticBuilds']
+type RepositoryChangeControls = NonNullable<ReleaseTransparencyFeatures['repositoryChangeControls']>
+
+const repositoryChangeControlLabels: Record<RepositoryChangeControl, string> = {
+	requiredReview: 'required review',
+	requiredChecks: 'required status checks',
+	forcePushBlocked: 'blocked force pushes',
+	branchDeletionBlocked: 'blocked branch deletion',
+	tagsImmutable: 'immutable release tags',
+}
+
+function repositoryChangeControlStates(
+	controls: RepositoryChangeControls,
+): Array<{ label: string; state: RepositoryChangeControlState }> {
+	return [
+		{ label: repositoryChangeControlLabels.requiredReview, state: controls.requiredReview },
+		{ label: repositoryChangeControlLabels.requiredChecks, state: controls.requiredChecks },
+		{ label: repositoryChangeControlLabels.forcePushBlocked, state: controls.forcePushBlocked },
+		{
+			label: repositoryChangeControlLabels.branchDeletionBlocked,
+			state: controls.branchDeletionBlocked,
+		},
+		{ label: repositoryChangeControlLabels.tagsImmutable, state: controls.tagsImmutable },
+	]
+}
+
+function hasChangeControls(basicSignals: BasicSignalPresence): boolean {
+	return basicSignals.missingChangeControls?.length === 0
+}
 
 function computeBasicSignals(
 	hasPublicChangelog: HasPublicChangelog,
 	dependencyLocking: DependencyLocking,
+	repositoryChangeControls: RepositoryChangeControls | null,
 ): BasicSignals {
 	const changelog = isSupported(hasPublicChangelog)
 	const locking = isSupported(dependencyLocking)
+	const missingChangeControls =
+		repositoryChangeControls === null
+			? null
+			: repositoryChangeControlStates(repositoryChangeControls)
+					.filter(({ state }) => !isRepositoryChangeControlPresent(state))
+					.map(({ label }) => label)
 
 	return {
 		changelog,
 		locking,
-		pass: changelog && locking,
+		missingChangeControls,
+		// Repository change controls that have not been assessed do not prevent a basic pass.
+		pass:
+			changelog &&
+			locking &&
+			(missingChangeControls === null || missingChangeControls.length === 0),
 	}
 }
 
@@ -110,19 +160,20 @@ function missingAdvancedSignal(advancedSignals: AdvancedSignalPresence): string 
 }
 
 function missingBasicSignals(basicSignals: BasicSignalPresence): string {
-	if (!basicSignals.changelog && !basicSignals.locking) {
-		return 'public changelog and dependency locking'
+	const { missingChangeControls } = basicSignals
+	const missing = [
+		basicSignals.changelog ? null : 'public changelog',
+		basicSignals.locking ? null : 'dependency locking',
+		missingChangeControls === null || missingChangeControls.length === 0
+			? null
+			: `repository change controls (${commaListFormat(missingChangeControls)})`,
+	].filter((signal): signal is string => signal !== null)
+
+	if (missing.length === 0) {
+		throw new Error('No missing basic signals')
 	}
 
-	if (!basicSignals.changelog && basicSignals.locking) {
-		return 'public changelog'
-	}
-
-	if (basicSignals.changelog && !basicSignals.locking) {
-		return 'dependency locking'
-	}
-
-	throw new Error('No missing basic signals')
+	return commaListFormat(missing)
 }
 
 function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
@@ -264,6 +315,7 @@ function fail(ctx: EvaluationContext, basicSignals: BasicSignalPresence): Evalua
 	const supportedBasicSignals = [
 		basicSignals.changelog ? 'public changelog' : null,
 		basicSignals.locking ? 'dependency locking' : null,
+		hasChangeControls(basicSignals) ? 'repository change controls' : null,
 	].filter((signal): signal is string => signal !== null)
 
 	const detailsText =
@@ -280,6 +332,15 @@ function fail(ctx: EvaluationContext, basicSignals: BasicSignalPresence): Evalua
 	if (!basicSignals.locking) {
 		bullets.push(
 			'- **Dependency locking**: use a lockfile (or equivalent) to pin all dependencies to known versions.',
+		)
+	}
+
+	if (
+		basicSignals.missingChangeControls !== null &&
+		basicSignals.missingChangeControls.length > 0
+	) {
+		bullets.push(
+			`- **Repository change controls**: add publicly visible repository rules (such as those on GitHub) for ${commaListFormat(basicSignals.missingChangeControls)}.`,
 		)
 	}
 
@@ -327,76 +388,100 @@ export const releaseProcess: Attribute = {
 		between versions are documented.
 		Without these signals, a compromised or tampered release may go undetected.
 	`),
-	methodology: mdParagraph(`
-		Four binary signals are assessed, grouped into two categories:
+	methodology: markdown(`
+		Five binary signals are assessed, grouped into two categories:
 
 		**Basic**:
 
 		1. **Public changelog**: the wallet publishes release notes or a changelog.
 		2. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
+		3. **Repository change controls**: the wallet's source repository requires an approving
+		   review and passing status checks before merging, blocks force pushes and deletion of
+		   protected branches, and keeps release tags immutable.
 
 		**Advanced**:
 
-		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
-		4. **Reproducible or hermetic builds**: independent parties can verify that build output matches
+		4. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
+		5. **Reproducible or hermetic builds**: independent parties can verify that build output matches
 		   source, or the build can run fully offline. Verifying this independently requires access to
 		   public source code.
 
-		A wallet **passes** when both basic signals and both advanced signals are present.
+		A wallet **passes** when all basic signals and both advanced signals are present.
 		Partial coverage earns a **partial** rating, based on which groups are satisfied.
 		Basic signals alone score lower than advanced signals alone, reflecting stronger trust from
 		advanced-group evidence. No signals at all earns a **fail**.
+
+		Repository change controls count when anyone can check them (such as public repository
+		rules on GitHub), or when the developer states they are in place. If the rating relies on
+		such a statement, it is marked as unverifiable. Controls that cannot be checked publicly
+		and that the developer makes no statement about do not count. Wallets whose repository
+		change controls have not been assessed yet are rated on the other signals.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(
-				'The wallet has a public changelog, reproducible or hermetic builds, signed artifacts, and locked dependencies.',
+				'The wallet has a public changelog, reproducible or hermetic builds, signed artifacts, locked dependencies, and repository change controls.',
 			),
 			pass(
 				EvaluationContext.forTest(() => releaseProcess),
-				['public changelog', 'reproducible builds', 'artifact signing', 'dependency locking'],
+				[
+					'public changelog',
+					'reproducible builds',
+					'artifact signing',
+					'dependency locking',
+					'repository change controls',
+				],
 			),
 		),
 		partial: [
 			exampleRating(
 				paragraph(
-					'The wallet has a public changelog and dependency locking, but lacks both artifact signing and reproducible or hermetic builds.',
+					'The wallet has a public changelog, dependency locking, and repository change controls, but lacks both artifact signing and reproducible or hermetic builds.',
 				),
 				partialBasicPassAdvancedFail(
 					EvaluationContext.forTest(() => releaseProcess),
-					['public changelog', 'dependency locking'],
+					['public changelog', 'dependency locking', 'repository change controls'],
 				),
 			),
 			exampleRating(
 				paragraph(
-					'The wallet has artifact signing, but no reproducible or hermetic builds, changelog, or dependency locking.',
+					'The wallet has artifact signing and repository change controls, but no reproducible or hermetic builds, changelog, or dependency locking.',
 				),
 				partialBasicFailAdvancedPartial(
 					EvaluationContext.forTest(() => releaseProcess),
-					['artifact signing'],
-					{ changelog: false, locking: false },
+					['artifact signing', 'repository change controls'],
+					{ changelog: false, locking: false, missingChangeControls: [] },
 					{ signing: true, builds: false },
 				),
 			),
 			exampleRating(
 				paragraph(
-					'The wallet has reproducible builds and artifact signing, but lacks changelog and dependency locking.',
+					'The wallet has reproducible builds, artifact signing, and dependency locking, but lacks a changelog and its repository does not require review before merging.',
 				),
 				partialBasicFailAdvancedPass(
 					EvaluationContext.forTest(() => releaseProcess),
-					['reproducible builds', 'artifact signing'],
-					{ changelog: false, locking: false },
+					['reproducible builds', 'artifact signing', 'dependency locking'],
+					{
+						changelog: false,
+						locking: true,
+						missingChangeControls: [repositoryChangeControlLabels.requiredReview],
+					},
 				),
 			),
 			exampleRating(
 				paragraph(
-					'The wallet has a changelog, dependency locking, and artifact signing, but no reproducible or hermetic builds.',
+					'The wallet has a changelog, dependency locking, repository change controls, and artifact signing, but no reproducible or hermetic builds.',
 				),
 				partialBasicPassAdvancedPartial(
 					EvaluationContext.forTest(() => releaseProcess),
-					['public changelog', 'dependency locking', 'artifact signing'],
+					[
+						'public changelog',
+						'artifact signing',
+						'dependency locking',
+						'repository change controls',
+					],
 					{ signing: true, builds: false },
 				),
 			),
@@ -404,18 +489,38 @@ export const releaseProcess: Attribute = {
 		fail: [
 			exampleRating(
 				paragraph(
-					'The wallet has a public changelog, but lacks dependency locking, artifact signing, and reproducible or hermetic builds.',
+					'The wallet has a public changelog and repository change controls, but lacks dependency locking, artifact signing, and reproducible or hermetic builds.',
 				),
 				fail(
 					EvaluationContext.forTest(() => releaseProcess),
-					{ changelog: true, locking: false },
+					{ changelog: true, locking: false, missingChangeControls: [] },
 				),
 			),
 			exampleRating(
-				paragraph('The wallet lacks both basic signals and advanced signals.'),
+				paragraph(
+					'The wallet has a public changelog and dependency locking, but its repository allows force pushes and does not keep release tags immutable, and it lacks artifact signing and reproducible or hermetic builds.',
+				),
 				fail(
 					EvaluationContext.forTest(() => releaseProcess),
-					{ changelog: false, locking: false },
+					{
+						changelog: true,
+						locking: true,
+						missingChangeControls: [
+							repositoryChangeControlLabels.forcePushBlocked,
+							repositoryChangeControlLabels.tagsImmutable,
+						],
+					},
+				),
+			),
+			exampleRating(
+				paragraph('The wallet lacks all basic signals and advanced signals.'),
+				fail(
+					EvaluationContext.forTest(() => releaseProcess),
+					{
+						changelog: false,
+						locking: false,
+						missingChangeControls: Object.values(repositoryChangeControlLabels),
+					},
 				),
 			),
 		],
@@ -455,7 +560,12 @@ export const releaseProcess: Attribute = {
 			return unrated(ctx)
 		}
 
-		const basicSignals = computeBasicSignals(hasPublicChangelog, dependencyLocking)
+		const repositoryChangeControls = rt.repositoryChangeControls
+		const basicSignals = computeBasicSignals(
+			hasPublicChangelog,
+			dependencyLocking,
+			repositoryChangeControls,
+		)
 		const advancedSignals = computeAdvancedSignals(
 			artifactSigning,
 			rt.reproducibleBuilds,
@@ -481,13 +591,26 @@ export const releaseProcess: Attribute = {
 			buildSignal,
 			advancedSignals.signing ? 'artifact signing' : null,
 			basicSignals.locking ? 'dependency locking' : null,
+			hasChangeControls(basicSignals) ? 'repository change controls' : null,
 		].filter((signal): signal is string => signal !== null)
 
-		ctx.setVerifiability(
-			verifiabilityNeedsSourceCodeVisibility
-				? verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false })
-				: Verifiability.VERIFIABLE,
-		)
+		const changeControlsAreClaimed =
+			repositoryChangeControls !== null &&
+			hasChangeControls(basicSignals) &&
+			repositoryChangeControlStates(repositoryChangeControls).some(
+				({ state }) => state === RepositoryChangeControlState.CLAIMED_PRESENT,
+			)
+
+		if (changeControlsAreClaimed) {
+			// The developer's statement is the only evidence for some of the controls.
+			ctx.setVerifiability(Verifiability.UNVERIFIABLE)
+		} else {
+			ctx.setVerifiability(
+				verifiabilityNeedsSourceCodeVisibility
+					? verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false })
+					: Verifiability.VERIFIABLE,
+			)
+		}
 
 		const sourceVisible = isSourcePubliclyVisible(ctx.features.licensing)
 
@@ -495,7 +618,7 @@ export const releaseProcess: Attribute = {
 			return unrated(ctx)
 		}
 
-		ctx.addRef(hasPublicChangelog, artifactSigning, dependencyLocking)
+		ctx.addRef(hasPublicChangelog, artifactSigning, dependencyLocking, repositoryChangeControls)
 
 		if (advancedSignals.builds) {
 			ctx.addRef(
