@@ -18,6 +18,8 @@ import { type CodeSnippetIndex } from '@/utils/code-snippet-index'
 import { codeSnippetsForReferences } from '@/utils/code-snippet-store'
 import { sortEipSupportCards } from '@/utils/eip-support-sort'
 import { getWalletUrl } from '@/utils/urls'
+import type { ImageSizeIndex } from '@/utils/image-size-index'
+import { imageSizesForReferences } from '@/utils/image-size-store'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -75,6 +77,11 @@ function eipStatusSupportCards<_AttributeGroupId extends string>(
 	return sortEipSupportCards(attributeTree, entries)
 }
 
+/** The dimensions of the images referenced by `cards`. */
+async function cardImageSizes(cards: EipStatusSupportCard[]): Promise<ImageSizeIndex> {
+	return await imageSizesForReferences(cards.flatMap(card => card.references))
+}
+
 /** The stored code snippets referenced by `cards`. */
 function cardCodeSnippets(cards: EipStatusSupportCard[]): CodeSnippetIndex {
 	return Object.fromEntries(
@@ -129,6 +136,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
 					cards={softwareCards}
 					codeSnippets={cardCodeSnippets(softwareCards)}
+					imageSizes={await cardImageSizes(softwareCards)}
 					client:visible
 				/>
 			)
@@ -140,6 +148,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
 					cards={hardwareCards}
 					codeSnippets={cardCodeSnippets(hardwareCards)}
+					imageSizes={await cardImageSizes(hardwareCards)}
 					client:visible
 				/>
 			)
@@ -151,6 +160,7 @@ const embeddedCards = eipStatusSupportCards(
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
 					cards={embeddedCards}
 					codeSnippets={cardCodeSnippets(embeddedCards)}
+					imageSizes={await cardImageSizes(embeddedCards)}
 					client:visible
 				/>
 			)
