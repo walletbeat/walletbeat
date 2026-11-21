@@ -69,7 +69,7 @@ export type ChainAbstraction = {
 				 * to not display them).
 				 * (e.g. The wallet shows a fee breakdown before the user confirms the bridge transaction.)
 				 */
-				feesLargerThan1bps: FeeDisplay
+				feesLargerThan1bps: FeeDisplay | 'NO_FEES_CHARGED'
 			}>
 		>
 
