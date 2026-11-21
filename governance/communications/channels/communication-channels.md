@@ -59,10 +59,25 @@ _Keep list sorted by chronological "Established" date._
   - **Established**: 2026-06
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
+- **Walletbeat ↔ Devcon**:
+  - **Walletbeat contributors**: 0xMattmatt, polymutex, darrylyeo, Lucila
+  - **Established**: 2026-06
+  - **Fibonacci-approximate number of participants**: 9
+  - **Medium**: Telegram
 - **Walletbeat ↔ Blockaid**:
   - **Walletbeat contributors**: 0xMattmatt, polymutex, ren2140
   - **Wallet development teams represented**: Blockaid
   - **Established**: 2026-08
+  - **Fibonacci-approximate number of participants**: 5
+  - **Medium**: Telegram
+- **Walletbeat ↔ L2BEAT**:
+  - **Walletbeat contributors**: 0xMattmatt, polymutex, ren2140
+  - **Established**: 2026-09
+  - **Fibonacci-approximate number of participants**: 4
+  - **Medium**: Signal
+- **Walletbeat ↔ Trezor**:
+  - **Walletbeat contributors**: 0xMattmatt, polymutex
+  - **Established**: 2026-10
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
 

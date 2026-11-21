@@ -15,7 +15,7 @@
 	},
 	"author": "https://metamask.io",
 	"background": {
-		"service_worker": "scripts/app-init.js"
+		"service_worker": "service-worker.js"
 	},
 	"commands": {
 		"_execute_browser_action": {
@@ -39,13 +39,7 @@
 	"content_scripts": [
 		{
 			"matches": ["file://*/*", "http://*/*", "https://*/*"],
-			"js": [
-				"scripts/disable-console.js",
-				"scripts/lockdown-install.js",
-				"scripts/lockdown-run.js",
-				"scripts/lockdown-more.js",
-				"scripts/contentscript.js"
-			],
+			"js": ["scripts/contentscript.js"],
 			"run_at": "document_start",
 			"all_frames": true
 		},
@@ -55,6 +49,11 @@
 			"run_at": "document_start",
 			"world": "MAIN",
 			"all_frames": true
+		},
+		{
+			"matches": ["https://x.com/*", "https://www.x.com/*"],
+			"css": ["scripts/cashtag/pill/page.css", "scripts/cashtag/widget/page.css"],
+			"run_at": "document_start"
 		},
 		{
 			"matches": ["*://connect.trezor.io/*/popup.html*"],
@@ -87,7 +86,6 @@
 	"permissions": [
 		"activeTab",
 		"alarms",
-		"clipboardWrite",
 		"notifications",
 		"scripting",
 		"storage",
@@ -102,8 +100,16 @@
 		"pages": ["snaps/index.html"]
 	},
 	"short_name": "__MSG_appName__",
+	"web_accessible_resources": [
+		{
+			"resources": ["cashtag-widget.html"],
+			"matches": ["https://x.com/*", "https://www.x.com/*"]
+		}
+	],
+	"version": "13.56.0.0",
+	"version_name": "13.56.0",
 	"content_security_policy": {
-		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; frame-ancestors 'none'; font-src 'self';",
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; frame-ancestors 'self' https://x.com https://www.x.com; font-src 'self';",
 		"sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'; default-src 'none'; connect-src *; font-src 'self';"
 	},
 	"cross_origin_opener_policy": {
@@ -113,9 +119,8 @@
 		"matches": ["http://*/*", "https://*/*"],
 		"ids": ["*"]
 	},
-	"minimum_chrome_version": "115",
+	"minimum_chrome_version": "123",
 	"side_panel": {
 		"default_path": "sidepanel.html"
-	},
-	"version": "13.25.0"
+	}
 }
