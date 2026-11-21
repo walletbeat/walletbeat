@@ -144,15 +144,15 @@
 											]
 												.filter(segment => segment)
 												.map(listItem => `\n* ${listItem}`)
-												.join('')}`
+												.join('')}\n\n`
 										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
-											? 'checking the contract or transaction data against a database of known scams.'
+											? ' checking the contract or transaction data against a database of known scams.'
 											: outcome.metadata.scamAlerts.contractTransactionWarning
 														.previousContractInteractionWarning
-												? 'warning you when interacting with a contract you have not interacted with before.'
+												? ' warning you when interacting with a contract you have not interacted with before.'
 												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
-													? 'warning you when interacting with a contract that has only recently been created onchain.'
-													: 'providing contract warnings.'
+													? ' warning you when interacting with a contract that has only recently been created onchain.'
+													: ' providing contract warnings.'
 								}${leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
 									[
 										outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
@@ -176,7 +176,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.scamUrlWarning)
-							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.${leakClause(outcome.metadata.scamAlerts.scamUrlWarning, [
+							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking the app's URL against a set of known scam apps.${leakClause(outcome.metadata.scamAlerts.scamUrlWarning, [
 									[
 										outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL',
 										'the full URL of the app',
