@@ -1,0 +1,30 @@
+{
+	"highlightRanges": [
+		{
+			"first": 31,
+			"last": 37
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"/// 32-byte AEAD key for [`super::WalletState`], persisted inside [super::Vault].",
+				"#[derive(Clone, Serialize, Deserialize)]",
+				"pub struct WalletStateKey(SecureArray<u8, 32>);",
+				"",
+				"impl WalletStateKey {",
+				"   pub fn generate() -> Result<Self, anyhow::Error> {",
+				"      let mut bytes = [0u8; 32];",
+				"      rand::thread_rng().fill_bytes(&mut bytes);",
+				"      let key =",
+				"         SecureArray::from_slice_mut(&mut bytes).map_err(|e| anyhow!(\"wallet state key: {e}\"))?;",
+				"      Ok(Self(key))",
+				"   }",
+				"",
+				"   /// Whether `other` holds the same key.",
+				"   ///"
+			],
+			"startLine": 27
+		}
+	]
+}

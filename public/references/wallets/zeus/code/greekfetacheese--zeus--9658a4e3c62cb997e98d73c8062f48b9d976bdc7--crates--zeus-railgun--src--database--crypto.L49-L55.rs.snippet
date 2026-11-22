@@ -1,0 +1,36 @@
+{
+	"highlightRanges": [
+		{
+			"first": 49,
+			"last": 55
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl<'de> Deserialize<'de> for RailgunDbKey {"
+			],
+			"startLine": 38
+		},
+		{
+			"lines": [
+				"   }",
+				"}",
+				"",
+				"impl RailgunDbKey {",
+				"   /// Generate a fresh random key.",
+				"   pub fn generate() -> Result<Self, DatabaseError> {",
+				"      let mut bytes = [0u8; 32];",
+				"      rand::rng().fill_bytes(&mut bytes);",
+				"      let key = SecureArray::from_slice_mut(&mut bytes)",
+				"         .map_err(|e| DatabaseError::StorageError(format!(\"railgun db key: {e}\")))?;",
+				"      Ok(Self(Mutex::new(key)))",
+				"   }",
+				"",
+				"   fn lock(&self) -> std::sync::MutexGuard<'_, SecureArray<u8, 32>> {",
+				"      self.0.lock().expect(\"RailgunDbKey poisoned\")"
+			],
+			"startLine": 45
+		}
+	]
+}

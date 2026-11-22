@@ -1,0 +1,66 @@
+{
+	"highlightRanges": [
+		{
+			"first": 343,
+			"last": 352
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl NetworkSettings {"
+			],
+			"startLine": 42
+		},
+		{
+			"lines": [
+				"   fn list_ui(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 128
+		},
+		{
+			"lines": [
+				"      ScrollArea::vertical().auto_shrink([false; 2]).content_margin(5).show(ui, |ui| {"
+			],
+			"startLine": 324
+		},
+		{
+			"lines": [
+				"         for (_url, rpc) in rpcs.iter_mut() {",
+				"            ui.horizontal(|ui| {"
+			],
+			"startLine": 328
+		},
+		{
+			"lines": [
+				"               rpc_col(ui, url_w, ROW_H, |ui| {",
+				"                  ui.add(",
+				"                     SecureTextEdit::singleline(&mut url)"
+			],
+			"startLine": 333
+		},
+		{
+			"lines": [
+				"                        .margin(Margin::same(5)),",
+				"                  );",
+				"               });",
+				"",
+				"               let was_enabled = rpc.enabled;",
+				"               let res = rpc_col(ui, ENABLED_W, ROW_H, |ui| {",
+				"                  ui.checkbox(&mut rpc.enabled, \"\")",
+				"               });",
+				"",
+				"               if res.inner.clicked() {",
+				"                  let z_client = ctx.client_manager.clone();",
+				"                  z_client.set_rpc_enabled(chain, &rpc.url, rpc.enabled);",
+				"",
+				"                  if !was_enabled && rpc.enabled {",
+				"                     let rpc = rpc.clone();",
+				"                     RT.spawn(async move {",
+				"                        let ctx = SHARED_GUI.read(|gui| gui.ctx.clone());",
+				"                        let z_client = ctx.get_client_manager();"
+			],
+			"startLine": 339
+		}
+	]
+}

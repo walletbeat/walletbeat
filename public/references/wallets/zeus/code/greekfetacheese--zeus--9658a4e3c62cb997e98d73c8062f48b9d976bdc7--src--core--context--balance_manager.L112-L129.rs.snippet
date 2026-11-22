@@ -1,0 +1,47 @@
+{
+	"highlightRanges": [
+		{
+			"first": 112,
+			"last": 129
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl BalanceManagerHandle {"
+			],
+			"startLine": 48
+		},
+		{
+			"lines": [
+				"   }",
+				"",
+				"   /// `retry_if_unchanged` true if we expect the balance to change,",
+				"   /// for example after a tx",
+				"   pub async fn update_eth_balance(",
+				"      &self,",
+				"      ctx: ZeusCtx,",
+				"      chain: u64,",
+				"      owners: Vec<Address>,",
+				"      retry_if_unchanged: bool,",
+				"   ) -> Result<(), anyhow::Error> {",
+				"      if owners.is_empty() {",
+				"         return Ok(());",
+				"      }",
+				"",
+				"      let client = ctx.get_client_manager();",
+				"      let batch_size = self.batch_size();",
+				"      let max_retries = self.max_retries();",
+				"      let retry_delay = self.retry_delay();",
+				"      let native = NativeCurrency::from(chain);",
+				"",
+				"      for chunk in owners.chunks(batch_size) {",
+				"         let chunk = chunk.to_vec();",
+				"         // Held in wei, the shape the round answers in, so both sides of the comparison are the same",
+				"         // type (`awaiting_change`).",
+				"         let old_balances: HashMap<Address, U256> = if retry_if_unchanged {"
+			],
+			"startLine": 108
+		}
+	]
+}

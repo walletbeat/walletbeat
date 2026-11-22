@@ -1,0 +1,31 @@
+{
+	"highlightRanges": [
+		{
+			"first": 319,
+			"last": 319
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"impl Rpc {"
+			],
+			"startLine": 312
+		},
+		{
+			"lines": [
+				"   pub fn builder(url: impl Into<Arc<str>>, chain_id: u64) -> RpcBuilder {",
+				"      RpcBuilder {",
+				"         url: url.into(),",
+				"         chain_id,",
+				"         default: false,",
+				"         enabled: false,",
+				"         mev_protect: false,",
+				"         rps: DEFAULT_RPC_RPS,",
+				"         cu_per_second: DEFAULT_RPC_CU_PER_SECOND,",
+				"      }"
+			],
+			"startLine": 314
+		}
+	]
+}

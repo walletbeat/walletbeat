@@ -1,0 +1,86 @@
+{
+	"highlightRanges": [
+		{
+			"first": 648,
+			"last": 699
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"pub async fn send_transaction(",
+				"   ctx: ZeusCtx,",
+				"   source_is_zeus: bool,",
+				"   req: SendTxRequest,",
+				"   opts: SendTxOptions,",
+				") -> Result<(TransactionReceipt, TransactionRich), anyhow::Error> {"
+			],
+			"startLine": 510
+		},
+		{
+			"lines": [
+				"   let rpc = client.get_best_rpc(chain.id()).ok_or(anyhow!(\"No available RPC found\"))?;",
+				"   let tx_client = client.client_for(&rpc, ClientKind::Send).await?;",
+				"",
+				"   // If needed use MEV protect client, if not found prompt the user to continue",
+				"   let send_client = if opts.mev_protect {",
+				"      match ctx.get_mev_protect_client(chain.id()).await {",
+				"         Ok(mev_client) => mev_client,",
+				"         Err(_) => {",
+				"            // One prompt at a time, as everywhere this window is used: a second flow",
+				"            // replacing the prompt would leave the first waiting on an answer it never",
+				"            // asked for, and both would act on the one click.",
+				"            //",
+				"            // This is the send flow's *second* prompt, and it is sequential by construction, not",
+				"            // stacked: `confirm_tx` above has already returned, which dropped its `ConfirmClaim`",
+				"            // and released the transaction confirmation, and that prompt's collector closed its",
+				"            // window before the MEV lookup ran. So the predicate is false here for this flow too —",
+				"            // no exemption is needed, and a future edit that raised this prompt while the",
+				"            // confirmation were still unanswered would be refused rather than drawn over it.",
+				"            let claimed = SHARED_GUI.write(|gui| {",
+				"               if authorising_prompt_busy(gui) {",
+				"                  return false;",
+				"               }",
+				"",
+				"               let opened = if source_is_zeus {",
+				"                  gui.confirm_window.open(\"No available MEV protect RPC found\")",
+				"               } else {",
+				"                  gui.confirm_window.open_from_dapp(\"No available MEV protect RPC found\")",
+				"               };",
+				"",
+				"               if opened {",
+				"                  gui.confirm_window.set_msg2(\"Continue without MEV protection?\");",
+				"                  gui.request_repaint();",
+				"               }",
+				"",
+				"               opened",
+				"            });",
+				"",
+				"            if !claimed {",
+				"               return Err(anyhow!(",
+				"                  \"Another prompt is already waiting for confirmation\"",
+				"               ));",
+				"            }",
+				"",
+				"            // Held until this flow is done with the prompt, however it ends.",
+				"            let _claim = ConfirmWindowClaim;",
+				"",
+				"            if !wait_confirm_window().await {",
+				"               return Err(anyhow!(\"Transaction rejected\"));",
+				"            }",
+				"",
+				"            tx_client",
+				"         }",
+				"      }",
+				"   } else {",
+				"      tx_client",
+				"   };",
+				"",
+				"   // Last gate: the wallet may have locked while the confirmation was up (or",
+				"   // during the MEV prompt). Never broadcast for a locked wallet.",
+				"   ctx.ensure_unlocked()?;"
+			],
+			"startLine": 644
+		}
+	]
+}

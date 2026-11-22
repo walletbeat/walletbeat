@@ -1,0 +1,37 @@
+{
+	"highlightRanges": [
+		{
+			"first": 243,
+			"last": 250
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"pub enum RemoteArtifactLoaderError {"
+			],
+			"startLine": 224
+		},
+		{
+			"lines": [
+				"   #[error(transparent)]",
+				"   Pin(#[from] ArtifactPinError),",
+				"}",
+				"",
+				"impl Default for RemoteArtifactLoader {",
+				"   fn default() -> Self {",
+				"      Self::new(",
+				"         \"https://github.com/greekfetacheese/privacy-protocol-artifacts/tree/main/artifacts\",",
+				"         None,",
+				"      )",
+				"   }",
+				"}",
+				"",
+				"impl RemoteArtifactLoader {",
+				"   pub fn new(base_url: &str, cache_dir: Option<PathBuf>) -> Self {",
+				"      if let Some(ref dir) = cache_dir {"
+			],
+			"startLine": 239
+		}
+	]
+}

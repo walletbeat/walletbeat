@@ -9,6 +9,7 @@ const expectedFullyRatedWallets: WalletName[] = [
 	'rabby',
 	'rainbow',
 	'uniswapWallet',
+	'zeus',
 ]
 
 function unratedAttributeIds(walletName: WalletName): string[] {

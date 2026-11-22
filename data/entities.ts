@@ -2,24 +2,38 @@ import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
+import { blockrazor } from '@/data/entities/blockrazor'
 import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
 import { cloudinary } from '@/data/entities/cloudinary'
+import { coinbase } from '@/data/entities/coinbase'
 import { consensys } from '@/data/entities/consensys'
 import { deBank } from '@/data/entities/debank'
+import { drpc } from '@/data/entities/drpc'
 import { flashbots } from '@/data/entities/flashbots'
 import { github } from '@/data/entities/github'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
+import { llamanodes } from '@/data/entities/llamanodes'
+import { meowRpc } from '@/data/entities/meow-rpc'
+import { mevBlocker } from '@/data/entities/mev-blocker'
 import { monad } from '@/data/entities/monad'
+import { nodies } from '@/data/entities/nodies'
+import { offchainLabs } from '@/data/entities/offchain-labs'
+import { oneRpc } from '@/data/entities/one-rpc'
+import { opLabs } from '@/data/entities/op-labs'
+import { publicnode } from '@/data/entities/publicnode'
 import { quicknode } from '@/data/entities/quicknode'
 import { rainbow } from '@/data/entities/rainbow'
+import { robinhood } from '@/data/entities/robinhood'
 import { rudderstack } from '@/data/entities/rudderstack'
 import { segment } from '@/data/entities/segment'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
+import { tenderly } from '@/data/entities/tenderly'
 import { trustWallet } from '@/data/entities/trust-wallet'
 import { uniswapLabs } from '@/data/entities/uniswap-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
+import { zan } from '@/data/entities/zan'
 import type { Entity } from '@/schema/entity'
 
 /**
@@ -31,24 +45,38 @@ export const allEntities = {
 	alphabet,
 	ambire: ambireEntity,
 	apple,
+	blockrazor,
 	citrea,
 	cloudflare,
 	cloudinary,
+	coinbase,
 	consensys,
 	debank: deBank,
+	drpc,
 	flashbots,
 	github,
 	hyperFoundation,
+	llamanodes,
+	meowRpc,
+	mevBlocker,
 	monad,
+	nodies,
+	offchainLabs,
+	oneRpc,
+	opLabs,
+	publicnode,
 	quicknode,
 	rainbow,
+	robinhood,
 	rudderstack,
 	segment,
 	sentry,
 	sonicLabs,
+	tenderly,
 	trustWallet,
 	uniswapLabs,
 	walletbeat,
+	zan,
 }
 
 /** A valid Entity ID. */
