@@ -762,6 +762,8 @@ export const zeus: SoftwareWallet = {
 								'Zeus derives the master HD wallet from the username and password using Argon2Id with a fixed high-cost parameter set, and persists it in a vault encrypted with those same credentials. The stored key material is protected by a standardized key derivation function rather than an ad-hoc scheme. Zeus does not generate the master key from a random number generator: its entropy comes from the user credentials. The keys Zeus does generate itself, such as the Railgun database key and the wallet state key, use the operating system CSPRNG.',
 							url: [
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/vault.rs#L369-L387',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-railgun/src/database/crypto.rs#L49-L55',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/wallet_state_key.rs#L31-L37',
 								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md#not-line-specific',
 							] as NonEmptyArray<string>,
 						},
