@@ -1171,15 +1171,23 @@ export const zeus: SoftwareWallet = {
 					byDefault: OrderflowDisclosureLevel.NONE,
 				},
 				practicesPage: notSupported,
-				userCanRemoveAuctioning: notSupportedWithRef({
+				userCanRemoveAuctioning: supported({
 					ref: [
 						{
 							explanation:
-								'Zeus does not auction orderflow, so there is no auctioning for the user to remove. Swap quotes and simulations are computed locally by the app, and transactions are submitted through the RPC endpoints the user chooses, or through a private MEV Protect endpoint when one is enabled.',
+								'The MEV Protect path is the only way Zeus hands orderflow to an auction. A MEV Protect endpoint has to be enabled before a transaction can take it, and the flag can be turned off per endpoint in Network Settings. With the flag off, or when no MEV Protect endpoint is enabled and the user accepts the fallback prompt, Zeus sends through the regular RPC endpoint, so no orderflow is auctioned.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L716-L733',
-								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L378',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L370-L383',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L371',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send.rs#L316-L341',
 							] as NonEmptyArray<string>,
+						},
+						{
+							explanation:
+								'The swap settings panel carries its own MEV Protect switch, so a swap can be sent without the auction path from that panel.',
+							file: 'public/references/wallets/zeus/screenshots/2026-09-26-zeus-swap-settings.png',
+							label:
+								'Zeus swap settings panel showing the MEV Protect switch alongside slippage, deadline, max hops, max routes, split routing, swap versions, and simulate mode',
 						},
 					],
 				}),
