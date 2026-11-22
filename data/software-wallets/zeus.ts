@@ -635,7 +635,6 @@ export const zeus: SoftwareWallet = {
 						customizableBroadcaster: featureSupported,
 					}),
 					crossContractCalls: notSupported,
-					// Unshield defaults to private broadcast (paymaster/bundler), self-broadcast is opt-in.
 					defaultTransactionSubmissionType: 'BROADCASTER',
 					merkleTreeSync: 'ON_USER_DEVICE',
 					privateTransfers: featureSupported,
