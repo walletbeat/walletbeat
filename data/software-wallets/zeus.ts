@@ -554,7 +554,7 @@ export const zeus: SoftwareWallet = {
 							],
 							byEntity: github,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
 								endpoint: RegularEndpoint,
 								multiAddress: null,
 							},
@@ -582,7 +582,7 @@ export const zeus: SoftwareWallet = {
 							],
 							byEntity: github,
 							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.PROMPTED,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
 								endpoint: RegularEndpoint,
 								multiAddress: null,
 							},
