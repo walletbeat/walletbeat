@@ -502,7 +502,7 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Zeus keeps its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updated ETH & ERC20 balances in batches, that means one single request will contain if not all most of the user wallet addresses and this can make these addresses correlatable to each other.',
+										'Zeus keeps its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updates ETH and ERC20 balances in batches. This means each request contains multiple user wallet addresses, making them correlatable.',
 									url: [
 										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
 										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L258-L283',
