@@ -168,7 +168,31 @@ interface EncodedWalletDataRequest {
 	 */
 	responsePayload?: EncodedResponsePayload
 
+	/**
+	 * Encoded as omitted if the request was not routed through a proxy,
+	 * otherwise the proxy the request was routed through.
+	 */
+	proxy?: EncodedWalletDataRequestProxy
+
 	review?: EncodedWalletRequestReview
+}
+
+/**
+ * Encoded representation of the proxy through which a request was routed.
+ */
+interface EncodedWalletDataRequestProxy {
+	/**
+	 * The kind of proxy.
+	 */
+	kind: 'TOR'
+
+	/**
+	 * Opaque identifier for the isolation circuit within the proxy.
+	 * Two requests routed through the same circuit appear to the receiving entity
+	 * as coming from the same IP address.
+	 * `null` means no specific circuit was used.
+	 */
+	circuit: string | null
 }
 
 /**
@@ -848,6 +872,26 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		responsePayload = parseEncodedResponsePayload(obj.responsePayload, `${at}.responsePayload`)
 	}
 
+	let proxy: EncodedWalletDataRequestProxy | undefined
+
+	if (obj.proxy !== undefined) {
+		const proxyObj = expectRecord(obj.proxy, `${at}.proxy`)
+
+		const kind = proxyObj.kind
+
+		if (kind !== 'TOR') {
+			throw new Error(`Unexpected ${at}.proxy.kind=${String(kind)}`)
+		}
+
+		const circuit = proxyObj.circuit
+
+		if (circuit !== null && typeof circuit !== 'string') {
+			throw new Error(`Expected string or null at ${at}.proxy.circuit`)
+		}
+
+		proxy = { kind, circuit }
+	}
+
 	return {
 		domain,
 		path,
@@ -863,6 +907,7 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		...(responseStatus !== undefined ? { responseStatus } : {}),
 		...(responseOddHeaders && Object.keys(responseOddHeaders).length ? { responseOddHeaders } : {}),
 		...(responsePayload ? { responsePayload } : {}),
+		...(proxy ? { proxy } : {}),
 		...(review ? { review } : {}),
 	}
 }
@@ -2194,6 +2239,7 @@ export class WalletRequest {
 	public readonly responseOddHeaders: UserDataDict
 	private readonly _responsePayloadEncoded: EncodedResponsePayload | null
 	private readonly _responsePayload: DecodedResponsePayload | null
+	private readonly _proxy: EncodedWalletDataRequestProxy | null
 	public readonly review: WalletRequestReview
 	public notWalletInitiatedByProxy: WalletRequest | null = null
 	private readonly _key: string
@@ -2214,6 +2260,7 @@ export class WalletRequest {
 		responseStatus: number | null
 		responseOddHeaders: UserDataDict
 		responsePayloadEncoded: EncodedResponsePayload | null
+		proxy: EncodedWalletDataRequestProxy | null
 		review: EncodedWalletRequestReview | null
 	}) {
 		this._captureFile = args.captureFile
@@ -2231,6 +2278,7 @@ export class WalletRequest {
 		this.responseStatus = args.responseStatus
 		this.responseOddHeaders = args.responseOddHeaders
 		this._responsePayloadEncoded = args.responsePayloadEncoded
+		this._proxy = args.proxy
 		this._responsePayload =
 			args.responsePayloadEncoded !== null
 				? DecodedResponsePayload.fromEncoded(args.responsePayloadEncoded)
@@ -2290,6 +2338,7 @@ export class WalletRequest {
 			responseStatus: req.responseStatus ?? null,
 			responseOddHeaders: decodeUserDataDict(req.responseOddHeaders, `${at}.responseOddHeaders`),
 			responsePayloadEncoded: req.responsePayload ?? null,
+			proxy: req.proxy ?? null,
 			review: req.review ?? null,
 		})
 	}
@@ -2362,6 +2411,7 @@ export class WalletRequest {
 				: {}),
 			...(responseOddHeaders ? { responseOddHeaders } : {}),
 			...(responsePayloadEncoded !== null ? { responsePayload: responsePayloadEncoded } : {}),
+			...(this._proxy !== null ? { proxy: this._proxy } : {}),
 			...(this.review.toJSON() === undefined ? {} : { review: this.review.toJSON() }),
 		}
 	}
@@ -2522,9 +2572,18 @@ export class WalletRequest {
 	 * The proxy circuit this request was routed through, or `null` if it was
 	 * not proxied. Two requests routed through the same circuit appear to the
 	 * receiving entity as coming from the same IP address.
+	 *
+	 * The returned string is `\`<kind>\`` (e.g. `TOR`) when no specific circuit
+	 * was used, or `\`<kind>:<circuit>\`` (e.g. `TOR:some-circuit-id`) otherwise.
 	 */
 	public proxy(): string | null {
-		return null
+		if (this._proxy === null) {
+			return null
+		}
+
+		return this._proxy.circuit === null
+			? this._proxy.kind
+			: `${this._proxy.kind}:${this._proxy.circuit}`
 	}
 
 	/**
@@ -2671,7 +2730,10 @@ export class WalletRequest {
 			}
 		}
 
-		setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+		if (this.proxy() === null) {
+			setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+		}
+
 		const reqStrings = new WalletDataStrings(this._captureFile)
 
 		await this.populateStringsInto(reqStrings)
