@@ -88,7 +88,16 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
       - name: Install packages (macOS)
         if: runner.os == 'macOS'
-        run: brew install --cask $(cat deploy/macos-packages.txt)
+        run: |
+          packages=$(cat deploy/macos-packages.txt)
+          for delay in 5 15; do
+            if brew install --cask $packages; then
+              exit 0
+            fi
+            echo "macOS package installation failed. Retrying in ${delay}s." >&2
+            sleep "$delay"
+          done
+          brew install --cask $packages
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
         shell: bash
