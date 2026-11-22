@@ -1,16 +1,30 @@
 import { greekfetacheese } from '@/data/contributors/greekfetacheese'
 import { across } from '@/data/entities/across'
+import { blockrazor } from '@/data/entities/blockrazor'
+import { coinbase } from '@/data/entities/coinbase'
+import { drpc } from '@/data/entities/drpc'
 import { flashbots } from '@/data/entities/flashbots'
 import { github } from '@/data/entities/github'
+import { llamanodes } from '@/data/entities/llamanodes'
+import { meowRpc } from '@/data/entities/meow-rpc'
 import { mevBlocker } from '@/data/entities/mev-blocker'
+import { nodies } from '@/data/entities/nodies'
+import { offchainLabs } from '@/data/entities/offchain-labs'
+import { oneRpc } from '@/data/entities/one-rpc'
+import { opLabs } from '@/data/entities/op-labs'
 import { pimlico } from '@/data/entities/pimlico'
-import { userEnabledRpcEndpoints } from '@/data/entities/user-enabled-rpc'
+import { publicnode } from '@/data/entities/publicnode'
+import { robinhood } from '@/data/entities/robinhood'
+import { tenderly } from '@/data/entities/tenderly'
+import { zan } from '@/data/entities/zan'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { ethInfinitismSimple7702Contract } from '@/data/wallet-contracts/eth-infinitism-simple-7702'
+import type { Entity } from '@/schema/entity'
 import { AccountType } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
 	CollectionPolicy,
+	type DataCollectionByEntity,
 	DataCollectionPurpose,
 	EntityRole,
 	MultiAddressPolicy,
@@ -107,6 +121,66 @@ const mevProtectReferences: Record<string, References> = {
 	],
 }
 
+/** The Zeus release commit that this entry's new code refs pin to. */
+const zeusReleaseBaseUrl =
+	'https://github.com/greekfetacheese/zeus/blob/9658a4e3c62cb997e98d73c8062f48b9d976bdc7'
+
+/**
+ * One data collection row per built-in RPC provider. Zeus bundles endpoints
+ * from several providers, and each of them learns the same things once the
+ * user enables one of its endpoints.
+ */
+function builtInRpcRow(
+	byEntity: Entity,
+	providerName: string,
+	chains: string,
+	anchors: string,
+): WithRef<DataCollectionByEntity> {
+	return {
+		ref: [
+			{
+				explanation: `Some of the RPC endpoints built into Zeus are operated by ${providerName}, for chains ${chains}. No traffic reaches an endpoint until the user enables it in Network Settings. From then on it answers chain queries and broadcasts signed transactions.`,
+				url: `${zeusReleaseBaseUrl}/src/core/context/client.rs#${anchors}`,
+			},
+			{
+				explanation:
+					'Every built-in endpoint starts disabled. Network Settings is where the user turns one on or off.',
+				url: [
+					`${zeusReleaseBaseUrl}/src/core/context/client.rs#L319`,
+					`${zeusReleaseBaseUrl}/src/gui/ui/settings/networks.rs#L343-L352`,
+				] as NonEmptyArray<string>,
+			},
+			{
+				explanation:
+					'Zeus updates ETH and ERC20 balances in batches. This means each request contains multiple user wallet addresses, making them correlatable.',
+				url: [
+					`${zeusReleaseBaseUrl}/src/core/context/balance_manager.rs#L112-L129`,
+					`${zeusReleaseBaseUrl}/crates/zeus-eth/src/utils/batch.rs#L137-L154`,
+				] as NonEmptyArray<string>,
+			},
+		],
+		byEntity,
+		dataCollection: {
+			[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+			[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+			[WalletInfo.BALANCE]: CollectionPolicy.OPT_IN,
+			[WalletInfo.ASSETS]: CollectionPolicy.OPT_IN,
+			[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
+			endpoint: RegularEndpoint,
+			multiAddress: {
+				type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+			},
+		},
+		purposes: [
+			DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+			DataCollectionPurpose.TRANSACTION_BROADCAST,
+			DataCollectionPurpose.GAS_QUOTE,
+			DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+		],
+		role: EntityRole.OPERATOR,
+	}
+}
+
 export const zeus: SoftwareWallet = {
 	metadata: {
 		id: 'zeus',
@@ -115,7 +189,7 @@ export const zeus: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-24',
+		lastUpdated: '2026-11-22',
 		urls: {
 			docs: ['https://github.com/greekfetacheese/zeus'],
 			repositories: ['https://github.com/greekfetacheese/zeus'],
@@ -498,41 +572,24 @@ export const zeus: SoftwareWallet = {
 				},
 				[UserFlow.UNCLASSIFIED]: {
 					collected: [
-						{
-							ref: [
-								{
-									explanation:
-										'Zeus keeps its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updates ETH and ERC20 balances in batches. This means each request contains multiple user wallet addresses, making them correlatable.',
-									url: [
-										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
-										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L258-L283',
-										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/balance_manager.rs#L122-L127',
-										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-eth/src/utils/batch.rs#L134-L152',
-									] as NonEmptyArray<string>,
-								},
-							],
-							byEntity: userEnabledRpcEndpoints,
-							dataCollection: {
-								// Endpoints start disabled, so every field below is collected only
-								// after the user enables an endpoint in Network Settings.
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
-								[WalletInfo.BALANCE]: CollectionPolicy.OPT_IN,
-								[WalletInfo.ASSETS]: CollectionPolicy.OPT_IN,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
-								endpoint: RegularEndpoint,
-								multiAddress: {
-									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
-								},
-							},
-							purposes: [
-								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
-								DataCollectionPurpose.TRANSACTION_BROADCAST,
-								DataCollectionPurpose.GAS_QUOTE,
-								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
-							],
-							role: EntityRole.OPERATOR,
-						},
+						builtInRpcRow(
+							publicnode,
+							'PublicNode',
+							'1, 10, 56, 8453, 42161 and 4663',
+							'L617,L619,L632,L634,L642,L652,L656,L663,L674',
+						),
+						builtInRpcRow(tenderly, 'Tenderly', '1, 10 and 8453', 'L618,L630,L653'),
+						builtInRpcRow(blockrazor, 'BlockRazor', '1', 'L620'),
+						builtInRpcRow(opLabs, 'OP Labs', '10', 'L633'),
+						builtInRpcRow(drpc, 'dRPC', '10 and 4663', 'L631,L635,L675'),
+						builtInRpcRow(llamanodes, 'LlamaNodes', '56', 'L643'),
+						builtInRpcRow(nodies, 'Nodies', '56', 'L644'),
+						builtInRpcRow(zan, 'ZAN', '56', 'L645'),
+						builtInRpcRow(coinbase, 'Coinbase', '8453', 'L654'),
+						builtInRpcRow(oneRpc, '1RPC', '8453 and 42161', 'L655,L666'),
+						builtInRpcRow(meowRpc, 'MeowRPC', '42161', 'L664'),
+						builtInRpcRow(offchainLabs, 'Offchain Labs', '42161', 'L665'),
+						builtInRpcRow(robinhood, 'Robinhood', '4663', 'L673'),
 						{
 							ref: [
 								{

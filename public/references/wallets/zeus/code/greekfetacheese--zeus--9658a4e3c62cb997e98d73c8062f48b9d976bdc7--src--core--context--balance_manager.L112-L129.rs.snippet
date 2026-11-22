@@ -1,8 +1,8 @@
 {
 	"highlightRanges": [
 		{
-			"first": 122,
-			"last": 127
+			"first": 112,
+			"last": 129
 		}
 	],
 	"segments": [
@@ -10,10 +10,14 @@
 			"lines": [
 				"impl BalanceManagerHandle {"
 			],
-			"startLine": 46
+			"startLine": 48
 		},
 		{
 			"lines": [
+				"   }",
+				"",
+				"   /// `retry_if_unchanged` true if we expect the balance to change,",
+				"   /// for example after a tx",
 				"   pub async fn update_eth_balance(",
 				"      &self,",
 				"      ctx: ZeusCtx,",
@@ -25,7 +29,7 @@
 				"         return Ok(());",
 				"      }",
 				"",
-				"      let client = ctx.get_zeus_client();",
+				"      let client = ctx.get_client_manager();",
 				"      let batch_size = self.batch_size();",
 				"      let max_retries = self.max_retries();",
 				"      let retry_delay = self.retry_delay();",
@@ -33,11 +37,11 @@
 				"",
 				"      for chunk in owners.chunks(batch_size) {",
 				"         let chunk = chunk.to_vec();",
-				"         let old_balances: HashMap<Address, NumericValue> = if retry_if_unchanged {",
-				"            chunk.iter().map(|&owner| (owner, self.get_eth_balance(chain, owner))).collect()",
-				"         } else {"
+				"         // Held in wei, the shape the round answers in, so both sides of the comparison are the same",
+				"         // type (`awaiting_change`).",
+				"         let old_balances: HashMap<Address, U256> = if retry_if_unchanged {"
 			],
-			"startLine": 110
+			"startLine": 108
 		}
 	]
 }

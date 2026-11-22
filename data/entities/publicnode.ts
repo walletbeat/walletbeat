@@ -5,18 +5,16 @@ import type {
 } from '@/schema/entity'
 
 /**
- * Stand-in entity for external RPC endpoints the user chooses to enable.
- * Zeus ships a rotating list of default public RPCs, but none of them are used
- * until the user enables one in Network Settings. Operators of those endpoints
- * (whoever they are at the time) learn connection metadata and chain queries
- * only once an endpoint is enabled.
+ * PublicNode operates the RPC endpoints that Zeus bundles for chains 1, 10, 56, 8453, 42161 and 4663.
+ * Every endpoint starts disabled and is only used once the user enables it
+ * in Network Settings.
+ *
+ * No public privacy policy page for the service could be located.
  */
-export const userEnabledRpcEndpoints: CorporateEntity &
-	ChainDataProvider &
-	TransactionBroadcastProvider = {
-	id: 'userEnabledRpcEndpoints',
-	name: 'User-enabled external RPC endpoints',
-	legalName: 'NOT_A_LEGAL_ENTITY',
+export const publicnode: CorporateEntity & ChainDataProvider & TransactionBroadcastProvider = {
+	id: 'publicnode',
+	name: 'PublicNode',
+	legalName: { name: 'Allnodes Inc.', soundsDifferent: true },
 	type: {
 		chainDataProvider: true,
 		corporate: true,
@@ -36,5 +34,5 @@ export const userEnabledRpcEndpoints: CorporateEntity &
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
 	repoUrl: { type: 'NO_REPO' },
 	twitter: { type: 'NO_TWITTER_URL' },
-	url: { type: 'NO_WEBSITE' },
+	url: 'https://www.publicnode.com',
 }
