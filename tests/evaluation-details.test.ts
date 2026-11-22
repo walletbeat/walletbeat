@@ -8,6 +8,8 @@ import { evaluationDetailRenderData } from '@/types/content/evaluation-details'
 import type { ScamAlertDetailsContent } from '@/types/content/scam-alert-details'
 import type { SecurityAuditsDetailsContent } from '@/types/content/security-audits-details'
 
+import { renderedHtmlToMarkdown } from './utils/evaluation-details'
+
 function outcomeWithMetadata<_Metadata extends object>(metadata: _Metadata) {
 	return {
 		id: 'test',
@@ -141,4 +143,28 @@ describe('evaluationDetailRenderData', () => {
 			)
 		},
 	)
+})
+
+describe('renderedHtmlToMarkdown', () => {
+	it('separates block elements with blank lines', () => {
+		expect(
+			renderedHtmlToMarkdown(
+				'<!--[--><div><h4>Heading</h4><p>First paragraph.</p><ul><li>One.</li><li>Two.</li></ul></div><!--]-->',
+			),
+		).toBe('Heading\n\nFirst paragraph.\n\nOne.\n\nTwo.')
+	})
+
+	it('keeps the text of inline formatting elements', () => {
+		expect(
+			renderedHtmlToMarkdown(
+				'<p><s>Fixed flaw text.</s> <strong>Bold</strong> and <a href="/x">linked</a>.</p>',
+			),
+		).toBe('Fixed flaw text. Bold and linked.')
+	})
+
+	it('renders inline code as code spans', () => {
+		expect(renderedHtmlToMarkdown('<p>Uses <code>uint160</code> values.</p>')).toBe(
+			'Uses `uint160` values.',
+		)
+	})
 })

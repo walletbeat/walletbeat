@@ -1,4 +1,4 @@
-import { describe } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
 import { allRatedWallets, attributeTreeForWallet } from '@/data/wallets'
@@ -17,10 +17,12 @@ import {
 	ratingEnum,
 	ratingToText,
 } from '@/schema/attributes'
+import type { RatedWallet } from '@/schema/wallet'
 import { isTypographicContent } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 
-import { walletContentGrammarLint, warmupHarperLinter } from './utils/grammar'
+import { renderedHtmlToMarkdown, renderEvaluationDetailsHtml } from './utils/evaluation-details'
+import { grammarLint, walletContentGrammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
 
@@ -28,6 +30,8 @@ describe('evaluations', () => {
 	type NamedEvaluation<_OutcomeMetadata extends OutcomeMetadata> = {
 		name: string
 		evaluation: Evaluation<_OutcomeMetadata>
+		/** Wallet whose page displays the evaluation; null for sample evaluations. */
+		wallet: RatedWallet<string> | null
 	}
 	type PerAttribute<_OutcomeMetadata extends OutcomeMetadata> = {
 		attribute: Attribute<_OutcomeMetadata>
@@ -98,6 +102,7 @@ describe('evaluations', () => {
 						addEvaluation(attrGroup, genericEvalAttr.attribute, {
 							name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
 							evaluation: genericEvalAttr.evaluation,
+							wallet: ratedWallet,
 						})
 						const ratingScale = genericEvalAttr.attribute.ratingScale
 
@@ -128,6 +133,7 @@ describe('evaluations', () => {
 											addEvaluation(attrGroup, genericEvalAttr.attribute, {
 												name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
 												evaluation: sampleEvaluation,
+												wallet: null,
 											})
 										}
 									}
@@ -176,6 +182,19 @@ describe('evaluations', () => {
 
 								if (isTypographicContent(evaluation.evaluation.details)) {
 									walletContentGrammarLint('details', evaluation.evaluation.details)
+								} else if (evaluation.wallet !== null) {
+									const { wallet } = evaluation
+
+									describe('rendered details', () => {
+										it('has correct grammar', async () => {
+											await grammarLint(
+												renderedHtmlToMarkdown(
+													renderEvaluationDetailsHtml(wallet, evaluation.evaluation),
+												),
+												{ language: 'markdown' },
+											)
+										})
+									})
 								}
 
 								if (evaluation.evaluation.howToImprove !== undefined) {
