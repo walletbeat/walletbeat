@@ -314,7 +314,8 @@
 			content-visibility,
 			opacity,
 			scale,
-			translate
+			translate,
+			filter
 		;
 
 		@starting-style {

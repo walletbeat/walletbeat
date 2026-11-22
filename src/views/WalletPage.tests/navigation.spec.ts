@@ -1,6 +1,6 @@
 import { expect, test } from '../../../tests/browser/verified-test'
 
-for (const width of [390, 1024, 1025, 1440]) {
+for (const width of [390, 1344, 1345, 1440]) {
 	test(`native navigation and root ownership at ${width}px`, async ({ page }) => {
 		await page.setViewportSize({ width, height: 900 })
 		await page.goto('/__wallet-page/software/')
@@ -34,25 +34,29 @@ for (const width of [390, 1024, 1025, 1440]) {
 
 			expect(!/(auto|scroll)/.test(main.overflow) || main.scroll <= main.height).toBe(true)
 		})
-		await test.step('🗂️ HiddenNavigation / PopoverControl / IndependentPie: native reachability cycle', async () => {
-			if (width > 1024) {
+		await test.step('🗂️ HiddenNavigation / PopoverControl / IndependentPie: in-flow and overlay reachability', async () => {
+			if (width > 1344) {
 				return
 			}
 
 			const trigger = page.getByRole('button', { name: 'Table of contents', exact: true })
 			const toc = page.getByRole('navigation', { name: 'Table of contents', exact: true })
 
-			await expect(toc).toHaveCount(0)
+			await expect(toc).toBeVisible()
+			await expect(page.locator('#wallet-toc:popover-open')).toHaveCount(0)
 			await trigger.focus()
 			await page.keyboard.press('Enter')
-			await expect(toc).toBeVisible()
+			await expect(page.locator('#wallet-toc:popover-open')).toBeVisible()
 			const links = toc.getByRole('link')
 
 			expect(await links.count()).toBeGreaterThan(0)
 			await links.first().focus()
 			await expect(links.first()).toBeFocused()
 			await page.keyboard.press('Escape')
-			await expect(toc).toHaveCount(0)
+			await expect(page.locator('#wallet-toc:popover-open, #wallet-toc[data-closing]')).toHaveCount(
+				0,
+			)
+			await expect(toc).toBeVisible()
 			await expect(trigger).toBeFocused()
 			await page.keyboard.press('Tab')
 			expect(

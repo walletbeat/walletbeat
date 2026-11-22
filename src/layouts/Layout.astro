@@ -46,6 +46,38 @@ import Footer from '@/views/Footer.astro'
 		<Font cssVariable='--fontFamily-avenir' preload />
 
 		<ClientRouter />
+		<script>
+			let keyboardInput = false
+			const setKeyboardInput = (value: boolean) => {
+				if (keyboardInput === value) {
+					return
+				}
+				keyboardInput = value
+				document.documentElement.toggleAttribute('data-keyboard-input', value)
+			}
+			const updateWindowActivity = () => {
+				document.documentElement.toggleAttribute('data-keyboard-input', keyboardInput)
+				document.documentElement.toggleAttribute(
+					'data-window-active',
+					document.hasFocus() && document.visibilityState === 'visible',
+				)
+			}
+			// Text inputs retain visible focus after pointer movement; the latest input chooses attention.
+			document.addEventListener('keydown', event => {
+				if (!['Alt', 'Control', 'Meta', 'Shift'].includes(event.key)) {
+					setKeyboardInput(true)
+				}
+			})
+			for (const event of ['pointermove', 'pointerdown', 'wheel']) {
+				document.addEventListener(event, () => setKeyboardInput(false), { passive: true })
+			}
+			window.addEventListener('focus', updateWindowActivity)
+			window.addEventListener('blur', updateWindowActivity)
+			document.addEventListener('visibilitychange', updateWindowActivity)
+			document.addEventListener('astro:after-swap', updateWindowActivity)
+			window.addEventListener('pageshow', updateWindowActivity)
+			updateWindowActivity()
+		</script>
 		<script is:inline>
 			;(() => {
 				const systemDark = matchMedia('(prefers-color-scheme: dark)')
@@ -149,6 +181,7 @@ import Footer from '@/views/Footer.astro'
 				<slot />
 				<Footer />
 			</div>
+			<div class='attention-backdrop' aria-hidden='true'></div>
 		</div>
 	</body>
 </html>
@@ -169,7 +202,8 @@ import Footer from '@/views/Footer.astro'
 
 		/* Constants */
 		--navigation-desktop-inlineSize: min(20rem, 320px);
-		--navigation-mobile-blockSize: 4.16rem;
+		--navigation-mobile-minBlockSize: 4.16rem;
+		--navigation-mobile-blockSize: var(--navigation-mobile-minBlockSize);
 		--navigation-controlInsetInline: 0.75rem;
 
 		/* Rules */
@@ -188,7 +222,8 @@ import Footer from '@/views/Footer.astro'
 			--sticky-paddingInlineEnd: var(--safeArea-insetRight);
 		}
 
-		@media (width > 1024px) {
+		/* Two 20rem rails leave 40rem of content and 4rem of inline padding. */
+		@media (width > 84rem) {
 			grid-template:
 				'Nav Content' minmax(0, 1fr)
 				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
@@ -199,7 +234,7 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			grid-template:
 				'Nav' var(--navigation-mobile-blockSize)
 				'Content' minmax(0, 1fr)
@@ -209,6 +244,16 @@ import Footer from '@/views/Footer.astro'
 				--sticky-marginBlockStart: var(--separator-width);
 				--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
 			}
+		}
+
+		> .attention-backdrop {
+			grid-area: 1 / 1 / -1 / -1;
+			position: sticky;
+			inset-block-start: 0;
+			inline-size: 100%;
+			block-size: 100%;
+			z-index: 3;
+			pointer-events: none;
 		}
 
 		> .skip-link {
@@ -225,7 +270,7 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
-		> nav {
+		> :global(nav) {
 			grid-area: Nav;
 			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
 		}
@@ -236,7 +281,7 @@ import Footer from '@/views/Footer.astro'
 			min-block-size: 0;
 			min-inline-size: 0;
 
-			@media (width <= 1024px) and (prefers-reduced-motion: no-preference) {
+			@media (width <= 84rem) and (prefers-reduced-motion: no-preference) {
 				&:not(:has([data-sticky-breadcrumb~="root"])) {
 					transform-style: preserve-3d;
 					transform: translateZ(0);
@@ -252,6 +297,40 @@ import Footer from '@/views/Footer.astro'
 </style>
 
 <style is:global>
+	#layout > .attention-backdrop {
+		transition-property: backdrop-filter;
+	}
+
+	:where(#nav) :is([data-icon], .logo) {
+		transition-property: filter;
+	}
+
+	/* Native hover propagation stops at top-layer scroll regions. */
+	:root[data-window-active] {
+		&[data-keyboard-input]:has(#nav :focus-visible),
+		&:not([data-keyboard-input]):has(#nav:hover, #nav [data-scroll-container]:hover) {
+			#layout > .attention-backdrop {
+				backdrop-filter: grayscale(1);
+			}
+			#nav[data-sticky] {
+				--sticky-zIndex: 4;
+			}
+			#content [popover]:is(:popover-open, [data-closing]) {
+				filter: grayscale(1);
+			}
+		}
+		&[data-keyboard-input]:has(#layout[data-scroll-container] #top):has(#content:focus-visible),
+		&[data-keyboard-input]:has(#layout[data-scroll-container] #top :focus-visible),
+		&:not([data-keyboard-input]):has(
+				#layout[data-scroll-container] #top:hover,
+				#layout[data-scroll-container] #top [data-scroll-container]:hover
+			):not(:has(#nav:hover, #nav [data-scroll-container]:hover)) {
+			#nav :is([data-icon], .logo) {
+				filter: grayscale(1);
+			}
+		}
+	}
+
 	@property --navigation-mobile-blockSize {
 		syntax: '<length>';
 		inherits: true;
@@ -333,7 +412,7 @@ import Footer from '@/views/Footer.astro'
 			---breadcrumb-naturalItemHeight: calc(100vw * (1 / var(---breadcrumb-itemBlock) - 1));
 			---breadcrumb-itemHeight: round(nearest, var(---breadcrumb-naturalItemHeight), 0.0625px);
 		}
-		@media (width <= 1024px) {
+		@media (width <= 84rem) {
 			#layout:has([data-sticky-breadcrumb~="root"]) {
 				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
 				---navigation-entryEasing: linear(
@@ -360,7 +439,7 @@ import Footer from '@/views/Footer.astro'
 					1
 				);
 				--navigation-mobile-blockSize: max(
-					4.16rem,
+					var(--navigation-mobile-minBlockSize),
 					calc(
 						var(---breadcrumb-naturalItemHeight) * var(---wallet-compact-h1) /
 							var(---wallet-name-flow-font-size) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)

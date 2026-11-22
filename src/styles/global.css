@@ -232,6 +232,7 @@ label:has(> input) {
 }
 
 [popover] {
+	transition-property: filter;
 	background-color: transparent;
 }
 

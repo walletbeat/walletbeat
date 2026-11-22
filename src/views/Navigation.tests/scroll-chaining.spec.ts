@@ -4,7 +4,7 @@ for (const javaScriptEnabled of [true, false]) {
 	test.describe(`site navigation with JavaScript ${javaScriptEnabled ? 'enabled' : 'disabled'}`, () => {
 		test.use({ javaScriptEnabled })
 
-		for (const width of [390, 900, 1025, 1280]) {
+		for (const width of [390, 900, 1344, 1345]) {
 			test(`site header and menu boundary chain wheel input and contain open menus at ${width}px`, async ({
 				page,
 			}) => {
@@ -21,10 +21,11 @@ for (const javaScriptEnabled of [true, false]) {
 					await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded')
 				}
 
+				const mobile = await page.evaluate(() => matchMedia('(width <= 84rem)').matches)
 				const navigation = page.locator('#nav')
 				const panel = page.locator('#nav-menu')
 				const toggle = page.getByRole('button', { name: 'Open navigation menu', exact: true })
-				const pointerTarget = width <= 1024 ? toggle : navigation.locator('header .logo')
+				const pointerTarget = mobile ? toggle : navigation.locator('header .logo')
 				const root = page.locator('#layout')
 
 				// Chaining and snap-target selection have independent owners.
@@ -53,7 +54,7 @@ for (const javaScriptEnabled of [true, false]) {
 						.toBeGreaterThanOrEqual(400)
 				}
 
-				for (const open of width <= 1024 ? [false, true] : [false]) {
+				for (const open of mobile ? [false, true] : [false]) {
 					if (open) {
 						await toggle.click()
 					}
@@ -76,7 +77,7 @@ for (const javaScriptEnabled of [true, false]) {
 						)
 						.toBe(true)
 
-					for (const target of width <= 1024 && !open
+					for (const target of mobile && !open
 						? [pointerTarget]
 						: [pointerTarget, panel.locator('input[type="search"]')]) {
 						await panel.evaluate(element =>

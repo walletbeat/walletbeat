@@ -7,6 +7,7 @@ import { chromium, firefox, webkit } from '@playwright/test'
 import { wbIconEmojiSequences } from '@/styles/wbicons'
 import { getWalletStageAndLadder } from '@/utils/stage'
 
+import { semanticOutline } from '../../src/views/WalletPage.tests/fixtures/semantic-outline.mjs'
 import { parseProcedures, parseRequirements } from './contract-evidence.mjs'
 import { sourceSnapshot, verifyServerSource } from './fixtures/source-snapshot.mjs'
 import {
@@ -15,7 +16,6 @@ import {
 	walletFixtures,
 } from './fixtures/wallet-fixtures'
 import { presentationStyles } from './presentation-styles.mjs'
-import { semanticOutline } from './semantic-outline.mjs'
 
 /**
  * @typedef {Pick<DOMRectReadOnly, 'x'|'y'|'top'|'bottom'|'left'|'right'|'width'|'height'>} CaptureBox
@@ -503,7 +503,7 @@ function observeMenuState() {
 	}
 }
 
-const [contractPath, output, url = 'http://127.0.0.1:4521/ambire/', engine = 'chromium'] =
+const [contractPath, output, url = 'http://127.0.0.1:4558/ambire/', engine = 'chromium'] =
 	process.argv.slice(2)
 
 if (!contractPath || !output) {
@@ -586,7 +586,7 @@ async function settleDocumentAnimations(details) {
 	})
 }
 
-const requiredWidths = [390, 864, 1024, 1025, 1440]
+const requiredWidths = [390, 864, 1344, 1345, 1440]
 const sampledWidths = process.env.WALLET_PAGE_WIDTHS?.split(',').map(Number) ?? requiredWidths
 
 if (
@@ -726,18 +726,21 @@ try {
 		initial.pieLinkCount = await page.locator('.pie-navigation a[href^="#"]').count()
 		initial.tocCycle = null
 
-		if (width <= 1024) {
+		if (width <= 1344) {
 			const panel = page.locator('#wallet-toc')
 
 			await page.getByRole('button', { name: 'Table of contents', exact: true }).click()
-			await panel.waitFor({ state: 'visible' })
+			await page.locator('#wallet-toc:popover-open').waitFor({ state: 'visible' })
 			const opened = await page
 				.getByRole('navigation', { name: 'Table of contents', exact: true })
 				.count()
 			const nativeOpen = await panel.evaluate(element => element.matches(':popover-open'))
 
 			await page.keyboard.press('Escape')
-			await panel.waitFor({ state: 'hidden' })
+			await page
+				.locator('#wallet-toc:popover-open, #wallet-toc[data-closing]')
+				.waitFor({ state: 'detached' })
+			await panel.waitFor({ state: 'visible' })
 			initial.tocCycle = {
 				opened,
 				nativeOpen,
@@ -956,7 +959,7 @@ try {
 
 		observation.footerFlow = await page.evaluate(observeFooterFlow)
 
-		if (width <= 1024 && (await page.locator('#menu-toggle').isVisible())) {
+		if (width <= 1344 && (await page.locator('#menu-toggle').isVisible())) {
 			await scrollRoot.evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }))
 			const menuState = observeMenuState
 
@@ -1220,7 +1223,7 @@ const checks = {
 				o.initial.tocTriggerCount === 1 &&
 				o.initial.pieOutsidePopover &&
 				o.initial.pieLinkCount > 0 &&
-				(o.width > 1024 || o.initial.tocCycle?.nativeOpen),
+				(o.width > 1344 || o.initial.tocCycle?.nativeOpen),
 		),
 		'A distinct named native button opens the actual TOC popover on each mobile width; individual pie links remain outside that popover and outside its toggle.',
 	],
@@ -1282,7 +1285,7 @@ const checks = {
 	MobileChrome: [
 		all(
 			o =>
-				o.width > 1024 ||
+				o.width > 1344 ||
 				o.initial.direction !== 'ltr' ||
 				(o.initial.chrome.theme &&
 					o.initial.chrome.theme.x + o.initial.chrome.theme.width / 2 < o.width / 2),
@@ -1326,14 +1329,14 @@ const checks = {
 		all(
 			o =>
 				o.initial.tocDefinitionNames === 1 &&
-				(o.width > 1024
+				(o.width > 1344
 					? o.initial.tocNames === 1
-					: o.initial.tocNames === 0 &&
+					: o.initial.tocNames === 1 &&
 						o.initial.tocCycle?.opened === 1 &&
-						o.initial.tocCycle?.closed === 0 &&
+						o.initial.tocCycle?.closed === 1 &&
 						o.initial.tocCycle?.nativeOpen),
 		),
-		'The actual native TOC navigation has one contextual name, is present in the desktop accessibility tree, and enters/leaves the mobile accessibility tree through native opening and Escape closure.',
+		'The actual native TOC navigation has one contextual name and remains accessible in flow; mobile opening enters the native popover and Escape returns the same navigation to flow.',
 	],
 	Platforms: [
 		all(o => o.initial.platformCards === 0),
