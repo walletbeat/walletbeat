@@ -12,15 +12,18 @@ Wallets show human readable transactions instead of hexadecimal data.
 
 For example, this is a safe wallet transaction with clear signing. You can clearly understand what you're about to do. 
 
-![Clear Signing](./clear_signing_example.jpg)
+![Clear Signing](./clear_signing_example.png)
 
 ---
 
 1. Scam alerting 
 
 Wallets warn users if they're signing a possible scam transaction. Your wallet should flag these types of scams 👇
+- Address poisoning
+- Unlimited token approvals
+- Known scam addresses
 
-![Scam Alerting](./scam_alerting.jpg)
+![Scam Alerting](./scam_alerting.png)
 
 ---
 
@@ -32,7 +35,7 @@ The catch is that it simulates what might happen, not what will happen.
 
 For example, when doing swaps, a sandwich attack can still give you the worst price.
 
-![Transaction Simulation](./transaction_simulation.jpg)
+![Transaction Simulation](./transaction_simulation.png)
 
 ---
 
@@ -42,7 +45,7 @@ The wallet sets conditions on what a transaction can do. And if those conditions
 
 It is still in research 👇
 
-![Transaction Assertions](./transaction_assertions.jpg)
+![Transaction Assertions](./transaction_assertions.png)
 
 ---
 
@@ -52,11 +55,11 @@ Today we're used to check pages of hexadecimal data and hope we didn't make a si
 
 But with ERC-8213, a call data digest compresses all of it into a single 32-byte digest.
 
-![Easier Transaction Verification](./easier_transaction_verification.jpg)
+![Easier Transaction Verification](./easier_transaction_verification.png)
 
 ---
 
-The problem: wallets usually ship one of these, not all of them.
+The problem: wallets usually ship one of these, not all of them. While all of these are available, that won't matter if they don't land on wallets.
 
 If you're a wallet developer, implement this. If you're a wallet user, ask for this.
  
@@ -66,7 +69,7 @@ That's where Walletbeat comes in.
 
 Walletbeat rates wallets on privacy, security, transparency, self-sovereignty, and ecosystem alignment.
 
-We give them actionable feedback to improve.
+We give wallets actionable feedback to improve.
 
 https://walletbeat.eth.limo/
 
