@@ -1,6 +1,7 @@
 import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
+import { amplitude } from '@/data/entities/amplitude'
 import { apple } from '@/data/entities/apple'
 import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
@@ -30,6 +31,7 @@ export const allEntities = {
 	ackee,
 	alphabet,
 	ambire: ambireEntity,
+	amplitude,
 	apple,
 	citrea,
 	cloudflare,
