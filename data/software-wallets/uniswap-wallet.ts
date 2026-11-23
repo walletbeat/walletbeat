@@ -257,9 +257,15 @@ export const uniswapWallet: SoftwareWallet = {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'CHAIN_CLIENT',
-			}),
+			nameServices: {
+				ens: supported<AddressResolutionData>({
+					medium: 'CHAIN_CLIENT',
+				}),
+				gwei: null,
+				hyperliquid: null,
+				mega: null,
+				wei: null,
+			},
 		},
 		chainAbstraction: {
 			/** Chain bridging features. */

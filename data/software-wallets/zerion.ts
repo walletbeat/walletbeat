@@ -198,11 +198,17 @@ export const zerion: SoftwareWallet = {
 						},
 					}),
 				},
-				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-					medium: 'OFFCHAIN',
-					offchainDataVerifiability: 'NOT_VERIFIABLE',
-					offchainProviderConnection: 'DIRECT_CONNECTION',
-				}),
+				nameServices: {
+					ens: supported<AddressResolutionData>({
+						medium: 'OFFCHAIN',
+						offchainDataVerifiability: 'NOT_VERIFIABLE',
+						offchainProviderConnection: 'DIRECT_CONNECTION',
+					}),
+					gwei: null,
+					hyperliquid: null,
+					mega: null,
+					wei: null,
+				},
 			},
 			[Variant.MOBILE]: {
 				ref: [
@@ -234,11 +240,17 @@ export const zerion: SoftwareWallet = {
 						},
 					}),
 				},
-				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-					medium: 'OFFCHAIN',
-					offchainDataVerifiability: 'NOT_VERIFIABLE',
-					offchainProviderConnection: 'DIRECT_CONNECTION',
-				}),
+				nameServices: {
+					ens: supported<AddressResolutionData>({
+						medium: 'OFFCHAIN',
+						offchainDataVerifiability: 'NOT_VERIFIABLE',
+						offchainProviderConnection: 'DIRECT_CONNECTION',
+					}),
+					gwei: null,
+					hyperliquid: null,
+					mega: null,
+					wei: null,
+				},
 			},
 		},
 		chainAbstraction: {
