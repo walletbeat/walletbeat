@@ -54,7 +54,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6.4.0
         with:
-          node-version: 22
+          node-version: 26
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -98,7 +98,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6.4.0
         with:
-          node-version: 22
+          node-version: 26
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

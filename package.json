@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"packageManager": "pnpm@11.19.0",
 	"engines": {
-		"node": ">=22.22.0"
+		"node": ">=26.13.1"
 	},
 	"scripts": {
 		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
