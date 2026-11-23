@@ -163,6 +163,21 @@ function describeUpstreamError(err: unknown): string {
 
 	return getErrorMessage(err)
 }
+/**
+ * Let wallets that run as web pages (e.g. Safe{Wallet}) call the proxy.
+ * Browsers send a CORS preflight `OPTIONS` request before each cross-origin
+ * JSON-RPC `POST`. Some Chromium versions also require the server to opt in
+ * to requests from public pages to local network addresses.
+ */
+function setCorsHeaders(req: http.IncomingMessage, res: http.ServerResponse): void {
+	res.setHeader('Access-Control-Allow-Origin', '*')
+	res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+	res.setHeader(
+		'Access-Control-Allow-Headers',
+		req.headers['access-control-request-headers'] ?? 'Content-Type',
+	)
+	res.setHeader('Access-Control-Allow-Private-Network', 'true')
+}
 // Main request handler
 function respondWithError(res: http.ServerResponse, statusCode: number, message: string): void {
 	log(`Error: ${message}`)
@@ -172,6 +187,15 @@ function respondWithError(res: http.ServerResponse, statusCode: number, message:
 
 function createHandler(upstream: string, multiplier: bigint) {
 	return async (req: http.IncomingMessage, res: http.ServerResponse): Promise<void> => {
+		setCorsHeaders(req, res)
+
+		if (req.method === 'OPTIONS') {
+			res.writeHead(204)
+			res.end()
+
+			return
+		}
+
 		if (req.method !== 'POST') {
 			respondWithError(res, 405, 'Method not allowed – use POST')
 
