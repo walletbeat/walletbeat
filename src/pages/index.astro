@@ -12,12 +12,15 @@ import Layout from '../layouts/Layout.astro'
 // Components
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+
+const heading = 'Who watches the wallets?'
 ---
 
 <Layout
 	preloadSpMonorium
+	splashHeading={heading}
 	metadata={{
-		title: 'Walletbeat - Who watches the wallets?',
+		title: `Walletbeat - ${heading}`,
 	}}
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
@@ -31,7 +34,7 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 				<img src='/logo.svg' alt='' width='516' height='126' data-safari='invert-lightness' />
 			</div>
 
-			<h1>Who watches the wallets?</h1>
+			<h1>{heading}</h1>
 
 			<p>
 				Walletbeat aims to provide a comprehensive list of wallets, their functionality, practices,
@@ -83,13 +86,7 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 				inset-block-end: clamp(-6rem, -9cqi, -3rem);
 				pointer-events: none;
 				mask-image: linear-gradient(to bottom, black calc(100% - 6rem), transparent);
-				background:
-					url('/images/background/ascii-flower-block.svg') right 8cqi top 3cqi /
-						clamp(10em, 26cqi, 24em) auto no-repeat,
-					url('/images/background/ascii-symbol-clusters.svg') right -4cqi bottom -2cqi /
-						clamp(16em, 42cqi, 36em) auto no-repeat,
-					url('/images/background/ascii-dot-field.svg') center / 34rem auto repeat,
-					linear-gradient(120deg, light-dark(#e4bdf3, #3f165e), light-dark(#d7a4eb, #60228b));
+				background: var(---hero-background);
 
 				img {
 					--mark-inline-size: clamp(10em, 7.5em + 23cqi, 28em);
@@ -110,6 +107,10 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 
 			> :not(.hero-background) {
 				position: relative;
+			}
+
+			:global(html[data-splash="moving"]) & > :is(h1, p, nav) {
+				visibility: hidden;
 			}
 
 			h1 {
