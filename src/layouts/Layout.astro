@@ -10,6 +10,7 @@ import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
 
 type Props = {
+	showContributionCallToAction?: boolean
 	metadata: ComponentProps<typeof Metadata>['metadata']
 
 	/**
@@ -22,13 +23,22 @@ type Props = {
 	 * Only enable on pages that render complex icons above the fold.
 	 */
 	preloadComplexIcons?: boolean
+	/** Preload SP Monorium when it renders above the fold. */
+	preloadSpMonorium?: boolean
 }
 
-const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
+const {
+	metadata,
+	rewriteUrlTo,
+	preloadComplexIcons = false,
+	preloadSpMonorium = false,
+	showContributionCallToAction = true,
+} = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
+import ContributionCallToAction from '@/views/ContributionCallToAction.astro'
 import Footer from '@/views/Footer.astro'
 ---
 
@@ -41,6 +51,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
+		<Font cssVariable='--fontFamily-spMonorium' preload={preloadSpMonorium} />
 		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
@@ -140,6 +151,7 @@ import Footer from '@/views/Footer.astro'
 			<slot name='nav' />
 			<div id='content' tabindex='-1' data-column='gap-0' data-sticky-container>
 				<slot />
+				{showContributionCallToAction && <ContributionCallToAction />}
 				<Footer />
 			</div>
 		</div>
