@@ -28,14 +28,14 @@ import {
  * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
  * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
  */
-const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
+const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex', 'minimalsm'])
 
 /**
  * Proper nouns that Harper's OrthographicConsistency rule does not recognize and flags for a
  * different capitalization (e.g. it wants "debank", "simplex", or title-case "Zeus" even
  * though the lowercase forms here appear only in repo paths and the proper forms are brands).
  */
-const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
+const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['CoW', 'DeBank', 'SimpleX', 'zeus'])
 
 let vocabulary: string[] | null = null
 
@@ -210,6 +210,11 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 		regExp: /\boff-chain\b/gi,
 		replace: () => 'offchain',
 	}),
+	getRegexpLinter({
+		name: 'Walletbeat', // Use the canonical "Walletbeat" spelling, not split or differently-cased variants.
+		regExp: /\b(?:Wallet[B]eat|wallet[Bb]eat|Wallet beat|Wallet Beat|wallet beat|wallet Beat)\b/g,
+		replace: () => 'Walletbeat',
+	}),
 ]
 
 /**
@@ -280,6 +285,20 @@ function collectCspellPatternRanges(text: string): { start: number; end: number 
 	return ranges
 }
 
+/** Return all character ranges in `text` that are email addresses. */
+function collectEmailRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+	const emailRegExp = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g
+
+	for (const m of text.matchAll(emailRegExp)) {
+		const start = m.index ?? 0
+
+		ranges.push({ start, end: start + m[0].length })
+	}
+
+	return ranges
+}
+
 /** Return true if `[spanStart, spanEnd)` overlaps any entry in `ranges`. */
 function overlapsAnyRange(
 	spanStart: number,
@@ -328,6 +347,8 @@ export async function grammarLintMessages(
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
 	// Same for GitHub labels
 	const githubLabelRanges = collectGitHubLabelRanges(trimmedText)
+	// Same for email addresses (identifiers, not prose)
+	const emailRanges = collectEmailRanges(trimmedText)
 
 	let lints: Lint[] = []
 
@@ -346,7 +367,8 @@ export async function grammarLintMessages(
 				return (
 					!extractedProse.excludedRanges.some(range => start >= range.start && start < range.end) &&
 					!overlapsAnyRange(start, end, cspellRanges) &&
-					!overlapsAnyRange(start, end, githubLabelRanges)
+					!overlapsAnyRange(start, end, githubLabelRanges) &&
+					!overlapsAnyRange(start, end, emailRanges)
 				)
 			})
 		}

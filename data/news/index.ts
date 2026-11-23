@@ -16,6 +16,8 @@ import newsletterProviderBreachPhishing from './2026-09-10-newsletter-provider-b
 import payyBridgeExploit from './2026-09-24-payy-bridge-exploit'
 import metamaskInfrastructureSecurityIncident from './2026-09-30-metamask-infrastructure-security-incident'
 import keystoneWebsiteDataBreach from './2026-10-24-keystone-website-data-breach'
+import trezorSkladonDataBreach from './2026-11-16-trezor-skladon-data-breach'
+import fluidkeySecurityIncident from './2026-11-19-fluidkey-security-incident'
 
 /**
  * All news articles about wallet security incidents, sorted by date (newest first)
@@ -38,6 +40,8 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	payyBridgeExploit,
 	metamaskInfrastructureSecurityIncident,
 	keystoneWebsiteDataBreach,
+	trezorSkladonDataBreach,
+	fluidkeySecurityIncident,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**

@@ -9,7 +9,7 @@
 	"scripts": {
 		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "bash deploy/build.sh",
-		"check:all": "pnpm run \"/^check:(astro|svelte|vitest|lint|syntax|spelling:quiet|misc|build:post:quiet|signed-commit:quiet)$/\"",
+		"check:all": "pnpm run --sequential \"/^check:(astro|svelte|vitest|lint|syntax|spelling:quiet|misc|build:post:quiet|signed-commit:quiet)$/\"",
 		"check:ci": "cross-env WALLETBEAT_ENV=CI pnpm run astro sync && cross-env WALLETBEAT_ENV=CI pnpm run check:all && cross-env WALLETBEAT_ENV=CI pnpm run check:ci:bundle:size-delta && cross-env WALLETBEAT_ENV=CI pnpm run check:ci:build-determinism",
 		"check:quick": "pnpm run \"/^check:(lint:quick|syntax|spelling:quiet|misc)$/\"",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
@@ -82,6 +82,7 @@
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.26",
 		"svelte": "5.57.2",
+		"temporal-polyfill": "^1.0.7",
 		"typescript-eslint": "^8.69.0",
 		"wagmi": "3.7.7"
 	},

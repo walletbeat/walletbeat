@@ -94,6 +94,18 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit3.jpg',
 ])
 
 /** A single image file discovered by the crawler. */
@@ -1155,6 +1167,16 @@ describe('image integrity', () => {
 			const persisted = parseCleanImageHashes(await fs.readFile(WHITELIST_PATH, 'utf8'))
 
 			expect(persisted).toEqual(whitelist)
+		})
+	})
+
+	describe('whitelist almost never grows', () => {
+		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 21 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
+
+		it('has the expected size', () => {
+			expect(BLOCKY_ALLOWED_FILES.size).toBe(
+				whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded,
+			)
 		})
 	})
 })

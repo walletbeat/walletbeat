@@ -1,6 +1,4 @@
-// --- Types ---
-
-import { assertCalendarDate, type CalendarDate, calendarParts } from '@/types/date'
+import { type CalendarDate, daysBetween, today } from '@/types/date'
 
 export interface PriceDataRow {
 	Date: CalendarDate
@@ -45,13 +43,6 @@ export function normalizeAsset(asset: string): string {
 	return asset
 }
 
-/** Format a YYYY-MM-DD date as dd-mm-yyyy for CoinGecko history endpoint. */
-function formatDateForCoinGecko(date: CalendarDate): string {
-	const parts = calendarParts(date)
-
-	return `${parts.day}-${parts.month}-${parts.year}`
-}
-
 /** Key used to index price entries: "YYYY-MM-DD|ASSET" */
 export function priceKey(date: CalendarDate, asset: string): string {
 	return `${date}|${asset}`
@@ -66,8 +57,7 @@ async function fetchHistoricalPrice(asset: string, date: CalendarDate): Promise<
 		throw new Error(`No CoinGecko ID mapped for asset "${asset}"`)
 	}
 
-	const dateStr = formatDateForCoinGecko(date)
-	const url = `https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${dateStr}`
+	const url = `https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${date}`
 
 	const response = await fetch(url)
 
@@ -139,41 +129,33 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promi
  * Returns PriceDataRow[] with one entry per pair.
  */
 export async function fetchPrices(pairs: [CalendarDate, string][]): Promise<PriceDataRow[]> {
-	const today = new Date().toISOString().slice(0, 10)
-	const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
-	const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+	const currentDate = today()
 
 	const results: PriceDataRow[] = []
 
 	for (const [date, asset] of pairs) {
-		if (STABLECOINS.has(asset)) {
-			results.push({
-				Date: assertCalendarDate(date),
-				Asset: asset,
-				Value: '1.00',
-				Denomination: 'USD',
-			})
-			continue
+		const isStablecoin = STABLECOINS.has(asset)
+		let price = 1
+
+		if (!isStablecoin) {
+			const isRecent = Math.abs(daysBetween(currentDate, date)) <= 1
+
+			price = await withRetry(() =>
+				isRecent ? fetchCurrentPrice(asset) : fetchHistoricalPrice(asset, date),
+			)
 		}
 
-		let price: number
-
-		if (date === today || date === yesterday || date === tomorrow) {
-			price = await withRetry(() => fetchCurrentPrice(asset))
-		} else {
-			price = await withRetry(() => fetchHistoricalPrice(asset, date))
-		}
-
-		// Round to 2 decimal places for display
 		results.push({
-			Date: assertCalendarDate(date),
+			Date: date,
 			Asset: asset,
 			Value: price.toFixed(2),
 			Denomination: 'USD',
 		})
 
 		// Rate limiting: sleep between API calls (CoinGecko free tier ~10-30 calls/min)
-		await sleep(5000)
+		if (!isStablecoin) {
+			await sleep(5000)
+		}
 	}
 
 	return results
