@@ -28,7 +28,7 @@ import {
  * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
  * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
  */
-const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
+const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex', 'minimalsm'])
 
 /**
  * Proper nouns that Harper's OrthographicConsistency rule does not recognize and flags for a
