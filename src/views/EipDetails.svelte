@@ -23,6 +23,7 @@
 
 
 	// Components
+	import DateTime from '@/components/DateTime.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import { ContentType } from '@/types/content'
 </script>
@@ -47,14 +48,7 @@
 				<!-- `data-final-since` lets pages refresh the day count client-side. -->
 				<span class="final-since">
 					<strong data-final-since={eip.finalizedDate}>{eipFinalForLabel(daysSince(eip.finalizedDate))}</strong>,
-					since <time datetime={eip.finalizedDate}>{
-						new Date(eip.finalizedDate).toLocaleDateString('en-US', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-							timeZone: 'UTC',
-						})
-					}</time>
+					since <DateTime datetime={eip.finalizedDate} />
 				</span>
 			{/if}
 		</div>
