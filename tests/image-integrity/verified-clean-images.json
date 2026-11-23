@@ -1159,6 +1159,30 @@
 		"hash": "ae8f2a88155137b829c43933f9b08d6439a61c344cda4e6659919fc2c58d04fe",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-request.png": {
+		"hash": "53f9e8c978a5a2fc45215d6c2fdf950d3e41a4705ea39e33fd701cabc09a74e1",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-response.png": {
+		"hash": "12bef30ce21de8ba6c86d0d1996c77500ea9d04d14ff603d9f506702c9006deb",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-custom-rpc.png": {
+		"hash": "ee95b0bddb08f759aa39e3e64b39d7cb46c28a20bf2056b3c62a5a9e246be9e2",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-lying-proxy-log.png": {
+		"hash": "1fea2dba74c85bba5f43bd6de48d2f313ead9f7501b0d53133b2aa3523ff2a40",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-send-usdc.png": {
+		"hash": "6fe455d304cadf5fa1b5f3331e443aebd453b81963cda71cad9590666fb41b9e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/safe/screenshots/2026-11-23-safe-browser-usdc-balance.png": {
+		"hash": "d9b9d2b41c9c0cb94704dfb64b5d9c75f3c33d89dabf33ff3b519ae52387b003",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-custom-rpc.png": {
 		"hash": "1fdd584db782f90054ac02aa8cd21a67741425f837a0117b07c24097c1511257",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

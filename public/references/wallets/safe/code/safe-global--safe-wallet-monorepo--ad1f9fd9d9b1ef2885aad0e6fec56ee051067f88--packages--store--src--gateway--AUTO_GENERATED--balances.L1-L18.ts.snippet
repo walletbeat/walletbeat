@@ -1,0 +1,37 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1,
+			"last": 18
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"import { cgwClient as api } from '../cgwClient'",
+				"export const addTagTypes = ['balances'] as const",
+				"const injectedRtkApi = api",
+				"  .enhanceEndpoints({",
+				"    addTagTypes,",
+				"  })",
+				"  .injectEndpoints({",
+				"    endpoints: (build) => ({",
+				"      balancesGetBalancesV1: build.query<BalancesGetBalancesV1ApiResponse, BalancesGetBalancesV1ApiArg>({",
+				"        query: (queryArg) => ({",
+				"          url: `/v1/chains/${queryArg.chainId}/safes/${queryArg.safeAddress}/balances/${queryArg.fiatCode}`,",
+				"          params: {",
+				"            trusted: queryArg.trusted,",
+				"            exclude_spam: queryArg.excludeSpam,",
+				"          },",
+				"        }),",
+				"        providesTags: ['balances'],",
+				"      }),",
+				"      balancesGetSupportedFiatCodesV1: build.query<",
+				"        BalancesGetSupportedFiatCodesV1ApiResponse,",
+				"        BalancesGetSupportedFiatCodesV1ApiArg",
+				"      >({"
+			],
+			"startLine": 1
+		}
+	]
+}
