@@ -81,6 +81,7 @@ interface CleanImageEntry {
 const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
 	'resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg',
+	'resources/files/social-media/threads/2026-11-17 - Matts Talk Video/matt_picture.jpg',
 	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
 	// Same photo, reused in a later thread.
 	'resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg',
@@ -1168,7 +1169,7 @@ describe('image integrity', () => {
 	})
 
 	describe('whitelist almost never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 21 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
+		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 22 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
 
 		it('has the expected size', () => {
 			expect(BLOCKY_ALLOWED_FILES.size).toBe(
