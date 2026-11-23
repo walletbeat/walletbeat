@@ -86,18 +86,9 @@ jobs:
           sudo apt-get install -y $(cat deploy/debian-packages.txt)
         env:
           DEBIAN_FRONTEND: noninteractive
-      - name: Install packages (macOS)
+      - name: Install macOS packages
         if: runner.os == 'macOS'
-        run: |
-          packages=$(cat deploy/macos-packages.txt)
-          for delay in 5 15; do
-            if brew install --cask $packages; then
-              exit 0
-            fi
-            echo "macOS package installation failed. Retrying in ${delay}s." >&2
-            sleep "$delay"
-          done
-          brew install --cask $packages
+        uses: ./.github/actions/install-macos-packages
       - name: Install packages (Windows)
         if: runner.os == 'Windows'
         shell: bash
