@@ -87,6 +87,14 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	// Converted from a lossy AVIF source (no higher-quality source available); the
 	// blockiness artifacts are already baked into the pixel data before PNG re-encoding.
 	'resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png',
+	// Slide graphics with a dark gradient background; the blockiness is baked into
+	// the pixel data from the export pipeline (no higher-quality source available).
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/fee_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/funding.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/open_source_license.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/orderflow_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/release_process_transparency.png',
+	'resources/files/social-media/threads/2026-09-21 - Transparency Attribute/source_availability.png',
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
