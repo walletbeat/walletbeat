@@ -18,8 +18,10 @@ type HtmlLink = {
 	sourceUrl: string
 }
 
-const HTML_TAG_PATTERN = /<[A-Za-z][^>]*>/g
-const URL_ATTRIBUTE_PATTERN = /(?:^|\s)(?:href|src)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/gi
+const HTML_TAG_PATTERN = /<[A-Za-z][^\s/>]*([^>]*)>/g
+// Consumes each attribute's full value so that attribute-like text inside a
+// quoted value (e.g. serialized island props) is never treated as an attribute.
+const HTML_ATTRIBUTE_PATTERN = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
 const URL_SCHEME_PATTERN = /^([A-Za-z][A-Za-z\d+.-]*):/
 
 function sourceUrlForHtmlFile(relativePath: string): string {
@@ -60,10 +62,11 @@ function urlsInHtml(html: string): string[] {
 	const urls: string[] = []
 
 	for (const tagMatch of html.matchAll(HTML_TAG_PATTERN)) {
-		for (const attributeMatch of tagMatch[0].matchAll(URL_ATTRIBUTE_PATTERN)) {
-			const url = attributeMatch[1] ?? attributeMatch[2] ?? attributeMatch[3]
+		for (const attributeMatch of (tagMatch[1] ?? '').matchAll(HTML_ATTRIBUTE_PATTERN)) {
+			const name = attributeMatch[1]?.toLowerCase()
+			const url = attributeMatch[2] ?? attributeMatch[3] ?? attributeMatch[4]
 
-			if (url !== undefined) {
+			if ((name === 'href' || name === 'src') && url !== undefined) {
 				urls.push(url)
 			}
 		}
