@@ -56,6 +56,52 @@ describe('AI prose linter', () => {
 		])
 	})
 
+	it('flags the verb "names" and adjective "named", but not the noun "name"/"names"', async () => {
+		const lints = await aiTellsLinter.lint(
+			'the protocol names the wallet. it names this feature. a wallet named MetaMask. the named entity.',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+
+		expect(lints.map(lint => lint.get_problem_text())).toEqual(['names', 'names', 'named', 'named'])
+	})
+
+	it('flags a single verb "names" or adjective "named"', async () => {
+		const verbLints = await aiTellsLinter.lint(
+			'the protocol names the wallet',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+		const adjectiveLints = await aiTellsLinter.lint(
+			'Parses the named wallet',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+
+		expect(verbLints.map(lint => lint.get_problem_text())).toEqual(['names'])
+		expect(adjectiveLints.map(lint => lint.get_problem_text())).toEqual(['named'])
+	})
+
+	it('does not flag noun uses of "name"/"names"', async () => {
+		const lints = await aiTellsLinter.lint(
+			'ENS names resolve onchain. domain names are used. wallet names are displayed. the attribute name. human-readable names. full names.',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+
+		expect(lints).toEqual([])
+	})
+
+	it('does not flag passive "is named", idiomatic "named after", or past-tense verb objects', async () => {
+		const lints = await aiTellsLinter.lint(
+			'The landmark is named Table of contents. It is named after the founder. they named the product. they named us.',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+
+		expect(lints).toEqual([])
+	})
+
 	it('excludes code from the word-frequency denominator', async () => {
 		const code = 'wallet '.repeat(3000)
 		const text = ['gate gated gating', '```', code, '```'].join('\n')

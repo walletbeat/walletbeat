@@ -32,7 +32,7 @@ Both skills cross-reference each other, so if you land on the wrong one you will
 
 In this walkthrough, we will assume the following:
 
-- You are rating a software wallet that Walletbeat does not have existing data on, named My Little Wallet and developed by Big Wallet Corporation LLC.
+- You are rating a software wallet that Walletbeat does not have existing data on: My Little Wallet, developed by Big Wallet Corporation LLC.
 - My Little Wallet has a browser extension version and a mobile version, but not a desktop version.
 - Your online nickname is Chain Monkey and this is your first time contributing to Walletbeat.
 - You work for Big Wallet Corporation LLC.
@@ -93,7 +93,7 @@ Fields in `/data` must be **written down**. When you add a new property to a wal
 Use these three states:
 
 - **`null`** means "we have not researched this yet."
-- **A named sentinel** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
+- **A sentinel with a name** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
 - **A concrete value** means "we know what it is."
 
 This is why searching `/data` for `null` finds incomplete research. Omitted fields are invisible.

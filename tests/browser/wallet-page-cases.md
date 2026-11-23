@@ -37,7 +37,7 @@ For motion, capture natural source and scope boxes before enhancement, actual sc
 | 🏗️ `Destinations`   | Verify unique stable targets for all local in-page links. Compare pie/TOC membership only with real attribute groups and attributes; Stage and news anchors remain valid without pie/TOC entries. Reload the same wallet/variant and compare IDs. |
 | 🏗️ `SourceOrder`    | Inspect document order of the single aside and Stage Progress, then cross 1024/1025 without remounting or duplicating either tree.                                                                                                                |
 | 🏗️ `LadderPresence` | Open wallets with an applicable ladder, unknown criteria and no applicable ladder; compare section presence with the ladder data after resolution.                                                                                                |
-| 🏗️ `Landmarks`      | Query the accessibility tree for navigation named Table of contents, at closed/open mobile and desktop states.                                                                                                                                    |
+| 🏗️ `Landmarks`      | Query the accessibility tree for the Table of contents navigation, at closed/open mobile and desktop states.                                                                                                                                      |
 | 🏗️ `RegionNames`    | Inspect accessible region names and heading relationships for every attribute group; compare with individual attribute names.                                                                                                                     |
 
 ## 2. Root frame, scroll ownership and responsive columns

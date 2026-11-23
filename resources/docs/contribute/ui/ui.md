@@ -13,7 +13,7 @@ Most attributes can have basic details as Markdown. However, some attributes nee
 
 The pieces needed for custom components are as follows:
 
-- Create a new component at `src/views/attributes/<attribute_group>/<YourAttributeId>Details.svelte`. See `src/views/attributes/security/SecurityAuditsDetails.svelte` for an example. Your props **must** contain a prop named `wallet` (type: `RatedWallet`) and a prop named `value` (type: your attribute's `Value` subtype). You may also add any other props you like, but note that the `value` prop being present means your component has access to any fields defined in your attribute's `Value` subtype already.
+- Create a new component at `src/views/attributes/<attribute_group>/<YourAttributeId>Details.svelte`. See `src/views/attributes/security/SecurityAuditsDetails.svelte` for an example. Your props **must** contain a prop called `wallet` (type: `RatedWallet`) and a prop called `value` (type: your attribute's `Value` subtype). You may also add any other props you like, but note that the `value` prop being present means your component has access to any fields defined in your attribute's `Value` subtype already.
 
 ```typescript
 // Props
