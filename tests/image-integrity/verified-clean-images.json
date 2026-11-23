@@ -2171,6 +2171,62 @@
 		"hash": "ad1fb1198e946571676002cfebcffdba8bb940f5277761262d5d5d01ccb3e439",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit1.jpg": {
+		"hash": "0d6c0841746dd8cdb0ae490b81a06ae1e3cb845313689f32484eb7b929582063",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit2.jpg": {
+		"hash": "ef6272da5994899afc02dcb8ef6ef3b5c41fba8f858516d7a5ddb69e4ae2bd8f",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit3.jpg": {
+		"hash": "8f8c1ecf8967ea3d978a8fb9cdcb32c9dc49512166e0d873f21c11284e6223f7",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg": {
+		"hash": "a7e79245a137e4d641ef4e5eec3826278e20addeeeee486776dfd7df947eb2ef",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg": {
+		"hash": "c7a49f988d45a1b2d9390dd7aa8e0ae7dd14b4c6f81f7606971bf4c416e0ed35",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg": {
+		"hash": "14c0e9e4d3c432a7aff3ddafe24941dfeb64010c85b69f745292de09cc417821",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg": {
+		"hash": "95fa8013e1a20932d13340aba103b98c4fc8efd78839e38b23953c65029ed7e1",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg": {
+		"hash": "c53b42cfcffe964da21de7b0e0499f0fc8b2387bf9e962acdb4b7effe90678d3",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel.jpg": {
+		"hash": "b1c44fbbd5e452cdcb94c3171c70881b1fbb5c3b8d463503b0ac19e765762ed4",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel2.jpg": {
+		"hash": "af1beacacc3370440e3cb879b96c528832d633fd93171ad61d652d7d89f2380a",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel3.jpg": {
+		"hash": "cd47e44c114184fafe51b71c32d701a6ab1f0dcab95f2b429bbbb2ca20d8185e",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg": {
+		"hash": "c84cb9b7c84766d1717665fded19cd8f5f5c2c030e420dc0f09a463af5fd7e16",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg": {
+		"hash": "6a31acf539e1a5b50de44d16bfea30993fc1b94e0de3455a1851a17ec1c27ed9",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/wallpaper_devcon.jpg": {
+		"hash": "b318cd25bbae02ab63d6ba3192c8bfca613d85e0507a52e5572e4a73b511c27c",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
