@@ -1,0 +1,41 @@
+---
+import { GITHUB_REPO_URL } from '@/constants/github'
+---
+
+<section aria-labelledby='contribution-heading' data-scroll-item='inline-detached flow'>
+	<div data-card='secondary padding-8' data-column='center gap-4'>
+		<span data-icon='wbicons-simple contribute' aria-hidden='true'></span>
+		<h2 id='contribution-heading'>Wallet watchers wanted</h2>
+		<p>
+			<a href={`${GITHUB_REPO_URL}/discussions`}>Discuss</a> or{' '}
+			<a href={`${GITHUB_REPO_URL}/compare`}>contribute a pull request</a> to the{' '}
+			<a href={GITHUB_REPO_URL}><strong>Git repository</strong></a>.
+		</p>
+	</div>
+</section>
+
+<style>
+	:global(
+		#layout:has(
+			> :where(#content)
+				> section[aria-labelledby="contribution-heading"]
+				> :where(div)
+				> :where(p)
+				> a:focus-visible
+		)
+	) {
+		scroll-behavior: auto;
+	}
+
+	h2 {
+		max-inline-size: 100%;
+		font-family: var(--fontFamily-spMonorium);
+		font-weight: 400;
+		text-transform: uppercase;
+	}
+
+	section {
+		padding-block: 2rem;
+		text-align: center;
+	}
+</style>

@@ -10,6 +10,7 @@ import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
 
 type Props = {
+	showContributionCallToAction?: boolean
 	metadata: ComponentProps<typeof Metadata>['metadata']
 
 	/**
@@ -31,11 +32,13 @@ const {
 	rewriteUrlTo,
 	preloadComplexIcons = false,
 	preloadSpMonorium = false,
+	showContributionCallToAction = true,
 } = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
+import ContributionCallToAction from '@/views/ContributionCallToAction.astro'
 import Footer from '@/views/Footer.astro'
 ---
 
@@ -148,6 +151,7 @@ import Footer from '@/views/Footer.astro'
 			<slot name='nav' />
 			<div id='content' tabindex='-1' data-column='gap-0' data-sticky-container>
 				<slot />
+				{showContributionCallToAction && <ContributionCallToAction />}
 				<Footer />
 			</div>
 		</div>
