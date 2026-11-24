@@ -1,0 +1,53 @@
+{
+	"highlightRanges": [
+		{
+			"first": 92,
+			"last": 112
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"const NonceDetails = () => {"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"  return ("
+			],
+			"startLine": 72
+		},
+		{
+			"lines": [
+				"    </ConfirmInfoSection>",
+				"  );",
+				"};",
+				"",
+				"export const AdvancedDetails = ({",
+				"  overrideVisibility = false,",
+				"}: {",
+				"  overrideVisibility?: boolean;",
+				"}) => {",
+				"  const showAdvancedDetails = useSelector(",
+				"    selectConfirmationAdvancedDetailsOpen,",
+				"  );",
+				"",
+				"  if (!overrideVisibility && !showAdvancedDetails) {",
+				"    return null;",
+				"  }",
+				"",
+				"  return (",
+				"    <>",
+				"      <NonceDetails />",
+				"      <TransactionData />",
+				"      <NestedTransactionData />",
+				"      <QuotedSwapTransactionData />",
+				"    </>",
+				"  );",
+				"};"
+			],
+			"startLine": 88
+		}
+	]
+}
