@@ -112,6 +112,13 @@ export const navigationDocs = {
 	href: '/docs/',
 } as const satisfies NavigationItem
 
+export const navigationDonate = {
+	id: 'donate',
+	icon: 'donation',
+	title: 'Donate',
+	href: '/donate/',
+} as const satisfies NavigationItem
+
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
 	icon: 'ICON_FARCASTER',
@@ -238,4 +245,5 @@ export const defaultNavigationItems = [
 	navigationWalletEips,
 	navigationTesting,
 	navigationDocs,
+	navigationDonate,
 ] as const satisfies NavigationItem[]
