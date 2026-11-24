@@ -1078,7 +1078,7 @@ export const ambire: SoftwareWallet = {
 						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+						nondeterminism: 'RESIMULATES_NO_WARNING' as const,
 					},
 				}),
 			},
