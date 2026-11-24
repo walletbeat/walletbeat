@@ -117,6 +117,12 @@ enum JustificationReason {
 	NO_BETTER_VERSION_EXISTS_AND_IT_COSTS_MONEY_TO_RECREATE = 'NO_BETTER_VERSION_EXISTS_AND_IT_COSTS_MONEY_TO_RECREATE',
 
 	/**
+	 * The image comes from another entity (e.g. conference photos from the
+	 * organizers of the conference), and no better version exists.
+	 */
+	IMAGE_PROVIDED_BY_OTHER_ENTITY = 'IMAGE_PROVIDED_BY_OTHER_ENTITY',
+
+	/**
 	 * This image is a duplicate of another image from either `BLOCKY_ALLOWED_FILES`
 	 * or `UNJUSTIFIED_BLOCKY_ALLOWED_FILES`, but under a different name.
 	 */
