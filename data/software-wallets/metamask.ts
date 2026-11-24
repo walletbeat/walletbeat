@@ -1456,7 +1456,8 @@ export const metamask: SoftwareWallet = {
 						url: 'https://github.com/MetaMask/metamask-extension/blob/590c4e96293baf990aefd4922bf648dfc7d4f427/app/scripts/controllers/preferences-controller.ts#L189',
 					},
 					{
-						label: 'MetaMask shows the nonce and decoded calldata only in advanced details',
+						label:
+							'MetaMask shows the nonce and decoded calldata when advanced details is toggled on',
 						url: 'https://github.com/MetaMask/metamask-extension/blob/590c4e96293baf990aefd4922bf648dfc7d4f427/ui/pages/confirmations/components/confirm/info/shared/advanced-details/advanced-details.tsx#L92-L112',
 					},
 					{
