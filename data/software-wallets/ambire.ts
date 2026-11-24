@@ -1052,11 +1052,11 @@ export const ambire: SoftwareWallet = {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+							transactionOutcome: TransactionOutcome.EXPLAINED,
 						},
 					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
