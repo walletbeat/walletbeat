@@ -359,6 +359,8 @@
 
 		expandHeaderCells = true,
 
+		pageSize,
+
 		cellVerticalAlign,
 		Cell,
 
@@ -377,6 +379,9 @@
 		sortedColumn?: _Column | undefined
 
 		expandHeaderCells?: boolean
+
+		/** Rows per page. When set and the rows do not fit on one page, pagination controls are shown. */
+		pageSize?: number
 
 		Cell?: Snippet<[{
 			row: _RowValue
@@ -401,6 +406,8 @@
 		rowIsDisabled,
 		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
 		displaceDisabledRows,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		pageSize,
 	})
 	$effect(() => {
 		table.rows = rows
@@ -413,6 +420,13 @@
 	})
 	$effect(() => {
 		table.displaceDisabledRows = displaceDisabledRows
+	})
+	$effect(() => {
+		table.pageSize = pageSize || Infinity
+	})
+	$effect(() => {
+		if (table.currentPage > table.totalPages)
+			table.currentPage = table.totalPages
 	})
 
 	$effect(() => {
@@ -659,6 +673,49 @@
 			{/each}
 		</tbody>
 	</table>
+
+	{#if table.totalPages > 1}
+		{@const firstRow = (table.currentPage - 1) * table.pageSize + 1}
+		{@const lastRow = Math.min(table.currentPage * table.pageSize, table.totalRows)}
+
+		<nav
+			class="pagination"
+			aria-label="Table pages"
+			data-row="gap-3 wrap align-center"
+		>
+			<small class="pagination-range">
+				{firstRow}–{lastRow} of {table.totalRows}
+			</small>
+
+			<div data-row="gap-2 align-center">
+				<button
+					type="button"
+					data-pressable
+					disabled={!table.canGoBack}
+					onclick={() => {
+						table.currentPage -= 1
+					}}
+				>
+					Previous
+				</button>
+
+				<small class="pagination-page">
+					Page {table.currentPage} of {table.totalPages}
+				</small>
+
+				<button
+					type="button"
+					data-pressable
+					disabled={!table.canGoForward}
+					onclick={() => {
+						table.currentPage += 1
+					}}
+				>
+					Next
+				</button>
+			</div>
+		</nav>
+	{/if}
 </div>
 
 
@@ -1027,6 +1084,22 @@
 
 		:where(td) {
 			padding: var(--table-cell-padding);
+		}
+	}
+
+	.pagination {
+		position: sticky;
+		inset-inline-start: 0;
+		inline-size: 100%;
+		padding: 0.6em var(--table-cell-padding);
+		box-shadow: 0 calc(-1 * var(--table-outerBorderWidth)) 0 var(--table-outerBorderColor);
+
+		font-size: 0.875em;
+
+		.pagination-range,
+		.pagination-page {
+			color: var(--text-secondary);
+			font-variant-numeric: tabular-nums;
 		}
 	}
 </style>
