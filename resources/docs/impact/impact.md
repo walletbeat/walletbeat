@@ -30,3 +30,5 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
   - **Reaction**: Bitget Wallet silently pushed the same fix, no official post: https://github.com/walletbeat/walletbeat/pull/1734
 - **2026-10**: Alexander Chopan points out that Walletbeat has a list of things it wishes wallets did: https://x.com/alexanderchopan/status/2114440976450326966
   - Casberi uses Walletbeat's evaluation framework and stage system for its wallet roadmap.
+- **2026-11**: Walletbeat contributor polymutex points out that wallets should look up clear signing manifests without revealing them to anyone else, the same way browsers check scam lists: https://x.com/polymutex/status/2120544154220732464
+  - **Reaction**: Anon builds it into its extension, looking up both clear signing data and phishing sites on the user's device: https://x.com/anondotinc/status/2121219633407574099

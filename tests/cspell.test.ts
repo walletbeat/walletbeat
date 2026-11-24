@@ -1,6 +1,9 @@
+import fs from 'fs'
+import path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { trimWhitespacePrefix } from '@/types/utils/text'
+import { getRepositoryRoot } from '@/utils/codebase'
 import {
 	commonExclusions,
 	getCodebaseIndex,
@@ -135,6 +138,40 @@ describe('cSpell', async () => {
 
 			return cur
 		}, '')
+	})
+
+	it('contains only printable ASCII characters', () => {
+		const configPath = path.join(getRepositoryRoot(), '.cspell.json')
+		const configContents = fs.readFileSync(configPath, { encoding: 'utf-8' })
+
+		// Printable ASCII is 0x20-0x7e; allow standard whitespace (space, tab, CR, LF).
+		const isAllowed = (char: string): boolean => {
+			const code = char.charCodeAt(0)
+
+			return (
+				(code >= 0x20 && code <= 0x7e) ||
+				code === 0x09 || // tab
+				code === 0x0a || // LF
+				code === 0x0d // CR
+			)
+		}
+
+		const disallowedChars = configContents.split('').filter(char => !isAllowed(char))
+
+		expect(disallowedChars).toSatisfy(
+			chars => Array.isArray(chars) && chars.length === 0,
+			trimWhitespacePrefix(`
+				Found disallowed characters in the cSpell config:
+
+				${disallowedChars.map(c => `- "${c}" (U+${c.charCodeAt(0).toString(16).padStart(4, '0')})`).join('\n')}
+
+				The cSpell config must contain only printable ASCII characters or
+				standard whitespace (space, tab, LF, CR). The cSpell word database
+				is also used for grammar checking with Harper.js, which expects
+				ASCII words. Replace any non-printable or non-ASCII characters with
+				their ASCII equivalents.
+			`),
+		)
 	})
 
 	it('does not have duplicate words', () => {
