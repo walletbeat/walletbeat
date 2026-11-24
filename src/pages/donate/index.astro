@@ -1,0 +1,67 @@
+---
+// Layouts
+import Layout from '../../layouts/Layout.astro'
+
+// Components
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+import DonatePage from '@/components/Donate/DonatePage.svelte'
+
+// Data
+import donationsSnapshot from '../../../governance/treasury/donations.json'
+import addressesTsv from '../../../governance/treasury/addresses.tsv?raw'
+import {
+	type AddressRow,
+	parseTSV,
+} from '@/tools/treasury-markdown-updater/treasury-markdown-updater-lib'
+
+const excludedSenders = parseTSV<AddressRow>(addressesTsv)
+	.map(row => row.Address)
+	.filter(address => address.startsWith('eth:'))
+	.map(address => address.slice('eth:'.length).toLowerCase())
+---
+
+<Layout
+	metadata={{
+		title: 'Walletbeat Donate',
+		description:
+			'Support Walletbeat with a donation in ETH or stablecoins on Ethereum mainnet, or through Giveth.',
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>Support Walletbeat</h1>
+				<p>
+					Walletbeat is a free, open-source public good that rates Ethereum wallets. Donations pay
+					for research, wallet testing, and hosting.
+				</p>
+			</hgroup>
+		</header>
+
+		<div data-scroll-item='inline-detached'>
+			<DonatePage client:load snapshotJson={donationsSnapshot} excludedSenders={excludedSenders} />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 52rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		padding-block-end: 4rem;
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			opacity: 0.85;
+		}
+	}
+</style>
