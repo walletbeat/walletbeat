@@ -471,6 +471,18 @@
 		"hash": "35eb6c2ee21702b90d0fcfa17ba820ff4b22d7bc51d628d2bcc6c5ce8c3ec5d9",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-eth-review.png": {
+		"hash": "d753df57479bb50490b50f75028897c6ee0bf8ce7bbb1997091bde85a05e9a42",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-usdc-review.png": {
+		"hash": "3c151f30c19166f2765c8505b5dd9a8424746d9c25998c470b8f8784a1524379",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/casberi/screenshots/2026-11-24-casberi-swap-review.png": {
+		"hash": "274ce69b012a2d04fada6d819777922f9d0a0a2529c93e7f0625572b59cda3e7",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg": {
 		"hash": "445435961148f77b094496ac18b00113079dac75557f8155948f4b90851b1ecc",
 		"passedTests": ["blockiness", "file-format"]

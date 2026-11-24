@@ -6,6 +6,7 @@ import { notSupported, supported } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
 	FeeType,
+	type OperationFeeDisplay,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -143,13 +144,20 @@ export const casberi: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported({
+				builtInErc20Swap: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
 								'A swap shows the network fee as a ceiling in dollars and names the venue with its pool fee as a percentage. No wallet fee is charged.',
 							label: 'Fee wording for sends and swaps',
 							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The swap screen before signing. It shows the network fee in dollars, the exchange with its pool fee as a percentage, and the exact amount approved.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-swap-review.png',
+							label: 'Swap screen before signing',
+							lastRetrieved: '2026-11-24',
 						},
 					],
 					fees: {
@@ -168,13 +176,20 @@ export const casberi: SoftwareWallet = {
 						},
 					},
 				}),
-				erc20L1Transfer: supported({
+				erc20L1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
 								'A send shows the network fee before signing as a ceiling in dollars, or in ETH when no price is known.',
 							label: 'Fee wording for sends and swaps',
 							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The send screen for USDC on Ethereum before signing. It shows the network fee in dollars.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-usdc-review.png',
+							label: 'USDC send screen before signing',
+							lastRetrieved: '2026-11-24',
 						},
 					],
 					fees: {
@@ -193,13 +208,20 @@ export const casberi: SoftwareWallet = {
 						},
 					},
 				}),
-				ethL1Transfer: supported({
+				ethL1Transfer: supported<OperationFeeDisplay>({
 					ref: [
 						{
 							explanation:
 								'A send shows the network fee before signing as a ceiling in dollars, or in ETH when no price is known.',
 							label: 'Fee wording for sends and swaps',
 							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The send screen for ETH on Ethereum before signing. It shows the network fee in dollars.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-eth-review.png',
+							label: 'ETH send screen before signing',
+							lastRetrieved: '2026-11-24',
 						},
 					],
 					fees: {
