@@ -86,16 +86,7 @@ export const safe: SoftwareWallet = {
 		chainConfigurability: supported({
 			ref: refTodo,
 			customChainRpcEndpoint: notSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-				withNoConnectivityExceptL1RPCEndpoint: {
-					accountCreation: featureSupported,
-					accountImport: featureSupported,
-					erc20BalanceLookup: featureSupported,
-					erc20TokenSend: featureSupported,
-					etherBalanceLookup: featureSupported,
-				},
-			}),
+			l1: null,
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 			}),
