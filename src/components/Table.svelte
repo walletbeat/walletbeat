@@ -690,7 +690,6 @@
 			<div data-row="gap-2 align-center">
 				<button
 					type="button"
-					data-pressable
 					disabled={!table.canGoBack}
 					onclick={() => {
 						table.currentPage -= 1
@@ -705,7 +704,6 @@
 
 				<button
 					type="button"
-					data-pressable
 					disabled={!table.canGoForward}
 					onclick={() => {
 						table.currentPage += 1

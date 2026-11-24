@@ -189,6 +189,7 @@ function parseTransfer(value: unknown): DonationTransfer {
 export function parseDonationsSnapshot(json: unknown): DonationsSnapshot {
 	if (
 		!isRecord(json) ||
+		json.treasury !== treasuryAddress ||
 		!isDecimalString(json.toBlock) ||
 		!Array.isArray(json.transfers) ||
 		!isRecord(json.ensNames)
@@ -486,7 +487,6 @@ export interface DonorTotal {
 	/** Total value in USD at the time of each donation, with `usdPriceDecimals` decimals. */
 	usdValue: bigint
 	donationCount: number
-	lastBlockNumber: bigint
 }
 
 /** USD value of a donation at the time it was made, with `usdPriceDecimals` decimals. */
@@ -503,12 +503,12 @@ function usdValue(transfer: DonationTransfer): bigint {
  */
 export function rankDonors(
 	transfers: DonationTransfer[],
-	excludedSenders: ReadonlySet<string>,
+	excludedSenders: ReadonlySet<Erc55Address>,
 ): DonorTotal[] {
 	const totals = new Map<Erc55Address, DonorTotal>()
 
 	for (const transfer of transfers) {
-		if (excludedSenders.has(transfer.sender.toLowerCase())) {
+		if (excludedSenders.has(transfer.sender)) {
 			continue
 		}
 
@@ -517,14 +517,11 @@ export function rankDonors(
 			amounts: donationAssets.fullRecord<bigint>({}, 0n),
 			usdValue: 0n,
 			donationCount: 0,
-			lastBlockNumber: 0n,
 		}
 
 		total.amounts[transfer.asset] += transfer.amount
 		total.usdValue += usdValue(transfer)
 		total.donationCount += 1
-		total.lastBlockNumber =
-			transfer.blockNumber > total.lastBlockNumber ? transfer.blockNumber : total.lastBlockNumber
 		totals.set(transfer.sender, total)
 	}
 
@@ -535,14 +532,13 @@ export function rankDonors(
 		.sort((a, b) => (a.usdValue === b.usdValue ? 0 : a.usdValue > b.usdValue ? -1 : 1))
 }
 
-/** Format an amount in base units as a human-readable decimal with at most `maxFractionDigits`. */
-export function formatAssetAmount(
-	asset: DonationAsset,
-	amount: bigint,
-	maxFractionDigits = 4,
-): string {
+/** Number of fraction digits shown in formatted asset amounts. */
+const shownFractionDigits = 4
+
+/** Format an amount in base units as a human-readable decimal with at most `shownFractionDigits`. */
+export function formatAssetAmount(asset: DonationAsset, amount: bigint): string {
 	const [whole, fraction = ''] = Value.format(amount, donationAssetInfo[asset].decimals).split('.')
-	const trimmed = fraction.slice(0, maxFractionDigits).replace(/0+$/, '')
+	const trimmed = fraction.slice(0, shownFractionDigits).replace(/0+$/, '')
 
 	return `${BigInt(whole).toLocaleString('en-US')}${trimmed === '' ? '' : `.${trimmed}`}`
 }

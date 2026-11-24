@@ -159,7 +159,7 @@
 		</hgroup>
 
 		<div data-column="gap-3">
-			<div class="amount-field" data-row="gap-2 align-center">
+			<div class="amount-field" data-row="gap-2">
 				<label for="donation-amount" data-visually-hidden>Amount</label>
 				<input
 					id="donation-amount"
@@ -193,7 +193,6 @@
 						type="button"
 						class="preset"
 						class:active={amountInput.trim() === preset}
-						data-pressable
 						disabled={isBusy}
 						onclick={() => {
 							amountInput = preset
@@ -214,7 +213,6 @@
 		<button
 			type="submit"
 			class="primary"
-			data-pressable
 			disabled={isBusy || amount === null}
 		>
 			{#if status.kind === 'pending'}
@@ -254,7 +252,7 @@
 
 				<div class="address-box" data-row="gap-2">
 					<code>{treasuryAddress}</code>
-					<button type="button" class="copy" data-pressable onclick={() => void copyAddress()}>
+					<button type="button" class="copy" onclick={() => void copyAddress()}>
 						{copied ? 'Copied' : 'Copy'}
 					</button>
 				</div>
@@ -279,7 +277,6 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					data-link="camouflaged"
-					data-pressable
 				>
 					Open Walletbeat on Giveth ↗
 				</a>
@@ -334,21 +331,19 @@
 	}
 
 	.amount-field {
+		align-items: stretch;
+
 		.amount-input {
 			flex: 1;
 			min-inline-size: 0;
-			block-size: 3.5rem;
-			padding-inline: 1rem;
-			font-size: 1.75rem;
+			font-size: 1.1rem;
 			font-weight: 600;
 			font-variant-numeric: tabular-nums;
 			text-align: start;
 		}
 
 		:global(.asset-select) {
-			flex: 0 0 8rem;
-			block-size: 3.5rem;
-			font-size: 1rem;
+			flex-shrink: 0;
 			font-weight: 600;
 		}
 	}
@@ -368,7 +363,7 @@
 
 	.primary {
 		inline-size: 100%;
-		block-size: 3.25rem;
+		padding-block: 0.75rem;
 		justify-content: center;
 		border: none;
 		background-color: var(--accent);

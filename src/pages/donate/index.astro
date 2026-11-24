@@ -14,11 +14,12 @@ import {
 	type AddressRow,
 	parseTSV,
 } from '@/tools/treasury-markdown-updater/treasury-markdown-updater-lib'
+import { ethereumErc55Address } from '@/types/utils/ethereum-address'
 
 const excludedSenders = parseTSV<AddressRow>(addressesTsv)
 	.map(row => row.Address)
 	.filter(address => address.startsWith('eth:'))
-	.map(address => address.slice('eth:'.length).toLowerCase())
+	.map(address => ethereumErc55Address(address.slice('eth:'.length)))
 ---
 
 <Layout

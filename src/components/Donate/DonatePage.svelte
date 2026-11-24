@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte'
 
 	import { parseDonationsSnapshot, rankDonors } from '@/lib/donations'
+	import type { Erc55Address } from '@/types/utils/ethereum-address'
 	import DonateForm from './DonateForm.svelte'
 	import TopDonors from './TopDonors.svelte'
 
@@ -11,8 +12,8 @@
 	}: {
 		/** Contents of the donations snapshot file. */
 		snapshotJson: unknown
-		/** Lowercase addresses that never count as donors. */
-		excludedSenders: string[]
+		/** Addresses that never count as donors. */
+		excludedSenders: Erc55Address[]
 	} = $props()
 
 	const tabs = [
@@ -68,7 +69,7 @@
 			>
 				{tab.label}
 				{#if tab.id === 'top-donors'}
-					<span class="count">{donorCount}</span>
+					<span data-badge="small">{donorCount}</span>
 				{/if}
 			</button>
 		{/each}
@@ -87,6 +88,7 @@
 <style>
 	.tab-selector {
 		align-self: flex-start;
+		align-items: stretch;
 		padding: 0.25rem;
 		border: 1px solid var(--border-color);
 		border-radius: 999px;
@@ -110,14 +112,6 @@
 		&.active {
 			background-color: var(--accent-backgroundColor);
 			color: var(--accent);
-		}
-
-		.count {
-			padding: 0.05rem 0.45rem;
-			border-radius: 999px;
-			background-color: var(--background-tertiary);
-			font-size: 0.75rem;
-			font-variant-numeric: tabular-nums;
 		}
 	}
 </style>

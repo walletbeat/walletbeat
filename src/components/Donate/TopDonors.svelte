@@ -7,6 +7,7 @@
 		formatUsd,
 		rankDonors,
 	} from '@/lib/donations'
+	import type { Erc55Address } from '@/types/utils/ethereum-address'
 	import Table, { type Column, ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 
 	let {
@@ -14,7 +15,7 @@
 		excludedSenders,
 	}: {
 		snapshot: DonationsSnapshot
-		excludedSenders: ReadonlySet<string>
+		excludedSenders: ReadonlySet<Erc55Address>
 	} = $props()
 
 	interface DonorRow {
