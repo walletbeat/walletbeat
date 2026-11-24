@@ -76,7 +76,7 @@ Run `pnpm check:all` before considering tasks complete or opening a PR. PR check
 
 Note that `pnpm check:all` has side-effects in some cases, such as updating the image cache, which is necessary to pass when running in CI. As such, relying on CI to tell you if tests pass is insufficient; you _MUST_ run it locally prior to sending a PR. If it fails due to reasons your changes introduce, fix them. If it fails due to unrelated reasons, you should investigate and either file an issue, or send another PR to fix this first.
 
-Some changes require certain command-line tools to be installed. Example includes `inkscape` in the case of SVGs, or `bwrap` on Linux for testing build reproducibility. If these are not installed, ask your operator what to do as appropriate.
+Some changes require certain command-line tools to be installed. Example includes `bwrap` on Linux for testing build reproducibility. If these are not installed, ask your operator what to do as appropriate.
 
 ### Comments
 

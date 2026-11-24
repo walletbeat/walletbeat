@@ -6,6 +6,9 @@
 set -uo pipefail
 
 read -r -a packages <<< "$(tr -d '\r' < "$(dirname "$0")/windows-packages.txt" | tr '\n' ' ')"
+if [[ ${#packages[@]} -eq 0 ]]; then
+	exit 0
+fi
 for attempt in 1 2 3; do
 	choco install "${packages[@]}" -y --no-progress
 	missing=()

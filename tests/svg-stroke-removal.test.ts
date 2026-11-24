@@ -1,17 +1,9 @@
-import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
-import * as os from 'node:os'
 import path from 'node:path'
-import { env } from 'node:process'
-import * as zlib from 'node:zlib'
 
+import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
-import {
-	parsePngChunks,
-	pngChunkData,
-	readPngHeader,
-} from '@/tools/image-integrity/png-optimizer-lib'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import { removeCSSOutline } from '../src/tools/icon-font-generator/svg-stroke-removal'
@@ -260,190 +252,68 @@ describe('removeCSSOutline on all stroked SVGs under resources/', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Pixel-comparison tests (requires Inkscape; skipped when unavailable)
+// Pixel-comparison tests
 // ---------------------------------------------------------------------------
 
-/** Finds a working Inkscape CLI invocation, or null. */
-function findInkscape(): string[] | null {
-	const candidates: string[][] = [
-		['inkscape'],
-		['flatpak', 'run', `--filesystem=${os.tmpdir()}`, 'org.inkscape.Inkscape'],
-	]
+/** Rasterize an SVG string to raw 8-bit pixels, 512 pixels wide. */
+async function renderSvg(
+	svgContents: string,
+): Promise<{ width: number; height: number; channels: number; data: Buffer }> {
+	const { data, info } = await sharp(Buffer.from(svgContents))
+		.resize({ width: 512 })
+		.raw()
+		.toBuffer({ resolveWithObject: true })
 
-	for (const candidate of candidates) {
-		const result = spawnSync(candidate[0], [...candidate.slice(1), '--version'], {
-			encoding: 'utf8',
-			timeout: 300000,
-		})
-
-		if (result.status === 0 && result.stdout.includes('Inkscape')) {
-			return candidate
-		}
-	}
-
-	return null
+	return { width: info.width, height: info.height, channels: info.channels, data }
 }
 
-const inkscape = findInkscape()
+describe('rendering equivalence', () => {
+	/**
+	 * The rasterizer flattens curves at a fixed device-space tolerance, so two
+	 * different-but-equivalent vector representations of the same image never
+	 * rasterize fully identically: hairline antialiasing differences along
+	 * edges are inherent. These thresholds are calibrated to that floor:
+	 * structural errors (a missing or displaced stroke) exceed them by orders
+	 * of magnitude.
+	 */
+	const MAX_DIFFERING_FRACTION = 0.1
+	const MAX_LARGE_DIFF_FRACTION = 0.003
 
-interface DecodedImage {
-	width: number
-	height: number
-	channels: number
-	data: Buffer
-}
+	for (const { relativePath, contents } of strokedSvgs) {
+		it(`${relativePath} renders visually identically after conversion`, async () => {
+			const original = await renderSvg(contents)
+			const converted = await renderSvg(removeCSSOutline(contents))
 
-/** Minimal decoder for Inkscape's PNG output (8-bit, non-interlaced). */
-function decodePNG(filePath: string): DecodedImage {
-	const chunks = parsePngChunks(fs.readFileSync(filePath))
-	const { width, height, bitDepth, colorType, interlaceMethod } = readPngHeader(chunks)
+			expect(converted.width).toBe(original.width)
+			expect(converted.height).toBe(original.height)
+			expect(converted.channels).toBe(original.channels)
+			let differing = 0
+			let largeDifference = 0
+			const pixelCount = original.width * original.height
 
-	expect(bitDepth, 'bit depth').toBe(8)
-	expect(interlaceMethod, 'interlacing').toBe(0)
-	const channels = { 0: 1, 2: 3, 4: 2, 6: 4 }[colorType] ?? 0
+			for (let i = 0; i < original.data.length; i += original.channels) {
+				let maximum = 0
 
-	expect(channels, 'color type').toBeGreaterThan(0)
-	const compressed = chunks.filter(chunk => chunk.type === 'IDAT').map(pngChunkData)
-	const raw = zlib.inflateSync(Buffer.concat(compressed))
-	const stride = width * channels
-	const data = Buffer.alloc(height * stride)
-
-	for (let y = 0; y < height; y++) {
-		const filter = raw[y * (stride + 1)]
-		const row = raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1))
-		const previousRow = y > 0 ? data.subarray((y - 1) * stride, y * stride) : null
-		const currentRow = data.subarray(y * stride, (y + 1) * stride)
-
-		for (let x = 0; x < stride; x++) {
-			const left = x >= channels ? currentRow[x - channels] : 0
-			const up = previousRow ? previousRow[x] : 0
-			const upLeft = x >= channels && previousRow ? previousRow[x - channels] : 0
-			let value = row[x]
-
-			switch (filter) {
-				case 0:
-					break
-				case 1:
-					value += left
-					break
-				case 2:
-					value += up
-					break
-				case 3:
-					value += (left + up) >> 1
-					break
-				case 4: {
-					const initial = left + up - upLeft
-					const distanceLeft = Math.abs(initial - left)
-					const distanceUp = Math.abs(initial - up)
-					const distanceUpLeft = Math.abs(initial - upLeft)
-
-					value +=
-						distanceLeft <= distanceUp && distanceLeft <= distanceUpLeft
-							? left
-							: distanceUp <= distanceUpLeft
-								? up
-								: upLeft
-					break
+				for (let c = 0; c < original.channels; c++) {
+					maximum = Math.max(maximum, Math.abs(original.data[i + c] - converted.data[i + c]))
 				}
-				default:
-					throw new Error(`Unsupported PNG filter ${filter}`)
+
+				if (maximum > 0) {
+					differing++
+				}
+
+				if (maximum > 32) {
+					largeDifference++
+				}
 			}
-
-			currentRow[x] = value & 0xff
-		}
+			expect(
+				differing / pixelCount,
+				`${differing} of ${pixelCount} pixels differ`,
+			).toBeLessThanOrEqual(MAX_DIFFERING_FRACTION)
+			expect(
+				largeDifference / pixelCount,
+				`${largeDifference} of ${pixelCount} pixels differ by more than 32 levels`,
+			).toBeLessThanOrEqual(MAX_LARGE_DIFF_FRACTION)
+		})
 	}
-
-	return { width, height, channels, data }
-}
-
-function renderToPNG(command: string[], svgPath: string, pngPath: string): void {
-	const result = spawnSync(
-		command[0],
-		[
-			...command.slice(1),
-			'--export-type=png',
-			`--export-filename=${pngPath}`,
-			'-w',
-			'512',
-			svgPath,
-		],
-		{ encoding: 'utf8', timeout: 55000 },
-	)
-
-	expect(result.status, `inkscape failed: ${result.stderr}`).toBe(0)
-}
-
-describe.skipIf(env.WALLETBEAT_ENV !== 'CI' && inkscape === null)(
-	'rendering equivalence (Inkscape)',
-	() => {
-		/**
-		 * Inkscape rasterizes curves by flattening them at a fixed device-space
-		 * tolerance, so two different-but-equivalent vector representations of
-		 * the same image never rasterize fully identically: hairline
-		 * antialiasing differences along edges are inherent (Inkscape's own
-		 * stroke-to-path conversion exhibits the same magnitude of difference).
-		 * These thresholds are calibrated to that floor: structural errors (a
-		 * missing or displaced stroke) exceed them by orders of magnitude.
-		 */
-		const MAX_DIFFERING_FRACTION = 0.1
-		const MAX_LARGE_DIFF_FRACTION = 0.003
-
-		const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'svg-stroke-removal-'))
-
-		for (const { relativePath, contents } of strokedSvgs) {
-			it(`${relativePath} renders visually identically after conversion`, () => {
-				const name = path.basename(relativePath, '.svg')
-				const originalSvg = path.join(temporaryDir, `${name}.svg`)
-				const convertedSvg = path.join(temporaryDir, `${name}.converted.svg`)
-				const originalPng = path.join(temporaryDir, `${name}.orig.png`)
-				const convertedPng = path.join(temporaryDir, `${name}.converted.png`)
-
-				fs.writeFileSync(originalSvg, contents)
-				fs.writeFileSync(convertedSvg, removeCSSOutline(contents))
-
-				if (inkscape === null) {
-					throw new Error('Inkscape unavailable')
-				}
-
-				const command = inkscape
-
-				renderToPNG(command, originalSvg, originalPng)
-				renderToPNG(command, convertedSvg, convertedPng)
-				const original = decodePNG(originalPng)
-				const converted = decodePNG(convertedPng)
-
-				expect(converted.width).toBe(original.width)
-				expect(converted.height).toBe(original.height)
-				expect(converted.channels).toBe(original.channels)
-				let differing = 0
-				let largeDifference = 0
-				const pixelCount = original.width * original.height
-
-				for (let i = 0; i < original.data.length; i += original.channels) {
-					let maximum = 0
-
-					for (let c = 0; c < original.channels; c++) {
-						maximum = Math.max(maximum, Math.abs(original.data[i + c] - converted.data[i + c]))
-					}
-
-					if (maximum > 0) {
-						differing++
-					}
-
-					if (maximum > 32) {
-						largeDifference++
-					}
-				}
-				expect(
-					differing / pixelCount,
-					`${differing} of ${pixelCount} pixels differ`,
-				).toBeLessThanOrEqual(MAX_DIFFERING_FRACTION)
-				expect(
-					largeDifference / pixelCount,
-					`${largeDifference} of ${pixelCount} pixels differ by more than 32 levels`,
-				).toBeLessThanOrEqual(MAX_LARGE_DIFF_FRACTION)
-			})
-		}
-	},
-)
+})
