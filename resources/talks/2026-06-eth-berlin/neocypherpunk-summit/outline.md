@@ -50,7 +50,7 @@ Demo at least two wallets.
 
 ---
 
-## Components of a full wallet walkway test
+## Components of a full wallet walkaway test
 
 Every component interoperable, with well-developed self-hostable alternatives.
 

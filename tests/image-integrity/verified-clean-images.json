@@ -16,11 +16,11 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"governance/treasury/treasury-expenses-breakdown.svg": {
-		"hash": "3c59515698606342d3c0b0f6ced7f0750f834039f0933c5bfd3b54ff49e7dd06",
+		"hash": "d80f38162f0874d208aeb96891292551d5260c52548e678a2af7df181bce7263",
 		"passedTests": ["file-format"]
 	},
 	"governance/treasury/treasury-expenses-over-time.svg": {
-		"hash": "994f269148cbe1960a07ade81d52e531eabbe935ad0a72dc9c38c1aaf8fcbb33",
+		"hash": "6fa96c544e24d2df0c62901520ddb334f88d40436755e69ecac89af1ec2ff3e1",
 		"passedTests": ["file-format"]
 	},
 	"public/banner--small.png": {
@@ -57,6 +57,10 @@
 	},
 	"public/images/entities/binance.svg": {
 		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/casberi.svg": {
+		"hash": "b07bf6e6a8c7ccf3a11517d95870b0d5c55a8520a37afff7ae136bc1ffc35f2c",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/entities/cloakedTechnologies.png": {
@@ -101,6 +105,10 @@
 	},
 	"public/images/entities/honeycomb.svg": {
 		"hash": "f5250ba9776653c69c7ebb7d423d795eeca60729abf012fd1c6c0973a1b73f25",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/infinex.svg": {
+		"hash": "5a311c305646dfa835f6fea89b488b8952e358f82bd4eb4c852f850a6d9724a9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/entities/jiffylabs.png": {
@@ -203,6 +211,10 @@
 		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/wallets/casberi.svg": {
+		"hash": "b07bf6e6a8c7ccf3a11517d95870b0d5c55a8520a37afff7ae136bc1ffc35f2c",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/wallets/cloaked.png": {
 		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -249,6 +261,10 @@
 	},
 	"public/images/wallets/imtoken.svg": {
 		"hash": "99873319aa6259b1f2f47261cd1b04b6047d535186dd3edaae4492a48086ffa4",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/infinex.svg": {
+		"hash": "5a311c305646dfa835f6fea89b488b8952e358f82bd4eb4c852f850a6d9724a9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/keycard-shell.svg": {
@@ -689,6 +705,50 @@
 	},
 	"public/references/wallets/metamask/screenshots/2026-10-04-metamask-mobile-erc7831-unresolved.png": {
 		"hash": "e73bf46b7bbc9d2964e33a619dc57ddbfabe3cfc1fa43a30c61648dacb821105",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-aave-supply.png": {
+		"hash": "f8212bdf61fd6d0a7d1fb1b73eab2c65aaa2af3f70e5feb7e020c6358d27c6cb",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-batch-approve-supply.png": {
+		"hash": "391553f815f8f7515eb97b36db051f684ff7f485745adda93107a49400fa9831",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eip712.png": {
+		"hash": "f4da84eb4d73112c255383a2725a1612543e1751fa583c97067589de40be0f69",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-general-gas-settings.png": {
+		"hash": "51ecddfe5984a098131ccff6d337746042997eb8074a05f2ac3b7b567017e04b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer-raw.png": {
+		"hash": "ac72b9097f74f7766f833e270cb29d871a9cdeef71b35026693d84d836127713",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-eth-transfer.png": {
+		"hash": "da4d6db1a41cf374411a88c5468ccb5ee7ea0297cdf32fa1f370269a6ef3b416",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-aave-supply.png": {
+		"hash": "ab9c78a7e6c81aa774dc7b3aac78b5f8aed8059992d1b883d6a8d842e055ba11",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-safe-batch-approve-supply.png": {
+		"hash": "35922e10210c87d83c747d1e3b0955bdb052a5225b9df2ca18dccca09de2f48c",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-siwe.png": {
+		"hash": "442df28b6e36d552090ce1dc1bf009e46c82e47a0591f1cb033cd674b593ce03",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval-raw-hex.png": {
+		"hash": "fc650b8ef658f13b932ab95801a79cf880f1ef984f6d0f5811557fe6fe212e88",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/nufi/screenshots/2026-10-16-nufi-usdc-approval.png": {
+		"hash": "eaa31b0b24e59dd828ff63e0c0cf9026fbdb28baaf7707478e0d34fb8ab0e915",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
@@ -1891,6 +1951,82 @@
 		"hash": "d2063f35b8d30453180a8940ed96b450d215c5e07665b6a715f21bae095e35c1",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/ambire-license.png": {
+		"hash": "ddf80cbe79713f0acb7605de038b7fbc289ca1c1f0832af384891b5c87c809cc",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/base-app-license.png": {
+		"hash": "daf0f8bd7f3bcf607a763bae2c60954713c8d80748a7dc098c1ff98a5f5c792b",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/bitget-license.png": {
+		"hash": "7b6b1d461e78ef9e0508703fb9ce970a24281faaed42e4f93f5313cbbf410b42",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/bridge-wallet-license.png": {
+		"hash": "f86f8193bfc0fcd5d4ee04327dded7805d80c83f328ba58b80516671514d9b88",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/gem-wallet-license.png": {
+		"hash": "e3ece7a9910bd6b2da7e636dc1b711841e2849563816f6c0da6836efe075d6c6",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/imtoken-license.png": {
+		"hash": "26c16ffa20baa01fd4cab12f64f8b5e34ce066fa04696a0c59c57f82039597d4",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/metamask-license.png": {
+		"hash": "9e56ffd7ab6aadd2ed296d02466f6fd506680f6ec2eedb46f953500b750a5f83",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/nufi-license.png": {
+		"hash": "f0013507780f868befa3c5cb498f34b8e30e9b2e597db071e8bd23a85d501d93",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/okx-license.png": {
+		"hash": "52f1126340c2bff205ee35e15487b357d2630bad4b9e540047ef5ecc610f5920",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/phantom-license.png": {
+		"hash": "ffa4a44a818f2981cfb1af76b73dfcefb50601028fd9ab386db1db003cf6ceb7",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/pillarx-license.png": {
+		"hash": "b5e9d8aee2f5a22690c0a453dc546a014f3482b82d7c1bf78c25126cb9ed6a5a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/rabby-license.png": {
+		"hash": "e0ead6f4906b7050e5d6783f3a914a496752e27c53bfd6ae847e2a8aa8026fb0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/rainbow-license.png": {
+		"hash": "245621d744fa2fb99c21a35cd476b9bf68450d5a90d188fb09f434853dc4a170",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/safe-license.png": {
+		"hash": "2310dc9229f9399053e744d491c52e91c55ae07f9921b4b073e3f708e6eb747d",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/uniswap-wallet-license.png": {
+		"hash": "6a53e88b5cd28117393eb706d307fa80832c756b0897bb43128e3e9f8c8b6650",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/verifiability-tier-list.png": {
+		"hash": "a9ce07ea6b99c70552998ca6d42823328e617793b1b85a0d822fd539a62a6f4a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/why-it-matters.png": {
+		"hash": "1e437b77013aa966285a5d37fb4f67e252a3476b6a3de98063cdb16ce54f9b71",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/zerion-license.png": {
+		"hash": "778e9037895ebc9da9c9c3de9e0e6fca86ca4e63b78537bd9a0ebc0be378faa0",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/zeus-license.png": {
+		"hash": "3eb706d97d210a757356a063db254dc5a58fff8f01b282da3e8e557dd73f47b9",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/social-media/threads/2026-10-01 - September Monthly Update/erc-7730_tracker.png": {
 		"hash": "6fa75ec6e1c9046954b12cad1098420b6908003211233a91f12ab8ab4d9ebe01",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -2033,6 +2169,62 @@
 	},
 	"resources/files/social-media/threads/2026-11-09 - October Monthly Update/security-news-october.jpg": {
 		"hash": "ad1fb1198e946571676002cfebcffdba8bb940f5277761262d5d5d01ccb3e439",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit1.jpg": {
+		"hash": "0d6c0841746dd8cdb0ae490b81a06ae1e3cb845313689f32484eb7b929582063",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit2.jpg": {
+		"hash": "ef6272da5994899afc02dcb8ef6ef3b5c41fba8f858516d7a5ddb69e4ae2bd8f",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit3.jpg": {
+		"hash": "8f8c1ecf8967ea3d978a8fb9cdcb32c9dc49512166e0d873f21c11284e6223f7",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg": {
+		"hash": "a7e79245a137e4d641ef4e5eec3826278e20addeeeee486776dfd7df947eb2ef",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg": {
+		"hash": "c7a49f988d45a1b2d9390dd7aa8e0ae7dd14b4c6f81f7606971bf4c416e0ed35",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg": {
+		"hash": "14c0e9e4d3c432a7aff3ddafe24941dfeb64010c85b69f745292de09cc417821",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg": {
+		"hash": "95fa8013e1a20932d13340aba103b98c4fc8efd78839e38b23953c65029ed7e1",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg": {
+		"hash": "c53b42cfcffe964da21de7b0e0499f0fc8b2387bf9e962acdb4b7effe90678d3",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel.jpg": {
+		"hash": "b1c44fbbd5e452cdcb94c3171c70881b1fbb5c3b8d463503b0ac19e765762ed4",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel2.jpg": {
+		"hash": "af1beacacc3370440e3cb879b96c528832d633fd93171ad61d652d7d89f2380a",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel3.jpg": {
+		"hash": "cd47e44c114184fafe51b71c32d701a6ab1f0dcab95f2b429bbbb2ca20d8185e",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg": {
+		"hash": "c84cb9b7c84766d1717665fded19cd8f5f5c2c030e420dc0f09a463af5fd7e16",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg": {
+		"hash": "6a31acf539e1a5b50de44d16bfea30993fc1b94e0de3455a1851a17ec1c27ed9",
+		"passedTests": ["file-format"]
+	},
+	"resources/files/social-media/threads/2026-11-15 - Devcon Recap/wallpaper_devcon.jpg": {
+		"hash": "b318cd25bbae02ab63d6ba3192c8bfca613d85e0507a52e5572e4a73b511c27c",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
@@ -2558,6 +2750,14 @@
 	"src/assets/fonts/wbicons-simple/wbicons-simple.svg": {
 		"hash": "1ea9dbe7272022b1beef4b632971f5b19e1bde55d8c8bf97f276f48ebba409f2",
 		"passedTests": ["file-format"]
+	},
+	"src/icons/farcaster.svg": {
+		"hash": "5ba89d1475d7dd13625bdd2d155215818b042fbf1aee6c486d16f693204c9da7",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
+	"src/icons/x.svg": {
+		"hash": "1b02de178678bbd80de5d2986451a00711b307bd7e651522a8b33ba8b3d57270",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"tests/browser/fixtures/wide-wallet.svg": {
 		"hash": "5a5c57cf3b58ac167529042d92f5e2922c205409b72d5cee6be299b6c80b9d62",
