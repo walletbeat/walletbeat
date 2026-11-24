@@ -63,9 +63,15 @@ export const casberi: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Casberi is licensed under GPL-3.0-or-later, with a section 7 additional permission for linking the `reown-swift` library.',
-						label: 'Casberi license',
+							'The LICENSE file holds the text of the GNU General Public License version 3.',
+						label: 'Casberi license file',
 						url: `${source}/LICENSE#not-line-specific`,
+					},
+					{
+						explanation:
+							'The README licenses Casberi under version 3 of the GPL or any later version, and adds a section 7 permission for linking the `reown-swift` library.',
+						label: 'License section of the README',
+						url: 'https://github.com/alexanderchopan/casberi/blob/a341ce9e0f6a34ec90cfe12872c4d3c8f51e1fee/README.md#L88-L96',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
