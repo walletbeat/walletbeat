@@ -25,7 +25,12 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-column='gap-8'
+		style='--scrollItem-inlineDetached-maxSize: 70ch;'
+	>
 		<header data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-4'>
 				<h1>Wallet Security News</h1>
@@ -55,7 +60,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 												>
 													<img
 														src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`}
-														alt={wallet.displayName}
+														alt=''
 													/>
 													<span>{wallet.displayName}</span>
 												</a>
@@ -74,7 +79,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 									<DateTime datetime={news.publishedAt} />
 
 									{news.publishedAt !== news.updatedAt && (
-										<small class='gap-1'>
+										<small>
 											<span>・</span>
 											<span>
 												Updated <DateTime datetime={news.updatedAt} />
@@ -127,8 +132,8 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
 								<p>{news.summary}</p>
 
-								<div data-card='secondary padding-4 radius-4' data-column='gap-3'>
-									<h4>Impact</h4>
+								<div data-card='secondary' data-column='gap-3'>
+									<h3>Impact</h3>
 									<ul>
 										<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
 										<li>Category: {impactCategories[news.impact.category].label}</li>
@@ -139,14 +144,14 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
 								{refs(news).length > 0 && (
 									<footer data-column='gap-3'>
-										<h4>Sources</h4>
+										<h3>Sources</h3>
 										<ul>
 											{refs(news).map(ref =>
 												ref.urls.map(url => (
 													<li>
 														<a href={url.url} target='_blank' rel='noopener noreferrer'>
 															{url.label}
-															<span set:html={ExternalLinkIcon} />
+															<span aria-hidden='true' set:html={ExternalLinkIcon} />
 														</a>
 													</li>
 												)),
@@ -180,23 +185,12 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 </Layout>
 
 <style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 52rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.1rem;
-			color: var(--text-secondary);
-			opacity: 0.85;
-		}
-	}
-
 	article {
+		.article-content {
+			line-height: 1.6;
+			overflow-wrap: anywhere;
+		}
+
 		.wallet-link {
 			&[data-badge] {
 				--badge-backgroundColor: var(--background-secondary);
@@ -209,10 +203,6 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 			text-align: end;
 			font-size: 0.9em;
 			color: var(--text-secondary);
-		}
-
-		.article-content {
-			line-height: 1.75;
 		}
 
 		dl.metadata {
@@ -249,10 +239,6 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 					--badge-backgroundColor: var(--status-color);
 				}
 			}
-		}
-
-		ul {
-			padding-inline-start: 1.5em;
 		}
 	}
 </style>
