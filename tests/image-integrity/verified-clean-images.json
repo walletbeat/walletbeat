@@ -2171,9 +2171,9 @@
 		"hash": "ad1fb1198e946571676002cfebcffdba8bb940f5277761262d5d5d01ccb3e439",
 		"passedTests": ["blockiness", "file-format"]
 	},
-	"resources/files/social-media/threads/2026-11-20 - ETHSecurity Badge Holders/our-initiative.jpg": {
-		"hash": "f65910becdfe5f6ad7d234477885ca0a898bc48df8090d80709212095d3ca7ec",
-		"passedTests": ["file-format"]
+	"resources/files/social-media/threads/2026-11-20 - ETHSecurity Badge Holders/our_initiative.png": {
+		"hash": "9ff45bb1520b5ae4c2a39488726918cda4a9f4c17db7bb7e99391b11f4559289",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
