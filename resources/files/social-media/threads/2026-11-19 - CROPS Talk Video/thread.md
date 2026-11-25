@@ -1,16 +1,8 @@
 Wallets are how users use and experience Ethereum.
 
-Doesn't matter how CROPS-y the protocol layer is: no CROPS in wallets equals no CROPS for users.
-
-Walletbeat push the wallet ecosystem forward through open, transparent, and evidence-based evaluations. 
+Doesn't matter how CROPS-y the protocol layer is: if you want CROPS for users, you need CROPS in wallets.
 
 Pushing CROPS to wallets, we ensure Ethereum values make it all the way to users.
-
----
-
-If you want CROPS for users, you need CROPS in wallets.
-
-@polymutex shows what we mean by CROPS in wallets, and how wallets currently don't stack up to all these. 
 
 Watch the full talk here 👇
 
@@ -18,7 +10,7 @@ https://youtu.be/qP0u2WPQjs8?si=RpteprItkmOGUkxV
 
 ---
 
-@polymutex maps all the CROPS letters to concrete wallet features. 
+@polymutex shows what we mean by CROPS in wallets, and maps all the CROPS letters to concrete wallet features. 
 
 No wallet meets all of them today but we're hoping to make that be more common in wallets. 
 
@@ -57,6 +49,7 @@ The flywheel that Walletbeat is trying to kickstart is as follows:
 ![Walletbeat Flywheel](./walletbeat_flywheel.png)
 
 ---
+
 Kickstarting this flywheel is where we need your help:
 
 We need people to speak up and push wallets to care about what Walletbeat says about them. 
@@ -67,6 +60,6 @@ Ethereum values only matter if users actually get to experience them.
 
 ---
 
-Walletbeat is a rating system for Ethereum wallets. A place where users know what to expect from a wallet, developers have a clear standard to build toward, and wallets compete on Ethereum values.
+Walletbeat push the wallet ecosystem forward through open, transparent, and evidence-based evaluations. 
 
 https://walletbeat.eth.limo/
