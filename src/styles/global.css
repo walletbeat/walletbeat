@@ -290,4 +290,8 @@ h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
 	overflow-wrap: break-word;
+
+	* + &:not(:where([data-row], summary) *) {
+		margin-block-start: 0.5em;
+	}
 }
