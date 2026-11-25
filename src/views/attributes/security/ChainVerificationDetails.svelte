@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
-	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
+	import { ethereumL1LightClientName, ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -46,7 +46,7 @@
 				`**{{WALLET_NAME}}** performs L1 chain state verification using ${lightClients.map((client: EthereumL1LightClient, i: number) => {
 					const clientUrl = ethereumL1LightClientUrl(client)
 
-					return `${commaListPrefix(i, lightClients.length)}[${client}](${typeof clientUrl === 'string' ? clientUrl : clientUrl.url})`
+					return `${commaListPrefix(i, lightClients.length)}[${ethereumL1LightClientName(client)}](${typeof clientUrl === 'string' ? clientUrl : clientUrl.url})`
 				}).join('')}${lightClients.length === 1 ? ' light client.' : ' light clients.'}${coverageLimitations.map(limitation => `\n\n${limitation}`).join('')}`
 		)
 	}}
