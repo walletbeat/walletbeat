@@ -2,7 +2,7 @@
 name: wallet-security-news
 description: >
   Use when a contributor wants to add a Wallet Security News entry to the
-  walletbeat site. Guides through reading the incident source, extracting the
+  Walletbeat site. Guides through reading the incident source, extracting the
   required data, classifying the incident (type, severity, impact, status),
   structuring the news file, registering it in the index, and verifying with
   the project checks. Works for hacks, data breaches, vulnerabilities, and

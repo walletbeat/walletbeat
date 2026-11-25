@@ -66,32 +66,117 @@ interface CleanImageEntry {
 }
 
 /**
- * Files that are explicitly allowed to be low-quality/blocky JPEGs.
+ * Files that are explicitly allowed to be low-quality/blocky images.
  *
- * This is a MANUAL whitelist. An image in
- * this set is acknowledged as intentionally low-quality (e.g. an old marketing
- * asset that is not worth re-encoding), so the blockiness test does not apply
- * to it. It must be updated by hand when a new intentionally-low-quality image
- * is added.
+ * This is a manual whitelist. An image in this list is acknowledged as
+ * intentionally low-quality (e.g. an old marketing asset that is not worth
+ * re-encoding), so the blockiness test does not apply to it.
  *
- * Seeded with the images currently in the repository whose baked-in JPEG
- * artifacts exceed the blockiness threshold and that cannot be improved by
- * re-encoding.
+ * `UNJUSTIFIED_BLOCKY_ALLOWED_FILES` must never grow.
+ * Use `BLOCKY_ALLOWED_FILES` instead.
  */
-const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
+const UNJUSTIFIED_BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
 	'resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg',
 	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
-	// Same photo, reused in a later thread.
-	'resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg',
-	// Converted from a lossy AVIF source (no higher-quality source available); the
-	// blockiness artifacts are already baked into the pixel data before PNG re-encoding.
-	'resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png',
 	'public/images/entities/firefly.jpg',
 	'public/images/wallets/firefly.jpg',
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/devcon-booth3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/impact-project.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/security_hub1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/privacy-panel3.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit1.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit2.jpg',
+	'resources/files/social-media/threads/2026-11-15 - Devcon Recap/defence_summit3.jpg',
 ])
+
+/**
+ * Reason for an image being blocky.
+ *
+ * Do not add reasons to this set of possible reasons.
+ *
+ * "I used the wrong encoding settings" is not a valid reason. Re-encode with the right settings.
+ */
+enum JustificationReason {
+	/**
+	 * This image was taken before November 2026 when justifications started being enforced.
+	 */
+	TAKEN_BEFORE_NOVEMBER_2026 = 'TAKEN_BEFORE_NOVEMBER_2026',
+
+	/**
+	 * No better version of this image exists online or on my computer,
+	 * and it would cost money to recreate the image in lossless quality.
+	 */
+	NO_BETTER_VERSION_EXISTS_AND_IT_COSTS_MONEY_TO_RECREATE = 'NO_BETTER_VERSION_EXISTS_AND_IT_COSTS_MONEY_TO_RECREATE',
+
+	/**
+	 * The image comes from another entity (e.g. conference photos from the
+	 * organizers of the conference), and no better version exists.
+	 */
+	IMAGE_PROVIDED_BY_OTHER_ENTITY = 'IMAGE_PROVIDED_BY_OTHER_ENTITY',
+
+	/**
+	 * This image is a duplicate of another image from either `BLOCKY_ALLOWED_FILES`
+	 * or `UNJUSTIFIED_BLOCKY_ALLOWED_FILES`, but under a different name.
+	 */
+	DUPLICATE_OF_ALREADY_WHITELISTED_IMAGE = 'DUPLICATE_OF_ALREADY_WHITELISTED_IMAGE',
+
+	/**
+	 * This image is a photo from a digital camera owned by a Walletbeat
+	 * contributor which was set to poor image quality at the time the photo was
+	 * taken, but which has now been set to proper image quality so that this will
+	 * never happen again.
+	 */
+	PHOTO_COMING_FROM_PHOTO_CAMERA_THAT_WAS_SET_TO_WRONG_QUALITY_SETTINGS_WHICH_HAVE_BEEN_FIXED_FOR_FUTURE_MEDIA = 'PHOTO_COMING_FROM_PHOTO_CAMERA_THAT_WAS_SET_TO_WRONG_QUALITY_SETTINGS_WHICH_HAVE_BEEN_FIXED_FOR_FUTURE_MEDIA',
+}
+
+interface JustifiedBlockyFile {
+	/** Repo-root-relative image path. */
+	path: string
+
+	/**
+	 * JustificationReason enum for this image being blocky.
+	 */
+	justificationEnum: JustificationReason
+
+	/**
+	 * Justification for this image being whitelisted.
+	 * Must be provided by a human operator, not agent-driven.
+	 */
+	justificationReason: string
+}
+
+/**
+ * List of allowed-to-be-blocky files.
+ */
+const BLOCKY_ALLOWED_FILES: JustifiedBlockyFile[] = [
+	{
+		path: 'resources/files/social-media/threads/2026-10-29 - Devcon Overview/polymutex_cypherpunk_congress_2026.jpg',
+		justificationEnum: JustificationReason.DUPLICATE_OF_ALREADY_WHITELISTED_IMAGE,
+		justificationReason:
+			'Reuse of the same photo already whitelisted for the Web3Privacy Panel thread.',
+	},
+	{
+		path: 'resources/files/social-media/threads/2026-10-30 - Forward Defense Summit/defence_summit.png',
+		justificationEnum: JustificationReason.TAKEN_BEFORE_NOVEMBER_2026,
+		justificationReason: 'Converted from AVIF image before 2026-11 cutoff.',
+	},
+]
+
+/** Whether the blockiness test is waived for the given file. */
+function isBlockyAllowed(filePath: string): boolean {
+	return (
+		UNJUSTIFIED_BLOCKY_ALLOWED_FILES.has(filePath) ||
+		BLOCKY_ALLOWED_FILES.some(entry => entry.path === filePath)
+	)
+}
 
 /** A single image file discovered by the crawler. */
 interface ImageFileEntry {
@@ -151,7 +236,7 @@ const BLOCKINESS_TEST: ImageTest = {
 	name: 'blockiness',
 	requiresInkscape: false,
 	appliesTo: entry => {
-		if (BLOCKY_ALLOWED_FILES.has(entry.filePath)) {
+		if (isBlockyAllowed(entry.filePath)) {
 			return false
 		}
 
@@ -1155,13 +1240,36 @@ describe('image integrity', () => {
 		})
 	})
 
-	describe('whitelist almost never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded = 9 // Only increase this when no higher-quality version of the image exists. Otherwise, find or produce one instead.
+	describe('unjustified whitelist almost never grows', () => {
+		const unjustifiedWhitelistExpectedSizePleaseNeverIncreaseThis = 19 // Never increase this. Use a better image if possible, or use the `BLOCKY_ALLOWED_FILES` whitelist if impossible.
 
 		it('has the expected size', () => {
-			expect(BLOCKY_ALLOWED_FILES.size).toBe(
-				whitelistExpectedSizePleaseNeverIncreaseThisUnlessNeeded,
+			expect(UNJUSTIFIED_BLOCKY_ALLOWED_FILES.size).toBe(
+				unjustifiedWhitelistExpectedSizePleaseNeverIncreaseThis,
 			)
+		})
+
+		it('does not overlap the justified whitelist', () => {
+			const justifiedPaths = new Set(BLOCKY_ALLOWED_FILES.map(entry => entry.path))
+
+			for (const path of UNJUSTIFIED_BLOCKY_ALLOWED_FILES) {
+				expect(justifiedPaths.has(path), `${path} is in both whitelists`).toBe(false)
+			}
+		})
+	})
+
+	describe('justified whitelist', () => {
+		it('does not allow PNG files re-encoded from a lossy source', () => {
+			for (const entry of BLOCKY_ALLOWED_FILES) {
+				if (extensionOf(entry.path) !== '.png') {
+					continue
+				}
+
+				expect(
+					entry.justificationEnum,
+					`${entry.path} was actually re-encoded from a lossy source, and PNG is therefore not an appropriate image format to use for this image.`,
+				).toBe(JustificationReason.TAKEN_BEFORE_NOVEMBER_2026)
+			}
 		})
 	})
 })

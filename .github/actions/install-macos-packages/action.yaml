@@ -1,0 +1,24 @@
+name: Install macOS packages
+description: >-
+  Installs the packages listed in deploy/macos-packages.txt, with caching.
+runs:
+  using: composite
+  steps:
+    - name: Restore cached downloads
+      id: package-cache
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ runner.temp }}/walletbeat-macos
+        key: macos-packages-${{ hashFiles('deploy/macos-packages.txt') }}-${{ runner.arch }}
+    - name: Install packages
+      shell: bash
+      env:
+        WALLETBEAT_MACOS_CACHE_DIR: ${{ runner.temp }}/walletbeat-macos
+      run: |
+        "${{ github.workspace }}/deploy/install-macos-packages.sh"
+    - name: Save cached downloads
+      if: steps.package-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ runner.temp }}/walletbeat-macos
+        key: ${{ steps.package-cache.outputs.cache-primary-key }}
