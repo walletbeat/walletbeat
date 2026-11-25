@@ -1,3 +1,13 @@
+Wallets are how users use and experience Ethereum.
+
+Doesn't matter how CROPS-y the protocol layer is: no CROPS in wallets equals no CROPS for users.
+
+Walletbeat push the wallet ecosystem forward through open, transparent, and evidence-based evaluations. 
+
+Pushing CROPS to wallets, we ensure Ethereum values make it all the way to users.
+
+---
+
 If you want CROPS for users, you need CROPS in wallets.
 
 @polymutex shows what we mean by CROPS in wallets, and how wallets currently don't stack up to all these. 
@@ -54,3 +64,9 @@ We need people to speak up and push wallets to care about what Walletbeat says a
 Ethereum values only matter if users actually get to experience them.
 
 ![Ethereum Values for Users](./values_for_users.png)
+
+---
+
+Walletbeat is a rating system for Ethereum wallets. A place where users know what to expect from a wallet, developers have a clear standard to build toward, and wallets compete on Ethereum values.
+
+https://walletbeat.eth.limo/
