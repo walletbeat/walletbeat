@@ -67,8 +67,7 @@ const { navigationItems, currentHref = Astro.url.pathname } = Astro.props
 		<NavigationItems
 			client:load
 			transition:persist
-			items={navigationItems}
-			groups={[{ items: navigationItems }, { items: topbarNavigationItems }]}
+			groups={[navigationItems, topbarNavigationItems]}
 			currentHref={currentHref}
 		/>
 	</div>

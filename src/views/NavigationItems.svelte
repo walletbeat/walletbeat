@@ -8,13 +8,8 @@
 	import { lucideNavigationIcons as LUCIDE_ICONS } from '@/icons/lucide-navigation-icons'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
 
-	type NavigationGroup = {
-		items: NavigationItem[]
-	}
-
 	// Props
 	let {
-		items,
 		groups,
 		currentHref,
 		defaultOpen = false,
@@ -25,8 +20,7 @@
 		showLabels = true,
 		destinationState,
 	}: {
-		items: NavigationItem[]
-		groups?: NavigationGroup[]
+		groups: NavigationItem[][]
 		currentHref?: string
 		defaultOpen?: boolean
 		iconSnippet?: Snippet<[NavigationItem, number]>
@@ -36,8 +30,6 @@
 		showLabels?: boolean
 		destinationState?: (href: string | undefined, link?: boolean) => Record<string, string>
 	} = $props()
-
-	let navigationGroups = $derived(groups ?? [{ items }])
 
 	// State
 	import { SvelteMap } from 'svelte/reactivity'
@@ -65,7 +57,7 @@
 		const flatten = (items: NavigationItem[]): NavigationItem[] => (
 			items.flatMap(item => [item, ...flatten(item.children ?? [])])
 		)
-		const allItems = navigationGroups.flatMap(group => flatten(group.items))
+		const allItems = groups.flatMap(flatten)
 
 		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
 			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)
@@ -107,7 +99,6 @@
 
 	const hasNestedNavigation = (items: NavigationItem[]): boolean =>
 		items.some(item => item.children?.length)
-
 </script>
 
 <div
@@ -172,14 +163,10 @@
 		</search>
 	{/if}
 
-	{@render navigationGroupsList(navigationGroups)}
-</div>
-
-{#snippet navigationGroupsList(groups: NavigationGroup[])}
 	{#each groups as group, groupIndex (groupIndex)}
-		{@render navigationItems(group.items, 0)}
+		{@render navigationItems(group)}
 	{/each}
-{/snippet}
+</div>
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
 	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}

@@ -318,7 +318,29 @@ describe('rendered content collections', () => {
 		}
 	})
 
+	it('serializes exactly the links rendered in the navigation island', () => {
+		const island = one(
+			elements(page('/'), 'astro-island').filter(node =>
+				String(node.properties['component-url']).includes('/NavigationItems.'),
+			),
+			'Site navigation',
+		)
+		const serialized: string[] = []
 
+		JSON.parse(String(island.properties.props), (key: string, value: unknown) => {
+			if (key === 'href' && Array.isArray(value)) {
+				const tuple: unknown[] = value
+
+				if (tuple[0] === 0 && typeof tuple[1] === 'string') {
+					serialized.push(tuple[1])
+				}
+			}
+
+			return value
+		})
+		expect(linkDestinations(island).length).toBeGreaterThan(0)
+		expect(serialized.sort()).toEqual(linkDestinations(island).sort())
+	})
 })
 
 describe('content migrations', () => {
