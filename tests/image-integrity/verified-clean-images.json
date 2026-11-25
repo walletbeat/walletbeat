@@ -2248,7 +2248,7 @@
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/walkaway_test.png": {
-		"hash": "5b8e9e89273e9cf732e57af22d21bbda376e316937e81b61b8dfcef60bb21f63",
+		"hash": "a3dcb2f378cf7ee4197e7a0d1f9ab04bba1cb289396ee1f8427cb35663ca8000",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
