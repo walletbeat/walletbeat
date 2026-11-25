@@ -2235,6 +2235,26 @@
 		"hash": "b318cd25bbae02ab63d6ba3192c8bfca613d85e0507a52e5572e4a73b511c27c",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/crops_talk_devcon.png": {
+		"hash": "781d71b8016c8290bb164533431d75dc1aa969fad54caabcd7718a5426e00126",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/values_for_users.png": {
+		"hash": "b4e7a2c29f483672672a37edbf3adf4763fb2be0ebdd0b41a374e775f21046d8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/walletbeat_flywheel.png": {
+		"hash": "789b6d973058b0b77f3761850e0757af5be8c1a1194284c0737e33395aebb22a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/walletbeat_role.png": {
+		"hash": "df06624f2027ed1ab12c70c6ecb930bb7079ef7f47a725cab49a346c0190eca8",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-19 - CROPS Talk Video/walletbeat_role1.png": {
+		"hash": "3852c2b0fec3ccd6b324b65bd287b09738d728b5cfa34306f67fa35588e70299",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
