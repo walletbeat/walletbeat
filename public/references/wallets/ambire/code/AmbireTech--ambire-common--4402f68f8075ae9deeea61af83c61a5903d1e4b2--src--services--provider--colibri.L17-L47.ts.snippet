@@ -1,0 +1,60 @@
+{
+	"highlightRanges": [
+		{
+			"first": 17,
+			"last": 47
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"const assertSupportedBlockTag = (method: string, params: any[] | Record<string, any>) => {"
+			],
+			"startLine": 9
+		},
+		{
+			"lines": [
+				"",
+				"  throw new Error('Colibri verifier does not support pending block tag requests')",
+				"}",
+				"",
+				"class ColibriRpcProvider extends JsonRpcProvider {",
+				"  #colibri: Colibri",
+				"",
+				"  constructor(",
+				"    network: NetworkInterface,",
+				"    proverUrls: string[],",
+				"    options?: JsonRpcApiProviderOptions",
+				"  ) {",
+				"    super(network.selectedRpcUrl, Network.from(Number(network.chainId)), options)",
+				"",
+				"    this.#colibri = new Colibri({",
+				"      chainId: Number(network.chainId),",
+				"      rpcs: [network.selectedRpcUrl],",
+				"      prover: [...proverUrls],",
+				"      proofStrategy: Strategy.VerifiedOnly,",
+				"      prover_mode: 'remote',",
+				"      zk_proof: true",
+				"    })",
+				"  }",
+				"",
+				"  send(method: string, params: any[] | Record<string, any>): Promise<any> {",
+				"    assertSupportedBlockTag(method, params)",
+				"",
+				"    return this.#colibri.request({ method, params }) as Promise<any>",
+				"  }",
+				"",
+				"  destroy(): void {",
+				"    this.#colibri.destroy()",
+				"    super.destroy()",
+				"  }",
+				"}",
+				"",
+				"export const getColibriRpcProvider = (",
+				"  network: NetworkInterface,",
+				"  options?: JsonRpcApiProviderOptions"
+			],
+			"startLine": 13
+		}
+	]
+}

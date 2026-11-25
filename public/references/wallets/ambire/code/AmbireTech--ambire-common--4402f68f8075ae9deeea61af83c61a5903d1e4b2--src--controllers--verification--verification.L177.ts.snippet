@@ -1,0 +1,36 @@
+{
+	"highlightRanges": [
+		{
+			"first": 177,
+			"last": 177
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export class VerificationController extends EventEmitter {"
+			],
+			"startLine": 56
+		},
+		{
+			"lines": [
+				"  /**"
+			],
+			"startLine": 164
+		},
+		{
+			"lines": [
+				"   * - Colibri far behind the RPC -> `warning` (cannot verify)",
+				"   * - Colibri slightly behind the RPC -> wait briefly for Colibri to catch up,",
+				"   *   then verify or report a warning",
+				"   */",
+				"  async verifyPortfolio(params: VerifyPortfolioParams): Promise<PortfolioVerification> {",
+				"    const { account, network, rpcResult, getOptions, tokenDataCache } = params",
+				"    const rpcBlockNumber = BigInt(rpcResult.blockNumber)",
+				"    const updatedAt = Date.now()",
+				""
+			],
+			"startLine": 173
+		}
+	]
+}
