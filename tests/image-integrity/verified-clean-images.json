@@ -1,8 +1,4 @@
 {
-	"darryl_candidates_dependency_minimalism.png": {
-		"hash": "c73122d4a5f03e3bb54d1221e0121f3c069f4fd30c7984a5465127061692d520",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"governance/decisions/2026/travel-policy/airfare.png": {
 		"hash": "9e3f925773dddf1c696cad25a166a9b72a480c0f8bbcbb7b865cbdd2821b946f",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -2232,19 +2228,19 @@
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/astro_framework.png": {
-		"hash": "50f0673d20f4a832a56abaecdc5836bf1b989850bde9af8c9a5c510d27daecba",
+		"hash": "878a922d8cbbe68b9e6c959a575f56b90568276bde28894b43147fecd0d54005",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/darryl_picture.png": {
-		"hash": "e6cd62c4580733a9ecc0bb336e7cedf953f664ed13559a1709792952a16de9fa",
+		"hash": "f97bacc77095728cb731a3244c94baf3ffb62b471a2aae7fd88e2a8db5927396",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/dependency_minimalism.png": {
-		"hash": "c73122d4a5f03e3bb54d1221e0121f3c069f4fd30c7984a5465127061692d520",
+		"hash": "1851ee3b95419acceb7a5a6d0b93dbd9182ed68a8e7246ecf673c8521c8d13c9",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/walkaway_test.png": {
-		"hash": "971c4e7aaad3d8619f19bdb67ccd50dc2de95fdafc222c66ef9d813836f13a08",
+		"hash": "5b8e9e89273e9cf732e57af22d21bbda376e316937e81b61b8dfcef60bb21f63",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {

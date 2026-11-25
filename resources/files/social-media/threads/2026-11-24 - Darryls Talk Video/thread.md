@@ -12,7 +12,9 @@ If we hold wallets to Ethereum values, our own site should follow the same value
 
 ---
 
-So when @polymutex and @darryl__yeo first set out to build this website two years ago, they felt it was quite important to apply the same Ethereum values and principles across the build and publishing pipeline that powers the website. This led us to some interesting tech decisions ⬇️
+So when @polymutex and @darryl__yeo first set out to build this two years ago, they felt the need to apply the same Ethereum values across the build and publishing pipeline that powers the website. 
+
+This led us to some interesting tech decisions ⬇️
 
 ---
 
@@ -34,24 +36,24 @@ Some would argue that this is actually the entire point of the industry and we n
 
 The conventional path for a site like this: React and Next.js, a database like Supabase or Postgres, Tailwind for styling, deployed to a centralized host like Vercel or Cloudflare.
 
-It works. But there's lots of hidden assumptions behind choosing any tech stack and they all come with their own set of trade-offs. 
+It works. But there are lots of hidden assumptions behind choosing any tech stack and they all come with their own set of trade-offs. 
 
 ---
 
 Wallet ratings barely change day to day. So why pay for a database, or a server that renders pages on demand?
 
-Instead, Walletbeat: here's the decisions we made for our tech stack.
-- Models wallet data as static TypeScript data structures. we chose to model everything as static data structures in Typescript. 
-- Compiles the site to static files with Astro. we use a static compiler such as Astro.
-- Uses Svelte for the interactive bits. for the interactive bits, we use Svelte.
+Instead, here's the decisions we made for our tech stack:
+- Model everything as static data structures in TypeScript. 
+- A static compiler such as Astro.
+- Svelte for the interactive bits. 
 
 ![Astro Framework](./astro_framework.png)
 
 ---
 
-Distribution matters just as much as the build. After evaluating dozens of options, two stood out: ENS and HTTPS gateways like eth.limo, tied together with a custom GitHub Actions pipeline.
+What about the dependencies we need to publish and distribute it? 
 
-What next? What about the dependencies we need to publish and distribute it? So yeah, polymutex evaluated dozens of possible tools and in the end two technologies stood out ENS and HTTPS gateways like E limo. In the end we built our a custom GitHub actions pipeline around this.
+polymutex evaluated dozens of possible tools and in the end two technologies stood out: ENS and HTTPS gateways like eth.limo. We also built a custom GitHub Actions pipeline around this.
 
 ---
 
@@ -59,7 +61,7 @@ If every Walletbeat maintainer walked away tomorrow, the site should keep workin
 
 ---
 
-Watch the full talk, then check our ratings for yourself 👇
+Watch the full talk, then check our website for yourself 👇
 
 https://walletbeat.eth.limo/
 
