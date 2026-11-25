@@ -145,6 +145,9 @@ export enum BrowserExtensionPermission {
 	/** Access the user's Google Account email address. */
 	IDENTITY_EMAIL = 'identity.email',
 
+	/** Detect when the system becomes idle, locked, or active again via chrome.idle. */
+	IDLE = 'idle',
+
 	/** List, enable, disable, or uninstall other extensions. */
 	MANAGEMENT = 'management',
 
@@ -265,8 +268,9 @@ export interface BrowserExtensionManifest {
 	 * Which external web pages and other extensions may open a direct message
 	 * channel to the wallet (e.g. to send RPC requests).
 	 * Maps to the `externally_connectable` manifest field.
-	 * Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the
-	 * manifest, meaning no external connections are permitted.
+	 * Set to 'NOT_DECLARED' if the field is absent from the manifest, meaning
+	 * no web page may connect. Browsers still let any installed extension
+	 * connect in that case.
 	 */
 	externallyConnectable:
 		| {
@@ -275,7 +279,7 @@ export interface BrowserExtensionManifest {
 				/** Which web page origins may send messages directly to the wallet. */
 				pageMatches: HostPermissionScope
 		  }
-		| 'NOT_EXTERNALLY_CONNECTABLE'
+		| 'NOT_DECLARED'
 
 	/**
 	 * Security-sensitive Browser API permissions declared in the `permissions`

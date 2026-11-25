@@ -1,7 +1,7 @@
 ---
 name: wallet-create
 description: >
-  Use when a contributor wants to add a brand-new wallet to the walletbeat
+  Use when a contributor wants to add a brand-new wallet to the Walletbeat
   project. Guides through entity setup, contributor file creation, wallet
   skeleton, and site registration. For populating feature data on an existing
   wallet, use /wallet-update instead.

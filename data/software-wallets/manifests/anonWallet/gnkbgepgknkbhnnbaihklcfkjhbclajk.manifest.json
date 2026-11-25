@@ -3,7 +3,7 @@
 	"manifest_version": 3,
 	"name": "__MSG_extensionName__",
 	"short_name": "Anon Wallet",
-	"version": "0.10.2",
+	"version": "0.12.4",
 	"description": "__MSG_extensionDescription__",
 	"author": "Anon Inc.",
 	"homepage_url": "https://anon.inc",
@@ -14,7 +14,8 @@
 		"notifications",
 		"tabs",
 		"alarms",
-		"sidePanel"
+		"sidePanel",
+		"favicon"
 	],
 	"host_permissions": ["<all_urls>"],
 	"action": {
