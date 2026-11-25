@@ -205,6 +205,7 @@
 		"dejavu",
 		"delegatable",
 		"delegator",
+		"Dependabot",
 		"deprioritized",
 		"Devcon",
 		"Devconnect",
@@ -699,6 +700,7 @@
 		"substeps",
 		"subtable",
 		"Supabase",
+		"superkalo",
 		"SV",
 		"svgs",
 		"svgtofont",
@@ -868,9 +870,22 @@
 		"resources/contracts/images/**"
 	],
 	"patterns": [
-		{ "name": "4everland", "pattern": "/\\b4everland\\b/gi" },
-		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
-		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
+		{
+			"name": "1kx",
+			"pattern": "/\\b1kx\\b/g"
+		},
+		{
+			"name": "4everland",
+			"pattern": "/\\b4everland\\b/gi"
+		},
+		{
+			"name": "Bitcoin addresses",
+			"pattern": "/\\bbtc:[0-9a-z]+/g"
+		},
+		{
+			"name": "CIDv1",
+			"pattern": "/\\bbafy\\w+/g"
+		},
 		{
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
@@ -903,6 +918,7 @@
 		}
 	],
 	"ignoreRegExpList": [
+		"1kx",
 		"4everland",
 		"backdoor",
 		"Bitcoin addresses",

@@ -1,0 +1,54 @@
+{
+	"highlightRanges": [
+		{
+			"first": 146,
+			"last": 153
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  publish-public-release:"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 30
+		},
+		{
+			"lines": [
+				"      - name: Create the public repo draft release"
+			],
+			"startLine": 89
+		},
+		{
+			"lines": [
+				"        run: |"
+			],
+			"startLine": 93
+		},
+		{
+			"lines": [
+				"          if grep -q 'AmbireTech/ambire-app' release-notes.md; then",
+				"            echo \"::warning::The release notes still link to this private repo, these will 404 publicly:\"",
+				"            grep -n 'AmbireTech/ambire-app' release-notes.md",
+				"          fi",
+				"",
+				"          # Immutable releases lock their assets on publish, so a human reviews the",
+				"          # draft and publishes it - that publish is what gets signed by GitHub.",
+				"          gh release create \"$TAG\" assets/*.zip assets/SHA256SUMS ${APK_ASSET:-} \\",
+				"            --repo \"$PUBLIC_REPO\" \\",
+				"            --draft \\",
+				"            --target \"$RELEASE_SHA\" \\",
+				"            --title \"$(cat release-title.txt)\" \\",
+				"            --notes-file release-notes.md",
+				"        shell: bash"
+			],
+			"startLine": 141
+		}
+	]
+}
