@@ -423,6 +423,14 @@
 		"hash": "70a2f41929bc2da233a7e2f4179958f39dec576944ca44476bc2389e8e2f38e8",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-11-25-ambire-erc8213-calldata-digest.png": {
+		"hash": "aecab6eb078b6ac9655ef99373befb3eda00e2edeabeb3c3f4398acefc7ce253",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-11-25-ambire-erc8213-eip712-digest.png": {
+		"hash": "d1479f729062f1cf222d748ffea6a1a98816011aba6dc7c5e3bdf3aae6726cac",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "4bac1d664f7693867cd725d1a1700d239335913fbf56ed29edc656645ecd883e",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]

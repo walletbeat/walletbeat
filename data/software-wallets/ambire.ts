@@ -1009,18 +1009,31 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Ambire shows the domain hash, message hash and EIP-712 digest for typed data signature requests, each with a copy button.',
+							file: 'public/references/wallets/ambire/screenshots/2026-11-25-ambire-erc8213-eip712-digest.png',
+							label: 'Ambire signature request showing ERC-8213 hashes and EIP-712 digest',
+						},
+						{
+							explanation:
+								'Ambire shows the ERC-8213 calldata digest above the decoded transaction data, with a copy button.',
+							file: 'public/references/wallets/ambire/screenshots/2026-11-25-ambire-erc8213-calldata-digest.png',
+							label: 'Ambire transaction builder showing the ERC-8213 calldata digest',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
 						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
 				}),
 				transactionDetailsDisplay: {
@@ -1067,7 +1080,7 @@ export const ambire: SoftwareWallet = {
 						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+						nondeterminism: 'RESIMULATES_NO_WARNING' as const,
 					},
 				}),
 			},
