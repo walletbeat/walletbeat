@@ -16,11 +16,14 @@ import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
 import {
 	EthereumL1LightClient,
 	type EthereumL1LightClientCoverage,
 	type EthereumL1LightClientSupport,
+	ethereumL1LightClientVerifiedDataName,
+	unverifiedEthereumL1Data,
 } from '../../features/security/light-client'
 import {
 	type ChainConfigurability,
@@ -42,7 +45,7 @@ function supportsChainVerification(
 		details: chainVerificationDetailsContent({
 			lightClients,
 			enabledByDefault: true,
-			verifiesTransactionSimulation: true,
+			verifiedData: { balances: true, nameResolution: true, transactionSimulation: true },
 		}),
 	})
 }
@@ -50,18 +53,22 @@ function supportsChainVerification(
 function partialChainVerification(
 	ctx: EvaluationContext,
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
-	{ enabledByDefault, verifiesTransactionSimulation }: EthereumL1LightClientCoverage,
+	{ enabledByDefault, verifiedData }: EthereumL1LightClientCoverage,
 ): Evaluation {
+	const unverifiedData = unverifiedEthereumL1Data(verifiedData)
+	const unverifiedDataNames = unverifiedData.map(
+		dataKind => ethereumL1LightClientVerifiedDataName[dataKind],
+	)
 	const howToImproveSteps = [
 		...(enabledByDefault ? [] : ['enable light client verification by default']),
-		...(verifiesTransactionSimulation
+		...(unverifiedData.length === 0
 			? []
-			: ['verify the chain state used to simulate transactions before signing']),
+			: [`use the light client to also verify ${commaListFormat(unverifiedDataNames)}`]),
 	]
 
 	return ctx.build({
 		outcome: {
-			id: `chain_verification_l1_partial_${lightClients.join('_')}_${enabledByDefault ? 'default' : 'opt_in'}_${verifiesTransactionSimulation ? 'simulation' : 'no_simulation'}`,
+			id: `chain_verification_l1_partial_${lightClients.join('_')}_${enabledByDefault ? 'default' : 'opt_in'}_unverified_${unverifiedData.join('_') || 'none'}`,
 			rating: Rating.PARTIAL,
 			displayName: 'Partial L1 chain state verification',
 			shortExplanation: sentence(
@@ -71,7 +78,7 @@ function partialChainVerification(
 		details: chainVerificationDetailsContent({
 			lightClients,
 			enabledByDefault,
-			verifiesTransactionSimulation,
+			verifiedData,
 		}),
 		howToImprove: mdParagraph(`{{WALLET_NAME}} should ${howToImproveSteps.join(' and ')}.`),
 	})
@@ -146,10 +153,11 @@ export const chainVerification: Attribute = {
 		client for verification of Ethereum L1 state.
 
 		A wallet passes if its light client is enabled by default and verifies
-		the chain state used to simulate transactions before signing. A wallet
-		receives a partial rating if it integrates a light client, but
-		verification is opt-in or only covers some of the chain data the wallet
-		relies on (e.g. displayed balances, but not transaction simulation).
+		all the chain data the wallet relies on: balances, name resolution
+		(e.g. ENS), and the chain state used to simulate transactions before
+		signing. A wallet receives a partial rating if it integrates a light
+		client, but verification is opt-in or only covers some of that data
+		(e.g. balances, but not transaction simulations).
 
 		See the [chain verification testing guide](${withBasePath('/docs/wallet-testing/chain-verification/')})
 		for how Walletbeat tests whether a wallet verifies the chain data it receives.
@@ -173,12 +181,15 @@ export const chainVerification: Attribute = {
 		),
 		partial: exampleRating(
 			mdParagraph(
-				'The wallet integrates a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/), but verification is opt-in or does not cover transaction simulation.',
+				'The wallet integrates a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/), but verification is opt-in or does not cover all the chain data the wallet relies on.',
 			),
 			partialChainVerification(
 				EvaluationContext.forTest(() => chainVerification),
 				[EthereumL1LightClient.colibri],
-				{ enabledByDefault: false, verifiesTransactionSimulation: false },
+				{
+					enabledByDefault: false,
+					verifiedData: { balances: true, nameResolution: true, transactionSimulation: false },
+				},
 			),
 		),
 		fail: exampleRating(
@@ -220,7 +231,7 @@ export const chainVerification: Attribute = {
 			return noChainVerification(ctx, ctx.features.chainConfigurability)
 		}
 
-		const { enabledByDefault, verifiesTransactionSimulation, ...lightClientsSupport } =
+		const { enabledByDefault, verifiedData, ...lightClientsSupport } =
 			ctx.popRefs<EthereumL1LightClientSupport>(l1Client)
 		const supportedLightClients: EthereumL1LightClient[] = []
 
@@ -236,10 +247,10 @@ export const chainVerification: Attribute = {
 			throw new Error('No supported light clients found; this should be impossible per type system')
 		}
 
-		if (!enabledByDefault || !verifiesTransactionSimulation) {
+		if (!enabledByDefault || unverifiedEthereumL1Data(verifiedData).length > 0) {
 			return partialChainVerification(ctx, supportedLightClients, {
 				enabledByDefault,
-				verifiesTransactionSimulation,
+				verifiedData,
 			})
 		}
 

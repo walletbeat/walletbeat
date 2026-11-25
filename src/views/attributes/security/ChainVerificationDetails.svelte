@@ -1,12 +1,12 @@
 <script lang="ts">
 	// Types/constants
-	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
-	import { ethereumL1LightClientName, ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
+	import type { EthereumL1LightClient, EthereumL1LightClientVerifiedData } from '@/schema/features/security/light-client'
+	import { ethereumL1LightClientName, ethereumL1LightClientUrl, ethereumL1LightClientVerifiedDataName, unverifiedEthereumL1Data } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { commaListPrefix } from '@/types/utils/text'
+	import { commaListFormat, commaListPrefix } from '@/types/utils/text'
 
 
 	// Props
@@ -14,19 +14,23 @@
 		wallet,
 		lightClients,
 		enabledByDefault,
-		verifiesTransactionSimulation,
+		verifiedData,
 		refs,
 	}: {
 		wallet: { metadata: WalletMetadata }
 		lightClients?: NonEmptyArray<EthereumL1LightClient>
 		enabledByDefault?: boolean
-		verifiesTransactionSimulation?: boolean
+		verifiedData?: EthereumL1LightClientVerifiedData
 		refs?: FullyQualifiedReference[]
 	} = $props()
 
+	const unverifiedDataNames = $derived(
+		verifiedData ? unverifiedEthereumL1Data(verifiedData).map(dataKind => ethereumL1LightClientVerifiedDataName[dataKind]) : []
+	)
+
 	const coverageLimitations = $derived([
 		...(enabledByDefault === false ? ['Verification is opt-in: users must enable it in the settings.'] : []),
-		...(verifiesTransactionSimulation === false ? ['Transaction simulations are not verified, so the predicted outcome of a transaction still relies on the RPC provider.'] : []),
+		...(unverifiedDataNames.length > 0 ? [`The light client does not verify ${commaListFormat(unverifiedDataNames)}, so this data still relies on the RPC provider.`] : []),
 	])
 
 

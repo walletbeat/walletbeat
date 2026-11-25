@@ -1,3 +1,5 @@
+import { nonEmptyKeys } from '@/types/utils/non-empty'
+
 import type { LabeledUrl } from '../../url'
 import type { AtLeastOneSupported } from '../support'
 
@@ -59,6 +61,44 @@ export function ethereumL1LightClientUrl(l1LightClient: EthereumL1LightClient): 
 }
 
 /**
+ * The kinds of chain data the wallet relies on, and whether each one is
+ * verified by its light client(s).
+ */
+export interface EthereumL1LightClientVerifiedData {
+	/** Native and token balances displayed to the user. */
+	balances: boolean
+
+	/** Resolution of human-readable names (e.g. ENS) to addresses. */
+	nameResolution: boolean
+
+	/** The chain state used to simulate transactions before signing. */
+	transactionSimulation: boolean
+}
+
+/**
+ * Human-friendly name for each kind of chain data a light client can verify.
+ */
+export const ethereumL1LightClientVerifiedDataName: Record<
+	keyof EthereumL1LightClientVerifiedData,
+	string
+> = {
+	balances: 'balances',
+	nameResolution: 'name resolution (e.g. ENS)',
+	transactionSimulation: 'transaction simulations',
+}
+
+/**
+ * The kinds of chain data that are not verified by the light client(s).
+ */
+export function unverifiedEthereumL1Data(
+	verifiedData: EthereumL1LightClientVerifiedData,
+): Array<keyof EthereumL1LightClientVerifiedData> {
+	return nonEmptyKeys<keyof EthereumL1LightClientVerifiedData, boolean>(verifiedData).filter(
+		dataKind => !verifiedData[dataKind],
+	)
+}
+
+/**
  * How much of the chain data the wallet relies on is verified by its
  * light client(s).
  */
@@ -69,12 +109,8 @@ export interface EthereumL1LightClientCoverage {
 	 */
 	enabledByDefault: boolean
 
-	/**
-	 * Whether the chain state used to simulate transactions before signing is
-	 * verified by the light client, as opposed to only some other data such as
-	 * displayed balances.
-	 */
-	verifiesTransactionSimulation: boolean
+	/** Which kinds of chain data are verified by the light client(s). */
+	verifiedData: EthereumL1LightClientVerifiedData
 }
 
 export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient> &

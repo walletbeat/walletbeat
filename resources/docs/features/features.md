@@ -2446,12 +2446,22 @@ Known Ethereum L1 light client implementations a wallet may embed. Sometimes vis
 
 ---
 
+### Interface: `EthereumL1LightClientVerifiedData`
+
+The kinds of chain data the wallet relies on, and whether each one is verified by its light client(s).
+
+- `balances` (`boolean`): Native and token balances displayed to the user.
+- `nameResolution` (`boolean`): Resolution of human-readable names (e.g. ENS) to addresses.
+- `transactionSimulation` (`boolean`): The chain state used to simulate transactions before signing.
+
+---
+
 ### Interface: `EthereumL1LightClientCoverage`
 
 How much of the chain data the wallet relies on is verified by its light client(s).
 
 - `enabledByDefault` (`boolean`): Whether light client verification is active without the user having to opt into it (e.g. by toggling a setting).
-- `verifiesTransactionSimulation` (`boolean`): Whether the chain state used to simulate transactions before signing is verified by the light client, as opposed to only some other data such as displayed balances.
+- `verifiedData` (`EthereumL1LightClientVerifiedData`): Which kinds of chain data are verified by the light client(s).
 
 ---
 

@@ -924,7 +924,11 @@ export const ambire: SoftwareWallet = {
 					},
 					[EthereumL1LightClient.colibri]: featureSupported,
 					enabledByDefault: false,
-					verifiesTransactionSimulation: false,
+					verifiedData: {
+						balances: true,
+						nameResolution: true,
+						transactionSimulation: false,
+					},
 				}),
 			},
 			passkeyVerification: notSupported,
