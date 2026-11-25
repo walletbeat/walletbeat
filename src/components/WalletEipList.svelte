@@ -47,16 +47,11 @@
 </nav>
 
 <!-- EIP list -->
-<div class="eip-list">
+<div data-column>
 	{#each filtered as eip (eip.number)}
-		<div class="eip-item">
-			<details
-				bind:open={openStates[eip.number]}
-				data-card="secondary padding-4 radius-4"
-				class:open={openStates[eip.number]}
-			>
+		<details bind:open={openStates[eip.number]} data-card="secondary">
 				<summary>
-					<div class="eip-row">
+					<h2 class="eip-row">
 						<span class="eip-icon" aria-hidden="true">
 							{#if eip.icon in lucideNavigationIcons}
 								{@html (lucideNavigationIcons as Record<string, string>)[eip.icon]}
@@ -69,29 +64,29 @@
 						<span class="eip-status" data-status={eip.status}>
 							{eipStatusLabel[eip.status]}
 						</span>
-					</div>
+					</h2>
 				</summary>
 
-				<div class="eip-detail">
+				<div class="eip-detail" data-column="gap-4">
 					<section class="eip-detail__section">
-						<h4>Summary</h4>
+						<h3>Summary</h3>
 						<Typography content={markdown(eip.summaryMarkdown)} />
 					</section>
 
 					<section class="eip-detail__section">
-						<h4>Why it matters for wallets</h4>
+						<h3>Why it matters for wallets</h3>
 						<Typography content={markdown(eip.whyItMattersMarkdown)} />
 					</section>
 
 					{#if eip.noteMarkdown}
 						<section class="eip-detail__section">
-							<h4>Notes</h4>
+							<h3>Notes</h3>
 							<Typography content={markdown(eip.noteMarkdown)} />
 						</section>
 					{/if}
 
 					<section class="eip-detail__section">
-						<h4>Implemented by</h4>
+						<h3>Implemented by</h3>
 						{#if eip.implementers.length > 0}
 							<ul class="eip-implementers" data-list="unstyled">
 								{#each eip.implementers as wallet (wallet.id)}
@@ -114,7 +109,7 @@
 						{/if}
 					</section>
 
-					<div class="eip-detail__links">
+					<div data-row="start wrap gap-5">
 						<a class="eip-detail__spec-link" href={getEipTrackerUrl(eip)}>
 							Wallet support tracker →
 						</a>
@@ -129,8 +124,7 @@
 						</a>
 					</div>
 				</div>
-			</details>
-		</div>
+		</details>
 	{/each}
 </div>
 
@@ -181,50 +175,19 @@
 		opacity: 0.7;
 	}
 
-	/* EIP list */
-	.eip-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
+	details[data-card] {
+		overflow: hidden;
+		transition-property: border-color;
+		border: 1px solid transparent;
 
-	.eip-item {
-		details {
-			overflow: hidden;
-			transition: border-color 0.15s ease;
-			border: 1px solid transparent;
-
-			&.open {
-				border-color: var(--accent);
-			}
-
-			summary {
-				list-style: none;
-				cursor: pointer;
-				user-select: none;
-
-				&::-webkit-details-marker {
-					display: none;
-				}
-
-				&::after {
-					content: '›';
-					font-size: 1.1rem;
-					color: var(--text-secondary);
-					opacity: 0.5;
-					transition: transform 0.2s ease;
-					flex-shrink: 0;
-				}
-			}
-
-			&.open summary::after {
-				transform: rotate(90deg);
-			}
+		&[open] {
+			border-color: var(--accent);
 		}
 	}
 
 	/* Row (summary line) */
 	.eip-row {
+		font: inherit;
 		display: flex;
 		align-items: center;
 		gap: 1.5rem;
@@ -300,16 +263,13 @@
 
 	/* Expanded detail */
 	details[data-card] > .eip-detail {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--border-color);
-		margin-top: 0.875rem;
+		padding-block-start: 1rem;
+		border-block-start: 1px solid var(--border-color);
+		margin-block-start: 0.875rem;
 	}
 
 	.eip-detail__section {
-		h4 {
+		h3 {
 			font-size: 0.75rem;
 			font-weight: 700;
 			text-transform: uppercase;
@@ -357,11 +317,6 @@
 			border-radius: 0.3rem;
 			object-fit: contain;
 		}
-	}
-
-	.eip-detail__links {
-		display: flex;
-		gap: 1.25rem;
 	}
 
 	.eip-detail__spec-link {
