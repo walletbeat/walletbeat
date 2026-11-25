@@ -219,7 +219,7 @@ export const ambire: SoftwareWallet = {
 		coinspectId: 'ambire',
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140, minimalsm, superkalo],
 		iconExtension: 'svg',
-		lastUpdated: '2026-11-10',
+		lastUpdated: '2026-11-25',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -1273,7 +1273,7 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencySandboxing: notSupportedWithRef({
+				dependencySandboxing: supported({
 					ref: [
 						{
 							explanation:
