@@ -1,14 +1,13 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { defineHastPlugin } from 'satteri'
 
-import { githubBlobUrl } from '@/constants/github'
+import { GITHUB_REPO_URL, githubBlobUrl } from '@/constants/github'
 import {
-	ALLOWED_GITHUB_URLS,
-	FORBIDDEN_GITHUB_PREFIXES,
-	IMAGE_EXTENSIONS,
+	IN_REPO_GITHUB_URL_PREFIXES,
+	markdownPageSlug,
 	NON_SERVED_EXTENSIONS,
 	PUBLISHED_URL_PREFIXES,
 	SERVED_REPO_DIRS,
@@ -16,18 +15,6 @@ import {
 	URL_REWRITE_MAPPINGS,
 } from '@/constants/rendered-collections'
 import { assertStringHasPrefix } from '@/types/utils/text'
-
-function isImageExtension(path: string): boolean {
-	const lower = path.toLowerCase()
-
-	for (const ext of IMAGE_EXTENSIONS) {
-		if (lower.endsWith(ext)) {
-			return true
-		}
-	}
-
-	return false
-}
 
 /**
  * Return the lowercase file extension (including the leading dot) of a path,
@@ -42,33 +29,38 @@ function extensionOf(url: string): `.${string}` | '' {
 }
 
 /**
- * Whether a GitHub blob/tree URL points to a file with a non-served extension.
- * Such GitHub links are allowed (they are the intended target for non-served
- * files), whereas GitHub links to rendered content are forbidden.
+ * Extract the repo-root-relative path (leading `/`) from a GitHub blob/tree
+ * URL, or null when the URL is not one. The branch component may itself
+ * contain slashes, so split points are tried left to right; the first one
+ * whose remainder starts with a repository root entry wins.
  */
-function isNonServedGithubUrl(url: string): boolean {
-	for (const prefix of FORBIDDEN_GITHUB_PREFIXES) {
-		if (!url.startsWith(prefix)) {
-			continue
-		}
+export function githubInRepoPath(url: string, repoRoot: string): string | null {
+	const prefix = IN_REPO_GITHUB_URL_PREFIXES.find(p => url.startsWith(p))
 
-		// After the prefix the URL is `<branch>/<path>`.
-		const rest = url.slice(prefix.length)
-		const slash = rest.indexOf('/')
+	if (prefix === undefined) {
+		return null
+	}
 
-		if (slash < 0) {
-			continue
-		}
+	const rest = url.slice(prefix.length)
+	const segments = rest.split('/')
+	let rootEntries: Set<string> | null
 
-		const filePath = rest.slice(slash + 1)
-		const extension = extensionOf(filePath)
+	try {
+		rootEntries = new Set(readdirSync(repoRoot))
+	} catch {
+		rootEntries = null
+	}
 
-		if (extension !== '' && NON_SERVED_EXTENSIONS.has(extension)) {
-			return true
+	for (let split = 1; split < segments.length; split++) {
+		const candidate = segments.slice(split).join('/')
+		const firstSegment = segments[split]
+
+		if (rootEntries === null || rootEntries.has(firstSegment)) {
+			return '/' + candidate
 		}
 	}
 
-	return false
+	return null
 }
 
 function resolveRelativeUrl(url: string, sourceDir: string): string {
@@ -107,29 +99,12 @@ function resolveRelativeUrl(url: string, sourceDir: string): string {
 	return result
 }
 
-function stripFilename(url: string): string {
-	if (isImageExtension(url)) {
-		return url
-	}
-
-	// Preserve query string and hash
-	const hashIdx = url.indexOf('#')
-	const queryIdx = url.indexOf('?')
-	const cutIdx = hashIdx >= 0 ? hashIdx : queryIdx >= 0 ? queryIdx : -1
-	const base = cutIdx >= 0 ? url.slice(0, cutIdx) : url
-	const suffix = cutIdx >= 0 ? url.slice(cutIdx) : ''
-
-	const lastSlash = base.lastIndexOf('/')
-
-	if (lastSlash > 0 && base.slice(lastSlash + 1).endsWith('.md')) {
-		return base.slice(0, lastSlash + 1) + suffix
-	}
-
-	return url
-}
+const markdownPagePath = (path: string) =>
+	path.endsWith('.md') ? markdownPageSlug(path.slice(0, -3)) + '/' : path
 
 /**
- * Rewrite a repo-relative URL to its published site URL.
+ * Rewrite a repository path to its published pathname, retaining an authored
+ * section link. Native and external references are not rewritten.
  *
  * Returns the rewritten URL plus whether a source-tree mapping matched. When
  * no mapping matches the resolved path, the path is returned unchanged
@@ -137,31 +112,32 @@ function stripFilename(url: string): string {
  * is not actually published by the site.
  */
 export function rewriteUrl(url: string, sourceDir: string): { url: string; matched: boolean } {
-	if (SKIPPED_URL_PREFIXES.some(p => url.startsWith(p))) {
+	const pathname = url.split(/[?#]/, 1)[0]
+
+	if (!pathname || SKIPPED_URL_PREFIXES.some(prefix => url.startsWith(prefix))) {
 		return { url, matched: false }
 	}
 
-	let resolved = url.startsWith('/') ? url : resolveRelativeUrl(url, sourceDir)
+	const suffixIndex = url.search(/[?#]/)
+	const suffix = suffixIndex === -1 ? '' : url.slice(suffixIndex)
+	const resolved = pathname.startsWith('/') ? pathname : resolveRelativeUrl(pathname, sourceDir)
 	const extension = extensionOf(resolved)
 
 	if (extension !== '' && NON_SERVED_EXTENSIONS.has(extension)) {
 		return { url: githubBlobUrl(resolved), matched: true }
 	}
 
-	// Apply prefix mappings (longest match first).
-	const sorted = [...URL_REWRITE_MAPPINGS].sort((a, b) => b.repoPrefix.length - a.repoPrefix.length)
+	for (const mapping of URL_REWRITE_MAPPINGS) {
+		if (resolved.startsWith(mapping.repoPrefix)) {
+			const relativePath = resolved.slice(mapping.repoPrefix.length)
 
-	for (const mapping of sorted) {
-		if (resolved === mapping.repoPrefix || resolved.startsWith(mapping.repoPrefix)) {
-			if (mapping.stripFilename) {
-				resolved = stripFilename(resolved)
+			return {
+				url:
+					mapping.urlPrefix +
+					(mapping.stripFilename ? markdownPagePath(relativePath) : relativePath) +
+					suffix,
+				matched: true,
 			}
-
-			const suffix = resolved.slice(mapping.repoPrefix.length)
-			const suffixToUse =
-				mapping.urlPrefix.endsWith('/') && suffix.startsWith('/') ? suffix.slice(1) : suffix
-
-			return { url: mapping.urlPrefix + suffixToUse, matched: true }
 		}
 	}
 
@@ -171,7 +147,7 @@ export function rewriteUrl(url: string, sourceDir: string): { url: string; match
 		return { url: githubBlobUrl(resolved), matched: true }
 	}
 
-	return { url: resolved, matched: false }
+	return { url: resolved + suffix, matched: false }
 }
 
 /**
@@ -225,25 +201,26 @@ export function createUrlRewritePlugin() {
 					return
 				}
 
-				if (SKIPPED_URL_PREFIXES.some(p => url.startsWith(p))) {
+				// In-repo GitHub blob/tree URLs are transformed to their
+				// associated site URLs at generation time rather than rewritten in
+				// document sources; documents representing frozen applications keep
+				// their original text. When the linked file is not served by the
+				// site, the original branch-pinned GitHub URL is the correct target
+				// and is kept as-is.
+				const repoPath = githubInRepoPath(url, process.cwd())
+
+				if (repoPath !== null) {
+					const { url: rewritten, matched } = rewriteUrl(repoPath, '/')
+
+					if (matched && !rewritten.startsWith(GITHUB_REPO_URL)) {
+						ctx.setProperty(node, propKey, rewritten)
+					}
+
 					return
 				}
 
-				// Check forbidden prefixes
-				for (const prefix of FORBIDDEN_GITHUB_PREFIXES) {
-					if (
-						url.startsWith(prefix) &&
-						!ALLOWED_GITHUB_URLS.has(url) &&
-						!isNonServedGithubUrl(url)
-					) {
-						ctx.report({
-							message: `Forbidden URL prefix: ${prefix} (URL: ${url})`,
-							node,
-							severity: 'error',
-						})
-
-						return
-					}
+				if (SKIPPED_URL_PREFIXES.some(p => url.startsWith(p))) {
+					return
 				}
 
 				// Derive source directory from fileURL
@@ -284,17 +261,28 @@ export function createUrlRewritePlugin() {
 	})
 }
 
-export function createStripFirstH1Plugin() {
-	return defineHastPlugin({
-		name: 'strip-first-h1',
+export const createMarkdownStructurePlugin = () =>
+	defineHastPlugin({
+		name: 'markdown-structure',
 		element: {
-			filter: ['h1'],
-			visit(node, ctx) {
-				if (!ctx.data.stripFirstH1Done) {
+			filter: ['h1', 'table'],
+			visit: (node, ctx) => {
+				if (node.tagName === 'table') {
+					ctx.replaceNode(node, {
+						type: 'element',
+						tagName: 'div',
+						properties: {
+							'data-scroll-container': 'inline',
+							tabindex: 0,
+							role: 'region',
+							'aria-label': 'Scrollable table',
+						},
+						children: [node],
+					})
+				} else if (!ctx.data.stripFirstH1Done) {
 					ctx.data.stripFirstH1Done = true
 					ctx.removeNode(node)
 				}
 			},
 		},
 	})
-}

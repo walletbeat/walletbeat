@@ -1,6 +1,7 @@
 // Types
 import type { ComputedSlice } from '@/components/pie-geometry'
 import type { WBIconID } from '@/styles/wbicons'
+import { type CollectionPage, collectionPages } from '@/utils/collection-utils'
 
 export type LucideNavigationIcon =
 	| 'ICON_AT_SIGN'
@@ -70,20 +71,6 @@ function eipTrackerNavigationItems(idPrefix: string, walletType: WalletType): Na
 		}))
 }
 
-export const navigationFaq = {
-	id: 'faq',
-	icon: 'faq',
-	title: 'FAQ',
-	href: '/faq/',
-} as const satisfies NavigationItem
-
-export const navigationAbout = {
-	id: 'about',
-	icon: 'about',
-	title: 'About',
-	href: '/about/',
-} as const satisfies NavigationItem
-
 export const navigationRepository = {
 	id: 'code-repository',
 	icon: 'repository',
@@ -103,13 +90,6 @@ export const navigationTesting = {
 	icon: 'wallet_test',
 	title: 'Playground',
 	href: '/test/',
-} as const satisfies NavigationItem
-
-export const navigationDocs = {
-	id: 'docs',
-	icon: 'about',
-	title: 'Documentation',
-	href: '/docs/',
 } as const satisfies NavigationItem
 
 export const navigationFarcasterChannel = {
@@ -140,9 +120,38 @@ export const navigationStages = {
 	href: '/stages/',
 } as const satisfies NavigationItem
 
+/**
+ * Navigation entries for a collection. The collection root is always present;
+ * descendant pages appear only when they opt in by declaring a
+ * `shortTitle`, and attach to their nearest included ancestor.
+ */
+const collectionNavigationChildren = (page: CollectionPage): NavigationItem[] =>
+	page.children.flatMap(child => {
+		if (child.shortTitle === undefined) {
+			return collectionNavigationChildren(child)
+		}
+
+		return [
+			{
+				id: child.href,
+				title: child.shortTitle,
+				href: child.href,
+				icon: child.icon,
+				children: collectionNavigationChildren(child),
+			},
+		]
+	})
+
+const collectionNavigationItem = (page: CollectionPage): NavigationItem => ({
+	id: page.href,
+	title: page.shortTitle ?? page.listTitle,
+	href: page.href,
+	icon: page.icon,
+	children: collectionNavigationChildren(page),
+})
+
 export const topbarNavigationItems = [
-	navigationAbout,
-	navigationFaq,
+	...collectionPages.map(collectionNavigationItem),
 	navigationRepository,
 	navigationTwitter,
 	navigationFarcasterChannel,
@@ -237,5 +246,4 @@ export const defaultNavigationItems = [
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,
-	navigationDocs,
 ] as const satisfies NavigationItem[]

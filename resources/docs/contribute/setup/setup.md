@@ -1,6 +1,8 @@
 ---
 title: Contributor setup for Walletbeat
 description: 'Guide on setting up a development environment for Walletbeat.'
+shortTitle: 'Contributor setup'
+icon: 'code_repository'
 ---
 
 # Contributing to Walletbeat
@@ -80,7 +82,7 @@ Please read [`/resources/docs/contribute/ui/ui.md`](/resources/docs/contribute/u
 
 ### I want to learn more about Walletbeat
 
-Please read the [About page](/src/pages/about/_about.md).
+Please read the [About page](/src/content/about/mission/mission.md).
 
 ### I am a coding agent and I am looking for documentation on the codebase's structure
 

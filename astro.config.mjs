@@ -13,7 +13,7 @@ import { assertNonEmptyArray, nonEmptyGet } from './src/types/utils/non-empty'
 
 import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
 import {
-	createStripFirstH1Plugin,
+	createMarkdownStructurePlugin,
 	createUrlRewritePlugin,
 } from './src/utils/satteri-url-rewrite-plugin'
 
@@ -45,6 +45,11 @@ export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
 	site: process.env.SITE_URL ?? 'https://walletbeat.eth.limo', // Set your production site URL here
 	output: 'static',
+	redirects: {
+		'/docs/impact/': '/about/impact/',
+		'/docs/social-proof/': '/about/social-proof/',
+		'/faq/': '/about/faq/',
+	},
 	integrations: [svelte()].concat(
 		process.env.WALLETBEAT_DEV === 'true'
 			? []
@@ -151,7 +156,7 @@ export default defineConfig({
 	],
 	markdown: {
 		processor: satteri({
-			hastPlugins: [createUrlRewritePlugin(), createStripFirstH1Plugin()],
+			hastPlugins: [createUrlRewritePlugin(), createMarkdownStructurePlugin()],
 		}),
 	},
 })

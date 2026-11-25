@@ -65,7 +65,7 @@
 		const flatten = (items: NavigationItem[]): NavigationItem[] => (
 			items.flatMap(item => [item, ...flatten(item.children ?? [])])
 		)
-		const allItems = (groups ?? [{ items }]).flatMap(group => flatten(group.items))
+		const allItems = navigationGroups.flatMap(group => flatten(group.items))
 
 		for (const details of root.querySelectorAll<HTMLDetailsElement>('details[data-navigation-item]')) {
 			const item = allItems.find(candidate => candidate.id === details.dataset.navigationItem)
@@ -108,19 +108,6 @@
 	const hasNestedNavigation = (items: NavigationItem[]): boolean =>
 		items.some(item => item.children?.length)
 
-	const highlightText = (text: string, query: string) => {
-		const ranges = fuzzyMatch(text, query)
-
-		return ranges
-			? [
-					...ranges.flatMap(([start, end], i, arr) => [
-						text.slice(arr[i - 1]?.[1] ?? 0, start),
-						`<mark>${text.slice(start, end)}</mark>`,
-					]),
-					text.slice(ranges.at(-1)?.[1] ?? 0),
-				].join('')
-			: text
-	}
 </script>
 
 <div
@@ -277,6 +264,7 @@
 {/snippet}
 
 {#snippet navigationContent(item: NavigationItem, depth: number)}
+	{@const ranges = fuzzyMatch(item.title, effectiveSearchValue) ?? []}
 	{#if iconSnippet}
 		{@render iconSnippet(item, depth)}
 	{:else if item.icon}
@@ -301,9 +289,9 @@
 		{/if}
 	{/if}
 
-	<span data-row-item="flexible" data-visually-hidden={showLabels ? undefined : ''}
-		>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span
-	>
+	<span data-row-item="flexible" data-visually-hidden={showLabels ? undefined : ''}>
+		{#each ranges as [start, end], index (start)}{item.title.slice(ranges[index - 1]?.[1] ?? 0, start)}<mark>{item.title.slice(start, end)}</mark>{/each}{item.title.slice(ranges.at(-1)?.[1] ?? 0)}
+	</span>
 
 	{#if afterLabelSnippet}
 		<span class="navigation-item-after" data-row="gap-1">

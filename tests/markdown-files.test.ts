@@ -3,7 +3,7 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
+import { MARKDOWN_ASTRO_COLLECTIONS } from '@/constants/rendered-collections'
 import { isRepoRelativeLink } from '@/schema/url'
 import { assertStringHasPrefix } from '@/types/utils/text'
 import {
@@ -24,9 +24,24 @@ import { grammarLint, grammarLintMessages } from './utils/grammar'
  * repo-root-relative, not GitHub blob/tree URLs, so that they resolve to the
  * on-site rendered HTML version during static generation.
  */
-const RENDERED_MARKDOWN_DIRS = Object.values(RENDERED_MARKDOWN_COLLECTIONS).map(c =>
+const RENDERED_MARKDOWN_DIRS = Object.values(MARKDOWN_ASTRO_COLLECTIONS).map(c =>
 	assertStringHasPrefix(c.repoDir, '/').slice(1),
 )
+
+/**
+ * Repo-root-relative directories whose markdown files represent frozen
+ * documents (e.g. grant applications, meeting minutes): immutable historical
+ * records whose text must never be rewritten. Their links reference paths as
+ * they existed when the document was written, so source-level link existence
+ * and link-style rules do not apply to them; the resolution of their links is
+ * enforced at generation time instead (in-repo GitHub URLs are transformed to
+ * their associated site URLs, and every rendered link must terminate at a real
+ * page — see tests/postbuild/redirects.test.ts).
+ */
+const FROZEN_MARKDOWN_DIRS = ['governance/grants', 'governance/minutes']
+
+const isFrozenMarkdownFile = (filePath: string): boolean =>
+	FROZEN_MARKDOWN_DIRS.some(dir => filePath.startsWith(dir + '/'))
 
 /**
  * Extract the repo-root-relative file path from a `github.com/walletbeat/walletbeat`
@@ -173,6 +188,13 @@ describe('markdown files', async () => {
 						`Link to ${url} (line ${line}) escapes repository root directory`,
 					)
 
+					// Frozen documents are immutable historical records; their links
+					// reference paths as they existed at writing time and are resolved
+					// at generation time instead.
+					if (isFrozenMarkdownFile(filePath)) {
+						continue
+					}
+
 					// Check if file exists directly or as a directory.
 					// It might be a .md, .astro, .html, etc., or a directory.
 					const absResolved = path.join(getRepositoryRoot(), resolvedPath)
@@ -202,8 +224,10 @@ describe('markdown files', async () => {
 
 	describe('rendered markdown files link to in-repo rendered markdown via repo-root-relative paths', () => {
 		it('rejects GitHub blob/tree links to rendered markdown files', async () => {
-			const renderedMarkdownFiles = allMarkdownFiles.filter(filePath =>
-				RENDERED_MARKDOWN_DIRS.some(dir => filePath.startsWith(dir + '/')),
+			const renderedMarkdownFiles = allMarkdownFiles.filter(
+				filePath =>
+					RENDERED_MARKDOWN_DIRS.some(dir => filePath.startsWith(dir + '/')) &&
+					!isFrozenMarkdownFile(filePath),
 			)
 
 			const violations: string[] = []

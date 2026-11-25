@@ -2,32 +2,34 @@ import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 import { defineCollection } from 'astro:content'
 
-import { RENDERED_MARKDOWN_COLLECTIONS } from './constants/rendered-collections.ts'
-import { assertStringHasPrefix } from './types/utils/text.ts'
+import {
+	MARKDOWN_ASTRO_COLLECTIONS,
+	type MarkdownAstroCollection,
+} from './constants/rendered-collections.ts'
+import { type WBIconID, wbiconsIDs } from './styles/wbicons.ts'
+import { remap } from './types/utils/remap.ts'
 
 const docSchema = z.object({
 	title: z.string(),
 	description: z.string().optional(),
+	listTitle: z.string().optional(),
+	shortTitle: z.string().optional(),
+	icon: z
+		.custom<WBIconID>(value => typeof value === 'string' && (wbiconsIDs as Set<string>).has(value))
+		.optional(),
+	order: z.number().optional(),
 })
 
-function repoDirToGlobBase(repoDir: `/${string}`): string {
-	return assertStringHasPrefix(repoDir, '/').slice(1)
-}
-
-const docs = defineCollection({
-	loader: glob({
-		base: `./${repoDirToGlobBase(RENDERED_MARKDOWN_COLLECTIONS.docs.repoDir)}`,
-		pattern: '**/*.md',
-	}),
-	schema: docSchema,
-})
-
-const governance = defineCollection({
-	loader: glob({
-		base: `./${repoDirToGlobBase(RENDERED_MARKDOWN_COLLECTIONS.governance.repoDir)}`,
-		pattern: '**/*.md',
-	}),
-	schema: docSchema,
-})
-
-export const collections = { docs, governance }
+export const collections = remap(
+	MARKDOWN_ASTRO_COLLECTIONS,
+	(_, { repoDir }: MarkdownAstroCollection) =>
+		defineCollection({
+			loader: glob({
+				base: `.${repoDir}`,
+				pattern: '**/*.md',
+				generateId: ({ entry }) => entry.slice(0, -3),
+				retainBody: false,
+			}),
+			schema: docSchema,
+		}),
+)

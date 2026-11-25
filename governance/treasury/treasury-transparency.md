@@ -1,6 +1,8 @@
 ---
 title: Walletbeat Treasury Transparency Report
 description: 'Overview of Walletbeat treasury addresses and their operational history.'
+shortTitle: 'Treasury transparency report'
+icon: 'funding_transparency'
 ---
 
 # Walletbeat Treasury Transparency Report

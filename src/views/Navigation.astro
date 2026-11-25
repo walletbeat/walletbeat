@@ -1,12 +1,6 @@
 ---
 import type { NavigationItem } from '@/constants/navigation'
-import {
-	navigationAbout,
-	navigationFaq,
-	navigationFarcasterChannel,
-	navigationRepository,
-	navigationTwitter,
-} from '@/constants/navigation'
+import { topbarNavigationItems } from '@/constants/navigation'
 import NavigationItems from './NavigationItems.svelte'
 import LuMenu from 'lucide-static/icons/menu.svg?raw'
 import LuMoon from 'lucide-static/icons/moon.svg?raw'
@@ -18,13 +12,6 @@ interface Props {
 }
 
 const { navigationItems, currentHref = Astro.url.pathname } = Astro.props
-const secondaryNavigationItems = [
-	navigationAbout,
-	navigationFaq,
-	navigationRepository,
-	navigationTwitter,
-	navigationFarcasterChannel,
-] satisfies NavigationItem[]
 ---
 
 <nav
@@ -81,7 +68,7 @@ const secondaryNavigationItems = [
 			client:load
 			transition:persist
 			items={navigationItems}
-			groups={[{ items: navigationItems }, { items: secondaryNavigationItems }]}
+			groups={[{ items: navigationItems }, { items: topbarNavigationItems }]}
 			currentHref={currentHref}
 		/>
 	</div>
