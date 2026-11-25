@@ -35,39 +35,35 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			</hgroup>
 		</header>
 
-		{
-			parentUrl && (
-				<nav data-scroll-item='inline-detached padding-match-start'>
-					<a href={parentUrl}>← Back</a>
-				</nav>
-			)
-		}
+		{parentUrl && (
+			<nav data-scroll-item='inline-detached padding-match-start'>
+				<a href={parentUrl}>← Back</a>
+			</nav>
+		)}
 
-		{
-			entries.length > 0 ? (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<div class='index-grid'>
-						{entries.map(entry => (
-							<a class='index-card' href={entry.path}>
-								<div class='index-card-content'>
-									<h2>{entry.title}</h2>
+		{entries.length > 0 ? (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<div class='index-grid'>
+					{entries.map(entry => (
+						<a class='index-card' href={entry.path}>
+							<div class='index-card-content'>
+								<h2>{entry.title}</h2>
 
-									{entry.description && <p>{entry.description}</p>}
-								</div>
+								{entry.description && <p>{entry.description}</p>}
+							</div>
 
-								<span class='index-card-arrow' aria-hidden='true'>
-									→
-								</span>
-							</a>
-						))}
-					</div>
+							<span class='index-card-arrow' aria-hidden='true'>
+								→
+							</span>
+						</a>
+					))}
 				</div>
-			) : (
-				<div data-scroll-item='inline-detached padding-match-end'>
-					<p>No pages in this directory.</p>
-				</div>
-			)
-		}
+			</div>
+		) : (
+			<div data-scroll-item='inline-detached padding-match-end'>
+				<p>No pages in this directory.</p>
+			</div>
+		)}
 	</main>
 </Layout>
 

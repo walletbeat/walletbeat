@@ -20,18 +20,16 @@ const entry = entryId ? await getEntry('governance', entryId) : undefined
 const page = await resolveCollectionPage(entry, entries, slug, collection)
 ---
 
-{
-	page.kind === 'content' ? (
-		<MarkdownPage metadata={page.metadata}>
-			<page.content />
-		</MarkdownPage>
-	) : (
-		<IndexPage
-			metadata={page.metadata}
-			entries={page.entries}
-			currentDir={page.currentDir}
-			urlPrefix={collection.urlPrefix}
-			parentUrl={page.parentUrl}
-		/>
-	)
-}
+{page.kind === 'content' ? (
+	<MarkdownPage metadata={page.metadata}>
+		<page.content />
+	</MarkdownPage>
+) : (
+	<IndexPage
+		metadata={page.metadata}
+		entries={page.entries}
+		currentDir={page.currentDir}
+		urlPrefix={collection.urlPrefix}
+		parentUrl={page.parentUrl}
+	/>
+)}
