@@ -22,8 +22,10 @@ import {
 	EthereumL1LightClient,
 	type EthereumL1LightClientCoverage,
 	type EthereumL1LightClientSupport,
+	type EthereumL1LightClientVerifiedData,
 	ethereumL1LightClientVerifiedDataName,
 	unverifiedEthereumL1Data,
+	verifiedEthereumL1Data,
 } from '../../features/security/light-client'
 import {
 	type ChainConfigurability,
@@ -50,6 +52,36 @@ function supportsChainVerification(
 	})
 }
 
+function ethereumL1DataNames(dataKinds: Array<keyof EthereumL1LightClientVerifiedData>): string {
+	return commaListFormat(dataKinds.map(dataKind => ethereumL1LightClientVerifiedDataName[dataKind]))
+}
+
+/**
+ * Short explanation of a partial rating that names what is verified, what is
+ * not, and whether the user has to turn verification on first.
+ */
+function partialChainVerificationExplanation({
+	enabledByDefault,
+	verifiedData,
+}: EthereumL1LightClientCoverage): string {
+	const verifiedDataNames = ethereumL1DataNames(verifiedEthereumL1Data(verifiedData))
+	const unverifiedDataNames = ethereumL1DataNames(unverifiedEthereumL1Data(verifiedData))
+
+	if (verifiedDataNames === '') {
+		return `{{WALLET_NAME}} integrates an Ethereum L1 light client, but does not use it to verify ${unverifiedDataNames}.`
+	}
+
+	if (unverifiedDataNames === '') {
+		return '{{WALLET_NAME}} can verify Ethereum L1 chain data, but only if the user turns it on.'
+	}
+
+	if (enabledByDefault) {
+		return `{{WALLET_NAME}} verifies Ethereum L1 ${verifiedDataNames}, but not ${unverifiedDataNames}.`
+	}
+
+	return `{{WALLET_NAME}} can verify Ethereum L1 ${verifiedDataNames} if the user turns it on, but not ${unverifiedDataNames}.`
+}
+
 function partialChainVerification(
 	ctx: EvaluationContext,
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
@@ -72,7 +104,7 @@ function partialChainVerification(
 			rating: Rating.PARTIAL,
 			displayName: 'Partial L1 chain state verification',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} can verify some Ethereum L1 chain data, but not by default or not for all of it.',
+				partialChainVerificationExplanation({ enabledByDefault, verifiedData }),
 			),
 		},
 		details: chainVerificationDetailsContent({

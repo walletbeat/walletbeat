@@ -88,6 +88,17 @@ export const ethereumL1LightClientVerifiedDataName: Record<
 }
 
 /**
+ * The kinds of chain data that are verified by the light client(s).
+ */
+export function verifiedEthereumL1Data(
+	verifiedData: EthereumL1LightClientVerifiedData,
+): Array<keyof EthereumL1LightClientVerifiedData> {
+	return nonEmptyKeys<keyof EthereumL1LightClientVerifiedData, boolean>(verifiedData).filter(
+		dataKind => verifiedData[dataKind],
+	)
+}
+
+/**
  * The kinds of chain data that are not verified by the light client(s).
  */
 export function unverifiedEthereumL1Data(
