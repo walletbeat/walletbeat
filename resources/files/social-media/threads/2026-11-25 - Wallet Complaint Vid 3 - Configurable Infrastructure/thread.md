@@ -13,7 +13,7 @@ What happens when one of those services blocks you?
 
 ---
 
-In this case, the @iamwehi was blocked from Safe and wanted to run their own Safe Transaction Service.
+In this case, @iamwehi was blocked from Safe and wanted to run their own Safe Transaction Service.
 
 The problem?
 The service can be self-hosted, but the wallet didn't let them use their own instance.
