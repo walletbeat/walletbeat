@@ -17,7 +17,7 @@
 		"check:build:post:quiet": "cross-env QUIET=true pnpm run check:build:post",
 		"check:ci:bundle:size-delta": "bash tests/ci/bundle-size-delta.test.sh",
 		"check:ci:build-determinism": "bash tests/ci/build-determinism.test.sh",
-		"check:lint": "pnpm run astro sync && eslint --cache src data tests",
+		"check:lint": "pnpm run astro sync && cross-env NODE_OPTIONS=--max-old-space-size=4096 eslint --cache src data tests",
 		"check:lint:quick": "cross-env WALLETBEAT_PRECOMMIT_FAST=true pnpm run check:lint --report-unused-disable-directives-severity=off",
 		"check:misc": "pnpm run \"/^check:misc:.+/\"",
 		"check:misc:must-be-static": "bash deploy/misc-tests/must_be_static.sh",

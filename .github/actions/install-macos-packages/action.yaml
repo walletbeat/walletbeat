@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Restore cached downloads
       id: package-cache
-      uses: actions/cache/restore@v6
+      uses: actions/cache/restore@v6.1.0
       with:
         path: ${{ runner.temp }}/walletbeat-macos
         key: macos-packages-${{ hashFiles('deploy/macos-packages.txt') }}-${{ runner.arch }}
@@ -18,7 +18,7 @@ runs:
         "${{ github.workspace }}/deploy/install-macos-packages.sh"
     - name: Save cached downloads
       if: steps.package-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v6
+      uses: actions/cache/save@v6.1.0
       with:
         path: ${{ runner.temp }}/walletbeat-macos
         key: ${{ steps.package-cache.outputs.cache-primary-key }}
