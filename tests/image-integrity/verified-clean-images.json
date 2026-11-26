@@ -1195,6 +1195,10 @@
 		"hash": "537d52c068ea54b664796f7285dcdf29c5e279f782e80e17172dc61b66524a8e",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"public/references/wallets/trust-wallet/screenshots/2026-11-26-trust-wallet-browser-connect-hardware-wallet.png": {
+		"hash": "905a95cdb3e9fa4edfc88f67ec78832d6806c39b37d6ce120b89d8d490ba1315",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "5b5321fdcb41c07a239d25c121e1985308346d30862bfcdc7fa5fc745e0ba9e2",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
