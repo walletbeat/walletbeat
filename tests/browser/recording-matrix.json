@@ -67,7 +67,7 @@
 		"width": 390,
 		"height": 844,
 		"scenario": "alternating",
-		"wallet": "base-app",
+		"wallet": "coinbase-wallet",
 		"theme": "light",
 		"transparency": "no-preference"
 	},
