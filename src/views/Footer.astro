@@ -1,13 +1,13 @@
 ---
 import FarcasterIcon from '@/icons/farcaster.svg?raw'
 import XIcon from '@/icons/x.svg?raw'
-import LuGithub from 'lucide-static/icons/github.svg?raw'
+import GitHubIcon from '@/icons/github.svg?raw'
 
 const socialLinks = [
 	{
 		label: 'Walletbeat on GitHub',
 		href: 'https://github.com/walletbeat/walletbeat',
-		icon: LuGithub,
+		icon: GitHubIcon,
 	},
 	{
 		label: 'Walletbeat on X',
@@ -35,7 +35,7 @@ const socialLinks = [
 		</a>
 
 		<p data-row-item='wrap-center basis-6'>
-			Made with 🌸 & 💗 by the {' '}
+			Made with 🌸 & 💗 by the{' '}
 			<a
 				href='https://github.com/walletbeat/walletbeat/graphs/contributors?all=1'
 				target='_blank'
@@ -47,22 +47,20 @@ const socialLinks = [
 
 		<nav data-row='center' data-row-item='wrap-center' aria-label='Walletbeat links'>
 			<ul data-list='unstyled' data-row='center'>
-				{
-					socialLinks.map(link => (
-						<li>
-							<a
-								data-icon='circle'
-								href={link.href}
-								target='_blank'
-								rel='noreferrer'
-								aria-label={link.label}
-								title={link.label}
-							>
-								<span set:html={link.icon} />
-							</a>
-						</li>
-					))
-				}
+				{socialLinks.map(link => (
+					<li>
+						<a
+							data-icon='circle'
+							href={link.href}
+							target='_blank'
+							rel='noreferrer'
+							aria-label={link.label}
+							title={link.label}
+						>
+							<span set:html={link.icon} />
+						</a>
+					</li>
+				))}
 			</ul>
 		</nav>
 	</div>

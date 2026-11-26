@@ -2779,6 +2779,10 @@
 		"hash": "5ba89d1475d7dd13625bdd2d155215818b042fbf1aee6c486d16f693204c9da7",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"src/icons/github.svg": {
+		"hash": "b7214e9faa609e8b17f16905e1350574c11206b578648f2c5e33d8b92e5dfdcb",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"src/icons/x.svg": {
 		"hash": "1b02de178678bbd80de5d2986451a00711b307bd7e651522a8b33ba8b3d57270",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]

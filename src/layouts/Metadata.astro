@@ -99,7 +99,9 @@ const ogImageUrl = toAbsolute(metadata.openGraph.image.url)
 <meta name='application-name' content={metadata.applicationName} />
 <meta name='description' content={metadata.description} />
 <meta name='keywords' content={metadata.keywords.join(', ')} />
-{metadata.icons.map(icon => <link rel='icon' href={icon.url} sizes={icon.sizes} />)}
+{metadata.icons.map(icon => (
+	<link rel='icon' href={icon.url} sizes={icon.sizes} />
+))}
 
 {/* Open Graph — Facebook, LinkedIn, Slack, Discord */}
 <meta property='og:type' content={metadata.openGraph.type} />

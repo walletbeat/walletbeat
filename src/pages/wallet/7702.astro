@@ -23,7 +23,7 @@ import Layout from '@/layouts/Layout.astro'
 import Eip7702Table from '@/views/Eip7702Table.svelte'
 import Navigation from '@/views/Navigation.astro'
 import Typography from '@/components/Typography.svelte'
-import GitHubIcon from 'lucide-static/icons/github.svg?raw'
+import GitHubIcon from '@/icons/github.svg?raw'
 
 /** Classify a wallet's EIP-7702 adoption type at build time. */
 function getWalletTypeFor7702(wallet: RatedWallet<string>): WalletTypeFor7702 {
@@ -135,13 +135,17 @@ const softwareRows = eip7702Rows(Object.values(ratedSoftwareWallets))
 
 		<footer data-scroll-item='inline-detached padding-match-end' data-row='center'>
 			<p>
-				Incorrect data? Submit a PR: <a
+				Incorrect data? Submit a PR:{' '}
+				<a
 					href={repositoryUrl}
 					target='_blank'
 					rel='noopener noreferrer'
 					data-input
-					data-link='camouflaged'><span data-icon set:html={GitHubIcon} />GitHub Repository</a
+					data-link='camouflaged'
 				>
+					<span data-icon set:html={GitHubIcon} />
+					GitHub Repository
+				</a>
 			</p>
 		</footer>
 	</main>
