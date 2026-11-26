@@ -238,7 +238,6 @@ export const completedTemplate: SoftwareWallet = {
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: true,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
@@ -289,7 +288,6 @@ export const completedTemplate: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						ref: [],
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
 							[FeeType.ONCHAIN_APP_FEE]: true,
@@ -312,18 +310,16 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			crossChainBalances: {
 				ref: refTodo,
-				ether: supported({
-					ref: refTodo,
+				ether: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 				globalAccountValue: featureSupported,
 				perChainAccountValue: featureSupported,
-				usdc: supported({
-					ref: refTodo,
+				usdc: {
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({

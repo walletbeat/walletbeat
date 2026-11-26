@@ -20,7 +20,7 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { slowMist } from '../entities/slowmist'
@@ -114,7 +114,13 @@ export const onekeyWallet: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'At the discretion of OneKey, quality, creativity, or novelty of submissions may modify payouts within a given range.',
+						url: 'https://bugrap.io/bounties/OneKey',
+					},
+				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
 				dateStarted: '2023-04-20' as const,
@@ -122,13 +128,6 @@ export const onekeyWallet: HardwareWallet = {
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.BUGRAP,
 				rewards: supported({
-					ref: [
-						{
-							explanation:
-								'At the discretion of OneKey, quality, creativity, or novelty of submissions may modify payouts within a given range.',
-							url: 'https://bugrap.io/bounties/OneKey',
-						},
-					],
 					currency: 'USDC',
 					maximum: 10000,
 					minimum: 100,

@@ -357,7 +357,6 @@ export const ambire: SoftwareWallet = {
 						url: 'https://www.ambire.com/',
 					},
 					feesLargerThan1bps: {
-						ref: [],
 						feesInvolved: {
 							[FeeType.NETWORK_FEE]: true,
 							[FeeType.ONCHAIN_APP_FEE]: true,
@@ -383,25 +382,16 @@ export const ambire: SoftwareWallet = {
 					label: 'Implementation of token filtering by name',
 					url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 				},
-				ether: supported({
-					ref: {
-						explanation: 'Ambire supports filtering by token name.',
-						label: 'Implementation of token filtering by name',
-						url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
-					},
+				ether: {
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 				globalAccountValue: featureSupported,
 				perChainAccountValue: featureSupported,
-				usdc: supported({
-					ref: {
-						explanation: 'Ambire supports filtering by token name.',
-						url: 'https://www.ambire.com/',
-					},
+				usdc: {
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-				}),
+				},
 			},
 		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
