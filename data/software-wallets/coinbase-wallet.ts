@@ -237,7 +237,7 @@ export const coinbaseWallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The Coinbase Wallet wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
+							'The wallet picker in Coinbase Wallet lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
 						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
 						label: 'Coinbase Wallet "Add Wallet" sheet: Create Wallet / Import Wallet options',
 					},
@@ -245,7 +245,7 @@ export const coinbaseWallet: SoftwareWallet = {
 						explanation:
 							'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
 						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-wallet-list.jpg',
-						label: 'Coinbase Wallet wallet picker showing multiple coexisting wallets',
+						label: 'Wallet picker in Coinbase Wallet showing multiple coexisting wallets',
 					},
 				],
 			}),
