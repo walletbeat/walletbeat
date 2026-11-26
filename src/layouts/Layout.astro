@@ -10,6 +10,8 @@ import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
 
 type Props = {
+	splashHeading?: string
+	showContributionCallToAction?: boolean
 	metadata: ComponentProps<typeof Metadata>['metadata']
 
 	/**
@@ -22,13 +24,23 @@ type Props = {
 	 * Only enable on pages that render complex icons above the fold.
 	 */
 	preloadComplexIcons?: boolean
+	/** Preload SP Monorium when it renders above the fold. */
+	preloadSpMonorium?: boolean
 }
 
-const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
+const {
+	metadata,
+	rewriteUrlTo,
+	preloadComplexIcons = false,
+	preloadSpMonorium = false,
+	splashHeading,
+	showContributionCallToAction = true,
+} = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
 import Background from '@/components/Background.svelte'
+import ContributionCallToAction from '@/views/ContributionCallToAction.astro'
 import Footer from '@/views/Footer.astro'
 ---
 
@@ -41,6 +53,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
+		<Font cssVariable='--fontFamily-spMonorium' preload={preloadSpMonorium} />
 		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
@@ -98,8 +111,35 @@ import Footer from '@/views/Footer.astro'
 				</script>
 			)
 		}
+		<script is:inline>
+			if (
+				!location.hash &&
+				performance.now() < 500 &&
+				typeof KeyframeEffect === 'function' &&
+				'pseudoElement' in KeyframeEffect.prototype &&
+				typeof Element.prototype.animate === 'function' &&
+				!matchMedia('(prefers-reduced-motion: reduce)').matches
+			) {
+				const root = document.documentElement
+				const started = String(performance.now())
+				root.dataset.splash = started
+				// Release the initial layout if the body bootstrap is delayed or missing.
+				setTimeout(
+					() => {
+						if (root.dataset.splash === started) {
+							delete root.dataset.splash
+						}
+					},
+					Math.max(0, 500 - performance.now()),
+				)
+			}
+		</script>
 	</head>
 	<body>
+		<div class='splash-visual' aria-hidden='true' inert>
+			<span class='splash-visual-logo' data-safari='invert-lightness'></span>
+			{splashHeading && <p>{splashHeading}</p>}
+		</div>
 		<Background
 			blobs={{
 				purple: {
@@ -138,8 +178,145 @@ import Footer from '@/views/Footer.astro'
 				<span>Skip to main content</span>
 			</a>
 			<slot name='nav' />
+			<script is:inline>
+				;(() => {
+					const root = document.documentElement
+					if (!root.hasAttribute('data-splash')) {
+						return
+					}
+					if (location.hash || !document.querySelector('#nav > header > .logo')) {
+						delete root.dataset.splash
+						return
+					}
+					const controller = new AbortController()
+					const animations = []
+					let frame
+					const openingWord = heading => {
+						const text = heading?.firstChild
+						const word = text?.nodeValue?.match(/^\s*(\S+)/)
+						if (!word) {
+							return
+						}
+						const range = document.createRange()
+						range.setStart(text, word[0].length - word[1].length)
+						range.setEnd(text, word[0].length)
+						const rects = range.getClientRects()
+						if (rects.length === 1 && rects[0].width > 0) {
+							return { word: word[1], rect: rects[0] }
+						}
+					}
+					const finish = () => {
+						delete root.dataset.splash
+						for (const animation of animations) {
+							animation.cancel()
+						}
+						cancelAnimationFrame(frame)
+						clearTimeout(timer)
+						controller.abort()
+					}
+					const timer = setTimeout(finish, Math.max(0, 500 - performance.now()))
+					const start = () => {
+						if (!root.hasAttribute('data-splash') || location.hash || performance.now() >= 500) {
+							finish()
+							return
+						}
+						const scene = document.querySelector('.splash-visual')
+						const layout = document.getElementById('layout')
+						const logo = scene?.querySelector('.splash-visual-logo')
+						const target = document.querySelector('#nav > header > .logo > img')
+						const heading = scene?.querySelector('p')
+						const destination = document.querySelector('#content > main > header > h1')
+						if (!logo || !target || !layout || !document.getElementById('content')) {
+							finish()
+							return
+						}
+						const oldLogo = logo.getBoundingClientRect()
+						const newLogo = target.getBoundingClientRect()
+						const from = openingWord(heading)
+						const to = heading ? openingWord(destination) : undefined
+						if (
+							!(oldLogo.width > 0 && newLogo.width > 0) ||
+							(heading && (!from || !to || from.word !== to.word))
+						) {
+							finish()
+							return
+						}
+						const timing = {
+							duration: 700,
+							fill: 'both',
+							easing: getComputedStyle(root).getPropertyValue('--transition-easeOutExpo').trim(),
+						}
+						const move = (actor, before, after) => {
+							const scale = after.width / before.width
+							const box = actor.getBoundingClientRect()
+							const x = after.left - box.left - scale * (before.left - box.left)
+							const y = after.top - box.top - scale * (before.top - box.top)
+							animations.push(
+								actor.animate(
+									[
+										{ transform: 'none' },
+										{ transform: `translate(${x}px, ${y}px) scale(${scale})` },
+									],
+									timing,
+								),
+							)
+						}
+						try {
+							move(logo, oldLogo, newLogo)
+							if (heading) {
+								move(heading, from.rect, to.rect)
+							}
+							animations.push(
+								scene.animate([{ opacity: 1 }, { opacity: 0 }], {
+									...timing,
+									pseudoElement: '::before',
+								}),
+							)
+							animations.push(
+								layout.animate([{ opacity: 0 }, { opacity: 0, offset: 0.7 }, { opacity: 1 }], {
+									...timing,
+									easing: 'linear',
+								}),
+							)
+							const time = document.timeline.currentTime
+							if (time === null || performance.now() >= 500) {
+								finish()
+								return
+							}
+							for (const animation of animations) {
+								animation.startTime = time
+							}
+							clearTimeout(timer)
+							root.dataset.splash = 'moving'
+							Promise.all(animations.map(animation => animation.finished)).then(finish, finish)
+						} catch {
+							finish()
+						}
+					}
+					for (const name of ['astro:before-preparation', 'focusin', 'pointerdown', 'keydown']) {
+						document.addEventListener(name, finish, { signal: controller.signal, capture: true })
+					}
+					document.addEventListener('wheel', finish, {
+						signal: controller.signal,
+						capture: true,
+						passive: true,
+					})
+					for (const name of ['hashchange', 'pagehide', 'resize']) {
+						window.addEventListener(name, finish, { signal: controller.signal })
+					}
+					matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', finish, {
+						signal: controller.signal,
+					})
+					root.dataset.splash = ''
+					// Give the centered scene a render opportunity before requesting capture.
+					frame = requestAnimationFrame(() => {
+						frame = requestAnimationFrame(start)
+					})
+				})()
+			</script>
 			<div id='content' tabindex='-1' data-column='gap-0' data-sticky-container>
 				<slot />
+				{showContributionCallToAction && <ContributionCallToAction />}
 				<Footer />
 			</div>
 		</div>
@@ -534,6 +711,79 @@ import Footer from '@/views/Footer.astro'
 				> [data-sticky-breadcrumb~="position"]
 				.wallet-name {
 				---breadcrumb-markerWrap: var(---wallet-chainWrap);
+			}
+		}
+	}
+</style>
+
+<style is:global>
+	body {
+		---hero-background:
+			url('/images/background/ascii-flower-block.svg') right 8cqi top 3cqi /
+				clamp(10em, 26cqi, 24em) auto no-repeat,
+			url('/images/background/ascii-symbol-clusters.svg') right -4cqi bottom -2cqi /
+				clamp(16em, 42cqi, 36em) auto no-repeat,
+			url('/images/background/ascii-dot-field.svg') center / 34rem auto repeat,
+			linear-gradient(120deg, light-dark(#e4bdf3, #3f165e), light-dark(#d7a4eb, #60228b));
+	}
+	.splash-visual {
+		display: none;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		:root[data-splash] {
+			&:not([data-splash="moving"]) {
+				#layout > :not(.skip-link),
+				#layout > :not(.skip-link) * {
+					visibility: hidden !important;
+				}
+			}
+
+			&[data-splash="moving"] #nav > header > .logo {
+				visibility: hidden;
+			}
+
+			.splash-visual {
+				position: fixed;
+				inset: 0;
+				z-index: 4;
+				display: grid;
+				place-content: center;
+				justify-items: center;
+				gap: 1.5rem;
+				padding: 1.5rem;
+				pointer-events: none;
+
+				&::before {
+					content: '';
+					position: absolute;
+					inset: 0;
+					z-index: -1;
+					background: var(---hero-background);
+				}
+
+				> * {
+					transform-origin: top left;
+				}
+
+				> .splash-visual-logo {
+					inline-size: min(24rem, 80vw);
+					aspect-ratio: 516 / 126;
+					background: url('/logo.svg') center / contain no-repeat;
+				}
+
+				> p {
+					max-inline-size: 36rem;
+					margin: 0;
+					font-family: var(--fontFamily-spMonorium);
+					font-size: clamp(1.75rem, 4vw, 3.5rem);
+					font-weight: 400;
+					line-height: 1.1;
+					text-box: trim-both auto;
+					text-wrap: balance;
+					overflow-wrap: break-word;
+					text-align: center;
+				}
 			}
 		}
 	}
