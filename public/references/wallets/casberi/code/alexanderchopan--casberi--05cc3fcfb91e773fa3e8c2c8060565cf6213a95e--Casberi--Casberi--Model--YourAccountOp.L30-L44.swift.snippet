@@ -1,0 +1,50 @@
+{
+	"highlightRanges": [
+		{
+			"first": 30,
+			"last": 44
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountOp {"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    struct Network: Equatable, Identifiable, Sendable {"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"        let dollar: String",
+				"        var dollarSymbol = \"USDC\"",
+				"        /// A test network: free money, offered in DEBUG builds only.",
+				"        let isTest: Bool",
+				"        /// Circle's paymaster for EntryPoint v0.7, where there is one (prd",
+				"        /// §1780): the contract that fronts a send's gas and takes it back",
+				"        /// from the account's own USDC. Base and its testnet only.",
+				"        var usdcGas: String? = nil",
+				"        var id: Int { chainId }",
+				"    }",
+				"",
+				"    static let base = Network(",
+				"        name: \"Base\", chainId: 8453,",
+				"        rpcs: [\"https://mainnet.base.org\", \"https://base-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/8453/rpc\", \"https://api.candide.dev/public/v3/8453\"],",
+				"        dollar: \"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913\", isTest: false,",
+				"        usdcGas: \"0x6C973eBe80dCD8660841D4356bf15c32460271C9\")",
+				"    static let ethereum = Network(",
+				"        name: \"Ethereum\", chainId: 1,",
+				"        rpcs: [\"https://rpc.mevblocker.io\", \"https://ethereum-rpc.publicnode.com\"],",
+				"        bundlers: [\"https://public.pimlico.io/v2/1/rpc\", \"https://api.candide.dev/public/v3/1\"],",
+				"        dollar: \"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\", isTest: false)",
+				"    /// Robinhood Chain, back with every feature (prd §1454, amending"
+			],
+			"startLine": 26
+		}
+	]
+}

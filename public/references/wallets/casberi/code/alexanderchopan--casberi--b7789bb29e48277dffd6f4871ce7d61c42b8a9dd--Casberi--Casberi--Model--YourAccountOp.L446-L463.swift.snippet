@@ -1,0 +1,47 @@
+{
+	"highlightRanges": [
+		{
+			"first": 446,
+			"last": 463
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"enum YourAccountOp {"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"    }",
+				"",
+				"    // MARK: - The recovery key's calls (prd §1427)",
+				"",
+				"    /// Deploy the recovery key's Safe passkey signer (idempotent: the",
+				"    /// factory returns the existing one) and make it an owner at threshold 1.",
+				"    /// `threshold` is the one the network already keeps (prd §1456): adding",
+				"    /// a key never lowers it — at 2 the spend limit stands.",
+				"    static func addRecoveryCalls(account: String, x: [UInt8], y: [UInt8], signer: String, threshold: Int = 1) -> [Call] {",
+				"        let create = YourAccount.sel(\"createSigner(uint256,uint256,uint176)\") + x + y + SafeWebAuthn.verifiersWord!",
+				"        let add = YourAccount.sel(\"addOwnerWithThreshold(address,uint256)\") + w(signer) + w(max(threshold, 1))",
+				"        return [Call(operation: 0, to: SafeWebAuthn.factory, value: w(0), data: create),",
+				"                Call(operation: 0, to: account, value: w(0), data: add)]",
+				"    }",
+				"",
+				"    /// A key held outside Casberi (prd §1432): an address of the person's own",
+				"    /// — a Ledger, MetaMask — made an owner at threshold 1, so the account",
+				"    /// answers to it with no app of ours (Safe's own web app signs for it).",
+				"    static func addOwnerCall(account: String, owner: String, threshold: Int = 1) -> Call {",
+				"        Call(operation: 0, to: account, value: w(0),",
+				"             data: YourAccount.sel(\"addOwnerWithThreshold(address,uint256)\") + w(owner) + w(max(threshold, 1)))",
+				"    }",
+				"",
+				"    /// Safe's owners are a linked list: `removeOwner` names the owner before",
+				"    /// the one removed (the sentinel `0x…01` before the first, in",
+				"    /// `getOwners` order) and the threshold to keep. Nil when `owner` is not"
+			],
+			"startLine": 442
+		}
+	]
+}

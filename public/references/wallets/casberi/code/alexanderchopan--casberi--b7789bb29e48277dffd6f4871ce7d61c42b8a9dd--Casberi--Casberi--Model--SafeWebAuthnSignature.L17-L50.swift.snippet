@@ -1,0 +1,57 @@
+{
+	"highlightRanges": [
+		{
+			"first": 17,
+			"last": 50
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"/// WebAuthn assertion. The Safe sees a contract signature (`v = 0`); the",
+				"/// contract sees `sha256(authenticatorData ‖ sha256(clientDataJSON))` signed",
+				"/// on P-256; the key never leaves the chip.",
+				"///",
+				"/// **This phone is its own authenticator.** No browser, no passkey API, no",
+				"/// relying party: `authenticatorData` and `clientDataFields` are built HERE",
+				"/// (WebAuthn.sol checks the flags byte and rebuilds the JSON from the",
+				"/// challenge; it verifies nothing about the rpIdHash or the origin), and the",
+				"/// Enclave signs the digest directly through the pre-hashed overload.",
+				"///",
+				"/// **The rail is stronger here than for the K1 key.** Before a signature",
+				"/// leaves, `SafeEnclaveSigner` asks the factory's own",
+				"/// `isValidSignatureForSigner(message, signature, x, y, verifiers)` and",
+				"/// requires the ERC-1271 magic value back — so the chain verifies the exact",
+				"/// bytes about to be posted, and every possible encoding mistake in this",
+				"/// file is a decline rather than a wrong signature.",
+				"enum SafeWebAuthn {",
+				"",
+				"    /// `SafeWebAuthnSignerFactory` 0.2.1, deployed through Safe's singleton",
+				"    /// factory — one address on every chain it reached. Never TRUSTED: the",
+				"    /// signer reads code at it before offering the route, and reads the",
+				"    /// signer address back from the factory rather than deriving it (the",
+				"    /// derivation needs the proxy's creation code, which only the compiler",
+				"    /// has).",
+				"    static let factory = \"0x1d31F259eE307358a26dFb23EB365939E8641195\"",
+				"    /// RIP-7212's P-256 precompile, tried first where the chain has it.",
+				"    static let precompile = 0x100",
+				"    /// Daimo's audited Solidity verifier, the fallback everywhere else.",
+				"    static let fallbackVerifier = \"0xc2b78104907F722DABAc4C69f826a522B2754De4\"",
+				"",
+				"    /// `P256.Verifiers`, a `uint176`: the precompile's two bytes above the",
+				"    /// fallback's twenty. As a full word for calldata.",
+				"    static var verifiersWord: [UInt8]? {",
+				"        guard var word = SafeABI.word(address: fallbackVerifier) else { return nil }",
+				"        word[10] = UInt8((precompile >> 8) & 0xFF)",
+				"        word[11] = UInt8(precompile & 0xFF)",
+				"        return word",
+				"    }",
+				"",
+				"    static let rpID = \"casberi.app\"",
+				"    static let clientDataFields = \"\\\"origin\\\":\\\"https://casberi.app\\\",\\\"crossOrigin\\\":false\"",
+				"    /// ERC-1271's `isValidSignature(bytes32,bytes)` selector, the magic value."
+			],
+			"startLine": 13
+		}
+	]
+}
