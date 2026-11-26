@@ -5,9 +5,12 @@ import type { AtLeastOneSupported } from '../support'
  * Known Ethereum L1 light client implementations a wallet may embed.
  * Sometimes visible in the UI, but more reliably identified by checking the
  * wallet's documentation for light client claims, or by searching the source
- * code for imports of helios or similar libraries.
+ * code for imports of helios, colibri, or similar libraries.
  */
 export enum EthereumL1LightClient {
+	/** Colibri: a fully verifying, stateless Ethereum light client. */
+	colibri = 'colibri',
+
 	/** Helios: a fast, trustless Ethereum light client written in Rust. */
 	helios = 'helios',
 
@@ -20,6 +23,8 @@ export enum EthereumL1LightClient {
  */
 export function ethereumL1LightClientName(l1LightClient: EthereumL1LightClient): string {
 	switch (l1LightClient) {
+		case EthereumL1LightClient.colibri:
+			return 'Colibri'
 		case EthereumL1LightClient.helios:
 			return 'Helios'
 		case EthereumL1LightClient.heliosMobi:
@@ -32,6 +37,11 @@ export function ethereumL1LightClientName(l1LightClient: EthereumL1LightClient):
  */
 export function ethereumL1LightClientUrl(l1LightClient: EthereumL1LightClient): LabeledUrl {
 	switch (l1LightClient) {
+		case EthereumL1LightClient.colibri:
+			return {
+				url: 'https://www.corpuscore.tech/colibri',
+				label: ethereumL1LightClientName(l1LightClient),
+			}
 		case EthereumL1LightClient.helios:
 			return {
 				url: 'https://helios.a16zcrypto.com/',

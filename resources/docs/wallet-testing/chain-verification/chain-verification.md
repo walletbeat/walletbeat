@@ -19,7 +19,12 @@ More generally, a dishonest or compromised RPC provider could:
 - Lie about transaction receipts or contract state to manipulate your decisions.
 - Hide pending or confirmed transactions from you.
 
-A wallet that integrates a light client (e.g. [Helios](https://github.com/a16z/helios)) can detect such lies by independently verifying block headers against a trusted beacon checkpoint and rechecking `eth_call` results against Merkle proofs. The goal of this test: determining whether the wallet under test does any such verification, or whether it can be trivially deceived.
+A wallet that integrates a light client can detect such lies by verifying chain data locally instead of trusting the RPC response. Implementations differ in how they do this:
+
+- [Helios](https://github.com/a16z/helios) follows a light sync of block headers from a trusted beacon checkpoint, then rechecks values such as `eth_call` results against Merkle proofs included under those headers.
+- [Colibri](https://www.corpuscore.tech/colibri) does not sync a header chain. For each request it verifies a consensus proof (that the block is on the canonical chain from a trusted checkpoint, via sync-committee / BLS evidence) together with an execution proof (Merkle proofs for balances, storage, or call results), all checked by a local verifier.
+
+The goal of this test: determining whether the wallet under test does any such verification, or whether it can be trivially deceived.
 
 ## High-level guide
 

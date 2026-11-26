@@ -49,7 +49,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 ### Chain Verification
 
 - **Do you use a light client to independently verify Ethereum L1 state (without trusting a centralized RPC)?** (yes / no)
-- **If yes, which implementation?** (e.g. Helios)
+- **If yes, which implementation?** (e.g. Helios, Colibri)
 
 ### Passkeys
 
