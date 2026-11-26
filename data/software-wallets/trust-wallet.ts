@@ -8,6 +8,11 @@ import {
 	CoverageBreadth,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
@@ -212,7 +217,26 @@ export const trustWallet: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							"The extension's existing wallet screen lists Ledger under hardware wallets.",
+						file: 'public/references/wallets/trust-wallet/screenshots/2026-11-26-trust-wallet-browser-connect-hardware-wallet.png',
+						label:
+							"Screenshot of the Trust Wallet extension's existing wallet screen, provided by a maintainer",
+					},
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: refTodo,
+					wallets: {},
+				},
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: notSupportedWithRef({
