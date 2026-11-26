@@ -168,11 +168,17 @@ export const casberi: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
 						},
 					},
 				}),
@@ -200,11 +206,11 @@ export const casberi: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
@@ -232,11 +238,11 @@ export const casberi: SoftwareWallet = {
 						},
 						shownAfterSingleAction: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 						shownByDefault: {
 							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
-							units: null,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 					},
 				}),
