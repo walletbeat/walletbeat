@@ -1,0 +1,40 @@
+{
+	"highlightRanges": [
+		{
+			"first": 3,
+			"last": 21
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"import Foundation",
+				"",
+				"/// **WHICH REQUESTS GO THROUGH TOR (prd §1495).**",
+				"///",
+				"/// Every request that names a wallet — yours or one you follow — is sent",
+				"/// through Tor, so no service learns where you are, and none can tell that",
+				"/// the wallets you look at belong to one person. The rule is read off",
+				"/// `NetworkReach`: an entry marked `throughTor` routes its hosts, except the",
+				"/// hosts measured refusing every Tor exit (`refusesTor`), which go direct and",
+				"/// are listed as such where the app states what it reaches. The Feed's apps",
+				"/// never go through Tor: a signed-in session met from a new exit every few",
+				"/// minutes reads as a hijacked account, and none of them carries an address.",
+				"///",
+				"/// One circuit per wallet: the isolation key is the first address the request",
+				"/// names, so two wallets you follow never share an exit (Tor's",
+				"/// `IsolateSOCKSAuth`, keyed by the SOCKS username). A request naming no",
+				"/// address shares its host's circuit.",
+				"///",
+				"/// Not a setting and not optional (prd §1495 item 1): where Tor cannot",
+				"/// connect, the wallets stand on their last readings, stamped (prd §825), and",
+				"/// nothing reads them another way.",
+				"enum TorRoute {",
+				"",
+				"    enum Way: Equatable {",
+				"        /// Through Tor, on the circuit for this key."
+			],
+			"startLine": 1
+		}
+	]
+}
