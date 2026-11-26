@@ -50,11 +50,11 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 
-import baseAppRawExtManifest from './manifests/baseApp/hnfanknocfeofbddgcijnmhnfnkdnaad.manifest.json'
+import coinbaseWalletRawExtManifest from './manifests/coinbaseWallet/hnfanknocfeofbddgcijnmhnfnkdnaad.manifest.json'
 
-export const baseApp: SoftwareWallet = {
+export const coinbaseWallet: SoftwareWallet = {
 	metadata: {
-		id: 'base-app',
+		id: 'coinbase-wallet',
 		displayName: 'Coinbase Wallet (Formerly Base App)',
 		tableName: 'Coinbase Wallet',
 		coinspectId: 'coinbase-wallet',
@@ -93,7 +93,7 @@ export const baseApp: SoftwareWallet = {
 					{
 						explanation:
 							'Per the Base App team statement, supported account types are "EOA + 7702 delegation / 4337".',
-						file: 'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+						file: 'public/references/wallets/coinbase-wallet/2026-02-23-questionnaire.md',
 						label: 'Base App team statement (2026-02-23)',
 					},
 				],
@@ -238,13 +238,13 @@ export const baseApp: SoftwareWallet = {
 					{
 						explanation:
 							'The Coinbase Wallet wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
-						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
+						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
 						label: 'Coinbase Wallet "Add Wallet" sheet: Create Wallet / Import Wallet options',
 					},
 					{
 						explanation:
 							'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
-						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
+						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-wallet-list.jpg',
 						label: 'Coinbase Wallet wallet picker showing multiple coexisting wallets',
 					},
 				],
@@ -483,7 +483,7 @@ export const baseApp: SoftwareWallet = {
 						lastRetrieved: '2026-10-09',
 						url: 'https://chromewebstore.google.com/detail/coinbase-wallet-extension/hnfanknocfeofbddgcijnmhnfnkdnaad',
 					},
-					browserExtensionHardening: parseBrowserExtensionManifest(baseAppRawExtManifest),
+					browserExtensionHardening: parseBrowserExtensionManifest(coinbaseWalletRawExtManifest),
 					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
 					secureRng: SecureRngSource.NOT_VERIFIABLE,
 				},
@@ -507,14 +507,14 @@ export const baseApp: SoftwareWallet = {
 						{
 							explanation:
 								'Coinbase Wallet Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
-							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png',
+							file: 'public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-swap-review.png',
 							label: 'Coinbase Wallet Trade screen for a $1.52 USDC to ETH swap',
 							lastRetrieved: '2026-09-09',
 						},
 						{
 							explanation:
 								'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
-							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
+							file: 'public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-approve-exact-amount-event.png',
 							label:
 								'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
 							lastRetrieved: '2026-09-09',
