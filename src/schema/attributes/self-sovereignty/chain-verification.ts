@@ -16,10 +16,16 @@ import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
 import {
 	EthereumL1LightClient,
+	type EthereumL1LightClientCoverage,
 	type EthereumL1LightClientSupport,
+	type EthereumL1LightClientVerifiedData,
+	ethereumL1LightClientVerifiedDataName,
+	unverifiedEthereumL1Data,
+	verifiedEthereumL1Data,
 } from '../../features/security/light-client'
 import {
 	type ChainConfigurability,
@@ -38,7 +44,75 @@ function supportsChainVerification(
 			displayName: 'L1 chain state verification',
 			shortExplanation: sentence('{{WALLET_NAME}} verifies chain integrity of the Ethereum L1.'),
 		},
-		details: chainVerificationDetailsContent({ lightClients }),
+		details: chainVerificationDetailsContent({
+			lightClients,
+			enabledByDefault: true,
+			verifiedData: { balances: true, nameResolution: true, transactionSimulation: true },
+		}),
+	})
+}
+
+function ethereumL1DataNames(dataKinds: Array<keyof EthereumL1LightClientVerifiedData>): string {
+	return commaListFormat(dataKinds.map(dataKind => ethereumL1LightClientVerifiedDataName[dataKind]))
+}
+
+/**
+ * Short explanation of a partial rating that names what is verified, what is
+ * not, and whether the user has to turn verification on first.
+ */
+function partialChainVerificationExplanation({
+	enabledByDefault,
+	verifiedData,
+}: EthereumL1LightClientCoverage): string {
+	const verifiedDataNames = ethereumL1DataNames(verifiedEthereumL1Data(verifiedData))
+	const unverifiedDataNames = ethereumL1DataNames(unverifiedEthereumL1Data(verifiedData))
+
+	if (verifiedDataNames === '') {
+		return `{{WALLET_NAME}} integrates an Ethereum L1 light client, but does not use it to verify ${unverifiedDataNames}.`
+	}
+
+	if (unverifiedDataNames === '') {
+		return '{{WALLET_NAME}} can verify Ethereum L1 chain data, but only if the user turns it on.'
+	}
+
+	if (enabledByDefault) {
+		return `{{WALLET_NAME}} verifies Ethereum L1 ${verifiedDataNames}, but not ${unverifiedDataNames}.`
+	}
+
+	return `{{WALLET_NAME}} can verify Ethereum L1 ${verifiedDataNames} if the user turns it on, but not ${unverifiedDataNames}.`
+}
+
+function partialChainVerification(
+	ctx: EvaluationContext,
+	lightClients: NonEmptyArray<EthereumL1LightClient>,
+	{ enabledByDefault, verifiedData }: EthereumL1LightClientCoverage,
+): Evaluation {
+	const unverifiedData = unverifiedEthereumL1Data(verifiedData)
+	const unverifiedDataNames = unverifiedData.map(
+		dataKind => ethereumL1LightClientVerifiedDataName[dataKind],
+	)
+	const howToImproveSteps = [
+		...(enabledByDefault ? [] : ['enable light client verification by default']),
+		...(unverifiedData.length === 0
+			? []
+			: [`use the light client to also verify ${commaListFormat(unverifiedDataNames)}`]),
+	]
+
+	return ctx.build({
+		outcome: {
+			id: `chain_verification_l1_partial_${lightClients.join('_')}_${enabledByDefault ? 'default' : 'opt_in'}_unverified_${unverifiedData.join('_') || 'none'}`,
+			rating: Rating.PARTIAL,
+			displayName: 'Partial L1 chain state verification',
+			shortExplanation: sentence(
+				partialChainVerificationExplanation({ enabledByDefault, verifiedData }),
+			),
+		},
+		details: chainVerificationDetailsContent({
+			lightClients,
+			enabledByDefault,
+			verifiedData,
+		}),
+		howToImprove: mdParagraph(`{{WALLET_NAME}} should ${howToImproveSteps.join(' and ')}.`),
 	})
 }
 
@@ -110,6 +184,13 @@ export const chainVerification: Attribute = {
 		Wallets are evaluated based on whether or not they integrate a light
 		client for verification of Ethereum L1 state.
 
+		A wallet passes if its light client is enabled by default and verifies
+		all the chain data the wallet relies on: balances, name resolution
+		(e.g. ENS), and the chain state used to simulate transactions before
+		signing. A wallet receives a partial rating if it integrates a light
+		client, but verification is opt-in or only covers some of that data
+		(e.g. balances, but not transaction simulations).
+
 		See the [chain verification testing guide](${withBasePath('/docs/wallet-testing/chain-verification/')})
 		for how Walletbeat tests whether a wallet verifies the chain data it receives.
 
@@ -128,6 +209,19 @@ export const chainVerification: Attribute = {
 			supportsChainVerification(
 				EvaluationContext.forTest(() => chainVerification),
 				[EthereumL1LightClient.helios],
+			),
+		),
+		partial: exampleRating(
+			mdParagraph(
+				'The wallet integrates a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/), but verification is opt-in or does not cover all the chain data the wallet relies on.',
+			),
+			partialChainVerification(
+				EvaluationContext.forTest(() => chainVerification),
+				[EthereumL1LightClient.colibri],
+				{
+					enabledByDefault: false,
+					verifiedData: { balances: true, nameResolution: true, transactionSimulation: false },
+				},
 			),
 		),
 		fail: exampleRating(
@@ -169,11 +263,12 @@ export const chainVerification: Attribute = {
 			return noChainVerification(ctx, ctx.features.chainConfigurability)
 		}
 
-		const l1ClientNoRefs = ctx.popRefs<EthereumL1LightClientSupport>(l1Client)
+		const { enabledByDefault, verifiedData, ...lightClientsSupport } =
+			ctx.popRefs<EthereumL1LightClientSupport>(l1Client)
 		const supportedLightClients: EthereumL1LightClient[] = []
 
 		for (const [lightClient, supported] of nonEmptyEntries<EthereumL1LightClient, Support>(
-			l1ClientNoRefs,
+			lightClientsSupport,
 		)) {
 			if (isSupported(supported)) {
 				supportedLightClients.push(lightClient)
@@ -182,6 +277,13 @@ export const chainVerification: Attribute = {
 
 		if (!isNonEmptyArray(supportedLightClients)) {
 			throw new Error('No supported light clients found; this should be impossible per type system')
+		}
+
+		if (!enabledByDefault || unverifiedEthereumL1Data(verifiedData).length > 0) {
+			return partialChainVerification(ctx, supportedLightClients, {
+				enabledByDefault,
+				verifiedData,
+			})
 		}
 
 		return supportsChainVerification(ctx, supportedLightClients)

@@ -685,6 +685,12 @@ export const completedTemplate: SoftwareWallet = {
 				ethereumL1: supported({
 					ref: refTodo,
 					[EthereumL1LightClient.helios]: featureSupported,
+					enabledByDefault: true,
+					verifiedData: {
+						balances: true,
+						nameResolution: true,
+						transactionSimulation: true,
+					},
 				}),
 			},
 			passkeyVerification: supported({

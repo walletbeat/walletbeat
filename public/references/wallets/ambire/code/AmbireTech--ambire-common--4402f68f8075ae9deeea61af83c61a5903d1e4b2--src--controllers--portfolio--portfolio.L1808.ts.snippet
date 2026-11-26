@@ -1,0 +1,59 @@
+{
+	"highlightRanges": [
+		{
+			"first": 1808,
+			"last": 1808
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 174
+		},
+		{
+			"lines": [
+				"  protected async updatePortfolioState(",
+				"    account: Account,",
+				"    network: Network,",
+				"    portfolioLib: Portfolio | null,",
+				"    portfolioProps: Partial<GetOptions> & {",
+				"      defiMaxDataAgeMs: number",
+				"      hasKeys: boolean",
+				"      maxDataAgeMs?: number",
+				"      isManualUpdate?: boolean",
+				"      bypassServerSideCache?: boolean",
+				"    }",
+				"  ): Promise<[boolean, FormattedPortfolioDiscoveryResponse | null]> {"
+			],
+			"startLine": 1727
+		},
+		{
+			"lines": [
+				"    try {"
+			],
+			"startLine": 1780
+		},
+		{
+			"lines": [
+				"      const allHints = this.hints.getAllHints("
+			],
+			"startLine": 1801
+		},
+		{
+			"lines": [
+				"        this.#state[account.addr]?.[network.chainId.toString()]?.result?.defiPositions,",
+				"        isManualUpdate,",
+				"        discoveryData?.data?.hints",
+				"      )",
+				"      const shouldVerifyPortfolio = !!network.isColibriEnabled && !portfolioProps.simulation",
+				"",
+				"      // Colibri verification runs off the critical path (see below). Show a",
+				"      // loading badge immediately so the UI reflects that a verification is pending.",
+				"      const verification: PortfolioVerification | undefined = shouldVerifyPortfolio"
+			],
+			"startLine": 1804
+		}
+	]
+}

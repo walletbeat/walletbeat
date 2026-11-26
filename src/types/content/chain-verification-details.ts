@@ -1,10 +1,14 @@
 import type { EvaluationData } from '@/schema/attributes'
-import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
+import type {
+	EthereumL1LightClient,
+	EthereumL1LightClientCoverage,
+} from '@/schema/features/security/light-client'
 
 import { component, type Content } from '../content'
 import type { NonEmptyArray } from '../utils/non-empty'
 
-export interface ChainVerificationDetailsProps extends EvaluationData {
+export interface ChainVerificationDetailsProps
+	extends EvaluationData, EthereumL1LightClientCoverage {
 	lightClients: NonEmptyArray<EthereumL1LightClient>
 }
 

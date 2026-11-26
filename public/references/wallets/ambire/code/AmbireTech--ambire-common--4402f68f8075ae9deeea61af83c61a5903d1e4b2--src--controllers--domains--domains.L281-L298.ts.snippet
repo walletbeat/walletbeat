@@ -1,0 +1,48 @@
+{
+	"highlightRanges": [
+		{
+			"first": 281,
+			"last": 298
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"export class DomainsController extends EventEmitter implements IDomainsController {"
+			],
+			"startLine": 71
+		},
+		{
+			"lines": [
+				"  /**",
+				"   * Cross-checks an RPC-resolved address by re-resolving the domain through the same service against",
+				"   * Colibri's proven state. Returns true on a match, false when no ready verifier exists for the",
+				"   * service's chain (verification is skipped), and throws a user-facing error on a genuine mismatch.",
+				"   */",
+				"  async #verifyResolvedAddress(resolver: NameResolver, domain: string, address: string) {",
+				"    const verified = await withTimeout(",
+				"      () => resolver.resolve(domain, this.#verificationContext(), { resolveAvatar: false }),",
+				"      { timeoutMs: RESOLUTION_VERIFY_TIMEOUT_MS }",
+				"    )",
+				"",
+				"    if (!verified) return false",
+				"",
+				"    if (!verified.address && !address) return false",
+				"    if (verified.address && address && getAddress(verified.address) === getAddress(address)) {",
+				"      return true",
+				"    }",
+				"",
+				"    throw new EmittableError({",
+				"      level: 'silent',",
+				"      message: `${resolver.label} resolution mismatch for ${domain}: RPC returned ${address}, Colibri returned ${verified.address}`",
+				"    })",
+				"  }",
+				"",
+				"  async #setResolveDomainFailure(domain: string, error: any) {",
+				"    const message = getUserFacingResolutionError(error)",
+				""
+			],
+			"startLine": 276
+		}
+	]
+}

@@ -1,3 +1,5 @@
+import { nonEmptyKeys } from '@/types/utils/non-empty'
+
 import type { LabeledUrl } from '../../url'
 import type { AtLeastOneSupported } from '../support'
 
@@ -13,6 +15,12 @@ export enum EthereumL1LightClient {
 
 	/** Helios-Mobi: a mobile-optimized port of Helios. */
 	heliosMobi = 'heliosMobi',
+
+	/**
+	 * Colibri Stateless: a stateless light client that verifies RPC responses
+	 * against Merkle proofs and zero-knowledge proofs of the sync committee.
+	 */
+	colibri = 'colibri',
 }
 
 /**
@@ -24,6 +32,8 @@ export function ethereumL1LightClientName(l1LightClient: EthereumL1LightClient):
 			return 'Helios'
 		case EthereumL1LightClient.heliosMobi:
 			return 'Helios-Mobi'
+		case EthereumL1LightClient.colibri:
+			return 'Colibri Stateless'
 	}
 }
 
@@ -42,7 +52,77 @@ export function ethereumL1LightClientUrl(l1LightClient: EthereumL1LightClient): 
 				url: 'https://github.com/hsyodyssey/helios-mobi',
 				label: ethereumL1LightClientName(l1LightClient),
 			}
+		case EthereumL1LightClient.colibri:
+			return {
+				url: 'https://github.com/corpus-core/colibri-stateless',
+				label: ethereumL1LightClientName(l1LightClient),
+			}
 	}
 }
 
-export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
+/**
+ * The kinds of chain data the wallet relies on, and whether each one is
+ * verified by its light client(s).
+ */
+export interface EthereumL1LightClientVerifiedData {
+	/** Native and token balances displayed to the user. */
+	balances: boolean
+
+	/** Resolution of human-readable names (e.g. ENS) to addresses. */
+	nameResolution: boolean
+
+	/** The chain state used to simulate transactions before signing. */
+	transactionSimulation: boolean
+}
+
+/**
+ * Human-friendly name for each kind of chain data a light client can verify.
+ */
+export const ethereumL1LightClientVerifiedDataName: Record<
+	keyof EthereumL1LightClientVerifiedData,
+	string
+> = {
+	balances: 'balances',
+	nameResolution: 'name resolution (e.g. ENS)',
+	transactionSimulation: 'transaction simulations',
+}
+
+/**
+ * The kinds of chain data that are verified by the light client(s).
+ */
+export function verifiedEthereumL1Data(
+	verifiedData: EthereumL1LightClientVerifiedData,
+): Array<keyof EthereumL1LightClientVerifiedData> {
+	return nonEmptyKeys<keyof EthereumL1LightClientVerifiedData, boolean>(verifiedData).filter(
+		dataKind => verifiedData[dataKind],
+	)
+}
+
+/**
+ * The kinds of chain data that are not verified by the light client(s).
+ */
+export function unverifiedEthereumL1Data(
+	verifiedData: EthereumL1LightClientVerifiedData,
+): Array<keyof EthereumL1LightClientVerifiedData> {
+	return nonEmptyKeys<keyof EthereumL1LightClientVerifiedData, boolean>(verifiedData).filter(
+		dataKind => !verifiedData[dataKind],
+	)
+}
+
+/**
+ * How much of the chain data the wallet relies on is verified by its
+ * light client(s).
+ */
+export interface EthereumL1LightClientCoverage {
+	/**
+	 * Whether light client verification is active without the user having to
+	 * opt into it (e.g. by toggling a setting).
+	 */
+	enabledByDefault: boolean
+
+	/** Which kinds of chain data are verified by the light client(s). */
+	verifiedData: EthereumL1LightClientVerifiedData
+}
+
+export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient> &
+	EthereumL1LightClientCoverage
