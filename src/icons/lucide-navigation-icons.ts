@@ -6,6 +6,7 @@ import StairsIcon from 'lucide-static/icons/chart-no-axes-column-increasing.svg?
 import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
 import EyeOffIcon from 'lucide-static/icons/eye-off.svg?raw'
 import FileCodeIcon from 'lucide-static/icons/file-code.svg?raw'
+import FootprintsIcon from 'lucide-static/icons/footprints.svg?raw'
 import GlobeIcon from 'lucide-static/icons/globe.svg?raw'
 import HashIcon from 'lucide-static/icons/hash.svg?raw'
 import LayersIcon from 'lucide-static/icons/layers.svg?raw'
@@ -30,6 +31,7 @@ export const lucideNavigationIcons: Record<LucideNavigationIcon, string> = {
 	ICON_EYE_OFF: EyeOffIcon,
 	ICON_FARCASTER: FarcasterIcon,
 	ICON_FILE_CODE: FileCodeIcon,
+	ICON_FOOTPRINTS: FootprintsIcon,
 	ICON_GLOBE: GlobeIcon,
 	ICON_HASH: HashIcon,
 	ICON_LAYERS: LayersIcon,
