@@ -52,6 +52,31 @@ import { allVariantsForWalletType, WalletType } from '../wallet-types'
 
 export const softwareWalletVariants = allVariantsForWalletType(WalletType.SOFTWARE)
 
+/** Evaluates whether all of a software wallet's variants have publicly available source code. */
+export const softwareWalletSourceAvailability =
+	stageCriterionEvaluationPerVariant<SoftwareAttributeGroupId>(
+		softwareWalletVariants,
+		(variantWallet): StageCriterionEvaluation => {
+			const visible = isSourcePubliclyVisible(variantWallet.features.licensing)
+
+			if (visible === null) {
+				return { rating: StageCriterionRating.UNRATED }
+			}
+
+			if (!visible) {
+				return {
+					rating: StageCriterionRating.FAIL,
+					explanation: sentence("{{WALLET_NAME}}'s source code is not publicly available."),
+				}
+			}
+
+			return {
+				rating: StageCriterionRating.PASS,
+				explanation: sentence("{{WALLET_NAME}}'s source code is publicly available."),
+			}
+		},
+	)
+
 export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0',
 	label: 'Stage 0',
@@ -68,28 +93,7 @@ export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'The source code must be publicly available so that it can be reviewed by the public.',
 					),
-					evaluate: stageCriterionEvaluationPerVariant(
-						softwareWalletVariants,
-						(variantWallet): StageCriterionEvaluation => {
-							const visible = isSourcePubliclyVisible(variantWallet.features.licensing)
-
-							if (visible === null) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							if (!visible) {
-								return {
-									rating: StageCriterionRating.FAIL,
-									explanation: sentence("{{WALLET_NAME}}'s source code is not publicly available."),
-								}
-							}
-
-							return {
-								rating: StageCriterionRating.PASS,
-								explanation: sentence("{{WALLET_NAME}}'s source code is publicly available."),
-							}
-						},
-					),
+					evaluate: softwareWalletSourceAvailability,
 					displayName: 'Source Availability',
 				},
 			],
