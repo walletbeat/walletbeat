@@ -1,0 +1,44 @@
+---
+import { defaultNavigationItems, navigationWalkaway } from '@/constants/navigation'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
+import Layout from '@/layouts/Layout.astro'
+import { evaluateWalletOnWalkawayTest, WalkawayTestResult } from '@/schema/walkaway'
+import { softwareWalletWalkawayTest } from '@/schema/walkaway/software-wallet-walkaway'
+import { getWalletUrl } from '@/utils/urls'
+import Navigation from '@/views/Navigation.astro'
+import WalkawayPage, { type WalkawayPageWallet } from '@/views/WalkawayPage.svelte'
+
+const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
+	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
+
+	if (evaluation.result === WalkawayTestResult.NOT_APPLICABLE) {
+		return []
+	}
+
+	return [
+		{
+			id: wallet.metadata.id,
+			displayName: wallet.metadata.displayName,
+			href: getWalletUrl(wallet),
+			iconSrc: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+			result: evaluation.result,
+			criteria: evaluation.criteria,
+		},
+	]
+})
+---
+
+<Layout
+	metadata={{
+		title: `${navigationWalkaway.title} - Walletbeat`,
+		description:
+			'The walkaway test checks whether an Ethereum wallet keeps working, and keeps its users in control, if its team and servers disappear.',
+		keywordsAfter: ['walkaway test', 'self-sovereignty', 'criteria', 'evaluation'],
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible' data-sticky-container>
+		<WalkawayPage {wallets} />
+	</main>
+</Layout>
