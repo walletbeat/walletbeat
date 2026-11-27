@@ -199,10 +199,6 @@
 		"hash": "a9f1d0baaccf6c3ea3216f67da4fac14b69a8193b469185fdc7b9c0b8f7c051e",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
-	"public/images/wallets/coinbase-wallet.svg": {
-		"hash": "d8e9892066e3db9686e8ed63556884306b7068c068e0bf1bf561c272c16e1386",
-		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
-	},
 	"public/images/wallets/bitbox.svg": {
 		"hash": "bcf5c5ba7f095693a1cf402ebbaa31a4855f471979e0997c36d758ffc2a2cf00",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
@@ -218,6 +214,10 @@
 	"public/images/wallets/cloaked.png": {
 		"hash": "fb49af51cc0a44b56aee8fb7b4ea6a547057b8eb0e78b387bc144a6af39382b8",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/images/wallets/coinbase-wallet.svg": {
+		"hash": "108fb550ab810d21684ecd18f0103aa2ccfc2d55d12b6e047ca2542be57c9a28",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
 	"public/images/wallets/cypherock.svg": {
 		"hash": "01d46eacc61d583a8249e55df6c3a8eeda2fe0cbd62ea05bece39a5b98edecb9",
@@ -431,22 +431,6 @@
 		"hash": "d1479f729062f1cf222d748ffea6a1a98816011aba6dc7c5e3bdf3aae6726cac",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
-		"hash": "4bac1d664f7693867cd725d1a1700d239335913fbf56ed29edc656645ecd883e",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-wallet-list.jpg": {
-		"hash": "77bd76042b6a90582a36aad4c8bebdaf67970f1ee5589e4693061a63f64ac061",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-approve-exact-amount-event.png": {
-		"hash": "df4f76173090f7ac8f20b822d94675fdd4e220a8461d616c196f7b49173bf8cf",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
-	"public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-swap-review.png": {
-		"hash": "40d99193291802f6c65eb653920847b0e1fdd1a1de355a65750db7560d9809a6",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png": {
 		"hash": "1895d6aeb48a07ceae6855ee8ddffe2768150f342201aeea930b6abb5167afa6",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
@@ -489,6 +473,22 @@
 	},
 	"public/references/wallets/casberi/screenshots/2026-11-24-casberi-swap-review.png": {
 		"hash": "274ce69b012a2d04fada6d819777922f9d0a0a2529c93e7f0625572b59cda3e7",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
+		"hash": "4bac1d664f7693867cd725d1a1700d239335913fbf56ed29edc656645ecd883e",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-wallet-list.jpg": {
+		"hash": "77bd76042b6a90582a36aad4c8bebdaf67970f1ee5589e4693061a63f64ac061",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-approve-exact-amount-event.png": {
+		"hash": "df4f76173090f7ac8f20b822d94675fdd4e220a8461d616c196f7b49173bf8cf",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-swap-review.png": {
+		"hash": "40d99193291802f6c65eb653920847b0e1fdd1a1de355a65750db7560d9809a6",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg": {
