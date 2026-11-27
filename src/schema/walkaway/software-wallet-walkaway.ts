@@ -1,7 +1,7 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 import { sentence } from '@/types/content'
-import { commaListFormat } from '@/types/utils/text'
 import { setContains } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
 import { accountUnruggability } from '../attributes/self-sovereignty/account-unruggability'
