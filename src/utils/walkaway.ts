@@ -12,20 +12,20 @@ export const allWalkawayTests = [softwareWalletWalkawayTest] as const
 
 /**
  * Evaluate a wallet on the first walkaway test that applies to it.
- * Returns null if no walkaway test applies.
+ * Returns `'NOT_APPLICABLE'` if no walkaway test applies.
  */
 export function getWalletWalkawayEvaluation(
 	wallet: RatedWalletStageSlice,
-): WalletWalkawayEvaluation<string> | null {
+): WalletWalkawayEvaluation<string> | 'NOT_APPLICABLE' {
 	for (const test of allWalkawayTests) {
 		const evaluation = evaluateWalletOnWalkawayTest(wallet, test)
 
-		if (evaluation !== null) {
+		if (evaluation !== 'NOT_APPLICABLE') {
 			return evaluation
 		}
 	}
 
-	return null
+	return 'NOT_APPLICABLE'
 }
 
 /**

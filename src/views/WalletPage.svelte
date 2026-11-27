@@ -442,7 +442,7 @@
 
 	const primaryStage = $derived(getWalletStageAndLadder(wallet))
 
-	const walkawayEvaluation = $derived(showStage ? getWalletWalkawayEvaluation(wallet) : null)
+	const walkawayEvaluation = $derived(showStage ? getWalletWalkawayEvaluation(wallet) : 'NOT_APPLICABLE')
 
 	const evalTree = $derived(
 		((selectedVariant && wallet.variants[selectedVariant]?.attributes) ||
@@ -957,7 +957,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					<WalletStageBadge stage={primaryStage.stage} ladderEvaluation={primaryStage.ladderEvaluation} size="large" href={primaryStage.stage && typeof primaryStage.stage === 'object' ? `#${primaryStage.stage.id}` : '#stages'} />
 				{/if}
 
-				{#if walkawayEvaluation !== null}
+				{#if walkawayEvaluation !== 'NOT_APPLICABLE'}
 					<WalletWalkawayBadge evaluation={walkawayEvaluation} size="large" />
 				{/if}
 			{/if}

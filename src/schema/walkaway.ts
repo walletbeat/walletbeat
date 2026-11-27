@@ -72,14 +72,14 @@ export interface WalletWalkawayEvaluation<_AttributeGroupId extends string> {
 /**
  * Evaluate a wallet on a walkaway test.
  * A failed criterion makes the whole test fail, even if other criteria are
- * unrated. Returns null if the test does not apply to the wallet.
+ * unrated. Returns `'NOT_APPLICABLE'` if the test does not apply to the wallet.
  */
 export function evaluateWalletOnWalkawayTest<_AttributeGroupId extends string>(
 	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 	test: WalletWalkawayTest<_AttributeGroupId>,
-): WalletWalkawayEvaluation<_AttributeGroupId> | null {
+): WalletWalkawayEvaluation<_AttributeGroupId> | 'NOT_APPLICABLE' {
 	if (!test.applicableTo(wallet)) {
-		return null
+		return 'NOT_APPLICABLE'
 	}
 
 	const criteria = nonEmptyMap(test.criteria, criterion => {

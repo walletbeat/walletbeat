@@ -13,7 +13,7 @@ import { Content, frontmatter } from './_walkaway.md'
 const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
 	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
 
-	if (evaluation === null) {
+	if (evaluation === 'NOT_APPLICABLE') {
 		return []
 	}
 
