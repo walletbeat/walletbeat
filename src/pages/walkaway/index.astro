@@ -1,5 +1,5 @@
 ---
-import { defaultNavigationItems, navigationWalkaway } from '@/constants/navigation'
+import { defaultNavigationItems } from '@/constants/navigation'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import Layout from '@/layouts/Layout.astro'
 import { evaluateWalletOnWalkawayTest } from '@/schema/walkaway'
@@ -7,6 +7,8 @@ import { softwareWalletWalkawayTest } from '@/schema/walkaway/software-wallet-wa
 import { getWalletUrl } from '@/utils/urls'
 import Navigation from '@/views/Navigation.astro'
 import WalkawayPage, { type WalkawayPageWallet } from '@/views/WalkawayPage.svelte'
+
+import { Content, frontmatter } from './_walkaway.md'
 
 const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
 	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
@@ -30,15 +32,16 @@ const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPa
 
 <Layout
 	metadata={{
-		title: `${navigationWalkaway.title} - Walletbeat`,
-		description:
-			'The walkaway test checks whether an Ethereum wallet keeps working, and keeps its users in control, if its team and servers disappear.',
+		title: `${frontmatter.title} - Walletbeat`,
+		description: frontmatter.description,
 		keywordsAfter: ['walkaway test', 'self-sovereignty', 'criteria', 'evaluation'],
 	}}
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
 	<main data-column-item='flexible' data-sticky-container>
-		<WalkawayPage {wallets} />
+		<WalkawayPage {wallets}>
+			<Content />
+		</WalkawayPage>
 	</main>
 </Layout>
