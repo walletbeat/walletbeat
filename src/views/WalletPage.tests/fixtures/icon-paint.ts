@@ -450,7 +450,7 @@ export async function observeIconPaint({
 
 		for (const owner of ['root', 'actor', 'header', 'row', 'scope', 'flow'] as const) {
 			for (const axis of ['x', 'y', 'width', 'height'] as const) {
-				const actualBox = result.initialGeometry[owner],
+				const actualBox: Geometry[typeof owner] = result.initialGeometry[owner],
 					referenceBox = initial[owner]
 
 				assert.ok(actualBox && referenceBox)
@@ -464,7 +464,7 @@ export async function observeIconPaint({
 		assert.equal(result.initialGeometry.timeline.axis, initial.timeline.axis)
 
 		for (const endpoint of ['startOffset', 'endOffset'] as const) {
-			const actual = result.initialGeometry.timeline[endpoint]?.px,
+			const actual: number | null | undefined = result.initialGeometry.timeline[endpoint]?.px,
 				expected = initial.timeline[endpoint]?.px
 
 			assert.ok(

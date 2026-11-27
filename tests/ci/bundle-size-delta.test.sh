@@ -5,15 +5,15 @@ set -euo pipefail
 # Compare the size of the production build (`dist`) between the current
 # revision (HEAD) and the closest reference revision.
 #
-# The reference revision is the tip of whichever "known reference" branch
-# (see REFERENCES below) is an ancestor of HEAD and is closest to it. For a
-# pull-request head, this is normally the branch the PR was based on.
+# The reference revision is the merge-base of HEAD with whichever "known
+# reference" branch (see REFERENCES below) is closest to it. For a pull-request
+# head, this is normally the commit the PR was based on.
 #
 # Fails if the current build is much larger OR much smaller than the previous
 # build. Intended to catch unintended additional bloat, or accidental deletion
 # of large portions of the site.
 #
-# If either revision's build fails, or no reference branch is an ancestor of
+# If either revision's build fails, or no reference branch shares history with
 # HEAD, the test passes vacuously.
 #
 # This test is intentionally NOT part of the default `check:all` runs.
@@ -54,14 +54,15 @@ if [[ "$EXPECT_LARGE_INCREASE" -eq 0 ]] && [[ "$EXPECT_LARGE_DECREASE" -eq 0 ]];
 	log "Verifying that the bundle size has not changed significantly."
 fi
 
-# Print the reference commit to compare against: the tip of the reference
-# branch that is an ancestor of HEAD and is closest to it (fewest commits
-# between the branch tip and HEAD). Returns non-zero if no such branch exists.
+# Print the reference commit to compare against: the merge-base of HEAD with
+# the closest reference branch (fewest commits between the merge-base and
+# HEAD). Returns non-zero if no such branch exists.
 find_reference_commit() {
 	local best_commit=''
 	local best_count=''
 	local ref
 	local commit
+	local base
 	local count
 	for ref in "${REFERENCES[@]}"; do
 		commit=''
@@ -69,12 +70,13 @@ find_reference_commit() {
 			! commit="$(git -C "$ROOT" rev-parse --verify -q "refs/heads/$ref" 2>/dev/null)"; then
 			continue
 		fi
-		if ! git -C "$ROOT" merge-base --is-ancestor "$commit" HEAD 2>/dev/null; then
+		base="$(git -C "$ROOT" merge-base "$commit" HEAD 2>/dev/null || true)"
+		if [[ -z "$base" ]]; then
 			continue
 		fi
-		count="$(git -C "$ROOT" rev-list --count "$commit..HEAD" 2>/dev/null)"
+		count="$(git -C "$ROOT" rev-list --count "$base..HEAD" 2>/dev/null)"
 		if [[ -z "$best_count" ]] || { [[ -n "$count" ]] && [[ "$count" -lt "$best_count" ]]; }; then
-			best_commit="$commit"
+			best_commit="$base"
 			best_count="$count"
 		fi
 	done
@@ -85,7 +87,7 @@ find_reference_commit() {
 }
 
 if ! REFERENCE_HEAD="$(find_reference_commit)"; then
-	log "No reference branch (${REFERENCES[*]}) is an ancestor of HEAD; passing vacuously."
+	log "No reference branch (${REFERENCES[*]}) shares history with HEAD; passing vacuously."
 	exit 0
 fi
 

@@ -13,6 +13,8 @@ Before you can contribute wallet data to Walletbeat, you need to make a copy of 
 
 ### Get started
 
+Install [Node.js 26 LTS](https://nodejs.org/en/download) (26.13.1 or later) before installing dependencies.
+
 1. Clone the repository and install dependencies:
 
    ```bash

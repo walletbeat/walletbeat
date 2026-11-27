@@ -97,25 +97,23 @@ const models = cases.map(candidate => {
 <Layout metadata={{ title: 'Canonical pie geometry fixtures' }}>
 	<main data-column='gap-6'>
 		<h1>Canonical pie geometry</h1>
-		{
-			cases.map(candidate => (
-				<section
-					id={candidate.id}
-					data-card='padding-4'
-					data-column='gap-3'
-					style='max-inline-size: 20rem'
-				>
-					<h2>{candidate.id}</h2>
-					<Pie
-						slices={candidate.slices}
-						levels={candidate.levels}
-						{radius}
-						{padding}
-						layout={PieLayout.FullTop}
-					/>
-				</section>
-			))
-		}
+		{cases.map(candidate => (
+			<section
+				id={candidate.id}
+				data-card='padding-4'
+				data-column='gap-3'
+				style='max-inline-size: 20rem'
+			>
+				<h2>{candidate.id}</h2>
+				<Pie
+					slices={candidate.slices}
+					levels={candidate.levels}
+					{radius}
+					{padding}
+					layout={PieLayout.FullTop}
+				/>
+			</section>
+		))}
 	</main>
 	<script is:inline type='application/json' id='pie-models' set:html={JSON.stringify(models)} />
 </Layout>

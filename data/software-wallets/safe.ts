@@ -1,8 +1,10 @@
+import { minimalsm } from '@/data/contributors/minimalsm'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { ackee } from '@/data/entities/ackee'
 import { certora } from '@/data/entities/certora'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -22,7 +24,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
 	FeeType,
@@ -30,7 +37,11 @@ import {
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
-import { type LooseReference, refNotNecessary, refTodo } from '@/schema/reference'
+import {
+	type ArtifactSigningDetails,
+	RepositoryChangeControlState,
+} from '@/schema/features/transparency/release-transparency'
+import { type LooseReference, refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
@@ -46,12 +57,15 @@ export const safe: SoftwareWallet = {
 		displayName: 'Safe',
 		tableName: 'Safe',
 		coinspectId: { type: 'NO_COINSPECT_ID' },
-		contributors: [nconsigny],
+		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-11-18',
+		lastUpdated: '2026-11-23',
 		urls: {
 			docs: ['https://docs.safe.global/'],
-			repositories: ['https://github.com/safe-fndn'],
+			repositories: [
+				'https://github.com/safe-global/safe-wallet-monorepo',
+				'https://github.com/safe-fndn',
+			],
 			websites: ['https://safe.global'],
 		},
 	},
@@ -82,12 +96,72 @@ export const safe: SoftwareWallet = {
 			}),
 		},
 		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+			[Variant.BROWSER]: {
+				ref: [
+					{
+						explanation:
+							"The address field looks up ENS names on Ethereum through the app's own node connection, or through the user's custom node if one is set.",
+						urls: [
+							{
+								label: 'Name resolver hook',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/components/common/AddressInput/useNameResolver.ts#L21-L36',
+							},
+							{
+								label: 'ENS hub provider',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/hooks/useEnsHubProvider.ts#L31-L45',
+							},
+							{
+								label: 'ENS resolution',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/ens.ts#L67-L82',
+							},
+						],
+					},
+					{
+						explanation:
+							'An address with a network prefix is accepted only when the prefix matches the current network. Other chain-specific address formats are not recognized.',
+						urls: [
+							{
+								label: 'Prefix parsing',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/addresses.ts#L37-L54',
+							},
+							{
+								label: 'Prefix validation',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/packages/utils/src/utils/validation.ts#L20-L32',
+							},
+						],
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+					medium: 'CHAIN_CLIENT',
+				}),
 			},
-			nonChainSpecificEnsResolution: null,
+			[Variant.MOBILE]: {
+				ref: [
+					{
+						explanation:
+							'The send and address book fields accept only plain addresses, not ENS names.',
+						urls: [
+							{
+								label: 'Recipient validation',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/Send/hooks/useRecipientValidation.ts#L51-L62',
+							},
+							{
+								label: 'Contact schema',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/AddressBook/Contact/schemas/contactSchema.ts#L13-L28',
+							},
+						],
+					},
+				],
+				chainSpecificAddressing: {
+					erc7828: notSupported,
+					erc7831: notSupported,
+				},
+				nonChainSpecificEnsResolution: notSupported,
+			},
 		},
 		chainAbstraction: null,
 		chainConfigurability: supported({
@@ -123,9 +197,9 @@ export const safe: SoftwareWallet = {
 			walletAppLicense: {
 				ref: [
 					{
-						explanation: 'Safe uses the LGPL-3.0 license for its source code',
+						explanation: 'The Safe{Wallet} web and mobile apps are licensed under GPL-3.0.',
 						label: 'Safe License File',
-						url: 'https://github.com/safe-global/safe-wallet-monorepo',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/LICENSE#L1-L2',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,
@@ -150,6 +224,12 @@ export const safe: SoftwareWallet = {
 				},
 				{
 					explanation:
+						'Safe, then called Gnosis Safe, raised $100 million in 2022 in a round led by the venture firm 1kx.',
+					label: 'Safe funding announcement',
+					url: 'https://safefoundation.org/blog/gnosis-safe-raises-usd100-million-led-by-1kx-to-unlock-digital-asset',
+				},
+				{
+					explanation:
 						'SAFE tokenomics and governance scope. The token is currently used primarily for SafeDAO treasury resource allocation (e.g., grants).',
 					url: 'https://safefoundation.org/blog/safe-tokenomics',
 				},
@@ -164,10 +244,27 @@ export const safe: SoftwareWallet = {
 				publicOffering: false,
 				selfFunded: false,
 				transparentConvenienceFees: true,
-				ventureCapital: false,
+				ventureCapital: true,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'Both apps keep a list of Safe accounts, and users can create or add existing accounts.',
+					urls: [
+						{
+							label: 'Web: accounts list',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/web/src/features/myAccounts/components/AccountsHeader/index.tsx#L54-L69',
+						},
+						{
+							label: 'Mobile: add existing account',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/6ca3977268dd2635957193b0bd55e4437b4570ea/apps/mobile/src/features/AccountsSheet/MyAccounts/MyAccountsFooter.tsx#L29-L37',
+						},
+					],
+				},
+			],
+		}),
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -208,7 +305,52 @@ export const safe: SoftwareWallet = {
 			},
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'With its Ethereum RPC set to a test proxy that reports false ERC-20 balances, Safe shows the real balance of 1.99988 USDC. Safe does not get token balances from the RPC endpoint.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-usdc-balance.png',
+							label: 'Safe web app asset list showing 1.99988 USDC',
+						},
+						{
+							explanation:
+								'The maximum amount that Safe lets the user send is the real balance of 1.999883 USDC.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-send-usdc.png',
+							label: 'Safe web app send screen for USDC',
+						},
+						{
+							explanation:
+								'The Ethereum RPC provider is set to a local test proxy that reports false ERC-20 balances.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-custom-rpc.png',
+							label: 'Safe web app Environment variables page with a custom RPC provider',
+						},
+						{
+							explanation:
+								'Safe sends `eth_chainId`, `eth_getCode`, `eth_call` and `eth_accounts` requests through the proxy. None of them is an ERC-20 balance query, so the proxy does not change a balance.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-lying-proxy-log.png',
+							label: 'Log of the lying RPC proxy during the Safe test',
+						},
+						{
+							explanation:
+								'Safe loads token balances from the Safe Client Gateway at `safe-client.safe.global`, not from the RPC endpoint that the user sets.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-request.png',
+							label: 'Browser network log of the Safe balance request',
+						},
+						{
+							explanation:
+								'The Safe Client Gateway returns the USDC balance as 1999883 base units, which is 1.999883 USDC. Safe shows this value with no verification against the chain.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-response.png',
+							label: 'Safe Client Gateway response with the USDC balance',
+						},
+						{
+							explanation:
+								'Safe gets token balances from the balances endpoint of the Safe Client Gateway.',
+							label: 'Safe balance query to the Safe Client Gateway',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/ad1f9fd9d9b1ef2885aad0e6fec56ee051067f88/packages/store/src/gateway/AUTO_GENERATED/balances.ts#L1-L18',
+						},
+					],
+				}),
 			},
 			passkeyVerification: supported({
 				ref: [
@@ -585,15 +727,99 @@ export const safe: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: {
+					[Variant.BROWSER]: supported<ArtifactSigningDetails>({
+						ref: [
+							{
+								explanation:
+									"Safe's release system signs each web release and publishes a signed record of the release archive on the public Sigstore log.",
+								urls: [
+									{
+										label: 'Signed release tag',
+										url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/workflows/web-tag-release.yml#L69-L71',
+									},
+									{
+										label: 'Release archive attestation',
+										url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/workflows/web-tag-release.yml#L206-L213',
+									},
+								],
+							},
+						],
+						publication: 'SIGSTORE_REKOR',
+						signer: 'BUILD_INFRA_IDENTITY',
+					}),
+					[Variant.MOBILE]: notSupported,
+				},
 				dependencyAgeGate: null,
-				dependencyLocking: null,
-				dependencySandboxing: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
-				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				dependencyLocking: supported({
+					ref: {
+						explanation:
+							'The release build installs the exact dependency versions recorded in the repository and fails if they would change.',
+						label: 'Dependency install step',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/actions/yarn/action.yml#L48-L51',
+					},
+				}),
+				dependencySandboxing: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Dependencies are not isolated from each other or from the app when it runs. This setting only stops dependencies from running scripts during installation.',
+						label: 'Install scripts setting',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.yarnrc.yml#L7',
+					},
+				}),
+				dependencyVulnerabilityScanning: supported<WithRef<{}>>({
+					ref: {
+						explanation:
+							'Dependabot watches dependencies for known security flaws and opens updates to fixed versions, as in these examples.',
+						urls: [
+							{
+								label: 'Security update for `fast-uri`',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/pull/8829',
+							},
+							{
+								label: 'Security update for `proxy-addr`',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/pull/8964',
+							},
+						],
+					},
+				}),
+				hasPublicChangelog: {
+					[Variant.BROWSER]: supported({
+						ref: {
+							label: 'Safe{Wallet} releases',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
+						},
+					}),
+					[Variant.MOBILE]: supported({
+						ref: {
+							explanation: 'Each Safe{Mobile} version on the App Store comes with release notes.',
+							label: 'Safe{Mobile} on the App Store',
+							url: 'https://apps.apple.com/us/app/safe-mobile/id6748754793',
+						},
+					}),
+				},
+				hermeticBuilds: notSupported,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'The main branch, which releases are built from, cannot be deleted or force-pushed, and changes must go through a pull request. Its public rules do not require an approving review or passing checks.',
+							label: 'Rules for the main branch',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/rules/15670114',
+						},
+						{
+							explanation: 'Release tags cannot be deleted or moved.',
+							label: 'Rules for tags',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/rules/16698869',
+						},
+					],
+					branchDeletionBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					forcePushBlocked: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+					requiredChecks: RepositoryChangeControlState.UNVERIFIABLE,
+					requiredReview: RepositoryChangeControlState.UNVERIFIABLE,
+					tagsImmutable: RepositoryChangeControlState.VERIFIABLY_PRESENT,
+				},
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({

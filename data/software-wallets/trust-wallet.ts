@@ -8,6 +8,11 @@ import {
 	CoverageBreadth,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+	type SupportedHardwareWallet,
+} from '@/schema/features/security/hardware-wallet-support'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
@@ -61,7 +66,7 @@ export const trustWallet: SoftwareWallet = {
 		coinspectId: 'trust-wallet',
 		contributors: [minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-18',
+		lastUpdated: '2026-11-11',
 		urls: {
 			docs: ['https://developer.trustwallet.com/developer'],
 			extensions: [
@@ -212,10 +217,62 @@ export const trustWallet: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							"The extension's existing wallet screen lists Ledger under hardware wallets.",
+						file: 'public/references/wallets/trust-wallet/screenshots/2026-11-26-trust-wallet-browser-connect-hardware-wallet.png',
+						label:
+							"Screenshot of the Trust Wallet extension's existing wallet screen, provided by a maintainer",
+					},
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: refTodo,
+					wallets: {},
+				},
+			},
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'With its Ethereum RPC set to a test proxy that reports false ERC-20 balances, Trust Wallet shows 1,000,000 USDC for an address that holds none. The wallet shows no warning.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-fake-usdc-balance.png',
+							label: 'Trust Wallet browser extension showing a balance of 1,000,000 USDC',
+						},
+						{
+							explanation:
+								'Trust Wallet lets the user enter the fake balance of 1,000,000 USDC as the amount to send.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-send-fake-usdc.png',
+							label: 'Trust Wallet browser extension send screen for USDC',
+						},
+						{
+							explanation:
+								'The Ethereum RPC endpoint is set to a local test proxy. Trust Wallet warns that a malicious RPC provider can lie about balances and transaction results.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-custom-rpc.png',
+							label: 'Trust Wallet browser extension Ethereum RPC endpoint settings',
+						},
+						{
+							explanation:
+								'Trust Wallet requests the USDC balance through the proxy. The proxy changes the real balance of zero to a fake one.',
+							file: 'public/references/wallets/trust-wallet/screenshots/2026-11-11-trust-wallet-browser-lying-proxy-log.png',
+							label: 'Log of the lying RPC proxy during the Trust Wallet test',
+						},
+						{
+							explanation:
+								'Trust Wallet states that it does not verify the legitimacy, security, or reliability of custom networks or RPC endpoints.',
+							label: 'Trust Wallet announcement on network support changes',
+							url: 'https://trustwallet.com/blog/product/trust-wallet-to-sunset-support-for-multiple-networks-on-september-15-2026',
+						},
+					],
+				}),
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: securityAudits,
