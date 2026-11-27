@@ -10,6 +10,7 @@ export type LucideNavigationIcon =
 	| 'ICON_EYE_OFF'
 	| 'ICON_FARCASTER'
 	| 'ICON_FILE_CODE'
+	| 'ICON_FOOTPRINTS'
 	| 'ICON_CHART_PIE'
 	| 'ICON_GLOBE'
 	| 'ICON_HASH'
@@ -140,6 +141,13 @@ export const navigationStages = {
 	href: '/stages/',
 } as const satisfies NavigationItem
 
+export const navigationWalkaway = {
+	id: 'walkaway',
+	icon: 'ICON_FOOTPRINTS',
+	title: 'Walkaway Test',
+	href: '/walkaway/',
+} as const satisfies NavigationItem
+
 export const topbarNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -234,6 +242,7 @@ export const defaultNavigationItems = [
 		],
 	},
 	navigationStages,
+	navigationWalkaway,
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,
