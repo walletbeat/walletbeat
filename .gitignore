@@ -8,6 +8,9 @@ src/generated/
 # Cache for Vitest or whatever else
 .cache/
 
+# Vitest JSON test-report output
+.vitest/
+
 # Dependencies
 node_modules
 **/node_modules
