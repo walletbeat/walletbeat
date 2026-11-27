@@ -8,7 +8,7 @@ import { getWalletUrl } from '@/utils/urls'
 import Navigation from '@/views/Navigation.astro'
 import WalkawayPage, { type WalkawayPageWallet } from '@/views/WalkawayPage.svelte'
 
-import { Content, frontmatter } from './_walkaway.md'
+import { Content, frontmatter } from './walkaway.md'
 
 const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
 	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
