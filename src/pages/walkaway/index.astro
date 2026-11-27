@@ -2,7 +2,7 @@
 import { defaultNavigationItems, navigationWalkaway } from '@/constants/navigation'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import Layout from '@/layouts/Layout.astro'
-import { evaluateWalletOnWalkawayTest, WalkawayTestResult } from '@/schema/walkaway'
+import { evaluateWalletOnWalkawayTest } from '@/schema/walkaway'
 import { softwareWalletWalkawayTest } from '@/schema/walkaway/software-wallet-walkaway'
 import { getWalletUrl } from '@/utils/urls'
 import Navigation from '@/views/Navigation.astro'
@@ -11,7 +11,7 @@ import WalkawayPage, { type WalkawayPageWallet } from '@/views/WalkawayPage.svel
 const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
 	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
 
-	if (evaluation.result === WalkawayTestResult.NOT_APPLICABLE) {
+	if (evaluation === null) {
 		return []
 	}
 

@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Types/constants
 	import { stageCriterionRatings } from '@/schema/stages'
-	import { WalkawayTestResult, type WalletWalkawayEvaluation } from '@/schema/walkaway'
-	import { walkawayTestResults } from '@/utils/walkaway'
+	import type { WalletWalkawayEvaluation } from '@/schema/walkaway'
+	import { walkawayTestResultLabels } from '@/utils/walkaway'
 
 
 	// Props
@@ -18,36 +18,29 @@
 
 
 	// Derived
-	const display = $derived(
-		evaluation.result === WalkawayTestResult.NOT_APPLICABLE ? null : walkawayTestResults[evaluation.result]
-	)
+	const display = $derived(walkawayTestResultLabels[evaluation.result])
 
 	const title = $derived(
-		evaluation.result === WalkawayTestResult.NOT_APPLICABLE || display === null ?
-			undefined
-		:
-			[
-				display.title,
-				...evaluation.criteria.map(({ criterion, evaluation: criterionEvaluation }) =>
-					`${stageCriterionRatings[criterionEvaluation.rating].icon} ${criterion.displayName}`
-				),
-			].join('\n')
+		[
+			display.title,
+			...evaluation.criteria.map(({ criterion, evaluation: criterionEvaluation }) =>
+				`${stageCriterionRatings[criterionEvaluation.rating].icon} ${criterion.displayName}`
+			),
+		].join('\n')
 	)
 </script>
 
 
-{#if display !== null}
-	<a {href} data-link="camouflaged">
-		<data
-			data-badge={size}
-			value={evaluation.result}
-			{title}
-			style:--accent={display.color}
-		>
-			Walkaway: {display.label}
-		</data>
-	</a>
-{/if}
+<a {href} data-link="camouflaged">
+	<data
+		data-badge={size}
+		value={evaluation.result}
+		{title}
+		style:--accent={stageCriterionRatings[evaluation.result].color}
+	>
+		Walkaway: {display.label}
+	</data>
+</a>
 
 
 <style>
