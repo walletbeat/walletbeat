@@ -1,10 +1,7 @@
-import { execFile } from 'node:child_process'
 import * as crypto from 'node:crypto'
 import * as fs from 'node:fs/promises'
-import * as os from 'node:os'
 import * as path from 'node:path'
 import { env } from 'node:process'
-import { promisify } from 'node:util'
 
 import { format, resolveConfig } from 'prettier'
 import sharp from 'sharp'
@@ -201,8 +198,6 @@ interface ImageTest {
 	appliesTo(entry: ImageFileEntry): boolean
 	/** Run the test against the image. */
 	run(entry: ImageFileEntry): Promise<ImageTestResult> | ImageTestResult
-	/** Whether this test requires the `inkscape` CLI. */
-	requiresInkscape: boolean
 }
 
 /** Extension of a path, lowercased ('' if none). */
@@ -234,7 +229,6 @@ function extractEmbeddedRasters(svgContents: string): { mime: string; buffer: Bu
  */
 const BLOCKINESS_TEST: ImageTest = {
 	name: 'blockiness',
-	requiresInkscape: false,
 	appliesTo: entry => {
 		if (isBlockyAllowed(entry.filePath)) {
 			return false
@@ -331,7 +325,6 @@ function getSvgoConfig(): Promise<Config> {
  */
 const SVG_OPTIMIZED_TEST: ImageTest = {
 	name: 'svg-optimized',
-	requiresInkscape: false,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && !isSvgOptimizationExcluded(entry.filePath),
 	run: async entry => {
@@ -366,7 +359,6 @@ const SVG_OPTIMIZED_TEST: ImageTest = {
  */
 const PNG_OPTIMIZED_TEST: ImageTest = {
 	name: 'png-optimized',
-	requiresInkscape: false,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.png' && detectImageFormat(entry.raw) === 'png',
 	run: async entry => {
@@ -416,7 +408,6 @@ function isSvgVectorExcluded(filePath: string): boolean {
  */
 const SVG_VECTOR_TEST: ImageTest = {
 	name: 'svg-vector',
-	requiresInkscape: false,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && !isSvgVectorExcluded(entry.filePath),
 	run: entry => {
@@ -464,24 +455,6 @@ interface TouchingBorders {
 	bottom: boolean
 }
 
-const execFileAsync = promisify(execFile)
-
-/** Whether the inkscape-dependent tests should run. */
-let inkscapeTestsEnabled = false
-
-/**
- * Check whether the `inkscape` CLI is available on PATH.
- */
-async function isInkscapeAvailable(): Promise<boolean> {
-	try {
-		await execFileAsync('inkscape', ['--version'])
-
-		return true
-	} catch {
-		return false
-	}
-}
-
 /** Parse the `viewBox` attribute of an SVG (null when absent/malformed). */
 function parseViewBox(contents: string): ViewBox | null {
 	const match = contents.match(/viewBox\s*=\s*"([^"]+)"/)
@@ -503,45 +476,15 @@ function parseViewBox(contents: string): ViewBox | null {
 }
 
 /**
- * Rasterize an SVG to a 2048×2048 PNG using the `inkscape` CLI, returning the
- * raw PNG bytes.
+ * Rasterize an SVG to a 2048×2048 PNG, returning the raw PNG bytes. The
+ * density is set so that the initial raster is already 2048 pixels wide,
+ * making the resize a no-op re-encode on that grid.
  */
-async function rasterizeSvgWithInkscape(svgPath: string): Promise<Buffer> {
-	const outPath = path.join(os.tmpdir(), `wbicon-${crypto.randomUUID()}.png`)
-	const args = [
-		'--export-type=png',
-		'--export-width=2048',
-		'--export-height=2048',
-		`--export-filename=${outPath}`,
-		svgPath,
-	]
-
-	// inkscape can transiently fail to connect to the session D-Bus bus on
-	// startup (Gio::DBus::Error) even when the bus is present; retry a couple of
-	// times to make the rasterization deterministic.
-	let lastError: unknown
-
-	try {
-		for (let attempt = 0; attempt < 3; attempt++) {
-			try {
-				await execFileAsync('inkscape', args, { timeout: 60000 })
-
-				return fs.readFile(outPath)
-			} catch (error) {
-				lastError = error
-			}
-		}
-
-		throw lastError
-	} finally {
-		// Always clean up the temporary PNG, whether rasterization succeeded or
-		// not. Ignore a missing file (e.g. inkscape never produced one).
-		try {
-			await fs.unlink(outPath)
-		} catch {
-			// Ignore: the file may not exist.
-		}
-	}
+async function rasterizeSvg(svgContents: string, viewBox: ViewBox): Promise<Buffer> {
+	return sharp(Buffer.from(svgContents), { density: (72 * 2048) / viewBox.width })
+		.resize(2048, 2048, { fit: 'fill' })
+		.png()
+		.toBuffer()
 }
 
 /** Detect which borders of a 2048×2048 rasterized icon the content touches. */
@@ -602,7 +545,6 @@ const WBICON_PREFIX = 'resources/files/wbicons/'
  */
 const WBICON_SQUARE_TEST: ImageTest = {
 	name: 'wbicon-square',
-	requiresInkscape: true,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && entry.filePath.startsWith(WBICON_PREFIX),
 	run: async entry => {
@@ -621,7 +563,7 @@ const WBICON_SQUARE_TEST: ImageTest = {
 			}
 		}
 
-		const png = await rasterizeSvgWithInkscape(path.join(getRepositoryRoot(), entry.filePath))
+		const png = await rasterizeSvg(entry.contents, viewBox)
 		const borders = await detectTouchingBorders(png)
 		const count = [borders.left, borders.right, borders.top, borders.bottom].filter(Boolean).length
 		const opposing = (borders.left && borders.right) || (borders.top && borders.bottom)
@@ -680,7 +622,6 @@ async function validateIcoFrames(entry: ImageFileEntry): Promise<ImageTestResult
  */
 const FILE_FORMAT_TEST: ImageTest = {
 	name: 'file-format',
-	requiresInkscape: false,
 	appliesTo: entry => isImageExtension(extensionOf(entry.filePath)),
 	run: async entry => {
 		const ext = extensionOf(entry.filePath)
@@ -1009,14 +950,11 @@ describe('image integrity', () => {
 	describe('repository images', async () => {
 		const isCi = env.WALLETBEAT_ENV === 'CI'
 
-		inkscapeTestsEnabled = isCi || (await isInkscapeAvailable())
-
 		// The whitelist is mutated in place as the scan discovers clean, new,
 		// changed, or removed images, then written back to disk.
 		const whitelist = await loadCleanImageHashes()
 
 		const failures: ImageFailure[] = []
-		const inkscapeRequiredFailures: { filePath: string; test: string }[] = []
 		const scannedFiles: string[] = []
 		const skippedFiles: string[] = []
 		// Files that currently have at least one applicable integrity test.
@@ -1061,27 +999,10 @@ describe('image integrity', () => {
 					contents: entry.contents,
 				}
 
-				const appliedTests = IMAGE_TESTS.filter(test => test.appliesTo(imageEntry))
+				const applicableTests = IMAGE_TESTS.filter(test => test.appliesTo(imageEntry))
 
 				const hash = crypto.createHash('sha256').update(entry.raw).digest('hex')
 				const existing = whitelist[entry.path]
-
-				// When the inkscape CLI is unavailable, an inkscape-requiring
-				// test cannot run. If the image does not already have a valid
-				// cached entry for that test, the cache cannot be kept up to
-				// date, so the test must fail and instruct the user to install
-				// inkscape.
-				if (!inkscapeTestsEnabled) {
-					for (const test of appliedTests) {
-						if (test.requiresInkscape && !hasValidCachedEntry(existing, hash, [test.name])) {
-							inkscapeRequiredFailures.push({ filePath: entry.path, test: test.name })
-						}
-					}
-				}
-
-				const applicableTests = appliedTests.filter(
-					test => inkscapeTestsEnabled || !test.requiresInkscape,
-				)
 
 				// Images with no applicable tests have nothing to verify and
 				// are not tracked in the whitelist.
@@ -1182,22 +1103,6 @@ describe('image integrity', () => {
 				expect(
 					failures.length,
 					`${failures.length} image file(s) fail one or more integrity tests. See error output for details.`,
-				).toBe(0)
-			}
-		})
-
-		it('no inkscape-requiring test is needed without inkscape installed', () => {
-			if (inkscapeRequiredFailures.length > 0) {
-				const message =
-					'The following images need an inkscape-requiring test to keep ' +
-					'verified-clean-images.json up to date, but the inkscape CLI is ' +
-					'not installed:\n\n' +
-					inkscapeRequiredFailures.map(f => `  ${f.filePath} (test: ${f.test})`).join('\n') +
-					'\n\nInstall the inkscape CLI and re-run the tests to verify these images.\n'
-
-				expect(
-					inkscapeRequiredFailures.length,
-					`${inkscapeRequiredFailures.length} image(s) require the inkscape CLI to be verified.\n${message}`,
 				).toBe(0)
 			}
 		})

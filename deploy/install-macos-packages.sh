@@ -53,50 +53,6 @@ install_with_brew() {
 	brew install --cask "$name"
 }
 
-# SHA-256 of the Inkscape arm64 DMG, keyed by version.
-inkscape_sha256() {
-	local version="$1"
-	case "$version" in
-	"1.4.4")
-		echo "eacca94ab01e59467cdd5452a2867c3734450f9a4cfb3346956cc9b07f34f3f1"
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
-
-install_inkscape() {
-	local version="$1"
-	local sha url dmg mount_point
-	sha="$(inkscape_sha256 "$version")" || fail "Unknown Inkscape version '$version'; no checksum available."
-	url="https://media.inkscape.org/dl/resources/file/Inkscape-${version}_arm64.dmg"
-	dmg="$CACHE_DIR/Inkscape-${version}_arm64.dmg"
-
-	if [[ -f "$dmg" ]] && verify_sha256 "$dmg" "$sha"; then
-		log "Using cached Inkscape DMG at $dmg."
-	else
-		rm -f "$dmg"
-		download_with_retry "$url" "$dmg" || fail "Failed to download Inkscape ${version}."
-		verify_sha256 "$dmg" "$sha" || fail "Inkscape ${version} DMG checksum mismatch; refusing to install."
-		log "Inkscape DMG downloaded and verified."
-	fi
-
-	mount_point="$(mktemp -d)"
-	hdiutil attach "$dmg" -nobrowse -mountpoint "$mount_point" >/dev/null
-	if [[ ! -d "$mount_point/Inkscape.app" ]]; then
-		hdiutil detach "$mount_point" >/dev/null 2>&1 || true
-		rmdir "$mount_point"
-		fail "Inkscape.app not found in DMG."
-	fi
-	rm -rf /Applications/Inkscape.app
-	cp -R "$mount_point/Inkscape.app" /Applications/
-	hdiutil detach "$mount_point" >/dev/null
-	rmdir "$mount_point"
-	# Expose the CLI on PATH so the tests can invoke `inkscape`.
-	ln -sfn "/Applications/Inkscape.app/Contents/MacOS/inkscape" /usr/local/bin/inkscape
-}
-
 main() {
 	[[ "$(uname -s)" == "Darwin" ]] || fail "This script is only for macOS."
 	[[ -f "$PACKAGES_FILE" ]] || fail "Package list not found: $PACKAGES_FILE"
