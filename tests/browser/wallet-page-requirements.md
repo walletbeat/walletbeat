@@ -392,7 +392,7 @@ Prerequisites: Navigation identity in §13 and pie visibility/clearance in §§1
 
 - **🗂️ `TOCTags`** Stage tags are not repeated in the TOC.
 
-- **🗂️ `TOCTitle`** There is no redundant visible TOC title; the named navigation landmark remains.
+- **🗂️ `TOCTitle`** There is no redundant visible TOC title; the navigation landmark with a name remains.
 
 - **🗂️ `TOCTrigger`** A separate native TOC control opens the panel; the compact flower retains its individual petal links instead of becoming one replacement toggle.
 

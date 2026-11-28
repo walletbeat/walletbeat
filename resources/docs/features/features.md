@@ -129,7 +129,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 A set of features for any software wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletSoftwareFeatures = WalletBaseFeatures & {
@@ -208,7 +208,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 A set of features for any hardware wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletHardwareFeatures = WalletBaseFeatures & {
@@ -242,7 +242,7 @@ type WalletHardwareFeatures = WalletBaseFeatures & {
 
 A set of features for any embedded wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletEmbeddedFeatures = WalletBaseFeatures & {
@@ -2869,7 +2869,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 Scope of web origins that can load resources from the extension via `web_accessible_resources`.
 
 - `NONE` = `'NONE'`: `web_accessible_resources` is absent; no extension resource is reachable from any web page. Most secure default.
-- `SPECIFIC_ORIGINS` = `'SPECIFIC_ORIGINS'`: Only a fixed list of named HTTPS origins may load extension resources.
+- `SPECIFIC_ORIGINS` = `'SPECIFIC_ORIGINS'`: Only a fixed list of HTTPS origins may load extension resources.
 - `HTTPS_ONLY` = `'HTTPS_ONLY'`: Any HTTPS origin may load extension resources.
 - `HTTP_AND_HTTPS` = `'HTTP_AND_HTTPS'`: Any HTTP or HTTPS origin may load extension resources.
 - `UNRESTRICTED` = `'UNRESTRICTED'`: Any origin, including non-web schemes, may load extension resources.
@@ -2881,7 +2881,7 @@ Scope of web origins that can load resources from the extension via `web_accessi
 Scope of extension IDs permitted to open a message channel to the wallet via `externally_connectable`. Ordered from least to most permissive.
 
 - `NONE` = `'NONE'`: No `ids` field listed; no other extension may connect.
-- `SPECIFIC` = `'SPECIFIC'`: Only specific, named extension IDs may connect.
+- `SPECIFIC` = `'SPECIFIC'`: Only specific extension IDs may connect.
 - `ANY` = `'ANY'`: Any installed extension may connect (`"ids": ["*"]`).
 
 ---

@@ -217,7 +217,7 @@ export enum WebAccessibleResourcesScope {
 	 */
 	NONE = 'NONE',
 
-	/** Only a fixed list of named HTTPS origins may load extension resources. */
+	/** Only a fixed list of HTTPS origins may load extension resources. */
 	SPECIFIC_ORIGINS = 'SPECIFIC_ORIGINS',
 
 	/** Any HTTPS origin may load extension resources. */
@@ -238,7 +238,7 @@ export enum ExternalExtensionIdScope {
 	/** No `ids` field listed; no other extension may connect. */
 	NONE = 'NONE',
 
-	/** Only specific, named extension IDs may connect. */
+	/** Only specific extension IDs may connect. */
 	SPECIFIC = 'SPECIFIC',
 
 	/** Any installed extension may connect (`"ids": ["*"]`). */

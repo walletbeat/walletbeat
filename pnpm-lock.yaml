@@ -111,6 +111,9 @@ importers:
       chalk:
         specifier: ^6.0.1
         version: 6.0.1
+      compromise:
+        specifier: ^14.19.0
+        version: 14.20.0
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -2796,6 +2799,11 @@ packages:
     resolution: {integrity: sha512-dnN3ibLeoRf2HNC+OlCiNc5d2zxbLJXOtiZUudNFSXZrNSydxcCsSpRzXwfu7BBWCIfHPw+xTayeBvJCP/D8Ng==}
     engines: {node: '>= 18'}
 
+  compromise@14.20.0:
+    resolution: {integrity: sha512-XFtjCI4hs8jde5uY/3KqlKQ12dt4h1mAYVPnss0o91ia0971VdluY4ZN9GlxbV9zI8DW2YP+NzGqpnsFFidenA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -3065,6 +3073,10 @@ packages:
   eciesjs@0.4.7:
     resolution: {integrity: sha512-4JQahOkBdDy27jjW4q3FJQigHlcwZXx28sCtBQkBamF2XUdcNXrInpgrr8h205MtVIS0CMHufyIKGVjtjxQ2ZA==}
     engines: {node: '>=16.0.0'}
+
+  efrt@2.9.0:
+    resolution: {integrity: sha512-ZMAvlcu4AfmtJ4K/0hs0uofVUZPSeLG/w4yOyZawQLl9YEy8iDKIxIIPsUAlS907clC7bgD17e73vi5unwNE/g==}
+    engines: {node: '>=12.0.0'}
 
   electron-to-chromium@1.5.478:
     resolution: {integrity: sha512-pftG+ma5Lm8O6/p45bhYT6StBN5ziQymaRzmCZwFl8DwWHKPPD93FdOmP1aqftcepolQYvrcyTLa17kE8Yf+jg==}
@@ -5277,6 +5289,10 @@ packages:
 
   suf-log@2.5.3:
     resolution: {integrity: sha512-KvC8OPjzdNOe+xQ4XWJV2whQA0aM1kGVczMQ8+dStAO6KfEB140JEVQ9dE76ONZ0/Ylf67ni4tILPJB41U0eow==}
+
+  suffix-thumb@6.1.0:
+    resolution: {integrity: sha512-Lh1ZP+tj1TWnlw3RsR6eY/ARhZ3fIPrquE2Xts/wnGB7j1od2OZbCrWYsahkuaLqY7omsNKDUA6JITtE4elhfw==}
+    engines: {node: '>=18'}
 
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
@@ -8646,6 +8662,11 @@ snapshots:
 
   common-ancestor-path@2.0.0: {}
 
+  compromise@14.20.0:
+    dependencies:
+      efrt: 2.9.0
+      suffix-thumb: 6.1.0
+
   concat-map@0.0.1: {}
 
   conf@10.2.0:
@@ -8970,6 +8991,8 @@ snapshots:
       '@noble/ciphers': 0.5.3
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
+
+  efrt@2.9.0: {}
 
   electron-to-chromium@1.5.478: {}
 
@@ -11634,6 +11657,8 @@ snapshots:
   suf-log@2.5.3:
     dependencies:
       s.color: 0.0.15
+
+  suffix-thumb@6.1.0: {}
 
   supports-color@5.5.0:
     dependencies:

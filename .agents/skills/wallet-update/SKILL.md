@@ -120,7 +120,7 @@ Comments are **definitely not appropriate** for:
 
 ### The type system — read this section carefully
 
-**`null` = unknown.** Never use `undefined` or omit the field. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing. If the answer is known to be "none / does not apply", use a named sentinel (`NO_*`) or empty array — not `undefined`. See "How `/data` fields are encoded" in `resources/docs/contribute/wallet-data/wallet-data.md`.
+**`null` = unknown.** Never use `undefined` or omit the field. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing. If the answer is known to be "none / does not apply", use a `NO_*` sentinel or empty array — not `undefined`. See "How `/data` fields are encoded" in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 **`VariantFeature<T>`** — Nearly every field is wrapped in this. It means you can either:
 
