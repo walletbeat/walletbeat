@@ -2279,6 +2279,18 @@
 		"hash": "9ff45bb1520b5ae4c2a39488726918cda4a9f4c17db7bb7e99391b11f4559289",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
+	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/astro_framework.png": {
+		"hash": "878a922d8cbbe68b9e6c959a575f56b90568276bde28894b43147fecd0d54005",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/darryl_picture.png": {
+		"hash": "f97bacc77095728cb731a3244c94baf3ffb62b471a2aae7fd88e2a8db5927396",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
+	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/walkaway_test.png": {
+		"hash": "91a29807a9d137dcdc1c45ddf6086de2d9d17d417174661048972c5c6461124a",
+		"passedTests": ["blockiness", "file-format", "png-optimized"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
