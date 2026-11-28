@@ -28,7 +28,7 @@ const WALLET_REFERENCES_DIR = 'public/references/wallets'
  * files here when you add them.
  */
 const QUESTIONNAIRE_FILES: string[] = [
-	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/coinbase-wallet/2026-02-23-questionnaire.md',
 	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
 ]
 

@@ -7,10 +7,10 @@ import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
 import { anonWallet } from './software-wallets/anon-wallet'
-import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
 import { casberi } from './software-wallets/casberi'
 import { cloaked } from './software-wallets/cloaked'
+import { coinbaseWallet } from './software-wallets/coinbase-wallet'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
@@ -73,10 +73,10 @@ export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
 export const softwareWallets = {
 	ambire,
 	anonWallet,
-	baseApp,
 	bitget,
 	casberi,
 	cloaked,
+	coinbaseWallet,
 	daimo,
 	elytro,
 	family,

@@ -138,6 +138,8 @@ http://localhost:8545
 
 Save the setting and switch to that network. The proxy terminal then shows `Request:` lines for the calls that the wallet makes. If no lines appear, the wallet does not use the proxy.
 
+> **Note:** Wallets that run as web pages (e.g. Safe{Wallet}) call the proxy from the browser. The proxy sends the CORS headers that the browser requires for this. Chromium-based browsers may also ask for permission to access devices on your local network. Allow it, or the wallet cannot reach the proxy.
+
 ### Step 5: Import a funded account
 
 Import (or connect) an account that holds a nonzero ERC-20 balance. It is important to use a nonzero balance. A zero balance multiplied by any factor is still displayed as zero (the proxy invents a small nonzero value in this case, but it may fall below the wallet's display threshold).

@@ -25,7 +25,7 @@ import EipDetails from '@/views/EipDetails.svelte'
 import EipSupportPie from '@/views/EipSupportPie.svelte'
 import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import Navigation from '@/views/Navigation.astro'
-import GitHubIcon from 'lucide-static/icons/github.svg?raw'
+import GitHubIcon from '@/icons/github.svg?raw'
 
 export const prerender = true
 
@@ -110,61 +110,57 @@ const embeddedCards = eipStatusSupportCards(
 				<EipDetails eip={eip} headingLevel={1} />
 			</div>
 
-			{
-				softwareCards.length > 0 && (
-					<EipSupportPie
-						cards={softwareCards}
-						listId='software-wallets'
-						walletTypeLabel='software wallets'
-						eipLabel={eipShortLabel(eip)}
-					/>
-				)
-			}
+			{softwareCards.length > 0 && (
+				<EipSupportPie
+					cards={softwareCards}
+					listId='software-wallets'
+					walletTypeLabel='software wallets'
+					eipLabel={eipShortLabel(eip)}
+				/>
+			)}
 		</header>
 
-		{
-			softwareCards.length > 0 && (
-				<EipStatusSupportCards
-					id='software-wallets'
-					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
-					cards={softwareCards}
-					codeSnippets={cardCodeSnippets(softwareCards)}
-					client:visible
-				/>
-			)
-		}
+		{softwareCards.length > 0 && (
+			<EipStatusSupportCards
+				id='software-wallets'
+				title={`Software Wallets by ${eipShortLabel(eip)} Support`}
+				cards={softwareCards}
+				codeSnippets={cardCodeSnippets(softwareCards)}
+				client:visible
+			/>
+		)}
 
-		{
-			hardwareCards.length > 0 && (
-				<EipStatusSupportCards
-					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
-					cards={hardwareCards}
-					codeSnippets={cardCodeSnippets(hardwareCards)}
-					client:visible
-				/>
-			)
-		}
+		{hardwareCards.length > 0 && (
+			<EipStatusSupportCards
+				title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
+				cards={hardwareCards}
+				codeSnippets={cardCodeSnippets(hardwareCards)}
+				client:visible
+			/>
+		)}
 
-		{
-			embeddedCards.length > 0 && (
-				<EipStatusSupportCards
-					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
-					cards={embeddedCards}
-					codeSnippets={cardCodeSnippets(embeddedCards)}
-					client:visible
-				/>
-			)
-		}
+		{embeddedCards.length > 0 && (
+			<EipStatusSupportCards
+				title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
+				cards={embeddedCards}
+				codeSnippets={cardCodeSnippets(embeddedCards)}
+				client:visible
+			/>
+		)}
 
 		<footer data-scroll-item='inline-detached padding-match-end' data-row='center'>
 			<p>
-				Incorrect data? Submit a PR: <a
+				Incorrect data? Submit a PR:{' '}
+				<a
 					href={repositoryUrl}
 					target='_blank'
 					rel='noopener noreferrer'
 					data-input
-					data-link='camouflaged'><span data-icon set:html={GitHubIcon} />GitHub Repository</a
+					data-link='camouflaged'
 				>
+					<span data-icon set:html={GitHubIcon} />
+					GitHub Repository
+				</a>
 			</p>
 		</footer>
 	</main>

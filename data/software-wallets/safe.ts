@@ -47,7 +47,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-16',
+		lastUpdated: '2026-11-23',
 		urls: {
 			docs: ['https://docs.safe.global/'],
 			repositories: [
@@ -293,7 +293,52 @@ export const safe: SoftwareWallet = {
 			},
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'With its Ethereum RPC set to a test proxy that reports false ERC-20 balances, Safe shows the real balance of 1.99988 USDC. Safe does not get token balances from the RPC endpoint.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-usdc-balance.png',
+							label: 'Safe web app asset list showing 1.99988 USDC',
+						},
+						{
+							explanation:
+								'The maximum amount that Safe lets the user send is the real balance of 1.999883 USDC.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-send-usdc.png',
+							label: 'Safe web app send screen for USDC',
+						},
+						{
+							explanation:
+								'The Ethereum RPC provider is set to a local test proxy that reports false ERC-20 balances.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-custom-rpc.png',
+							label: 'Safe web app Environment variables page with a custom RPC provider',
+						},
+						{
+							explanation:
+								'Safe sends `eth_chainId`, `eth_getCode`, `eth_call` and `eth_accounts` requests through the proxy. None of them is an ERC-20 balance query, so the proxy does not change a balance.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-lying-proxy-log.png',
+							label: 'Log of the lying RPC proxy during the Safe test',
+						},
+						{
+							explanation:
+								'Safe loads token balances from the Safe Client Gateway at `safe-client.safe.global`, not from the RPC endpoint that the user sets.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-request.png',
+							label: 'Browser network log of the Safe balance request',
+						},
+						{
+							explanation:
+								'The Safe Client Gateway returns the USDC balance as 1999883 base units, which is 1.999883 USDC. Safe shows this value with no verification against the chain.',
+							file: 'public/references/wallets/safe/screenshots/2026-11-23-safe-browser-balance-response.png',
+							label: 'Safe Client Gateway response with the USDC balance',
+						},
+						{
+							explanation:
+								'Safe gets token balances from the balances endpoint of the Safe Client Gateway.',
+							label: 'Safe balance query to the Safe Client Gateway',
+							url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/ad1f9fd9d9b1ef2885aad0e6fec56ee051067f88/packages/store/src/gateway/AUTO_GENERATED/balances.ts#L1-L18',
+						},
+					],
+				}),
 			},
 			passkeyVerification: supported({
 				ref: [

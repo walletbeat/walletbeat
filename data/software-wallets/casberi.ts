@@ -2,8 +2,20 @@ import { alexanderchopan } from '@/data/contributors/alexanderchopan'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { notSupported, supported } from '@/schema/features/support'
+import {
+	FeeDisplayLevel,
+	FeeType,
+	type OperationFeeDisplay,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { nonEmptySet } from '@/types/utils/non-empty'
+
+const source =
+	'https://github.com/alexanderchopan/casberi/blob/b7789bb29e48277dffd6f4871ce7d61c42b8a9dd'
 
 export const casberi: SoftwareWallet = {
 	metadata: {
@@ -46,37 +58,63 @@ export const casberi: SoftwareWallet = {
 				'6963': null,
 			},
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation:
+							'The LICENSE file holds the text of the GNU General Public License version 3.',
+						label: 'Casberi license file',
+						url: `${source}/LICENSE#not-line-specific`,
+					},
+					{
+						explanation:
+							'The README licenses Casberi under version 3 of the GPL or any later version, and adds a section 7 permission for linking the `reown-swift` library.',
+						label: 'License section of the README',
+						url: 'https://github.com/alexanderchopan/casberi/blob/a341ce9e0f6a34ec90cfe12872c4d3c8f51e1fee/README.md#L88-L96',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Swaps are written on the device against the Uniswap, Aerodrome and Sushi routers. No fee recipient, partner fee or referral code is added to a swap.',
+					label: 'Swap calls built on the device with no wallet fee',
+					url: `${source}/Casberi/Casberi/Model/YourAccountSwap.swift#L3-L30`,
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
+				publicOffering: false,
+				selfFunded: true,
+				transparentConvenienceFees: false,
+				ventureCapital: false,
 			},
 		},
 		multiAddress: null,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: notSupported,
+				usage: notSupported,
 			},
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://casberi.app/privacy.html',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: notSupported,
 			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
@@ -84,7 +122,7 @@ export const casberi: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: null,
@@ -105,18 +143,136 @@ export const casberi: SoftwareWallet = {
 			},
 		},
 		transparency: {
-			operationFees: null,
+			operationFees: {
+				builtInErc20Swap: supported<OperationFeeDisplay>({
+					ref: [
+						{
+							explanation:
+								'A swap shows the network fee as a ceiling in dollars and names the venue with its pool fee as a percentage. No wallet fee is charged.',
+							label: 'Fee wording for sends and swaps',
+							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The swap screen before signing. It shows the network fee in dollars, the exchange with its pool fee as a percentage, and the exact amount approved.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-swap-review.png',
+							label: 'Swap screen before signing',
+							lastRetrieved: '2026-11-24',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: true,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
+						},
+					},
+				}),
+				erc20L1Transfer: supported<OperationFeeDisplay>({
+					ref: [
+						{
+							explanation:
+								'A send shows the network fee before signing as a ceiling in dollars, or in ETH when no price is known.',
+							label: 'Fee wording for sends and swaps',
+							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The send screen for USDC on Ethereum before signing. It shows the network fee in dollars.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-usdc-review.png',
+							label: 'USDC send screen before signing',
+							lastRetrieved: '2026-11-24',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+				ethL1Transfer: supported<OperationFeeDisplay>({
+					ref: [
+						{
+							explanation:
+								'A send shows the network fee before signing as a ceiling in dollars, or in ETH when no price is known.',
+							label: 'Fee wording for sends and swaps',
+							url: `${source}/Casberi/Casberi/Model/YourAccountPreview.swift#L36-L46`,
+						},
+						{
+							explanation:
+								'The send screen for ETH on Ethereum before signing. It shows the network fee in dollars.',
+							file: 'public/references/wallets/casberi/screenshots/2026-11-24-casberi-send-eth-review.png',
+							label: 'ETH send screen before signing',
+							lastRetrieved: '2026-11-24',
+						},
+					],
+					fees: {
+						feesInvolved: {
+							[FeeType.NETWORK_FEE]: true,
+							[FeeType.ONCHAIN_APP_FEE]: false,
+							[FeeType.WALLET_FEE]: false,
+						},
+						shownAfterSingleAction: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+						shownByDefault: {
+							comprehensiveness: FeeDisplayLevel.COMPREHENSIVE,
+							units: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+					},
+				}),
+				uniswapUSDCToEtherSwap: null,
+			},
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyAgeGate: null,
-				dependencyLocking: null,
+				dependencyLocking: supported({
+					ref: [
+						{
+							label: 'Swift package versions pinned in Package.resolved',
+							url: `${source}/Casberi/Casberi.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved#not-line-specific`,
+						},
+					],
+				}),
 				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				hasPublicChangelog: supported({
+					ref: {
+						explanation:
+							'The changelog lists the release notes for each App Store version from 3.0.28 on. Earlier versions are reconstructed from the repository and say so.',
+						label: 'Casberi changelog',
+						url: 'https://github.com/alexanderchopan/casberi/blob/05cc3fcfb91e773fa3e8c2c8060565cf6213a95e/CHANGELOG.md#not-line-specific',
+					},
+				}),
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: null,

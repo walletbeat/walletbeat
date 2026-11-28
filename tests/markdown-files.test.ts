@@ -97,7 +97,7 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'governance/grants/2025-10-gitcoin-grants-privacy-round/project-info.md',
 	'governance/roadmap/2025/2025-roadmap.md',
 	'governance/treasury/treasury-transparency.md',
-	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/coinbase-wallet/2026-02-23-questionnaire.md',
 	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
 	'resources/docs/features/features.md',
 	'resources/files/community-partner-applications/2026-dappcon.md',
