@@ -55,7 +55,7 @@ Run the `run-multisig-ui.sh` script in this directory. All other files are used 
 
 You can set the following environment variables prior to running the script:
 
-- `ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT`: RPC endpoint for consensus data (default: `https://ethereum.operationsolarstorm.org`).
+- `ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT`: RPC endpoint for consensus data (default: `https://ethereum-beacon-api.publicnode.com`).
 - `ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT`: RPC endpoint for execution data (default: `https://ethereum-rpc.publicnode.com`).
 - `USE_TOR`: Whether to use Tor for the above two endpoints (default: `true`).
 - `ETERNAL_SAFE_PORT`: Port number on which the Eternal Safe frontend will be available on your computer (default: `8088`).
