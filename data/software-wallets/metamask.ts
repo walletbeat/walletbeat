@@ -1445,9 +1445,20 @@ export const metamask: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'MetaMask shows the amount, sender, recipient, network, network fee, and nonce on an ETH transfer request.',
+							'MetaMask shows the amount, sender, recipient, network, and network fee on an ETH transfer request.',
 						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_2.png',
 						label: 'MetaMask transfer request for an ETH transfer',
+					},
+					{
+						explanation:
+							'MetaMask shows the nonce and decoded calldata only after you turn on advanced details, which are off by default.',
+						label: 'MetaMask turns advanced details off by default',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/590c4e96293baf990aefd4922bf648dfc7d4f427/app/scripts/controllers/preferences-controller.ts#L189',
+					},
+					{
+						label:
+							'MetaMask shows the nonce and decoded calldata when advanced details is toggled on',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/590c4e96293baf990aefd4922bf648dfc7d4f427/ui/pages/confirmations/components/confirm/info/shared/advanced-details/advanced-details.tsx#L92-L112',
 					},
 					{
 						explanation:
@@ -1484,9 +1495,15 @@ export const metamask: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'MetaMask does not decode an Aave supply. It only shows the simulated balance change and the contract being interacted with.',
+								'MetaMask can decode an Aave supply transaction when advanced details is toggled on.',
 							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
 							label: 'MetaMask transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'With advanced details on, MetaMask decodes an Aave supply into its asset, amount, and the address it is credited to.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_5.png',
+							label: 'MetaMask decoded calldata for an Aave supply',
 						},
 						{
 							explanation:
@@ -1505,7 +1522,7 @@ export const metamask: SoftwareWallet = {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -1562,7 +1579,7 @@ export const metamask: SoftwareWallet = {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},

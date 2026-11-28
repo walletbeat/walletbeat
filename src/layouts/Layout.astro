@@ -91,13 +91,9 @@ import Footer from '@/views/Footer.astro'
 			})()
 		</script>
 
-		{
-			rewriteUrlTo !== undefined && (
-				<script is:inline define:vars={{ rewriteUrlTo }}>
-					history.replaceState(null, '', rewriteUrlTo);
-				</script>
-			)
-		}
+		{rewriteUrlTo !== undefined && <script is:inline define:vars={{ rewriteUrlTo }}>
+			history.replaceState(null, '', rewriteUrlTo)
+		</script>}
 	</head>
 	<body>
 		<Background

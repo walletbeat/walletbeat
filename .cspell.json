@@ -20,6 +20,7 @@
 		"airgap",
 		"airgapping",
 		"airgaps",
+		"alexanderchopan",
 		"Allatus",
 		"Ambire",
 		"AmbireTech",
@@ -54,6 +55,7 @@
 		"backgrounding",
 		"backlinks",
 		"backpay",
+		"badgeholder",
 		"bankless",
 		"bankr",
 		"bankrbot",
@@ -118,11 +120,13 @@
 		"chainid",
 		"Chainway",
 		"charcode",
+		"Chaskin",
 		"Chavan",
 		"chdir",
 		"checkmark",
 		"checksummed",
 		"Cheseaux",
+		"Chirag",
 		"choco",
 		"Chopan",
 		"chromeos",
@@ -137,6 +141,7 @@
 		"codegen",
 		"codepoint",
 		"coinbase",
+		"CoinGecko",
 		"Coinkite",
 		"CoinList",
 		"Coinspect",
@@ -150,12 +155,14 @@
 		"Consigny",
 		"Containerfile",
 		"contentscript",
+		"convos",
 		"CoolWallet",
 		"copyable",
 		"coreutils",
 		"Cormoran",
 		"correlatability",
 		"correlatable",
+		"Cotabe",
 		"Crashlytics",
 		"Crecimiento",
 		"cron",
@@ -164,6 +171,7 @@
 		"Cryptpad",
 		"cspell",
 		"CSPRNG",
+		"CTA",
 		"ctfassets",
 		"ctrl",
 		"Cure53",
@@ -175,6 +183,7 @@
 		"cypherpunk",
 		"Daimo",
 		"DAO",
+		"daofund",
 		"dApp",
 		"dappcon",
 		"DappFence",
@@ -196,11 +205,13 @@
 		"dejavu",
 		"delegatable",
 		"delegator",
+		"Dependabot",
 		"deprioritized",
 		"Devcon",
 		"Devconnect",
 		"devdasx",
 		"devp2p",
+		"DEX",
 		"dir",
 		"dirs",
 		"disintermediation",
@@ -218,6 +229,7 @@
 		"Earthfast",
 		"Edgeserver",
 		"EF",
+		"EFDS",
 		"EIP",
 		"EIP7702Proxy",
 		"EIPs",
@@ -227,6 +239,7 @@
 		"Enkrypt",
 		"EOA",
 		"EOAs",
+		"EOS",
 		"ERC",
 		"ERC1155",
 		"ERC20",
@@ -243,6 +256,7 @@
 		"Ethereans",
 		"ethers",
 		"Etherscan",
+		"ETHSecurity",
 		"evenodd",
 		"everland",
 		"EVM",
@@ -303,9 +317,11 @@
 		"GrapheneOS",
 		"greekfetacheese",
 		"GridPlus",
+		"Griff",
 		"grindy",
 		"grotesk",
 		"gstatic",
+		"Gulsian",
 		"h3rman",
 		"hackathon",
 		"HackerOne",
@@ -336,6 +352,7 @@
 		"ilyavna",
 		"imkey",
 		"imToken",
+		"Infinex",
 		"Infura",
 		"inkscape",
 		"inpage",
@@ -392,6 +409,8 @@
 		"libvips",
 		"LiFi",
 		"lightningcss",
+		"linecap",
+		"linejoin",
 		"linkability",
 		"linkable",
 		"linkables",
@@ -417,6 +436,7 @@
 		"lucilajulianaa",
 		"lucilapastore",
 		"Ludlow",
+		"Mahyar",
 		"mainfont",
 		"mainnet",
 		"maintainership",
@@ -454,6 +474,7 @@
 		"Mobi",
 		"Monorium",
 		"moritz",
+		"mountpoint",
 		"mozrt",
 		"mozrt2",
 		"MTBF",
@@ -478,6 +499,7 @@
 		"niard",
 		"Nico",
 		"nloureiro",
+		"nobrowse",
 		"Noir",
 		"noninteractive",
 		"nonsticky",
@@ -501,6 +523,7 @@
 		"onekey",
 		"OpenGraph",
 		"OpenZeppelin",
+		"operationalizing",
 		"opsec",
 		"orbitor",
 		"orderflow",
@@ -576,11 +599,13 @@
 		"rekor",
 		"relayer",
 		"remappings",
+		"Ren",
 		"ren2140",
 		"renderable",
 		"Reown",
 		"repairability",
 		"replaceability",
+		"repost",
 		"repr",
 		"reprioritized",
 		"requestid",
@@ -643,11 +668,13 @@
 		"shuf",
 		"sidepanel",
 		"signingkey",
+		"signoz",
 		"signup",
 		"sigri",
 		"sigstore",
 		"SIWE",
 		"Skiplink",
+		"Skladon",
 		"SlowMist",
 		"SLSA",
 		"smartcard",
@@ -676,9 +703,12 @@
 		"subshells",
 		"substeps",
 		"subtable",
+		"superkalo",
 		"SV",
 		"svgs",
 		"svgtofont",
+		"swiftpm",
+		"T3",
 		"takeoverable",
 		"Tangem",
 		"tantodefi",
@@ -768,6 +798,7 @@
 		"VitalikButerin",
 		"Vitest",
 		"vmargin",
+		"Vorschatt",
 		"wagmi",
 		"waitlisted",
 		"Waku",
@@ -802,6 +833,9 @@
 		"worktree",
 		"worktrees",
 		"X1",
+		"xcodeproj",
+		"xcshareddata",
+		"xcworkspace",
 		"xerror",
 		"xlink",
 		"xmattmatt",
@@ -816,7 +850,8 @@
 		"Zirkus",
 		"ZKID",
 		"ZKSync",
-		"zooko"
+		"zooko",
+		"zsh"
 	],
 	"flagWords": [],
 	"ignorePaths": [
@@ -843,6 +878,10 @@
 	],
 	"patterns": [
 		{
+			"name": "1kx",
+			"pattern": "/\\b1kx\\b/g"
+		},
+		{
 			"name": "4everland",
 			"pattern": "/\\b4everland\\b/gi"
 		},
@@ -858,76 +897,35 @@
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
-		{
-			"name": "Chrome extension literally",
-			"pattern": "/\\bChrome extensions?\\b/g"
-		},
-		{
-			"name": "Git commit ref pins",
-			"pattern": "/@(?:[0-9a-f]{40}|[0-9a-f]{7})\\b/g"
-		},
-		{
-			"name": "Git short commit hashes",
-			"pattern": "/\\b[0-9a-f]{8}\\b/g"
-		},
-		{
-			"name": "GitHub line anchors",
-			"pattern": "/\\bL\\d+(?:-\\d+)?\\b/g"
-		},
-		{
-			"name": "Hexadecimal addresses",
-			"pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi"
-		},
-		{
-			"name": "Million-dollar and billion-dollar amounts",
-			"pattern": "/\\$[.0-9a]+[BM]/g"
-		},
+		{ "name": "Chrome extension literally", "pattern": "/\\bChrome extensions?\\b/g" },
+		{ "name": "Git commit ref pins", "pattern": "/@(?:[0-9a-f]{40}|[0-9a-f]{7})\\b/g" },
+		{ "name": "Git short commit hashes", "pattern": "/\\b[0-9a-f]{8}\\b/g" },
+		{ "name": "GitHub line anchors", "pattern": "/\\bL\\d+(?:-\\d+)?\\b/g" },
+		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
+		{ "name": "Million-dollar and billion-dollar amounts", "pattern": "/\\$[.0-9a]+[BM]/g" },
 		{
 			"name": "Rabby Walle audit PDF filename",
 			"pattern": "/Debank Rabby Walle Audit Report\\.pdf/g"
 		},
-		{
-			"name": "Seven Seven Six",
-			"pattern": "/Seven Seven Six/g"
-		},
-		{
-			"name": "svgicons2svgfont",
-			"pattern": "/svgicons2svgfont/g"
-		},
-		{
-			"name": "Version numbers",
-			"pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g"
-		},
-		{
-			"name": "backdoor",
-			"pattern": "/\\bbackdoor\\b/gi"
-		},
-		{
-			"name": "C.",
-			"pattern": "/\\bC\\./g"
-		},
-		{
-			"name": "N/A",
-			"pattern": "/\\bN\\/A\\b/g"
-		},
-		{
-			"name": "tl;dr",
-			"pattern": "/\\btl;dr\\b/g"
-		},
+		{ "name": "Seven Seven Six", "pattern": "/Seven Seven Six/g" },
+		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" },
+		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" },
+		{ "name": "backdoor", "pattern": "/\\bbackdoor\\b/gi" },
+		{ "name": "C.", "pattern": "/\\bC\\./g" },
+		{ "name": "N/A", "pattern": "/\\bN\\/A\\b/g" },
+		{ "name": "tl;dr", "pattern": "/\\btl;dr\\b/g" },
 		{
 			"name": "Technical tokens",
 			"pattern": "/\\b[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|kt|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swift|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
 		},
-		{
-			"name": "Social media handles",
-			"pattern": "/(?<![\\w])@[A-Za-z0-9_]+\\b/g"
-		},
+		{ "name": "Social media handles", "pattern": "/(?<![\\w])@[A-Za-z0-9_]+\\b/g" },
 		{
 			"name": "Mixed-case filenames",
 			"pattern": "/\\b(?=[a-z0-9_-]*[A-Z])[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|kt|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swift|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
 		}
 	],
 	"ignoreRegExpList": [
+		"1kx",
 		"4everland",
 		"backdoor",
 		"Bitcoin addresses",

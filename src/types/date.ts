@@ -1,3 +1,12 @@
+import { getISO } from 'temporal-polyfill/fns/Calendar'
+import { plainDateISO } from 'temporal-polyfill/fns/Now'
+import { compare, diffDays, fromString, toString } from 'temporal-polyfill/fns/PlainDate'
+
+const Temporal = {
+	Now: { plainDateISO },
+	PlainDate: { from: (date: string) => fromString(date, getISO), compare },
+}
+
 type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 type ThirtyDays = `0${Exclude<Digit, '0'>}` | `1${Digit}` | `2${Digit}` | '30'
 type ThirtyOneDays = ThirtyDays | '31'
@@ -15,23 +24,21 @@ type Year = `20${'1' | '2' | '3'}${Digit}` // We're good from 2010 to 2039.
 /** A valid date in YYYY-MM-DD format. */
 export type CalendarDate = `${Year}-${MonthAndDay}`
 
-// Must accept the same years as `Year`, so `assertCalendarDate` cannot return a value the type rejects.
-const CALENDAR_DATE_PATTERN = /^20[123]\d-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+// Match the supported years and canonical spelling. Temporal validates the month and day.
+const CALENDAR_DATE_PATTERN = /^20[123]\d-\d{2}-\d{2}$/
 
-/** Check whether a string is a valid CalendarDate. */
 function isCalendarDate(date: string): date is CalendarDate {
 	if (!CALENDAR_DATE_PATTERN.test(date)) {
 		return false
 	}
 
-	const [year, month, day] = date.split('-').map(part => +part)
-	const parsed = new Date(Date.UTC(year, month - 1, day))
-	const isRealDate =
-		parsed.getUTCFullYear() === year &&
-		parsed.getUTCMonth() === month - 1 &&
-		parsed.getUTCDate() === day
+	try {
+		Temporal.PlainDate.from(date)
 
-	return isRealDate
+		return true
+	} catch {
+		return false
+	}
 }
 
 export function assertCalendarDate(date: string): CalendarDate {
@@ -42,61 +49,27 @@ export function assertCalendarDate(date: string): CalendarDate {
 	return date
 }
 
-/** The components of a calendar date in YYYY-MM-DD format. */
-export interface CalendarDateParts {
-	year: number
-	month: number
-	day: number
-}
-
-/** Break a CalendarDate into its components. */
-export function calendarParts(calendarDate: CalendarDate): CalendarDateParts {
-	const [year, month, day] = calendarDate.split('-')
-
-	return {
-		year: +year,
-		month: +month,
-		day: +day,
-	}
-}
-
-/** Convert a CalendarDate to a JavaScript Date. */
-export function calendarDateToDate(calendarDate: CalendarDate): Date {
-	const { year, month, day } = calendarParts(calendarDate)
-
-	return new Date(year, month - 1, day)
-}
-
-/** Return today's CalendarDate. */
+/** Return today's UTC calendar date. */
 export function today(): CalendarDate {
-	const date = new Date()
-	const year = date.getFullYear().toString()
-	const month = (date.getMonth() + 1).toString().padStart(2, '0')
-	const day = date.getDate().toString().padStart(2, '0')
-
-	return assertCalendarDate(`${year}-${month}-${day}`)
+	return assertCalendarDate(toString(Temporal.Now.plainDateISO('UTC')))
 }
 
-/** Return the number of days between two CalendarDates. */
-export function daysBetween(calendarDate1: CalendarDate, calendarDate2: CalendarDate): number {
-	const date1 = calendarDateToDate(calendarDate1)
-
-	date1.setMinutes(date1.getMinutes() - date1.getTimezoneOffset()) // Convert to UTC.
-	const date2 = calendarDateToDate(calendarDate2)
-
-	date2.setMinutes(date2.getMinutes() - date2.getTimezoneOffset()) // Convert to UTC.
-
-	return Math.floor((date2.valueOf() - date1.valueOf()) / (1000 * 60 * 60 * 24))
+/** Return the signed number of days from the first date to the second. */
+export function daysBetween(first: CalendarDate, second: CalendarDate): number {
+	return diffDays(Temporal.PlainDate.from(first), Temporal.PlainDate.from(second))
 }
 
 /** Return the number of days since a specific CalendarDate. */
 export function daysSince(calendarDate: CalendarDate): number {
-	return daysBetween(calendarDate, today())
+	return diffDays(Temporal.PlainDate.from(calendarDate), Temporal.Now.plainDateISO('UTC'))
 }
 
-/** Compare two dates; usable as a date sorting function. */
-export function dateCompare(calendarDate1: CalendarDate, calendarDate2: CalendarDate): -1 | 0 | 1 {
-	const days = daysBetween(calendarDate1, calendarDate2)
+/** Compare two dates for ascending sort order. */
+export function dateCompare(first: CalendarDate, second: CalendarDate): -1 | 0 | 1 {
+	const order = Temporal.PlainDate.compare(
+		Temporal.PlainDate.from(first),
+		Temporal.PlainDate.from(second),
+	)
 
-	return days < 0 ? 1 : days > 0 ? -1 : 0
+	return order < 0 ? -1 : order > 0 ? 1 : 0
 }

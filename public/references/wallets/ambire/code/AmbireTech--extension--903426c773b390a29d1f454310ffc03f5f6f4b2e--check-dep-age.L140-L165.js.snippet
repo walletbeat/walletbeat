@@ -1,0 +1,48 @@
+{
+	"highlightRanges": [
+		{
+			"first": 140,
+			"last": 165
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"",
+				";(async () => {",
+				"  const changed = getChangedPackages()",
+				"",
+				"  if (changed.length === 0) {",
+				"    console.log(`✅ No new resolved dependencies vs ${BASE_REF}`)",
+				"    return",
+				"  }",
+				"",
+				"  console.log(`Checking ${changed.length} new dependency versions`)",
+				"  console.log(`Min age: ${MIN_DAYS} days`)",
+				"",
+				"  const { unresolved, tooNew } = await checkPackageAges(changed, MIN_DAYS)",
+				"",
+				"  if (unresolved.length) {",
+				"    console.error('\\n❌ Could not resolve publish time for:')",
+				"    unresolved.forEach((p) => console.error(' -', p))",
+				"  }",
+				"",
+				"  if (tooNew.length) {",
+				"    console.error(`\\n❌ Dependencies newer than ${MIN_DAYS} days:`)",
+				"    tooNew.forEach((p) => console.error(' -', p))",
+				"  }",
+				"",
+				"  if (unresolved.length || tooNew.length) {",
+				"    process.exit(1)",
+				"  }",
+				"",
+				"  console.log(`✅ All new dependencies are at least ${MIN_DAYS} days old`)",
+				"})().catch((e) => {",
+				"  console.error(e?.stack || e)",
+				"  process.exit(2)",
+				"})"
+			],
+			"startLine": 136
+		}
+	]
+}

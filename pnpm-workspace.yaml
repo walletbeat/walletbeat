@@ -8,7 +8,6 @@ allowBuilds:
   '@google/genai': false
   bufferutil: false
   esbuild: false
-  keccak: false
   protobufjs: false
   sharp: false
   ttf2woff2: false

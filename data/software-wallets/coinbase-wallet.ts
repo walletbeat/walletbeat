@@ -50,17 +50,17 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 
-import baseAppRawExtManifest from './manifests/baseApp/hnfanknocfeofbddgcijnmhnfnkdnaad.manifest.json'
+import coinbaseWalletRawExtManifest from './manifests/coinbaseWallet/hnfanknocfeofbddgcijnmhnfnkdnaad.manifest.json'
 
-export const baseApp: SoftwareWallet = {
+export const coinbaseWallet: SoftwareWallet = {
 	metadata: {
-		id: 'base-app',
-		displayName: 'Base App',
-		tableName: 'Base App',
+		id: 'coinbase-wallet',
+		displayName: 'Coinbase Wallet (Formerly Base App)',
+		tableName: 'Coinbase Wallet',
 		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-10-09',
+		lastUpdated: '2026-11-27',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],
 			extensions: [
@@ -73,9 +73,9 @@ export const baseApp: SoftwareWallet = {
 			socials: {
 				discord: 'https://discord.com/invite/buildonbase',
 				farcaster: 'https://farcaster.xyz/baseapp.base.eth',
-				x: 'https://x.com/baseapp',
+				x: 'https://x.com/coinbasewallet',
 			},
-			websites: ['https://base.app/', 'https://wallet.coinbase.com/'],
+			websites: ['https://wallet.coinbase.com/'],
 		},
 	},
 	features: {
@@ -87,13 +87,13 @@ export const baseApp: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of app interactions. There is no user-facing "upgrade my account" UI in the Base App.',
+							'Legacy Coinbase Wallet EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of app interactions. There is no user-facing "upgrade my account" UI in Coinbase Wallet.',
 						url: 'https://blog.base.dev/securing-eip-7702-upgrades',
 					},
 					{
 						explanation:
-							'Per Base App team statement, supported account types are "EOA + 7702 delegation / 4337".',
-						file: 'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+							'Per the Base App team statement, supported account types are "EOA + 7702 delegation / 4337".',
+						file: 'public/references/wallets/coinbase-wallet/2026-02-23-questionnaire.md',
 						label: 'Base App team statement (2026-02-23)',
 					},
 				],
@@ -128,7 +128,7 @@ export const baseApp: SoftwareWallet = {
 			[Variant.BROWSER]: null,
 			[Variant.MOBILE]: {
 				ref: refTodo,
-				// Confirmed in-app (Base App v29.94.123): neither ERC-7828
+				// Confirmed in-app (Coinbase Wallet v29.94.123): neither ERC-7828
 				// (donations.walletbeat.eth@optimism.eth) nor ERC-7831
 				// (donations.walletbeat.eth:optimism:1) resolves in the Send recipient
 				// field. No public documentation indicates support for either standard.
@@ -205,11 +205,11 @@ export const baseApp: SoftwareWallet = {
 			},
 		},
 		licensing: fullyClosedSource,
-		// Coinbase is the parent company funding Base App development. Public via
+		// Coinbase is the parent company funding Coinbase Wallet development. Public via
 		// direct listing on Nasdaq (COIN, April 2021), so publicOffering captures
-		// the public-equity-funded nature. Base App's in-app swap UI displays a
+		// the public-equity-funded nature. Coinbase Wallet's in-app swap UI displays a
 		// separate Coinbase-attributed fee, so transparentConvenienceFees applies.
-		// No governance token tied to Base App or Coinbase. SEC filings provide
+		// No governance token tied to Coinbase Wallet or Coinbase. SEC filings provide
 		// public revenue breakdown.
 		monetization: {
 			ref: 'https://www.sec.gov/edgar/browse/?CIK=0001679788',
@@ -226,32 +226,32 @@ export const baseApp: SoftwareWallet = {
 				ventureCapital: false,
 			},
 		},
-		// A recent Base App update added multi-wallet support: the wallet picker
+		// A recent Coinbase Wallet update added multi-wallet support: the wallet picker
 		// lists multiple coexisting wallets (e.g. "Wallet 5", "Wallet 6") and an
 		// "Add Wallet" sheet offers both "Create Wallet" (a new multi-chain wallet)
 		// and "Import Wallet" (sign into an existing passkey). Verified in-app
-		// (Base App v29.99.7, 2026-06-19).
+		// (Coinbase Wallet v29.99.7, 2026-06-19).
 		multiAddress: {
 			[Variant.BROWSER]: null,
 			[Variant.MOBILE]: supported({
 				ref: [
 					{
 						explanation:
-							'The Base App wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
-						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
-						label: 'Base App "Add Wallet" sheet: Create Wallet / Import Wallet options',
+							'The wallet picker in Coinbase Wallet lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
+						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
+						label: 'Coinbase Wallet "Add Wallet" sheet: Create Wallet / Import Wallet options',
 					},
 					{
 						explanation:
 							'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
-						file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
-						label: 'Base App wallet picker showing multiple coexisting wallets',
+						file: 'public/references/wallets/coinbase-wallet/screenshots/2026-06-19-multi-address-wallet-list.jpg',
+						label: 'Wallet picker in Coinbase Wallet showing multiple coexisting wallets',
 					},
 				],
 			}),
 		},
 		privacy: {
-			// Per direct in-app check (Settings > Privacy & Security, Base App v29.94.123):
+			// Per direct in-app check (Settings > Privacy & Security, Coinbase Wallet v29.94.123):
 			// there is NO toggle to disable crash reporting, diagnostics, or usage
 			// analytics. The only data-collection toggle is "Personalized Advertising"
 			// (defaulted ON), which reduces ad-related data sharing but does not stop
@@ -268,7 +268,7 @@ export const baseApp: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'No opt-out exists in the Base App Privacy & Security settings as of v29.94.123.',
+									'No opt-out exists in the Coinbase Wallet Privacy & Security settings as of v29.94.123.',
 								url: 'https://wallet.coinbase.com/privacy-policy',
 							},
 						],
@@ -302,7 +302,7 @@ export const baseApp: SoftwareWallet = {
 				[Variant.BROWSER]: 'https://wallet.coinbase.com/privacy-policy',
 				[Variant.MOBILE]: 'https://wallet.coinbase.com/dapp-privacy-policy',
 			},
-			// Base App ships no built-in privacy features as of v29.94.123. Default
+			// Coinbase Wallet ships no built-in privacy features as of v29.94.123. Default
 			// transfers are public ERC-20 / ETH sends on Base. Coinbase has signaled
 			// future work on private transactions (Iron Fish acquisition, March 2025),
 			// but no stealth address, Railgun, Privacy Pools, or Tornado Cash Nova
@@ -336,7 +336,7 @@ export const baseApp: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			// Verified in-app (Base App v29.94.123):
+			// Verified in-app (Coinbase Wallet v29.94.123):
 			// - No app-level PIN, password, biometric toggle, or pattern lock.
 			//   Opening the app does not require any authentication.
 			// - Face ID / biometric IS required before signing transactions (this is
@@ -352,9 +352,9 @@ export const baseApp: SoftwareWallet = {
 					duressMode: notSupported,
 				},
 			},
-			// Base App exposes no UI for adding, pairing, or managing hardware wallet keys
+			// Coinbase Wallet exposes no UI for adding, pairing, or managing hardware wallet keys
 			// and there are no settings for Ledger, Trezor, or other hardware devices.
-			// There is also nothing in the Base App documentation that indicates support
+			// There is also nothing in the Coinbase Wallet documentation that indicates support
 			// for hardware wallets.
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: null,
@@ -398,7 +398,7 @@ export const baseApp: SoftwareWallet = {
 				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
 				libraryUrl: 'https://github.com/base-org/webauthn-sol',
 			}),
-			// Audits cover the Coinbase Smart Wallet contracts that power Base App passkey-created accounts.
+			// Audits cover the Coinbase Smart Wallet contracts that power Coinbase Wallet passkey-created accounts.
 			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
 			publicSecurityAudits: [
 				{
@@ -461,7 +461,7 @@ export const baseApp: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Base App v30.1.0 issues a `useBlocklistQueryQuery` query to `graphql-base.coinbase.com` on every in-app-browser navigation. The request carries the full visited URL, including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. Coinbase additionally documents that Base App warns users before they proceed to a flagged site.',
+									'Coinbase Wallet v30.1.0 issues a `useBlocklistQueryQuery` query to `graphql-base.coinbase.com` on every in-app-browser navigation. The request carries the full visited URL, including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. Coinbase additionally documents that Coinbase Wallet warns users before they proceed to a flagged site.',
 								lastRetrieved: '2026-06-29',
 								url: 'https://help.coinbase.com/en/wallet/security/avoiding-crypto-scams',
 							},
@@ -483,7 +483,7 @@ export const baseApp: SoftwareWallet = {
 						lastRetrieved: '2026-10-09',
 						url: 'https://chromewebstore.google.com/detail/coinbase-wallet-extension/hnfanknocfeofbddgcijnmhnfnkdnaad',
 					},
-					browserExtensionHardening: parseBrowserExtensionManifest(baseAppRawExtManifest),
+					browserExtensionHardening: parseBrowserExtensionManifest(coinbaseWalletRawExtManifest),
 					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
 					secureRng: SecureRngSource.NOT_VERIFIABLE,
 				},
@@ -493,8 +493,8 @@ export const baseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			// Base App exposes in-app ERC-20 token approval management via a "Token
-			// Approvals" screen (verified in-app, Base App v29.94.123). Users can
+			// Coinbase Wallet exposes in-app ERC-20 token approval management via a "Token
+			// Approvals" screen (verified in-app, Coinbase Wallet v29.94.123). Users can
 			// inspect and revoke individual approvals directly in the wallet UI,
 			// across multiple chains. The screen
 			// covers traditional ERC-20 token.approve() allowances and Permit2-style
@@ -506,15 +506,15 @@ export const baseApp: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Base App Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
-							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png',
-							label: 'Base App Trade screen for a $1.52 USDC to ETH swap',
+								'Coinbase Wallet Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
+							file: 'public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-swap-review.png',
+							label: 'Coinbase Wallet Trade screen for a $1.52 USDC to ETH swap',
 							lastRetrieved: '2026-09-09',
 						},
 						{
 							explanation:
 								'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
-							file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
+							file: 'public/references/wallets/coinbase-wallet/screenshots/2026-09-09-coinbase-wallet-approve-exact-amount-event.png',
 							label:
 								'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
 							lastRetrieved: '2026-09-09',
@@ -528,7 +528,7 @@ export const baseApp: SoftwareWallet = {
 					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 				},
 			},
-			// Base App mobile is closed-source. It does not ship its own
+			// Coinbase Wallet mobile is closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
 			// are broadcast via Coinbase's RPC infrastructure. Users cannot configure
 			// a custom RPC endpoint (chainConfigurability: notSupported above), so
@@ -541,7 +541,7 @@ export const baseApp: SoftwareWallet = {
 					l1: {
 						ref: {
 							explanation:
-								"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
+								"Coinbase Wallet and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
 							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts#not-line-specific',
 						},
 						selfBroadcastViaDirectGossip: notSupported,
@@ -554,7 +554,7 @@ export const baseApp: SoftwareWallet = {
 							TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 						ref: {
 							explanation:
-								'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
+								'Per the open-source `base/account-sdk` that backs Coinbase Wallet account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Coinbase Wallet mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
 							url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts#not-line-specific',
 						},
 					},
@@ -582,7 +582,7 @@ export const baseApp: SoftwareWallet = {
 				}),
 			},
 		},
-		// Base App accounts run Coinbase Smart Wallet logic, which exposes
+		// Coinbase Wallet accounts run Coinbase Smart Wallet logic, which exposes
 		// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
 		// contract-level property (executeBatch) that holds on every chain the
 		// wallet is deployed to, including Ethereum L1. Confirmed live on
@@ -609,7 +609,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
+							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Coinbase Wallet account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
 						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
 					},
 				],

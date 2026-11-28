@@ -372,7 +372,7 @@
 
 	import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-	import GithubIcon from 'lucide-static/icons/github.svg?raw'
+	import GithubIcon from '@/icons/github.svg?raw'
 	import GlobeIcon from 'lucide-static/icons/globe.svg?raw'
 	import KeyIcon from 'lucide-static/icons/key.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'

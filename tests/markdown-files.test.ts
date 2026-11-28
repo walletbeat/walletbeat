@@ -97,7 +97,7 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'governance/grants/2025-10-gitcoin-grants-privacy-round/project-info.md',
 	'governance/roadmap/2025/2025-roadmap.md',
 	'governance/treasury/treasury-transparency.md',
-	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/coinbase-wallet/2026-02-23-questionnaire.md',
 	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
 	'resources/docs/features/features.md',
 	'resources/files/community-partner-applications/2026-dappcon.md',
@@ -115,12 +115,20 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-01-30 - Okx Wallet/thread.md',
 	'resources/files/social-media/threads/2026-04-22 - Security Best Practices/thread.md',
 	'resources/files/social-media/threads/2026-05-15 - Transaction legibility ERC-8213 ERC-7730/thread.md',
+	'governance/minutes/2025/2025-06-22/2025-06-22.md',
+	'governance/minutes/2025/2025-12-18/2025-12-18.notes.md',
+	'governance/minutes/2026/2026-01-08/2026-01-08.notes.md',
+	'governance/minutes/2026/2026-02-04/2026-02-04.notes.md',
+	'governance/minutes/2026/2026-02-26/2026-02-26-notes.md',
+	'governance/minutes/2026/2026-03-19/2026-03-19-notes.md',
+	'governance/minutes/2026/2026-04-09/2026-04-09-notes.md',
+	'governance/minutes/2026/2026-04-30/2026-04-30.notes.md',
+	'governance/minutes/2026/2026-05-21/2026-05-21.notes.md',
+	'governance/minutes/2026/2026-07-09/2026-07-09.notes.md',
+	'governance/minutes/2026/2026-08-20/2026-08-20.notes.md',
+	'governance/minutes/2026/2026-09-17/2026-09-17.notes.md',
+	'governance/minutes/2026/2026-10-08/2026-10-08.notes.md',
 ])
-
-/**
- * Markdown entries matching this pattern are excluded from grammar checks.
- */
-const GRAMMAR_CHECK_EXCLUDED: RegExp[] = [/^governance\/minutes\/.*/]
 
 describe('markdown files', async () => {
 	const allMarkdownFiles: string[] = []
@@ -143,10 +151,7 @@ describe('markdown files', async () => {
 			const absPath = path.join(getRepositoryRoot(), filePath)
 			const content = await fs.readFile(absPath, 'utf-8')
 
-			if (
-				!GRAMMAR_CHECK_WHITELIST.has(filePath) &&
-				GRAMMAR_CHECK_EXCLUDED.every(r => r.exec(filePath) === null)
-			) {
+			if (!GRAMMAR_CHECK_WHITELIST.has(filePath)) {
 				it('has correct grammar', async () => {
 					await grammarLint(content, { language: 'markdown' })
 				})
@@ -303,7 +308,7 @@ describe('markdown files', async () => {
 	})
 
 	describe('whitelist never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThis = 27 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
+		const whitelistExpectedSizePleaseNeverIncreaseThis = 40 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
 
 		it('has the expected size', () => {
 			expect(GRAMMAR_CHECK_WHITELIST.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)
