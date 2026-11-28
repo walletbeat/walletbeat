@@ -66,7 +66,7 @@ export interface TreasuryMarkdownUpdaterConfig {
 	test: boolean
 }
 
-interface AddressRow {
+export interface AddressRow {
 	Address: string
 	Name: string
 	Control: string
@@ -100,7 +100,7 @@ function readFile(filePath: string): string {
  * Parses a TSV string into an array of objects.
  * Uses strict typing avoiding 'any'.
  */
-function parseTSV<T>(content: string): T[] {
+export function parseTSV<T>(content: string): T[] {
 	const lines = content.trim().split('\n')
 
 	if (lines.length < 2) {
