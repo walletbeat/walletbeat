@@ -34,6 +34,8 @@ import {
 	isTransactionOutcomeExplained,
 	MessageSigningDetails,
 	noDataExtraction,
+	type SimulatedFailedTransaction,
+	type SimulatedNondeterministicTransaction,
 	SimulationBenchmarkTransactions,
 	type SoftwareTransactionLegibilityImplementation,
 	type SoftwareTransactionSimulations,
@@ -45,6 +47,7 @@ import {
 	featureSupportedNoRef,
 	isSupported,
 	notSupportedWithRef,
+	type Support,
 	supported,
 } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
@@ -566,6 +569,52 @@ function hardwareFullTransactionLegibility(
 	})
 }
 
+// Software wallet simulation helpers
+
+/** Benchmark transactions whose outcome must be explained for a software wallet to pass. */
+const softwareSimulationOutcomeBenchmarks = [
+	BasicBenchmarkTransactions.ERC_20_TRANSFER,
+	BasicBenchmarkTransactions.ERC_721_TRANSFER,
+	BasicBenchmarkTransactions.ERC_1155_TRANSFER,
+	ComplexBenchmarkTransactions.USDC_APPROVAL,
+	ComplexBenchmarkTransactions.AAVE_SUPPLY,
+	ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
+	ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+	ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+] as const
+
+function isFailedTransactionDetected(tx: SimulatedFailedTransaction | null): boolean {
+	return tx !== null && tx.failure === 'DETECTED'
+}
+
+function isNondeterminismWarned(tx: SimulatedNondeterministicTransaction | null): boolean {
+	return tx !== null && tx.nondeterminism === 'RESIMULATES_WITH_WARNING'
+}
+
+/**
+ * Whether the wallet explains the outcome of every benchmark transaction,
+ * detects failing transactions, and warns about nondeterministic ones.
+ */
+function softwareSimulationsFullySupported(
+	transactionSimulations: Support<SoftwareTransactionSimulations>,
+): boolean {
+	if (!isSupported(transactionSimulations)) {
+		return false
+	}
+
+	return (
+		softwareSimulationOutcomeBenchmarks.every(
+			benchmark => isTransactionOutcomeExplained(transactionSimulations[benchmark]) === true,
+		) &&
+		isFailedTransactionDetected(
+			transactionSimulations[SimulationBenchmarkTransactions.FAILED_TRANSACTION],
+		) &&
+		isNondeterminismWarned(
+			transactionSimulations[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION],
+		)
+	)
+}
+
 // Software wallet detail generation helpers
 interface SoftwareFeatureDetails {
 	calldataDisplay: {
@@ -811,7 +860,7 @@ function analyzeSoftwareFeatures({
 		{
 			const tx = simData[SimulationBenchmarkTransactions.FAILED_TRANSACTION]
 
-			if (tx === null || tx.failure !== 'DETECTED') {
+			if (!isFailedTransactionDetected(tx)) {
 				details.transactions.partial.push('Failed transaction simulation (failure not detected)')
 			} else {
 				details.transactions.passing.push('Failed transaction simulation')
@@ -822,20 +871,20 @@ function analyzeSoftwareFeatures({
 		{
 			const tx = simData[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]
 
-			if (tx !== null && tx.nondeterminism === 'NO_OUTCOME_SHOWN') {
+			if (isNondeterminismWarned(tx)) {
+				details.transactions.passing.push('Nondeterministic transaction simulation')
+			} else if (tx === null || tx.nondeterminism === 'NO_OUTCOME_SHOWN') {
 				details.transactions.partial.push(
 					'Nondeterministic transaction simulation (no outcome shown)',
 				)
-			} else if (tx !== null && tx.nondeterminism === 'STATIC_SINGLE_OUTCOME') {
+			} else if (tx.nondeterminism === 'STATIC_SINGLE_OUTCOME') {
 				details.transactions.partial.push(
 					'Nondeterministic transaction simulation (nondeterminism not detected)',
 				)
-			} else if (tx !== null && tx.nondeterminism === 'RESIMULATES_NO_WARNING') {
+			} else {
 				details.transactions.partial.push(
 					'Nondeterministic transaction simulation (detected but no warning shown)',
 				)
-			} else {
-				details.transactions.passing.push('Nondeterministic transaction simulation')
 			}
 		}
 	}
@@ -1086,7 +1135,7 @@ function softwareMissingErc4361TransactionLegibility(
 			),
 		},
 		details: markdown(
-			`{{WALLET_NAME}} implements comprehensive transaction legibility, including full calldata display, complex transaction decoding, and simulation capabilities, but does not support ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum). This standard allows wallets to clearly present sign-in authentication requests to users.
+			`{{WALLET_NAME}} implements full ${eipMarkdownShortLink(erc8213)} and ${eipMarkdownShortLink(erc7730)} support, explains the outcome of all benchmark transactions, detects failed transactions, and warns about nondeterministic transactions, but does not support ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum). This standard allows wallets to clearly present sign-in authentication requests to users.
 
 ${featureDetailsMarkdown}`,
 		),
@@ -1105,6 +1154,7 @@ function softwareFullTransactionLegibility(
 ): Evaluation {
 	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
+	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
 	return ctx.build({
 		outcome: {
@@ -1114,8 +1164,14 @@ function softwareFullTransactionLegibility(
 			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
 		},
 		details: markdown(
-			`{{WALLET_NAME}} implements full transaction legibility. The wallet displays calldata in all formats (raw hex, formatted, copyable), clearly explains the outcome of all benchmark transaction types including complex nested transactions, and detects failed and nondeterministic transactions, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
+			`{{WALLET_NAME}} implements full transaction legibility. The wallet shows the raw hex calldata and both ${eipMarkdownShortLink(erc8213)} digests, decodes all benchmark transactions including complex nested transactions using ${eipMarkdownShortLink(erc7730)}, clearly explains the outcome of all benchmark transactions, detects failed transactions, and warns about nondeterministic transactions.\n\n${featureDetailsMarkdown}`,
 		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} could further improve with the following:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
@@ -1226,7 +1282,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 			transactionSimulations[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED] === null ||
 			transactionSimulations[
 				ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
-			] === null
+			] === null ||
+			transactionSimulations[SimulationBenchmarkTransactions.FAILED_TRANSACTION] === null ||
+			transactionSimulations[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION] === null
 		) {
 			return unrated(ctx)
 		}
@@ -1295,7 +1353,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return softwareNoTransactionLegibility(ctx, softwareTransactionLegibility)
 	}
 
-	if (erc8213Full && erc7730Full) {
+	if (erc8213Full && erc7730Full && softwareSimulationsFullySupported(transactionSimulations)) {
 		if (!isSupported(erc4361)) {
 			return softwareMissingErc4361TransactionLegibility(ctx, softwareTransactionLegibility)
 		}
@@ -1411,7 +1469,7 @@ export const transactionLegibility: Attribute = {
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it fully supports ${eipMarkdownShortLink(erc7730)} calldata decoding, displays calldata in all required formats (raw hex, formatted, copyable, digest), shows all essential transaction details, and implements ${eipMarkdownShortLink(erc8213)} along with ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum).
+		- A wallet receives a passing rating if it fully supports ${eipMarkdownShortLink(erc7730)} calldata decoding, shows the raw hex calldata, fully implements ${eipMarkdownShortLink(erc8213)} (Calldata digest and ${eipMarkdownShortLink(eip712)} digest), and supports ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum). It must also explain the outcome of all benchmark transactions, detect failed transactions, and warn about nondeterministic transactions.
 		- A wallet receives a partial rating if it has some combination of these features but not all.
 		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
