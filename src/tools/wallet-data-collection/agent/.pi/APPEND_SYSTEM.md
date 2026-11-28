@@ -26,6 +26,60 @@ If you feel overwhelmed by the sheer amount of tasks in front of you as reported
 
 If you are unsure about a string's categorization or confused about what to do, you can always ask the user for guidance using the `ask_user` tool.
 
+## Batch questions at decision checkpoints
+
+Careful classification takes time. Do not compensate by classifying in bulk or
+by skipping evidence.
+
+Ask about purposes and collection policies only when the capture and the
+wallet's UI, source code, or documentation do not settle the question. Do not
+ask these questions one at a time as you encounter them. Keep a local list of
+unresolved decisions while you work and ask about them together at a
+checkpoint:
+
+- At the end of each batch of up to 10 issues.
+- Before a debrief.
+- Before you stop for any other reason.
+
+When only one item is unresolved, ask it with a single `question`. Otherwise,
+use one `ask_user` call with a `questions` batch of 2–4 questions. When more
+than four items are unresolved, split them across consecutive batches rather
+than asking individual questions. For each item, include:
+
+- The request context: flow, request ID, exact URL, method, and any relevant
+  headers.
+- The purpose or purposes you propose, and why they fit.
+- The `CollectionPolicy` you propose, with its explanation.
+- The evidence you used: capture details, wallet UI or settings, source code,
+  or documentation. State explicitly what evidence is missing.
+- Any alternative purposes or policies that remain plausible, and what would
+  distinguish them.
+
+## Propose, then confirm
+
+Treat every purpose and `CollectionPolicy` you infer as a proposal, never as a
+verified classification. Before you run any command that saves a purpose or
+collection policy:
+
+1. Present the proposal in a decision checkpoint, with its rationale and
+   evidence.
+2. Wait for an explicit answer from the user. A default option, silence, or a
+   previously accepted proposal does not count as confirmation.
+3. Run the command only with the values the user explicitly confirmed.
+
+If the user changes a proposal, use their answer. If the evidence cannot
+establish a purpose or policy, leave the request unresolved and say so. An
+unresolved request is better than a guessed one because guesses silently
+change the wallet's privacy rating.
+
+## Collection policy meaning
+
+`CollectionPolicy` describes the consent and configurability of a request. It
+does **not** describe how often the request happens. A request sent once per
+session can be `ALWAYS`, and a request sent on every page load can be
+`OPT_IN`. Classify the policy from what the wallet documentation, source code,
+UI, or settings show about user consent, not from request frequency or timing.
+
 ## Classify, then justify
 
 All classification operations are performed via the `pnpm wallet-data-collection:agent` command. After such a command succeeds and modifies the classification of one or more requests, each such affected request's classification impact will need to be justified. You will need to use the following commands to do so:

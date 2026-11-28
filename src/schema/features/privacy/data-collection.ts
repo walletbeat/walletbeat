@@ -12,7 +12,10 @@ import { Enum, mergeEnums } from '@/utils/enum'
 import type { Entity } from '../../entity'
 
 /**
- * An enum representing when data collection occurs.
+ * An enum representing the consent and configurability of data collection.
+ *
+ * This describes whether data collection can be opted into or disabled by the
+ * user. It does not describe how frequently the data is collected.
  *
  * Values are ordered from most private (NEVER) to least private (ALWAYS).
  */
