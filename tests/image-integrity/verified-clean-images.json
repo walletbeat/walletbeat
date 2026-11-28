@@ -315,6 +315,10 @@
 		"hash": "2009bbf3972a28beccefcf1efaa1299d26487a51dbeb1d717bd2de17e341103e",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/wallets/punicus.svg": {
+		"hash": "ada6c5ace1c74d092b6a38f4e8141073e0732303499c77fda392f639c7ffa4d4",
+		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
+	},
 	"public/images/wallets/rabby.svg": {
 		"hash": "afc65e5c6c0046a8002ed85875f39de07e7a2f41934870156704d57345337146",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
