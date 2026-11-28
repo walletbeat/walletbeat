@@ -82,3 +82,4 @@ src/tools/wallet-data-collection/agent/auth.json
 # Playwright verification outputs
 test-results/
 playwright-report/
+._*
