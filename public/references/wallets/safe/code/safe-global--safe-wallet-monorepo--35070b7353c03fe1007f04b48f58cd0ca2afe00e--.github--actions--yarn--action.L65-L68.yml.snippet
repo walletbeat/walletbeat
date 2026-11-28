@@ -1,0 +1,51 @@
+{
+	"highlightRanges": [
+		{
+			"first": 65,
+			"last": 68
+		}
+	],
+	"segments": [
+		{
+			"lines": [
+				"runs:"
+			],
+			"startLine": 23
+		},
+		{
+			"lines": [
+				"  steps:"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"    - name: Restore node_modules"
+			],
+			"startLine": 52
+		},
+		{
+			"lines": [
+				"      with:"
+			],
+			"startLine": 56
+		},
+		{
+			"lines": [
+				"        key: >-",
+				"          ${{ runner.os }}-${{ runner.arch }}-node-${{ steps.node.outputs.node-version }}-modules-${{",
+				"          hashFiles('yarn.lock', '**/package.json', '.yarnrc.yml', '.yarn/patches/**') }}",
+				"",
+				"    # Runs on a cache hit too: Yarn then only checks the tree against the lockfile.",
+				"    - name: Yarn install",
+				"      shell: bash",
+				"      run: yarn install --immutable",
+				"",
+				"    - name: Yarn after-install to generate contracts types",
+				"      if: inputs.after-install == 'true'",
+				"      shell: bash"
+			],
+			"startLine": 61
+		}
+	]
+}

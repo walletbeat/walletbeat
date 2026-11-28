@@ -36,7 +36,7 @@ import {
 	type ArtifactSigningDetails,
 	RepositoryChangeControlState,
 } from '@/schema/features/transparency/release-transparency'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 export const safe: SoftwareWallet = {
@@ -47,7 +47,7 @@ export const safe: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, minimalsm],
 		iconExtension: 'svg',
-		lastUpdated: '2026-11-23',
+		lastUpdated: '2026-11-28',
 		urls: {
 			docs: ['https://docs.safe.global/'],
 			repositories: [
@@ -528,6 +528,24 @@ export const safe: SoftwareWallet = {
 									},
 								],
 							},
+							{
+								explanation:
+									'The web release job can write attestations. It uses `actions/attest` to create a signed build provenance attestation for the release archive.',
+								label: 'Safe web release workflow',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/workflows/web-tag-release.yml#L100-L104,L214-L217',
+							},
+							{
+								explanation:
+									'GitHub publishes the attestations of the Safe repository. Each attestation is signed with the identity of the GitHub Actions workflow that built the artifact.',
+								label: 'Safe repository attestations',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/attestations',
+							},
+							{
+								explanation:
+									'The attestation for the `web-v1.105.0` release archive is in the public Sigstore transparency log.',
+								label: 'Sigstore transparency log entry',
+								url: 'https://search.sigstore.dev/?logIndex=3669618074',
+							},
 						],
 						publication: 'SIGSTORE_REKOR',
 						signer: 'BUILD_INFRA_IDENTITY',
@@ -535,14 +553,46 @@ export const safe: SoftwareWallet = {
 					[Variant.MOBILE]: notSupported,
 				},
 				dependencyAgeGate: null,
-				dependencyLocking: supported({
-					ref: {
-						explanation:
-							'The release build installs the exact dependency versions recorded in the repository and fails if they would change.',
-						label: 'Dependency install step',
-						url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/d09c30200d532d36570f4b8c6b886130ebdf7170/.github/actions/yarn/action.yml#L48-L51',
-					},
-				}),
+				dependencyLocking: {
+					[Variant.BROWSER]: supported({
+						ref: [
+							{
+								explanation:
+									'The shared Yarn setup action installs dependencies with `yarn install --immutable`, which fails if `yarn.lock` would change.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/actions/yarn/action.yml#L65-L68',
+							},
+							{
+								explanation:
+									'The web release job uses this action to install dependencies before it builds the release.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/.github/workflows/web-tag-release.yml#L143-L148',
+							},
+						],
+					}),
+					[Variant.MOBILE]: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									"Safe builds the mobile app with the Expo build service. The public production build profile does not set `EAS_NO_FROZEN_LOCKFILE`. However, it uses the `production` environment, which also loads private environment variables from Safe's Expo account.",
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15,L44-L61',
+							},
+							{
+								explanation:
+									'The mobile app uses Expo SDK 55 and React Native 0.83. These versions meet the version condition of the Expo build service for a frozen lockfile.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/package.json#L97,L122',
+							},
+							{
+								explanation:
+									'The Expo build service uses a frozen lockfile for Expo SDK 53 or newer and React Native 0.79 or newer, but only if `EAS_NO_FROZEN_LOCKFILE` is not set. A private environment variable can set it, so the public build configuration does not decide this.',
+								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/utils/packageManager.ts#L137-L164',
+							},
+							{
+								explanation:
+									'With Yarn 2 or newer, a frozen lockfile install runs `yarn install --immutable`. Otherwise, the install runs `yarn install --no-immutable`, which can change `yarn.lock`. Public evidence does not show that the mobile release build locks its dependencies.',
+								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/common/installDependencies.ts#L43-L54',
+							},
+						],
+					}),
+				},
 				dependencySandboxing: notSupportedWithRef({
 					ref: {
 						explanation:
@@ -570,16 +620,32 @@ export const safe: SoftwareWallet = {
 				hasPublicChangelog: {
 					[Variant.BROWSER]: supported({
 						ref: {
-							label: 'Safe{Wallet} releases',
+							explanation: 'Safe publishes web app release notes via GitHub Releases.',
+							label: 'Safe web app releases on GitHub',
 							url: 'https://github.com/safe-global/safe-wallet-monorepo/releases',
 						},
 					}),
-					[Variant.MOBILE]: supported({
-						ref: {
-							explanation: 'Each Safe{Mobile} version on the App Store comes with release notes.',
-							label: 'Safe{Mobile} on the App Store',
-							url: 'https://apps.apple.com/us/app/safe-mobile/id6748754793',
-						},
+					[Variant.MOBILE]: supported<MustRef<{}>>({
+						ref: [
+							{
+								explanation:
+									'The App Store version history lists release notes for each version of the Safe mobile app.',
+								label: 'Safe mobile app on the App Store',
+								url: 'https://apps.apple.com/us/app/safe-mobile/id6748754793',
+							},
+							{
+								explanation:
+									'The iOS and Android apps are built from one app configuration with one version number, so the App Store version history also covers the Android releases.',
+								label: 'Safe mobile app version',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/app.config.ts#L30-L34',
+							},
+							{
+								explanation:
+									'The Google Play listing shows the release notes of the latest Android version only.',
+								label: 'Safe mobile app on Google Play',
+								url: 'https://play.google.com/store/apps/details?id=global.safe.mobileapp',
+							},
+						],
 					}),
 				},
 				hermeticBuilds: notSupported,
