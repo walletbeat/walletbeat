@@ -22,7 +22,7 @@ Two principles guided the stack.
 
 1. Dependency minimalism: write software that deliberately tries to have as few dependencies as practical. This is more important than ever now that we have AI hacks and software supply chain attacks happening everywhere.
 
-![Dependency Minimalism](./dependency_minimalism.png)
+https://x.com/VitalikButerin/status/1880324753170256005
 
 ---
 
@@ -53,7 +53,7 @@ Instead, here's the decisions we made for our tech stack:
 
 What about the dependencies we need to publish and distribute it? 
 
-polymutex evaluated dozens of possible tools and in the end two technologies stood out: ENS and HTTPS gateways like eth.limo. We also built a custom GitHub Actions pipeline around this.
+@polymutex evaluated dozens of possible tools and in the end two technologies stood out: ENS and HTTPS gateways like eth.limo. We also built a custom GitHub Actions pipeline around this.
 
 ---
 
@@ -61,7 +61,7 @@ If every Walletbeat maintainer walked away tomorrow, the site should keep workin
 
 ---
 
-Watch the full talk, then check our website for yourself 👇
+Watch the full talk, and check our website for yourself 👇
 
 https://walletbeat.eth.limo/
 

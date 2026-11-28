@@ -2243,12 +2243,8 @@
 		"hash": "f97bacc77095728cb731a3244c94baf3ffb62b471a2aae7fd88e2a8db5927396",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
-	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/dependency_minimalism.png": {
-		"hash": "1851ee3b95419acceb7a5a6d0b93dbd9182ed68a8e7246ecf673c8521c8d13c9",
-		"passedTests": ["blockiness", "file-format", "png-optimized"]
-	},
 	"resources/files/social-media/threads/2026-11-24 - Darryls Talk Video/walkaway_test.png": {
-		"hash": "a3dcb2f378cf7ee4197e7a0d1f9ab04bba1cb289396ee1f8427cb35663ca8000",
+		"hash": "91a29807a9d137dcdc1c45ddf6086de2d9d17d417174661048972c5c6461124a",
 		"passedTests": ["blockiness", "file-format", "png-optimized"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
