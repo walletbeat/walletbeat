@@ -82,6 +82,18 @@ describe('AI prose linter', () => {
 		expect(adjectiveLints.map(lint => lint.get_problem_text())).toEqual(['named'])
 	})
 
+	it('flags the attributive adjective "named" and reports correct character spans', async () => {
+		const lints = await aiTellsLinter.lint(
+			'the named wallet',
+			{ language: 'plaintext' },
+			GrammarTextKind.GENERAL,
+		)
+
+		expect(lints).toHaveLength(1)
+		expect(lints[0].get_problem_text()).toBe('named')
+		expect(lints[0].span()).toEqual({ start: 4, end: 9 })
+	})
+
 	it('does not flag noun uses of "name"/"names"', async () => {
 		const lints = await aiTellsLinter.lint(
 			'ENS names resolve onchain. domain names are used. wallet names are displayed. the attribute name. human-readable names. full names.',

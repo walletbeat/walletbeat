@@ -3,6 +3,11 @@
  * Check reference punctuation and flag words that appear too often.
  */
 
+// compromise is used for its per-token part-of-speech tags, which the name
+// matcher below inspects directly. Harper's Weir language has no way to require
+// a specific word to take a specific part of speech (a literal word and a UPOS
+// tag are separate expressions), so the equivalent rule would need fragile
+// context matching, and Harper is not more accurate here anyway.
 import nlp from 'compromise'
 
 import { extractProse } from '@/utils/markdown-utils'
@@ -23,8 +28,10 @@ interface ParsedTerm {
 	/** Whitespace/punctuation following this term (e.g. `", "` after a list item). */
 	post: string
 	/** Character offset within the source text, from compromise's `offset` field. */
-	start: number
-	length: number
+	offset: {
+		start: number
+		length: number
+	}
 }
 
 interface ParsedSentence {
@@ -127,6 +134,15 @@ function isNameNounModifier(prev: ParsedTerm | undefined): boolean {
 	return prev !== undefined && new RegExp(`^(?:${nameNounModifiers})$`, 'i').test(prev.text)
 }
 
+/** Build a `WordMatch` for `term` using compromise's character offsets. */
+function termMatch(term: ParsedTerm): WordMatch {
+	return {
+		text: term.text,
+		start: term.offset.start,
+		end: term.offset.start + term.offset.length,
+	}
+}
+
 /**
  * Flag the verb "names" and the adjective "named".
  *
@@ -147,20 +163,9 @@ function nameMatcher(prose: string): WordMatch[] {
 		const next = terms[i + 1]
 		const prev = terms[i - 1]
 
-		if (/^names$/i.test(term.text) && term.tags.includes('Verb')) {
-			// compromise occasionally tags the noun "names" as a verb inside a
-			// comma-separated noun list (e.g. "email addresses, names, bank
-			// account numbers") or after a noun-modifier (e.g. "domain names
-			// only"). Skip.
-			if (isNounListItem(prev) || isNameNounModifier(prev)) {
-				continue
-			}
-
-			matches.push({ text: term.text, start: term.start, end: term.start + term.length })
-		} else if (
+		const isVerbNames = /^names$/i.test(term.text) && term.tags.includes('Verb')
+		const isNamedAiIsm =
 			/^named$/i.test(term.text) &&
-			term.tags.includes('Verb') &&
-			term.tags.includes('PastTense') &&
 			// Passive voice (e.g. "the landmark is named Table of contents") is not
 			// the AI-ism "named X".
 			!term.tags.includes('Passive') &&
@@ -170,10 +175,29 @@ function nameMatcher(prose: string): WordMatch[] {
 			// after "named" is a true past-tense verb object ("named us"), not
 			// the AI-ism.
 			next.tags.includes('Noun') &&
-			!next.tags.includes('Pronoun')
-		) {
-			matches.push({ text: term.text, start: term.start, end: term.start + term.length })
+			!next.tags.includes('Pronoun') &&
+			// compromise tags the attributive adjective "named" as `Adjective`
+			// (e.g. "the named wallet") and the past-tense verb or participle as
+			// `Verb` + `PastTense` (e.g. "a wallet named MetaMask").
+			(term.tags.includes('Adjective') ||
+				(term.tags.includes('Verb') && term.tags.includes('PastTense')))
+
+		if (!isVerbNames && !isNamedAiIsm) {
+			continue
 		}
+
+		if (
+			isVerbNames &&
+			// compromise occasionally tags the noun "names" as a verb inside a
+			// comma-separated noun list (e.g. "email addresses, names, bank
+			// account numbers") or after a noun-modifier (e.g. "domain names
+			// only"). Skip.
+			(isNounListItem(prev) || isNameNounModifier(prev))
+		) {
+			continue
+		}
+
+		matches.push(termMatch(term))
 	}
 
 	return matches

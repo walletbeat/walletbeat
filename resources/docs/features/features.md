@@ -129,7 +129,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 A set of features for any software wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a sentinel string or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletSoftwareFeatures = WalletBaseFeatures & {
@@ -208,7 +208,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 A set of features for any hardware wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a sentinel string or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletHardwareFeatures = WalletBaseFeatures & {
@@ -242,7 +242,7 @@ type WalletHardwareFeatures = WalletBaseFeatures & {
 
 A set of features for any embedded wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a sentinel string or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a `NO_*` sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletEmbeddedFeatures = WalletBaseFeatures & {

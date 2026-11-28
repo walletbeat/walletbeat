@@ -93,7 +93,7 @@ Fields in `/data` must be **written down**. When you add a new property to a wal
 Use these three states:
 
 - **`null`** means "we have not researched this yet."
-- **A sentinel with a name** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
+- **A `NO_*` sentinel** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
 - **A concrete value** means "we know what it is."
 
 This is why searching `/data` for `null` finds incomplete research. Omitted fields are invisible.
