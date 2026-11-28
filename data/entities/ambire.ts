@@ -27,9 +27,7 @@ export const ambireEntity: OffchainDataProvider &
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/adex-03c2',
 	farcaster: 'https://warpcast.com/ambirewallet',
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'Bulgaria',
 	linkedin: 'https://www.linkedin.com/company/ambiretech',
 	privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf',

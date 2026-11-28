@@ -17,9 +17,7 @@ export const gridplus: CorporateEntity & WalletDeveloper = {
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/gridplus',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'svg',
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'United States',
 	linkedin: 'https://www.linkedin.com/company/gridplus/',
 	privacyPolicy: 'https://gridplus.io/policies/privacy-policy',

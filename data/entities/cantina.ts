@@ -17,11 +17,7 @@ export const cantina: CorporateEntity & SecurityAuditor = {
 	},
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: 'NO_ICON',
 	jurisdiction: 'United States',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: 'https://cantina.xyz/privacy-policy',

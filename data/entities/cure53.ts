@@ -19,8 +19,8 @@ export const cure53: CorporateEntity & SecurityAuditor = {
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: {
 		extension: 'png',
-		height: 136,
-		width: 137,
+		height: 137,
+		width: 136,
 	},
 	jurisdiction: 'Berlin, Germany',
 	linkedin: 'https://www.linkedin.com/company/cure53',
