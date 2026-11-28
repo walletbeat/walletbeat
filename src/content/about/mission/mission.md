@@ -1,6 +1,10 @@
 ---
 title: About Walletbeat
 description: 'Describes Walletbeat as a project: the vision, the mission, project objectives and commitments.'
+listTitle: 'Mission / Values'
+shortTitle: 'Mission / Values'
+icon: 'free_and_open_source_license'
+order: 1
 ---
 
 # About Walletbeat
@@ -61,7 +65,7 @@ This means its evaluation criteria methodology is applied consistently _across_ 
 **This does not mean Walletbeat is neutral**. Walletbeat is opinionated in its decision of _which_ criteria to use.
 Walletbeat aims to follow Ethereum's ethos and cypherpunk values as a guiding principle.
 See [Vitalik Buterin's blog post on wallets](https://vitalik.eth.limo/general/2024/12/03/wallets.html)
-and the [Walletbeat FAQ page](../faq/) for more details.
+and the [Walletbeat FAQ page](/src/pages/about/faq/) for more details.
 
 ## Commitment to transparency
 

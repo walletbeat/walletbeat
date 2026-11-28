@@ -281,6 +281,48 @@ pre {
 	font-size: 0.875em;
 }
 
+:where(pre:has(> code)) {
+	min-inline-size: 0;
+	max-inline-size: 100%;
+	overflow: auto;
+	overflow-wrap: normal;
+	padding: 0.75em 1em;
+	border-radius: 0.5em;
+	background-color: var(--background-secondary);
+	font-size: 0.875em;
+	line-height: 1.6;
+	scrollbar-width: thin;
+}
+
+[data-scroll-container~="inline"]:has(> table) {
+	scrollbar-width: thin;
+
+	&::-webkit-scrollbar {
+		display: initial;
+	}
+}
+
+:where([data-scroll-container~="inline"] > table) {
+	inline-size: 100%;
+	border-collapse: collapse;
+	overflow-wrap: normal;
+
+	:not(pre) > code {
+		overflow-wrap: normal;
+	}
+
+	:where(th, td) {
+		padding: 0.5em 0.75em;
+		border: var(--separator-width) solid var(--border-color);
+		vertical-align: top;
+	}
+
+	:where(th) {
+		background-color: var(--background-secondary);
+		white-space: nowrap;
+	}
+}
+
 h1,
 h2,
 h3,
@@ -290,4 +332,8 @@ h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
 	overflow-wrap: break-word;
+
+	* + &:not(:where([data-row], summary) *) {
+		margin-block-start: 0.5em;
+	}
 }

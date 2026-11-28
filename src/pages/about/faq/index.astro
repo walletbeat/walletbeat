@@ -185,7 +185,7 @@ const frequentlyAskedQuestions = [
 	},
 	{
 		anchor: 'score-computation',
-		question: "How are wallets' score computed?",
+		question: "How is each wallet's score computed?",
 		answer: markdown(`
 			Scores are computed as a weighted average of all the criteria that go
 			into assessing wallets.
@@ -266,7 +266,12 @@ import { defaultNavigationItems } from '@/constants/navigation'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-column='gap-8'
+		style='--scrollItem-inlineDetached-maxSize: 70ch;'
+	>
 		<header id='top' data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-2'>
 				<h1>Frequently Asked Questions</h1>
@@ -274,15 +279,15 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			</hgroup>
 		</header>
 
-		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
+		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-6'>
 			{frequentlyAskedQuestions.map(entry => (
-				<details id={entry.anchor} data-card='padding-5 radius-4'>
-					<summary>
-						<h4>{entry.question}</h4>
+				<details id={entry.anchor} data-card='padding-5'>
+					<summary style='--collapsible-markerAxis: z;'>
+						<h2>{entry.question}</h2>
 					</summary>
 
 					<div data-column='gap-5'>
-						<Typography client:visible content={entry.answer} />
+						<Typography content={entry.answer} />
 					</div>
 				</details>
 			))}
@@ -291,69 +296,8 @@ import { defaultNavigationItems } from '@/constants/navigation'
 </Layout>
 
 <style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-paddingStart: 4.5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-	}
-
-	hgroup p {
-		color: var(--text-secondary);
-		font-size: 1rem;
-	}
-
-	details[data-card] {
-		border: var(--separator-width) solid var(--border-color);
-
-		summary {
-			list-style: none;
-
-			&::-webkit-details-marker {
-				display: none;
-			}
-
-			/* Pin the design-system chevron so it cannot fall back to a border-drawn one. */
-			&::after {
-				content: '';
-				flex-shrink: 0;
-				inline-size: 0.75em;
-				block-size: 1lh;
-				border: none;
-				background-color: currentColor;
-				mask: var(--icon-chevron) no-repeat center / contain;
-				-webkit-mask: var(--icon-chevron) no-repeat center / contain;
-				opacity: 0.66;
-				transform: rotate(0deg);
-				transition-property: transform;
-				transition-duration: 0.2s;
-			}
-
-			h4 {
-				font-size: 1.2rem;
-				font-weight: 600;
-				line-height: 1.4;
-			}
-		}
-
-		&[open] > summary {
-			border-block-end: var(--separator-width) solid var(--border-color);
-
-			&::after {
-				transform: rotate(180deg);
-			}
-		}
-
-		> div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
-		}
+	details > div {
+		line-height: 1.6;
+		overflow-wrap: anywhere;
 	}
 </style>

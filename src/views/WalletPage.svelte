@@ -1020,7 +1020,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 			<div class="pie-navigation-geometry">
 				<NavigationItems
 				{destinationState}
-					items={pieNavigationItems}
+					groups={[pieNavigationItems]}
 					showLabels={false}
 					showSearch={false}
 					defaultOpen
@@ -1054,7 +1054,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 		>
 			<NavigationItems
 				{destinationState}
-				items={attributeNavigationItems}
+				groups={[attributeNavigationItems]}
 				showSearch={false}
 				defaultOpen
 				afterLabelSnippet={navigationBadgeSnippet}

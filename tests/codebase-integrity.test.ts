@@ -521,15 +521,13 @@ describe('codebase integrity', () => {
 			/^\d{4}-\d{2}-\d{2} - [-\w ]+(\.[a-z0-9]+)*$/, // 'YYYY-MM-DD - Something'
 		]
 
+		/** Astro route parameters use the same lower-case or camelCase names inside brackets. */
+		const DYNAMIC_ROUTE_COMPONENT_REGEX =
+			/^\[(?:\.\.\.)?[a-z][a-zA-Z0-9]*\](?:\.\[[a-z][a-zA-Z0-9]*\])*(?:\.[a-z0-9]+)*$/
+
 		/** Path components that are exempt from the check. */
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
-			'[attrGroupId].astro',
-			'[eip].astro',
-			'[walletName]',
-			'[...slug]',
-			'[...path].[ext].ts',
-			'_about.md',
 			'APPEND_SYSTEM.md',
 		])
 
@@ -546,7 +544,10 @@ describe('codebase integrity', () => {
 				const components = entry.path.split('/')
 
 				for (const component of components) {
-					if (PATH_COMPONENT_WHITELIST.has(component)) {
+					if (
+						PATH_COMPONENT_WHITELIST.has(component) ||
+						(entry.path.startsWith('src/pages/') && DYNAMIC_ROUTE_COMPONENT_REGEX.test(component))
+					) {
 						continue
 					}
 

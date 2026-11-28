@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { githubBlobUrl } from '@/constants/github'
 import { getRepositoryRoot } from '@/utils/codebase'
-import { isNonPublishedRepoPath, rewriteUrl } from '@/utils/satteri-url-rewrite-plugin'
+import {
+	githubInRepoPath,
+	isNonPublishedRepoPath,
+	rewriteUrl,
+} from '@/utils/satteri-url-rewrite-plugin'
 
 describe('rewriteUrl', () => {
 	it('strips a markdown filename for a matched collection mapping', () => {
@@ -12,6 +16,13 @@ describe('rewriteUrl', () => {
 		).toEqual({ url: '/docs/wallet-testing/data-collection/', matched: true })
 	})
 
+	it('maps root-level Markdown to its own page', () => {
+		expect(rewriteUrl('/resources/docs/css-attribute-authoring.md', '/')).toEqual({
+			url: '/docs/css-attribute-authoring/',
+			matched: true,
+		})
+	})
+
 	it('strips a markdown filename for a governance mapping', () => {
 		expect(rewriteUrl('/governance/roadmap/2026/2026-roadmap.md', '/')).toEqual({
 			url: '/governance/roadmap/2026/',
@@ -19,9 +30,25 @@ describe('rewriteUrl', () => {
 		})
 	})
 
-	it('maps a src/pages markdown file to its site route', () => {
-		expect(rewriteUrl('/src/pages/about/_about.md', '/')).toEqual({
-			url: '/about/',
+	it('maps About Markdown to its collection route', () => {
+		expect(rewriteUrl('/src/content/about/mission/mission.md', '/')).toEqual({
+			url: '/about/mission/',
+			matched: true,
+		})
+	})
+
+	it('preserves query string and fragment when rewriting', () => {
+		expect(
+			rewriteUrl(
+				'/resources/docs/wallet-testing/data-collection/data-collection.md?x=1#section',
+				'/',
+			),
+		).toEqual({ url: '/docs/wallet-testing/data-collection/?x=1#section', matched: true })
+	})
+
+	it('maps an Astro page directory to its site route', () => {
+		expect(rewriteUrl('/src/pages/about/faq/', '/')).toEqual({
+			url: '/about/faq/',
 			matched: true,
 		})
 	})
@@ -64,7 +91,7 @@ describe('rewriteUrl', () => {
 		})
 	})
 
-	it('keeps query strings and hashes on a stripped markdown link', () => {
+	it('keeps an authored section link on a rendered Markdown page', () => {
 		expect(
 			rewriteUrl(
 				'/resources/docs/wallet-testing/l1-provider-independence/l1-provider-independence.md#step-2-create-a-dedicated-browser-or-device-for-wallet-testing',
@@ -169,5 +196,53 @@ describe('isNonPublishedRepoPath', () => {
 
 	it('allows an asset served from public/', () => {
 		expect(isNonPublishedRepoPath('/logo.svg', repoRoot)).toBe(false)
+	})
+})
+
+describe('githubInRepoPath', () => {
+	const repoRoot = getRepositoryRoot()
+
+	it('extracts the path from a blob URL with a single-segment branch', () => {
+		expect(
+			githubInRepoPath(
+				'https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md',
+				repoRoot,
+			),
+		).toBe('/resources/docs/impact/impact.md')
+	})
+
+	it('extracts the path from a tree URL', () => {
+		expect(
+			githubInRepoPath(
+				'https://github.com/walletbeat/walletbeat/tree/beta/resources/talks',
+				repoRoot,
+			),
+		).toBe('/resources/talks')
+	})
+
+	it('extracts the path when the branch itself contains slashes', () => {
+		expect(
+			githubInRepoPath(
+				'https://github.com/walletbeat/walletbeat/blob/feature/docs/resources/docs/impact/impact.md',
+				repoRoot,
+			),
+		).toBe('/resources/docs/impact/impact.md')
+	})
+
+	it('retains a section anchor on the extracted path', () => {
+		expect(
+			githubInRepoPath(
+				'https://github.com/walletbeat/walletbeat/blob/master/governance/treasury/treasury-transparency.md#L10',
+				repoRoot,
+			),
+		).toBe('/governance/treasury/treasury-transparency.md#L10')
+	})
+
+	it('returns null for a non-blob/tree GitHub URL', () => {
+		expect(githubInRepoPath('https://github.com/walletbeat/walletbeat', repoRoot)).toBe(null)
+	})
+
+	it('returns null for a non-GitHub URL', () => {
+		expect(githubInRepoPath('https://beta.walletbeat.eth.limo/about/', repoRoot)).toBe(null)
 	})
 })

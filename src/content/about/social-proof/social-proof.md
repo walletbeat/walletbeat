@@ -1,6 +1,10 @@
 ---
 title: 'Walletbeat wall of love'
 description: "A log of positive social media mentions as a result of Walletbeat's actions or existence."
+listTitle: 'Wall of love'
+shortTitle: 'Wall of love'
+icon: 'contribute'
+order: 4
 ---
 
 - https://x.com/SCBuergel/status/2054251881916961048

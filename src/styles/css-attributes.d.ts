@@ -83,6 +83,7 @@ declare global {
 		 *
 		 * ### CSS Variables
 		 * - `--collapsible-summaryPaddingBlock`: block-axis padding on the native summary of a card disclosure; configure on the summary, defaults to `--card-padding`; inline and body padding retain the card value
+		 * - `--collapsible-markerAxis`: axis of the disclosure chevron rotation, defaults to `x`; configure on the summary for an independently oriented marker.
 		 * - `--collapsible-markerInlineTimeline`: local marker measurement clock; inherited from the nearest identified disclosure or breadcrumb scope, with an explicit local override for repeated anonymous owners
 		 * - `--collapsible-markerMotion`: `clearance` enables caller-configured motion at the actual native marker owner and closed breadcrumb end clusters; open end clusters retain their arrival motion
 		 * - `--collapsible-markerClearanceRadius`, `--collapsible-markerClearanceCenterInline`, `--collapsible-markerClearanceCenterBlock`: obstacle ink radius and logical viewport center; the native marker owns its measured inline end and line height

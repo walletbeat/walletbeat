@@ -1,0 +1,101 @@
+---
+import { render } from 'astro:content'
+import type { InferGetStaticPropsType } from 'astro'
+
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import { collectionPages, flattenCollectionPages } from '@/utils/collection-utils'
+import Navigation from '@/views/Navigation.astro'
+import ChevronRight from 'lucide-static/icons/chevron-right.svg?raw'
+
+export const getStaticPaths = () =>
+	collectionPages
+		.flatMap(flattenCollectionPages)
+		.filter(page => page.source.kind !== 'static')
+		.map(page => ({
+			params: { collection: page.collection, slug: page.slug || undefined },
+			props: { page },
+		}))
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>
+const { page } = Astro.props
+const Content = page.source.kind === 'markdown' ? (await render(page.source.entry)).Content : null
+---
+
+<Layout metadata={page.metadata}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-column='gap-8'
+		style='--scrollItem-inlineDetached-maxSize: 70ch;'
+	>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1 id={Content ? 'page-title' : undefined}>{page.metadata.title}</h1>
+				{page.metadata.description && <p>{page.metadata.description}</p>}
+			</hgroup>
+		</header>
+		{Content ? (
+			<article
+				aria-labelledby='page-title'
+				data-scroll-item='inline-detached padding-match-end'
+				data-column='gap-4'
+			>
+				<Content />
+			</article>
+		) : (
+			<ul
+				data-scroll-item='inline-detached padding-match-end'
+				data-list='unstyled'
+				data-row='wrap gap-6'
+				style='align-items: stretch;'
+			>
+				{page.children.map(({ href, listTitle, metadata: { description } }) => (
+					<li data-column data-row-item='flexible basis-3'>
+						<a
+							{href}
+							data-column-item='flexible'
+							data-link='camouflaged'
+							data-card='secondary padding-5'
+							data-row='align-start gap-2'
+						>
+							<div data-row-item='flexible' data-column='start gap-4'>
+								<h2>{listTitle}</h2>
+								{description && <p>{description}</p>}
+							</div>
+							<span data-icon aria-hidden='true' set:html={ChevronRight} />
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
+	</main>
+</Layout>
+
+<style>
+	li a {
+		h2 {
+			font: inherit;
+		}
+
+		p {
+			font-weight: 400;
+		}
+	}
+
+	article {
+		line-height: 1.6;
+		overflow-wrap: anywhere;
+
+		:global(:where(img, video)) {
+			max-inline-size: 100%;
+			block-size: auto;
+		}
+
+		:global(blockquote) {
+			padding-inline-start: 1em;
+			border-inline-start: var(--separator-width) solid var(--border-color);
+		}
+	}
+</style>
