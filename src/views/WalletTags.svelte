@@ -3,6 +3,7 @@
 	import EipDetails from '@/views/EipDetails.svelte'
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
+	import { eipShortLabel } from '@/schema/eips'
 	import { AccountType } from '@/schema/features/account-support'
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { hasVariant, Variant } from '@/schema/variants'
@@ -85,7 +86,11 @@
 		{/if}
 	{/snippet}
 	{#if 'eipTooltipContent' in tag && tag.eipTooltipContent}
-		<Tooltip placement="inline-end" buttonTriggerPlacement={onFilter ? 'behind' : 'around'}>
+		<Tooltip
+			placement="inline-end"
+			buttonTriggerPlacement={onFilter ? 'behind' : 'around'}
+			ariaLabel={`${eipShortLabel(tag.eipTooltipContent)} details`}
+		>
 			{@render Tag()}
 			{#snippet TooltipContent()}
 				<div class="eip-tooltip-content"><EipDetails eip={tag.eipTooltipContent} /></div>

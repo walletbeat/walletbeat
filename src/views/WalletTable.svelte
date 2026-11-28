@@ -905,6 +905,7 @@
 						}
 						tooltipButtonTriggerPlacement="behind"
 						tooltipHoverTriggerPlacement="around"
+						tooltipAriaLabel={`${displayName} details`}
 						showAccordionMarker
 						tooltipMaxWidth="20rem"
 					>
