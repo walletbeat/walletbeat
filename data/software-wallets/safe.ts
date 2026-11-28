@@ -422,13 +422,23 @@ export const safe: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'The base build profile sets only the Node version and the build images. It keeps the default install step of the Expo build service.',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15',
+									"Safe builds the mobile app with the Expo build service. The public production build profile does not set `EAS_NO_FROZEN_LOCKFILE`. However, it uses the `production` environment, which also loads private environment variables from Safe's Expo account.",
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L7-L15,L44-L61',
 							},
 							{
 								explanation:
-									'The production build profile extends the base profile and adds no install step. No public workflow forces a locked install for this build.',
-								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/eas.json#L44-L61',
+									'The mobile app uses Expo SDK 55 and React Native 0.83. These versions meet the version condition of the Expo build service for a frozen lockfile.',
+								url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/35070b7353c03fe1007f04b48f58cd0ca2afe00e/apps/mobile/package.json#L97,L122',
+							},
+							{
+								explanation:
+									'The Expo build service uses a frozen lockfile for Expo SDK 53 or newer and React Native 0.79 or newer, but only if `EAS_NO_FROZEN_LOCKFILE` is not set. A private environment variable can set it, so the public build configuration does not decide this.',
+								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/utils/packageManager.ts#L137-L164',
+							},
+							{
+								explanation:
+									'With Yarn 2 or newer, a frozen lockfile install runs `yarn install --immutable`. Otherwise, the install runs `yarn install --no-immutable`, which can change `yarn.lock`. Public evidence does not show that the mobile release build locks its dependencies.',
+								url: 'https://github.com/expo/eas-cli/blob/f4b4f035b04a42618ef0338f84ef621dc5511221/packages/build-tools/src/common/installDependencies.ts#L43-L54',
 							},
 						],
 					}),
