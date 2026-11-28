@@ -3,6 +3,7 @@
 .playwright-cli/
 .pnpm-store/
 data/*-wallets/collection/*
+data/coinspect/checks.json
 data/coinspect/current-reports/
 pnpm-lock.yaml
 resources/files/
