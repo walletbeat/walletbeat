@@ -31,15 +31,13 @@ Install [Node.js 26 LTS](https://nodejs.org/en/download) (26.13.1 or later) befo
 
 3. Browse the site at `http://localhost:4321/`.
 
-4. Run the tests:
+### Verify and sign changes
 
-   ```bash
-   pnpm check:quick # Quick tests only
-   pnpm check:all   # All CI tests
-   pnpm fix         # Automatically fix formatting problems
-   ```
+Run `pnpm fix` to apply formatting and refresh generated files, then run `pnpm check:quick` before each commit. Run `pnpm check:all` when the change is ready. It must pass before completing the task or opening a PR. Investigate failures and resolve them before submission. Some checks refresh tracked outputs such as the image cache. Inspect and include related generated changes.
 
-If you are not familiar with using a terminal, `git`, `pnpm`, or TypeScript development in general, ask your friendly neighborhood LLM to help you out; these can be very helpful in helping you set up the required dependencies. Note that you need to [sign your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key) in order to pass CI, i.e. your git `commit.gpgsign` setting needs to be set to `true` and you should have a valid SSH or GPG key set up for commits. If you use GitHub, ensure to [add it to your GitHub profile](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) to get the "Verified" commit badge.
+Use `.cspell.json` for valid spelling exceptions. For changes to grammar rules in `tests/utils/grammar.ts`, fix affected site content in the same change. Install tools such as Inkscape when required by the checks for your change.
+
+CI requires every commit to be signed. Set `commit.gpgsign` to `true` and configure a valid SSH or GPG key. [Configure commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key).
 
 ### Contribution workflow
 
@@ -47,7 +45,7 @@ At a high-level, any type of contribution to Walletbeat goes like this:
 
 - Clone the repository locally and install dependencies (see above).
 - Make your desired changes; use `pnpm dev` to preview, `pnpm check:quick` to run tests.
-- Once done, verify that your work is complete and passes tests by running `pnpm check:all`. If it does not, fix that first.
+- Follow the [authoring principles](../authoring/authoring.md) and [verification steps](#verify-and-sign-changes).
 - Create a fork of the Walletbeat repository under your own GitHub account. You can do this by pressing the "Fork" button on the [Walletbeat GitHub repository page](https://github.com/walletbeat/walletbeat)
 - Create a new branch in your local clone of the repository. For example: `git checkout -b my-cool-pr`
 - Commit your changes to the branch. For example: `git add -p` (to review your changes), then `git commit -m 'Make cool changes to Walletbeat.'`
@@ -59,7 +57,7 @@ _Need more help?_: For more help on creating PRs, check out [GitHub's own guide]
 After sending a PR, a Walletbeat contributor should soon review your changes. If there are problems (test failures, invalid data, etc.), your PR may need further work. You can update your PR by pushing additional changes to the same branch. Follow this workflow:
 
 - Make the requested changes in your editor.
-- Rerun all tests: `pnpm check:all`. If they do not pass, fix that first.
+- Repeat [verification](#verify-and-sign-changes).
 - Commit your changes: `git add -p` then `git commit -m 'Some more fixes'`
 - Upload your changes to GitHub: `git push`
 - Write a comment on the PR to explain your fixes and to notify your reviewer that they need to take another look at your PR.

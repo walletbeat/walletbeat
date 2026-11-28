@@ -342,6 +342,14 @@ export async function grammarLintMessages(
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
 	const extractedProse = extractProse(trimmedText, lintOptions?.language)
+	// Frontmatter names are machine identifiers; descriptions remain prose.
+	const frontmatterName =
+		lintOptions?.language === 'markdown'
+			? /^---\r?\n(?:(?!---\r?\n)[^\n]*\n)*?name:[ \t]*([^\r\n]+)(?=\r?\n)/.exec(trimmedText)
+			: null
+	const nameStart = frontmatterName
+		? frontmatterName.index + frontmatterName[0].lastIndexOf(frontmatterName[1])
+		: -1
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
@@ -365,6 +373,11 @@ export async function grammarLintMessages(
 				const { start, end } = lint.span()
 
 				return (
+					!(
+						frontmatterName &&
+						start >= nameStart &&
+						start < nameStart + frontmatterName[1].length
+					) &&
 					!extractedProse.excludedRanges.some(range => start >= range.start && start < range.end) &&
 					!overlapsAnyRange(start, end, cspellRanges) &&
 					!overlapsAnyRange(start, end, githubLabelRanges) &&

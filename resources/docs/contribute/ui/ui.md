@@ -5,7 +5,7 @@ description: "Explains how to contribute to Walletbeat's UI code."
 
 # Walletbeat UI development guide
 
-_Not complete yet!_
+Read the [authoring principles](../authoring/authoring.md) and the [CSS attribute guide](https://walletbeat.eth.limo/docs/css-attribute-authoring/) before making UI changes.
 
 ## Custom UI components for attributes
 

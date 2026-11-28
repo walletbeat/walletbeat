@@ -172,12 +172,7 @@ export const softwareWallets = {
 
 ### Step C.4 — Verify the setup
 
-Once Steps C.1–C.3 are complete, run:
-
-```bash
-pnpm lint         # Fix formatting
-pnpm check:all    # Check for errors
-```
+Once Steps C.1–C.3 are complete, follow the [contributor verification steps](../../../resources/docs/contribute/setup/setup.md#verify-and-sign-changes).
 
 Help the contributor interpret and fix any TypeScript or lint errors. Common issues:
 
