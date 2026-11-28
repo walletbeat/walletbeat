@@ -54,12 +54,13 @@
 	} from '@/schema/attribute-groups'
 	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
-	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
+	import { slugifyCamelCase } from '@/types/utils/text'
 	import { setItems } from '@/types/utils/non-empty'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
+	import { renderTypographicContentToPlainText } from '@/utils/markdown-utils'
 	import { allCriteriaInStage, getAttributeStagesForWallet, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
@@ -788,28 +789,14 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 							)
 							.map(({ attribute }) => ({
 								'@type': 'Question',
-								name: renderStrings(
-									attribute.question.contentType === ContentType.MARKDOWN
-										? attribute.question.markdown
-										: attribute.question.contentType === ContentType.TEXT
-											? attribute.question.text
-											: attribute.displayName,
-									{
-										WALLET_NAME: wallet.metadata.displayName,
-									},
-								),
+								name: renderTypographicContentToPlainText(attribute.question, {
+									WALLET_NAME: wallet.metadata.displayName,
+								}),
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: renderStrings(
-										attribute.why.contentType === ContentType.MARKDOWN
-											? attribute.why.markdown
-											: attribute.why.contentType === ContentType.TEXT
-												? attribute.why.text
-												: 'No explanation available',
-										{
-											WALLET_NAME: wallet.metadata.displayName,
-										},
-									),
+									text: renderTypographicContentToPlainText(attribute.why, {
+										WALLET_NAME: wallet.metadata.displayName,
+									}),
 								},
 							})),
 					)

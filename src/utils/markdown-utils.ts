@@ -1,4 +1,4 @@
-import { parse, postprocess, preprocess } from 'micromark'
+import { micromark, parse, postprocess, preprocess } from 'micromark'
 
 import { stringHasPrefix } from '@/types/utils/text'
 
@@ -7,6 +7,8 @@ import {
 	type Frontmatter,
 	type MarkdownContent,
 	type MarkdownContentWithFrontmatter,
+	prerenderTypographicContent,
+	type TypographicContent,
 } from '../types/content'
 import type { Strings } from '../types/utils/string-templates'
 
@@ -248,6 +250,54 @@ export function collapseToSingleLine(text: string): string {
 	}
 
 	return trimmed.replace(/\s+/g, ' ')
+}
+
+const htmlBlockEndRegExp = /<\/(?:p|li|h[1-6]|blockquote|pre)>|<br \/>|<hr \/>/g
+
+/** The only character references that micromark writes in its HTML output. */
+const micromarkCharacterReferences: Record<string, string> = {
+	amp: '&',
+	gt: '>',
+	lt: '<',
+	quot: '"',
+}
+
+/**
+ * Render Markdown to the plain text that a reader of the rendered HTML sees.
+ * Link text is kept; link destinations, emphasis markers, code delimiters and
+ * other Markdown syntax are dropped. Each block (paragraph, list item,
+ * heading) goes on its own line.
+ * Useful where HTML cannot be used, such as structured data for search engines.
+ */
+export function markdownToPlainText(markdown: string): string {
+	return micromark(markdown, { allowDangerousHtml: false })
+		.replace(/[ \t]*\n[ \t]*/g, ' ')
+		.replace(htmlBlockEndRegExp, '\n')
+		.replace(/<[^>]*>/g, '')
+		.replace(/&(amp|gt|lt|quot);/g, (_match, name: string) => micromarkCharacterReferences[name])
+		.split('\n')
+		.map(line => line.trim())
+		.filter(line => line !== '')
+		.join('\n')
+}
+
+/**
+ * Render typographic content with the given template strings to plain text.
+ * Markdown content goes through `markdownToPlainText`. Text content has its
+ * whitespace collapsed, the same way HTML displays it.
+ */
+export function renderTypographicContentToPlainText<_Strings extends Strings = null>(
+	content: TypographicContent<_Strings>,
+	strings: _Strings,
+): string {
+	const rendered = prerenderTypographicContent(content, strings)
+
+	switch (rendered.contentType) {
+		case ContentType.TEXT:
+			return rendered.text.replace(/[ \t\r\n]+/g, ' ').trim()
+		case ContentType.MARKDOWN:
+			return markdownToPlainText(rendered.markdown)
+	}
 }
 
 /**
