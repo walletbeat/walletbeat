@@ -77,6 +77,7 @@ interface CleanImageEntry {
  */
 const UNJUSTIFIED_BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-07-14 - Clear signing update/walletbeat_slide.jpg',
+	'resources/files/social-media/threads/2026-10-16 - Ecosystem Deep Dive/crops_for_users.png',
 	'resources/files/social-media/threads/2026-10-18 - Walletbeat Contribute Workshop/matt_picture.jpg',
 	'resources/files/social-media/threads/2026-10-23 - Web3Privacy Panel/polymutex_cypherpunk_congress_2026.jpg',
 	'public/images/entities/firefly.jpg',
