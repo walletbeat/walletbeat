@@ -1,3 +1,5 @@
+import { stripEipMagicUrls } from '@/schema/eips'
+
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
@@ -180,7 +182,7 @@ function typographicContentToPlainString(rendered: TypographicContent<null>): st
 		case ContentType.TEXT:
 			return rendered.text
 		case ContentType.MARKDOWN:
-			return rendered.markdown
+			return stripEipMagicUrls(rendered.markdown)
 		default:
 			return assertNever(rendered)
 	}
