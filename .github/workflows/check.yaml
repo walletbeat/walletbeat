@@ -14,7 +14,7 @@ on:
 
 concurrency:
   group: check-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check-quick:
@@ -39,24 +39,28 @@ jobs:
           - name: 'Build: Astro'
             command: pnpm run check:build:post:quiet
           - name: Commit signature
-            command: pnpm run check:signed-commit
+            command: bash tests/signed-commit.test.sh
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
       - name: Install packages
+        if: matrix.name != 'Commit signature'
         run: |
           sudo apt-get update
           sudo apt-get install -y $(cat deploy/debian-packages.txt)
         env:
           DEBIAN_FRONTEND: noninteractive
       - name: Install pnpm
+        if: matrix.name != 'Commit signature'
         uses: pnpm/action-setup@v6.1.1
       - name: Install Node.js
+        if: matrix.name != 'Commit signature'
         uses: actions/setup-node@v7.1.0
         with:
           node-version: 26
           cache: pnpm
       - name: Install dependencies
+        if: matrix.name != 'Commit signature'
         run: pnpm install --frozen-lockfile
       - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
