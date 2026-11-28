@@ -51,12 +51,7 @@ export const casberi: SoftwareWallet = {
 			delegation: null,
 		},
 		integration: {
-			browser: {
-				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
-			},
+			browser: 'NOT_A_BROWSER_WALLET',
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
