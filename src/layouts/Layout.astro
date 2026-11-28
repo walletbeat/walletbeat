@@ -22,9 +22,16 @@ type Props = {
 	 * Only enable on pages that render complex icons above the fold.
 	 */
 	preloadComplexIcons?: boolean
+	/** Preload SP Monorium when it renders above the fold. */
+	preloadSpMonorium?: boolean
 }
 
-const { metadata, rewriteUrlTo, preloadComplexIcons = false } = Astro.props
+const {
+	metadata,
+	rewriteUrlTo,
+	preloadComplexIcons = false,
+	preloadSpMonorium = false,
+} = Astro.props
 
 // Components
 import Metadata from '@/layouts/Metadata.astro'
@@ -41,6 +48,7 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
+		<Font cssVariable='--fontFamily-spMonorium' preload={preloadSpMonorium} />
 		<Font cssVariable='--fontFamily-wbicons-complex' preload={preloadComplexIcons} />
 		<Font cssVariable='--fontFamily-wbicons-simple' preload />
 		<Font cssVariable='--fontFamily-avenir' preload />
