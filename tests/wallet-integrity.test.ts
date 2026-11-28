@@ -12,11 +12,13 @@ import { getExtensionId } from '@/schema/extension-url'
 import { resolveFeatures } from '@/schema/features'
 import { isSupported } from '@/schema/features/support'
 import { validateFeeDisplay } from '@/schema/features/transparency/fee-display'
+import { isNoRef, refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { BaseWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
+import { assertCalendarDate, dateCompare, today } from '@/types/date'
 import { getErrorMessage } from '@/types/errors'
 import { getRepositoryRoot } from '@/utils/codebase'
 import { toKebabCase } from '@/utils/kebab'
@@ -121,6 +123,20 @@ describe('wallets', () => {
 					).not.toThrow()
 				}
 			})
+
+			const { discontinued } = wallet.metadata
+
+			if (discontinued !== undefined) {
+				it('cites a source for being discontinued', () => {
+					expect(isNoRef(discontinued.ref)).toBe(false)
+					expect(refs(discontinued).flatMap(ref => ref.urls).length).toBeGreaterThan(0)
+				})
+
+				it('has a discontinuation date that is not in the future', () => {
+					expect(() => assertCalendarDate(discontinued.date)).not.toThrow()
+					expect(dateCompare(discontinued.date, today())).toBeLessThanOrEqual(0)
+				})
+			}
 
 			it('has consistent fee displays for each variant', () => {
 				for (const variant of Object.values(Variant)) {
