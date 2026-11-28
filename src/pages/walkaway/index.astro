@@ -1,0 +1,47 @@
+---
+import { defaultNavigationItems } from '@/constants/navigation'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
+import Layout from '@/layouts/Layout.astro'
+import { evaluateWalletOnWalkawayTest } from '@/schema/walkaway'
+import { softwareWalletWalkawayTest } from '@/schema/walkaway/software-wallet-walkaway'
+import { getWalletUrl } from '@/utils/urls'
+import Navigation from '@/views/Navigation.astro'
+import WalkawayPage, { type WalkawayPageWallet } from '@/views/WalkawayPage.svelte'
+
+import { Content, frontmatter } from './walkaway.md'
+
+const wallets = Object.values(ratedSoftwareWallets).flatMap((wallet): WalkawayPageWallet[] => {
+	const evaluation = evaluateWalletOnWalkawayTest(wallet, softwareWalletWalkawayTest)
+
+	if (evaluation === 'NOT_APPLICABLE') {
+		return []
+	}
+
+	return [
+		{
+			id: wallet.metadata.id,
+			displayName: wallet.metadata.displayName,
+			href: getWalletUrl(wallet),
+			iconSrc: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+			result: evaluation.result,
+			criteria: evaluation.criteria,
+		},
+	]
+})
+---
+
+<Layout
+	metadata={{
+		title: `${frontmatter.title} - Walletbeat`,
+		description: frontmatter.description,
+		keywordsAfter: ['walkaway test', 'self-sovereignty', 'criteria', 'evaluation'],
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible' data-sticky-container>
+		<WalkawayPage {wallets}>
+			<Content />
+		</WalkawayPage>
+	</main>
+</Layout>

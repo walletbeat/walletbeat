@@ -3,6 +3,7 @@ import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
 import { allWalletLadders, type Ladders, WalletLadderType } from '@/schema/ladders'
 import {
 	getEvaluateFunctionAttributeId,
+	type StageCriterionEvaluation,
 	StageCriterionRating,
 	type StageEvaluatableWallet,
 	type WalletStage,
@@ -58,7 +59,15 @@ export function computeCountsAndStatus<_AttributeGroupId extends string>(
 	criteria: WalletStageCriterion<_AttributeGroupId>[],
 	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 ): StageCountsAndStatus {
-	const allEvaluations = criteria.map(criterion => criterion.evaluate(wallet))
+	return countsAndStatusOfEvaluations(criteria.map(criterion => criterion.evaluate(wallet)))
+}
+
+/**
+ * Same as `computeCountsAndStatus`, for criteria that were already evaluated.
+ */
+export function countsAndStatusOfEvaluations(
+	allEvaluations: StageCriterionEvaluation[],
+): StageCountsAndStatus {
 	const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)
 	const passedCount = applicableEvaluations.filter(
 		e => e.rating === StageCriterionRating.PASS,

@@ -57,6 +57,7 @@
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { setItems } from '@/types/utils/non-empty'
 	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletWalkawayEvaluation } from '@/utils/walkaway'
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
@@ -441,6 +442,8 @@
 
 	const primaryStage = $derived(getWalletStageAndLadder(wallet))
 
+	const walkawayEvaluation = $derived(showStage ? getWalletWalkawayEvaluation(wallet) : 'NOT_APPLICABLE')
+
 	const evalTree = $derived(
 		((selectedVariant && wallet.variants[selectedVariant]?.attributes) ||
 			wallet.overall) satisfies EvaluationTree<_AttributeGroupId>,
@@ -761,6 +764,7 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
+	import WalletWalkawayBadge from '@/views/WalletWalkawayBadge.svelte'
 	import WalletTags from '@/views/WalletTags.svelte'
 	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
@@ -951,6 +955,10 @@ const root = document.currentScript.closest('astro-island').querySelector('#top'
 					{/each}
 				{:else if primaryStage.ladderEvaluation !== null}
 					<WalletStageBadge stage={primaryStage.stage} ladderEvaluation={primaryStage.ladderEvaluation} size="large" href={primaryStage.stage && typeof primaryStage.stage === 'object' ? `#${primaryStage.stage.id}` : '#stages'} />
+				{/if}
+
+				{#if walkawayEvaluation !== 'NOT_APPLICABLE'}
+					<WalletWalkawayBadge evaluation={walkawayEvaluation} size="large" />
 				{/if}
 			{/if}
 
