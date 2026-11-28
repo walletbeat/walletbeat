@@ -2438,8 +2438,9 @@ Keys handling data is not visible in the wallet UI — it must be determined fro
 
 ### Enum: `EthereumL1LightClient`
 
-Known Ethereum L1 light client implementations a wallet may embed. Sometimes visible in the UI, but more reliably identified by checking the wallet's documentation for light client claims, or by searching the source code for imports of helios or similar libraries.
+Known Ethereum L1 light client implementations a wallet may embed. Sometimes visible in the UI, but more reliably identified by checking the wallet's documentation for light client claims, or by searching the source code for imports of helios, colibri, or similar libraries.
 
+- `colibri` = `'colibri'`: Colibri: a fully verifying, stateless Ethereum light client.
 - `helios` = `'helios'`: Helios: a fast, trustless Ethereum light client written in Rust.
 - `heliosMobi` = `'heliosMobi'`: Helios-Mobi: a mobile-optimized port of Helios.
 
